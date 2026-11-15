@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Discrete Probability</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Conditioning</p>
       <h1>Conditional Probability</h1>
       <p class="lesson-lede">Restricting the sample space to what you now know.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Conditioning restricts the space</li><li>The two conditionals are different numbers</li><li>The multiplication rule chains</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Conditioning</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Conditional probability</span><p>For events <span class="math" data-say="A">A</span>, <span class="math" data-say="B">B</span> with <span class="math" data-say="P of B is greater than 0">P(B) &gt; 0</span>, <span class="math" data-say="P of A given B equals P of A intersect B over P of B">P(A | B) = P(A ∩ B) / P(B)</span>.</p></div><p>In the equally-likely model this is transparent: <span class="math" data-say="P of A the size of B equals the quantity, A intersect B the absolute value of over, S the absolute value of, over the quantity, B the absolute value of over, S the absolute value of, equals, A intersect B the absolute value of over, B">P(A|B) = (|A ∩ B|/|S|)/(|B|/|S|) = |A ∩ B|/|B|</span>. The outcomes outside <span class="math" data-say="B">B</span> have been discarded, and <span class="math" data-say="B">B</span> is now the sample space.</p><div class="thm"><span class="label">Theorem &middot; Conditional probability is a probability</span><p>For fixed <span class="math" data-say="B">B</span> with <span class="math" data-say="P of B is greater than 0">P(B) &gt; 0</span>, the function <span class="math" data-say="A maps to P of A given B">A ↦ P(A|B)</span> satisfies all three axioms. So every theorem about probability holds for conditional probability too.</p></div><div class="thm"><span class="label">Theorem &middot; Multiplication rule</span><p><span class="math" data-say="P of A intersect B equals P of A the size of B P of B equals P of B, A P of A">P(A ∩ B) = P(A|B)P(B) = P(B|A)P(A)</span>, and more generally <span class="math" data-say="P of A sub 1 intersect and so on intersect A sub n equals P of A sub 1 P of A sub 2 the size of A sub 1 P of A sub 3, A sub 1 intersect A sub 2 and so on">P(A₁ ∩ ⋯ ∩ A_n) = P(A₁)P(A₂|A₁)P(A₃|A₁∩A₂)⋯</span>.</p></div><div class="example"><span class="label">Example &middot; Sequential draws</span><p>Two cards from a deck without replacement. <span class="math" data-say="P of both aces equals P of first ace times P of second ace given first ace equals the quantity 4 over 52, times the quantity 3 over 51, equals 1 over 221">P(both aces) = P(first ace) · P(second ace | first ace) = (4/52)(3/51) = 1/221</span>. Conditioning is exactly what handles "without replacement": the second probability changes because the first draw changed the deck.</p></div><h3>The two conditionals are different</h3><div class="example"><span class="label">Example &middot; Dice</span><p>Roll two dice. <span class="math" data-say="P of sum is 7 given first die is 4 equals 1 over 6">P(sum is 7 | first die is 4) = 1/6</span>, since among the six outcomes with a 4 first, exactly one has sum 7. But <span class="math" data-say="P of first die is 4 given sum is 7 equals 1 over 6">P(first die is 4 | sum is 7) = 1/6</span> too &mdash; a coincidence arising from symmetry, not a rule.</p></div><div class="example"><span class="label">Example &middot; Where they differ wildly</span><p><span class="math" data-say="P of is a mammal given is a dog equals 1">P(is a mammal | is a dog) = 1</span>, while <span class="math" data-say="P of is a dog given is a mammal">P(is a dog | is a mammal)</span> is small. The two conditionals share a numerator <span class="math" data-say="P of A intersect B">P(A ∩ B)</span> and have different denominators, and the ratio of the denominators is exactly how much they differ.</p></div><h3>The Monty Hall problem</h3><p>Three doors, a prize behind one. You pick door 1. The host, who knows where the prize is, opens a different door with no prize behind it &mdash; say door 3 &mdash; and offers you a switch. Should you?</p><div class="mathblock" data-say="prize behind, your choice, host must open, switching wins ?. door 1, door 1, door 2 or 3, NO. door 2, door 1, door 3, YES. door 3, door 1, door 2, YES. Each row has probability 1 over 3, so switching wins with probability 2 over 3" tabindex="0" role="region" aria-label="Mathematical notation">prize behind  your choice  host must open   switching wins?
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Conditioning</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Conditional probability</span><p>For events <span class="math" data-say="A">A</span>, <span class="math" data-say="B">B</span> with <span class="math" data-say="P of B is greater than 0">P(B) &gt; 0</span>, <span class="math" data-say="P of A given B equals P of A intersect B over P of B">P(A | B) = P(A ∩ B) / P(B)</span>.</p></div><p>In the equally-likely model this is transparent: <span class="math" data-say="P of A the size of B equals the quantity, A intersect B the absolute value of over, S the absolute value of, over the quantity, B the absolute value of over, S the absolute value of, equals, A intersect B the absolute value of over, B">P(A|B) = (|A ∩ B|/|S|)/(|B|/|S|) = |A ∩ B|/|B|</span>. The outcomes outside <span class="math" data-say="B">B</span> have been discarded, and <span class="math" data-say="B">B</span> is now the sample space.</p><div class="thm"><span class="label">Theorem &middot; Conditional probability is a probability</span><p>For fixed <span class="math" data-say="B">B</span> with <span class="math" data-say="P of B is greater than 0">P(B) &gt; 0</span>, the function <span class="math" data-say="A maps to P of A given B">A ↦ P(A|B)</span> satisfies all three axioms. So every theorem about probability holds for conditional probability too.</p></div><div class="thm"><span class="label">Theorem &middot; Multiplication rule</span><p><span class="math" data-say="P of A intersect B equals P of A the size of B P of B equals P of B, A P of A">P(A ∩ B) = P(A|B)P(B) = P(B|A)P(A)</span>, and more generally <span class="math" data-say="P of A sub 1 intersect and so on intersect A sub n equals P of A sub 1 P of A sub 2 the size of A sub 1 P of A sub 3, A sub 1 intersect A sub 2 and so on">P(A₁ ∩ ⋯ ∩ A_n) = P(A₁)P(A₂|A₁)P(A₃|A₁∩A₂)⋯</span>.</p></div><div class="example"><span class="label">Example &middot; Sequential draws</span><p>Two cards from a deck without replacement. <span class="math" data-say="P of both aces equals P of first ace times P of second ace given first ace equals the quantity 4 over 52, times the quantity 3 over 51, equals 1 over 221">P(both aces) = P(first ace) · P(second ace | first ace) = (4/52)(3/51) = 1/221</span>. Conditioning is exactly what handles "without replacement": the second probability changes because the first draw changed the deck.</p></div><h3>The two conditionals are different</h3><div class="example"><span class="label">Example &middot; Dice</span><p>Roll two dice. <span class="math" data-say="P of sum is 7 given first die is 4 equals 1 over 6">P(sum is 7 | first die is 4) = 1/6</span>, since among the six outcomes with a 4 first, exactly one has sum 7. But <span class="math" data-say="P of first die is 4 given sum is 7 equals 1 over 6">P(first die is 4 | sum is 7) = 1/6</span> too &mdash; a coincidence arising from symmetry, not a rule.</p></div><div class="example"><span class="label">Example &middot; Where they differ wildly</span><p><span class="math" data-say="P of is a mammal given is a dog equals 1">P(is a mammal | is a dog) = 1</span>, while <span class="math" data-say="P of is a dog given is a mammal">P(is a dog | is a mammal)</span> is small. The two conditionals share a numerator <span class="math" data-say="P of A intersect B">P(A ∩ B)</span> and have different denominators, and the ratio of the denominators is exactly how much they differ.</p></div><h3>The Monty Hall problem</h3><p>Three doors, a prize behind one. You pick door 1. The host, who knows where the prize is, opens a different door with no prize behind it &mdash; say door 3 &mdash; and offers you a switch. Should you?</p><div class="mathblock" data-say="prize behind, your choice, host must open, switching wins ?. door 1, door 1, door 2 or 3, NO. door 2, door 1, door 3, YES. door 3, door 1, door 2, YES. Each row has probability 1 over 3, so switching wins with probability 2 over 3" tabindex="0" role="region" aria-label="Mathematical notation">prize behind  your choice  host must open   switching wins?
    door 1        door 1     door 2 or 3          NO
    door 2        door 1     door 3              YES
    door 3        door 1     door 2              YES
 
-Each row has probability 1/3, so switching wins with probability 2/3.</div><p>The step people miss is that the host's action is not random: he <em>knows</em> and is constrained to open a losing door. That constraint is information, and conditioning on it is what makes switching better. If the host opened a door at random and it happened to be empty, the answer would be <span class="math" data-say="1 over 2">1/2</span> &mdash; a different problem with the same picture.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Sample space, event, condition</h2></div><p>Exact fractions, every outcome listed</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+Each row has probability 1/3, so switching wins with probability 2/3.</div><p>The step people miss is that the host's action is not random: he <em>knows</em> and is constrained to open a losing door. That constraint is information, and conditioning on it is what makes switching better. If the host opened a door at random and it happened to be empty, the answer would be <span class="math" data-say="1 over 2">1/2</span> &mdash; a different problem with the same picture.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Sample space, event, condition</h2></div><p>Exact fractions, every outcome listed</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="prExp">Sample space</strong><span id="prCount"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>in A</span><span class="tone-purple"><i class="legend-swatch"></i>in B</span><span class="tone-green"><i class="legend-swatch"></i>in both</span></div>
@@ -1409,10 +1452,10 @@ Each row has probability 1/3, so switching wins with probability 2/3.</div><p>Th
       <div class="lab-stage"><div id="prSpace"></div></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="prTable"></table></div>
       <div class="status-banner" id="prStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Conditioning, visibly</h3>
-          <p>Event B is the condition, and the table shows <span class="math" data-say="P of A given B">P(A|B)</span> as the count in both divided by the count in B &mdash; the restricted sample space, not the original. A = sum is 7 and B = the first die is 4 is the dice example in the body: B holds in 6 of the 36 chips and A in one of those, <span class="math" data-say="4, 3">(4,3)</span>, so <span class="math" data-say="P of A given B equals 1 over 6">P(A|B) = 1/6</span>. Now switch B to "at least one 6": the numerator is two chips, <span class="math" data-say="1, 6">(1,6)</span> and <span class="math" data-say="6, 1">(6,1)</span>, but <span class="math" data-say="P of A given B equals 2 over 11">P(A|B) = 2/11</span> while <span class="math" data-say="P of B given A equals 2 over 6 equals 1 over 3">P(B|A) = 2/6 = 1/3</span> &mdash; same numerator, different denominators, and the ratio of the two answers is <span class="math" data-say="P of A over P of B equals 6 over 11">P(A)/P(B) = 6/11</span>, which is “Bayes' Theorem”'s theorem before it is stated.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Conditioning, visibly</h3>
+            <p>Event B is the condition, and the table shows <span class="math" data-say="P of A given B">P(A|B)</span> as the count in both divided by the count in B &mdash; the restricted sample space, not the original. A = sum is 7 and B = the first die is 4 is the dice example in the body: B holds in 6 of the 36 chips and A in one of those, <span class="math" data-say="4, 3">(4,3)</span>, so <span class="math" data-say="P of A given B equals 1 over 6">P(A|B) = 1/6</span>. Now switch B to "at least one 6": the numerator is two chips, <span class="math" data-say="1, 6">(1,6)</span> and <span class="math" data-say="6, 1">(6,1)</span>, but <span class="math" data-say="P of A given B equals 2 over 11">P(A|B) = 2/11</span> while <span class="math" data-say="P of B given A equals 2 over 6 equals 1 over 3">P(B|A) = 2/6 = 1/3</span> &mdash; same numerator, different denominators, and the ratio of the two answers is <span class="math" data-say="P of A over P of B equals 6 over 11">P(A)/P(B) = 6/11</span>, which is “Bayes' Theorem”'s theorem before it is stated.</p>
         <div class="field">
           <label for="prExperiment">Experiment</label>
           <select id="prExperiment">
@@ -1435,12 +1478,14 @@ Each row has probability 1/3, so switching wins with probability 2/3.</div><p>Th
           <div class="kpi"><span>P(B)</span><strong id="prPB">&mdash;</strong></div>
           <div class="kpi"><span>P(A|B)</span><strong id="prPAB">&mdash;</strong></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Conditioning correctly</h2></div><p>Say which event is the condition, out loud.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Identify the conditioning event</h3><p><span class="math" data-say="P of A given B">P(A|B)</span> conditions on <span class="math" data-say="B">B</span>. Writing the sentence "given that <span class="math" data-say="B">B</span> happened" prevents the swap.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Restrict the sample space</h3><p>In the equally-likely model, count within <span class="math" data-say="B">B</span>. The denominator changes and the numerator becomes <span class="math" data-say="the size of A intersect B">|A ∩ B|</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Use the multiplication rule for sequences</h3><p>Each draw conditions on the previous ones. Without replacement, the denominators shrink.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Ask whether you wanted the other conditional</h3><p>The two are related by Bayes, which is “Bayes' Theorem”. Computing the wrong one is the most consequential error in this course.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Conditioning correctly</h2>
+      <p class="lead-in">Say which event is the condition, out loud.</p>
+      <ol class="key-ideas method"><li><strong>Identify the conditioning event.</strong> <span class="math" data-say="P of A given B">P(A|B)</span> conditions on <span class="math" data-say="B">B</span>. Writing the sentence "given that <span class="math" data-say="B">B</span> happened" prevents the swap.</li><li><strong>Restrict the sample space.</strong> In the equally-likely model, count within <span class="math" data-say="B">B</span>. The denominator changes and the numerator becomes <span class="math" data-say="the size of A intersect B">|A ∩ B|</span>.</li><li><strong>Use the multiplication rule for sequences.</strong> Each draw conditions on the previous ones. Without replacement, the denominators shrink.</li><li><strong>Ask whether you wanted the other conditional.</strong> The two are related by Bayes, which is “Bayes' Theorem”. Computing the wrong one is the most consequential error in this course.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1466,17 +1511,16 @@ Each row has probability 1/3, so switching wins with probability 2/3.</div><p>Th
 Same family, two different pieces of information, two answers.</div><p>The difference is real and not a trick: "at least one is a boy" and "the elder is a boy" restrict the sample space to sets of different sizes. Almost every disputed probability puzzle turns out to be an ambiguity about which restriction was intended.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Swapping the two conditionals</strong><span><span class="math" data-say="P of A given B">P(A|B)</span> and <span class="math" data-say="P of B given A">P(B|A)</span> are different numbers with the same numerator. “Bayes' Theorem” gives the exact relationship.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Forgetting the denominator changed</strong><span>Conditioning restricts the sample space. Dividing by <span class="math" data-say="the size of S">|S|</span> instead of <span class="math" data-say="the size of B">|B|</span> gives <span class="math" data-say="P of A intersect B">P(A ∩ B)</span>, not <span class="math" data-say="P of A given B">P(A|B)</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Ignoring how the information arrived</strong><span>Monty Hall and the two-child problem both hinge on it. "At least one boy" and "the elder is a boy" are different conditions.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state the restricted sample space.</strong><p>For each conditional probability you compute, write down explicitly which outcomes remain. That sentence catches the swap, the wrong denominator and the ambiguity all at once.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Conditional probability is where probability stops being counting and starts being modelling. The arithmetic never gets harder than division; deciding what to condition on is where the difficulty lives.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Swapping the two conditionals</strong><span><span class="math" data-say="P of A given B">P(A|B)</span> and <span class="math" data-say="P of B given A">P(B|A)</span> are different numbers with the same numerator. “Bayes' Theorem” gives the exact relationship.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Forgetting the denominator changed</strong><span>Conditioning restricts the sample space. Dividing by <span class="math" data-say="the size of S">|S|</span> instead of <span class="math" data-say="the size of B">|B|</span> gives <span class="math" data-say="P of A intersect B">P(A ∩ B)</span>, not <span class="math" data-say="P of A given B">P(A|B)</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Ignoring how the information arrived</strong><span>Monty Hall and the two-child problem both hinge on it. "At least one boy" and "the elder is a boy" are different conditions.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state the restricted sample space.</strong><p>For each conditional probability you compute, write down explicitly which outcomes remain. That sentence catches the swap, the wrong denominator and the ambiguity all at once.</p></div></div><div class="note"><strong>Note:</strong> Conditional probability is where probability stops being counting and starts being modelling. The arithmetic never gets harder than division; deciding what to condition on is where the difficulty lives.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Conditioning restricts the space</summary><p><span class="math" data-say="P of A given B">P(A|B)</span> counts the outcomes in <span class="math" data-say="A">A</span> among those in <span class="math" data-say="B">B</span>. The denominator is <span class="math" data-say="the size of B">|B|</span>, not <span class="math" data-say="the size of S">|S|</span>.</p></details><details class="recall"><summary>The two conditionals are different numbers</summary><p><span class="math" data-say="P of test positive given disease">P(test positive | disease)</span> and <span class="math" data-say="P of disease given test positive">P(disease | test positive)</span> differ by the base rate, often by orders of magnitude.</p></details><details class="recall"><summary>The multiplication rule chains</summary><p><span class="math" data-say="P of A intersect B intersect C equals P of A P of B the size of A P of C, A intersect B">P(A ∩ B ∩ C) = P(A)P(B|A)P(C|A∩B)</span> &mdash; useful for sequential draws, where each step conditions on the previous ones.</p></details></div>
+      <h3>Summary</h3>
       <p><span class="math" data-say="P of A given B equals P of A intersect B over P of B">P(A | B) = P(A ∩ B)/P(B)</span> is not a new axiom: it is the original counting restricted to the outcomes where <span class="math" data-say="B">B</span> holds. The traps are all about which of <span class="math" data-say="P of A given B">P(A|B)</span> and <span class="math" data-say="P of B given A">P(B|A)</span> you have computed.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Conditioning restricts the space.</strong> <span class="math" data-say="P of A given B">P(A|B)</span> counts the outcomes in <span class="math" data-say="A">A</span> among those in <span class="math" data-say="B">B</span>. The denominator is <span class="math" data-say="the size of B">|B|</span>, not <span class="math" data-say="the size of S">|S|</span>.</li><li><strong>The two conditionals are different numbers.</strong> <span class="math" data-say="P of test positive given disease">P(test positive | disease)</span> and <span class="math" data-say="P of disease given test positive">P(disease | test positive)</span> differ by the base rate, often by orders of magnitude.</li><li><strong>The multiplication rule chains.</strong> <span class="math" data-say="P of A intersect B intersect C equals P of A P of B the size of A P of C, A intersect B">P(A ∩ B ∩ C) = P(A)P(B|A)P(C|A∩B)</span> &mdash; useful for sequential draws, where each step conditions on the previous ones.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="P of A given B equals P of A intersect B over P of B, requires P of B is greater than 0. P of A intersect B equals P of A given B times P of B, the multiplication rule. P of A given B is not equal to P of B given A, in general. conditioning SHRINKS the sample space to B" tabindex="0" role="region" aria-label="Mathematical notation">P(A | B) = P(A ∩ B) / P(B)        requires P(B) &gt; 0
 P(A ∩ B) = P(A | B) · P(B)        the multiplication rule
 P(A | B) ≠ P(B | A)               in general
@@ -1995,11 +2039,42 @@ conditioning SHRINKS the sample space to B</div><figcaption>A smaller sample spa
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2067,7 +2142,7 @@ conditioning SHRINKS the sample space to B</div><figcaption>A smaller sample spa
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

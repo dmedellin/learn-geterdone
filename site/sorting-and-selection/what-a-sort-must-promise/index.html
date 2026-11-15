@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Sorting and Selection</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The four promises</p>
       <h1>What a Sort Must Promise</h1>
       <p class="lesson-lede">Classify four sorts on four promises, then sort records on two keys by stable passes in the right order.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Stability is a claim about equal keys only</li><li>In place and adaptive are different promises again</li><li>A stable sort composes, and that is what it is for</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Four promises, and which of them a complexity class implies</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Stable sort</span><p>A sorting algorithm is <strong>stable</strong> if, whenever two input records have equal keys, the one that appeared earlier in the input also appears earlier in the output. The property is about the algorithm, for every input, not about one run of it.</p></div><p>Equal keys are the only records the definition talks about. A sort that gets the order of unequal keys wrong is not unstable; it is broken. So stability can only be observed on a list with repeats, and it is observed by carrying something the key does not determine &mdash; here the input position, called a tag.</p><div class="example"><span class="label">Example &middot; Selection sort caught on eight keys</span><p>Tag the list <span class="math" data-say="7 3 7 1 9 3 5 1">7 3 7 1 9 3 5 1</span> by position, so the records are <span class="math" data-say="7 number 1 3 number 2 7 number 3 1 number 4 9 number 5 3 number 6 5 number 7 1 number 8">7#1 3#2 7#3 1#4 9#5 3#6 5#7 1#8</span>. Insertion sort returns <span class="math" data-say="1 number 4 1 number 8 3 number 2 3 number 6 5 number 7 7 number 1 7 number 3 9 number 5">1#4 1#8 3#2 3#6 5#7 7#1 7#3 9#5</span> and merge sort returns the same. Selection sort returns <span class="math" data-say="1 number 4 1 number 8 3 number 6 3 number 2 5 number 7 7 number 3 7 number 1 9 number 5">1#4 1#8 3#6 3#2 5#7 7#3 7#1 9#5</span>: the threes and the sevens have each come out reversed. Two pairs out of input order, and the question is settled.</p></div><p>That asymmetry is worth being explicit about. One reordered pair refutes stability, because stability is a claim about every input and a counterexample is enough to kill one. Zero reordered pairs on one list establishes nothing at all: there are <span class="math" data-say="8 factorial equals 40320">8! = 40 320</span> lists of that length and this was one. Stability is proved from the algorithm &mdash; insertion sort never moves an element past an equal one, and merge sort's merge takes from the left run when the heads are equal &mdash; never from a measurement.</p><div class="defbox"><span class="label">Definition &middot; In place, and adaptive</span><p>An algorithm sorts <strong>in place</strong> if it uses <span class="math" data-say="theta of 1">Θ(1)</span> memory beyond the array it is given. It is <strong>adaptive</strong> if its cost falls as its input gets closer to sorted, measured in whatever way the analysis names: number of inversions, or number of already ordered runs.</p></div><p>These two cut across stability and across the complexity class. Merge sort is stable, not in place, not adaptive in its standard form. Heapsort is in place, not stable, not adaptive. Insertion sort is stable, in place and adaptive, and quadratic. Nothing in <span class="math" data-say="theta of n times log n">Θ(n log n)</span> implies any of the three, which is why the promise a situation needs has to be named before an algorithm is chosen.</p><h3>The fourth promise is about what the algorithm is allowed to look at</h3><p>A <strong>comparison sort</strong> may only ask, of two keys, whether one is at most the other. Every sort above is one. Discrete Mathematics' &ldquo;Searching and Sorting&rdquo; proves that no such algorithm can sort every array of <span class="math" data-say="n">n</span> keys in fewer than <span class="math" data-say="the ceiling of log base 2 n factorial">⌈log₂ n!⌉</span> comparisons, and that bound is cited throughout this course and reproved nowhere in it. A sort that reads the key itself &mdash; its digits, its value as an array index &mdash; is outside the bound rather than better than it, which is what &ldquo;Counting Sort&rdquo; is about.</p><div class="thm"><span class="label">Theorem &middot; Two stable passes sort on two keys</span><p>Let a list be sorted by a stable pass on the minor key and then by a stable pass on the major key. The result is in increasing order of major key, and within each run of equal major keys, in increasing order of minor key.</p></div><div class="proof"><p>The second pass orders the major keys, which gives the first claim.</p><p>Take two records with equal major keys. The second pass is stable, so it leaves them in the order it found them, which is the order the first pass left them in. The first pass ordered the whole list by minor key, so of those two the smaller minor key came first. Both claims hold, and the only property of the second pass that was used is its stability.</p><p><span class="qed">&#9633;</span></p></div><p>Read that proof backwards and the misconception dissolves. If the major pass runs first, the minor pass afterwards is the one ordering the whole list, and what survives inside its ties is the major order &mdash; so the output is sorted by minor key, with major keys as a tie-break. That is a correct sort of a different thing. The lab runs both orders on the same eight records and prints the two sequences.</p><p>This composition is not a curiosity: it is the whole correctness argument of radix sort, which is <span class="math" data-say="d">d</span> stable passes, one per digit, least significant first. &ldquo;Radix Sort&rdquo; makes each pass unstable on demand and lets the composition fall apart in front of you.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Stability is a promise about equal keys</h2></div><p>Tag every record with where it started, then watch which sorts keep the order</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Four promises, and which of them a complexity class implies</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Stable sort</span><p>A sorting algorithm is <strong>stable</strong> if, whenever two input records have equal keys, the one that appeared earlier in the input also appears earlier in the output. The property is about the algorithm, for every input, not about one run of it.</p></div><p>Equal keys are the only records the definition talks about. A sort that gets the order of unequal keys wrong is not unstable; it is broken. So stability can only be observed on a list with repeats, and it is observed by carrying something the key does not determine &mdash; here the input position, called a tag.</p><div class="example"><span class="label">Example &middot; Selection sort caught on eight keys</span><p>Tag the list <span class="math" data-say="7 3 7 1 9 3 5 1">7 3 7 1 9 3 5 1</span> by position, so the records are <span class="math" data-say="7 number 1 3 number 2 7 number 3 1 number 4 9 number 5 3 number 6 5 number 7 1 number 8">7#1 3#2 7#3 1#4 9#5 3#6 5#7 1#8</span>. Insertion sort returns <span class="math" data-say="1 number 4 1 number 8 3 number 2 3 number 6 5 number 7 7 number 1 7 number 3 9 number 5">1#4 1#8 3#2 3#6 5#7 7#1 7#3 9#5</span> and merge sort returns the same. Selection sort returns <span class="math" data-say="1 number 4 1 number 8 3 number 6 3 number 2 5 number 7 7 number 3 7 number 1 9 number 5">1#4 1#8 3#6 3#2 5#7 7#3 7#1 9#5</span>: the threes and the sevens have each come out reversed. Two pairs out of input order, and the question is settled.</p></div><p>That asymmetry is worth being explicit about. One reordered pair refutes stability, because stability is a claim about every input and a counterexample is enough to kill one. Zero reordered pairs on one list establishes nothing at all: there are <span class="math" data-say="8 factorial equals 40320">8! = 40 320</span> lists of that length and this was one. Stability is proved from the algorithm &mdash; insertion sort never moves an element past an equal one, and merge sort's merge takes from the left run when the heads are equal &mdash; never from a measurement.</p><div class="defbox"><span class="label">Definition &middot; In place, and adaptive</span><p>An algorithm sorts <strong>in place</strong> if it uses <span class="math" data-say="theta of 1">Θ(1)</span> memory beyond the array it is given. It is <strong>adaptive</strong> if its cost falls as its input gets closer to sorted, measured in whatever way the analysis names: number of inversions, or number of already ordered runs.</p></div><p>These two cut across stability and across the complexity class. Merge sort is stable, not in place, not adaptive in its standard form. Heapsort is in place, not stable, not adaptive. Insertion sort is stable, in place and adaptive, and quadratic. Nothing in <span class="math" data-say="theta of n times log n">Θ(n log n)</span> implies any of the three, which is why the promise a situation needs has to be named before an algorithm is chosen.</p><h3>The fourth promise is about what the algorithm is allowed to look at</h3><p>A <strong>comparison sort</strong> may only ask, of two keys, whether one is at most the other. Every sort above is one. Discrete Mathematics' &ldquo;Searching and Sorting&rdquo; proves that no such algorithm can sort every array of <span class="math" data-say="n">n</span> keys in fewer than <span class="math" data-say="the ceiling of log base 2 n factorial">⌈log₂ n!⌉</span> comparisons, and that bound is cited throughout this course and reproved nowhere in it. A sort that reads the key itself &mdash; its digits, its value as an array index &mdash; is outside the bound rather than better than it, which is what &ldquo;Counting Sort&rdquo; is about.</p><div class="thm"><span class="label">Theorem &middot; Two stable passes sort on two keys</span><p>Let a list be sorted by a stable pass on the minor key and then by a stable pass on the major key. The result is in increasing order of major key, and within each run of equal major keys, in increasing order of minor key.</p></div><div class="proof"><p>The second pass orders the major keys, which gives the first claim.</p><p>Take two records with equal major keys. The second pass is stable, so it leaves them in the order it found them, which is the order the first pass left them in. The first pass ordered the whole list by minor key, so of those two the smaller minor key came first. Both claims hold, and the only property of the second pass that was used is its stability.</p><p><span class="qed">&#9633;</span></p></div><p>Read that proof backwards and the misconception dissolves. If the major pass runs first, the minor pass afterwards is the one ordering the whole list, and what survives inside its ties is the major order &mdash; so the output is sorted by minor key, with major keys as a tie-break. That is a correct sort of a different thing. The lab runs both orders on the same eight records and prints the two sequences.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Stability is a promise about equal keys</h2></div><p>Tag every record with where it started, then watch which sorts keep the order</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Four promises, one of them visible</strong><span>equal keys carry their input position, so a reordering shows</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>input order kept</span><span class="tone-red"><i class="legend-swatch"></i>equal keys reordered</span><span class="tone-muted"><i class="legend-swatch"></i>key value</span></div>
@@ -1404,10 +1447,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="stPlot" viewBox="0 0 660 190" role="img" aria-label="Records before and after the sort, each carrying the position it started in."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="stTable"></table></div>
       <div class="status-banner" id="stStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Choose the list and the algorithm</h3>
-          <p>Every record carries the position it was typed in, so a reordering of equal keys is seen rather than claimed. The lower panel sorts eight two-key records by two stable passes, in both orders, and prints both results.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Choose the list and the algorithm</h3>
+            <p>Every record carries the position it was typed in, so a reordering of equal keys is seen rather than claimed. The lower panel sorts eight two-key records by two stable passes, in both orders, and prints both results.</p>
         <div class="field">
           <label for="stKeys">Keys (equal keys are the interesting ones)</label>
           <input id="stKeys" type="text" value="7, 3, 7, 1, 9, 3, 5, 1" inputmode="text" autocomplete="off">
@@ -1427,12 +1470,15 @@
           <div class="kpi"><span>Stable on this list</span><strong id="stVerdict">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="stHint" style="margin:0;">A tag is the position a record started in. After a stable sort the tags inside each run of equal keys still ascend; after an unstable one they do not. The second list is sorted on two keys by two stable passes, in both orders.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>This composition is not a curiosity: it is the whole correctness argument of radix sort, which is <span class="math" data-say="d">d</span> stable passes, one per digit, least significant first. &ldquo;Radix Sort&rdquo; makes each pass unstable on demand and lets the composition fall apart in front of you.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Choosing a sort, rather than recalling one</h2></div><p>The promises come before the algorithm, and the memory limit is usually what decides.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the promises the situation needs</h3><p>Are there equal keys whose input order carries information? Is there room for another <span class="math" data-say="n">n</span> records? Is the input usually nearly sorted already? Each answer rules algorithms out, and none of them is the question of which sort is fastest.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Tag the records before you sort them</h3><p>Attach the input position to every record. Without a tag, a reordering of equal keys is invisible: the keys come out in the same sequence either way. With one, the output is its own evidence.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read a violation as a refutation, and zero as nothing</h3><p>One pair of equal keys out of input order proves the algorithm is not stable. No such pair proves nothing about the algorithm: it is one list. If you want stability, take it from the algorithm's structure, which the lab's hint states for the two sorts that have it.</p></article><article class="card concept-card"><div class="icon">4</div><h3>For two keys, sort on the least significant first</h3><p>Then each later pass has only to order its own key, because it leaves its own ties alone. Write down which pass you intend to be stable; if a pass is not, the composition has no argument behind it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Choosing a sort, rather than recalling one</h2>
+      <p class="lead-in">The promises come before the algorithm, and the memory limit is usually what decides.</p>
+      <ol class="key-ideas method"><li><strong>Name the promises the situation needs.</strong> Are there equal keys whose input order carries information? Is there room for another <span class="math" data-say="n">n</span> records? Is the input usually nearly sorted already? Each answer rules algorithms out, and none of them is the question of which sort is fastest.</li><li><strong>Tag the records before you sort them.</strong> Attach the input position to every record. Without a tag, a reordering of equal keys is invisible: the keys come out in the same sequence either way. With one, the output is its own evidence.</li><li><strong>Read a violation as a refutation, and zero as nothing.</strong> One pair of equal keys out of input order proves the algorithm is not stable. No such pair proves nothing about the algorithm: it is one list. If you want stability, take it from the algorithm's structure, which the lab's hint states for the two sorts that have it.</li><li><strong>For two keys, sort on the least significant first.</strong> Then each later pass has only to order its own key, because it leaves its own ties alone. Write down which pass you intend to be stable; if a pass is not, the composition has no argument behind it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1462,17 +1508,16 @@ the second sequence is sorted by minor key alone:
 and the major keys 1 3 2 1 3 1 3 2 are in no order at all</div><p>Look at what each pass is responsible for. In the working order, pass 2 is the last word on the major key and pass 1 survives only inside pass 2's ties &mdash; which it does exactly because pass 2 is stable. In the other order, pass 2 is the last word on the minor key, so that is what the output is sorted by.</p><p>The lab's third table row reports whether the two orders happened to agree. On these records they do not. On a list where every major key is distinct they would, and that agreement would be a fact about the list rather than permission to choose the order freely.</p><p>For a faded rehearsal, add the record <span class="math" data-say="2, 10">2:10</span> to the end of the list and predict both outputs before running them. The supplied first move is this: <span class="math" data-say="2, 10">2:10</span> has the smallest minor key on the list, so in the working order it starts the pass-1 sequence &mdash; say where it ends up after pass 2, and then where it ends up under the other order, and check both in the lab.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading stability off the complexity class</strong><span>Two sorts in the same class need not agree about anything except the growth of their worst-case comparison count. Merge sort and heapsort are both <span class="math" data-say="theta of n times log n">Θ(n log n)</span>; one is stable, one is in place, and neither is both. The class is a statement about a count, and stability is a statement about where equal keys end up.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sorting by the primary key first</strong><span>It feels like the important key should be settled first, and it is exactly backwards: the last pass is the one whose order survives across the whole list, so the primary key must be sorted last. The lab runs both orders on the same records, and the wrong one comes out ordered by the key nobody asked to order by.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking zero violations as a proof of stability</strong><span>The lab says &ldquo;no reordering seen&rdquo; rather than &ldquo;stable&rdquo; for a reason. A list on which every sort happens to be stable teaches nothing, and the first list tried when this panel was built was one of those. Separate an equal pair with a smaller key and try again, and take the actual claim from the algorithm.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which promise a situation needs before you name a sort.</strong><p>You should be able to tag a record list, read a stability violation off the output, say why one violation settles the question and zero does not, and order a two-key sort's passes with a reason rather than a preference.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The next four lessons are about one algorithm and one that stands beside it. &ldquo;Partitioning&rdquo; takes the single pass quicksort is built from, and it is worth noticing on the way that the pass is where quicksort's instability comes from: a swap moves an element across the array, past whatever equal keys lie between.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading stability off the complexity class</strong><span>Two sorts in the same class need not agree about anything except the growth of their worst-case comparison count. Merge sort and heapsort are both <span class="math" data-say="theta of n times log n">Θ(n log n)</span>; one is stable, one is in place, and neither is both. The class is a statement about a count, and stability is a statement about where equal keys end up.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sorting by the primary key first</strong><span>It feels like the important key should be settled first, and it is exactly backwards: the last pass is the one whose order survives across the whole list, so the primary key must be sorted last. The lab runs both orders on the same records, and the wrong one comes out ordered by the key nobody asked to order by.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking zero violations as a proof of stability</strong><span>The lab says &ldquo;no reordering seen&rdquo; rather than &ldquo;stable&rdquo; for a reason. A list on which every sort happens to be stable teaches nothing, and the first list tried when this panel was built was one of those. Separate an equal pair with a smaller key and try again, and take the actual claim from the algorithm.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which promise a situation needs before you name a sort.</strong><p>You should be able to tag a record list, read a stability violation off the output, say why one violation settles the question and zero does not, and order a two-key sort's passes with a reason rather than a preference.</p></div></div><div class="note"><strong>Note:</strong> The next four lessons are about one algorithm and one that stands beside it. &ldquo;Partitioning&rdquo; takes the single pass quicksort is built from, and it is worth noticing on the way that the pass is where quicksort's instability comes from: a swap moves an element across the array, past whatever equal keys lie between.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Stability is a claim about equal keys only</summary><p>A sort is <strong>stable</strong> when two records with equal keys come out in the order they went in. Tag every record with the position it started in and the property becomes visible: after a stable sort the tags inside each run of equal keys still ascend. On the list <span class="math" data-say="7 3 7 1 9 3 5 1">7 3 7 1 9 3 5 1</span> insertion sort and merge sort leave every such run alone; selection sort leaves two pairs reversed, because the long-range swap that puts the minimum in place jumps one equal key over its twin.</p></details><details class="recall"><summary>In place and adaptive are different promises again</summary><p><strong>In place</strong> means the extra memory is <span class="math" data-say="theta of 1">Θ(1)</span>, the input array aside &mdash; merge sort's standard form needs <span class="math" data-say="theta of n">Θ(n)</span> and is not. <strong>Adaptive</strong> means already-ordered input costs less: insertion sort is <span class="math" data-say="theta of n">Θ(n)</span> on sorted input and <span class="math" data-say="theta of n squared">Θ(n²)</span> on reversed, and heapsort is <span class="math" data-say="theta of n times log n">Θ(n log n)</span> on both. Each promise is independent of the others and of the complexity class.</p></details><details class="recall"><summary>A stable sort composes, and that is what it is for</summary><p>To order records by a major key with ties broken by a minor key, sort on the minor key and then on the major, both passes stable. The second pass puts the major keys in order; inside each run of equal major keys it changes nothing, so the minor order the first pass established survives. Run the passes the other way and the second pass, which orders by minor key across the whole list, destroys the major order the first one built.</p></details></div>
+      <h3>Summary</h3>
       <p>Order is the least of what a sort is asked for. Three further promises are separate from it and from each other: whether equal keys keep the order they arrived in, whether the extra memory is constant, and whether nearly sorted input is cheaper. None of the three follows from a complexity class, and the first of them is what lets a two-key sort be done as two one-key passes.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Stability is a claim about equal keys only.</strong> A sort is <strong>stable</strong> when two records with equal keys come out in the order they went in. Tag every record with the position it started in and the property becomes visible: after a stable sort the tags inside each run of equal keys still ascend. On the list <span class="math" data-say="7 3 7 1 9 3 5 1">7 3 7 1 9 3 5 1</span> insertion sort and merge sort leave every such run alone; selection sort leaves two pairs reversed, because the long-range swap that puts the minimum in place jumps one equal key over its twin.</li><li><strong>In place and adaptive are different promises again.</strong> <strong>In place</strong> means the extra memory is <span class="math" data-say="theta of 1">Θ(1)</span>, the input array aside &mdash; merge sort's standard form needs <span class="math" data-say="theta of n">Θ(n)</span> and is not. <strong>Adaptive</strong> means already-ordered input costs less: insertion sort is <span class="math" data-say="theta of n">Θ(n)</span> on sorted input and <span class="math" data-say="theta of n squared">Θ(n²)</span> on reversed, and heapsort is <span class="math" data-say="theta of n times log n">Θ(n log n)</span> on both. Each promise is independent of the others and of the complexity class.</li><li><strong>A stable sort composes, and that is what it is for.</strong> To order records by a major key with ties broken by a minor key, sort on the minor key and then on the major, both passes stable. The second pass puts the major keys in order; inside each run of equal major keys it changes nothing, so the minor order the first pass established survives. Run the passes the other way and the second pass, which orders by minor key across the whole list, destroys the major order the first one built.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="stable, equal keys leave in the order they arrived. in place, theta of 1 extra memory, the input aside. adaptive, cheaper on input that is already nearly sorted. comparison, asks only whether A is at most b, key-based reads the key itself. two keys by stable passes, the MINOR key first, then the major" tabindex="0" role="region" aria-label="Mathematical notation">stable       equal keys leave in the order they arrived
 in place     Θ(1) extra memory, the input aside
 adaptive     cheaper on input that is already nearly sorted
@@ -3572,11 +3617,42 @@ two keys by stable passes:   the MINOR key first, then the major</div><figcaptio
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3644,7 +3720,7 @@ two keys by stable passes:   the MINOR key first, then the major</div><figcaptio
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

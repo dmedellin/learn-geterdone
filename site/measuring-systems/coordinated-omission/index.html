@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Measuring Systems</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Biases a measurement adds</p>
       <h1>Coordinated Omission</h1>
       <p class="lesson-lede">Compute the naive and the corrected percentile from one trace with a stall, and say which arrival model each one assumes.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A closed loop stops generating exactly when the system stops responding</li><li>Real arrivals do not wait for you to be ready</li><li>The correction changes the sample, never a measurement</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The requests that were never sent, and where they belong in the sample</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Coordinated omission</span><p><strong>Coordinated omission</strong> is the bias in which a measurement process suspends its own sampling during the events it exists to measure. In a closed-loop load generator, the next request is issued only after the previous reply, so a stall of duration <span class="math" data-say="S">S</span> on a schedule of one request every <span class="math" data-say="I">I</span> suppresses about <span class="math" data-say="S over I">S/I</span> requests &mdash; and every one of them would have been slow.</p></div><p>The name says the important part: the omission is <em>coordinated</em> with the fault. Requests are not dropped at random from the sample, which would be harmless; they are dropped precisely when the system is behaving worst, which is where the percentile you are reporting lives.</p><p>Consider a generator configured to send one request every 10 ms with a healthy service time of 2 ms. It sends a hundred requests and during one of them the service stalls for a full second. The trace it produces is ninety-nine requests at 2 ms and one at 1 000 ms.</p><div class="mathblock" data-say="trace as recorded, 99 times 2 milliseconds, 1 times 1000 milliseconds, n equals 100. naive p 99, rank the ceiling of 0.99 times 100, equals 99 of 100, goes to, 2 milliseconds. schedule during the stall, one request due every 10 milliseconds. requests due inside 1000 milliseconds, not sent, 99. the k-th of them was due at k times 10 milliseconds into the stall and. waited until the stall cleared, 1000 minus 10 k ms. k equals 1 goes to 990 milliseconds, k equals 50 goes to 500 milliseconds, k equals 99 goes to 10 milliseconds. corrected sample, 99 times 2 milliseconds, plus, 990, 980, and so on, 10, plus, 1 times 1000 milliseconds. n equals 199. corrected p 99, rank the ceiling of 0.99 times 199, equals 198 of 199, goes to, 990 milliseconds. 990 divided by 2 equals 495" tabindex="0" role="region" aria-label="Mathematical notation">trace as recorded          99 × 2 ms      1 × 1 000 ms      n = 100
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The requests that were never sent, and where they belong in the sample</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Coordinated omission</span><p><strong>Coordinated omission</strong> is the bias in which a measurement process suspends its own sampling during the events it exists to measure. In a closed-loop load generator, the next request is issued only after the previous reply, so a stall of duration <span class="math" data-say="S">S</span> on a schedule of one request every <span class="math" data-say="I">I</span> suppresses about <span class="math" data-say="S over I">S/I</span> requests &mdash; and every one of them would have been slow.</p></div><p>The name says the important part: the omission is <em>coordinated</em> with the fault. Requests are not dropped at random from the sample, which would be harmless; they are dropped precisely when the system is behaving worst, which is where the percentile you are reporting lives.</p><p>Consider a generator configured to send one request every 10 ms with a healthy service time of 2 ms. It sends a hundred requests and during one of them the service stalls for a full second. The trace it produces is ninety-nine requests at 2 ms and one at 1 000 ms.</p><div class="mathblock" data-say="trace as recorded, 99 times 2 milliseconds, 1 times 1000 milliseconds, n equals 100. naive p 99, rank the ceiling of 0.99 times 100, equals 99 of 100, goes to, 2 milliseconds. schedule during the stall, one request due every 10 milliseconds. requests due inside 1000 milliseconds, not sent, 99. the k-th of them was due at k times 10 milliseconds into the stall and. waited until the stall cleared, 1000 minus 10 k ms. k equals 1 goes to 990 milliseconds, k equals 50 goes to 500 milliseconds, k equals 99 goes to 10 milliseconds. corrected sample, 99 times 2 milliseconds, plus, 990, 980, and so on, 10, plus, 1 times 1000 milliseconds. n equals 199. corrected p 99, rank the ceiling of 0.99 times 199, equals 198 of 199, goes to, 990 milliseconds. 990 divided by 2 equals 495" tabindex="0" role="region" aria-label="Mathematical notation">trace as recorded          99 × 2 ms      1 × 1 000 ms      n = 100
 
 naive p99   rank ⌈0.99×100⌉ = 99 of 100   →   2 ms
 
@@ -1406,12 +1450,11 @@ corrected sample   99 × 2 ms   +   990, 980, …, 10   +   1 × 1 000 ms
 
 corrected p99   rank ⌈0.99×199⌉ = 198 of 199   →   990 ms
 
-990 ÷ 2 = 495</div><p>The naive p99 is 2 ms, which is the healthy service time. That is not a coincidence and it is the signature of the bug: with one slow request in a hundred, rank 99 never reaches it, so the reported 99th percentile is a measurement of the system when nothing was wrong. A report of &ldquo;p99 = 2 ms&rdquo; on a run that contained a one-second outage is arithmetically correct and completely uninformative.</p><p>The median moves too, and the direction is worth noticing: 2 ms naive against 10 ms corrected. A bias that is usually described as a tail problem reaches the middle of the distribution as soon as the stall is long relative to the schedule.</p><div class="thm"><span class="label">Theorem &middot; What the correction assumes</span><p>Imputing the missing requests at their scheduled times is exactly right when arrivals are <strong>open</strong>: generated by a process indifferent to how long the system is taking. It is exactly wrong when arrivals are genuinely <strong>closed</strong> &mdash; a fixed population of clients that each wait for their own reply before acting again, such as a bounded thread pool or a human at a terminal.</p><p>In the closed case the requests really were not made, the users really did wait once, and the naive number is what happened. Applying the correction there double-counts. Deciding which model your workload follows is a modelling judgement the arithmetic cannot make for you, and it is the assumption this page rests on.</p></div><h3>Why more threads is not the fix</h3><p>The usual first reaction is to raise the generator&rsquo;s concurrency: a hundred threads instead of one, so a stall blocks only one of them. It moves the number and it does not remove the bias. Each thread is still a closed loop, each still stops issuing during a stall, and a fault that affects the whole service stalls all of them at once &mdash; which is the case you are trying to measure. What removes the bias is generating requests on a clock rather than on replies, and recording each request&rsquo;s latency from its <em>scheduled</em> start rather than from when a thread got round to sending it.</p><div class="example"><span class="label">Example &middot; Two generators, one service, one stall</span><p>A clock-driven generator issues a request every 10 ms whether or not the last one returned, and timestamps each from its due time. Through the same one-second stall it records a hundred slow requests with waits from 1 000 ms down to 10 ms, and its p99 is 990 ms with no correction applied at all.</p><p>The closed-loop generator records one. The corrected sample above is an after-the-fact reconstruction of what the clock-driven generator would have seen, which is why it lands on the same number: the correction is not a heuristic, it is the missing half of the experiment.</p></div><h3>The same bias outside load testing</h3><p>A monitoring agent that scrapes its own metrics and blocks while the process is stalled omits exactly the samples that matter. So does a client library that records latency only for requests that completed and drops the ones the user abandoned, and so does any dashboard whose denominator quietly excludes timeouts. In each case the sample is missing the events the measurement exists to detect, and in each case the reported number is a true statement about a sample nobody wanted.</p><p>The check is one question: could this measurement have been prevented from being taken by the very fault it is supposed to record? If yes, the number is biased in a direction that flatters, and the size of the bias is what the lab computes.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The requests the load generator never sent</h2></div><p>A stall measured once, and the same stall charged to everyone it delayed</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+990 ÷ 2 = 495</div><p>The naive p99 is 2 ms, which is the healthy service time. That is not a coincidence and it is the signature of the bug: with one slow request in a hundred, rank 99 never reaches it, so the reported 99th percentile is a measurement of the system when nothing was wrong. A report of &ldquo;p99 = 2 ms&rdquo; on a run that contained a one-second outage is arithmetically correct and completely uninformative.</p><p>The median moves too, and the direction is worth noticing: 2 ms naive against 10 ms corrected. A bias that is usually described as a tail problem reaches the middle of the distribution as soon as the stall is long relative to the schedule.</p><div class="thm"><span class="label">Theorem &middot; What the correction assumes</span><p>Imputing the missing requests at their scheduled times is exactly right when arrivals are <strong>open</strong>: generated by a process indifferent to how long the system is taking. It is exactly wrong when arrivals are genuinely <strong>closed</strong> &mdash; a fixed population of clients that each wait for their own reply before acting again, such as a bounded thread pool or a human at a terminal.</p><p>In the closed case the requests really were not made, the users really did wait once, and the naive number is what happened. Applying the correction there double-counts. Deciding which model your workload follows is a modelling judgement the arithmetic cannot make for you, and it is the assumption this page rests on.</p></div><h3>Why more threads is not the fix</h3><p>The usual first reaction is to raise the generator&rsquo;s concurrency: a hundred threads instead of one, so a stall blocks only one of them. It moves the number and it does not remove the bias. Each thread is still a closed loop, each still stops issuing during a stall, and a fault that affects the whole service stalls all of them at once &mdash; which is the case you are trying to measure. What removes the bias is generating requests on a clock rather than on replies, and recording each request&rsquo;s latency from its <em>scheduled</em> start rather than from when a thread got round to sending it.</p><div class="example"><span class="label">Example &middot; Two generators, one service, one stall</span><p>A clock-driven generator issues a request every 10 ms whether or not the last one returned, and timestamps each from its due time. Through the same one-second stall it records a hundred slow requests with waits from 1 000 ms down to 10 ms, and its p99 is 990 ms with no correction applied at all.</p><p>The closed-loop generator records one. The corrected sample above is an after-the-fact reconstruction of what the clock-driven generator would have seen, which is why it lands on the same number: the correction is not a heuristic, it is the missing half of the experiment.</p></div><h3>The same bias outside load testing</h3><p>A monitoring agent that scrapes its own metrics and blocks while the process is stalled omits exactly the samples that matter. So does a client library that records latency only for requests that completed and drops the ones the user abandoned, and so does any dashboard whose denominator quietly excludes timeouts. In each case the sample is missing the events the measurement exists to detect, and in each case the reported number is a true statement about a sample nobody wanted.</p><p>The check is one question: could this measurement have been prevented from being taken by the very fault it is supposed to record? If yes, the number is biased in a direction that flatters, and the size of the bias is what the lab computes.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The requests the load generator never sent</h2></div><p>A stall measured once, and the same stall charged to everyone it delayed</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Coordinated omission</strong><span>the requests a stalled generator never sent, put back at the times they were due</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>requests that were sent</span><span class="tone-red"><i class="legend-swatch"></i>the stall</span><span class="tone-amber"><i class="legend-swatch"></i>imputed requests</span></div>
@@ -1419,10 +1462,10 @@ corrected p99   rank ⌈0.99×199⌉ = 198 of 199   →   990 ms
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="coPlot" viewBox="0 0 660 190" role="img" aria-label="A timeline of scheduled requests, the stall, and the imputed requests drawn at the times the schedule called for."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
       <div class="status-banner" id="coStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the schedule and the stall</h3>
-          <p>The naive column is what the generator recorded and the corrected column is that same recording plus the requests the schedule called for while it was blocked. Both columns are nearest rank on their own sample. Shrink the stall below one scheduled interval and watch the two columns become the same number &mdash; with no requests due inside the stall, there is nothing to put back.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the schedule and the stall</h3>
+            <p>The naive column is what the generator recorded and the corrected column is that same recording plus the requests the schedule called for while it was blocked. Both columns are nearest rank on their own sample. Shrink the stall below one scheduled interval and watch the two columns become the same number &mdash; with no requests due inside the stall, there is nothing to put back.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="coN">Requests the generator sent</label><span class="range-value" id="coNOut">100</span></div>
           <input id="coN" type="range" min="20" max="400" step="10" value="100" />
@@ -1452,12 +1495,14 @@ corrected p99   rank ⌈0.99×199⌉ = 198 of 199   →   990 ms
           <div class="kpi"><span>Ratio, corrected &divide; naive</span><strong id="coRatio">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="coHint" style="margin:0;">A closed-loop generator sends the next request when the last one returns, so while the system is stalled it sends nothing and the stall is measured once. The correction puts back the requests the schedule called for during the stall, each waiting from the moment it was due until the stall cleared.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Correcting a trace for the requests it does not contain</h2></div><p>Before any arithmetic, decide whether the correction applies at all. Steps two to four are mechanical once it does.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide whether your arrivals are open or closed</h3><p>Open means the request rate is set by something outside the system &mdash; users, a queue, a cron fleet &mdash; and does not slow down when the system does. Closed means a fixed population each waiting on its own reply. The correction belongs to the open case only, and applying it to a closed workload overstates the tail.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the intended schedule</h3><p>One request every <span class="math" data-say="I">I</span>, or whatever rate the generator was configured for. This is the piece of information that makes the correction possible: it is not inferred from the trace, it is what you told the generator to do.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the requests due inside each stall, and give each its wait</h3><p>A stall of <span class="math" data-say="S">S</span> starting when a request was due suppresses <span class="math" data-say="the ceiling of S over I, minus 1">⌈S/I⌉ − 1</span> later requests. The <span class="math" data-say="k">k</span>-th is due <span class="math" data-say="k times I">k·I</span> into the stall and waits <span class="math" data-say="S minus k times I">S − k·I</span> until it clears. Add those latencies to the sample; change nothing that was measured.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Recompute the percentile on the enlarged sample</h3><p>Same nearest-rank rule, larger <span class="math" data-say="n">n</span>, so the rank moves too. Report both numbers and the ratio, because the ratio is the finding: a factor of 495 is a statement about the measurement apparatus that the corrected number alone does not convey.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Correcting a trace for the requests it does not contain</h2>
+      <p class="lead-in">Before any arithmetic, decide whether the correction applies at all. Steps two to four are mechanical once it does.</p>
+      <ol class="key-ideas method"><li><strong>Decide whether your arrivals are open or closed.</strong> Open means the request rate is set by something outside the system &mdash; users, a queue, a cron fleet &mdash; and does not slow down when the system does. Closed means a fixed population each waiting on its own reply. The correction belongs to the open case only, and applying it to a closed workload overstates the tail.</li><li><strong>Find the intended schedule.</strong> One request every <span class="math" data-say="I">I</span>, or whatever rate the generator was configured for. This is the piece of information that makes the correction possible: it is not inferred from the trace, it is what you told the generator to do.</li><li><strong>Count the requests due inside each stall, and give each its wait.</strong> A stall of <span class="math" data-say="S">S</span> starting when a request was due suppresses <span class="math" data-say="the ceiling of S over I, minus 1">⌈S/I⌉ − 1</span> later requests. The <span class="math" data-say="k">k</span>-th is due <span class="math" data-say="k times I">k·I</span> into the stall and waits <span class="math" data-say="S minus k times I">S − k·I</span> until it clears. Add those latencies to the sample; change nothing that was measured.</li><li><strong>Recompute the percentile on the enlarged sample.</strong> Same nearest-rank rule, larger <span class="math" data-say="n">n</span>, so the rank moves too. Report both numbers and the ratio, because the ratio is the finding: a factor of 495 is a statement about the measurement apparatus that the corrected number alone does not convey.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1497,17 +1542,16 @@ CORRECTED SAMPLE          n = 100 + 99 = 199
   990 ÷ 2 = 495</div><p>Nothing in the corrected sample was measured twice and nothing was invented. The ninety-nine added entries are the schedule, and the schedule was an input to the experiment. If you object to them you are objecting to the configured request rate, not to the arithmetic.</p><p>The factor of 495 is not a general constant. It is <span class="math" data-say="S over I">S/I</span> scaled by where the ranks land: lengthen the stall and it grows, shorten the scheduled interval and it grows, and take the stall below one interval and it collapses to 1 because no request was due inside it. The lab lets you find the point where the two columns separate.</p><p>For faded practice, set the stall to 200 ms and the interval to 50 ms on the same hundred requests. The supplied first move is that three requests were due inside the stall, at 150, 100 and 50 ms of waiting. Predict both the naive and the corrected p99 before you touch the sliders, then check, and say in one sentence why this trace is so much less alarming than the first.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing the generator saw what users would have seen</strong><span>It saw what a client that politely stops sending during an outage would have seen, which is nobody. The tell is a reported percentile equal to the healthy service time on a run that contained a visible stall: if the p99 and the median are the same number and the maximum is three orders of magnitude away, the sample is missing the requests that were due while the maximum was happening.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Fixing it by adding threads or by discarding the outlier</strong><span>Both make the number prettier. Threads spread the omission across more loops without removing it, and dropping the single slow request removes the only surviving evidence that the stall occurred. The measurement problem is that ninety-nine slow requests are missing, and neither move puts one back.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Applying the correction to a genuinely closed workload</strong><span>A fixed pool of clients that each wait really did experience one delay each, and imputing extra arrivals on top invents load that could not have existed. The correction is a model of open arrivals, it is stated as one, and reporting a corrected percentile without saying which arrival model it assumes is the same failure in the other direction.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “could this fault have suppressed its own measurement?” is a question you ask of every measurement.</strong><p>You should be able to recognise a closed-loop trace from its percentiles, count the requests a stall suppressed from the schedule, give each its imputed wait, recompute the percentile on the enlarged sample, and state whether the workload being measured is open or closed.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The stall in that trace was at least recorded once. A metrics pipeline has a second way of not seeing an event, which is that nothing was sampled while it was happening at all: &ldquo;Scrape Intervals and What They Cannot See&rdquo; computes the probability that a spike lands between two reads, and names the longest spike that can hide entirely.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing the generator saw what users would have seen</strong><span>It saw what a client that politely stops sending during an outage would have seen, which is nobody. The tell is a reported percentile equal to the healthy service time on a run that contained a visible stall: if the p99 and the median are the same number and the maximum is three orders of magnitude away, the sample is missing the requests that were due while the maximum was happening.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Fixing it by adding threads or by discarding the outlier</strong><span>Both make the number prettier. Threads spread the omission across more loops without removing it, and dropping the single slow request removes the only surviving evidence that the stall occurred. The measurement problem is that ninety-nine slow requests are missing, and neither move puts one back.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Applying the correction to a genuinely closed workload</strong><span>A fixed pool of clients that each wait really did experience one delay each, and imputing extra arrivals on top invents load that could not have existed. The correction is a model of open arrivals, it is stated as one, and reporting a corrected percentile without saying which arrival model it assumes is the same failure in the other direction.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “could this fault have suppressed its own measurement?” is a question you ask of every measurement.</strong><p>You should be able to recognise a closed-loop trace from its percentiles, count the requests a stall suppressed from the schedule, give each its imputed wait, recompute the percentile on the enlarged sample, and state whether the workload being measured is open or closed.</p></div></div><div class="note"><strong>Note:</strong> The stall in that trace was at least recorded once. A metrics pipeline has a second way of not seeing an event, which is that nothing was sampled while it was happening at all: &ldquo;Scrape Intervals and What They Cannot See&rdquo; computes the probability that a spike lands between two reads, and names the longest spike that can hide entirely.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A closed loop stops generating exactly when the system stops responding</summary><p>Send a request, wait for the reply, send the next. It is the obvious way to write a load generator and it has a built-in feedback: the slower the system, the less load it receives. During a one-second stall a loop scheduled at 10 ms apart issues no requests at all, so instead of a hundred slow requests the trace contains one, and the other ninety-nine are simply absent from the sample.</p></details><details class="recall"><summary>Real arrivals do not wait for you to be ready</summary><p>Users, upstream services and message queues keep arriving during a stall. The requests the closed loop did not send are requests that would have existed, and each would have waited from the moment it was due until the stall cleared. That is what the correction restores: not an invented distribution, but the schedule the generator itself was configured with.</p></details><details class="recall"><summary>The correction changes the sample, never a measurement</summary><p>Every latency the generator recorded stays exactly as recorded. What is added is one entry per request the schedule called for during the stall, at the wait that request would have experienced. The percentile is then the same nearest-rank rule applied to a larger sample &mdash; the disagreement between 2 ms and 990 ms is a disagreement about which requests existed, not about what a percentile is.</p></details></div>
+      <h3>Summary</h3>
       <p>A closed-loop load generator sends its next request when the last one comes back, so while the system is stalled it sends nothing and the stall is recorded once instead of once per request it delayed. Putting back the requests the schedule called for, each waiting from the moment it was due, moves the p99 of one trace from 2 ms to 990 ms &mdash; a factor of 495 &mdash; without measuring anything new.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A closed loop stops generating exactly when the system stops responding.</strong> Send a request, wait for the reply, send the next. It is the obvious way to write a load generator and it has a built-in feedback: the slower the system, the less load it receives. During a one-second stall a loop scheduled at 10 ms apart issues no requests at all, so instead of a hundred slow requests the trace contains one, and the other ninety-nine are simply absent from the sample.</li><li><strong>Real arrivals do not wait for you to be ready.</strong> Users, upstream services and message queues keep arriving during a stall. The requests the closed loop did not send are requests that would have existed, and each would have waited from the moment it was due until the stall cleared. That is what the correction restores: not an invented distribution, but the schedule the generator itself was configured with.</li><li><strong>The correction changes the sample, never a measurement.</strong> Every latency the generator recorded stays exactly as recorded. What is added is one entry per request the schedule called for during the stall, at the wait that request would have experienced. The percentile is then the same nearest-rank rule applied to a larger sample &mdash; the disagreement between 2 ms and 990 ms is a disagreement about which requests existed, not about what a percentile is.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="closed loop, the next request goes out when the last one returns. A 1000 milliseconds stall on a 10 milliseconds schedule hides 99 requests. naive p 99 equals 2 milliseconds, corrected p 99 equals 990 milliseconds, times 495. the k-th missing request waited, stall minus k times interval. the correction adds no measurement, one stall, charged to all it delayed" tabindex="0" role="region" aria-label="Mathematical notation">closed loop: the next request goes out when the last one returns
 a 1 000 ms stall on a 10 ms schedule hides 99 requests
 naive p99 = 2 ms        corrected p99 = 990 ms        ×495
@@ -2898,11 +2942,42 @@ the correction adds no measurement: one stall, charged to all it delayed</div><f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2970,7 +3045,7 @@ the correction adds no measurement: one stall, charged to all it delayed</div><f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

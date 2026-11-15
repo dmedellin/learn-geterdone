@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,31 +1424,29 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Storage Engines and Indexes</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Durability and layout</p>
       <h1>Working Set and the Page Cache</h1>
       <p class="lesson-lede">Compute the page cache&#x27;s hit rate from memory, dataset and skew, and the disk IOPS the misses leave behind.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The page cache is the cache you already know</li><li>The skew is what makes a small cache worth having</li><li>The number that matters is <span class="math" data-say="the quantity 1 minus h, times reads">(1 − h) × reads</span></li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Pages, skew, and the reads that still reach the disk</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Working set and page-cache hit rate</span><p>The <strong>page cache</strong> holds <span class="math" data-say="C">C</span> pages of a dataset of <span class="math" data-say="N">N</span> pages in memory. Under Zipf popularity with exponent <span class="math" data-say="s">s</span>, the <strong>hit rate</strong> is <span class="math" data-say="h equals H of C and s over H of N and s">h = H(C,s)/H(N,s)</span>, where <span class="math" data-say="H of n and s">H(n,s)</span> is the generalised harmonic number <span class="math" data-say="the sum of 1 over i to the power s">Σ 1/iˢ</span> over <span class="math" data-say="i equals 1 and so on n">i = 1…n</span>.</p><p>The <strong>disk IOPS</strong> the workload leaves is <span class="math" data-say="the quantity 1 minus h, times reads">(1 − h) × reads</span>. At <span class="math" data-say="s equals 0">s = 0</span> the formula collapses to <span class="math" data-say="h equals C over N">h = C/N</span>, and every page is equally likely to be wanted.</p></div><p>Both sizes have to be converted into pages before anything else happens. At an <span class="math" data-say="8 kB">8 kB</span> page a <span class="math" data-say="500 gigabytes">500 GB</span> dataset is <span class="math" data-say="62500000">62 500 000</span> pages and <span class="math" data-say="64 gigabytes">64 GB</span> of memory is <span class="math" data-say="8000000">8 000 000</span> of them, so <span class="math" data-say="C over N equals 12.80 percent">C/N = 12.80%</span>. The formula takes counts, not bytes, and a units error here moves the answer more than the skew does.</p><div class="mathblock" data-say="page 8 kB, dataset 500 gigabytes, to, N equals 62500000 pages. memory, 64 gigabytes, to, C equals, 8000000 pages, C over N equals 12.80 percent. s equals 1, h equals H of 8000000 and 1 over H of 62500000 and 1, is approximately, 88.905 percent, rounded. disk IOPS equals the quantity 1 minus 0.88905, times 20000, is approximately, 2219 a second. s equals 0, h equals C over N equals 16 over 125, equals, 12.800 percent, exact. disk IOPS equals the quantity 1 minus 0.128, times 20000, equals, 17440 a second" tabindex="0" role="region" aria-label="Mathematical notation">page 8 kB     dataset 500 GB  →  N = 62 500 000 pages
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Pages, skew, and the reads that still reach the disk</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Working set and page-cache hit rate</span><p>The <strong>page cache</strong> holds <span class="math" data-say="C">C</span> pages of a dataset of <span class="math" data-say="N">N</span> pages in memory. Under Zipf popularity with exponent <span class="math" data-say="s">s</span>, the <strong>hit rate</strong> is <span class="math" data-say="h equals H of C and s over H of N and s">h = H(C,s)/H(N,s)</span>, where <span class="math" data-say="H of n and s">H(n,s)</span> is the generalised harmonic number <span class="math" data-say="the sum of 1 over i to the power s">Σ 1/iˢ</span> over <span class="math" data-say="i equals 1 and so on n">i = 1…n</span>.</p><p>The <strong>disk IOPS</strong> the workload leaves is <span class="math" data-say="the quantity 1 minus h, times reads">(1 − h) × reads</span>. At <span class="math" data-say="s equals 0">s = 0</span> the formula collapses to <span class="math" data-say="h equals C over N">h = C/N</span>, and every page is equally likely to be wanted.</p></div><p>Both sizes have to be converted into pages before anything else happens. At an <span class="math" data-say="8 kB">8 kB</span> page a <span class="math" data-say="500 gigabytes">500 GB</span> dataset is <span class="math" data-say="62500000">62 500 000</span> pages and <span class="math" data-say="64 gigabytes">64 GB</span> of memory is <span class="math" data-say="8000000">8 000 000</span> of them, so <span class="math" data-say="C over N equals 12.80 percent">C/N = 12.80%</span>. The formula takes counts, not bytes, and a units error here moves the answer more than the skew does.</p><div class="mathblock" data-say="page 8 kB, dataset 500 gigabytes, to, N equals 62500000 pages. memory, 64 gigabytes, to, C equals, 8000000 pages, C over N equals 12.80 percent. s equals 1, h equals H of 8000000 and 1 over H of 62500000 and 1, is approximately, 88.905 percent, rounded. disk IOPS equals the quantity 1 minus 0.88905, times 20000, is approximately, 2219 a second. s equals 0, h equals C over N equals 16 over 125, equals, 12.800 percent, exact. disk IOPS equals the quantity 1 minus 0.128, times 20000, equals, 17440 a second" tabindex="0" role="region" aria-label="Mathematical notation">page 8 kB     dataset 500 GB  →  N = 62 500 000 pages
               memory   64 GB  →  C =  8 000 000 pages      C/N = 12.80%
 
 s = 1    h = H(8 000 000, 1) / H(62 500 000, 1)  ≈  88.905%     rounded
          disk IOPS = (1 − 0.88905) × 20 000       ≈   2 219 a second
 
 s = 0    h = C/N = 16/125                         =  12.800%     exact
-         disk IOPS = (1 − 0.128) × 20 000         =  17 440 a second</div><p>The two rows are the lesson. The same memory holding the same share of the same data serves about <span class="math" data-say="88.9 percent">88.9%</span> of the reads when popularity is skewed and <span class="math" data-say="12.8 percent">12.8%</span> when it is not, and the difference at the disk is a factor of nearly eight. Skew is not a detail of the workload; it is the reason the page cache exists.</p><h3>What each doubling of memory buys</h3><p>Hold the dataset and the skew and walk the memory up by factors of two. From a sixty-fourth of the data to a half, the hit rate goes <span class="math" data-say="77.553 percent">77.553%</span>, <span class="math" data-say="81.294 percent">81.294%</span>, <span class="math" data-say="85.036 percent">85.036%</span>, <span class="math" data-say="88.777 percent">88.777%</span>, <span class="math" data-say="92.518 percent">92.518%</span>, <span class="math" data-say="96.259 percent">96.259%</span> — about <span class="math" data-say="3.74">3.74</span> points every time. That is what <span class="math" data-say="H of C and 1">H(C,1)</span> growing like the logarithm of <span class="math" data-say="C">C</span> looks like: equal <em>multiples</em> of memory buy equal <em>absolute</em> improvements.</p><div class="example"><span class="label">Example &middot; Diminishing returns, in the unit the disk cares about</span><p>The residual IOPS on those same six rows are <span class="math" data-say="4489">4 489</span>, <span class="math" data-say="3741">3 741</span>, <span class="math" data-say="2993">2 993</span>, <span class="math" data-say="2245">2 245</span>, <span class="math" data-say="1496">1 496</span> and <span class="math" data-say="748">748</span>. Each doubling removes about <span class="math" data-say="748">748</span> IOPS — the same amount every time, not the same fraction. So the first doubling and the last one are worth the same to the disk, and the memory to buy them is thirty-two times more expensive on the last.</p></div><p>The hit rate on this page is rounded and the lab says so on its face. Past <span class="math" data-say="N equals 40">N = 40</span> pages the exact harmonic number is neither computable in a redraw nor readable when printed — its denominator grows far faster than the page — so <span class="math" data-say="h">h</span> comes from a floating-point approximation to <span class="math" data-say="H of n and s">H(n,s)</span>. The lab prints the exact fraction at <span class="math" data-say="N equals 40">N = 40</span>, <span class="math" data-say="C equals 4">C = 4</span> alongside, so the machinery producing the approximation is visible rather than asserted. At <span class="math" data-say="s equals 0">s = 0</span> the formula is <span class="math" data-say="C over N">C/N</span> and stays exact at any size.</p><p>And the model is Zipf, which is a description of many real workloads and a description of none of them exactly. <span class="math" data-say="s">s</span> is measured from a trace, not chosen; a real page cache also does read-ahead, which converts some misses into sequential reads that the IOPS figure treats too harshly, and holds dirty pages, which occupy <span class="math" data-say="C">C</span> without serving reads. The arithmetic is the right first estimate and it is not a measurement.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Working set and the page cache</h2></div><p>Memory over dataset, the skew, and the IOPS that are left</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+         disk IOPS = (1 − 0.128) × 20 000         =  17 440 a second</div><p>The two rows are the lesson. The same memory holding the same share of the same data serves about <span class="math" data-say="88.9 percent">88.9%</span> of the reads when popularity is skewed and <span class="math" data-say="12.8 percent">12.8%</span> when it is not, and the difference at the disk is a factor of nearly eight. Skew is not a detail of the workload; it is the reason the page cache exists.</p><h3>What each doubling of memory buys</h3><p>Hold the dataset and the skew and walk the memory up by factors of two. From a sixty-fourth of the data to a half, the hit rate goes <span class="math" data-say="77.553 percent">77.553%</span>, <span class="math" data-say="81.294 percent">81.294%</span>, <span class="math" data-say="85.036 percent">85.036%</span>, <span class="math" data-say="88.777 percent">88.777%</span>, <span class="math" data-say="92.518 percent">92.518%</span>, <span class="math" data-say="96.259 percent">96.259%</span> — about <span class="math" data-say="3.74">3.74</span> points every time. That is what <span class="math" data-say="H of C and 1">H(C,1)</span> growing like the logarithm of <span class="math" data-say="C">C</span> looks like: equal <em>multiples</em> of memory buy equal <em>absolute</em> improvements.</p><div class="example"><span class="label">Example &middot; Diminishing returns, in the unit the disk cares about</span><p>The residual IOPS on those same six rows are <span class="math" data-say="4489">4 489</span>, <span class="math" data-say="3741">3 741</span>, <span class="math" data-say="2993">2 993</span>, <span class="math" data-say="2245">2 245</span>, <span class="math" data-say="1496">1 496</span> and <span class="math" data-say="748">748</span>. Each doubling removes about <span class="math" data-say="748">748</span> IOPS — the same amount every time, not the same fraction. So the first doubling and the last one are worth the same to the disk, and the memory to buy them is thirty-two times more expensive on the last.</p></div><p>The hit rate on this page is rounded and the lab says so on its face. Past <span class="math" data-say="N equals 40">N = 40</span> pages the exact harmonic number is neither computable in a redraw nor readable when printed — its denominator grows far faster than the page — so <span class="math" data-say="h">h</span> comes from a floating-point approximation to <span class="math" data-say="H of n and s">H(n,s)</span>. The lab prints the exact fraction at <span class="math" data-say="N equals 40">N = 40</span>, <span class="math" data-say="C equals 4">C = 4</span> alongside, so the machinery producing the approximation is visible rather than asserted. At <span class="math" data-say="s equals 0">s = 0</span> the formula is <span class="math" data-say="C over N">C/N</span> and stays exact at any size.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Working set and the page cache</h2></div><p>Memory over dataset, the skew, and the IOPS that are left</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The page cache is the cache of Caching and Hit Rates</strong><span>h = H(C,s)/H(N,s), and the disk still sees (1 &minus; h) &times; reads</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>pages memory holds</span><span class="tone-muted"><i class="legend-swatch"></i>pages it does not</span><span class="tone-amber"><i class="legend-swatch"></i>uniform would give C/N</span><span class="tone-red"><i class="legend-swatch"></i>rounded figure</span></div>
@@ -1411,10 +1454,10 @@ s = 0    h = C/N = 16/125                         =  12.800%     exact
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="wsPlot" viewBox="0 0 520 220" role="img" aria-label="The page popularity curve with the resident prefix shaded, and the residual disk IOPS drawn beside it."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="wsTable"></table></div>
       <div class="status-banner" id="wsStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the memory, the dataset and the skew</h3>
-          <p>The hit rate is <span class="math" data-say="H of C and s over H of N and s">H(C,s)/H(N,s)</span> with <span class="math" data-say="C">C</span> and <span class="math" data-say="N">N</span> counted in pages, and the disk IOPS are <span class="math" data-say="the quantity 1 minus h, times the read rate">(1 − h) × the read rate</span>. Take the skew to <span class="math" data-say="s equals 0">s = 0</span> and watch the hit rate collapse to the share of the data, which is the whole argument for why skew is worth measuring.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the memory, the dataset and the skew</h3>
+            <p>The hit rate is <span class="math" data-say="H of C and s over H of N and s">H(C,s)/H(N,s)</span> with <span class="math" data-say="C">C</span> and <span class="math" data-say="N">N</span> counted in pages, and the disk IOPS are <span class="math" data-say="the quantity 1 minus h, times the read rate">(1 − h) × the read rate</span>. Take the skew to <span class="math" data-say="s equals 0">s = 0</span> and watch the hit rate collapse to the share of the data, which is the whole argument for why skew is worth measuring.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="wsMem">Memory for the page cache (GB)</label><span class="range-value" id="wsMemOut">64</span></div>
           <input id="wsMem" type="range" min="1" max="512" step="1" value="64" />
@@ -1440,12 +1483,15 @@ s = 0    h = C/N = 16/125                         =  12.800%     exact
           <div class="kpi"><span>Uniform popularity would give</span><strong id="wsUniform">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="wsHint" style="margin:0;">This calls zipfHit in sysdesign_core.py &mdash; the same function the Caching and Hit Rates lab calls, not a second copy, so the two courses cannot drift apart. s is the Zipf exponent and nothing else on this path is called s.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>And the model is Zipf, which is a description of many real workloads and a description of none of them exactly. <span class="math" data-say="s">s</span> is measured from a trace, not chosen; a real page cache also does read-ahead, which converts some misses into sequential reads that the IOPS figure treats too harshly, and holds dirty pages, which occupy <span class="math" data-say="C">C</span> without serving reads. The arithmetic is the right first estimate and it is not a measurement.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sizing a page cache</h2></div><p>Convert to pages, get the skew honestly, and then stay in the unit the device is limited by.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Convert both sizes into pages</h3><p><span class="math" data-say="N equals dataset over page">N = dataset/page</span> and <span class="math" data-say="C equals memory over page">C = memory/page</span>. At an <span class="math" data-say="8 kB">8 kB</span> page, <span class="math" data-say="500 gigabytes">500 GB</span> is <span class="math" data-say="62500000">62 500 000</span> pages and <span class="math" data-say="64 gigabytes">64 GB</span> is <span class="math" data-say="8000000">8 000 000</span>. The formula counts pages, and a mismatch of units here is the one error that changes the answer by orders of magnitude.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Get the skew from a trace, not from a default</h3><p><span class="math" data-say="s">s</span> is the Zipf exponent of your workload's page popularity, and it is the single most influential input: at <span class="math" data-say="s equals 0">s = 0</span> the hit rate is the share of the data and at <span class="math" data-say="s equals 1">s = 1</span> it is seven times that. Assuming <span class="math" data-say="s equals 1">s = 1</span> because it is the classic value is an assumption, and it should be labelled as one.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute <span class="math" data-say="h">h</span>, and immediately write <span class="math" data-say="1 minus h">1 − h</span> beside it</h3><p>A hit rate is for describing the cache and a miss rate is for describing everything behind it. <span class="math" data-say="88.905 percent">88.905%</span> and <span class="math" data-say="11.095 percent">11.095%</span> are the same measurement, and only the second one multiplies into a device limit.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Multiply by the read rate and compare against the disk</h3><p><span class="math" data-say="the quantity 1 minus h, times reads">(1 − h) × reads</span> is the IOPS the device must actually serve — <span class="math" data-say="2219">2 219</span> a second here. That is the number to hold against what the storage can do, and the number that tells you whether another doubling of memory is worth buying.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sizing a page cache</h2>
+      <p class="lead-in">Convert to pages, get the skew honestly, and then stay in the unit the device is limited by.</p>
+      <ol class="key-ideas method"><li><strong>Convert both sizes into pages.</strong> <span class="math" data-say="N equals dataset over page">N = dataset/page</span> and <span class="math" data-say="C equals memory over page">C = memory/page</span>. At an <span class="math" data-say="8 kB">8 kB</span> page, <span class="math" data-say="500 gigabytes">500 GB</span> is <span class="math" data-say="62500000">62 500 000</span> pages and <span class="math" data-say="64 gigabytes">64 GB</span> is <span class="math" data-say="8000000">8 000 000</span>. The formula counts pages, and a mismatch of units here is the one error that changes the answer by orders of magnitude.</li><li><strong>Get the skew from a trace, not from a default.</strong> <span class="math" data-say="s">s</span> is the Zipf exponent of your workload's page popularity, and it is the single most influential input: at <span class="math" data-say="s equals 0">s = 0</span> the hit rate is the share of the data and at <span class="math" data-say="s equals 1">s = 1</span> it is seven times that. Assuming <span class="math" data-say="s equals 1">s = 1</span> because it is the classic value is an assumption, and it should be labelled as one.</li><li><strong>Compute <span class="math" data-say="h">h</span>, and immediately write <span class="math" data-say="1 minus h">1 − h</span> beside it.</strong> A hit rate is for describing the cache and a miss rate is for describing everything behind it. <span class="math" data-say="88.905 percent">88.905%</span> and <span class="math" data-say="11.095 percent">11.095%</span> are the same measurement, and only the second one multiplies into a device limit.</li><li><strong>Multiply by the read rate and compare against the disk.</strong> <span class="math" data-say="the quantity 1 minus h, times reads">(1 − h) × reads</span> is the IOPS the device must actually serve — <span class="math" data-say="2219">2 219</span> a second here. That is the number to hold against what the storage can do, and the number that tells you whether another doubling of memory is worth buying.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1472,17 +1518,16 @@ IOPS       4 489    3 741    2 993    2 245    1 496      748
 each doubling:  +3.74 points of hit rate,  −748 IOPS</div><p>The two skew rows first. The same <span class="math" data-say="12.80 percent">12.80%</span> of the data serves <span class="math" data-say="88.9 percent">88.9%</span> of the reads under classic Zipf and <span class="math" data-say="12.8 percent">12.8%</span> under uniform popularity, and the disk sees <span class="math" data-say="2219">2 219</span> IOPS against <span class="math" data-say="17440">17 440</span>. Every sentence anyone writes about a page cache being effective is a sentence about the top row, and it is only true because real workloads are skewed.</p><p>Now read the last two rows across. Every doubling of memory adds about <span class="math" data-say="3.74">3.74</span> points of hit rate and removes about <span class="math" data-say="748">748</span> IOPS — the same amount each time, not the same fraction. That is <span class="math" data-say="H of C and 1">H(C,1)</span> growing like the logarithm of <span class="math" data-say="C">C</span>, and it is why memory sizing is a question with a budget rather than a knee: there is no point at which another doubling suddenly stops helping, and no point at which it starts helping more.</p><p>For a faded rehearsal, halve the memory to <span class="math" data-say="32 gigabytes">32 GB</span> and keep everything else. The supplied first move is that <span class="math" data-say="C">C</span> falls to <span class="math" data-say="4000000">4 000 000</span> pages. Compute the hit rate and the residual IOPS, check them against the doubling rule above, and then say roughly how much memory it would take to get the disk below <span class="math" data-say="1500">1 500</span> IOPS. Run the lab at your answer before opening the quiz.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>“It is on disk, so every read is a disk read”</strong><span>At <span class="math" data-say="64 gigabytes">64 GB</span> over <span class="math" data-say="500 gigabytes">500 GB</span> with skewed popularity, about <span class="math" data-say="88.9 percent">88.9%</span> of reads never reach the device: <span class="math" data-say="2219">2 219</span> IOPS out of <span class="math" data-say="20000">20 000</span>, a factor of nine. A capacity plan built on the assumption specifies nine times the storage IOPS it needs, which is expensive, and a plan that assumes the cache works without measuring the skew is wrong in the other direction, which is worse.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sizing memory against the dataset rather than the working set</strong><span>The dataset is <span class="math" data-say="500 gigabytes">500 GB</span> and the memory is <span class="math" data-say="64 gigabytes">64 GB</span>, and the cache still serves nine reads in ten. What memory has to cover is the pages that are actually asked for, and under skew that is a small and slowly growing fraction of the whole — so “we cannot cache it, it is half a terabyte” is a sentence about the wrong quantity.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the IOPS to halve when memory doubles</strong><span>They fall by a fixed number, not a fixed fraction: about <span class="math" data-say="748">748</span> IOPS per doubling at these settings. The hit rate is a ratio of harmonic numbers and grows like a logarithm, so the improvement from <span class="math" data-say="1 over 64">1/64</span> to <span class="math" data-say="1 over 32">1/32</span> of the data is the same size as the improvement from <span class="math" data-say="1 over 4">1/4</span> to <span class="math" data-say="1 over 2">1/2</span> — and costs thirty-two times less.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a page cache is obviously the same object as a cache.</strong><p>You should be able to convert a dataset and a memory size into pages, compute the hit rate at a stated skew, turn it into residual disk IOPS, and say what one more doubling of memory would buy in that unit.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every figure so far has described a system that is running. “RPO and RTO” prices the one that is not: how many bytes a backup schedule puts at risk and how many hours a restore takes — two questions in two different units, and a single sentence about having backups answers neither of them.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>“It is on disk, so every read is a disk read”</strong><span>At <span class="math" data-say="64 gigabytes">64 GB</span> over <span class="math" data-say="500 gigabytes">500 GB</span> with skewed popularity, about <span class="math" data-say="88.9 percent">88.9%</span> of reads never reach the device: <span class="math" data-say="2219">2 219</span> IOPS out of <span class="math" data-say="20000">20 000</span>, a factor of nine. A capacity plan built on the assumption specifies nine times the storage IOPS it needs, which is expensive, and a plan that assumes the cache works without measuring the skew is wrong in the other direction, which is worse.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sizing memory against the dataset rather than the working set</strong><span>The dataset is <span class="math" data-say="500 gigabytes">500 GB</span> and the memory is <span class="math" data-say="64 gigabytes">64 GB</span>, and the cache still serves nine reads in ten. What memory has to cover is the pages that are actually asked for, and under skew that is a small and slowly growing fraction of the whole — so “we cannot cache it, it is half a terabyte” is a sentence about the wrong quantity.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the IOPS to halve when memory doubles</strong><span>They fall by a fixed number, not a fixed fraction: about <span class="math" data-say="748">748</span> IOPS per doubling at these settings. The hit rate is a ratio of harmonic numbers and grows like a logarithm, so the improvement from <span class="math" data-say="1 over 64">1/64</span> to <span class="math" data-say="1 over 32">1/32</span> of the data is the same size as the improvement from <span class="math" data-say="1 over 4">1/4</span> to <span class="math" data-say="1 over 2">1/2</span> — and costs thirty-two times less.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a page cache is obviously the same object as a cache.</strong><p>You should be able to convert a dataset and a memory size into pages, compute the hit rate at a stated skew, turn it into residual disk IOPS, and say what one more doubling of memory would buy in that unit.</p></div></div><div class="note"><strong>Note:</strong> Every figure so far has described a system that is running. “RPO and RTO” prices the one that is not: how many bytes a backup schedule puts at risk and how many hours a restore takes — two questions in two different units, and a single sentence about having backups answers neither of them.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The page cache is the cache you already know</summary><p>Caching and Hit Rates computed a hit rate from a cache size, a dataset size and a Zipf exponent. This is the same formula, called through the same function, with pages in place of objects and page reads in place of requests. The lesson is a callback: if you can size a cache you can size a page cache, and there is no second model to learn.</p></details><details class="recall"><summary>The skew is what makes a small cache worth having</summary><p>At classic Zipf skew, <span class="math" data-say="12.80 percent">12.80%</span> of the pages carry about <span class="math" data-say="88.9 percent">88.9%</span> of the reads — <span class="math" data-say="6.9">6.9</span> times their share of the data. Uniform popularity would give exactly <span class="math" data-say="12.80 percent">12.80%</span>, the share itself. Every argument for buying memory is an argument about the skew, and the skew is measurable rather than assumed.</p></details><details class="recall"><summary>The number that matters is <span class="math" data-say="the quantity 1 minus h, times reads">(1 − h) × reads</span></summary><p>A hit rate is a fraction and the disk is a device with an IOPS limit. At <span class="math" data-say="20000">20 000</span> page reads a second and <span class="math" data-say="h is approximately 88.905 percent">h ≈ 88.905%</span>, about <span class="math" data-say="2219">2 219</span> of them reach the disk; uniform popularity would send <span class="math" data-say="17440">17 440</span>. Both are true of the same memory over the same data, and only the second sounds like a system in trouble.</p></details></div>
+      <h3>Summary</h3>
       <p>The page cache is the cache you already know, with pages for objects and page reads for requests: <span class="math" data-say="h equals H of C and s over H of N and s">h = H(C,s)/H(N,s)</span>, and the disk still sees <span class="math" data-say="the quantity 1 minus h, times reads">(1 − h) × reads</span>. Sixty-four gigabytes over a five-hundred-gigabyte dataset is <span class="math" data-say="12.80 percent">12.80%</span> of the pages and, at classic Zipf skew, about <span class="math" data-say="88.9 percent">88.9%</span> of the reads — which is why “it is on disk, so every read is a disk read” is wrong by a factor of nine.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The page cache is the cache you already know.</strong> Caching and Hit Rates computed a hit rate from a cache size, a dataset size and a Zipf exponent. This is the same formula, called through the same function, with pages in place of objects and page reads in place of requests. The lesson is a callback: if you can size a cache you can size a page cache, and there is no second model to learn.</li><li><strong>The skew is what makes a small cache worth having.</strong> At classic Zipf skew, <span class="math" data-say="12.80 percent">12.80%</span> of the pages carry about <span class="math" data-say="88.9 percent">88.9%</span> of the reads — <span class="math" data-say="6.9">6.9</span> times their share of the data. Uniform popularity would give exactly <span class="math" data-say="12.80 percent">12.80%</span>, the share itself. Every argument for buying memory is an argument about the skew, and the skew is measurable rather than assumed.</li><li><strong>The number that matters is <span class="math" data-say="the quantity 1 minus h, times reads">(1 − h) × reads</span>.</strong> A hit rate is a fraction and the disk is a device with an IOPS limit. At <span class="math" data-say="20000">20 000</span> page reads a second and <span class="math" data-say="h is approximately 88.905 percent">h ≈ 88.905%</span>, about <span class="math" data-say="2219">2 219</span> of them reach the disk; uniform popularity would send <span class="math" data-say="17440">17 440</span>. Both are true of the same memory over the same data, and only the second sounds like a system in trouble.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="h equals H of C and s over H of N and s, C pages resident of N, Zipf exponent s. disk IOPS equals the quantity 1 minus h, times reads. 64 gigabytes of 500 gigabytes at 8 kB a page, goes to, C equals 8000000 of N equals 62500000 equals 12.80 percent. s equals 1, h is approximately 88.905 percent, goes to, the quantity 1 minus h, times 20000 equals, 2219 IOPS. s equals 0, h equals, 12.800 percent, goes to, 17440 IOPS" tabindex="0" role="region" aria-label="Mathematical notation">h = H(C, s) / H(N, s)          C pages resident of N, Zipf exponent s
 disk IOPS = (1 − h) × reads
 
@@ -2665,11 +2710,42 @@ s = 0     h =  12.800%   →                      17 440 IOPS</div><figcaption>T
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2737,7 +2813,7 @@ s = 0     h =  12.800%   →                      17 440 IOPS</div><figcaption>T
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

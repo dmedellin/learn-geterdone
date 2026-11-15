@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Structural Patterns</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 4 · Structural Patterns</p>
       <h1>Flyweight</h1>
       <p class="lesson-lede">Many fine-grained objects made affordable by sharing the state they have in common and passing in the state that varies.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Intrinsic state</li><li>Extrinsic state</li><li>FlyweightFactory</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern, section by section, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Use sharing to support large numbers of fine-grained objects efficiently.&rdquo; That is the whole of Flyweight's intent. Its Motivation is a document editor that would like an object for every character, for the uniformity and flexibility that would bring, and cannot afford hundreds of thousands of them. The answer is one shared object per character code: the code is intrinsic, stored in the shared object; the character's position and style are extrinsic, worked out by the layout as it goes and handed to the shared object when it draws. Logically there is an object at every occurrence; physically there is one per letter. A footnote in Chapter 2's case study notes that its glyphs could be shared this way, and leaves that as an exercise.</p><p>Applicability is unusually strict: the authors say to apply the pattern only when <em>all</em> of five things hold. There are a great many objects; storing them all is costly simply because there are so many; most of an object's state can be made extrinsic; once it is, a few shared objects can stand in for large groups of them; and the application does not depend on object identity, since two occurrences that share a flyweight are one object, and an identity test cannot tell them apart.</p><p>The participants are the Flyweight interface, through which flyweights receive extrinsic state; the ConcreteFlyweight, which stores only intrinsic state and must be shareable; the UnsharedConcreteFlyweight, for objects such as rows and columns that use the interface without being shared; the FlyweightFactory; and the Client, which keeps references to flyweights and computes or stores their extrinsic state. Two rules make the collaboration work: every piece of state is classed as one or the other, and clients never create concrete flyweights themselves.</p><pre class="codeblock" data-say="line 1, comment, The flyweight what every tomato on the plan has in common.. line 2, final class plant kind. line 3, private final array of byte sprite, comment, about 2 KB, shared. line 4, plant kind of array of byte sprite this dot sprite is set to sprite. line 5, void draw of canvas c, int x, int y, comment, extrinsic state passed in. line 6, c dot blit of sprite, x, y. line 9, comment, The flyweight factory one PlantKind per species, made on first request.. line 10, final class plant kinds. line 11, private final map of string and plant kind pool is set to new hash map. line 12, private final sprite store sprites. line 13, plant kinds of sprite store sprites this dot sprites is set to sprites. line 14, plant kind get of string species. line 15, return pool dot compute if absent of species. line 16, s goes to new plant kind of sprites dot load of s" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The flyweight: what every tomato on the plan has in common.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern, section by section, then the count</h2><div class="prose reading"><p>&ldquo;Use sharing to support large numbers of fine-grained objects efficiently.&rdquo; That is the whole of Flyweight's intent. Its Motivation is a document editor that would like an object for every character, for the uniformity and flexibility that would bring, and cannot afford hundreds of thousands of them. The answer is one shared object per character code: the code is intrinsic, stored in the shared object; the character's position and style are extrinsic, worked out by the layout as it goes and handed to the shared object when it draws. Logically there is an object at every occurrence; physically there is one per letter. A footnote in Chapter 2's case study notes that its glyphs could be shared this way, and leaves that as an exercise.</p><p>Applicability is unusually strict: the authors say to apply the pattern only when <em>all</em> of five things hold. There are a great many objects; storing them all is costly simply because there are so many; most of an object's state can be made extrinsic; once it is, a few shared objects can stand in for large groups of them; and the application does not depend on object identity, since two occurrences that share a flyweight are one object, and an identity test cannot tell them apart.</p><p>The participants are the Flyweight interface, through which flyweights receive extrinsic state; the ConcreteFlyweight, which stores only intrinsic state and must be shareable; the UnsharedConcreteFlyweight, for objects such as rows and columns that use the interface without being shared; the FlyweightFactory; and the Client, which keeps references to flyweights and computes or stores their extrinsic state. Two rules make the collaboration work: every piece of state is classed as one or the other, and clients never create concrete flyweights themselves.</p><pre class="codeblock" data-say="line 1, comment, The flyweight what every tomato on the plan has in common.. line 2, final class plant kind. line 3, private final array of byte sprite, comment, about 2 KB, shared. line 4, plant kind of array of byte sprite this dot sprite is set to sprite. line 5, void draw of canvas c, int x, int y, comment, extrinsic state passed in. line 6, c dot blit of sprite, x, y. line 9, comment, The flyweight factory one PlantKind per species, made on first request.. line 10, final class plant kinds. line 11, private final map of string and plant kind pool is set to new hash map. line 12, private final sprite store sprites. line 13, plant kinds of sprite store sprites this dot sprites is set to sprites. line 14, plant kind get of string species. line 15, return pool dot compute if absent of species. line 16, s goes to new plant kind of sprites dot load of s" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The flyweight: what every tomato on the plan has in common.</span>
 <span class="cl">final class PlantKind {</span>
 <span class="cl">    private final byte[] sprite;                 // about 2 KB, shared</span>
 <span class="cl">    PlantKind(byte[] sprite) { this.sprite = sprite; }</span>
@@ -1462,14 +1506,11 @@
 <span class="cl">        return pool.computeIfAbsent(species,</span>
 <span class="cl">                s -&gt; new PlantKind(sprites.load(s)));</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The Consequences are about storage and its price. Finding, passing or computing extrinsic state costs time, especially if it used to be stored inside the object; space savings offset it, and they depend on three things: how far sharing reduces the number of instances, how much intrinsic state each object has, and whether the extrinsic state is computed or stored. The most is saved when objects have a great deal of both kinds and the extrinsic kind can be computed, since then sharing cuts the first and computation replaces the second. Combined with Composite, shared leaves can no longer keep a parent reference; the parent has to be passed in as extrinsic state too.</p><p>Two implementation issues follow. Removing extrinsic state is what decides whether the pattern applies at all: if there are as many different extrinsic states as objects, nothing is gained, and ideally the extrinsic state is computed from a much smaller separate structure, as the editor keeps a map of runs of characters in the same style. And shared objects must be managed, typically by a factory keyed by the intrinsic state; reclaiming them needs reference counting or garbage collection, unless there are few and they are kept for good. Known Uses report the InterViews document editor Doc, where, as the book gives the figures, a document of 180,000 characters needed only 480 character objects; and ET++, whose layout objects for each widget are flyweights, as strategies often can be.</p><p>Now the lab, on a garden planner that draws every plant on a plot. Each record is an intrinsic state and how many objects have it: 120 tomatoes, 300 basil, 450 lettuces and 80 marigolds. A species' sprite and growth table take 2,048 bytes; a plant's position, 8; a reference to a shared flyweight, 4. On the preset <code>plants-stored</code> the lab counts 950 objects and 4 flyweights. Without sharing every plant carries both kinds of state: <span data-say="950 times the quantity 2048 plus 8, equals 1953200">950 × (2,048 + 8) = 1,953,200</span> bytes. With flyweights there are four sprites, 950 stored positions and 950 references: <span data-say="4 times 2048 plus 950 times 8 plus 950 times 4 equals 19592">4 × 2,048 + 950 × 8 + 950 × 4 = 19,592</span> bytes. The saving is 1,933,608 bytes, about 99%. The most objects on one flyweight are the lettuces, 450; the fewest, the marigolds, 80.</p><p>On the preset <code>plants-computed</code> the planner works out each plant's position from its row and the spacing, so no position is stored: <span data-say="4 times 2048 plus 950 times 4 equals 11992">4 × 2,048 + 950 × 4 = 11,992</span> bytes, and about 99.4% saved. That is the authors' second kind of saving, extrinsic state traded for computation. The preset <code>name-tags</code> breaks the conditions: three name tags, each with its own text, so three flyweights for three objects. Unshared they take <span data-say="3 times the quantity 64 plus 8, equals 216">3 × (64 + 8) = 216</span> bytes; shared, <span data-say="3 times 64 plus 3 times 8 plus 3 times 4 equals 228">3 × 64 + 3 × 8 + 3 × 4 = 228</span>, and the lab reports a saving of −12. When there are as many intrinsic states as objects, the factory and the references are all cost.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, objects, dock minus full, 40, dock minus empty, 25, dock minus some, 135. line 2, intrinsic, 1024 bytes extrinsic, 16 bytes of stored. line 3, reference, 4 bytes" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">objects:   dock-full, 40; dock-empty, 25; dock-some, 135</span>
-<span class="cl">intrinsic: 1024 bytes   extrinsic: 16 bytes (stored)</span>
-<span class="cl">reference: 4 bytes</span></code></pre><p>A bike-share map draws 200 dock icons in three states. By hand, give the bytes without sharing, the bytes with flyweights (the position stored), and the saving. Type the figures into the lab to check.</p><p>Flyweight puts many contexts in front of one object. The next lesson, Proxy, puts one stand-in in front of one object, to control how it is reached.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Flyweights and storage</h2></div><p>storage without sharing and with one flyweight per intrinsic state</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The Consequences are about storage and its price. Finding, passing or computing extrinsic state costs time, especially if it used to be stored inside the object; space savings offset it, and they depend on three things: how far sharing reduces the number of instances, how much intrinsic state each object has, and whether the extrinsic state is computed or stored. The most is saved when objects have a great deal of both kinds and the extrinsic kind can be computed, since then sharing cuts the first and computation replaces the second. Combined with Composite, shared leaves can no longer keep a parent reference; the parent has to be passed in as extrinsic state too.</p><p>Two implementation issues follow. Removing extrinsic state is what decides whether the pattern applies at all: if there are as many different extrinsic states as objects, nothing is gained, and ideally the extrinsic state is computed from a much smaller separate structure, as the editor keeps a map of runs of characters in the same style. And shared objects must be managed, typically by a factory keyed by the intrinsic state; reclaiming them needs reference counting or garbage collection, unless there are few and they are kept for good. Known Uses report the InterViews document editor Doc, where, as the book gives the figures, a document of 180,000 characters needed only 480 character objects; and ET++, whose layout objects for each widget are flyweights, as strategies often can be.</p><p>Now the lab, on a garden planner that draws every plant on a plot. Each record is an intrinsic state and how many objects have it: 120 tomatoes, 300 basil, 450 lettuces and 80 marigolds. A species' sprite and growth table take 2,048 bytes; a plant's position, 8; a reference to a shared flyweight, 4. On the preset <code>plants-stored</code> the lab counts 950 objects and 4 flyweights. Without sharing every plant carries both kinds of state: <span data-say="950 times the quantity 2048 plus 8, equals 1953200">950 × (2,048 + 8) = 1,953,200</span> bytes. With flyweights there are four sprites, 950 stored positions and 950 references: <span data-say="4 times 2048 plus 950 times 8 plus 950 times 4 equals 19592">4 × 2,048 + 950 × 8 + 950 × 4 = 19,592</span> bytes. The saving is 1,933,608 bytes, about 99%. The most objects on one flyweight are the lettuces, 450; the fewest, the marigolds, 80.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Flyweights and storage</h2></div><p>storage without sharing and with one flyweight per intrinsic state</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Flyweights and storage</strong><span>storage without sharing and with one flyweight per intrinsic state</span></div>
       </div>
@@ -1477,10 +1518,10 @@
       <div class="table-wrap" id="gshTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gshTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Objects with the same intrinsic state share one flyweight. Without sharing every object holds its intrinsic and its extrinsic state: objects × (intrinsic + extrinsic). With sharing the intrinsic state is held once per flyweight, flyweights × intrinsic, plus, for every object, its extrinsic state if it is stored (none if it is computed) and the reference to its flyweight (0 unless given). Saved is the difference, negative when sharing costs more, and the share saved is saved over unshared, exact. Most and fewest go to the first given on a tie.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Storage with an object each, and with shared flyweights</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Storage with an object each, and with shared flyweights</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gshPreset">Worked example</label>
           <select id="gshPreset"><option value="plants-stored" selected>A garden plan's 950 plants of four species, positions stored</option><option value="plants-computed">The same plants, positions computed from row and spacing</option><option value="name-tags">Three name tags, each with its own text</option></select>
@@ -1516,12 +1557,17 @@
           <div class="kpi"><span>Fewest objects on one flyweight</span><strong id="gshSmallest">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>On the preset <code>plants-computed</code> the planner works out each plant's position from its row and the spacing, so no position is stored: <span data-say="4 times 2048 plus 950 times 4 equals 11992">4 × 2,048 + 950 × 4 = 11,992</span> bytes, and about 99.4% saved. That is the authors' second kind of saving, extrinsic state traded for computation. The preset <code>name-tags</code> breaks the conditions: three name tags, each with its own text, so three flyweights for three objects. Unshared they take <span data-say="3 times the quantity 64 plus 8, equals 216">3 × (64 + 8) = 216</span> bytes; shared, <span data-say="3 times 64 plus 3 times 8 plus 3 times 4 equals 228">3 × 64 + 3 × 8 + 3 × 4 = 228</span>, and the lab reports a saving of −12. When there are as many intrinsic states as objects, the factory and the references are all cost.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, objects, dock minus full, 40, dock minus empty, 25, dock minus some, 135. line 2, intrinsic, 1024 bytes extrinsic, 16 bytes of stored. line 3, reference, 4 bytes" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">objects:   dock-full, 40; dock-empty, 25; dock-some, 135</span>
+<span class="cl">intrinsic: 1024 bytes   extrinsic: 16 bytes (stored)</span>
+<span class="cl">reference: 4 bytes</span></code></pre><p>A bike-share map draws 200 dock icons in three states. By hand, give the bytes without sharing, the bytes with flyweights (the position stored), and the saving. Type the figures into the lab to check.</p><p>Flyweight puts many contexts in front of one object. The next lesson, Proxy, puts one stand-in in front of one object, to control how it is reached.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding whether sharing pays</h2></div><p>Four steps, the last of them on a design of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Split the state</h3><p>For one object, list what it would hold and mark each part intrinsic, the same in every context, or extrinsic, depending on where the object is.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the distinct intrinsic states</h3><p>Those are the flyweights. If there are nearly as many as objects, stop: the pattern's conditions are not met.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute both storage figures</h3><p>Without sharing, objects <span data-say="times">×</span> (intrinsic + extrinsic). With it, flyweights <span data-say="times">×</span> intrinsic, plus objects <span data-say="times">×</span> extrinsic if stored, plus a reference per object.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a design of your own</h3><p>Take a collection in your code with many small objects of few kinds (map markers, cells, particles, tokens) and estimate the bytes each way. Say whether the extrinsic part could be computed, and whether anything compares the objects by identity.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Deciding whether sharing pays</h2>
+      <p class="lead-in">Four steps, the last of them on a design of your own.</p>
+      <ol class="key-ideas method"><li><strong>Split the state.</strong> For one object, list what it would hold and mark each part intrinsic, the same in every context, or extrinsic, depending on where the object is.</li><li><strong>Count the distinct intrinsic states.</strong> Those are the flyweights. If there are nearly as many as objects, stop: the pattern's conditions are not met.</li><li><strong>Compute both storage figures.</strong> Without sharing, objects <span data-say="times">×</span> (intrinsic + extrinsic). With it, flyweights <span data-say="times">×</span> intrinsic, plus objects <span data-say="times">×</span> extrinsic if stored, plus a reference per object.</li><li><strong>Do it on a design of your own.</strong> Take a collection in your code with many small objects of few kinds (map markers, cells, particles, tokens) and estimate the bytes each way. Say whether the extrinsic part could be computed, and whether anything compares the objects by identity.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1540,17 +1586,16 @@ references: 950 × 4 = 3800
 with sharing: 8192 + 7600 + 3800 = 19592</div><p>The sprites, which were most of the cost, are paid for four times instead of 950. What remains per plant, a position and a reference, is what sharing cannot remove unless the position is computed.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Applying Flyweight wherever there are many objects</strong><span>The authors require five conditions together, and the decisive one is that most of the state can be made extrinsic and what remains takes few distinct values. On the lesson's illustration three name tags with their own text cost 12 bytes more shared than not.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Leaving context in the flyweight</strong><span>A shared object that stores anything about where it is used is no longer context-free, and every context sees the last one's value. The position, the parent and the style go outside, passed in when the flyweight is asked to act.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Comparing flyweights by identity</strong><span>Two plants of the same species are the same object. Code that tells occurrences apart by identity will find them equal; the authors list independence from identity as a condition for that reason.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute what sharing saves for a design.</strong><p>Given counts per intrinsic state and the bytes of each kind of state, state the storage without and with flyweights, stored and computed, and name the conditions under which the authors say the pattern applies.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts bytes from the sizes you give it. It does not count the time spent passing or computing extrinsic state, which the authors name as the pattern's cost, and it cannot tell whether your state really splits cleanly into a shared part and a contextual one.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Applying Flyweight wherever there are many objects</strong><span>The authors require five conditions together, and the decisive one is that most of the state can be made extrinsic and what remains takes few distinct values. On the lesson's illustration three name tags with their own text cost 12 bytes more shared than not.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Leaving context in the flyweight</strong><span>A shared object that stores anything about where it is used is no longer context-free, and every context sees the last one's value. The position, the parent and the style go outside, passed in when the flyweight is asked to act.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Comparing flyweights by identity</strong><span>Two plants of the same species are the same object. Code that tells occurrences apart by identity will find them equal; the authors list independence from identity as a condition for that reason.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute what sharing saves for a design.</strong><p>Given counts per intrinsic state and the bytes of each kind of state, state the storage without and with flyweights, stored and computed, and name the conditions under which the authors say the pattern applies.</p></div></div><div class="note"><strong>Note:</strong> The lab counts bytes from the sizes you give it. It does not count the time spent passing or computing extrinsic state, which the authors name as the pattern's cost, and it cannot tell whether your state really splits cleanly into a shared part and a contextual one.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Intrinsic state</summary><p>What a flyweight stores because it is the same wherever the object appears: a species' drawing, a character's code. Being independent of context, it can be shared.</p></details><details class="recall"><summary>Extrinsic state</summary><p>What depends on the context and varies with it, such as a position. The flyweight does not keep it; the client stores it or computes it and passes it in each time it asks the flyweight to act.</p></details><details class="recall"><summary>FlyweightFactory</summary><p>The object that creates and manages flyweights, handing out an existing one for a key or making it the first time. Clients get flyweights only from it, which is what guarantees they are shared.</p></details></div>
+      <h3>Summary</h3>
       <p>Flyweight shares one object among every context that needs the same context-free state, and has clients pass in the rest. Read the pattern and its demanding list of conditions, then count the bytes a garden planner's 950 plants take with an object each and with four shared species, with positions stored and computed, and a case where sharing costs more than it saves.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Intrinsic state.</strong> What a flyweight stores because it is the same wherever the object appears: a species' drawing, a character's code. Being independent of context, it can be shared.</li><li><strong>Extrinsic state.</strong> What depends on the context and varies with it, such as a position. The flyweight does not keep it; the client stores it or computes it and passes it in each time it asks the flyweight to act.</li><li><strong>FlyweightFactory.</strong> The object that creates and manages flyweights, handing out an existing one for a key or making it the first time. Clients get flyweights only from it, which is what guarantees they are shared.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="share what does not depend on context. intrinsic, stored in the flyweight. extrinsic, passed in by the client. clients get flyweights from a factory. saved, N times the sum of I and X, minus the sum of F times I, N times X and N times R. computing extrinsic state saves more. no identity, shared means the same object" tabindex="0" role="region" aria-label="Mathematical notation">share what does not depend on context
 intrinsic: stored in the flyweight
 extrinsic: passed in by the client
@@ -2313,11 +2358,42 @@ no identity: shared means the same object</div><figcaption>Flyweight in seven li
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2385,7 +2461,7 @@ no identity: shared means the same object</div><figcaption>Flyweight in seven li
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

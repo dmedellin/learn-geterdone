@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Justice and Collective Choice</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Distributive justice</p>
       <h1>The Difference Principle and Leximin</h1>
       <p class="lesson-lede">An inequality is allowed only if it raises the position of the worst off, and ties at the bottom are settled one place up.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Sort, then compare from the bottom</li><li>Inequality is permitted, on a condition</li><li>The justification is an argument about incentives</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Leximin on two distributions</h2>
-      <article class="prose reading"><p>The second part of Rawls's second principle of justice, the <strong>difference principle</strong>, says that social and economic inequalities are to be arranged so that they are to the greatest benefit of the least advantaged. As a rule for comparing two distributions of welfare it comes to this: prefer the one in which the worst-off person is better off. If their positions are the same, the person next up decides, and so on.</p><div class="defbox"><span class="label">Definition &middot; Leximin</span><p><strong>Leximin</strong> ranks two distributions by sorting each from lowest to highest and comparing them entry by entry from the bottom. The first position at which they differ decides, and the distribution with the larger entry there is ranked higher.</p></div><p>Take the distributions <span class="math" data-say="5, 5, 5">(5, 5, 5)</span> and <span class="math" data-say="6, 9, 20">(6, 9, 20)</span>. Sorted, they are as they stand. The first entries are <span class="math" data-say="5">5</span> and <span class="math" data-say="6">6</span>, and <span class="math" data-say="6">6</span> is larger, so the second distribution is ranked higher. The <span class="math" data-say="9">9</span> and the <span class="math" data-say="20">20</span> are never looked at. The same verdict would stand if the top entry were <span class="math" data-say="20000">20 000</span>, or if it were <span class="math" data-say="7">7</span>.</p><p>That is where the principle parts company with equality. A pure egalitarian prefers <span class="math" data-say="5, 5, 5">(5, 5, 5)</span> to <span class="math" data-say="6, 9, 20">(6, 9, 20)</span> because it is level, and levelling is what they are after. The difference principle prefers the second, because everyone is no worse off in it, and the worst-off are better. Preferring the first would mean denying the worst-off a unit of welfare so that others would not have more than they do. “Priority, Equality and Levelling Down” takes that cost as its subject.</p><p>When the bottoms tie, leximin looks upward. Compare <span class="math" data-say="5, 8, 8">(5, 8, 8)</span> with <span class="math" data-say="5, 6, 20">(5, 6, 20)</span>. The first entries are both <span class="math" data-say="5">5</span>. The second entries are <span class="math" data-say="8">8</span> and <span class="math" data-say="6">6</span>, so the first distribution wins, even though the total of the second is far larger. Maximin alone would have called the pair a tie; leximin finishes the job.</p><h3>The incentive argument</h3><p>Why would anyone choose the unequal distribution? The standard answer runs: if talented people are paid more, they will do work that produces more for everyone, and some of that increase reaches the worst-off. In the numbers, it is the step from <span class="math" data-say="5">5</span> to <span class="math" data-say="6">6</span> at the bottom that is bought by the <span class="math" data-say="9">9</span> and the <span class="math" data-say="20">20</span> above.</p><p>This is an argument, and it has a premise the lab cannot check. If the high rewards do not in fact raise the floor, the unequal distribution has nothing to recommend it, and leximin ranks it below an equal one with the same bottom. The lab ranks the two vectors you type; whether the first caused the second is what the philosophy is about.</p><div class="example"><span class="label">Example &middot; When equality is the better answer</span><p>Suppose the unequal distribution is <span class="math" data-say="5, 8, 20">(5, 8, 20)</span> and the equal one is <span class="math" data-say="5, 5, 5">(5, 5, 5)</span>. The floors tie at <span class="math" data-say="5">5</span>, and the next entries are <span class="math" data-say="8">8</span> and <span class="math" data-say="5">5</span>, so leximin ranks the unequal one higher. Now suppose the unequal distribution is <span class="math" data-say="4, 8, 20">(4, 8, 20)</span>. The floor is lower, and leximin ranks the level one higher, however large the top entry.</p></div><p>Three limits. Rawls applied the principle to the holdings of primary goods, such as income, rights and opportunities, and not to a single scale of welfare; he took the worst-off to be a representative group and not a named person; and he described the lexical form used here, which looks upward when the floors tie, as a refinement his argument did not need, since he expected the position of the worst-off to settle the cases that matter. The lab compares vectors of numbers, which is the cleanest form of the rule and not the whole of his view.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Two distributions, six rules</h2></div><p>the same people ranked by total, average, priority, the worst off, and sufficiency</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Leximin on two distributions</h2><div class="prose reading"><p>The second part of Rawls's second principle of justice, the <strong>difference principle</strong>, says that social and economic inequalities are to be arranged so that they are to the greatest benefit of the least advantaged. As a rule for comparing two distributions of welfare it comes to this: prefer the one in which the worst-off person is better off. If their positions are the same, the person next up decides, and so on.</p><div class="defbox"><span class="label">Definition &middot; Leximin</span><p><strong>Leximin</strong> ranks two distributions by sorting each from lowest to highest and comparing them entry by entry from the bottom. The first position at which they differ decides, and the distribution with the larger entry there is ranked higher.</p></div><p>Take the distributions <span class="math" data-say="5, 5, 5">(5, 5, 5)</span> and <span class="math" data-say="6, 9, 20">(6, 9, 20)</span>. Sorted, they are as they stand. The first entries are <span class="math" data-say="5">5</span> and <span class="math" data-say="6">6</span>, and <span class="math" data-say="6">6</span> is larger, so the second distribution is ranked higher. The <span class="math" data-say="9">9</span> and the <span class="math" data-say="20">20</span> are never looked at. The same verdict would stand if the top entry were <span class="math" data-say="20000">20 000</span>, or if it were <span class="math" data-say="7">7</span>.</p><p>That is where the principle parts company with equality. A pure egalitarian prefers <span class="math" data-say="5, 5, 5">(5, 5, 5)</span> to <span class="math" data-say="6, 9, 20">(6, 9, 20)</span> because it is level, and levelling is what they are after. The difference principle prefers the second, because everyone is no worse off in it, and the worst-off are better. Preferring the first would mean denying the worst-off a unit of welfare so that others would not have more than they do. “Priority, Equality and Levelling Down” takes that cost as its subject.</p><p>When the bottoms tie, leximin looks upward. Compare <span class="math" data-say="5, 8, 8">(5, 8, 8)</span> with <span class="math" data-say="5, 6, 20">(5, 6, 20)</span>. The first entries are both <span class="math" data-say="5">5</span>. The second entries are <span class="math" data-say="8">8</span> and <span class="math" data-say="6">6</span>, so the first distribution wins, even though the total of the second is far larger. Maximin alone would have called the pair a tie; leximin finishes the job.</p><h3>The incentive argument</h3><p>Why would anyone choose the unequal distribution? The standard answer runs: if talented people are paid more, they will do work that produces more for everyone, and some of that increase reaches the worst-off. In the numbers, it is the step from <span class="math" data-say="5">5</span> to <span class="math" data-say="6">6</span> at the bottom that is bought by the <span class="math" data-say="9">9</span> and the <span class="math" data-say="20">20</span> above.</p><p>This is an argument, and it has a premise the lab cannot check. If the high rewards do not in fact raise the floor, the unequal distribution has nothing to recommend it, and leximin ranks it below an equal one with the same bottom. The lab ranks the two vectors you type; whether the first caused the second is what the philosophy is about.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Two distributions, six rules</h2></div><p>the same people ranked by total, average, priority, the worst off, and sufficiency</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Comparing distributions of welfare</strong><span>each rule is a different answer to whose gain counts</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="agTable"></table></div>
       <div class="status-banner" id="agStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Rank two distributions</h3>
-          <p>A and B are lists of welfare levels, one entry per person. The rule is shipped as leximin; switch it to total or maximin to see where the verdict moves.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Rank two distributions</h3>
+            <p>A and B are lists of welfare levels, one entry per person. The rule is shipped as leximin; switch it to total or maximin to see where the verdict moves.</p>
         <div class="field">
           <label for="agPreset">Worked example</label>
           <select id="agPreset"><option value="incentive" selected>Equal 5, 5, 5 against 6, 9, 20</option><option value="tie-at-the-bottom">5, 8, 8 against 5, 6, 20</option><option value="pure-equality">6, 9, 20 against a level 4, 4, 4</option></select>
@@ -1442,12 +1485,15 @@
           <div class="kpi"><span>Population at &epsilon; to beat A</span><strong id="agRepug">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="example"><span class="label">Example &middot; When equality is the better answer</span><p>Suppose the unequal distribution is <span class="math" data-say="5, 8, 20">(5, 8, 20)</span> and the equal one is <span class="math" data-say="5, 5, 5">(5, 5, 5)</span>. The floors tie at <span class="math" data-say="5">5</span>, and the next entries are <span class="math" data-say="8">8</span> and <span class="math" data-say="5">5</span>, so leximin ranks the unequal one higher. Now suppose the unequal distribution is <span class="math" data-say="4, 8, 20">(4, 8, 20)</span>. The floor is lower, and leximin ranks the level one higher, however large the top entry.</p></div><p>Three limits. Rawls applied the principle to the holdings of primary goods, such as income, rights and opportunities, and not to a single scale of welfare; he took the worst-off to be a representative group and not a named person; and he described the lexical form used here, which looks upward when the floors tie, as a refinement his argument did not need, since he expected the position of the worst-off to settle the cases that matter. The lab compares vectors of numbers, which is the cleanest form of the rule and not the whole of his view.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Ranking two distributions by leximin</h2></div><p>Four moves. The only way to go wrong is to stop looking after the first entry when it ties.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Sort each distribution from the lowest entry up</h3><p>Order matters in the comparison and the identity of the person does not. The lab sorts for you and shows the order.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compare the first entries</h3><p>If one is larger, that distribution is ranked higher and the rest is irrelevant, however much larger the later entries are in the other.</p></article><article class="card concept-card"><div class="icon">3</div><h3>If they tie, compare the second entries, then the third</h3><p>Move up one position at a time and stop at the first difference. If every entry matches, the distributions are ranked equal.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Ask what produced the numbers</h3><p>If an inequality is to be defended, say what it does for the bottom entry. The justification is a claim about incentives or output, and it is a premise of the argument and not a result of the ranking.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Ranking two distributions by leximin</h2>
+      <p class="lead-in">Four moves. The only way to go wrong is to stop looking after the first entry when it ties.</p>
+      <ol class="key-ideas method"><li><strong>Sort each distribution from the lowest entry up.</strong> Order matters in the comparison and the identity of the person does not. The lab sorts for you and shows the order.</li><li><strong>Compare the first entries.</strong> If one is larger, that distribution is ranked higher and the rest is irrelevant, however much larger the later entries are in the other.</li><li><strong>If they tie, compare the second entries, then the third.</strong> Move up one position at a time and stop at the first difference. If every entry matches, the distributions are ranked equal.</li><li><strong>Ask what produced the numbers.</strong> If an inequality is to be defended, say what it does for the bottom entry. The justification is a claim about incentives or output, and it is a premise of the argument and not a result of the ranking.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1464,17 +1510,16 @@ A = 5, 8, 8      B = 5, 6, 20       first entries 5 = 5
    second entries 8 &gt; 6, so A ranks above B</div><p>In the second pair B has the larger total, <span class="math" data-say="31">31</span> against <span class="math" data-say="21">21</span>, and a total rule would choose it. Leximin does not add, so the larger total cannot buy a lower second entry.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the difference principle demands equality</strong><span>It permits any inequality that leaves the worst-off better off than they would otherwise be. (6, 9, 20) beats (5, 5, 5) because 6 is more than 5, and the 9 and 20 count neither for nor against. Equality is the answer only when no inequality raises the floor.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Stopping at a tie in the first entry</strong><span>Equal floors do not make equal distributions. Compare (5, 8, 8) and (5, 6, 20): maximin finds a tie, and leximin goes on to the second entries and finds that 8 beats 6.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the ranking as a defence of inequality</strong><span>The rule ranks the vectors it is given. That the unequal one has the higher floor is a premise somebody has to establish. If the high rewards did nothing for the bottom, the same rule would rank them below a level distribution with the same floor.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can rank two distributions by leximin and say what an inequality has to do to be allowed.</strong><p>Given two lists of welfare levels, sort them, find the first position at which they differ and name the winner; then state, for an unequal winner, the claim about incentives that the verdict depends on.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Try a distribution whose lowest entry is zero and the others enormous: leximin ranks it below any distribution whose lowest entry is positive. That is the rule at its most uncompromising, and it is why critics ask whether a lexical priority is too strong.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the difference principle demands equality</strong><span>It permits any inequality that leaves the worst-off better off than they would otherwise be. (6, 9, 20) beats (5, 5, 5) because 6 is more than 5, and the 9 and 20 count neither for nor against. Equality is the answer only when no inequality raises the floor.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Stopping at a tie in the first entry</strong><span>Equal floors do not make equal distributions. Compare (5, 8, 8) and (5, 6, 20): maximin finds a tie, and leximin goes on to the second entries and finds that 8 beats 6.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the ranking as a defence of inequality</strong><span>The rule ranks the vectors it is given. That the unequal one has the higher floor is a premise somebody has to establish. If the high rewards did nothing for the bottom, the same rule would rank them below a level distribution with the same floor.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can rank two distributions by leximin and say what an inequality has to do to be allowed.</strong><p>Given two lists of welfare levels, sort them, find the first position at which they differ and name the winner; then state, for an unequal winner, the claim about incentives that the verdict depends on.</p></div></div><div class="note"><strong>Note:</strong> Try a distribution whose lowest entry is zero and the others enormous: leximin ranks it below any distribution whose lowest entry is positive. That is the rule at its most uncompromising, and it is why critics ask whether a lexical priority is too strong.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Sort, then compare from the bottom</summary><p>List each distribution from the worst-off up. Compare the first entries, and only if they are equal compare the second, and so on. The first difference decides. This is leximin, short for lexical maximin.</p></details><details class="recall"><summary>Inequality is permitted, on a condition</summary><p>The principle does not prefer unequal distributions. It permits an inequality if the worst-off are better off with it than with any alternative, and forbids it otherwise.</p></details><details class="recall"><summary>The justification is an argument about incentives</summary><p>The usual defence of an unequal distribution is that the prospect of higher rewards draws out effort and talent, and that the extra product reaches the bottom. That is a premise about how people behave, not an output of the rule.</p></details></div>
+      <h3>Summary</h3>
       <p>The difference principle ranks distributions by their worst-off member, then by the next worst when the first are tied, and so on. An unequal distribution that lifts the bottom beats an equal one that does not. The wrong model is that the principle demands equality.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Sort, then compare from the bottom.</strong> List each distribution from the worst-off up. Compare the first entries, and only if they are equal compare the second, and so on. The first difference decides. This is leximin, short for lexical maximin.</li><li><strong>Inequality is permitted, on a condition.</strong> The principle does not prefer unequal distributions. It permits an inequality if the worst-off are better off with it than with any alternative, and forbids it otherwise.</li><li><strong>The justification is an argument about incentives.</strong> The usual defence of an unequal distribution is that the prospect of higher rewards draws out effort and talent, and that the extra product reaches the bottom. That is a premise about how people behave, not an output of the rule.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="compare the worst-off first. tied there ? compare the next worst. raising the the floor of beats equal shares. the principle allows inequality that pays" tabindex="0" role="region" aria-label="Mathematical notation">compare the worst-off first
 tied there? compare the next worst
 raising the floor beats equal shares
@@ -2158,11 +2203,42 @@ the principle allows inequality that pays</div><figcaption>Leximin, step by step
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2230,7 +2306,7 @@ the principle allows inequality that pays</div><figcaption>Leximin, step by step
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

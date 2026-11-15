@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,37 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Code Improvements</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 25 · Code-Tuning Strategies</p>
       <h1>Code-Tuning Strategies</h1>
       <p class="lesson-lede">A program is only as much faster as the time the changed code took, so measure where the time goes before changing anything.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Code tuning</li><li>The Pareto principle</li><li>Speedup</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s strategy, then the arithmetic of a profile</h2>
-      <article class="prose reading"><p><strong>Code Complete, Chapter 25, p. 608.</strong> &ldquo;Most programs spend most of their time in a small fraction of their code. You won’t know which code that is until you measure it.&rdquo; Read Chapter 25, pages 587 to 608, in your own copy first.</p><p>Your program is slow, and you have a suspect: the formatting routine, with its string building, which you have always thought wasteful. Chapter 25 asks you first whether the code is the place to look at all. Section 25.1 (p. 588) separates performance from code speed. McConnell's example is his own: a camera whose software made him upload pictures one at a time, replaced by a card reader that let him copy them all at once. He did not care whether the reader's code was faster, because his throughput was. Before code, the section lists six other places to look: the program's requirements, where a performance target is often stated that nobody needs; its design; the design of classes and routines; its dealings with the operating system; the compiler; and the hardware. Code tuning is last.</p><p>Section 25.2 (p. 591) defines code tuning as changing correct code, a few lines or a routine at a time, to run more efficiently, and admits its appeal. Then the Pareto principle. The book reports Barry Boehm's figure, that 20 percent of a program's routines consume 80 percent of its time (1987), and Donald Knuth's, that less than 4 percent of a program usually accounts for more than half of its run time (1971). Knuth found it with a profiler that counted the lines executed, and the book draws the consequence: measure to find the hot spots, and put your effort there. These are their programs' figures, from 1971 and 1987; your profile is what applies to yours.</p><p>The section then takes apart four beliefs it calls old wives' tales: that fewer lines of source run faster; that some operations are probably faster than others, when the answer changes with every compiler and machine; that you should optimise as you go; and that speed matters as much as correctness. Against optimising as you go it cites Knuth's warning about premature optimisation, and points out that nobody can tell which small part of a program will be the bottleneck until the program works. M. A. Jackson's rules of optimisation, which the chapter quotes in its margin, make the point drily: the first is don't, and the second, for experts only, is not yet. Good compilers, it adds, optimise straightforward code better than tricky code.</p><p>Section 25.3 (p. 597) names the usual sources of slowness, among them input and output, paging, system calls, interpreted languages and errors, and notes that the relative cost of common operations changed between the book's editions. Section 25.4 (p. 603) insists on measurement, with a story against himself. McConnell once rewrote a matrix-summing routine with pointers, sure he had saved thousands of multiplications, and measured it to enjoy the result: no improvement at all, at any size, because the compiler was already doing the same thing. What tuning without measurement reliably produces, he concludes, is harder code. Section 25.5 (p. 605) adds that gains come from many changes in combination, and Section 25.6 (p. 606) gives the approach: save a working version, measure, decide whether the problem is design or code, tune the bottleneck, measure each change, and revert any that does not help.</p><div class="defbox"><span class="label">Definition &middot; Speedup from tuning one routine</span><p>If a routine took t of a program's total time T and is made k times faster, the new total is T minus t plus t over k, and the speedup is T over the new total. The saving can never exceed t, however large k is.</p></div><p>The lab takes a profile, routine by routine, with a factor for each: 1 for unchanged, 10 for ten times faster. The profile is the lesson's illustration, not the book's: parse 600 ms, compute 250, format 100, write 50. The <code>tune-format</code> preset makes format ten times faster. Time before is 1,000 ms; Time after is 910, since 100 ms became 10; Speedup is 100/91, about 1.10; Saved is 9%. Your suspect was ten times faster and the program 9 percent faster.</p><p>The <code>tune-parse</code> preset only halves parse, the routine that takes most of the time: Time after 700, Speedup 10/7, about 1.43, Saved 30%. The <code>tune-the-small-ones</code> preset makes format and write each a thousand times faster: Time after 17003/20 = 850.15, Speedup 20000/17003, about 1.18, Saved about 15.0%, half of what halving parse gives. The last tile, Routines reaching 4/5 of the time, reads 2 of 4 for all three: taken largest first, parse and compute already make 850 of the 1,000 ms before any change. That four-fifths is the lab's target, not a law; on your own profile the count could be one routine or six.</p><h3>Exercise</h3><div class="mathblock" data-say="the hot routine, 95 percent of the time. everything else, 5 percent. change A, everything else 1000 times faster. change B, the hot routine twice as fast" tabindex="0" role="region" aria-label="Mathematical notation">the hot routine:  95 percent of the time
-everything else:  5 percent
-change A:  everything else 1000 times faster
-change B:  the hot routine twice as fast</div><p>For each change, compute the share of the total time it saves, and say which is worth making. To check, type a two-routine profile into the lab, with times 95 and 5 and the factors each change gives.</p><p>Once a measurement has found the hot spot, the question is what to change in it. The next lesson, “Code-Tuning Techniques”, reads the chapter of things to try.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Where the time goes</h2></div><p>tuning some routines, and the whole program&#x27;s time</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s strategy, then the arithmetic of a profile</h2><div class="prose reading"><p><strong>Code Complete, Chapter 25, p. 608.</strong> &ldquo;Most programs spend most of their time in a small fraction of their code. You won’t know which code that is until you measure it.&rdquo; Read Chapter 25, pages 587 to 608, in your own copy first.</p><p>Your program is slow, and you have a suspect: the formatting routine, with its string building, which you have always thought wasteful. Chapter 25 asks you first whether the code is the place to look at all. Section 25.1 (p. 588) separates performance from code speed. McConnell's example is his own: a camera whose software made him upload pictures one at a time, replaced by a card reader that let him copy them all at once. He did not care whether the reader's code was faster, because his throughput was. Before code, the section lists six other places to look: the program's requirements, where a performance target is often stated that nobody needs; its design; the design of classes and routines; its dealings with the operating system; the compiler; and the hardware. Code tuning is last.</p><p>Section 25.2 (p. 591) defines code tuning as changing correct code, a few lines or a routine at a time, to run more efficiently, and admits its appeal. Then the Pareto principle. The book reports Barry Boehm's figure, that 20 percent of a program's routines consume 80 percent of its time (1987), and Donald Knuth's, that less than 4 percent of a program usually accounts for more than half of its run time (1971). Knuth found it with a profiler that counted the lines executed, and the book draws the consequence: measure to find the hot spots, and put your effort there. These are their programs' figures, from 1971 and 1987; your profile is what applies to yours.</p><p>The section then takes apart four beliefs it calls old wives' tales: that fewer lines of source run faster; that some operations are probably faster than others, when the answer changes with every compiler and machine; that you should optimise as you go; and that speed matters as much as correctness. Against optimising as you go it cites Knuth's warning about premature optimisation, and points out that nobody can tell which small part of a program will be the bottleneck until the program works. M. A. Jackson's rules of optimisation, which the chapter quotes in its margin, make the point drily: the first is don't, and the second, for experts only, is not yet. Good compilers, it adds, optimise straightforward code better than tricky code.</p><p>Section 25.3 (p. 597) names the usual sources of slowness, among them input and output, paging, system calls, interpreted languages and errors, and notes that the relative cost of common operations changed between the book's editions. Section 25.4 (p. 603) insists on measurement, with a story against himself. McConnell once rewrote a matrix-summing routine with pointers, sure he had saved thousands of multiplications, and measured it to enjoy the result: no improvement at all, at any size, because the compiler was already doing the same thing. What tuning without measurement reliably produces, he concludes, is harder code. Section 25.5 (p. 605) adds that gains come from many changes in combination, and Section 25.6 (p. 606) gives the approach: save a working version, measure, decide whether the problem is design or code, tune the bottleneck, measure each change, and revert any that does not help.</p><div class="defbox"><span class="label">Definition &middot; Speedup from tuning one routine</span><p>If a routine took t of a program's total time T and is made k times faster, the new total is T minus t plus t over k, and the speedup is T over the new total. The saving can never exceed t, however large k is.</p></div><p>The lab takes a profile, routine by routine, with a factor for each: 1 for unchanged, 10 for ten times faster. The profile is the lesson's illustration, not the book's: parse 600 ms, compute 250, format 100, write 50. The <code>tune-format</code> preset makes format ten times faster. Time before is 1,000 ms; Time after is 910, since 100 ms became 10; Speedup is 100/91, about 1.10; Saved is 9%. Your suspect was ten times faster and the program 9 percent faster.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Where the time goes</h2></div><p>tuning some routines, and the whole program&#x27;s time</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Where the time goes</strong><span>tuning some routines, and the whole program's time</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="pfTable"></table></div>
       <div class="status-banner" id="pfStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What tuning one routine does to the whole</h3>
-          <p>The arithmetic of figures the lesson quotes (marked with their source). Each routine has its time before the change and a factor: 1 leaves it unchanged, 10 makes it ten times faster. The lab totals the times before and after and counts how many routines, largest first, hold four-fifths of the time before. Figures: an illustrative profile, not the book's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What tuning one routine does to the whole</h3>
+            <p>The arithmetic of figures the lesson quotes (marked with their source). Each routine has its time before the change and a factor: 1 leaves it unchanged, 10 makes it ten times faster. The lab totals the times before and after and counts how many routines, largest first, hold four-fifths of the time before. Figures: an illustrative profile, not the book's.</p>
         <div class="field">
           <label for="pfPreset">Worked example</label>
           <select id="pfPreset"><option value="tune-format" selected>Make format ten times faster</option><option value="tune-parse">Make parse twice as fast</option><option value="tune-the-small-ones">Make format and write a thousand times faster</option></select>
@@ -1426,12 +1466,18 @@ change B:  the hot routine twice as fast</div><p>For each change, compute the sh
           <div class="kpi"><span>Routines reaching 4/5 of the time</span><strong id="pfPareto">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The <code>tune-parse</code> preset only halves parse, the routine that takes most of the time: Time after 700, Speedup 10/7, about 1.43, Saved 30%. The <code>tune-the-small-ones</code> preset makes format and write each a thousand times faster: Time after 17003/20 = 850.15, Speedup 20000/17003, about 1.18, Saved about 15.0%, half of what halving parse gives. The last tile, Routines reaching 4/5 of the time, reads 2 of 4 for all three: taken largest first, parse and compute already make 850 of the 1,000 ms before any change. That four-fifths is the lab's target, not a law; on your own profile the count could be one routine or six.</p><h3>Exercise</h3><div class="mathblock" data-say="the hot routine, 95 percent of the time. everything else, 5 percent. change A, everything else 1000 times faster. change B, the hot routine twice as fast" tabindex="0" role="region" aria-label="Mathematical notation">the hot routine:  95 percent of the time
+everything else:  5 percent
+change A:  everything else 1000 times faster
+change B:  the hot routine twice as fast</div><p>For each change, compute the share of the total time it saves, and say which is worth making. To check, type a two-routine profile into the lab, with times 95 and 5 and the factors each change gives.</p><p>Once a measurement has found the hot spot, the question is what to change in it. The next lesson, “Code-Tuning Techniques”, reads the chapter of things to try.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding what to tune</h2></div><p>Four steps from a profile, and one with a profile of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Measure first</h3><p>Take a profile of the program on a realistic run, and list its routines by the time each takes, largest first.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the few that matter</h3><p>Count how many routines, from the top of the list, make up most of the time. Those are the only candidates.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Work out the most a change can save</h3><p>For a routine taking t of the total T, made k times faster, the new total is T minus t plus t over k. Even an infinite k saves only t.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Measure the change, and keep it only if it helps</h3><p>Save a working version, make one change, measure again, and revert the change if the time did not fall.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Profile a program of your own</h3><p>Take a profile of a program of yours, type its top four routines into the lab with their times, and note how many reach four-fifths of the time and what the best single change could save.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Deciding what to tune</h2>
+      <p class="lead-in">Four steps from a profile, and one with a profile of your own.</p>
+      <ol class="key-ideas method"><li><strong>Measure first.</strong> Take a profile of the program on a realistic run, and list its routines by the time each takes, largest first.</li><li><strong>Find the few that matter.</strong> Count how many routines, from the top of the list, make up most of the time. Those are the only candidates.</li><li><strong>Work out the most a change can save.</strong> For a routine taking t of the total T, made k times faster, the new total is T minus t plus t over k. Even an infinite k saves only t.</li><li><strong>Measure the change, and keep it only if it helps.</strong> Save a working version, make one change, measure again, and revert the change if the time did not fall.</li><li><strong>Profile a program of your own.</strong> Take a profile of a program of yours, type its top four routines into the lab with their times, and note how many reach four-fifths of the time and what the best single change could save.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1449,17 +1495,16 @@ speedup:  1000 / 910, about 1.10
 saved:  90 of 1000 ms, 9 percent</div><p>Halving parse instead, the <code>tune-parse</code> preset, saves 300 ms, more than three times as much, from a change one-fifth as large.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a tenfold speedup of a routine makes the program much faster</strong><span>A routine that runs ten times faster feels like a large win, and on its own benchmark it is one. The program gains only in proportion to the share of its time that routine took, which is why the chapter says to measure before tuning. On the lesson's illustration <code>tune-format</code> makes a routine ten times faster and the program 9 percent faster, while <code>tune-parse</code> makes the hot routine only twice as fast and saves 30 percent.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing fewer lines run faster</strong><span>The chapter's first old wives' tale. The number of lines of source says nothing reliable about the size or speed of the machine code, and its own measurements show a loop written out line by line running faster than the loop. Only a measurement says which is faster.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Tuning as you write</strong><span>Optimising every routine as it is written spends the effort on code that is not the bottleneck, because nobody can tell which small part of a program will be until it runs. The chapter's order is to make it correct and clear, then measure, then tune the few places the measurement points to.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute what a change to one routine does to the whole program.</strong><p>For a four-routine profile and a speed factor on one routine, compute the new total, the speedup and the share saved, and how many routines reach four-fifths of the time.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's profile is illustrative, and its arithmetic assumes the routines' times simply add and that speeding one up leaves the others alone; caching, input and output, and threads can each break that. It cannot measure anything: the times are what you type, and the chapter's whole point is that they must come from a measurement of your own program. The Pareto figures are Boehm's and Knuth's, from their programs.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a tenfold speedup of a routine makes the program much faster</strong><span>A routine that runs ten times faster feels like a large win, and on its own benchmark it is one. The program gains only in proportion to the share of its time that routine took, which is why the chapter says to measure before tuning. On the lesson's illustration <code>tune-format</code> makes a routine ten times faster and the program 9 percent faster, while <code>tune-parse</code> makes the hot routine only twice as fast and saves 30 percent.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing fewer lines run faster</strong><span>The chapter's first old wives' tale. The number of lines of source says nothing reliable about the size or speed of the machine code, and its own measurements show a loop written out line by line running faster than the loop. Only a measurement says which is faster.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Tuning as you write</strong><span>Optimising every routine as it is written spends the effort on code that is not the bottleneck, because nobody can tell which small part of a program will be until it runs. The chapter's order is to make it correct and clear, then measure, then tune the few places the measurement points to.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute what a change to one routine does to the whole program.</strong><p>For a four-routine profile and a speed factor on one routine, compute the new total, the speedup and the share saved, and how many routines reach four-fifths of the time.</p></div></div><div class="note"><strong>Note:</strong> The lab's profile is illustrative, and its arithmetic assumes the routines' times simply add and that speeding one up leaves the others alone; caching, input and output, and threads can each break that. It cannot measure anything: the times are what you type, and the chapter's whole point is that they must come from a measurement of your own program. The Pareto figures are Boehm's and Knuth's, from their programs.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Code tuning</summary><p>Changing correct code, at the scale of a few lines or one routine, to make it run more efficiently. The chapter separates it from changes to requirements, design or hardware, which it puts first.</p></details><details class="recall"><summary>The Pareto principle</summary><p>Here, the observation that a small part of a program accounts for most of its running time. The book reports Boehm's 20 percent of routines taking 80 percent of the time and Knuth's under 4 percent of a program taking over half.</p></details><details class="recall"><summary>Speedup</summary><p>The time before a change divided by the time after it. A routine made k times faster changes the total only by the share of the time that routine took.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 25 sets code tuning in its place: after requirements, design, the operating system, the compiler and the hardware, and only after measuring. Compute the overall speedup a change to one routine gives, from a profile, and find the few routines that hold most of the time.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Code tuning.</strong> Changing correct code, at the scale of a few lines or one routine, to make it run more efficiently. The chapter separates it from changes to requirements, design or hardware, which it puts first.</li><li><strong>The Pareto principle.</strong> Here, the observation that a small part of a program accounts for most of its running time. The book reports Boehm's 20 percent of routines taking 80 percent of the time and Knuth's under 4 percent of a program taking over half.</li><li><strong>Speedup.</strong> The time before a change divided by the time after it. A routine made k times faster changes the total only by the share of the time that routine took.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="measure before you tune. new total, old, minus the part, plus part divided by k. speedup, old time over new time. a few routines hold most of the time. keep a change only if it measures faster" tabindex="0" role="region" aria-label="Mathematical notation">measure before you tune
 new total: old, minus the part, plus part / k
 speedup: old time over new time
@@ -2158,11 +2203,42 @@ keep a change only if it measures faster</div><figcaption>Tuning in five lines</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2230,7 +2306,7 @@ keep a change only if it measures faster</div><figcaption>Tuning in five lines</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

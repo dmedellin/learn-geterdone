@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Sequences and Series</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The binomial theorem</p>
       <h1>Pascal&#x27;s Triangle</h1>
       <p class="lesson-lede">Construct and check a row of Pascal&#x27;s triangle, then interpret one entry as a choice count.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Rows and positions are both counted from 0</li><li>The building rule is a statement about choosing</li><li>The triangle is symmetric, and that halves the work</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Building the triangle, and what its entries count</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Pascal&#x27;s triangle</span><p>The array of numbers whose row <span class="math" data-say="0">0</span> is a single <span class="math" data-say="1">1</span>, in which every row begins and ends with <span class="math" data-say="1">1</span>, and in which every other entry is the sum of the two entries immediately above it. Rows are numbered from <span class="math" data-say="0">0</span> downwards and positions within a row from <span class="math" data-say="0">0</span> from the left.</p><p>The name is a historical accident: the array appears in Chinese, Indian and Persian mathematics centuries before Pascal, who wrote a treatise on it in the 1650s.</p></div><div class="mathblock" data-say="row 0, 1. a table, shown on the page. each 10 in row 5 is the sum of the 4 and the 6 above it. the 1 s down each edge have only one entry above them, so. nothing is added to them" tabindex="0" role="region" aria-label="Mathematical notation">row 0                    1
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Building the triangle, and what its entries count</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Pascal&#x27;s triangle</span><p>The array of numbers whose row <span class="math" data-say="0">0</span> is a single <span class="math" data-say="1">1</span>, in which every row begins and ends with <span class="math" data-say="1">1</span>, and in which every other entry is the sum of the two entries immediately above it. Rows are numbered from <span class="math" data-say="0">0</span> downwards and positions within a row from <span class="math" data-say="0">0</span> from the left.</p><p>The name is a historical accident: the array appears in Chinese, Indian and Persian mathematics centuries before Pascal, who wrote a treatise on it in the 1650s.</p></div><div class="mathblock" data-say="row 0, 1. a table, shown on the page. each 10 in row 5 is the sum of the 4 and the 6 above it. the 1 s down each edge have only one entry above them, so. nothing is added to them" tabindex="0" role="region" aria-label="Mathematical notation">row 0                    1
 row 1                  1   1
 row 2                1   2   1
 row 3              1   3   3   1
@@ -1406,22 +1450,21 @@ size 2    {A,B}     {A,C}     {B,C}               3 ways
 size 3    {A,B,C}                                 1 way
                                        total      8 = 2³
 
-1, 3, 3, 1  is row 3 of the triangle</div><div class="thm"><span class="label">Theorem &middot; The entries are counts</span><p>The number of ways to choose <span class="math" data-say="k">k</span> objects from a set of <span class="math" data-say="n">n</span> distinct objects is <span class="math" data-say="n choose k">C(n,k)</span>, the entry in row <span class="math" data-say="n">n</span> at position <span class="math" data-say="k">k</span>.</p></div><div class="proof"><p>Let <span class="math" data-say="N of n and k">N(n,k)</span> be the number of ways to choose <span class="math" data-say="k">k</span> from <span class="math" data-say="n">n</span>. There is one way to choose none and one way to choose all, so <span class="math" data-say="N of n and 0 equals N of n and n equals 1">N(n,0) = N(n,n) = 1</span>, matching the edges of the triangle.</p><p>Now fix one particular object. The selections that include it are completed by choosing <span class="math" data-say="k minus 1">k - 1</span> from the other <span class="math" data-say="n minus 1">n - 1</span>, and there are <span class="math" data-say="N of n minus 1 and k minus 1">N(n-1,k-1)</span> of those. The selections that exclude it are choices of <span class="math" data-say="k">k</span> from the other <span class="math" data-say="n minus 1">n - 1</span>, and there are <span class="math" data-say="N of n minus 1 and k">N(n-1,k)</span>. No selection is in both groups and none is outside them, so <span class="math" data-say="N of n and k equals N of n minus 1 and k minus 1 plus N of n minus 1 and k">N(n,k) = N(n-1,k-1) + N(n-1,k)</span>.</p><p>So <span class="math" data-say="N">N</span> starts as the triangle does and grows by the same rule, which forces the two tables to agree row by row. Stating that last step properly is what mathematical induction is for, and the Discrete Mathematics path does it; the two rules and the two starting rows are what this course checks.</p><p><span class="qed">&#9633;</span></p></div><p>There is a second count in the same picture. Start at the apex and walk down, going left or right at each step. The number of routes that reach a given entry is that entry, because every route arrives from one of the two entries above it. A route of <span class="math" data-say="n">n</span> steps that lands at position <span class="math" data-say="k">k</span> went right <span class="math" data-say="k">k</span> times, so the routes are another way of choosing which <span class="math" data-say="k">k</span> of the <span class="math" data-say="n">n</span> steps go right.</p><h3>Two structural checks</h3><p>Row <span class="math" data-say="n">n</span> adds up to <span class="math" data-say="2 to the power n">2ⁿ</span>. The reason is the delegation table above: sorting all the subsets of an <span class="math" data-say="n">n</span>-element set by size counts each subset exactly once, and a set of <span class="math" data-say="n">n</span> things has <span class="math" data-say="2 to the power n">2ⁿ</span> subsets, one for each way of saying yes or no to each thing. Row 6 gives <span class="math" data-say="1 plus 6 plus 15 plus 20 plus 15 plus 6 plus 1 equals 64">1 + 6 + 15 + 20 + 15 + 6 + 1 = 64</span>, and <span class="math" data-say="2 to the power 6 equals 64">2⁶ = 64</span>.</p><p>With alternating signs the same rows give <span class="math" data-say="0">0</span>, for every <span class="math" data-say="n is at least 1">n ≥ 1</span>. Row 4 gives <span class="math" data-say="1 minus 4 plus 6 minus 4 plus 1 equals 0">1 - 4 + 6 - 4 + 1 = 0</span> and row 7 gives <span class="math" data-say="1 minus 7 plus 21 minus 35 plus 35 minus 21 plus 7 minus 1 equals 0">1 - 7 + 21 - 35 + 35 - 21 + 7 - 1 = 0</span>. For odd <span class="math" data-say="n">n</span> the symmetry pairs each entry with an equal one of the opposite sign, which settles that case; for even <span class="math" data-say="n">n</span> the cancellation is real but the clean reason for it is the binomial theorem with <span class="math" data-say="A equals 1">a = 1</span> and <span class="math" data-say="b equals negative 1">b = -1</span>, which is the subject of “The Binomial Theorem”.</p><p>The entries grow quickly: <span class="math" data-say="20 choose 10 equals 184756">C(20,10) = 184756</span>, and reaching it by addition means building twenty rows, one hundred and ninety additions. That is the argument for a formula, and it is what “The Binomial Theorem” supplies.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Pascal&#x27;s triangle, built and checked</h2></div><p>Every entry by addition and by C(n, k), and every row sum against 2^n</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+1, 3, 3, 1  is row 3 of the triangle</div><div class="thm"><span class="label">Theorem &middot; The entries are counts</span><p>The number of ways to choose <span class="math" data-say="k">k</span> objects from a set of <span class="math" data-say="n">n</span> distinct objects is <span class="math" data-say="n choose k">C(n,k)</span>, the entry in row <span class="math" data-say="n">n</span> at position <span class="math" data-say="k">k</span>.</p></div><div class="proof"><p>Let <span class="math" data-say="N of n and k">N(n,k)</span> be the number of ways to choose <span class="math" data-say="k">k</span> from <span class="math" data-say="n">n</span>. There is one way to choose none and one way to choose all, so <span class="math" data-say="N of n and 0 equals N of n and n equals 1">N(n,0) = N(n,n) = 1</span>, matching the edges of the triangle.</p><p>Now fix one particular object. The selections that include it are completed by choosing <span class="math" data-say="k minus 1">k - 1</span> from the other <span class="math" data-say="n minus 1">n - 1</span>, and there are <span class="math" data-say="N of n minus 1 and k minus 1">N(n-1,k-1)</span> of those. The selections that exclude it are choices of <span class="math" data-say="k">k</span> from the other <span class="math" data-say="n minus 1">n - 1</span>, and there are <span class="math" data-say="N of n minus 1 and k">N(n-1,k)</span>. No selection is in both groups and none is outside them, so <span class="math" data-say="N of n and k equals N of n minus 1 and k minus 1 plus N of n minus 1 and k">N(n,k) = N(n-1,k-1) + N(n-1,k)</span>.</p><p>So <span class="math" data-say="N">N</span> starts as the triangle does and grows by the same rule, which forces the two tables to agree row by row. Stating that last step properly is what mathematical induction is for, and the Discrete Mathematics path does it; the two rules and the two starting rows are what this course checks.</p><p><span class="qed">&#9633;</span></p></div><p>There is a second count in the same picture. Start at the apex and walk down, going left or right at each step. The number of routes that reach a given entry is that entry, because every route arrives from one of the two entries above it. A route of <span class="math" data-say="n">n</span> steps that lands at position <span class="math" data-say="k">k</span> went right <span class="math" data-say="k">k</span> times, so the routes are another way of choosing which <span class="math" data-say="k">k</span> of the <span class="math" data-say="n">n</span> steps go right.</p><h3>Two structural checks</h3><p>Row <span class="math" data-say="n">n</span> adds up to <span class="math" data-say="2 to the power n">2ⁿ</span>. The reason is the delegation table above: sorting all the subsets of an <span class="math" data-say="n">n</span>-element set by size counts each subset exactly once, and a set of <span class="math" data-say="n">n</span> things has <span class="math" data-say="2 to the power n">2ⁿ</span> subsets, one for each way of saying yes or no to each thing. Row 6 gives <span class="math" data-say="1 plus 6 plus 15 plus 20 plus 15 plus 6 plus 1 equals 64">1 + 6 + 15 + 20 + 15 + 6 + 1 = 64</span>, and <span class="math" data-say="2 to the power 6 equals 64">2⁶ = 64</span>.</p><p>With alternating signs the same rows give <span class="math" data-say="0">0</span>, for every <span class="math" data-say="n is at least 1">n ≥ 1</span>. Row 4 gives <span class="math" data-say="1 minus 4 plus 6 minus 4 plus 1 equals 0">1 - 4 + 6 - 4 + 1 = 0</span> and row 7 gives <span class="math" data-say="1 minus 7 plus 21 minus 35 plus 35 minus 21 plus 7 minus 1 equals 0">1 - 7 + 21 - 35 + 35 - 21 + 7 - 1 = 0</span>. For odd <span class="math" data-say="n">n</span> the symmetry pairs each entry with an equal one of the opposite sign, which settles that case; for even <span class="math" data-say="n">n</span> the cancellation is real but the clean reason for it is the binomial theorem with <span class="math" data-say="A equals 1">a = 1</span> and <span class="math" data-say="b equals negative 1">b = -1</span>, which is the subject of “The Binomial Theorem”.</p><p>The entries grow quickly: <span class="math" data-say="20 choose 10 equals 184756">C(20,10) = 184756</span>, and reaching it by addition means building twenty rows, one hundred and ninety additions. That is the argument for a formula, and it is what “The Binomial Theorem” supplies.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Pascal&#x27;s triangle, built and checked</h2></div><p>Every entry by addition and by C(n, k), and every row sum against 2^n</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="sqTitle">Sequence</strong><span id="sqSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>built by addition</span><span class="tone-purple"><i class="legend-swatch"></i>C(n, k) from factorials</span><span class="tone-green"><i class="legend-swatch"></i>the row sum against 2^n</span></div>
       </div>
       <div id="sqWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="sqStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Rows, and what they add to</h3>
-          <p>The lab builds the triangle one row at a time from the addition rule, and prints beside each row both the total of its entries added up and the value of <span class="math" data-say="2 to the power n">2ⁿ</span>, so the two can be compared. Build it to row 10, highlight the entry <span class="math" data-say="k equals 3">k = 3</span> in that row, and read off the number of ways to choose three people out of ten.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Rows, and what they add to</h3>
+            <p>The lab builds the triangle one row at a time from the addition rule, and prints beside each row both the total of its entries added up and the value of <span class="math" data-say="2 to the power n">2ⁿ</span>, so the two can be compared. Build it to row 10, highlight the entry <span class="math" data-say="k equals 3">k = 3</span> in that row, and read off the number of ways to choose three people out of ten.</p>
         <div class="field" id="sqFieldPreset">
           <label for="sqPreset">Worked example</label>
           <select id="sqPreset"><option value="0">row 5, the entry at k = 2</option><option value="1">row 0: the top, which no addition produced</option><option value="2">the edge of the triangle, where one parent is missing</option><option value="3">row 10, and its row sum 1024</option><option value="4">the symmetry C(n, k) = C(n, n-k)</option><option value="5">a row that is not in the triangle you built</option></select>
@@ -1444,12 +1487,14 @@ size 3    {A,B,C}                                 1 way
           <div class="kpi"><span id="sqK3Lab">&mdash;</span><strong id="sqK3">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="sqHint" style="margin:0;">The triangle is built by addition alone. The two highlight boxes take whole numbers: a row between 0 and the row you built to, and an entry between 0 and that row. Anything else is explained in the banner and the triangle is drawn regardless.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Getting an entry out of the triangle</h2></div><p>Four steps, and the last one costs one line of addition and is worth doing every time.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Number the rows and positions from 0</h3><p>Write the index above each entry before reading anything off. For <span class="math" data-say="8 choose 3">C(8,3)</span> you want row 8, and the fourth number along it, because position <span class="math" data-say="3">3</span> follows positions <span class="math" data-say="0, 1, 2">0, 1, 2</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Build down from a row you are sure of</h3><p>Each new row starts and ends with <span class="math" data-say="1">1</span>; every entry between them is the sum of the pair above. Take the row you trust, not the row you half remember.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Use the symmetry once you are past the middle</h3><p><span class="math" data-say="n choose k equals n choose n-k">C(n,k) = C(n,n-k)</span>, so the second half of a row is the first half reversed. In an odd-numbered row the two central entries are equal; in an even-numbered row there is a single central entry.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the row against <span data-say="2 to the power n">2ⁿ</span></h3><p>Add the entries. A row that does not total <span class="math" data-say="2 to the power n">2ⁿ</span> contains an error. A row that does may still contain two errors that cancel, so the symmetry is worth a second look.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Getting an entry out of the triangle</h2>
+      <p class="lead-in">Four steps, and the last one costs one line of addition and is worth doing every time.</p>
+      <ol class="key-ideas method"><li><strong>Number the rows and positions from 0.</strong> Write the index above each entry before reading anything off. For <span class="math" data-say="8 choose 3">C(8,3)</span> you want row 8, and the fourth number along it, because position <span class="math" data-say="3">3</span> follows positions <span class="math" data-say="0, 1, 2">0, 1, 2</span>.</li><li><strong>Build down from a row you are sure of.</strong> Each new row starts and ends with <span class="math" data-say="1">1</span>; every entry between them is the sum of the pair above. Take the row you trust, not the row you half remember.</li><li><strong>Use the symmetry once you are past the middle.</strong> <span class="math" data-say="n choose k equals n choose n-k">C(n,k) = C(n,n-k)</span>, so the second half of a row is the first half reversed. In an odd-numbered row the two central entries are equal; in an even-numbered row there is a single central entry.</li><li><strong>Check the row against <span data-say="2 to the power n">2ⁿ</span>.</strong> Add the entries. A row that does not total <span class="math" data-say="2 to the power n">2ⁿ</span> contains an error. A row that does may still contain two errors that cancel, so the symmetry is worth a second look.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1483,17 +1528,16 @@ symmetry   C(8,5) = 56 as well: choosing which 3 to send is the
            same act as choosing which 5 to leave behind</div><p>Each row was produced one way and checked another, which is what the <span class="math" data-say="2 to the power n">2ⁿ</span> line is for. It establishes that the entries of that row total the right amount; it does not establish that every entry is right, since two compensating errors would pass. Reading the row backwards and finding the same numbers is a second, independent check.</p><p><span class="math" data-say="56">56</span> answers a question about people with no obvious triangle in it. The connection is the argument above: the delegations of size <span class="math" data-say="3">3</span> from <span class="math" data-say="8">8</span> either include a particular person or do not, which is the same split that built the row.</p><p>For a faded row construction, start from the completed row 8 above and build row 9. The supplied edge entries are the two <span class="math" data-say="1">1</span>s; every interior entry is still yours. Use symmetry to check the row, add it to compare with <span class="math" data-say="2 to the power 9">2⁹</span>, and read <span class="math" data-say="9 choose 4">C(9,4)</span> as a sentence about choosing four people from nine before opening the quiz.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Counting rows or positions from 1</strong><span>Row 4 is the fifth row written down, and <span class="math" data-say="6 choose 2 equals 15">C(6,2) = 15</span> is the third number in its row. Every off-by-one in this lesson is this convention being applied on one side of a calculation and not the other. Writing the position numbers above the entries removes it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding the wrong pair, or treating the edges as a special rule</strong><span>An interior entry uses the two entries immediately above, not the two nearest numbers on the page. The edge <span class="math" data-say="1">1</span>s are not an exception bolted on: there is only one entry above them, and the missing neighbour counts as <span class="math" data-say="0">0</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the <span data-say="2 to the power n">2ⁿ</span> row total as a complete check</strong><span>A row with two compensating errors can still add to <span class="math" data-say="2 to the power n">2ⁿ</span>. The total is a necessary check, not a proof of every entry. Verify that the row is symmetric and that each interior number is the sum of its two parents; those local checks expose an error the total can hide.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can extend the triangle five rows and check each one as you go.</strong><p>You should be able to produce row 8 from row 5 without error, read <span class="math" data-say="8 choose 3">C(8,3)</span> off it with the positions counted correctly, and say why the entry is the answer to a question about choosing delegations. The <span class="math" data-say="2 to the power n">2ⁿ</span> check should be automatic.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> So far the triangle is a table with a counting interpretation. “The Binomial Theorem” connects it to algebra: expanding <span class="math" data-say="the quantity A plus b, to the power n">(a + b)ⁿ</span> means choosing an <span class="math" data-say="A">a</span> or a <span class="math" data-say="b">b</span> from each of <span class="math" data-say="n">n</span> brackets, which is the same choosing problem, so row <span class="math" data-say="n">n</span> turns out to be the list of coefficients. Having the rows already in hand is what makes that lesson short.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Counting rows or positions from 1</strong><span>Row 4 is the fifth row written down, and <span class="math" data-say="6 choose 2 equals 15">C(6,2) = 15</span> is the third number in its row. Every off-by-one in this lesson is this convention being applied on one side of a calculation and not the other. Writing the position numbers above the entries removes it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding the wrong pair, or treating the edges as a special rule</strong><span>An interior entry uses the two entries immediately above, not the two nearest numbers on the page. The edge <span class="math" data-say="1">1</span>s are not an exception bolted on: there is only one entry above them, and the missing neighbour counts as <span class="math" data-say="0">0</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the <span data-say="2 to the power n">2ⁿ</span> row total as a complete check</strong><span>A row with two compensating errors can still add to <span class="math" data-say="2 to the power n">2ⁿ</span>. The total is a necessary check, not a proof of every entry. Verify that the row is symmetric and that each interior number is the sum of its two parents; those local checks expose an error the total can hide.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can extend the triangle five rows and check each one as you go.</strong><p>You should be able to produce row 8 from row 5 without error, read <span class="math" data-say="8 choose 3">C(8,3)</span> off it with the positions counted correctly, and say why the entry is the answer to a question about choosing delegations. The <span class="math" data-say="2 to the power n">2ⁿ</span> check should be automatic.</p></div></div><div class="note"><strong>Note:</strong> So far the triangle is a table with a counting interpretation. “The Binomial Theorem” connects it to algebra: expanding <span class="math" data-say="the quantity A plus b, to the power n">(a + b)ⁿ</span> means choosing an <span class="math" data-say="A">a</span> or a <span class="math" data-say="b">b</span> from each of <span class="math" data-say="n">n</span> brackets, which is the same choosing problem, so row <span class="math" data-say="n">n</span> turns out to be the list of coefficients. Having the rows already in hand is what makes that lesson short.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Rows and positions are both counted from 0</summary><p>The apex is row <span class="math" data-say="0">0</span>, and the leftmost entry of any row is position <span class="math" data-say="0">0</span>. So row <span class="math" data-say="n">n</span> has <span class="math" data-say="n plus 1">n + 1</span> entries, and the third number in row 6 is <span class="math" data-say="6 choose 2 equals 15">C(6,2) = 15</span> rather than <span class="math" data-say="6 choose 3">C(6,3)</span>. The convention is arbitrary, but it is universal and it matches the exponents in <span class="math" data-say="the quantity A plus b, to the power n">(a + b)ⁿ</span>.</p></details><details class="recall"><summary>The building rule is a statement about choosing</summary><p>An entry counts the ways of choosing <span class="math" data-say="k">k</span> objects out of <span class="math" data-say="n">n</span>. Single out one object: either it is chosen, and the remaining <span class="math" data-say="k minus 1">k - 1</span> come from the other <span class="math" data-say="n minus 1">n - 1</span>, or it is not, and all <span class="math" data-say="k">k</span> do. Those two cases are separate and cover everything, so the counts add &mdash; which is the sum-of-the-two-above rule.</p></details><details class="recall"><summary>The triangle is symmetric, and that halves the work</summary><p><span class="math" data-say="n choose k equals n choose n-k">C(n,k) = C(n,n-k)</span>, because naming the <span class="math" data-say="k">k</span> objects to take is the same act as naming the <span class="math" data-say="n minus k">n - k</span> to leave. Row 8 is written once you know <span class="math" data-say="1, 8, 28, 56, 70">1, 8, 28, 56, 70</span>: the rest is <span class="math" data-say="56, 28, 8, 1">56, 28, 8, 1</span>, the first four of those read backwards, with the central <span class="math" data-say="70">70</span> written once.</p></details></div>
+      <h3>Summary</h3>
       <p>Start with a single <span class="math" data-say="1">1</span> and make every entry the sum of the two above it. The rows that come out are the coefficients of <span class="math" data-say="the quantity A plus b, to the power n">(a + b)ⁿ</span>, and each entry counts something exact: the number of ways to choose <span class="math" data-say="k">k</span> things from <span class="math" data-say="n">n</span>. This lesson builds the triangle and establishes what its entries count; the formula for computing one without building the rows above it comes next.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Rows and positions are both counted from 0.</strong> The apex is row <span class="math" data-say="0">0</span>, and the leftmost entry of any row is position <span class="math" data-say="0">0</span>. So row <span class="math" data-say="n">n</span> has <span class="math" data-say="n plus 1">n + 1</span> entries, and the third number in row 6 is <span class="math" data-say="6 choose 2 equals 15">C(6,2) = 15</span> rather than <span class="math" data-say="6 choose 3">C(6,3)</span>. The convention is arbitrary, but it is universal and it matches the exponents in <span class="math" data-say="the quantity A plus b, to the power n">(a + b)ⁿ</span>.</li><li><strong>The building rule is a statement about choosing.</strong> An entry counts the ways of choosing <span class="math" data-say="k">k</span> objects out of <span class="math" data-say="n">n</span>. Single out one object: either it is chosen, and the remaining <span class="math" data-say="k minus 1">k - 1</span> come from the other <span class="math" data-say="n minus 1">n - 1</span>, or it is not, and all <span class="math" data-say="k">k</span> do. Those two cases are separate and cover everything, so the counts add &mdash; which is the sum-of-the-two-above rule.</li><li><strong>The triangle is symmetric, and that halves the work.</strong> <span class="math" data-say="n choose k equals n choose n-k">C(n,k) = C(n,n-k)</span>, because naming the <span class="math" data-say="k">k</span> objects to take is the same act as naming the <span class="math" data-say="n minus k">n - k</span> to leave. Row 8 is written once you know <span class="math" data-say="1, 8, 28, 56, 70">1, 8, 28, 56, 70</span>: the rest is <span class="math" data-say="56, 28, 8, 1">56, 28, 8, 1</span>, the first four of those read backwards, with the central <span class="math" data-say="70">70</span> written once.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a table, shown on the page. n choose k, entry k of row n, both counted from 0. n choose k, equals, n minus 1 choose k minus 1 plus n minus 1 choose k, the building rule, in symbols. row n adds up to 2 to the power n, 1 plus 4 plus 6 plus 4 plus 1 equals 16" tabindex="0" role="region" aria-label="Mathematical notation">row 4      1   4   6   4   1      each entry the sum of the two above
 C(n,k)     entry k of row n, both counted from 0
 C(n,k)  =  C(n-1,k-1) + C(n-1,k)  the building rule, in symbols
@@ -4458,11 +4502,42 @@ row n adds up to 2ⁿ               1 + 4 + 6 + 4 + 1 = 16</div><figcaption>The 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -4530,7 +4605,7 @@ row n adds up to 2ⁿ               1 + 4 + 6 + 4 + 1 = 16</div><figcaption>The 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

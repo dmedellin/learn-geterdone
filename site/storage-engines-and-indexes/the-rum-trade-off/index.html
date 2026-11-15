@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Storage Engines and Indexes</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Filters and the trade-off</p>
       <h1>The RUM Trade-off</h1>
       <p class="lesson-lede">Compute the read, update and memory amplification of three engine shapes from the same parameters, and the disk bandwidth each one implies.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Three amplifications describe an engine</li><li>Each shape&#x27;s strength causes its weakness</li><li>The bandwidth a device needs is ingest <span data-say="times">×</span> update amplification</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Three amplifications, three engines, one triangle</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Read, update and memory amplification</span><p>For a storage engine, <strong>read amplification</strong> <span class="math" data-say="RA">RA</span> is the number of storage reads a logical lookup performs; <strong>update amplification</strong> <span class="math" data-say="UA">UA</span> is the bytes written to storage per byte ingested; <strong>memory amplification</strong> <span class="math" data-say="MA">MA</span> is the bytes occupied per byte of unique data.</p><p>The <strong>RUM conjecture</strong> is that no engine minimises all three: a design that is best in one is, in general, worse in at least one other.</p></div><p>Memory amplification is a measure of <em>space</em>, not of RAM. A tiered tree with <span class="math" data-say="MA equals 10">MA = 10</span> is keeping ten copies of a key on disk while it waits to merge them, and that is ten times the storage bill for the same unique data. The word is historical and it costs people an argument every time.</p><div class="mathblock" data-say="F equals 10, L equals 5, ingest 50 megabytes per second, 4 kB pages, 128 B rows, two thirds fill. engine, read, update, memory, bandwidth at 50 megabytes per second. a table, shown on the page. B-tree, 4, 125 over 4 equals 31.25, 3 over 2, 1.56 gigabytes per second. levelled, RA equals L, UA equals L times F over 2, MA equals 1 plus 1 over F. tiered, RA equals L times F, UA equals L, MA equals F. B-tree, RA equals height, UA equals page over r o w, MA equals 1 over fill" tabindex="0" role="region" aria-label="Mathematical notation">F = 10      L = 5      ingest 50 MB/s      4 kB pages, 128 B rows, ⅔ fill
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Three amplifications, three engines, one triangle</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Read, update and memory amplification</span><p>For a storage engine, <strong>read amplification</strong> <span class="math" data-say="RA">RA</span> is the number of storage reads a logical lookup performs; <strong>update amplification</strong> <span class="math" data-say="UA">UA</span> is the bytes written to storage per byte ingested; <strong>memory amplification</strong> <span class="math" data-say="MA">MA</span> is the bytes occupied per byte of unique data.</p><p>The <strong>RUM conjecture</strong> is that no engine minimises all three: a design that is best in one is, in general, worse in at least one other.</p></div><p>Memory amplification is a measure of <em>space</em>, not of RAM. A tiered tree with <span class="math" data-say="MA equals 10">MA = 10</span> is keeping ten copies of a key on disk while it waits to merge them, and that is ten times the storage bill for the same unique data. The word is historical and it costs people an argument every time.</p><div class="mathblock" data-say="F equals 10, L equals 5, ingest 50 megabytes per second, 4 kB pages, 128 B rows, two thirds fill. engine, read, update, memory, bandwidth at 50 megabytes per second. a table, shown on the page. B-tree, 4, 125 over 4 equals 31.25, 3 over 2, 1.56 gigabytes per second. levelled, RA equals L, UA equals L times F over 2, MA equals 1 plus 1 over F. tiered, RA equals L times F, UA equals L, MA equals F. B-tree, RA equals height, UA equals page over r o w, MA equals 1 over fill" tabindex="0" role="region" aria-label="Mathematical notation">F = 10      L = 5      ingest 50 MB/s      4 kB pages, 128 B rows, ⅔ fill
 
 engine             read        update        memory      bandwidth at 50 MB/s
 levelled LSM          5            25         11/10                1.25 GB/s
@@ -1400,12 +1444,11 @@ B-tree                4   125/4 = 31.25        3/2                1.56 GB/s
 
 levelled   RA = L        UA = L·F/2      MA = 1 + 1/F
 tiered     RA = L·F      UA = L          MA = F
-B-tree     RA = height   UA = page/row   MA = 1/fill</div><p>The two LSM rows are the same tree with two compaction policies. A levelled tree merges each incoming run into the level below immediately, so each level holds one sorted run and a lookup probes <span class="math" data-say="L">L</span> of them — at the cost of rewriting <span class="math" data-say="F over 2">F/2</span> bytes per byte per level. A tiered tree lets runs accumulate and merges <span class="math" data-say="F">F</span> of them at once, so it writes each byte once per level and a lookup has <span class="math" data-say="F">F</span> runs to search on every level. <span class="math" data-say="RA">RA</span> and <span class="math" data-say="UA">UA</span> swap places almost exactly.</p><div class="example"><span class="label">Example &middot; Where a B-tree&#x27;s triple comes from</span><p>Nothing in the B-tree row is a table lookup. Its read amplification is the height — <span class="math" data-say="4">4</span>, from a billion keys at a fanout of <span class="math" data-say="500">500</span>, by the integer search of “The Height of a B-tree”. Its update amplification is page over row: writing a whole <span class="math" data-say="4000 B">4 000 B</span> page to change a <span class="math" data-say="128 B">128 B</span> row is <span class="math" data-say="4000 over 128 equals 31.25">4 000/128 = 31.25</span>. Its memory amplification is one over the fill factor: pages kept about two-thirds full occupy <span class="math" data-say="1 over the quantity 2 over 3, equals 3 over 2">1/(2/3) = 3/2</span> times the space of the rows in them.</p></div><h3>The bandwidth question</h3><p>Compaction bandwidth is <span class="math" data-say="ingest times UA">ingest × UA</span>, and it is the number a device is chosen against. At <span class="math" data-say="50 megabytes per second">50 MB/s</span> the levelled tree needs <span class="math" data-say="1.25 gigabytes per second">1.25 GB/s</span>, the B-tree <span class="math" data-say="1.56 gigabytes per second">1.56 GB/s</span> and the tiered tree <span class="math" data-say="250.00 megabytes per second">250.00 MB/s</span>. The tiered engine is the only one of the three that a modest device can feed, and it is also the one that will probe fifty runs to answer a lookup. That is the trade stated in the two units that matter.</p><p>So the way to use the triangle is not to rank the corners. It is to name the amplification your workload cannot afford and then read what the other two cost. A write-heavy ingest pipeline that is queried rarely can live at the tiered corner. A point-lookup service on expensive storage cannot afford <span class="math" data-say="MA equals 10">MA = 10</span> and will not go there. A workload with both constraints is a workload that needs two engines.</p><p>What the triple does not include: compression, which moves <span class="math" data-say="MA">MA</span> and nothing else; a block cache, which moves the <em>observed</em> <span class="math" data-say="RA">RA</span> without moving the engine's; and any constant factor at all. These are ratios, so they compare shapes rather than products, and an implementation can be a factor of two better or worse than its shape at every corner.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The RUM trade-off, as three points on one triangle</h2></div><p>Read, update and memory amplification, computed for three engine shapes</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+B-tree     RA = height   UA = page/row   MA = 1/fill</div><p>The two LSM rows are the same tree with two compaction policies. A levelled tree merges each incoming run into the level below immediately, so each level holds one sorted run and a lookup probes <span class="math" data-say="L">L</span> of them — at the cost of rewriting <span class="math" data-say="F over 2">F/2</span> bytes per byte per level. A tiered tree lets runs accumulate and merges <span class="math" data-say="F">F</span> of them at once, so it writes each byte once per level and a lookup has <span class="math" data-say="F">F</span> runs to search on every level. <span class="math" data-say="RA">RA</span> and <span class="math" data-say="UA">UA</span> swap places almost exactly.</p><div class="example"><span class="label">Example &middot; Where a B-tree&#x27;s triple comes from</span><p>Nothing in the B-tree row is a table lookup. Its read amplification is the height — <span class="math" data-say="4">4</span>, from a billion keys at a fanout of <span class="math" data-say="500">500</span>, by the integer search of “The Height of a B-tree”. Its update amplification is page over row: writing a whole <span class="math" data-say="4000 B">4 000 B</span> page to change a <span class="math" data-say="128 B">128 B</span> row is <span class="math" data-say="4000 over 128 equals 31.25">4 000/128 = 31.25</span>. Its memory amplification is one over the fill factor: pages kept about two-thirds full occupy <span class="math" data-say="1 over the quantity 2 over 3, equals 3 over 2">1/(2/3) = 3/2</span> times the space of the rows in them.</p></div><h3>The bandwidth question</h3><p>Compaction bandwidth is <span class="math" data-say="ingest times UA">ingest × UA</span>, and it is the number a device is chosen against. At <span class="math" data-say="50 megabytes per second">50 MB/s</span> the levelled tree needs <span class="math" data-say="1.25 gigabytes per second">1.25 GB/s</span>, the B-tree <span class="math" data-say="1.56 gigabytes per second">1.56 GB/s</span> and the tiered tree <span class="math" data-say="250.00 megabytes per second">250.00 MB/s</span>. The tiered engine is the only one of the three that a modest device can feed, and it is also the one that will probe fifty runs to answer a lookup. That is the trade stated in the two units that matter.</p><p>So the way to use the triangle is not to rank the corners. It is to name the amplification your workload cannot afford and then read what the other two cost. A write-heavy ingest pipeline that is queried rarely can live at the tiered corner. A point-lookup service on expensive storage cannot afford <span class="math" data-say="MA equals 10">MA = 10</span> and will not go there. A workload with both constraints is a workload that needs two engines.</p><p>What the triple does not include: compression, which moves <span class="math" data-say="MA">MA</span> and nothing else; a block cache, which moves the <em>observed</em> <span class="math" data-say="RA">RA</span> without moving the engine's; and any constant factor at all. These are ratios, so they compare shapes rather than products, and an implementation can be a factor of two better or worse than its shape at every corner.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The RUM trade-off, as three points on one triangle</h2></div><p>Read, update and memory amplification, computed for three engine shapes</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Three corners, and no engine at the centre</strong><span>Read, update and memory amplification cannot all be minimised at once</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>levelled LSM</span><span class="tone-red"><i class="legend-swatch"></i>tiered LSM</span><span class="tone-purple"><i class="legend-swatch"></i>B-tree</span><span class="tone-amber"><i class="legend-swatch"></i>the corner each pays in</span></div>
@@ -1413,10 +1456,10 @@ B-tree     RA = height   UA = page/row   MA = 1/fill</div><p>The two LSM rows ar
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="rmTriangle" viewBox="0 0 520 280" role="img" aria-label="A triangle with read, update and memory at its corners and the three engines placed by the share each of their costs takes."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="rmTable"></table></div>
       <div class="status-banner" id="rmStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the fanout, the levels and the row size</h3>
-          <p>Each engine's triple comes out of the same parameters, and the bandwidth beside it is the ingest rate times its update amplification. Drop the fanout to <span class="math" data-say="4">4</span> and watch the levelled and tiered corners move in opposite directions while the B-tree, which has no <span class="math" data-say="F">F</span>, sits still.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the fanout, the levels and the row size</h3>
+            <p>Each engine's triple comes out of the same parameters, and the bandwidth beside it is the ingest rate times its update amplification. Drop the fanout to <span class="math" data-say="4">4</span> and watch the levelled and tiered corners move in opposite directions while the B-tree, which has no <span class="math" data-say="F">F</span>, sits still.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="rmF">Fanout F</label><span class="range-value" id="rmFOut">10</span></div>
           <input id="rmF" type="range" min="2" max="20" step="1" value="10" />
@@ -1440,12 +1483,14 @@ B-tree     RA = height   UA = page/row   MA = 1/fill</div><p>The two LSM rows ar
           <div class="kpi"><span>Disk bandwidth each needs at this ingest</span><strong id="rmBw">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="rmHint" style="margin:0;">The B-tree writes a whole 4 kB page to change one row and fills its pages to about two thirds, so its update and memory amplifications come out of the page geometry rather than out of a table. A billion keys at a fanout of 500 gives its read amplification, by the integer search of L2.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Placing a workload on the triangle</h2></div><p>The engine is chosen last. The first three steps are about the workload and the device.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down what the workload demands, in the same three units</h3><p>How many lookups a second and how many of them miss; how many bytes a second arrive; how much storage you are willing to buy. Those are the read, update and memory sides, stated before any engine is named.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute each engine&#x27;s triple from its own parameters</h3><p><span class="math" data-say="L">L</span> and <span class="math" data-say="F">F</span> give both LSM rows. The page size, the row size and the fill factor give the B-tree's update and memory amplification, and its height gives its read amplification.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply every update amplification by the ingest rate</h3><p>That is the sustained write bandwidth each engine requires. Compare the three numbers against the device you actually have, and some corners will disappear before you have chosen anything.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Name the corner you are paying in and check you can afford it</h3><p>Every engine is expensive somewhere. The decision is finished when you can say which amplification you are paying and what it costs in the unit it is measured in — probes, bytes a second, or terabytes.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Placing a workload on the triangle</h2>
+      <p class="lead-in">The engine is chosen last. The first three steps are about the workload and the device.</p>
+      <ol class="key-ideas method"><li><strong>Write down what the workload demands, in the same three units.</strong> How many lookups a second and how many of them miss; how many bytes a second arrive; how much storage you are willing to buy. Those are the read, update and memory sides, stated before any engine is named.</li><li><strong>Compute each engine&#x27;s triple from its own parameters.</strong> <span class="math" data-say="L">L</span> and <span class="math" data-say="F">F</span> give both LSM rows. The page size, the row size and the fill factor give the B-tree's update and memory amplification, and its height gives its read amplification.</li><li><strong>Multiply every update amplification by the ingest rate.</strong> That is the sustained write bandwidth each engine requires. Compare the three numbers against the device you actually have, and some corners will disappear before you have chosen anything.</li><li><strong>Name the corner you are paying in and check you can afford it.</strong> Every engine is expensive somewhere. The decision is finished when you can say which amplification you are paying and what it costs in the unit it is measured in — probes, bytes a second, or terabytes.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1474,17 +1519,16 @@ B-tree           read    height at N = 10⁹, B = 500 =      4
                  bandwidth  31.25 × 50 MB/s         =   1.56 GB/s</div><p>Read down each block and then across. Every engine is best at something: the tiered tree writes the least, the B-tree reads the least, the levelled tree stores the least. Every engine is worst at something too, and the worst figure is always the direct consequence of the best one.</p><p>None of the three bandwidth figures is <span class="math" data-say="50 megabytes per second">50 MB/s</span>. That is the misconception the page is built around, and it is the most expensive arithmetic error in this course: a device chosen against the ingest rate is short by a factor of between five and thirty-one, and the failure arrives weeks later as compaction debt rather than immediately as an error.</p><p>For a faded rehearsal, drop the fanout to <span class="math" data-say="4">4</span> and keep five levels. The supplied first move is that the levelled update amplification falls to <span class="math" data-say="10">10</span>. Compute all three triples at <span class="math" data-say="F equals 4">F = 4</span>, say which engine moved most and which did not move at all, and then compute the three bandwidths at the same <span class="math" data-say="50 megabytes per second">50 MB/s</span>. Check them in the lab before opening the quiz.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Sizing a device to the ingest rate</strong><span>The device sees <span class="math" data-say="ingest times UA">ingest × UA</span>. At <span class="math" data-say="50 megabytes per second">50 MB/s</span> into a levelled tree that is <span class="math" data-say="1.25 gigabytes per second">1.25 GB/s</span>, and into a B-tree <span class="math" data-say="1.56 gigabytes per second">1.56 GB/s</span>. The engine does not fail when the device is undersized; it falls behind, and falling behind raises the read amplification as well, so the system gets worse in two directions from one bad multiplication.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the triangle as a ranking</strong><span>There is no best corner. A page that says “tiered engines are write-optimised” has said something true and useless: the sentence that helps names the two prices as well — fifty probes on a lookup and ten times the storage. Any comparison quoting one amplification is a comparison with the cost removed.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading memory amplification as RAM</strong><span>It is bytes stored per byte of unique data, and it lands on the storage bill. <span class="math" data-say="MA equals 10">MA = 10</span> for a tiered tree means ten copies of a key on disk waiting to be merged, which is a decision about how much storage to buy — not about how much memory the process needs.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “which engine is best” reads as a malformed question.</strong><p>You should be able to compute all three amplifications for a levelled tree, a tiered tree and a B-tree from stated parameters, turn each update amplification into a device bandwidth, and name which corner a given workload is paying in.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every number on this page assumed the write reached durable storage. “fsync and Group Commit” is where that assumption gets priced: a single fsync caps durable commits at <span class="math" data-say="1 over t sub fsync">1/t_fsync</span> a second no matter what the rest of the engine can do, and the only way past it costs latency.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Sizing a device to the ingest rate</strong><span>The device sees <span class="math" data-say="ingest times UA">ingest × UA</span>. At <span class="math" data-say="50 megabytes per second">50 MB/s</span> into a levelled tree that is <span class="math" data-say="1.25 gigabytes per second">1.25 GB/s</span>, and into a B-tree <span class="math" data-say="1.56 gigabytes per second">1.56 GB/s</span>. The engine does not fail when the device is undersized; it falls behind, and falling behind raises the read amplification as well, so the system gets worse in two directions from one bad multiplication.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the triangle as a ranking</strong><span>There is no best corner. A page that says “tiered engines are write-optimised” has said something true and useless: the sentence that helps names the two prices as well — fifty probes on a lookup and ten times the storage. Any comparison quoting one amplification is a comparison with the cost removed.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading memory amplification as RAM</strong><span>It is bytes stored per byte of unique data, and it lands on the storage bill. <span class="math" data-say="MA equals 10">MA = 10</span> for a tiered tree means ten copies of a key on disk waiting to be merged, which is a decision about how much storage to buy — not about how much memory the process needs.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “which engine is best” reads as a malformed question.</strong><p>You should be able to compute all three amplifications for a levelled tree, a tiered tree and a B-tree from stated parameters, turn each update amplification into a device bandwidth, and name which corner a given workload is paying in.</p></div></div><div class="note"><strong>Note:</strong> Every number on this page assumed the write reached durable storage. “fsync and Group Commit” is where that assumption gets priced: a single fsync caps durable commits at <span class="math" data-say="1 over t sub fsync">1/t_fsync</span> a second no matter what the rest of the engine can do, and the only way past it costs latency.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Three amplifications describe an engine</summary><p><strong>Read</strong> amplification is the storage reads one logical lookup performs. <strong>Update</strong> amplification is the bytes written per byte ingested. <strong>Memory</strong> amplification is the bytes stored per byte of unique data. Every engine has all three, all three are ratios, and a design is a choice about which of them to make small.</p></details><details class="recall"><summary>Each shape&#x27;s strength causes its weakness</summary><p>A tiered tree writes each byte only <span class="math" data-say="5">5</span> times, the least of the three, and pays by probing <span class="math" data-say="50">50</span> runs on a lookup and keeping <span class="math" data-say="10">10</span> copies of a key. A levelled tree buys the reads back to <span class="math" data-say="5">5</span> and writes <span class="math" data-say="25">25</span>. A B-tree reads in <span class="math" data-say="4">4</span> and writes <span class="math" data-say="31.25">31.25</span> bytes to change one row. The connection is causal rather than coincidental: merging less means keeping more, and keeping more means searching more.</p></details><details class="recall"><summary>The bandwidth a device needs is ingest <span data-say="times">×</span> update amplification</summary><p>At <span class="math" data-say="50 megabytes per second">50 MB/s</span> of ingest the three engines demand <span class="math" data-say="1.25 gigabytes per second">1.25 GB/s</span>, <span class="math" data-say="250.00 megabytes per second">250.00 MB/s</span> and <span class="math" data-say="1.56 gigabytes per second">1.56 GB/s</span> of sustained write bandwidth. None of those is <span class="math" data-say="50 megabytes per second">50 MB/s</span>. Sizing the disk to what the application hands the engine is the misconception this page exists to kill, and it is off by between five and thirty-one times.</p></details></div>
+      <h3>Summary</h3>
       <p>Read amplification, update amplification and memory amplification cannot all be minimised at once. Levelled trees, tiered trees and B-trees sit at three corners of the same triangle, each best at something and paying for it somewhere else — and the disk bandwidth an engine needs is the ingest rate multiplied by its update amplification, which is never the ingest rate.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Three amplifications describe an engine.</strong> <strong>Read</strong> amplification is the storage reads one logical lookup performs. <strong>Update</strong> amplification is the bytes written per byte ingested. <strong>Memory</strong> amplification is the bytes stored per byte of unique data. Every engine has all three, all three are ratios, and a design is a choice about which of them to make small.</li><li><strong>Each shape&#x27;s strength causes its weakness.</strong> A tiered tree writes each byte only <span class="math" data-say="5">5</span> times, the least of the three, and pays by probing <span class="math" data-say="50">50</span> runs on a lookup and keeping <span class="math" data-say="10">10</span> copies of a key. A levelled tree buys the reads back to <span class="math" data-say="5">5</span> and writes <span class="math" data-say="25">25</span>. A B-tree reads in <span class="math" data-say="4">4</span> and writes <span class="math" data-say="31.25">31.25</span> bytes to change one row. The connection is causal rather than coincidental: merging less means keeping more, and keeping more means searching more.</li><li><strong>The bandwidth a device needs is ingest <span data-say="times">×</span> update amplification.</strong> At <span class="math" data-say="50 megabytes per second">50 MB/s</span> of ingest the three engines demand <span class="math" data-say="1.25 gigabytes per second">1.25 GB/s</span>, <span class="math" data-say="250.00 megabytes per second">250.00 MB/s</span> and <span class="math" data-say="1.56 gigabytes per second">1.56 GB/s</span> of sustained write bandwidth. None of those is <span class="math" data-say="50 megabytes per second">50 MB/s</span>. Sizing the disk to what the application hands the engine is the misconception this page exists to kill, and it is off by between five and thirty-one times.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="read times update times memory, choose two, and pay in the third. engine, read, update, memory, disk write at 50 megabytes per second in. a table, shown on the page. compaction bandwidth equals ingest times update amplification" tabindex="0" role="region" aria-label="Mathematical notation">read × update × memory — choose two, and pay in the third
 
 engine            read      update      memory     disk write at 50 MB/s in
@@ -2627,11 +2671,42 @@ compaction bandwidth = ingest × update amplification</div><figcaption>Three eng
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2699,7 +2774,7 @@ compaction bandwidth = ingest × update amplification</div><figcaption>Three eng
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

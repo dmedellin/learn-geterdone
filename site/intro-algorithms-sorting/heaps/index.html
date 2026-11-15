@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Sorting and Order Statistics</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 6 · Heapsort</p>
       <h1>Heaps and Building a Heap</h1>
       <p class="lesson-lede">A heap is a nearly complete binary tree stored in an array with every parent at least as large as its children, and the whole array can be made into one in linear time.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The array as a tree</li><li>The heap property</li><li>The height of a node</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;This upper bound, though correct, is not asymptotically tight.&rdquo; The authors say it in Section 6.3 of the obvious price of building a heap, and the rest of that section is the counting argument that replaces it. This lesson reads the opening of Chapter 6 and sections 6.1 to 6.3: what a heap is, how its defining property is restored below one node, and why turning a whole array into a heap costs only linear time.</p><p>The chapter opens by placing heapsort among the sorts of Part I. Like merge sort it runs in <span class="math" data-say="big O of n times log base 2 of n">O(n lg n)</span> time; like insertion sort it sorts in place, keeping only a constant number of elements outside the input array at any moment. It also introduces a new design technique: let a data structure manage the information an algorithm needs. The structure is the heap, and the authors note that it reappears as a priority queue later in the book. They also set aside the other meaning of the word, garbage-collected storage, which has nothing to do with this one.</p><div class="defbox"><span class="label">Definition &middot; Binary heap</span><p>An array <span class="math" data-say="A">A</span> with a length and a heap-size, where only <span class="math" data-say="A from 1 to heap-size">A[1..heap-size]</span> belongs to the heap. The root is <span class="math" data-say="A at 1">A[1]</span>; node <span class="math" data-say="i">i</span> has parent <span class="math" data-say="the floor of i over 2">⌊i/2⌋</span>, left child <span class="math" data-say="2 i">2i</span> and right child <span class="math" data-say="2 i plus 1">2i + 1</span>, each computable with a shift. A <strong>max-heap</strong> satisfies <span class="math" data-say="A at the floor of i over 2, is at least A at i">A[⌊i/2⌋] ≥ A[i]</span> for every node other than the root.</p></div><p>Section 6.1 adds two facts the analysis will need, both left to exercises. An n-element heap has height <span class="math" data-say="the floor of log base 2 of n">⌊lg n⌋</span> (Exercise 6.1-2), because the tree is nearly complete. And in the array layout the leaves are exactly the nodes <span class="math" data-say="the floor of n over 2, plus 1">⌊n/2⌋ + 1</span> to <span class="math" data-say="n">n</span> (Exercise 6.1-7): the second half of the array has no children. Heapsort uses max-heaps; the min-heap, with the inequality reversed, is the one priority queues usually use.</p><p>Section 6.2 gives MAX-HEAPIFY, the procedure everything else is built on. It is called on a node whose two subtrees are already max-heaps but whose own value may be smaller than a child's. It finds the largest of the node and its two children; if that is a child, it exchanges the two values and continues from the child's position, because the smaller value may now break the property one level down. The value sinks until it is at least as large as both children or reaches a leaf. Each level costs a constant, and a child's subtree holds at most <span class="math" data-say="2 n over 3">2n/3</span> of the nodes, which happens when the bottom level is exactly half full; the recurrence <span class="math" data-say="T of n is at most T of the quantity 2 n over 3, plus theta of 1">T(n) ≤ T(2n/3) + Θ(1)</span> gives <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> by the master theorem, or <span class="math" data-say="big O of h">O(h)</span> on a node of height h.</p><p>Section 6.3 builds a heap from an arbitrary array. The leaves are one-element heaps already, so BUILD-MAX-HEAP calls MAX-HEAPIFY on the internal nodes only, from <span class="math" data-say="the floor of n over 2">⌊n/2⌋</span> down to 1. The order is the correctness argument, and the authors give it as a loop invariant: before every iteration, every node numbered above i is the root of a max-heap. It holds at the start because those nodes are leaves; it is maintained because i's children are numbered above i, so they are heap roots and MAX-HEAPIFY's precondition is met; and when i reaches 0 it says node 1 is the root of a max-heap.</p><div class="thm"><span class="label">Theorem &middot; The build is linear</span><p>An n-element heap has at most <span class="math" data-say="the ceiling of n over 2 to the power h plus 1">⌈n/2ʰ⁺¹⌉</span> nodes of height h, and MAX-HEAPIFY at height h costs <span class="math" data-say="big O of h">O(h)</span>. So BUILD-MAX-HEAP costs at most the sum of <span class="math" data-say="the ceiling of n over 2 to the power h plus 1, times big O of h">⌈n/2ʰ⁺¹⌉ · O(h)</span> over h from 0 to <span class="math" data-say="the floor of log base 2 of n">⌊lg n⌋</span>, which is <span class="math" data-say="big O of the quantity n times the sum of h over 2 to the power h">O(n · Σ h/2ʰ)</span>, and the infinite series <span class="math" data-say="the sum of h over 2 to the power h">Σ h/2ʰ</span> converges to 2 (Appendix A). The build is <span class="math" data-say="big O of n">O(n)</span>.</p></div><p>The loose bound charged every one of the roughly n/2 calls the height of the whole tree. The tight one charges each call the height of its own node, and the point of the theorem is how few nodes are high: half the nodes are leaves and cost nothing, a quarter sit at height 1, an eighth at height 2, and only the root is at height <span class="math" data-say="the floor of log base 2 of n">⌊lg n⌋</span>. The node count halves at each level while the cost per node grows by one, and a halving beats an increment.</p><div class="mathblock" data-say="the sum at n equals 20, height the floor of log base 2 of 20, equals 4. h, nodes, at most the ceiling of 20 over 2 to the power h plus 1, h times nodes. a table, shown on the page. 21, against n times the floor of log base 2 of n, equals 80" tabindex="0" role="region" aria-label="Mathematical notation">the sum at n = 20, height ⌊lg 20⌋ = 4
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the count</h2><div class="prose reading"><p>&ldquo;This upper bound, though correct, is not asymptotically tight.&rdquo; The authors say it in Section 6.3 of the obvious price of building a heap, and the rest of that section is the counting argument that replaces it. This lesson reads the opening of Chapter 6 and sections 6.1 to 6.3: what a heap is, how its defining property is restored below one node, and why turning a whole array into a heap costs only linear time.</p><p>The chapter opens by placing heapsort among the sorts of Part I. Like merge sort it runs in <span class="math" data-say="big O of n times log base 2 of n">O(n lg n)</span> time; like insertion sort it sorts in place, keeping only a constant number of elements outside the input array at any moment. It also introduces a new design technique: let a data structure manage the information an algorithm needs. The structure is the heap, and the authors note that it reappears as a priority queue later in the book. They also set aside the other meaning of the word, garbage-collected storage, which has nothing to do with this one.</p><div class="defbox"><span class="label">Definition &middot; Binary heap</span><p>An array <span class="math" data-say="A">A</span> with a length and a heap-size, where only <span class="math" data-say="A from 1 to heap-size">A[1..heap-size]</span> belongs to the heap. The root is <span class="math" data-say="A at 1">A[1]</span>; node <span class="math" data-say="i">i</span> has parent <span class="math" data-say="the floor of i over 2">⌊i/2⌋</span>, left child <span class="math" data-say="2 i">2i</span> and right child <span class="math" data-say="2 i plus 1">2i + 1</span>, each computable with a shift. A <strong>max-heap</strong> satisfies <span class="math" data-say="A at the floor of i over 2, is at least A at i">A[⌊i/2⌋] ≥ A[i]</span> for every node other than the root.</p></div><p>Section 6.1 adds two facts the analysis will need, both left to exercises. An n-element heap has height <span class="math" data-say="the floor of log base 2 of n">⌊lg n⌋</span> (Exercise 6.1-2), because the tree is nearly complete. And in the array layout the leaves are exactly the nodes <span class="math" data-say="the floor of n over 2, plus 1">⌊n/2⌋ + 1</span> to <span class="math" data-say="n">n</span> (Exercise 6.1-7): the second half of the array has no children. Heapsort uses max-heaps; the min-heap, with the inequality reversed, is the one priority queues usually use.</p><p>Section 6.2 gives MAX-HEAPIFY, the procedure everything else is built on. It is called on a node whose two subtrees are already max-heaps but whose own value may be smaller than a child's. It finds the largest of the node and its two children; if that is a child, it exchanges the two values and continues from the child's position, because the smaller value may now break the property one level down. The value sinks until it is at least as large as both children or reaches a leaf. Each level costs a constant, and a child's subtree holds at most <span class="math" data-say="2 n over 3">2n/3</span> of the nodes, which happens when the bottom level is exactly half full; the recurrence <span class="math" data-say="T of n is at most T of the quantity 2 n over 3, plus theta of 1">T(n) ≤ T(2n/3) + Θ(1)</span> gives <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> by the master theorem, or <span class="math" data-say="big O of h">O(h)</span> on a node of height h.</p><p>Section 6.3 builds a heap from an arbitrary array. The leaves are one-element heaps already, so BUILD-MAX-HEAP calls MAX-HEAPIFY on the internal nodes only, from <span class="math" data-say="the floor of n over 2">⌊n/2⌋</span> down to 1. The order is the correctness argument, and the authors give it as a loop invariant: before every iteration, every node numbered above i is the root of a max-heap. It holds at the start because those nodes are leaves; it is maintained because i's children are numbered above i, so they are heap roots and MAX-HEAPIFY's precondition is met; and when i reaches 0 it says node 1 is the root of a max-heap.</p><div class="thm"><span class="label">Theorem &middot; The build is linear</span><p>An n-element heap has at most <span class="math" data-say="the ceiling of n over 2 to the power h plus 1">⌈n/2ʰ⁺¹⌉</span> nodes of height h, and MAX-HEAPIFY at height h costs <span class="math" data-say="big O of h">O(h)</span>. So BUILD-MAX-HEAP costs at most the sum of <span class="math" data-say="the ceiling of n over 2 to the power h plus 1, times big O of h">⌈n/2ʰ⁺¹⌉ · O(h)</span> over h from 0 to <span class="math" data-say="the floor of log base 2 of n">⌊lg n⌋</span>, which is <span class="math" data-say="big O of the quantity n times the sum of h over 2 to the power h">O(n · Σ h/2ʰ)</span>, and the infinite series <span class="math" data-say="the sum of h over 2 to the power h">Σ h/2ʰ</span> converges to 2 (Appendix A). The build is <span class="math" data-say="big O of n">O(n)</span>.</p></div><p>The loose bound charged every one of the roughly n/2 calls the height of the whole tree. The tight one charges each call the height of its own node, and the point of the theorem is how few nodes are high: half the nodes are leaves and cost nothing, a quarter sit at height 1, an eighth at height 2, and only the root is at height <span class="math" data-say="the floor of log base 2 of n">⌊lg n⌋</span>. The node count halves at each level while the cost per node grows by one, and a halving beats an increment.</p><div class="mathblock" data-say="the sum at n equals 20, height the floor of log base 2 of 20, equals 4. h, nodes, at most the ceiling of 20 over 2 to the power h plus 1, h times nodes. a table, shown on the page. 21, against n times the floor of log base 2 of n, equals 80" tabindex="0" role="region" aria-label="Mathematical notation">the sum at n = 20, height ⌊lg 20⌋ = 4
 
 h    nodes, at most ⌈20/2ʰ⁺¹⌉    h · nodes
 0          10                    0
@@ -1400,12 +1444,11 @@ h    nodes, at most ⌈20/2ʰ⁺¹⌉    h · nodes
 3           2                    6
 4           1                    4
                                 ---
-                                 21      against n·⌊lg n⌋ = 80</div><p>Now the lab, which runs the build and counts. It is the heap lab of the Algorithms Subject's lesson Building a Heap in Linear Time, where the same build is practised further, and it builds a <em>min</em>-heap: the mirror image of BUILD-MAX-HEAP, with every comparison reversed (Exercise 6.2-2 asks for that procedure), so every count the book makes for one is the count for the other. The keys are 1 to n in the arrival order you choose. The tiles are the sum in the table, evaluated exactly; the swaps made sifting down from the last internal node, which is BUILD-MAX-HEAP's method; the swaps made by inserting the keys one at a time instead; the sum divided by n; the height; and whether the two methods left the same array.</p><p>The worked example <code>shuffled</code>, labelled one fixed shuffle of the keys, has n = 31. The sum is 26, the bottom-up build makes 21 swaps, and inserting one key at a time makes 30. Choose the worked example labelled keys arriving in decreasing order, <code>worst-for-inserts</code>: every key is as far from its place as a key can be, the bottom-up build makes 26 swaps, exactly the sum, and insertion makes 98. The bound is met, so at 31 keys no smaller number could bound every arrival order. The third example, <code>already-a-heap</code>, sends the keys in increasing order: no swaps at all for either method.</p><p>Move the slider to 20 keys and you have the table above: the sum is 21, which the lab prints as 21/20 per element. On the shuffle the build swaps 11 times; in decreasing order, 17. Neither count is the bound. The bound is a sum over the shape of the tree, the same for every array of 20 keys, and the proof says no array can need more. The counts say what two arrays needed.</p><h3>Exercise</h3><p>Run BUILD-MAX-HEAP by hand on <span class="math" data-say="3, 8, 10, 1, 12, 6, 4, 7">[3, 8, 10, 1, 12, 6, 4, 7]</span>. Write the array after each call of MAX-HEAPIFY, count the exchanges, and compare the total with the sum over heights at n = 8. Then say which call made the most exchanges and why it could not have made more.</p><p>A heap's largest key is at its root. The next lesson, Heapsort and Priority Queues, takes it from there, n − 1 times, and turns the heap into a sorted array and into a queue that always serves its largest key first.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Building a heap from the bottom</h2></div><p>The sum of heights, evaluated rather than asserted</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+                                 21      against n·⌊lg n⌋ = 80</div><p>Now the lab, which runs the build and counts. It is the heap lab of the Algorithms Subject's lesson Building a Heap in Linear Time, where the same build is practised further, and it builds a <em>min</em>-heap: the mirror image of BUILD-MAX-HEAP, with every comparison reversed (Exercise 6.2-2 asks for that procedure), so every count the book makes for one is the count for the other. The keys are 1 to n in the arrival order you choose. The tiles are the sum in the table, evaluated exactly; the swaps made sifting down from the last internal node, which is BUILD-MAX-HEAP's method; the swaps made by inserting the keys one at a time instead; the sum divided by n; the height; and whether the two methods left the same array.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Building a heap from the bottom</h2></div><p>The sum of heights, evaluated rather than asserted</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Two ways to make a heap</strong><span>measured swaps for both, beside the sum evaluated exactly</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>sift down from the last internal node</span><span class="tone-red"><i class="legend-swatch"></i>n separate inserts</span><span class="tone-amber"><i class="legend-swatch"></i>the sum</span></div>
@@ -1413,10 +1456,10 @@ h    nodes, at most ⌈20/2ʰ⁺¹⌉    h · nodes
       <div class="lab-stage" id="hbStage" tabindex="0" role="region" aria-label="Swaps for both build methods against the exactly evaluated sum, for every size up to the one chosen."><svg id="hbPlot" style="min-width:520px" viewBox="0 0 520 220" role="img" aria-label="Swaps for both build methods against the exactly evaluated sum, for every size up to the one chosen."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="hbTable"></table></div>
       <div class="status-banner" id="hbStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Build a heap and price it by the sum over heights</h3>
-          <p>The keys are 1 to n in the arrival order you choose. The bottom-up build, BUILD-MAX-HEAP's method mirrored for a min-heap, and n separate insertions run on the same keys with counters. The sum over heights is evaluated exactly beside them: it is the bound for every arrival order, and the swaps are what one order cost.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Build a heap and price it by the sum over heights</h3>
+            <p>The keys are 1 to n in the arrival order you choose. The bottom-up build, BUILD-MAX-HEAP's method mirrored for a min-heap, and n separate insertions run on the same keys with counters. The sum over heights is evaluated exactly beside them: it is the bound for every arrival order, and the swaps are what one order cost.</p>
         <div class="field" id="hbPresetField">
           <label for="hbPreset">Worked example</label>
           <select id="hbPreset"><option value="worst-for-inserts">keys arriving in decreasing order</option><option value="shuffled" selected>one fixed shuffle of the keys</option><option value="already-a-heap">keys arriving in increasing order</option></select>
@@ -1438,12 +1481,15 @@ h    nodes, at most ⌈20/2ʰ⁺¹⌉    h · nodes
           <div class="kpi"><span>The two results</span><strong id="hbSame">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The worked example <code>shuffled</code>, labelled one fixed shuffle of the keys, has n = 31. The sum is 26, the bottom-up build makes 21 swaps, and inserting one key at a time makes 30. Choose the worked example labelled keys arriving in decreasing order, <code>worst-for-inserts</code>: every key is as far from its place as a key can be, the bottom-up build makes 26 swaps, exactly the sum, and insertion makes 98. The bound is met, so at 31 keys no smaller number could bound every arrival order. The third example, <code>already-a-heap</code>, sends the keys in increasing order: no swaps at all for either method.</p><p>Move the slider to 20 keys and you have the table above: the sum is 21, which the lab prints as 21/20 per element. On the shuffle the build swaps 11 times; in decreasing order, 17. Neither count is the bound. The bound is a sum over the shape of the tree, the same for every array of 20 keys, and the proof says no array can need more. The counts say what two arrays needed.</p><h3>Exercise</h3><p>Run BUILD-MAX-HEAP by hand on <span class="math" data-say="3, 8, 10, 1, 12, 6, 4, 7">[3, 8, 10, 1, 12, 6, 4, 7]</span>. Write the array after each call of MAX-HEAPIFY, count the exchanges, and compare the total with the sum over heights at n = 8. Then say which call made the most exchanges and why it could not have made more.</p><p>A heap's largest key is at its root. The next lesson, Heapsort and Priority Queues, takes it from there, n − 1 times, and turns the heap into a sorted array and into a queue that always serves its largest key first.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Building a heap by hand</h2></div><p>Four steps on paper, then one on an array of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Draw the tree from the array</h3><p>Put <span class="math" data-say="A at 1">A[1]</span> at the root and fill each level left to right. Mark nodes <span class="math" data-say="the floor of n over 2, plus 1">⌊n/2⌋ + 1</span> to <span class="math" data-say="n">n</span>: they are the leaves and will not be touched.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Sift down from the last internal node</h3><p>For i from <span class="math" data-say="the floor of n over 2">⌊n/2⌋</span> down to 1, compare <span class="math" data-say="A at i">A[i]</span> with its children, exchange it with the larger child if that child is larger, and repeat from where it landed until it is at least as large as its children or is a leaf.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the exchanges per call</h3><p>Write beside each node how many exchanges its call made. No call can make more than the height of its node.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Evaluate the sum over heights</h3><p>For h from 0 to <span class="math" data-say="the floor of log base 2 of n">⌊lg n⌋</span>, multiply <span class="math" data-say="the ceiling of n over 2 to the power h plus 1">⌈n/2ʰ⁺¹⌉</span> by h and add. Your total exchanges must not exceed it, whatever the array.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on an array of your own</h3><p>Write ten distinct numbers in any order, build the max-heap by hand, then set the lab to 10 keys and compare your exchange count with the sum the lab prints, 10.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Building a heap by hand</h2>
+      <p class="lead-in">Four steps on paper, then one on an array of your own.</p>
+      <ol class="key-ideas method"><li><strong>Draw the tree from the array.</strong> Put <span class="math" data-say="A at 1">A[1]</span> at the root and fill each level left to right. Mark nodes <span class="math" data-say="the floor of n over 2, plus 1">⌊n/2⌋ + 1</span> to <span class="math" data-say="n">n</span>: they are the leaves and will not be touched.</li><li><strong>Sift down from the last internal node.</strong> For i from <span class="math" data-say="the floor of n over 2">⌊n/2⌋</span> down to 1, compare <span class="math" data-say="A at i">A[i]</span> with its children, exchange it with the larger child if that child is larger, and repeat from where it landed until it is at least as large as its children or is a leaf.</li><li><strong>Count the exchanges per call.</strong> Write beside each node how many exchanges its call made. No call can make more than the height of its node.</li><li><strong>Evaluate the sum over heights.</strong> For h from 0 to <span class="math" data-say="the floor of log base 2 of n">⌊lg n⌋</span>, multiply <span class="math" data-say="the ceiling of n over 2 to the power h plus 1">⌈n/2ʰ⁺¹⌉</span> by h and add. Your total exchanges must not exceed it, whatever the array.</li><li><strong>Do it on an array of your own.</strong> Write ten distinct numbers in any order, build the max-heap by hand, then set the lab to 10 keys and compare your exchange count with the sum the lab prints, 10.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1463,17 +1509,16 @@ heap: 15 12 14 11 9 1 3 8 6 2
 6 exchanges; the sum at n = 10 is 10</div><p>The sum at n = 10 is <span class="math" data-say="3 times 1 plus 2 times 2 plus 1 times 3 equals 10">3·1 + 2·2 + 1·3 = 10</span>, and six exchanges is within it. The root's call made 3, the most any call can make here, because the root has height 3. Check the final array against the property: each parent at <span class="math" data-say="the floor of i over 2">⌊i/2⌋</span> is at least as large as the node at i.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Pricing the build at n lg n because each call costs O(lg n)</strong><span>There are about n/2 calls and each can cost up to the tree's height, so <span class="math" data-say="big O of n times log base 2 of n">O(n lg n)</span> is a correct bound, and the authors say so before showing it is not tight. A call costs the height of its own node, and half the nodes are leaves, a quarter have height 1, and only one has height <span class="math" data-say="the floor of log base 2 of n">⌊lg n⌋</span>; the sum over heights is linear. On the lesson's 20 keys the sum is 21 against <span class="math" data-say="n times the floor of log base 2 of n, equals 80">n·⌊lg n⌋ = 80</span>, and the worst arrival order the lab offers at 31 keys meets its sum of 26 exactly.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the heap property as sorted order</strong><span>The property relates each node to its parent and nothing else. Siblings can be in either order, and two nodes on different branches are not compared at all, which is why one set of keys has many heaps: the lab's two methods leave different arrays from the same shuffle. A sorted array is a heap, but a heap is rarely sorted; taking it apart into sorted order is the next lesson's work.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling MAX-HEAPIFY on a node whose subtrees are not heaps</strong><span>MAX-HEAPIFY sinks one value along one path and assumes everything below already obeys the property. Called on the root of an arbitrary array it fixes that path and leaves the rest as it was. That precondition is why the build goes from the last internal node upward to the root, and why the loop invariant is stated about the nodes numbered above i.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build a heap by hand and bound the work.</strong><p>Given eight to twelve keys, produce the max-heap BUILD-MAX-HEAP produces, count its exchanges, and evaluate the sum over heights that bounds them.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab builds a min-heap from the keys 1 to n in three arrival orders, so it cannot take your own array; the exercise and the worked example do that by hand. Its counts are swaps, which is what MAX-HEAPIFY's cost is made of, and they describe the order on screen. The linear bound is the theorem's, for every order.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Pricing the build at n lg n because each call costs O(lg n)</strong><span>There are about n/2 calls and each can cost up to the tree's height, so <span class="math" data-say="big O of n times log base 2 of n">O(n lg n)</span> is a correct bound, and the authors say so before showing it is not tight. A call costs the height of its own node, and half the nodes are leaves, a quarter have height 1, and only one has height <span class="math" data-say="the floor of log base 2 of n">⌊lg n⌋</span>; the sum over heights is linear. On the lesson's 20 keys the sum is 21 against <span class="math" data-say="n times the floor of log base 2 of n, equals 80">n·⌊lg n⌋ = 80</span>, and the worst arrival order the lab offers at 31 keys meets its sum of 26 exactly.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the heap property as sorted order</strong><span>The property relates each node to its parent and nothing else. Siblings can be in either order, and two nodes on different branches are not compared at all, which is why one set of keys has many heaps: the lab's two methods leave different arrays from the same shuffle. A sorted array is a heap, but a heap is rarely sorted; taking it apart into sorted order is the next lesson's work.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling MAX-HEAPIFY on a node whose subtrees are not heaps</strong><span>MAX-HEAPIFY sinks one value along one path and assumes everything below already obeys the property. Called on the root of an arbitrary array it fixes that path and leaves the rest as it was. That precondition is why the build goes from the last internal node upward to the root, and why the loop invariant is stated about the nodes numbered above i.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build a heap by hand and bound the work.</strong><p>Given eight to twelve keys, produce the max-heap BUILD-MAX-HEAP produces, count its exchanges, and evaluate the sum over heights that bounds them.</p></div></div><div class="note"><strong>Note:</strong> The lab builds a min-heap from the keys 1 to n in three arrival orders, so it cannot take your own array; the exercise and the worked example do that by hand. Its counts are swaps, which is what MAX-HEAPIFY's cost is made of, and they describe the order on screen. The linear bound is the theorem's, for every order.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The array as a tree</summary><p>A heap is an array <span class="math" data-say="A from 1 to n">A[1..n]</span> read as a nearly complete binary tree: every level full except perhaps the lowest, which fills from the left. Node <span class="math" data-say="i">i</span> has its parent at <span class="math" data-say="the floor of i over 2">⌊i/2⌋</span> and its children at <span class="math" data-say="2 i">2i</span> and <span class="math" data-say="2 i plus 1">2i + 1</span>, so no pointers are stored at all.</p></details><details class="recall"><summary>The heap property</summary><p>In a max-heap every node other than the root holds a value no larger than its parent's, so the largest value sits at the root. A min-heap reverses the inequality. The property relates parents to children only; it says nothing about the order of two siblings.</p></details><details class="recall"><summary>The height of a node</summary><p>The number of edges on the longest path that leads from the node down to a leaf. Leaves have height 0 and the root has height <span class="math" data-say="the floor of log base 2 of n">⌊lg n⌋</span>. The chapter's procedures cost time proportional to the height of the node they start at, which is why heights, and how many nodes have each, carry the analysis.</p></details></div>
+      <h3>Summary</h3>
       <p>Sections 6.1 to 6.3 define the binary heap, give the procedure that restores the heap property below one node, and build a heap from an unordered array by calling it from the last internal node back to the root. The obvious bound on the build is n lg n; the book shows it is linear by counting nodes at each height. Build a heap by hand, then evaluate the sum over heights exactly in the lab and set the exchanges actually made beside it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The array as a tree.</strong> A heap is an array <span class="math" data-say="A from 1 to n">A[1..n]</span> read as a nearly complete binary tree: every level full except perhaps the lowest, which fills from the left. Node <span class="math" data-say="i">i</span> has its parent at <span class="math" data-say="the floor of i over 2">⌊i/2⌋</span> and its children at <span class="math" data-say="2 i">2i</span> and <span class="math" data-say="2 i plus 1">2i + 1</span>, so no pointers are stored at all.</li><li><strong>The heap property.</strong> In a max-heap every node other than the root holds a value no larger than its parent's, so the largest value sits at the root. A min-heap reverses the inequality. The property relates parents to children only; it says nothing about the order of two siblings.</li><li><strong>The height of a node.</strong> The number of edges on the longest path that leads from the node down to a leaf. Leaves have height 0 and the root has height <span class="math" data-say="the floor of log base 2 of n">⌊lg n⌋</span>. The chapter's procedures cost time proportional to the height of the node they start at, which is why heights, and how many nodes have each, carry the analysis.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="parent of i is the floor of i over 2, children 2 i, 2 i plus 1. max-heap, no node larger than its parent. MAX-HEAPIFY costs big O of h at height h. build from the floor of n over 2, down to the root. most nodes are low, so the build is big O of n" tabindex="0" role="region" aria-label="Mathematical notation">parent of i is ⌊i/2⌋; children 2i, 2i + 1
 max-heap: no node larger than its parent
 MAX-HEAPIFY costs O(h) at height h
@@ -2961,11 +3006,42 @@ most nodes are low, so the build is O(n)</div><figcaption>Sections 6.1 to 6.3 in
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3033,7 +3109,7 @@ most nodes are low, so the build is O(n)</div><figcaption>Sections 6.1 to 6.3 in
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

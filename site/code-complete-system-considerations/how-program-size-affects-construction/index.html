@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">System Considerations</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 27 · Program Size</p>
       <h1>How Program Size Affects Construction</h1>
       <p class="lesson-lede">A larger project is not a small one made bigger: communication grows with the square of the team, errors per line rise and output per person falls.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Communication paths</li><li>Error density</li><li>Productivity</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument, then the book&#x27;s tables at three sizes</h2>
-      <article class="prose reading"><p><strong>Chapter 27, Key Points, p. 659.</strong> &ldquo;All other things being equal, a large project will have more errors per thousand lines of code than a small one.&rdquo; The chapter is short, pages 649 to 659; read it in your own copy before going on, Tables 27-1 and 27-2 especially, since the lesson uses a few of their figures and does not reproduce them.</p><p>What happens when a project grows? The obvious answer is that everything grows with it, and Chapter 27 argues that the obvious answer is wrong. McConnell opens with a hypothetical product whose next version is to be ten times the size, and says the effort, the errors and the mix of work will each grow by a different and larger factor. A large project, in his account, is a different kind of thing, and a team used to small ones can find its first large one getting out of hand.</p><p>Section 27.1 (p. 650) gives the first reason. One programmer has one path of communication, with the customer. Add people and the paths are not added; they multiply, because each new person may need to talk to every person already there. The book's figure draws them for teams of two, three, four, five and ten people: one path, then three, six, ten and forty-five. Every path is time spent talking and a chance of being misunderstood, which is why large projects formalise communication in documents: fifty people read and write documents rather than talk in every combination.</p><div class="defbox"><span class="label">Definition &middot; Communication paths in a team of n</span><p>Each pair of people is one path. There are n choices for the first person and n − 1 for the second, and each pair is counted twice that way, so the team has n times n minus one, halved: ten people have 10 times 9, halved, which is 45.</p></div><p>Section 27.2 (p. 651) asks whether your project is a typical size, and answers that no size is. Most projects are done by small teams, but because large projects use many more people each, a large share of all programmers work on large ones. Section 27.3 (p. 651) turns to errors. As size grows, more of them come from requirements and design: the book puts construction at about 75 percent of the errors on small projects and about 50 percent on larger ones, while noting that on some very large projects construction still accounts for up to three quarters. And the density rises. Table 27-1, after Jones, gives 0 to 25 errors per thousand lines for projects under 2K lines and 4 to 100 for projects of 512K lines or more.</p><p>Section 27.4 (p. 653) does the same for productivity. On small projects the single biggest influence is the individual programmer's skill; as size grows, the team and its organisation matter more. Table 27-2 gives the lines of code per staff-year the book's sources report: 2,000 to 25,000 at 10K lines, 1,000 to 20,000 at 100K, 700 to 10,000 at a million, with Cocomo II's nominal figure, 2,600 at 100K for instance, printed beside each range as a point inside it. McConnell says plainly that the specific figures vary dramatically with the kind of software, the people, the language and how lines are counted, and that the trend is what matters. These are other people's projects, averaged; your own records are the test of them.</p><p>Section 27.5 (p. 654) follows the shift into the work itself. Construction takes as much as 65 percent of the time on a small project and about 50 percent on a medium one, and less again on a large one, because detailed design, coding, debugging and unit testing grow roughly in proportion to size while communication, planning, integration and system testing grow faster. McConnell's chart of the shares stops at 512K lines, he says, to protect his job. The section ends on methodology: every team has one, chosen or not, and the book reports Boehm and Turner's advice that a light method scaled up tends to serve better than a heavy one pared down, the aim being a &ldquo;right-weight&rdquo; method for the project in front of you.</p><h3>The book&#x27;s rows, at three sizes</h3><p>The lab takes a team size, a size in thousands of lines and one row from each table, and does four pieces of arithmetic. Communication paths is the team size times one less, halved. Defects multiplies the size by each end of the density range. Staff-years divides the lines by each end of the productivity range, the fast end first. Spread of the productivity range divides the high by the low: how many times the slowest estimate exceeds the fastest. The <code>small-team</code> preset is three people on 10K lines, with the 2K&ndash;16K density row (0 to 40) and the 10K productivity row: 3 paths, 0&ndash;400 defects, 2/5 = 0.40 to 5 staff-years, and a spread of 25/2 = 12.50.</p><p>The <code>medium</code> preset is ten people on 100K lines, with the 64K&ndash;512K density row (2 to 70) and the 100K productivity row: 45 paths, 200&ndash;7,000 defects, 5&ndash;100 staff-years, a spread of 20. The <code>large-team</code> preset is fifty people on a million lines, with the top density row and the 1,000K productivity row: 1,225 paths, 4,000&ndash;100,000 defects, 100 to 10000/7 &asymp; 1,428.57 staff-years, and a spread of 100/7 &asymp; 14.29. On the lesson's illustration the team grew about seventeenfold and the paths about four hundredfold.</p><p>Read the spread before anything else. At every size the book's own productivity range is at least ten times wide, so the staff-years are an order of magnitude wide too, and that is the honest result: the table is a snapshot of an industry, not a forecast for your project. What the figures do show is the direction McConnell argues for. Every figure here is the lab's arithmetic on the book's rows; none is a measurement of a project, and a large range is a reason to find your own organisation's numbers.</p><h3>Exercise</h3><ul><li>A team of 6 people grows to 12.</li><li>Everyone may need to talk to everyone else, as in the chapter's figure.</li></ul><p>Compute the communication paths before and after the team grows, and how many times larger the second count is than the first. Do it by hand; then type each team size into the lab's People box to check.</p><p>The paths among people are one cost of size; the next chapter asks how construction on such a team is managed and estimated. The next lesson is &ldquo;Managing Construction&rdquo;.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Project arithmetic</h2></div><p>paths, defects and staff-years as a project grows</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument, then the book&#x27;s tables at three sizes</h2><div class="prose reading"><p><strong>Chapter 27, Key Points, p. 659.</strong> &ldquo;All other things being equal, a large project will have more errors per thousand lines of code than a small one.&rdquo; The chapter is short, pages 649 to 659; read it in your own copy before going on, Tables 27-1 and 27-2 especially, since the lesson uses a few of their figures and does not reproduce them.</p><p>What happens when a project grows? The obvious answer is that everything grows with it, and Chapter 27 argues that the obvious answer is wrong. McConnell opens with a hypothetical product whose next version is to be ten times the size, and says the effort, the errors and the mix of work will each grow by a different and larger factor. A large project, in his account, is a different kind of thing, and a team used to small ones can find its first large one getting out of hand.</p><p>Section 27.1 (p. 650) gives the first reason. One programmer has one path of communication, with the customer. Add people and the paths are not added; they multiply, because each new person may need to talk to every person already there. The book's figure draws them for teams of two, three, four, five and ten people: one path, then three, six, ten and forty-five. Every path is time spent talking and a chance of being misunderstood, which is why large projects formalise communication in documents: fifty people read and write documents rather than talk in every combination.</p><div class="defbox"><span class="label">Definition &middot; Communication paths in a team of n</span><p>Each pair of people is one path. There are n choices for the first person and n − 1 for the second, and each pair is counted twice that way, so the team has n times n minus one, halved: ten people have 10 times 9, halved, which is 45.</p></div><p>Section 27.2 (p. 651) asks whether your project is a typical size, and answers that no size is. Most projects are done by small teams, but because large projects use many more people each, a large share of all programmers work on large ones. Section 27.3 (p. 651) turns to errors. As size grows, more of them come from requirements and design: the book puts construction at about 75 percent of the errors on small projects and about 50 percent on larger ones, while noting that on some very large projects construction still accounts for up to three quarters. And the density rises. Table 27-1, after Jones, gives 0 to 25 errors per thousand lines for projects under 2K lines and 4 to 100 for projects of 512K lines or more.</p><p>Section 27.4 (p. 653) does the same for productivity. On small projects the single biggest influence is the individual programmer's skill; as size grows, the team and its organisation matter more. Table 27-2 gives the lines of code per staff-year the book's sources report: 2,000 to 25,000 at 10K lines, 1,000 to 20,000 at 100K, 700 to 10,000 at a million, with Cocomo II's nominal figure, 2,600 at 100K for instance, printed beside each range as a point inside it. McConnell says plainly that the specific figures vary dramatically with the kind of software, the people, the language and how lines are counted, and that the trend is what matters. These are other people's projects, averaged; your own records are the test of them.</p><p>Section 27.5 (p. 654) follows the shift into the work itself. Construction takes as much as 65 percent of the time on a small project and about 50 percent on a medium one, and less again on a large one, because detailed design, coding, debugging and unit testing grow roughly in proportion to size while communication, planning, integration and system testing grow faster. McConnell's chart of the shares stops at 512K lines, he says, to protect his job. The section ends on methodology: every team has one, chosen or not, and the book reports Boehm and Turner's advice that a light method scaled up tends to serve better than a heavy one pared down, the aim being a &ldquo;right-weight&rdquo; method for the project in front of you.</p><h3>The book&#x27;s rows, at three sizes</h3><p>The lab takes a team size, a size in thousands of lines and one row from each table, and does four pieces of arithmetic. Communication paths is the team size times one less, halved. Defects multiplies the size by each end of the density range. Staff-years divides the lines by each end of the productivity range, the fast end first. Spread of the productivity range divides the high by the low: how many times the slowest estimate exceeds the fastest. The <code>small-team</code> preset is three people on 10K lines, with the 2K&ndash;16K density row (0 to 40) and the 10K productivity row: 3 paths, 0&ndash;400 defects, 2/5 = 0.40 to 5 staff-years, and a spread of 25/2 = 12.50.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Project arithmetic</h2></div><p>paths, defects and staff-years as a project grows</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Project arithmetic</strong><span>paths, defects and staff-years as a project grows</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="pjTable"></table></div>
       <div class="status-banner" id="pjStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Paths, defects and staff-years by size</h3>
-          <p>The arithmetic of figures the lesson quotes (marked with their source). Each preset takes one row from each of the book's tables for its size. The densities and productivities are the book's quotations of other people's averages; the lab multiplies and divides them, and cannot say what your project will see. Figures: the book's Table 27-1 (p. 652), after Jones 1977 and 1998, and Table 27-2 (p. 653), after Putnam and Myers, Boehm et al. 2000 and Cusumano et al. 2003.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Paths, defects and staff-years by size</h3>
+            <p>The arithmetic of figures the lesson quotes (marked with their source). Each preset takes one row from each of the book's tables for its size. The densities and productivities are the book's quotations of other people's averages; the lab multiplies and divides them, and cannot say what your project will see. Figures: the book's Table 27-1 (p. 652), after Jones 1977 and 1998, and Table 27-2 (p. 653), after Putnam and Myers, Boehm et al. 2000 and Cusumano et al. 2003.</p>
         <div class="field">
           <label for="pjPreset">Worked example</label>
           <select id="pjPreset"><option value="small-team" selected>3 people, 10K lines (rows 2K–16K and 10K)</option><option value="medium">10 people, 100K lines (rows 64K–512K and 100K)</option><option value="large-team">50 people, 1,000K lines (rows 512K or more and 1,000K)</option></select>
@@ -1442,12 +1485,15 @@
           <div class="kpi"><span>Spread of the productivity range</span><strong id="pjSpread">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The <code>medium</code> preset is ten people on 100K lines, with the 64K&ndash;512K density row (2 to 70) and the 100K productivity row: 45 paths, 200&ndash;7,000 defects, 5&ndash;100 staff-years, a spread of 20. The <code>large-team</code> preset is fifty people on a million lines, with the top density row and the 1,000K productivity row: 1,225 paths, 4,000&ndash;100,000 defects, 100 to 10000/7 &asymp; 1,428.57 staff-years, and a spread of 100/7 &asymp; 14.29. On the lesson's illustration the team grew about seventeenfold and the paths about four hundredfold.</p><p>Read the spread before anything else. At every size the book's own productivity range is at least ten times wide, so the staff-years are an order of magnitude wide too, and that is the honest result: the table is a snapshot of an industry, not a forecast for your project. What the figures do show is the direction McConnell argues for. Every figure here is the lab's arithmetic on the book's rows; none is a measurement of a project, and a large range is a reason to find your own organisation's numbers.</p><h3>Exercise</h3><ul><li>A team of 6 people grows to 12.</li><li>Everyone may need to talk to everyone else, as in the chapter's figure.</li></ul><p>Compute the communication paths before and after the team grows, and how many times larger the second count is than the first. Do it by hand; then type each team size into the lab's People box to check.</p><p>The paths among people are one cost of size; the next chapter asks how construction on such a team is managed and estimated. The next lesson is &ldquo;Managing Construction&rdquo;.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Working a size through the book&#x27;s tables</h2></div><p>Five steps, the last of which is your own project's.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the paths</h3><p>Multiply the team size by one less than itself and halve it. Three people have 3 paths; fifty have 1,225.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the rows</h3><p>Put the size in thousands of lines into the band of Table 27-1 that contains it, and into the nearest row of Table 27-2; both tables are on pp. 652–653. A 100K-line project falls in the 64K–512K density band.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply and divide</h3><p>Multiply the size in KLOC by each end of the density range for defects. Divide the size in lines by each end of the productivity range for staff-years; the high productivity gives the low figure.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Take the spread</h3><p>Divide the high productivity by the low. That ratio is how wide the staff-year range is, and it is the first thing to report alongside it.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Place your own project</h3><p>With your copy open at Tables 27-1 and 27-2 (pp. 652–653), type your team's size, your project's size in thousands of lines and the two rows for that size into the lab. Note the paths, the defect range and the staff-year range, and write one sentence comparing the staff-years with what your project actually took.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Working a size through the book&#x27;s tables</h2>
+      <p class="lead-in">Five steps, the last of which is your own project's.</p>
+      <ol class="key-ideas method"><li><strong>Count the paths.</strong> Multiply the team size by one less than itself and halve it. Three people have 3 paths; fifty have 1,225.</li><li><strong>Find the rows.</strong> Put the size in thousands of lines into the band of Table 27-1 that contains it, and into the nearest row of Table 27-2; both tables are on pp. 652–653. A 100K-line project falls in the 64K–512K density band.</li><li><strong>Multiply and divide.</strong> Multiply the size in KLOC by each end of the density range for defects. Divide the size in lines by each end of the productivity range for staff-years; the high productivity gives the low figure.</li><li><strong>Take the spread.</strong> Divide the high productivity by the low. That ratio is how wide the staff-year range is, and it is the first thing to report alongside it.</li><li><strong>Place your own project.</strong> With your copy open at Tables 27-1 and 27-2 (pp. 652–653), type your team's size, your project's size in thousands of lines and the two rows for that size into the lab. Note the paths, the defect range and the staff-year range, and write one sentence comparing the staff-years with what your project actually took.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1465,17 +1511,16 @@ slow end: 1,000,000 / 700 ≈ 1,428.57 staff-years
 spread: 10,000 / 700 ≈ 14.29</div><p>Each figure is arithmetic on the book's rows. The spread says the slow end of the staff-year range is more than fourteen times the fast end, which is why the chapter leans on the trend and not on any one figure.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a ten-times-larger program is ten times the work</strong><span>It is the natural model: twice the lines, twice the effort. Chapter 27 argues against it on three counts. Error density rises with size (Table 27-1, after Jones), productivity falls (Table 27-2), and communication grows with the square of the team, so the work that is not construction grows faster than the work that is. On the lesson's illustration the team grows from 3 people to 50 and the paths from 3 to 1,225. The tables' ranges are wide, but at every size they move the same way.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking construction&#x27;s errors stop mattering on a large project</strong><span>Requirements and design errors do take a larger share as size grows, and a reader can conclude that construction is a minor source of trouble on big systems. The book's figures do not support that: construction is about half the errors on larger projects, about three quarters on small ones, and on some very large projects still up to three quarters (F2, p. 652). Half of a larger number of errors is still a great many.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Starting from a heavy method and paring it down</strong><span>A team that expects to grow may adopt the full apparatus of a large-project methodology at once and plan to drop what a small project does not need. The book reports Boehm and Turner's finding that the reverse tends to work better: start light and add formality as size demands it, aiming for a method of the right weight for the project actually in hand.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can work a team and a size through the book&#x27;s tables by hand.</strong><p>Given a team size, a size in thousands of lines and the book's rows for that size, compute the communication paths, the defect range, the staff-year range and the ratio of the productivity range's ends, each exactly, and say which of the four is a count and which are the book's averages.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab multiplies and divides; the figures it works on are the book's quotations of Jones, Putnam, Boehm and Cusumano, averages over projects mostly finished before 2004, and McConnell says the specific figures vary dramatically. The path count assumes everyone may need to talk to everyone, as the chapter's figure does; a team that is organised into smaller groups has fewer paths, which is the point of organising it. Nothing here can say how many errors your project will have.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a ten-times-larger program is ten times the work</strong><span>It is the natural model: twice the lines, twice the effort. Chapter 27 argues against it on three counts. Error density rises with size (Table 27-1, after Jones), productivity falls (Table 27-2), and communication grows with the square of the team, so the work that is not construction grows faster than the work that is. On the lesson's illustration the team grows from 3 people to 50 and the paths from 3 to 1,225. The tables' ranges are wide, but at every size they move the same way.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking construction&#x27;s errors stop mattering on a large project</strong><span>Requirements and design errors do take a larger share as size grows, and a reader can conclude that construction is a minor source of trouble on big systems. The book's figures do not support that: construction is about half the errors on larger projects, about three quarters on small ones, and on some very large projects still up to three quarters (F2, p. 652). Half of a larger number of errors is still a great many.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Starting from a heavy method and paring it down</strong><span>A team that expects to grow may adopt the full apparatus of a large-project methodology at once and plan to drop what a small project does not need. The book reports Boehm and Turner's finding that the reverse tends to work better: start light and add formality as size demands it, aiming for a method of the right weight for the project actually in hand.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can work a team and a size through the book&#x27;s tables by hand.</strong><p>Given a team size, a size in thousands of lines and the book's rows for that size, compute the communication paths, the defect range, the staff-year range and the ratio of the productivity range's ends, each exactly, and say which of the four is a count and which are the book's averages.</p></div></div><div class="note"><strong>Note:</strong> The lab multiplies and divides; the figures it works on are the book's quotations of Jones, Putnam, Boehm and Cusumano, averages over projects mostly finished before 2004, and McConnell says the specific figures vary dramatically. The path count assumes everyone may need to talk to everyone, as the chapter's figure does; a team that is organised into smaller groups has fewer paths, which is the point of organising it. Nothing here can say how many errors your project will have.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Communication paths</summary><p>A path is a pair of people who may need to talk. Among n people there are n times n minus one, halved, so the count grows with the square of the team, not in proportion to it. Two people have one path; ten have forty-five.</p></details><details class="recall"><summary>Error density</summary><p>Errors found per thousand lines of code, written KLOC. Table 27-1, which the book takes from Jones, gives a range of densities for each band of project size, and from the smallest band to the largest both ends rise.</p></details><details class="recall"><summary>Productivity</summary><p>Lines of code per staff-year, a staff-year being one person's work for a year. Table 27-2 gives a range for each size, from Putnam and Myers, Cocomo II and Cusumano's survey, and from the smallest row to the largest both ends fall.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 27 argues that scaling a project up changes its kind as well as its size. Count the communication paths in a team, work the book's tables of defect density and productivity into ranges for three sizes, and see how wide the ranges the book itself gives are.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Communication paths.</strong> A path is a pair of people who may need to talk. Among n people there are n times n minus one, halved, so the count grows with the square of the team, not in proportion to it. Two people have one path; ten have forty-five.</li><li><strong>Error density.</strong> Errors found per thousand lines of code, written KLOC. Table 27-1, which the book takes from Jones, gives a range of densities for each band of project size, and from the smallest band to the largest both ends rise.</li><li><strong>Productivity.</strong> Lines of code per staff-year, a staff-year being one person's work for a year. Table 27-2 gives a range for each size, from Putnam and Myers, Cocomo II and Cusumano's survey, and from the smallest row to the largest both ends fall.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="paths equal n times the quantity n minus 1, halved. defects equal K L O C times errors per K L O C. staff years equal lines divided by lines per year. spread equals the high rate divided by the low rate. larger, more errors per line, less per head. construction, smaller share as size grows" tabindex="0" role="region" aria-label="Mathematical notation">paths = n·(n − 1)/2
 defects = KLOC × errors per KLOC
 staff-years = lines / lines per year
@@ -2165,11 +2210,42 @@ construction: smaller share as size grows</div><figcaption>Chapter 27 in six lin
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2237,7 +2313,7 @@ construction: smaller share as size grows</div><figcaption>Chapter 27 in six lin
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

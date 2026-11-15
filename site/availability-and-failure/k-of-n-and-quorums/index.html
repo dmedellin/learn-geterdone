@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Availability and Failure</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Composing availability</p>
       <h1>k-of-n</h1>
       <p class="lesson-lede">Compute the availability of a k-of-n quorum and say when another replica helps.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>How many are up is a binomial</li><li>Series and parallel are its two ends</li><li>More replicas help only when k stays put</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The binomial tail, its two special cases, and when a replica hurts</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; k-of-n availability</span><p>A system is <strong><span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span></strong> when it serves as long as at least <span class="math" data-say="k">k</span> of its <span class="math" data-say="n">n</span> components are up. If the components are independent and each is up with probability <span class="math" data-say="A">A</span>, then <span class="math" data-say="A of k and n equals the sum from j equals k to n of n choose j A to the power j the quantity 1 minus A, to the power n minus j">A(k, n) = Σ_{j=k}^{n} C(n,j) Aʲ (1 − A)ⁿ⁻ʲ</span>. The term at <span class="math" data-say="j">j</span> is the probability that exactly <span class="math" data-say="j">j</span> are up: <span class="math" data-say="n choose j">C(n,j)</span> ways to choose which, <span class="math" data-say="A to the power j">Aʲ</span> for those being up and <span class="math" data-say="the quantity 1 minus A, to the power n minus j">(1 − A)ⁿ⁻ʲ</span> for the rest being down.</p></div><div class="mathblock" data-say="n equals 5, A equals 99 over 100, listed term by term. j, 5 choose j, term, value. a table, shown on the page. 1.0000000000. 3 minus of minus 5 equals j is at least 3 equals 0.999990149 equals 99.9990149 percent, five nines" tabindex="0" role="region" aria-label="Mathematical notation">n = 5, A = 99/100, listed term by term
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The binomial tail, its two special cases, and when a replica hurts</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; k-of-n availability</span><p>A system is <strong><span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span></strong> when it serves as long as at least <span class="math" data-say="k">k</span> of its <span class="math" data-say="n">n</span> components are up. If the components are independent and each is up with probability <span class="math" data-say="A">A</span>, then <span class="math" data-say="A of k and n equals the sum from j equals k to n of n choose j A to the power j the quantity 1 minus A, to the power n minus j">A(k, n) = Σ_{j=k}^{n} C(n,j) Aʲ (1 − A)ⁿ⁻ʲ</span>. The term at <span class="math" data-say="j">j</span> is the probability that exactly <span class="math" data-say="j">j</span> are up: <span class="math" data-say="n choose j">C(n,j)</span> ways to choose which, <span class="math" data-say="A to the power j">Aʲ</span> for those being up and <span class="math" data-say="the quantity 1 minus A, to the power n minus j">(1 − A)ⁿ⁻ʲ</span> for the rest being down.</p></div><div class="mathblock" data-say="n equals 5, A equals 99 over 100, listed term by term. j, 5 choose j, term, value. a table, shown on the page. 1.0000000000. 3 minus of minus 5 equals j is at least 3 equals 0.999990149 equals 99.9990149 percent, five nines" tabindex="0" role="region" aria-label="Mathematical notation">n = 5, A = 99/100, listed term by term
 
 j   C(5,j)   term                       value
 0     1      (1/100)⁵                   0.0000000001
@@ -1403,12 +1447,11 @@ j   C(5,j)   term                       value
                                         ───────────
                                         1.0000000000
 
-3-of-5 = j ≥ 3 = 0.999990149 = 99.9990149%        five nines</div><p>The column sums to exactly <span class="math" data-say="1">1</span>, which is the cheapest available check on a binomial: a set of terms that does not sum to one has a wrong coefficient somewhere in it. The lab prints that sum for whatever <span class="math" data-say="n">n</span> you set, and the coefficients are exact integers, so the twelfth row of Pascal's triangle is right rather than nearly right.</p><h3>The two ends are the two previous lessons</h3><p>At <span class="math" data-say="k equals n">k = n</span> only the <span class="math" data-say="j equals n">j = n</span> term survives, so <span class="math" data-say="A of n and n equals A to the power n">A(n, n) = Aⁿ</span>, which is the series product of <span class="math" data-say="n">n</span> identical components. At <span class="math" data-say="k equals 1">k = 1</span> every term except <span class="math" data-say="j equals 0">j = 0</span> survives, so <span class="math" data-say="A of 1 and n equals 1 minus the quantity 1 minus A, to the power n">A(1, n) = 1 − (1 − A)ⁿ</span>, which is the parallel formula. Three formulas, one of them; the lab computes all three and prints their agreement.</p><div class="example"><span class="label">Example &middot; Five replicas, three quorums</span><p>Each replica 99%. 1-of-5 is <span class="math" data-say="99.999999990000 percent">99.999999990000%</span> &mdash; ten nines, and the parallel formula to the digit. 3-of-5 is <span class="math" data-say="99.9990149 percent">99.9990149%</span> &mdash; five nines, <span class="math" data-say="5 minutes 10.65 seconds">5 min 10.65 s</span> a year. 5-of-5 is <span class="math" data-say="95.0990 percent">95.0990%</span> &mdash; one nine, <span class="math" data-say="17 d 21 h">17 d 21 h</span> a year, and identical to <span class="math" data-say="the quantity 99 over 100, to the power 5">(99/100)⁵</span>. The same five machines span nine orders of magnitude in downtime depending only on how many of them have to agree.</p></div><h3>When another replica lowers availability</h3><p>Compare 5-of-5 at <span class="math" data-say="95.0990 percent">95.0990%</span> with a single machine at <span class="math" data-say="99 percent">99%</span>. Four replicas were added and the availability fell by a factor of about fifty in downtime, because each new replica was also a new thing that had to be up. This is the honest answer to &ldquo;should we add another node&rdquo;: it depends on whether the quorum rule holds <span class="math" data-say="k">k</span> fixed as <span class="math" data-say="n">n</span> grows.</p><p>Majority quorums, <span class="math" data-say="k equals the ceiling of the quantity n plus 1, over 2">k = ⌈(n+1)/2⌉</span>, sit between the two extremes and do improve with <span class="math" data-say="n">n</span>, because <span class="math" data-say="k">k</span> grows at half the rate <span class="math" data-say="n">n</span> does: 2-of-3 is <span class="math" data-say="99.97020 percent">99.97020%</span> and 3-of-5 is <span class="math" data-say="99.9990149 percent">99.9990149%</span> at the same per-node 99%. That is the arithmetic behind five-node clusters, and it is also why going from five to seven buys much less than going from three to five.</p><div class="example"><span class="label">Example &middot; The write quorum that made things worse</span><p>A team runs three replicas and, worried about durability, changes writes to require acknowledgement from all three rather than two. Write availability moves from 2-of-3, <span class="math" data-say="99.97020 percent">99.97020%</span>, to 3-of-3, <span class="math" data-say="97.0299 percent">97.0299%</span> &mdash; from three nines to one, and from <span class="math" data-say="2 h 36 minutes">2 h 36 min</span> to <span class="math" data-say="10 d 20 h">10 d 20 h</span> a year. Nothing about the hardware changed. The lab reproduces this in two slider moves: set <span class="math" data-say="n equals 3">n = 3</span>, then <span class="math" data-say="k equals 2">k = 2</span> and <span class="math" data-say="k equals 3">k = 3</span>.</p></div><p>One boundary to keep in view: this lesson counts replicas that are up and says nothing about whether they agree on the data. A quorum that is available can still return a stale read, and the rule that prevents that &mdash; read and write sets overlapping &mdash; is a different condition on <span class="math" data-say="k">k</span> that belongs to the replication course.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Quorums: k of n</h2></div><p>A binomial tail, and the two compositions it collapses to at its edges</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+3-of-5 = j ≥ 3 = 0.999990149 = 99.9990149%        five nines</div><p>The column sums to exactly <span class="math" data-say="1">1</span>, which is the cheapest available check on a binomial: a set of terms that does not sum to one has a wrong coefficient somewhere in it. The lab prints that sum for whatever <span class="math" data-say="n">n</span> you set, and the coefficients are exact integers, so the twelfth row of Pascal's triangle is right rather than nearly right.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Quorums: k of n</h2></div><p>A binomial tail, and the two compositions it collapses to at its edges</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>k of n is a binomial tail</strong><span>and at k = n it is the series product, at k = 1 the parallel one</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>terms that count (j &ge; k)</span><span class="tone-muted"><i class="legend-swatch"></i>terms that do not</span><span class="tone-purple"><i class="legend-swatch"></i>the identities</span></div>
@@ -1416,10 +1459,10 @@ j   C(5,j)   term                       value
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="knBars" viewBox="0 0 520 180" role="img" aria-label="The binomial terms for j nodes up, with the tail from k highlighted."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="knTable"></table></div>
       <div class="status-banner" id="knStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the quorum</h3>
-          <p>Five replicas at 99% with a quorum of three are loaded. Every binomial term is listed and the tail from <span class="math" data-say="k">k</span> is highlighted; the last three readouts check that <span class="math" data-say="k equals n">k = n</span> is the series product, that <span class="math" data-say="k equals 1">k = 1</span> is the parallel form, and that the whole row sums to one. Take <span class="math" data-say="k">k</span> up to <span class="math" data-say="n">n</span> and watch availability fall below a single machine.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the quorum</h3>
+            <p>Five replicas at 99% with a quorum of three are loaded. Every binomial term is listed and the tail from <span class="math" data-say="k">k</span> is highlighted; the last three readouts check that <span class="math" data-say="k equals n">k = n</span> is the series product, that <span class="math" data-say="k equals 1">k = 1</span> is the parallel form, and that the whole row sums to one. Take <span class="math" data-say="k">k</span> up to <span class="math" data-say="n">n</span> and watch availability fall below a single machine.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="knN">Replicas n</label><span class="range-value" id="knNOut">5</span></div>
           <input id="knN" type="range" min="1" max="12" step="1" value="5" />
@@ -1441,12 +1484,15 @@ j   C(5,j)   term                       value
           <div class="kpi"><span>All n + 1 terms sum to</span><strong id="knSum">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="knHint" style="margin:0;">The coefficients are C(n, j) in BigInt, so the twelfth row of Pascal&rsquo;s triangle is exact and so is every term built on it. Raising n helps only while k stays put: a quorum that grows with the fleet is a chain wearing a redundancy costume.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>The two ends are the two previous lessons</h3><p>At <span class="math" data-say="k equals n">k = n</span> only the <span class="math" data-say="j equals n">j = n</span> term survives, so <span class="math" data-say="A of n and n equals A to the power n">A(n, n) = Aⁿ</span>, which is the series product of <span class="math" data-say="n">n</span> identical components. At <span class="math" data-say="k equals 1">k = 1</span> every term except <span class="math" data-say="j equals 0">j = 0</span> survives, so <span class="math" data-say="A of 1 and n equals 1 minus the quantity 1 minus A, to the power n">A(1, n) = 1 − (1 − A)ⁿ</span>, which is the parallel formula. Three formulas, one of them; the lab computes all three and prints their agreement.</p><div class="example"><span class="label">Example &middot; Five replicas, three quorums</span><p>Each replica 99%. 1-of-5 is <span class="math" data-say="99.999999990000 percent">99.999999990000%</span> &mdash; ten nines, and the parallel formula to the digit. 3-of-5 is <span class="math" data-say="99.9990149 percent">99.9990149%</span> &mdash; five nines, <span class="math" data-say="5 minutes 10.65 seconds">5 min 10.65 s</span> a year. 5-of-5 is <span class="math" data-say="95.0990 percent">95.0990%</span> &mdash; one nine, <span class="math" data-say="17 d 21 h">17 d 21 h</span> a year, and identical to <span class="math" data-say="the quantity 99 over 100, to the power 5">(99/100)⁵</span>. The same five machines span nine orders of magnitude in downtime depending only on how many of them have to agree.</p></div><h3>When another replica lowers availability</h3><p>Compare 5-of-5 at <span class="math" data-say="95.0990 percent">95.0990%</span> with a single machine at <span class="math" data-say="99 percent">99%</span>. Four replicas were added and the availability fell by a factor of about fifty in downtime, because each new replica was also a new thing that had to be up. This is the honest answer to &ldquo;should we add another node&rdquo;: it depends on whether the quorum rule holds <span class="math" data-say="k">k</span> fixed as <span class="math" data-say="n">n</span> grows.</p><p>Majority quorums, <span class="math" data-say="k equals the ceiling of the quantity n plus 1, over 2">k = ⌈(n+1)/2⌉</span>, sit between the two extremes and do improve with <span class="math" data-say="n">n</span>, because <span class="math" data-say="k">k</span> grows at half the rate <span class="math" data-say="n">n</span> does: 2-of-3 is <span class="math" data-say="99.97020 percent">99.97020%</span> and 3-of-5 is <span class="math" data-say="99.9990149 percent">99.9990149%</span> at the same per-node 99%. That is the arithmetic behind five-node clusters, and it is also why going from five to seven buys much less than going from three to five.</p><div class="example"><span class="label">Example &middot; The write quorum that made things worse</span><p>A team runs three replicas and, worried about durability, changes writes to require acknowledgement from all three rather than two. Write availability moves from 2-of-3, <span class="math" data-say="99.97020 percent">99.97020%</span>, to 3-of-3, <span class="math" data-say="97.0299 percent">97.0299%</span> &mdash; from three nines to one, and from <span class="math" data-say="2 h 36 minutes">2 h 36 min</span> to <span class="math" data-say="10 d 20 h">10 d 20 h</span> a year. Nothing about the hardware changed. The lab reproduces this in two slider moves: set <span class="math" data-say="n equals 3">n = 3</span>, then <span class="math" data-say="k equals 2">k = 2</span> and <span class="math" data-say="k equals 3">k = 3</span>.</p></div><p>One boundary to keep in view: this lesson counts replicas that are up and says nothing about whether they agree on the data. A quorum that is available can still return a stale read, and the rule that prevents that &mdash; read and write sets overlapping &mdash; is a different condition on <span class="math" data-say="k">k</span> that belongs to the replication course.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing and choosing a quorum</h2></div><p>Two of these steps are arithmetic and two are about what the number means once you have it. The second pair is where quorum decisions are actually made.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down k and n, and say which operation they govern</h3><p>Reads and writes often have different quorums, and the availability of a write is not the availability of a read. Compute them separately; a system quoted as one number is usually quoting whichever is better.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Sum the tail, term by term</h3><p><span class="math" data-say="the sum over j is at least k of n choose j A to the power j the quantity 1 minus A, to the power n minus j">Σ_{j≥k} C(n,j)Aʲ(1 − A)ⁿ⁻ʲ</span>. Write the terms out rather than reaching for a closed form &mdash; there is not one &mdash; and check that all <span class="math" data-say="n plus 1">n + 1</span> terms sum to one before trusting the part you kept.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check the two ends you already know</h3><p>Evaluate the same <span class="math" data-say="n">n</span> at <span class="math" data-say="k equals n">k = n</span> and at <span class="math" data-say="k equals 1">k = 1</span>. The first must equal the series product <span class="math" data-say="A to the power n">Aⁿ</span> and the second the parallel <span class="math" data-say="1 minus the quantity 1 minus A, to the power n">1 − (1 − A)ⁿ</span>. If either disagrees, a coefficient or an exponent is wrong.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Ask what happens to k when n grows</h3><p>Fixed <span class="math" data-say="k">k</span> means more replicas help. <span class="math" data-say="k equals n">k = n</span> means they hurt. A majority rule means they help with diminishing returns. That single question decides whether adding a node is an improvement, and it is answered by the quorum rule rather than by the node count.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing and choosing a quorum</h2>
+      <p class="lead-in">Two of these steps are arithmetic and two are about what the number means once you have it. The second pair is where quorum decisions are actually made.</p>
+      <ol class="key-ideas method"><li><strong>Write down k and n, and say which operation they govern.</strong> Reads and writes often have different quorums, and the availability of a write is not the availability of a read. Compute them separately; a system quoted as one number is usually quoting whichever is better.</li><li><strong>Sum the tail, term by term.</strong> <span class="math" data-say="the sum over j is at least k of n choose j A to the power j the quantity 1 minus A, to the power n minus j">Σ_{j≥k} C(n,j)Aʲ(1 − A)ⁿ⁻ʲ</span>. Write the terms out rather than reaching for a closed form &mdash; there is not one &mdash; and check that all <span class="math" data-say="n plus 1">n + 1</span> terms sum to one before trusting the part you kept.</li><li><strong>Check the two ends you already know.</strong> Evaluate the same <span class="math" data-say="n">n</span> at <span class="math" data-say="k equals n">k = n</span> and at <span class="math" data-say="k equals 1">k = 1</span>. The first must equal the series product <span class="math" data-say="A to the power n">Aⁿ</span> and the second the parallel <span class="math" data-say="1 minus the quantity 1 minus A, to the power n">1 − (1 − A)ⁿ</span>. If either disagrees, a coefficient or an exponent is wrong.</li><li><strong>Ask what happens to k when n grows.</strong> Fixed <span class="math" data-say="k">k</span> means more replicas help. <span class="math" data-say="k equals n">k = n</span> means they hurt. A majority rule means they help with diminishing returns. That single question decides whether adding a node is an improvement, and it is answered by the quorum rule rather than by the node count.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1477,17 +1523,16 @@ downtime a year
 1-of-1   3 d 15 h 36 min</div><p>Three nodes requiring two are a hundred times better than one node. The same three nodes requiring three are three times worse than one node, and the only thing that changed was a constant in a configuration file. The <span class="math" data-say="j equals 2">j = 2</span> term, <span class="math" data-say="0.029403">0.029403</span>, is where all of the difference lives: it is the probability that exactly one node is down, which 2-of-3 survives and 3-of-3 does not.</p><p>For a faded rehearsal, take <span class="math" data-say="n equals 5">n = 5</span> at the same per-node 99% and work out 4-of-5. The supplied first move is that you need the terms at <span class="math" data-say="j equals 4">j = 4</span> and <span class="math" data-say="j equals 5">j = 5</span>, which are already listed in the material above. Produce the availability and its annual downtime, place it between the 3-of-5 and 5-of-5 figures, and then answer the design question: going from three nodes to five, what must happen to <span class="math" data-say="k">k</span> for the change to be an improvement at all?</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming more replicas is more availability</strong><span>It depends on the quorum. Five replicas requiring five are less available than one replica requiring one &mdash; <span class="math" data-say="95.0990 percent">95.0990%</span> against <span class="math" data-say="99 percent">99%</span> &mdash; because each addition was both a new way to survive and a new thing that had to be up. Ask what <span class="math" data-say="k">k</span> does as <span class="math" data-say="n">n</span> grows before claiming the node count is the improvement.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting one availability for a system with two quorums</strong><span>Reads at 1-of-3 and writes at 3-of-3 are ten nines and one nine on the same hardware. A single headline figure for such a system is the read path's number wearing the whole system's name. Compute each operation's quorum separately and report both.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the majority rule as a rule about safety only</strong><span>A majority quorum is chosen so that read and write sets must intersect, which is a consistency property. It also has an availability consequence, and the two can point different ways: raising <span class="math" data-say="k">k</span> makes stale reads less likely and the system less available. Treating the quorum as purely a correctness knob hides the second half of the trade.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the question “should we add a node” reads as a question about k.</strong><p>You should be able to sum a binomial tail exactly, recover the series and parallel formulas from it by setting <span class="math" data-say="k equals n">k = n</span> and <span class="math" data-say="k equals 1">k = 1</span>, check the terms against a sum of one, and explain a configuration in which five replicas are less available than one.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every formula on this course so far &mdash; the product, the parallel complement, the binomial tail &mdash; has the same premise written above it, and it has been taken on trust three times. &ldquo;Correlated Failure&rdquo; is where it is paid for: a lab cannot check an assumption, so the model reports a confident number for a system whose components share a rack, a power feed or a deploy, and the only honest thing to do is compute both figures and look at the gap.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming more replicas is more availability</strong><span>It depends on the quorum. Five replicas requiring five are less available than one replica requiring one &mdash; <span class="math" data-say="95.0990 percent">95.0990%</span> against <span class="math" data-say="99 percent">99%</span> &mdash; because each addition was both a new way to survive and a new thing that had to be up. Ask what <span class="math" data-say="k">k</span> does as <span class="math" data-say="n">n</span> grows before claiming the node count is the improvement.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting one availability for a system with two quorums</strong><span>Reads at 1-of-3 and writes at 3-of-3 are ten nines and one nine on the same hardware. A single headline figure for such a system is the read path's number wearing the whole system's name. Compute each operation's quorum separately and report both.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the majority rule as a rule about safety only</strong><span>A majority quorum is chosen so that read and write sets must intersect, which is a consistency property. It also has an availability consequence, and the two can point different ways: raising <span class="math" data-say="k">k</span> makes stale reads less likely and the system less available. Treating the quorum as purely a correctness knob hides the second half of the trade.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the question “should we add a node” reads as a question about k.</strong><p>You should be able to sum a binomial tail exactly, recover the series and parallel formulas from it by setting <span class="math" data-say="k equals n">k = n</span> and <span class="math" data-say="k equals 1">k = 1</span>, check the terms against a sum of one, and explain a configuration in which five replicas are less available than one.</p></div></div><div class="note"><strong>Note:</strong> Every formula on this course so far &mdash; the product, the parallel complement, the binomial tail &mdash; has the same premise written above it, and it has been taken on trust three times. &ldquo;Correlated Failure&rdquo; is where it is paid for: a lab cannot check an assumption, so the model reports a confident number for a system whose components share a rack, a power feed or a deploy, and the only honest thing to do is compute both figures and look at the gap.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>How many are up is a binomial</summary><p>With <span class="math" data-say="n">n</span> replicas that are independently up with probability <span class="math" data-say="A">A</span>, the number up is <span class="math" data-say="Binomial of n and A">Binomial(n, A)</span>, so <span class="math" data-say="P of exactly j up equals n choose j A to the power j the quantity 1 minus A, to the power n minus j">P(exactly j up) = C(n,j)Aʲ(1 − A)ⁿ⁻ʲ</span>. A <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span> system is available when at least <span class="math" data-say="k">k</span> are up, which is the sum of those terms from <span class="math" data-say="j equals k">j = k</span> to <span class="math" data-say="j equals n">j = n</span> &mdash; the upper tail. The lab lists every term and sums them exactly, and the whole row sums to <span class="math" data-say="1">1</span>.</p></details><details class="recall"><summary>Series and parallel are its two ends</summary><p>Setting <span class="math" data-say="k equals n">k = n</span> demands every replica and the tail collapses to the single term <span class="math" data-say="A to the power n">Aⁿ</span>, which is the series product. Setting <span class="math" data-say="k equals 1">k = 1</span> demands any one and the tail is everything except <span class="math" data-say="j equals 0">j = 0</span>, which is <span class="math" data-say="1 minus the quantity 1 minus A, to the power n">1 − (1 − A)ⁿ</span> &mdash; the parallel formula. These are identities, and the lab checks both on screen rather than asserting them.</p></details><details class="recall"><summary>More replicas help only when k stays put</summary><p>At <span class="math" data-say="A equals 99 percent">A = 99%</span>, 3-of-5 is <span class="math" data-say="99.9990149 percent">99.9990149%</span> and 5-of-5 is <span class="math" data-say="95.0990 percent">95.0990%</span>, which is worse than a single machine's <span class="math" data-say="99 percent">99%</span>. Going from <span class="math" data-say="n equals 1">n = 1</span> to <span class="math" data-say="n equals 5">n = 5</span> helped or hurt entirely according to what happened to <span class="math" data-say="k">k</span>. A quorum that grows with the fleet, like <span class="math" data-say="k equals n">k = n</span>, is a chain wearing a redundancy costume.</p></details></div>
+      <h3>Summary</h3>
       <p>A system that needs <span class="math" data-say="k">k</span> of its <span class="math" data-say="n">n</span> replicas is available with probability <span class="math" data-say="the sum over j is at least k of n choose j A to the power j the quantity 1 minus A, to the power n minus j">Σ_{j≥k} C(n,j)Aʲ(1 − A)ⁿ⁻ʲ</span>, the upper tail of a binomial. Series and parallel are the two ends of it: <span class="math" data-say="k equals n">k = n</span> is the product and <span class="math" data-say="k equals 1">k = 1</span> is <span class="math" data-say="1 minus the product of 1 minus A sub i">1 − ∏(1 − Aᵢ)</span>. Whether another replica helps depends entirely on whether <span class="math" data-say="k">k</span> rises with <span class="math" data-say="n">n</span>, and if it does the answer is no.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>How many are up is a binomial.</strong> With <span class="math" data-say="n">n</span> replicas that are independently up with probability <span class="math" data-say="A">A</span>, the number up is <span class="math" data-say="Binomial of n and A">Binomial(n, A)</span>, so <span class="math" data-say="P of exactly j up equals n choose j A to the power j the quantity 1 minus A, to the power n minus j">P(exactly j up) = C(n,j)Aʲ(1 − A)ⁿ⁻ʲ</span>. A <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span> system is available when at least <span class="math" data-say="k">k</span> are up, which is the sum of those terms from <span class="math" data-say="j equals k">j = k</span> to <span class="math" data-say="j equals n">j = n</span> &mdash; the upper tail. The lab lists every term and sums them exactly, and the whole row sums to <span class="math" data-say="1">1</span>.</li><li><strong>Series and parallel are its two ends.</strong> Setting <span class="math" data-say="k equals n">k = n</span> demands every replica and the tail collapses to the single term <span class="math" data-say="A to the power n">Aⁿ</span>, which is the series product. Setting <span class="math" data-say="k equals 1">k = 1</span> demands any one and the tail is everything except <span class="math" data-say="j equals 0">j = 0</span>, which is <span class="math" data-say="1 minus the quantity 1 minus A, to the power n">1 − (1 − A)ⁿ</span> &mdash; the parallel formula. These are identities, and the lab checks both on screen rather than asserting them.</li><li><strong>More replicas help only when k stays put.</strong> At <span class="math" data-say="A equals 99 percent">A = 99%</span>, 3-of-5 is <span class="math" data-say="99.9990149 percent">99.9990149%</span> and 5-of-5 is <span class="math" data-say="95.0990 percent">95.0990%</span>, which is worse than a single machine's <span class="math" data-say="99 percent">99%</span>. Going from <span class="math" data-say="n equals 1">n = 1</span> to <span class="math" data-say="n equals 5">n = 5</span> helped or hurt entirely according to what happened to <span class="math" data-say="k">k</span>. A quorum that grows with the fleet, like <span class="math" data-say="k equals n">k = n</span>, is a chain wearing a redundancy costume.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="A equals the sum over j is at least k of n choose j A to the power j the quantity 1 minus A, to the power n minus j, the upper tail of a binomial. k equals n, goes to, the series product, k equals 1, goes to, 1 minus the product of 1 minus A sub i. at A equals 99 percent, 3 minus of minus 5 equals 99.9990149 percent, 5 minus of minus 5 equals 95.0990 percent, 1 minus of minus 1 equals 99 percent. so 5 minus of minus 5 is worse than one machine, by a factor of 49 in downtime" tabindex="0" role="region" aria-label="Mathematical notation">A = Σ_{j≥k} C(n,j) Aʲ (1 − A)ⁿ⁻ʲ        the upper tail of a binomial
 k = n  →  the series product            k = 1  →  1 − ∏(1 − Aᵢ)
 at A = 99%:  3-of-5 = 99.9990149%,  5-of-5 = 95.0990%,  1-of-1 = 99%
@@ -2655,11 +2700,42 @@ so 5-of-5 is worse than one machine, by a factor of 49 in downtime</div><figcapt
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2727,7 +2803,7 @@ so 5-of-5 is worse than one machine, by a factor of 49 in downtime</div><figcapt
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

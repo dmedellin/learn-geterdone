@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Dynamic Programming and Optimal Substructure</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Tables that are not grids</p>
       <h1>Won and Lost Positions</h1>
       <p class="lesson-lede">Label every position of a subtraction game from the definition alone, find the period in the labels, and say what the table can and cannot prove about it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The table&#x27;s entries are labels, and the recurrence is a quantifier</li><li>Evaluating upward from zero is the fill order, and it is forced</li><li>A period seen over nineteen positions is measured, not proved</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two labels, one quantifier, and a period that has to be argued for</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; A subtraction game, and its two kinds of position</span><p>Two players alternate. From a position <span class="math" data-say="p">p</span> a player may move to <span class="math" data-say="p minus m">p − m</span> for any <span class="math" data-say="m">m</span> in a fixed subtraction set with <span class="math" data-say="m is at most p">m ≤ p</span>. A player with no legal move loses. A position is <strong>losing</strong> if the player about to move from it loses under perfect play, and <strong>winning</strong> otherwise.</p></div><div class="thm"><span class="label">Theorem &middot; The labelling recurrence</span><p>A position <span class="math" data-say="p">p</span> is losing if and only if every move from <span class="math" data-say="p">p</span> leads to a winning position; equivalently, <span class="math" data-say="p">p</span> is winning if and only if some move from <span class="math" data-say="p">p</span> leads to a losing position. A position with no legal moves is losing.</p></div><div class="proof"><p>By strong induction on <span class="math" data-say="p">p</span>. Suppose every position below <span class="math" data-say="p">p</span> is correctly labelled. If some move from <span class="math" data-say="p">p</span> reaches a losing position, the player to move takes it and hands the opponent a position from which, by hypothesis, the opponent loses; so <span class="math" data-say="p">p</span> is winning.</p><p>If every move from <span class="math" data-say="p">p</span> reaches a winning position, then whatever the player does, the opponent is handed a position from which the opponent, by hypothesis, wins; so <span class="math" data-say="p">p</span> is losing. The two cases are exhaustive, and the vacuous case &mdash; no moves at all &mdash; falls under the second, which is why a terminal position loses.</p><p><span class="qed">&#9633;</span></p></div><p>Notice that this table has no objective to optimise. Every other page on this course computes a best value; this one computes a truth value, and the recurrence is a pair of quantifiers rather than a minimum or a sum. That is worth seeing once, because it separates the technique &mdash; a table, an order, a recurrence &mdash; from the arithmetic that usually accompanies it.</p><div class="example"><span class="label">Example &middot; Take one, three or four, from zero to eighteen</span><p>The labels come out <span class="math" data-say="L W L W W W W L W L W W W W L W L W W">L W L W W W W L W L W W W W L W L W W</span>. The losing positions are 0, 2, 7, 9, 14 and 16. Position 2 loses because its only legal move is to 1, which wins; position 7 loses because its moves reach 6, 4 and 3, all winning. The panel reports the smallest period over the positions shown as 7, and a memo-free minimax recursion agrees with the table at every position.</p></div><p>That period is not the multiples of anything. Losing positions are those congruent to 0 or 2 modulo 7, which is two residues rather than one. Change the subtraction set to 1, 2 and 3 and the losing positions are exactly the multiples of 4, and that pattern has an argument a reader can give in one line. Change it to 1 and 2 and the answer is the multiples of 3. Change it to 2 and 5 and positions 0 and 1 both lose, so the pattern does not even begin with a single loss.</p><h3>What is measured, and what can be proved</h3><p>The panel's period is computed by testing, for each <span class="math" data-say="k">k</span> in turn, whether the labels agree at every pair of positions <span class="math" data-say="k">k</span> apart among the positions labelled. With nineteen positions on screen and a reported period of 7, that is two full repetitions and a bit. It is a measurement, and if the pattern broke at position 40 the panel would say nothing about it.</p><div class="thm"><span class="label">Theorem &middot; Subtraction games are eventually periodic</span><p>Let <span class="math" data-say="M">M</span> be the largest element of the subtraction set. The label of a position is determined by the labels of the <span class="math" data-say="M">M</span> positions below it. There are at most <span class="math" data-say="2 to the power M">2^M</span> distinct windows of <span class="math" data-say="M">M</span> consecutive labels, so some window repeats, and from that point the sequence of labels repeats with a period at most <span class="math" data-say="2 to the power M">2^M</span>.</p></div><div class="proof"><p>Consider the sequence of windows <span class="math" data-say="w of p">w(p)</span> consisting of the labels of positions <span class="math" data-say="p minus M">p−M</span> through <span class="math" data-say="p minus 1">p−1</span>. The recurrence determines the label of <span class="math" data-say="p">p</span> from <span class="math" data-say="w of p">w(p)</span> alone, and therefore determines <span class="math" data-say="w of p plus 1">w(p+1)</span> from <span class="math" data-say="w of p">w(p)</span>. So the sequence of windows is generated by a function from a finite set to itself.</p><p>A sequence of elements of a set of size at most <span class="math" data-say="2 to the power M">2^M</span> generated by iterating a function must repeat a value within the first <span class="math" data-say="2 to the power M plus 1">2^M + 1</span> steps, and once a window repeats, everything after it repeats too. Hence the labels are eventually periodic with period at most <span class="math" data-say="2 to the power M">2^M</span>. For the subtraction set 1, 3, 4 that bound is 16, and the measured period is 7 &mdash; the bound is true, loose, and says nothing about which value below it occurs.</p><p><span class="qed">&#9633;</span></p></div><p>Those two results are exactly the pairing this Subject insists on. The table measures a period of 7 over nineteen positions. The pigeonhole argument proves eventual periodicity with period at most 16, for every subtraction set. Neither implies the other: the measurement does not establish that 7 continues, and the proof does not say the period is 7 or that it starts at position zero rather than later. Raising the range on the lab extends the measurement and never turns it into the theorem.</p><p>The cost is the least interesting thing on the page and is worth one sentence: nineteen positions are labelled with nineteen calls, each looking at up to three predecessors, so labelling <span class="math" data-say="n">n</span> positions is <span class="math" data-say="theta of n">Θ(n)</span> for a fixed subtraction set. The memo-free recursion that checks it is exponential and is capped at position 24 for that reason.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Won and lost, one position at a time</h2></div><p>The definition evaluated upward, and checked against a recursion</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two labels, one quantifier, and a period that has to be argued for</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; A subtraction game, and its two kinds of position</span><p>Two players alternate. From a position <span class="math" data-say="p">p</span> a player may move to <span class="math" data-say="p minus m">p − m</span> for any <span class="math" data-say="m">m</span> in a fixed subtraction set with <span class="math" data-say="m is at most p">m ≤ p</span>. A player with no legal move loses. A position is <strong>losing</strong> if the player about to move from it loses under perfect play, and <strong>winning</strong> otherwise.</p></div><div class="thm"><span class="label">Theorem &middot; The labelling recurrence</span><p>A position <span class="math" data-say="p">p</span> is losing if and only if every move from <span class="math" data-say="p">p</span> leads to a winning position; equivalently, <span class="math" data-say="p">p</span> is winning if and only if some move from <span class="math" data-say="p">p</span> leads to a losing position. A position with no legal moves is losing.</p></div><div class="proof"><p>By strong induction on <span class="math" data-say="p">p</span>. Suppose every position below <span class="math" data-say="p">p</span> is correctly labelled. If some move from <span class="math" data-say="p">p</span> reaches a losing position, the player to move takes it and hands the opponent a position from which, by hypothesis, the opponent loses; so <span class="math" data-say="p">p</span> is winning.</p><p>If every move from <span class="math" data-say="p">p</span> reaches a winning position, then whatever the player does, the opponent is handed a position from which the opponent, by hypothesis, wins; so <span class="math" data-say="p">p</span> is losing. The two cases are exhaustive, and the vacuous case &mdash; no moves at all &mdash; falls under the second, which is why a terminal position loses.</p><p><span class="qed">&#9633;</span></p></div><p>Notice that this table has no objective to optimise. Every other page on this course computes a best value; this one computes a truth value, and the recurrence is a pair of quantifiers rather than a minimum or a sum. That is worth seeing once, because it separates the technique &mdash; a table, an order, a recurrence &mdash; from the arithmetic that usually accompanies it.</p><div class="example"><span class="label">Example &middot; Take one, three or four, from zero to eighteen</span><p>The labels come out <span class="math" data-say="L W L W W W W L W L W W W W L W L W W">L W L W W W W L W L W W W W L W L W W</span>. The losing positions are 0, 2, 7, 9, 14 and 16. Position 2 loses because its only legal move is to 1, which wins; position 7 loses because its moves reach 6, 4 and 3, all winning. The panel reports the smallest period over the positions shown as 7, and a memo-free minimax recursion agrees with the table at every position.</p></div><p>That period is not the multiples of anything. Losing positions are those congruent to 0 or 2 modulo 7, which is two residues rather than one. Change the subtraction set to 1, 2 and 3 and the losing positions are exactly the multiples of 4, and that pattern has an argument a reader can give in one line. Change it to 1 and 2 and the answer is the multiples of 3. Change it to 2 and 5 and positions 0 and 1 both lose, so the pattern does not even begin with a single loss.</p><h3>What is measured, and what can be proved</h3><p>The panel's period is computed by testing, for each <span class="math" data-say="k">k</span> in turn, whether the labels agree at every pair of positions <span class="math" data-say="k">k</span> apart among the positions labelled. With nineteen positions on screen and a reported period of 7, that is two full repetitions and a bit. It is a measurement, and if the pattern broke at position 40 the panel would say nothing about it.</p><div class="thm"><span class="label">Theorem &middot; Subtraction games are eventually periodic</span><p>Let <span class="math" data-say="M">M</span> be the largest element of the subtraction set. The label of a position is determined by the labels of the <span class="math" data-say="M">M</span> positions below it. There are at most <span class="math" data-say="2 to the power M">2^M</span> distinct windows of <span class="math" data-say="M">M</span> consecutive labels, so some window repeats, and from that point the sequence of labels repeats with a period at most <span class="math" data-say="2 to the power M">2^M</span>.</p></div><div class="proof"><p>Consider the sequence of windows <span class="math" data-say="w of p">w(p)</span> consisting of the labels of positions <span class="math" data-say="p minus M">p−M</span> through <span class="math" data-say="p minus 1">p−1</span>. The recurrence determines the label of <span class="math" data-say="p">p</span> from <span class="math" data-say="w of p">w(p)</span> alone, and therefore determines <span class="math" data-say="w of p plus 1">w(p+1)</span> from <span class="math" data-say="w of p">w(p)</span>. So the sequence of windows is generated by a function from a finite set to itself.</p><p>A sequence of elements of a set of size at most <span class="math" data-say="2 to the power M">2^M</span> generated by iterating a function must repeat a value within the first <span class="math" data-say="2 to the power M plus 1">2^M + 1</span> steps, and once a window repeats, everything after it repeats too. Hence the labels are eventually periodic with period at most <span class="math" data-say="2 to the power M">2^M</span>. For the subtraction set 1, 3, 4 that bound is 16, and the measured period is 7 &mdash; the bound is true, loose, and says nothing about which value below it occurs.</p><p><span class="qed">&#9633;</span></p></div><p>Those two results are exactly the pairing this Subject insists on. The table measures a period of 7 over nineteen positions. The pigeonhole argument proves eventual periodicity with period at most 16, for every subtraction set. Neither implies the other: the measurement does not establish that 7 continues, and the proof does not say the period is 7 or that it starts at position zero rather than later. Raising the range on the lab extends the measurement and never turns it into the theorem.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Won and lost, one position at a time</h2></div><p>The definition evaluated upward, and checked against a recursion</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Won and lost, computed from the definition</strong><span>a position loses exactly when every move from it wins</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>a winning position</span><span class="tone-red"><i class="legend-swatch"></i>a losing position</span><span class="tone-muted"><i class="legend-swatch"></i>unreachable</span></div>
@@ -1404,10 +1447,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="gmGrid" viewBox="0 0 660 90" role="img" aria-label="Each position from zero upward, labelled won or lost."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gmRows"></table></div>
       <div class="status-banner" id="gmStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Choose what may be taken, and how far to label</h3>
-          <p>The subtraction set is typed as numbers; the labels are computed from the definition alone and checked against a memo-free minimax recursion. The reported period is the smallest one consistent with the positions on screen, which is a measurement and is not the same claim as periodicity.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Choose what may be taken, and how far to label</h3>
+            <p>The subtraction set is typed as numbers; the labels are computed from the definition alone and checked against a memo-free minimax recursion. The reported period is the smallest one consistent with the positions on screen, which is a measurement and is not the same claim as periodicity.</p>
         <div class="field">
           <label for="gmPreset">Subtraction set</label>
           <select id="gmPreset"><option value="subtract123">take 1, 2 or 3</option><option value="subtract12">take 1 or 2</option><option value="subtract134" selected>take 1, 3 or 4</option><option value="subtract25">take 2 or 5</option></select>
@@ -1429,12 +1472,15 @@
           <div class="kpi"><span>Position 0 is</span><strong id="gmZero">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="gmHint" style="margin:0;">Two players alternate and take between them the numbers you type; whoever cannot move loses. A position is <em>losing</em> exactly when every move from it leads to a winning position, and <em>winning</em> when some move leads to a losing one. That is the whole definition and the table is it, evaluated upward from zero. The period is then a fact about the table rather than a claim about the game.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The cost is the least interesting thing on the page and is worth one sentence: nineteen positions are labelled with nineteen calls, each looking at up to three predecessors, so labelling <span class="math" data-say="n">n</span> positions is <span class="math" data-say="theta of n">Θ(n)</span> for a fixed subtraction set. The memo-free recursion that checks it is exponential and is capped at position 24 for that reason.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Labelling a game, and reporting a pattern honestly</h2></div><p>The first three steps are mechanical; the fourth is the one this page exists for.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the definition as a quantifier over moves</h3><p>Losing when every move wins, winning when some move loses. Resist turning it into a formula about the position's value: the two quantifiers are the recurrence, and games where the pattern is not arithmetic are exactly where a formula would be invented.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Label upward, because every move goes down</h3><p>The fill order is forced by the fact that a move strictly decreases the position. There is nothing to choose and nothing to get wrong, which makes this the cheapest table on the course to be confident about.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check the labels against a second computation</h3><p>A memo-free minimax recursion at each position shares no state with the table. Run it at every position while the positions are small, and compare. The lab does this on every redraw up to its cap.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Report a measured period as a measurement</h3><p>Say over how many positions it was observed. If you want the claim that it continues, the argument is the pigeonhole one over windows of labels, and it gives eventual periodicity with a bound rather than the value you measured.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Check the first few positions by hand before believing the pattern</h3><p>With moves 2 and 5, positions 0 and 1 both lose, so the pattern opens with two losses in a row and a reader who has assumed a single loss at zero will misread the whole table. The beginning is where measured patterns most often mislead.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Labelling a game, and reporting a pattern honestly</h2>
+      <p class="lead-in">The first three steps are mechanical; the fourth is the one this page exists for.</p>
+      <ol class="key-ideas method"><li><strong>Write the definition as a quantifier over moves.</strong> Losing when every move wins, winning when some move loses. Resist turning it into a formula about the position's value: the two quantifiers are the recurrence, and games where the pattern is not arithmetic are exactly where a formula would be invented.</li><li><strong>Label upward, because every move goes down.</strong> The fill order is forced by the fact that a move strictly decreases the position. There is nothing to choose and nothing to get wrong, which makes this the cheapest table on the course to be confident about.</li><li><strong>Check the labels against a second computation.</strong> A memo-free minimax recursion at each position shares no state with the table. Run it at every position while the positions are small, and compare. The lab does this on every redraw up to its cap.</li><li><strong>Report a measured period as a measurement.</strong> Say over how many positions it was observed. If you want the claim that it continues, the argument is the pigeonhole one over windows of labels, and it gives eventual periodicity with a bound rather than the value you measured.</li><li><strong>Check the first few positions by hand before believing the pattern.</strong> With moves 2 and 5, positions 0 and 1 both lose, so the pattern opens with two losses in a row and a reader who has assumed a single loss at zero will misread the whole table. The beginning is where measured patterns most often mislead.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1467,17 +1513,16 @@ measured over 19 positions.  The pigeonhole argument proves
 eventual periodicity with period at most 2 to the 4, which is 16.</div><p>The residues are the honest way to state what was seen: the losing positions are those congruent to 0 or 2 modulo 7, over the range labelled. Two residues, not one, which is why no multiple-of-something description fits and why the table had to be computed rather than guessed.</p><p>Compare with the subtraction set 1, 2, 3, where the losing positions are 0, 4, 8, 12, 16 and the argument is one line: from a multiple of four, whatever you take, your opponent takes the complement to four and hands back another multiple of four. That argument is a proof for every position, and nothing like it is available for 1, 3, 4 &mdash; the lab measures 7 and the general theorem bounds the period by 16.</p><p>For a faded rehearsal, switch the subtraction set to 2 and 5 before running it. The supplied first move: from position 1 there is no legal move at all, so 1 loses, and so does 0. Predict the first six labels, then check &mdash; and note how much harder the pattern is to see when it does not begin the way you expect.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Turning the observed pattern into a formula</strong><span>The multiples of 4 for the set 1, 2, 3 have a one-line proof; the residues 0 and 2 modulo 7 for the set 1, 3, 4 have only a table over nineteen positions and a theorem that bounds the period at 16. Writing the second as though it had the status of the first is the defect this page exists to prevent.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the base case as a special rule</strong><span>It is the general rule applied to a position with nothing to quantify over. Treating it as an exception invites getting it backwards in a game where the player who cannot move wins instead, and there the same recurrence with the labels swapped is the correct one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Extending the range and calling the pattern proved</strong><span>Nineteen positions, then forty, then a hundred. Each is a longer measurement and none is the theorem. The theorem comes from the finiteness of the window, and it is available without labelling a single position.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can label a game from the definition and state the period&#x27;s status precisely.</strong><p>You should be able to write the two quantifiers, explain why a terminal position falls out of them, check the labels against a second computation, and separate a period measured over a range from the eventual periodicity a pigeonhole argument proves.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> One table remains, and it is indexed by subsets. It is also the page where the asymptotically better method loses by the widest margin on this course &mdash; not by a little, and not on a contrived instance, but on the smallest one the lab will accept.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Turning the observed pattern into a formula</strong><span>The multiples of 4 for the set 1, 2, 3 have a one-line proof; the residues 0 and 2 modulo 7 for the set 1, 3, 4 have only a table over nineteen positions and a theorem that bounds the period at 16. Writing the second as though it had the status of the first is the defect this page exists to prevent.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the base case as a special rule</strong><span>It is the general rule applied to a position with nothing to quantify over. Treating it as an exception invites getting it backwards in a game where the player who cannot move wins instead, and there the same recurrence with the labels swapped is the correct one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Extending the range and calling the pattern proved</strong><span>Nineteen positions, then forty, then a hundred. Each is a longer measurement and none is the theorem. The theorem comes from the finiteness of the window, and it is available without labelling a single position.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can label a game from the definition and state the period&#x27;s status precisely.</strong><p>You should be able to write the two quantifiers, explain why a terminal position falls out of them, check the labels against a second computation, and separate a period measured over a range from the eventual periodicity a pigeonhole argument proves.</p></div></div><div class="note"><strong>Note:</strong> One table remains, and it is indexed by subsets. It is also the page where the asymptotically better method loses by the widest margin on this course &mdash; not by a little, and not on a contrived instance, but on the smallest one the lab will accept.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The table&#x27;s entries are labels, and the recurrence is a quantifier</summary><p>There is no arithmetic here. A position is losing when <em>every</em> move from it reaches a winning position, and winning when <em>some</em> move reaches a losing one. Those are the two quantifiers, and they are duals, so one definition suffices. The base case falls out of it: a position with no legal move has vacuously every move reaching a win, so it loses.</p></details><details class="recall"><summary>Evaluating upward from zero is the fill order, and it is forced</summary><p>Every move strictly decreases the position, so the label of <span class="math" data-say="p">p</span> depends only on labels below <span class="math" data-say="p">p</span>, and counting upward from zero is the order that has them all. The lab checks this against a memo-free recursion that labels each position from scratch, so the table is compared with a second computation rather than displayed and believed.</p></details><details class="recall"><summary>A period seen over nineteen positions is measured, not proved</summary><p>The panel reports the smallest <span class="math" data-say="k">k</span> for which the labels agree at every pair of positions <span class="math" data-say="k">k</span> apart, <em>within the range shown</em>. That is a statement about nineteen positions. The general fact &mdash; that such a game's labels are eventually periodic &mdash; comes from a pigeonhole argument over windows of labels, and it bounds the period rather than giving its value.</p></details></div>
+      <h3>Summary</h3>
       <p>A position loses exactly when every move from it leads to a winning position. That definition is a recurrence whose entries are two symbols rather than numbers, and evaluating it upward from zero labels the whole game. With moves 1, 3 and 4 the losing positions are 0, 2, 7, 9, 14, 16 &mdash; a period of seven that is not the multiples of anything, and that the table exhibits over nineteen positions without proving.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The table&#x27;s entries are labels, and the recurrence is a quantifier.</strong> There is no arithmetic here. A position is losing when <em>every</em> move from it reaches a winning position, and winning when <em>some</em> move reaches a losing one. Those are the two quantifiers, and they are duals, so one definition suffices. The base case falls out of it: a position with no legal move has vacuously every move reaching a win, so it loses.</li><li><strong>Evaluating upward from zero is the fill order, and it is forced.</strong> Every move strictly decreases the position, so the label of <span class="math" data-say="p">p</span> depends only on labels below <span class="math" data-say="p">p</span>, and counting upward from zero is the order that has them all. The lab checks this against a memo-free recursion that labels each position from scratch, so the table is compared with a second computation rather than displayed and believed.</li><li><strong>A period seen over nineteen positions is measured, not proved.</strong> The panel reports the smallest <span class="math" data-say="k">k</span> for which the labels agree at every pair of positions <span class="math" data-say="k">k</span> apart, <em>within the range shown</em>. That is a statement about nineteen positions. The general fact &mdash; that such a game's labels are eventually periodic &mdash; comes from a pigeonhole argument over windows of labels, and it bounds the period rather than giving its value.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="position p is LOSING, when every move from p reaches a winning position. position p is WINNING, when some move from p reaches a losing position. a position with no moves is losing. take 1, 3 or 4, positions 0 to 18. L W L W W W W L W L W W W W L W L W W. losing, 0, 2, 7, 9, 14, 16, the pattern repeats every 7" tabindex="0" role="region" aria-label="Mathematical notation">position p is LOSING   when every move from p reaches a winning position
 position p is WINNING  when some move from p reaches a losing position
 a position with no moves is losing
@@ -3459,11 +3504,42 @@ take 1, 3 or 4, positions 0 to 18
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3531,7 +3607,7 @@ take 1, 3 or 4, positions 0 to 18
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

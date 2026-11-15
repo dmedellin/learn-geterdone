@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Replication and Consistency</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Consistency, counted</p>
       <h1>Conflict Resolution, Counted</h1>
       <p class="lesson-lede">Count the updates each merge rule discards on a trace of concurrent updates.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Last-writer-wins keeps one replica&#x27;s register and drops the rest</li><li>Accurate clocks change which update survives, not how many</li><li>The counter keeps one component per replica and merges by maximum</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two merges, one trace, and the count each one loses</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Concurrent updates, last-writer-wins, and a counter CRDT</span><p>Updates are <strong>concurrent</strong> when no chain of messages orders them — the condition “Vector Clocks and Concurrency” makes decidable. <strong>Last-writer-wins</strong> resolves them by keeping the state of the replica holding the largest timestamp. A <strong>counter CRDT</strong> holds one count per replica, merges two states by elementwise maximum and reports the sum.</p></div><p>Both rules produce a single answer from conflicting states, which is what a merge has to do. The difference is what each one is willing to throw away to get there, and that is a number rather than a matter of taste.</p><div class="mathblock" data-say="four concurrent updates, no replica has seen any other&#x27;s. replica, timestamp, delta, under LWW, CRDT component. A, 3, plus 2, discarded, A equals 2. B, 5, plus 3, kept, B equals 3 plus 4 equals 7. C, 4, plus 1, discarded, C equals 1. a table, shown on the page. true total, 2 plus 3 plus 1 plus 4, equals, 10. last-writer-wins, B holds the largest timestamp, so B&#x27;s. register wins, equals, 7. 2 updates discarded, worth 3. counter CRDT, the set A equals 2, B equals 7, C equals 1, summed, equals, 10. 0 updates discarded" tabindex="0" role="region" aria-label="Mathematical notation">four concurrent updates; no replica has seen any other&#x27;s
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two merges, one trace, and the count each one loses</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Concurrent updates, last-writer-wins, and a counter CRDT</span><p>Updates are <strong>concurrent</strong> when no chain of messages orders them — the condition “Vector Clocks and Concurrency” makes decidable. <strong>Last-writer-wins</strong> resolves them by keeping the state of the replica holding the largest timestamp. A <strong>counter CRDT</strong> holds one count per replica, merges two states by elementwise maximum and reports the sum.</p></div><p>Both rules produce a single answer from conflicting states, which is what a merge has to do. The difference is what each one is willing to throw away to get there, and that is a number rather than a matter of taste.</p><div class="mathblock" data-say="four concurrent updates, no replica has seen any other&#x27;s. replica, timestamp, delta, under LWW, CRDT component. A, 3, plus 2, discarded, A equals 2. B, 5, plus 3, kept, B equals 3 plus 4 equals 7. C, 4, plus 1, discarded, C equals 1. a table, shown on the page. true total, 2 plus 3 plus 1 plus 4, equals, 10. last-writer-wins, B holds the largest timestamp, so B&#x27;s. register wins, equals, 7. 2 updates discarded, worth 3. counter CRDT, the set A equals 2, B equals 7, C equals 1, summed, equals, 10. 0 updates discarded" tabindex="0" role="region" aria-label="Mathematical notation">four concurrent updates; no replica has seen any other&#x27;s
 
   replica   timestamp   delta    under LWW     CRDT component
      A          3        +2      discarded     A = 2
@@ -1413,12 +1457,11 @@
 so every replica converges on the same value regardless of
   the order gossip arrives in            — commutativity
   how the exchanges are grouped          — associativity
-  how often a message is redelivered     — idempotence</div><div class="example"><span class="label">Example &middot; Why each of the three laws is doing work</span><p>Drop commutativity and the value depends on which replica gossiped first, so two replicas that exchanged the same information in opposite orders disagree for ever. Drop associativity and it depends on how the exchanges were grouped, which is a topology detail nobody controls. Drop idempotence and a redelivered message — the thing every network does under retry — double counts. Elementwise maximum has all three, which is why the convergence needs no coordination at all: no ordering, no exactly-once delivery, no leader.</p></div><p>A grow-only counter is the easy case and it should be read as an existence proof rather than a general solution. Sets with removals, registers holding documents, and ordered sequences all need more machinery, and some conflicts are genuinely business decisions that no merge rule should be making. What transfers is the question: for this data type, what does my merge rule discard, and can I count it?</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Conflict resolution, counted</h2></div><p>What last-writer-wins throws away, and what a counter CRDT keeps</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  how often a message is redelivered     — idempotence</div><div class="example"><span class="label">Example &middot; Why each of the three laws is doing work</span><p>Drop commutativity and the value depends on which replica gossiped first, so two replicas that exchanged the same information in opposite orders disagree for ever. Drop associativity and it depends on how the exchanges were grouped, which is a topology detail nobody controls. Drop idempotence and a redelivered message — the thing every network does under retry — double counts. Elementwise maximum has all three, which is why the convergence needs no coordination at all: no ordering, no exactly-once delivery, no leader.</p></div><p>A grow-only counter is the easy case and it should be read as an existence proof rather than a general solution. Sets with removals, registers holding documents, and ordered sequences all need more machinery, and some conflicts are genuinely business decisions that no merge rule should be making. What transfers is the question: for this data type, what does my merge rule discard, and can I count it?</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Conflict resolution, counted</h2></div><p>What last-writer-wins throws away, and what a counter CRDT keeps</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Conflict resolution, counted</strong><span>last-writer-wins discards; the counter CRDT does not</span></div>
         <div class="inline-legend"><span class="tone-red"><i class="legend-swatch"></i>discarded by last-writer-wins</span><span class="tone-green"><i class="legend-swatch"></i>kept by both</span><span class="tone-cyan"><i class="legend-swatch"></i>the CRDT&rsquo;s per-replica counts</span><span class="tone-purple"><i class="legend-swatch"></i>the true total</span></div>
@@ -1427,10 +1470,10 @@ so every replica converges on the same value regardless of
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mgTable"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mgLaws"></table></div>
       <div class="status-banner" id="mgStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Edit the concurrent update trace</h3>
-          <p>Both merges run on the same trace, both counts are exact, and the three laws are checked on your updates rather than asserted. Move the timestamps around and watch which update survives change while the number discarded does not.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Edit the concurrent update trace</h3>
+            <p>Both merges run on the same trace, both counts are exact, and the three laws are checked on your updates rather than asserted. Move the timestamps around and watch which update survives change while the number discarded does not.</p>
         <div class="field">
           <label for="mgTrace">Concurrent updates, as replica:timestamp:+delta</label>
           <input id="mgTrace" type="text" value="A:3:+2, B:5:+3, C:4:+1, B:9:+4" inputmode="text" autocomplete="off">
@@ -1444,12 +1487,14 @@ so every replica converges on the same value regardless of
           <div class="kpi"><span>Updates the CRDT discards</span><strong id="mgCrdtLost">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="mgHint" style="margin:0;">Write <span class="tt">B:5:+3</span> for replica B adding three at timestamp 5. No replica has seen any other&rsquo;s update, so all of these are concurrent &mdash; which is the case the two merges disagree about, and the only case that matters.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting what a merge rule discards</h2></div><p>The trace first, the concurrency second, and only then the merge — because a rule applied to updates that were not concurrent discards nothing and proves nothing.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the trace as replica, timestamp and operation</h3><p>One line per acknowledged update. If the updates are increments, keep them as increments rather than as the resulting values — the distinction between an operation and a state is where the whole difference lives.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Establish that the updates really are concurrent</h3><p>Use the vector-clock comparison: if one update's vector dominates another's, they are ordered and there is no conflict to resolve. A merge rule is only tested by the pairs that are genuinely incomparable.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Apply last-writer-wins and count both quantities</h3><p>Find the largest timestamp, take that replica's state, and count the updates that are not in it and the value they carried. Report both: “two updates, worth three” says more than either half alone.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Apply the type&#x27;s own merge and check it against the true total</h3><p>For a counter, elementwise maximum then sum, compared with the sum of all the increments. If they agree, the rule discards nothing; if they do not, the difference is what it discards and you now know its size.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting what a merge rule discards</h2>
+      <p class="lead-in">The trace first, the concurrency second, and only then the merge — because a rule applied to updates that were not concurrent discards nothing and proves nothing.</p>
+      <ol class="key-ideas method"><li><strong>Write the trace as replica, timestamp and operation.</strong> One line per acknowledged update. If the updates are increments, keep them as increments rather than as the resulting values — the distinction between an operation and a state is where the whole difference lives.</li><li><strong>Establish that the updates really are concurrent.</strong> Use the vector-clock comparison: if one update's vector dominates another's, they are ordered and there is no conflict to resolve. A merge rule is only tested by the pairs that are genuinely incomparable.</li><li><strong>Apply last-writer-wins and count both quantities.</strong> Find the largest timestamp, take that replica's state, and count the updates that are not in it and the value they carried. Report both: “two updates, worth three” says more than either half alone.</li><li><strong>Apply the type&#x27;s own merge and check it against the true total.</strong> For a counter, elementwise maximum then sum, compared with the sum of all the increments. If they agree, the rule discards nothing; if they do not, the difference is what it discards and you now know its size.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1485,17 +1530,16 @@ now make every clock exact and re-run last-writer-wins
   the count discarded does not:  still 2 updates</div><p>Seven against ten, for a rule that raises no error and is the default in a great deal of software. The thirty per cent is not an edge case either — it is what happens whenever three replicas take writes and two of them are not the one holding the largest timestamp.</p><p>The last block is the one to argue with somebody about. Improving the clocks is the reflex fix and it changes the identity of the survivor without changing the arithmetic: two updates are still discarded, because two replicas other than the winner accepted writes. Clock accuracy is the answer to a question about ordering, and these updates were not ordered.</p><p>For a faded rehearsal, add a fifth update <span class="math" data-say="A, 11, plus 5">A:11:+5</span> to the trace. The supplied first move is that the largest timestamp is now <span class="math" data-say="11">11</span> and it is held by <span class="math" data-say="A">A</span>, so <span class="math" data-say="A">A</span>'s register wins. Work out the new last-writer-wins value, the number and worth of the updates it discards, and the CRDT's value — then say, before checking in the lab, whether the number discarded went up or down and why.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing better clocks make last-writer-wins safe</strong><span>They make it arbitrary in a more defensible way and nothing else. The number of discarded updates is set by how many replicas accepted concurrent writes, not by the precision of the timestamps. If losing acknowledged updates is unacceptable, the fix is a merge that does not choose, not a clock that chooses better.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reporting only one of the two counts</strong><span>“Two updates discarded” and “worth three” answer different questions and both are needed. A rule that drops many tiny updates and one that drops a single large one look identical in one number and completely different in the other, and which of them matters depends on the data rather than on the merge.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Generalising the counter to every data type</strong><span>A grow-only counter merges cleanly because increments commute and the elementwise maximum is a least upper bound. Removals, ordered lists and documents are harder, and some conflicts — two people editing the same sentence, two withdrawals from one balance — are business decisions that no automatic merge should quietly make. The transferable move is to count what your rule discards, not to reach for this particular rule.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we use last-writer-wins” prompts you to ask how many acknowledged updates that discards.</strong><p>You should be able to establish that a set of updates is concurrent, compute the last-writer-wins value together with the number and worth of what it drops, compute a counter CRDT's value from its components, state the three merge laws and what each one buys, and say why clock accuracy does not change the count.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That closes the course. Replication costs read capacity you get, write capacity you do not, a latency that is an order statistic rather than a sum, and a staleness that is a tail; quorums buy overlap by counting and nothing more than overlap; and “consistent” turns out to be three different countable questions with three different answers. The next course, “Partitioning and Load Balancing”, stops asking whether the copies agree and starts asking how the data was split between them in the first place — which is balls into bins, and skewed.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing better clocks make last-writer-wins safe</strong><span>They make it arbitrary in a more defensible way and nothing else. The number of discarded updates is set by how many replicas accepted concurrent writes, not by the precision of the timestamps. If losing acknowledged updates is unacceptable, the fix is a merge that does not choose, not a clock that chooses better.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reporting only one of the two counts</strong><span>“Two updates discarded” and “worth three” answer different questions and both are needed. A rule that drops many tiny updates and one that drops a single large one look identical in one number and completely different in the other, and which of them matters depends on the data rather than on the merge.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Generalising the counter to every data type</strong><span>A grow-only counter merges cleanly because increments commute and the elementwise maximum is a least upper bound. Removals, ordered lists and documents are harder, and some conflicts — two people editing the same sentence, two withdrawals from one balance — are business decisions that no automatic merge should quietly make. The transferable move is to count what your rule discards, not to reach for this particular rule.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we use last-writer-wins” prompts you to ask how many acknowledged updates that discards.</strong><p>You should be able to establish that a set of updates is concurrent, compute the last-writer-wins value together with the number and worth of what it drops, compute a counter CRDT's value from its components, state the three merge laws and what each one buys, and say why clock accuracy does not change the count.</p></div></div><div class="note"><strong>Note:</strong> That closes the course. Replication costs read capacity you get, write capacity you do not, a latency that is an order statistic rather than a sum, and a staleness that is a tail; quorums buy overlap by counting and nothing more than overlap; and “consistent” turns out to be three different countable questions with three different answers. The next course, “Partitioning and Load Balancing”, stops asking whether the copies agree and starts asking how the data was split between them in the first place — which is balls into bins, and skewed.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Last-writer-wins keeps one replica&#x27;s register and drops the rest</summary><p>The rule picks the update with the largest timestamp and takes the state of the replica that made it. That replica's register contains its own updates and nothing else, so every update made anywhere else during the partition is gone. On the trace here <span class="math" data-say="B">B</span> holds <span class="math" data-say="t equals 9">t = 9</span>, <span class="math" data-say="B">B</span>'s register is <span class="math" data-say="3 plus 4 equals 7">3 + 4 = 7</span>, and <span class="math" data-say="A">A</span>'s <span class="math" data-say="plus 2">+2</span> and <span class="math" data-say="C">C</span>'s <span class="math" data-say="plus 1">+1</span> are discarded — two updates worth three.</p></details><details class="recall"><summary>Accurate clocks change which update survives, not how many</summary><p>Make every timestamp perfectly correct and last-writer-wins still keeps one replica's register and still discards the others. All that changes is which replica is chosen. The count of discarded updates is a function of how many replicas were updated concurrently, and clock quality does not appear in it anywhere. This is the misconception the lesson exists to break.</p></details><details class="recall"><summary>The counter keeps one component per replica and merges by maximum</summary><p>State a counter as a vector of per-replica totals. A replica increments only its own component; merging two states takes the elementwise maximum; the value is the sum. Elementwise maximum is commutative, associative and idempotent, so every replica converges on the same value whatever order gossip arrives in, however often, and however many times a message is redelivered.</p></details></div>
+      <h3>Summary</h3>
       <p>Given concurrent updates to one value, last-writer-wins keeps the register of whichever replica holds the largest timestamp and discards the rest: on a four-update trace worth <span class="math" data-say="10">10</span> it returns <span class="math" data-say="7">7</span>, throwing away <span class="math" data-say="2">2</span> updates worth <span class="math" data-say="3">3</span>. A counter CRDT keeps one component per replica, merges by elementwise maximum and sums, returning <span class="math" data-say="10">10</span> and discarding none. Accurate clocks change which update survives, never how many do.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Last-writer-wins keeps one replica&#x27;s register and drops the rest.</strong> The rule picks the update with the largest timestamp and takes the state of the replica that made it. That replica's register contains its own updates and nothing else, so every update made anywhere else during the partition is gone. On the trace here <span class="math" data-say="B">B</span> holds <span class="math" data-say="t equals 9">t = 9</span>, <span class="math" data-say="B">B</span>'s register is <span class="math" data-say="3 plus 4 equals 7">3 + 4 = 7</span>, and <span class="math" data-say="A">A</span>'s <span class="math" data-say="plus 2">+2</span> and <span class="math" data-say="C">C</span>'s <span class="math" data-say="plus 1">+1</span> are discarded — two updates worth three.</li><li><strong>Accurate clocks change which update survives, not how many.</strong> Make every timestamp perfectly correct and last-writer-wins still keeps one replica's register and still discards the others. All that changes is which replica is chosen. The count of discarded updates is a function of how many replicas were updated concurrently, and clock quality does not appear in it anywhere. This is the misconception the lesson exists to break.</li><li><strong>The counter keeps one component per replica and merges by maximum.</strong> State a counter as a vector of per-replica totals. A replica increments only its own component; merging two states takes the elementwise maximum; the value is the sum. Elementwise maximum is commutative, associative and idempotent, so every replica converges on the same value whatever order gossip arrives in, however often, and however many times a message is redelivered.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="trace, A, 3, plus 2, B, 5, plus 3, C, 4, plus 1, B, 9, plus 4, all four concurrent. true total, every update applied, 10. last-writer-wins, B holds t equals 9, so B&#x27;s register wins, 7. 2 updates discarded, worth 3. counter CRDT, the set A equals 2, B equals 7, C equals 1, summed, 10, discarding 0. merge is elementwise max, commutative, associative, idempotent" tabindex="0" role="region" aria-label="Mathematical notation">trace   A:3:+2   B:5:+3   C:4:+1   B:9:+4     all four concurrent
 true total, every update applied                          10
 last-writer-wins: B holds t = 9, so B&#x27;s register wins       7
@@ -2991,11 +3035,42 @@ merge is elementwise max: commutative, associative, idempotent</div><figcaption>
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3063,7 +3138,7 @@ merge is elementwise max: commutative, associative, idempotent</div><figcaption>
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

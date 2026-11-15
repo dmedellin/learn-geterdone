@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">A Case Study: Designing a Document Editor</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 2 · A Case Study: Designing a Document Editor</p>
       <h1>Supporting Multiple Window Systems</h1>
       <p class="lesson-lede">An abstraction and its platform implementations kept in two class hierarchies joined by a reference, so that each can grow without the other.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Window</li><li>WindowImp</li><li>Bridge</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two hierarchies instead of one</h2>
-      <article class="prose reading"><p>&ldquo;The intent behind Bridge is to allow separate class hierarchies to work together even as they evolve independently.&rdquo; Section 2.6, Supporting Multiple Window Systems, reaches Bridge after first asking whether the previous section's pattern would do. Read the section in your own copy first.</p><p>The problem looks like the last one. A window system manages overlapping windows on the screen and routes keyboard and mouse input to them, and in 1995 there were several, Macintosh, Presentation Manager, Windows and X, with largely incompatible programming interfaces. Why not a factory per window system? Because Abstract Factory worked for widgets only because the authors wrote the widget classes themselves, deriving each standard's scroll bar from a common abstract one. Hierarchies from different vendors share no such base, and Lexi cannot write its own window system to supply one. What it can do is notice that window systems all do broadly the same things, and slide each one under a common interface.</p><p>That interface is the Window class Section 2.2 already used for drawing. How much should it offer? The authors reject both extremes. Offer only what every window system has, and Lexi is as weak as the weakest; offer everything any of them has, and the interface is huge, incoherent and changes with every vendor's release. They settle between: the popular windowing operations, plus the graphics operations glyphs need to draw themselves. Subclasses of Window are kinds of window, an application window, an icon, a dialog, each behaving a little differently.</p><p>Where does the platform code go? Two ways are dismissed. One is a separate version of Window and its subclasses for each platform, chosen when Lexi is built, with several classes of the same name to keep in step. The other is a platform subclass of every kind of window, which the authors call another subclass explosion, like the one embellishment would have caused. Neither lets the window system change after compiling. Their third way is the chapter's refrain, to encapsulate the concept that varies: put each window system's functionality in an object, a WindowImp, and implement Window in terms of it. A window's request to draw a rectangle becomes a call on its implementation, and the X subclass and the Presentation Manager subclass carry it out in their very different ways.</p><p>Which implementation does a window get? The section uses the previous lesson's pattern after all: an abstract factory for window-system resources, one concrete factory per window system, asked by Window's constructor for its implementation. The relationship between the two hierarchies is Bridge. Window's interface serves the application programmer; WindowImp's serves the window systems and may follow them, warts and all. The catalog lists the consequences: the implementation can be chosen at run time and changed without recompiling clients, each hierarchy can be extended on its own, and clients do not see implementation details. The catalog names no liability. The costs are visible in the section itself: a second hierarchy to maintain, a call through the implementation object for every drawing request, and an implementation interface that must be made to fit systems that do the same things differently.</p><pre class="codeblock" data-say="line 1, comment, The abstraction the library&#x27;s code uses.... line 2, abstract class notice. line 3, private final channel channel, comment, ...holds its implementation. line 4, notice of channel channel this dot channel is set to channel. line 5, protected void deliver of string subject, string body. line 6, channel dot send of subject, body. line 8, abstract void issue of member m. line 10, final class overdue extends notice. line 11, overdue of channel c super of c. line 12, void issue of member m. line 13, deliver of Overdue, m dot name plus, please return plus m dot oldest loan. line 16, comment, ...which caters to the delivery services, not to the library.. line 17, interface channel. line 18, void send of string subject, string body" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The abstraction the library&#x27;s code uses...</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two hierarchies instead of one</h2><div class="prose reading"><p>&ldquo;The intent behind Bridge is to allow separate class hierarchies to work together even as they evolve independently.&rdquo; Section 2.6, Supporting Multiple Window Systems, reaches Bridge after first asking whether the previous section's pattern would do. Read the section in your own copy first.</p><p>The problem looks like the last one. A window system manages overlapping windows on the screen and routes keyboard and mouse input to them, and in 1995 there were several, Macintosh, Presentation Manager, Windows and X, with largely incompatible programming interfaces. Why not a factory per window system? Because Abstract Factory worked for widgets only because the authors wrote the widget classes themselves, deriving each standard's scroll bar from a common abstract one. Hierarchies from different vendors share no such base, and Lexi cannot write its own window system to supply one. What it can do is notice that window systems all do broadly the same things, and slide each one under a common interface.</p><p>That interface is the Window class Section 2.2 already used for drawing. How much should it offer? The authors reject both extremes. Offer only what every window system has, and Lexi is as weak as the weakest; offer everything any of them has, and the interface is huge, incoherent and changes with every vendor's release. They settle between: the popular windowing operations, plus the graphics operations glyphs need to draw themselves. Subclasses of Window are kinds of window, an application window, an icon, a dialog, each behaving a little differently.</p><p>Where does the platform code go? Two ways are dismissed. One is a separate version of Window and its subclasses for each platform, chosen when Lexi is built, with several classes of the same name to keep in step. The other is a platform subclass of every kind of window, which the authors call another subclass explosion, like the one embellishment would have caused. Neither lets the window system change after compiling. Their third way is the chapter's refrain, to encapsulate the concept that varies: put each window system's functionality in an object, a WindowImp, and implement Window in terms of it. A window's request to draw a rectangle becomes a call on its implementation, and the X subclass and the Presentation Manager subclass carry it out in their very different ways.</p><p>Which implementation does a window get? The section uses the previous lesson's pattern after all: an abstract factory for window-system resources, one concrete factory per window system, asked by Window's constructor for its implementation. The relationship between the two hierarchies is Bridge. Window's interface serves the application programmer; WindowImp's serves the window systems and may follow them, warts and all. The catalog lists the consequences: the implementation can be chosen at run time and changed without recompiling clients, each hierarchy can be extended on its own, and clients do not see implementation details. The catalog names no liability. The costs are visible in the section itself: a second hierarchy to maintain, a call through the implementation object for every drawing request, and an implementation interface that must be made to fit systems that do the same things differently.</p><pre class="codeblock" data-say="line 1, comment, The abstraction the library&#x27;s code uses.... line 2, abstract class notice. line 3, private final channel channel, comment, ...holds its implementation. line 4, notice of channel channel this dot channel is set to channel. line 5, protected void deliver of string subject, string body. line 6, channel dot send of subject, body. line 8, abstract void issue of member m. line 10, final class overdue extends notice. line 11, overdue of channel c super of c. line 12, void issue of member m. line 13, deliver of Overdue, m dot name plus, please return plus m dot oldest loan. line 16, comment, ...which caters to the delivery services, not to the library.. line 17, interface channel. line 18, void send of string subject, string body" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The abstraction the library&#x27;s code uses...</span>
 <span class="cl">abstract class Notice {</span>
 <span class="cl">    private final Channel channel;   // ...holds its implementation</span>
 <span class="cl">    Notice(Channel channel) { this.channel = channel; }</span>
@@ -1463,12 +1507,11 @@
 <span class="cl">// ...which caters to the delivery services, not to the library.</span>
 <span class="cl">interface Channel {</span>
 <span class="cl">    void send(String subject, String body);</span>
-<span class="cl">}</span></code></pre><p>The lab's design is a library that sends notices, overdue, hold ready and renewal, through channels it does not control, email, SMS and app push, each with its own provider's interface. On the preset <code>library-notices</code> there are <span data-say="3 times 3 equals 9">3 × 3 = 9</span> combinations, so a platform subclass of every kind of notice needs 9 + 1 = 10 classes. Two hierarchies need (3 + 1) + (3 + 1) = 8, and the references tile says each notice holds one reference, to its channel, which is Window's reference to its WindowImp. A fourth channel adds 3 classes under subclassing, one per kind of notice <span data-say="10 goes to 13">(10 → 13)</span>, against <span data-say="1 8 goes to 9">1 (8 → 9)</span>, and no notice class is touched.</p><p>The preset <code>four-channels</code> adds a letter channel and then a new kind of notice: <span data-say="3 times 4 equals 12">3 × 4 = 12</span> combinations, 13 classes against 9, and the new notice costs 4 subclasses <span data-say="13 goes to 17">(13 → 17)</span> against <span data-say="1 9 goes to 10">1 (9 → 10)</span>. The ratio tile reads <span data-say="5 over 4 is approximately 1.3 times">5/4 ≈ 1.3×</span> on the first preset and <span data-say="13 over 9 is approximately 1.4 times">13/9 ≈ 1.4×</span> on this one. It is not large here; what the authors argue from is that the subclass count multiplies and the other adds, and that only the reference lets a notice be given a different channel while the program runs.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, document, receipt, label, printer, thermal, laser, inkjet, pdf" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">document, receipt, label; printer, thermal, laser, inkjet, pdf</span></code></pre><p>A shop prints two kinds of document on four kinds of printer, each with its own driver. By hand, count the classes under each design and what a fifth printer adds to each. Then type the line into the lab, with printer as the aspect that gains a variant.</p><p>The design now reaches the screen on any platform. The next lesson, User Operations, reads Section 2.7, where the problem moves from drawing to doing: how menus and buttons reach Lexi's operations, and how those operations are undone.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Classes</h2></div><p>every combination a subclass, or one hierarchy per aspect</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The lab's design is a library that sends notices, overdue, hold ready and renewal, through channels it does not control, email, SMS and app push, each with its own provider's interface. On the preset <code>library-notices</code> there are <span data-say="3 times 3 equals 9">3 × 3 = 9</span> combinations, so a platform subclass of every kind of notice needs 9 + 1 = 10 classes. Two hierarchies need (3 + 1) + (3 + 1) = 8, and the references tile says each notice holds one reference, to its channel, which is Window's reference to its WindowImp. A fourth channel adds 3 classes under subclassing, one per kind of notice <span data-say="10 goes to 13">(10 → 13)</span>, against <span data-say="1 8 goes to 9">1 (8 → 9)</span>, and no notice class is touched.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Classes</h2></div><p>every combination a subclass, or one hierarchy per aspect</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Classes</strong><span>every combination a subclass, or one hierarchy per aspect</span></div>
       </div>
@@ -1476,10 +1519,10 @@
       <div class="table-wrap" id="gclTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gclTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is one aspect that varies, then its variants (2 to 4 aspects, 1 to 8 variants each); every name is a class and is used once. Combinations = the product of the variant counts. With one subclass per combination the design has that product + 1 classes (one abstract base). With one hierarchy per aspect, joined by composition, each aspect has 1 abstract class + 1 concrete class per variant, so the design has the sum of the variant counts + the number of aspects; the client holds the first aspect's abstract class, and each of its objects holds one reference per other aspect. The ratio is the first count over the second. One new variant of the added aspect adds the product of the other aspects' counts under subclassing and 1 class under composition; neither design edits an existing class for it.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Abstractions and platforms: subclasses against a bridge</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Abstractions and platforms: subclasses against a bridge</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gclPreset">Worked example</label>
           <select id="gclPreset"><option value="library-notices" selected>A library's notices on three channels, a fourth channel</option><option value="four-channels">Four channels, and a new kind of notice</option></select>
@@ -1502,12 +1545,15 @@
           <div class="kpi"><span>A new variant: classes added by composition</span><strong id="gclAddCompose">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>four-channels</code> adds a letter channel and then a new kind of notice: <span data-say="3 times 4 equals 12">3 × 4 = 12</span> combinations, 13 classes against 9, and the new notice costs 4 subclasses <span data-say="13 goes to 17">(13 → 17)</span> against <span data-say="1 9 goes to 10">1 (9 → 10)</span>. The ratio tile reads <span data-say="5 over 4 is approximately 1.3 times">5/4 ≈ 1.3×</span> on the first preset and <span data-say="13 over 9 is approximately 1.4 times">13/9 ≈ 1.4×</span> on this one. It is not large here; what the authors argue from is that the subclass count multiplies and the other adds, and that only the reference lets a notice be given a different channel while the program runs.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, document, receipt, label, printer, thermal, laser, inkjet, pdf" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">document, receipt, label; printer, thermal, laser, inkjet, pdf</span></code></pre><p>A shop prints two kinds of document on four kinds of printer, each with its own driver. By hand, count the classes under each design and what a fifth printer adds to each. Then type the line into the lab, with printer as the aspect that gains a variant.</p><p>The design now reaches the screen on any platform. The next lesson, User Operations, reads Section 2.7, where the problem moves from drawing to doing: how menus and buttons reach Lexi's operations, and how those operations are undone.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting a bridge</h2></div><p>Four steps, the last of them on a design of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Separate the abstraction from the platform</h3><p>Write the kinds of thing the application uses (the abstraction) first, and the platforms that carry them out (the implementations) second.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count a platform subclass of every kind</h3><p>Multiply the two counts and add 1 for the base: one class per kind of thing on each platform.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the bridge</h3><p>Add the two counts and 1 abstract class for each side. Each object of the abstraction holds one reference to an implementation.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a design of your own</h3><p>Find code of your own that runs one idea on several platforms or vendors: storage, messaging, payment, rendering. Write the abstraction and the platforms, count both designs, and say whether the platform's interface is yours to change or a vendor's.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting a bridge</h2>
+      <p class="lead-in">Four steps, the last of them on a design of your own.</p>
+      <ol class="key-ideas method"><li><strong>Separate the abstraction from the platform.</strong> Write the kinds of thing the application uses (the abstraction) first, and the platforms that carry them out (the implementations) second.</li><li><strong>Count a platform subclass of every kind.</strong> Multiply the two counts and add 1 for the base: one class per kind of thing on each platform.</li><li><strong>Count the bridge.</strong> Add the two counts and 1 abstract class for each side. Each object of the abstraction holds one reference to an implementation.</li><li><strong>Do it on a design of your own.</strong> Find code of your own that runs one idea on several platforms or vendors: storage, messaging, payment, rendering. Write the abstraction and the platforms, count both designs, and say whether the platform's interface is yours to change or a vendor's.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1525,17 +1571,16 @@ a fourth channel, subclassing: +3 (10 → 13)
 a fourth channel, bridge: +1 (8 → 9)</div><p>Under the bridge the new channel is one class that implements the channel interface; every kind of notice can use it through the reference it already holds.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Applying Abstract Factory because the problem looks the same</strong><span>Section 2.6 opens by asking exactly that and answering no: the pattern needs abstract product classes the vendors do not share. The window systems' interfaces had to be hidden behind one Lexi defines, and only then could a factory pick an implementation.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding a platform subclass to every class in a hierarchy</strong><span>The authors call it another subclass explosion, and note that it fixes the platform at compile time. On the lesson's notices the lab counts 10 classes against 8, with each new channel costing 3 subclasses against 1; and no subclass can switch channel on a live notice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Making the implementation interface mirror the abstraction</strong><span>Bridge's point is that the two interfaces serve different readers: Window's the application programmer, WindowImp's the window systems, warts and all. The catalog notes the implementor usually offers primitives from which the abstraction builds higher-level operations.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a bridge against a subclass per platform.</strong><p>Given an abstraction and its platforms, state the classes under each design, what a new platform and a new kind of abstraction each add, and why Section 2.6 does not use Abstract Factory alone.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts classes on the aspects as stated. It cannot tell you whether your platforms' interfaces are close enough to slide under one, which the authors take as given for window systems, nor where between intersection and union your interface should fall.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Applying Abstract Factory because the problem looks the same</strong><span>Section 2.6 opens by asking exactly that and answering no: the pattern needs abstract product classes the vendors do not share. The window systems' interfaces had to be hidden behind one Lexi defines, and only then could a factory pick an implementation.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding a platform subclass to every class in a hierarchy</strong><span>The authors call it another subclass explosion, and note that it fixes the platform at compile time. On the lesson's notices the lab counts 10 classes against 8, with each new channel costing 3 subclasses against 1; and no subclass can switch channel on a live notice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Making the implementation interface mirror the abstraction</strong><span>Bridge's point is that the two interfaces serve different readers: Window's the application programmer, WindowImp's the window systems, warts and all. The catalog notes the implementor usually offers primitives from which the abstraction builds higher-level operations.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a bridge against a subclass per platform.</strong><p>Given an abstraction and its platforms, state the classes under each design, what a new platform and a new kind of abstraction each add, and why Section 2.6 does not use Abstract Factory alone.</p></div></div><div class="note"><strong>Note:</strong> The lab counts classes on the aspects as stated. It cannot tell you whether your platforms' interfaces are close enough to slide under one, which the authors take as given for window systems, nor where between intersection and union your interface should fall.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Window</summary><p>Lexi's abstract class for a window as the application sees it: operations to draw shapes and text, to raise, lower, iconify and redraw. Its subclasses are kinds of window, such as an application window, an icon or a dialog, and none of them depends on a particular window system.</p></details><details class="recall"><summary>WindowImp</summary><p>The abstract class for an object that hides one window system's own interface. Each window holds one, and forwards its drawing and window management to it; a subclass per window system translates those requests into that system's calls.</p></details><details class="recall"><summary>Bridge</summary><p>The pattern: an Abstraction holds a reference to an Implementor, RefinedAbstractions extend the abstraction, and ConcreteImplementors implement the implementor's interface, so that either hierarchy can gain classes without touching the other. It has a lesson of its own, Bridge, in Structural Patterns.</p></details></div>
+      <h3>Summary</h3>
       <p>Section 2.6 makes Lexi run on several window systems whose interfaces it does not control, by giving every window an implementation object behind a stable interface. Read why Abstract Factory alone will not do, then count the classes a library's notices need when each notice and channel pair is a subclass, against two hierarchies joined by a reference.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Window.</strong> Lexi's abstract class for a window as the application sees it: operations to draw shapes and text, to raise, lower, iconify and redraw. Its subclasses are kinds of window, such as an application window, an icon or a dialog, and none of them depends on a particular window system.</li><li><strong>WindowImp.</strong> The abstract class for an object that hides one window system's own interface. Each window holds one, and forwards its drawing and window management to it; a subclass per window system translates those requests into that system's calls.</li><li><strong>Bridge.</strong> The pattern: an Abstraction holds a reference to an Implementor, RefinedAbstractions extend the abstraction, and ConcreteImplementors implement the implementor's interface, so that either hierarchy can gain classes without touching the other. It has a lesson of its own, Bridge, in Structural Patterns.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="vendor interfaces share no base class. neither intersection nor union. encapsulate the concept that varies. a window holds its implementation. abstraction and implementation grow apart. a factory picks the implementation" tabindex="0" role="region" aria-label="Mathematical notation">vendor interfaces share no base class
 neither intersection nor union
 encapsulate the concept that varies
@@ -2311,11 +2356,42 @@ a factory picks the implementation</div><figcaption>Window systems in six lines<
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2383,7 +2459,7 @@ a factory picks the implementation</div><figcaption>Window systems in six lines<
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

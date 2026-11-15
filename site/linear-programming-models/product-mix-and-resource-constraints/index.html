@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,28 +1424,26 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Linear Programming Models</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The four model families</p>
       <h1>Product Mix and Packing Constraints</h1>
       <p class="lesson-lede">Build a packing model from a rate table and say which resources the optimum exhausts.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A packing row has usage on the left and availability on the right</li><li>The coefficients are per-unit rates, read down a column</li><li>Slack is the unused amount, in the resource’s own unit</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Packing rows, slack, and what tight does not mean</h2>
-      <article class="prose reading"><p>The data arrive as a table, and the model is a transcription of it. Rates down the columns, availabilities down the right, and the profit row underneath.</p><div class="mathblock" data-say="chairs C, tables T, available. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">                     chairs (C)   tables (T)    available
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Packing rows, slack, and what tight does not mean</h2><div class="prose reading"><p>The data arrive as a table, and the model is a transcription of it. Rates down the columns, availabilities down the right, and the profit row underneath.</p><div class="mathblock" data-say="chairs C, tables T, available. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">                     chairs (C)   tables (T)    available
   carpentry shop          1            0         4 bench hours
   finishing shop          0            2         12 finishing hours
   assembly line           3            2         18 assembly hours
-  profit a unit           3            5         —</div><div class="defbox"><span class="label">Definition &middot; Slack</span><p>For a row <span class="math" data-say="A times x is at most b">a·x ≤ b</span> and a point <span class="math" data-say="x">x</span>, the <strong>slack</strong> of the row at <span class="math" data-say="x">x</span> is <span class="math" data-say="b minus A times x">b − a·x</span>. It is at or above zero exactly where the row holds, and the row is <strong>tight</strong> at <span class="math" data-say="x">x</span> when the slack is zero.</p><p>Slack is a quantity in the situation and not a diagnostic: the slack in the carpentry row is the bench hours the plan leaves unused. “Standard Form, Slack and Surplus” promotes it to a variable of the model; here it is only computed.</p></div><p>The two-product workshop is worth 36 at <span class="math" data-say="2, 6">(2, 6)</span>, and the slacks there are 2 bench hours, 0 finishing hours and 0 assembly hours. Two of the three rows are used right up, which is the usual state of affairs: an optimum of a two-variable programme sits where two boundaries cross.</p><h3>A third product, and the end of the picture</h3><p>Let the workshop also make benches, at 1 bench hour, 1 finishing hour and 2 assembly hours each, earning 4. The table grows a column, every row grows a term, and the optimum becomes 75/2 at <span class="math" data-say="1, 9 over 2, 3">(1, 9/2, 3)</span> with all three rows tight. Two things changed. The answer is a fraction, and there is no longer a picture: three decisions cannot be drawn on a plane, so the lab hands the programme to the exact simplex instead of enumerating corners.</p><p>Both routes are solving the same kind of object and they agree wherever they overlap &mdash; pin the bench column at zero and the engine returns 36 again. That agreement is worth more than either method alone, because it is the only evidence that the picture was a method and not a habit.</p><h3>Tight is not the same as worth relieving</h3><p>A tight row is a resource the plan has used up. It is tempting to read that as “the bottleneck”, and to conclude that one more hour of it would buy something. It need not.</p><div class="example"><span class="label">Example &middot; Three exhausted resources, two of them worth nothing</span><p>Push the assembly line to 24 hours. The optimum moves to <span class="math" data-say="4, 6">(4, 6)</span> and earns 42, and now all three rows are tight: <span class="math" data-say="4 is at most 4">4 ≤ 4</span>, <span class="math" data-say="12 is at most 12">12 ≤ 12</span> and <span class="math" data-say="24 is at most 24">24 ≤ 24</span>. Add a twenty-fifth assembly hour and the answer is still 42, with one assembly hour idle. Add a bench hour and it is still 42. Add two finishing hours and it is 45. Three resources exhausted, one of them worth paying for.</p></div><p>What separates them is a number this course cannot yet compute: the change in the optimum for one more unit of a resource, and the range of availabilities over which that change is the truth. It is called a shadow price, it is “Duality and Sensitivity Analysis”, and the honest report here is that a tight row names a resource the plan exhausted and says nothing about what relieving it would be worth.</p><p>The slacks do settle a smaller question completely, and it is worth having. A row with slack left is a row that is not currently deciding anything: change its availability by less than its slack and neither the plan nor the profit moves at all.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Product mix, written from a table</h2></div><p>Per-unit rates down the columns, availabilities down the right</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  profit a unit           3            5         —</div><div class="defbox"><span class="label">Definition &middot; Slack</span><p>For a row <span class="math" data-say="A times x is at most b">a·x ≤ b</span> and a point <span class="math" data-say="x">x</span>, the <strong>slack</strong> of the row at <span class="math" data-say="x">x</span> is <span class="math" data-say="b minus A times x">b − a·x</span>. It is at or above zero exactly where the row holds, and the row is <strong>tight</strong> at <span class="math" data-say="x">x</span> when the slack is zero.</p><p>Slack is a quantity in the situation and not a diagnostic: the slack in the carpentry row is the bench hours the plan leaves unused. “Standard Form, Slack and Surplus” promotes it to a variable of the model; here it is only computed.</p></div><p>The two-product workshop is worth 36 at <span class="math" data-say="2, 6">(2, 6)</span>, and the slacks there are 2 bench hours, 0 finishing hours and 0 assembly hours. Two of the three rows are used right up, which is the usual state of affairs: an optimum of a two-variable programme sits where two boundaries cross.</p><h3>A third product, and the end of the picture</h3><p>Let the workshop also make benches, at 1 bench hour, 1 finishing hour and 2 assembly hours each, earning 4. The table grows a column, every row grows a term, and the optimum becomes 75/2 at <span class="math" data-say="1, 9 over 2, 3">(1, 9/2, 3)</span> with all three rows tight. Two things changed. The answer is a fraction, and there is no longer a picture: three decisions cannot be drawn on a plane, so the lab hands the programme to the exact simplex instead of enumerating corners.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Product mix, written from a table</h2></div><p>Per-unit rates down the columns, availabilities down the right</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Product mix, written from a table</strong><span>Per-unit rates down the columns, availabilities down the right</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the feasible region</span><span class="tone-amber"><i class="legend-swatch"></i>its corners</span><span class="tone-green"><i class="legend-swatch"></i>the winning corner</span></div>
@@ -1410,10 +1453,10 @@
       <div id="mdTable" style="margin-top:12px;"></div>
       <div id="mdExtra" style="margin-top:12px;"></div>
       <div class="status-banner" id="mdStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Move one availability and watch which rows stay tight</h3>
-          <p>The slack table evaluates every row at the optimum and marks it tight or slack, each in its own unit. Take the assembly line up to 24 and all three rows go tight at once; take it to 25 and one of them comes back with an hour to spare while the profit does not move.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Move one availability and watch which rows stay tight</h3>
+            <p>The slack table evaluates every row at the optimum and marks it tight or slack, each in its own unit. Take the assembly line up to 24 and all three rows go tight at once; take it to 25 and one of them comes back with an hour to spare while the profit does not move.</p>
         <div id="mdProductsRow">
           <div class="range-row"><label class="small-copy" for="mdProducts" id="mdProductsLab">how many products the workshop makes</label><span class="range-value" id="mdProductsOut">&mdash;</span></div>
           <input id="mdProducts" type="range" min="2" max="3" step="1" value="2" />
@@ -1437,12 +1480,15 @@
           <div class="kpi"><span id="mdK4Lab">&mdash;</span><strong id="mdK4">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Both routes are solving the same kind of object and they agree wherever they overlap &mdash; pin the bench column at zero and the engine returns 36 again. That agreement is worth more than either method alone, because it is the only evidence that the picture was a method and not a habit.</p><h3>Tight is not the same as worth relieving</h3><p>A tight row is a resource the plan has used up. It is tempting to read that as “the bottleneck”, and to conclude that one more hour of it would buy something. It need not.</p><div class="example"><span class="label">Example &middot; Three exhausted resources, two of them worth nothing</span><p>Push the assembly line to 24 hours. The optimum moves to <span class="math" data-say="4, 6">(4, 6)</span> and earns 42, and now all three rows are tight: <span class="math" data-say="4 is at most 4">4 ≤ 4</span>, <span class="math" data-say="12 is at most 12">12 ≤ 12</span> and <span class="math" data-say="24 is at most 24">24 ≤ 24</span>. Add a twenty-fifth assembly hour and the answer is still 42, with one assembly hour idle. Add a bench hour and it is still 42. Add two finishing hours and it is 45. Three resources exhausted, one of them worth paying for.</p></div><p>What separates them is a number this course cannot yet compute: the change in the optimum for one more unit of a resource, and the range of availabilities over which that change is the truth. It is called a shadow price, it is “Duality and Sensitivity Analysis”, and the honest report here is that a tight row names a resource the plan exhausted and says nothing about what relieving it would be worth.</p><p>The slacks do settle a smaller question completely, and it is worth having. A row with slack left is a row that is not currently deciding anything: change its availability by less than its slack and neither the plan nor the profit moves at all.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Building a packing model from a table</h2></div><p>The table is the model. These four steps are a transcription with two checks in it.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>One row per resource, one column per product</h3><p>Count the rows of your model before writing them: as many as there are things in limited supply. A row for each product is the commonest transposition, and it produces a model about nothing at all.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read the rates down the column of the product</h3><p>The chairs column of the table supplies the coefficient of <span class="math" data-say="C">C</span> in every row. Write the column out beside the rows it feeds if the table is wide; a misplaced rate is invisible once the programme is written.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check each row for units, both sides</h3><p><span class="math" data-say="hours per unit times units">hours per unit × units</span> is hours, and the availability is hours of the same shop. When a rate is quoted in minutes and an availability in hours, that is a real error and the only place it shows is here.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Solve, then read the slacks before the answer</h3><p>Which rows are tight is the structural fact about the solution; the objective value is one number. Note the slacks in their own units, and resist the conclusion that a tight row is worth relieving.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Building a packing model from a table</h2>
+      <p class="lead-in">The table is the model. These four steps are a transcription with two checks in it.</p>
+      <ol class="key-ideas method"><li><strong>One row per resource, one column per product.</strong> Count the rows of your model before writing them: as many as there are things in limited supply. A row for each product is the commonest transposition, and it produces a model about nothing at all.</li><li><strong>Read the rates down the column of the product.</strong> The chairs column of the table supplies the coefficient of <span class="math" data-say="C">C</span> in every row. Write the column out beside the rows it feeds if the table is wide; a misplaced rate is invisible once the programme is written.</li><li><strong>Check each row for units, both sides.</strong> <span class="math" data-say="hours per unit times units">hours per unit × units</span> is hours, and the availability is hours of the same shop. When a rate is quoted in minutes and an availability in hours, that is a real error and the only place it shows is here.</li><li><strong>Solve, then read the slacks before the answer.</strong> Which rows are tight is the structural fact about the solution; the objective value is one number. Note the slacks in their own units, and resist the conclusion that a tight row is worth relieving.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1474,17 +1520,16 @@ assembly      3 + 9 + 6    = 18  ≤ 18     slack 0     tight
 check      3(1) + 5(9/2) + 4(3)  =  3 + 45/2 + 12  =  75/2</div><p>Every row is tight, the plan asks for four and a half tables, and 75/2 is not a number a decimal would have kept. A reader who wanted whole tables has a real question and it is answered in “Integer Programming”, not by rounding &mdash; that warning is the standing one on this course.</p><p>For a faded rehearsal, drop the bench column and take the finishing shop from 12 hours to 13. The supplied first move is which rows can possibly change: only the ones that were tight, because a row with slack to spare is not deciding anything. Predict the new plan and profit, then check it against the lab, and say in a sentence why the carpentry slack grew rather than shrank.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a tight row as a bottleneck worth relieving</strong><span>Tight means used up. It does not mean that one more unit would buy anything, and two resources can both be exhausted with only one of them worth paying for. The distinction is a price and a range, which this course can name and deliberately cannot compute; saying so is more useful than guessing.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>One row per product instead of one row per resource</strong><span>The rows of a packing model belong to the things in limited supply and the columns to the things you decide. Transposing the table produces a model that builds, solves and answers a question nobody asked, and the usual symptom is coefficients that all look like profits.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quietly dropping a row with slack in it</strong><span>A row with slack at one optimum is not a row you may delete: move an availability or a profit and it can become the row that binds. What the slack licenses is narrower and exact &mdash; changing that availability by less than its slack moves neither the plan nor the objective.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which rows are tight before you are told the objective value.</strong><p>You should be able to transcribe a rate table into rows and columns without transposing it, compute the slack in every row at a given point in that row's own unit, and state what a tight row does and does not settle.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A packing row limits what a plan may consume. The next family turns the inequality round: a requirement says a plan must supply at least something, its gap is an over-fulfilment rather than an unused remainder, and the region such rows cut out has no ceiling at all &mdash; which turns out to be harmless, for a reason worth being careful about.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a tight row as a bottleneck worth relieving</strong><span>Tight means used up. It does not mean that one more unit would buy anything, and two resources can both be exhausted with only one of them worth paying for. The distinction is a price and a range, which this course can name and deliberately cannot compute; saying so is more useful than guessing.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>One row per product instead of one row per resource</strong><span>The rows of a packing model belong to the things in limited supply and the columns to the things you decide. Transposing the table produces a model that builds, solves and answers a question nobody asked, and the usual symptom is coefficients that all look like profits.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quietly dropping a row with slack in it</strong><span>A row with slack at one optimum is not a row you may delete: move an availability or a profit and it can become the row that binds. What the slack licenses is narrower and exact &mdash; changing that availability by less than its slack moves neither the plan nor the objective.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which rows are tight before you are told the objective value.</strong><p>You should be able to transcribe a rate table into rows and columns without transposing it, compute the slack in every row at a given point in that row's own unit, and state what a tight row does and does not settle.</p></div></div><div class="note"><strong>Note:</strong> A packing row limits what a plan may consume. The next family turns the inequality round: a requirement says a plan must supply at least something, its gap is an over-fulfilment rather than an unused remainder, and the region such rows cut out has no ceiling at all &mdash; which turns out to be harmless, for a reason worth being careful about.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A packing row has usage on the left and availability on the right</summary><p>Every <span class="math" data-say="less-than-or-equal">≤</span> row in this family is the same sentence: what the plan consumes of one resource, at most what there is of it. The row belongs to the resource, not to the product, so three products and three shops give three rows and not nine.</p></details><details class="recall"><summary>The coefficients are per-unit rates, read down a column</summary><p>The assembly row <span class="math" data-say="3 C plus 2 T is at most 18">3C + 2T ≤ 18</span> takes its 3 from the chairs column of the assembly row of the table and its 2 from the tables column. Reading the table across instead of down transposes the model into a different, solvable, wrong one, which is why the lab prints the table beside the programme it produced.</p></details><details class="recall"><summary>Slack is the unused amount, in the resource’s own unit</summary><p>At <span class="math" data-say="2, 6">(2, 6)</span> the carpentry row has 2 bench hours left and the other two rows have nothing left. That number is not a score and not a percentage: it is hours, and the same optimum has a slack in each row measured in a different unit.</p></details></div>
+      <h3>Summary</h3>
       <p>A packing row says <span class="math" data-say="usage is at most availability">usage ≤ availability</span>. Its coefficients are per-unit rates read down a column of a data table, and the gap it leaves at a point is that resource's <em>slack</em>, measured in the resource's own unit. A row with no slack left is tight, and this lesson is careful about what tight does and does not tell you.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A packing row has usage on the left and availability on the right.</strong> Every <span class="math" data-say="less-than-or-equal">≤</span> row in this family is the same sentence: what the plan consumes of one resource, at most what there is of it. The row belongs to the resource, not to the product, so three products and three shops give three rows and not nine.</li><li><strong>The coefficients are per-unit rates, read down a column.</strong> The assembly row <span class="math" data-say="3 C plus 2 T is at most 18">3C + 2T ≤ 18</span> takes its 3 from the chairs column of the assembly row of the table and its 2 from the tables column. Reading the table across instead of down transposes the model into a different, solvable, wrong one, which is why the lab prints the table beside the programme it produced.</li><li><strong>Slack is the unused amount, in the resource’s own unit.</strong> At <span class="math" data-say="2, 6">(2, 6)</span> the carpentry row has 2 bench hours left and the other two rows have nothing left. That number is not a score and not a percentage: it is hours, and the same optimum has a slack in each row measured in a different unit.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="usage is at most availability. rate per unit times units made, summed over the products. slack equals availability minus usage, in that resource prime s own unit. tight, if and only if, slack equals 0, if and only if, the resource is used right up. 3 C plus 2 T is at most 18, at 2, 6, 18 is at most 18, slack 0. C, is at most, 4, at 2, 6, 2 is at most, 4, slack 2 bench hours" tabindex="0" role="region" aria-label="Mathematical notation">usage ≤ availability
   rate per unit × units made, summed over the products
   slack = availability − usage,  in that resource’s own unit
@@ -3698,11 +3743,42 @@ check      3(1) + 5(9/2) + 4(3)  =  3 + 45/2 + 12  =  75/2</div><p>Every row is 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3770,7 +3846,7 @@ check      3(1) + 5(9/2) + 4(3)  =  3 + 45/2 + 12  =  75/2</div><p>Every row is 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

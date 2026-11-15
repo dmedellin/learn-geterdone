@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Of a Christian Commonwealth</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 33 · Of the Books of Holy Scripture</p>
       <h1>The Books of Holy Scripture</h1>
       <p class="lesson-lede">A book cannot have been written before the latest event it mentions, and by that test Hobbes finds Moses, Joshua and Samuel were not the last hands on their books.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The canon is a question of law</li><li>The books tell us when, not always who</li><li>Authority comes from the lawful power, not the writer</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The passage first, then the chapter line by line</h2>
-      <article class="prose reading"><p><strong>Chapter 33.</strong> &ldquo;We read in the last Chapter of Deuteronomie, ver. 6. concerning the sepulcher of Moses, that no man knoweth of his sepulcher to this day, that is, to the day wherein those words were written. It is therefore manifest, that those words were written after his interrement.&rdquo;</p><p>Suppose a friend gives you a letter that says it was written in 1900, and the letter says the new bridge <em>still stands to this day</em>. You would look up when the bridge was built, then ask how long it had stood. Hobbes does with the Bible what you would do with the letter. The chapter begins elsewhere, with the question of which books are the canon, and he is plain that this is a question of law. But the part you have just read answers a different question, who wrote the books, and it is answered with no appeal to anyone's authority.</p><p>His starting points are three. First, no other history tells us who wrote the books, and &ldquo;History&rdquo;, as he says, is &ldquo;the only proof of matter of fact&rdquo;. Second, reason will not do it either, because it convinces us of consequence and not of fact. Third, titles prove little: &ldquo;in titles of Books, the subject is marked, as often as the writer&rdquo;. The History of Livy names its author, and the History of Alexander names its subject, so the five Books of Moses may be books about Moses, as the Book of Ruth is not by Ruth. That leaves the books themselves.</p><p>The Pentateuch comes first. The last chapter of Deuteronomy says that no one knows Moses's grave &ldquo;to this day&rdquo;, so the words were written after the burial, and it would be a strange interpretation, Hobbes says, to say Moses spoke of his own sepulchre by prophecy. A defender could say that only the last chapter is later. So Hobbes goes on: Genesis says &ldquo;the Canaanite was then in the land&rdquo;, which must be the words of someone writing when the Canaanite was no longer there, and so not Moses, who died before he came in. Numbers cites a Book of the Wars of the Lord, which recorded Moses's acts. His conclusion is moderate: the five books &ldquo;were written after his time, though how long after it be not so manifest&rdquo;.</p><p>He does not strip Moses of authorship altogether. Moses did write what the books say he wrote: the volume of the law in Deuteronomy, chapters 11 to 27, which was to be written on stones, read to the people every seventh year, laid in the ark and, having been lost, found again by Hilkiah in the reign of Josiah. What Hobbes denies is that Moses compiled the books in the form we have them. He also adds that the phrase &ldquo;unto this day&rdquo; is one that &ldquo;signifieth a time past, beyond the memory of man&rdquo;. He finds it in Joshua, for the twelve stones set up in Jordan, for the name Gilgal and for the valley of Achor; in Judges, where Jonathan's sons are priests to the tribe of Dan until the captivity; and in Samuel, where a statute of David's and the name of a place are said to hold &ldquo;to this day&rdquo;.</p><p>For Kings and Chronicles his argument is different and simpler: the history is carried down to the captivity in Babylon, and &ldquo;the Facts Registred are alwaies more ancient than the Register&rdquo;, much more than books that quote the register. Ezra and Nehemiah mention the return; Esther belongs to the captivity. For other books he is cautious. Job he takes to be a treatise on why the wicked prosper, since most of it is in verse; the Psalter was compiled after the return, because it includes psalms of that time; and for the New Testament he says its writers lived within an age of the Ascension but that the books were received by the church later. That is a historical claim made by textual evidence, and critics were already making the same kind of argument in the seventeenth century; Spinoza would later press it at greater length.</p><p>The lab makes the test a calculation. You give each book a traditional author and his death on a stated scale of years, and each book the events it mentions, with their years. The latest event is the earliest the book can have been written. If that comes after the author's death, the book, as it stands, cannot be wholly his. The numbers are the lab's illustrative round figures, counted in years from the death of Moses; the test uses the order of events, not the size of the gaps, and Hobbes gives no dates.</p><p>The second half of the chapter turns to authority, and it is an argument with a trap in it for the sovereign's critics. God is the sovereign of sovereigns and must be obeyed whatever any prince commands, Hobbes agrees; but the question is not of obedience to God but of &ldquo;what God hath said&rdquo;, which a subject who has no private revelation can know only by natural reason, that is, by obeying his commonwealth. So &ldquo;it is not the Writer, but the authority of the Church, that maketh a Book Canonicall&rdquo;, and the church, if it is one person, is the commonwealth of Christians. If it is not one person, it has no will or voice. If it is one commonwealth over all Christendom, every Christian king is its private subject. &ldquo;The question truly stated is, By what Authority they are made Law.&rdquo; Anyone who answers <em>the Pope</em> or <em>the Spirit in me</em> is saying something about who is sovereign, and Hobbes has already argued about that.</p><p>That is the argument at its strongest and at its limit. The dating is open to anyone with a Bible, and many readers have accepted it while rejecting everything after it. The authority claim is the one the Church of Rome and the Presbyterian ministers disputed. The next lesson, <em>Spirit, Angel and Inspiration</em>, takes up the words Chapter 34 says must be fixed before the Discourse goes on.</p><p>The presets show the test in use. In moses-joshua the Pentateuch mentions an event 30 years after Moses's death, and Joshua mentions the stones standing &ldquo;unto this day&rdquo;, 200 years in, which is 170 years after Joshua died in year 30; both books are later than their traditional authors. In samuel the book of Samuel reaches year 700, 300 years after Samuel's death in year 400, and the Psalms include a psalm of the return from Babylon, year 868, 428 years after David died in year 440; the lab counts both as written after. In no-test, Job mentions nothing dated, and the lab says it has no test for it, which is not a finding that Job is early.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Scripture and its uses</h2></div><p>when a book was written, by the latest thing it mentions</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The passage first, then the chapter line by line</h2><div class="prose reading"><p><strong>Chapter 33.</strong> &ldquo;We read in the last Chapter of Deuteronomie, ver. 6. concerning the sepulcher of Moses, that no man knoweth of his sepulcher to this day, that is, to the day wherein those words were written. It is therefore manifest, that those words were written after his interrement.&rdquo;</p><p>Suppose a friend gives you a letter that says it was written in 1900, and the letter says the new bridge <em>still stands to this day</em>. You would look up when the bridge was built, then ask how long it had stood. Hobbes does with the Bible what you would do with the letter. The chapter begins elsewhere, with the question of which books are the canon, and he is plain that this is a question of law. But the part you have just read answers a different question, who wrote the books, and it is answered with no appeal to anyone's authority.</p><p>His starting points are three. First, no other history tells us who wrote the books, and &ldquo;History&rdquo;, as he says, is &ldquo;the only proof of matter of fact&rdquo;. Second, reason will not do it either, because it convinces us of consequence and not of fact. Third, titles prove little: &ldquo;in titles of Books, the subject is marked, as often as the writer&rdquo;. The History of Livy names its author, and the History of Alexander names its subject, so the five Books of Moses may be books about Moses, as the Book of Ruth is not by Ruth. That leaves the books themselves.</p><p>The Pentateuch comes first. The last chapter of Deuteronomy says that no one knows Moses's grave &ldquo;to this day&rdquo;, so the words were written after the burial, and it would be a strange interpretation, Hobbes says, to say Moses spoke of his own sepulchre by prophecy. A defender could say that only the last chapter is later. So Hobbes goes on: Genesis says &ldquo;the Canaanite was then in the land&rdquo;, which must be the words of someone writing when the Canaanite was no longer there, and so not Moses, who died before he came in. Numbers cites a Book of the Wars of the Lord, which recorded Moses's acts. His conclusion is moderate: the five books &ldquo;were written after his time, though how long after it be not so manifest&rdquo;.</p><p>He does not strip Moses of authorship altogether. Moses did write what the books say he wrote: the volume of the law in Deuteronomy, chapters 11 to 27, which was to be written on stones, read to the people every seventh year, laid in the ark and, having been lost, found again by Hilkiah in the reign of Josiah. What Hobbes denies is that Moses compiled the books in the form we have them. He also adds that the phrase &ldquo;unto this day&rdquo; is one that &ldquo;signifieth a time past, beyond the memory of man&rdquo;. He finds it in Joshua, for the twelve stones set up in Jordan, for the name Gilgal and for the valley of Achor; in Judges, where Jonathan's sons are priests to the tribe of Dan until the captivity; and in Samuel, where a statute of David's and the name of a place are said to hold &ldquo;to this day&rdquo;.</p><p>For Kings and Chronicles his argument is different and simpler: the history is carried down to the captivity in Babylon, and &ldquo;the Facts Registred are alwaies more ancient than the Register&rdquo;, much more than books that quote the register. Ezra and Nehemiah mention the return; Esther belongs to the captivity. For other books he is cautious. Job he takes to be a treatise on why the wicked prosper, since most of it is in verse; the Psalter was compiled after the return, because it includes psalms of that time; and for the New Testament he says its writers lived within an age of the Ascension but that the books were received by the church later. That is a historical claim made by textual evidence, and critics were already making the same kind of argument in the seventeenth century; Spinoza would later press it at greater length.</p><p>The lab makes the test a calculation. You give each book a traditional author and his death on a stated scale of years, and each book the events it mentions, with their years. The latest event is the earliest the book can have been written. If that comes after the author's death, the book, as it stands, cannot be wholly his. The numbers are the lab's illustrative round figures, counted in years from the death of Moses; the test uses the order of events, not the size of the gaps, and Hobbes gives no dates.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Scripture and its uses</h2></div><p>when a book was written, by the latest thing it mentions</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Scripture and its uses</strong><span>when a book was written, by the latest thing it mentions</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="lcnTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="lcnTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A book was written no earlier than the latest event it mentions (ties are named together). When that year is after the year its traditional author died, the book was written after the author's death and cannot be wholly the author's (Chapter 33); in the year of the death or before, the test does not rule the author out, which is not to show the author wrote it. Years are whole numbers on the scale the lesson states and may be negative. A book with no mention has no test. Books go in the order given.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Date a book by what it mentions</h3>
-          <p>A figure computed from what the lesson states. Years are counted from the death of Moses, which is year 0; they are round figures for the lab, not Hobbes's. The lab finds the latest event each book mentions and says whether that is after the traditional author's death.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Date a book by what it mentions</h3>
+            <p>A figure computed from what the lesson states. Years are counted from the death of Moses, which is year 0; they are round figures for the lab, not Hobbes's. The lab finds the latest event each book mentions and says whether that is after the traditional author's death.</p>
         <div class="field">
           <label for="lcnPreset">Worked example</label>
           <select id="lcnPreset"><option value="moses-joshua" selected>Moses and Joshua, years from the death of Moses</option><option value="samuel">Samuel and David, with the same scale</option><option value="no-test">A book with no mention</option></select>
@@ -1428,12 +1471,15 @@
           <div class="kpi"><span>No mention, no test</span><strong id="lcnNoTest">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The second half of the chapter turns to authority, and it is an argument with a trap in it for the sovereign's critics. God is the sovereign of sovereigns and must be obeyed whatever any prince commands, Hobbes agrees; but the question is not of obedience to God but of &ldquo;what God hath said&rdquo;, which a subject who has no private revelation can know only by natural reason, that is, by obeying his commonwealth. So &ldquo;it is not the Writer, but the authority of the Church, that maketh a Book Canonicall&rdquo;, and the church, if it is one person, is the commonwealth of Christians. If it is not one person, it has no will or voice. If it is one commonwealth over all Christendom, every Christian king is its private subject. &ldquo;The question truly stated is, By what Authority they are made Law.&rdquo; Anyone who answers <em>the Pope</em> or <em>the Spirit in me</em> is saying something about who is sovereign, and Hobbes has already argued about that.</p><p>That is the argument at its strongest and at its limit. The dating is open to anyone with a Bible, and many readers have accepted it while rejecting everything after it. The authority claim is the one the Church of Rome and the Presbyterian ministers disputed. The next lesson, <em>Spirit, Angel and Inspiration</em>, takes up the words Chapter 34 says must be fixed before the Discourse goes on.</p><p>The presets show the test in use. In moses-joshua the Pentateuch mentions an event 30 years after Moses's death, and Joshua mentions the stones standing &ldquo;unto this day&rdquo;, 200 years in, which is 170 years after Joshua died in year 30; both books are later than their traditional authors. In samuel the book of Samuel reaches year 700, 300 years after Samuel's death in year 400, and the Psalms include a psalm of the return from Babylon, year 868, 428 years after David died in year 440; the lab counts both as written after. In no-test, Job mentions nothing dated, and the lab says it has no test for it, which is not a finding that Job is early.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Dating a book from inside it</h2></div><p>Four steps, the same for any text that mentions its own past.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the traditional author and his death</h3><p>Write down who the title or tradition says wrote it, and when he died, on one stated scale. Remember Hobbes's caution that a title may mark a subject and not a writer.</p></article><article class="card concept-card"><div class="icon">2</div><h3>List what the book mentions</h3><p>Collect each event, monument or custom the book refers to as past, with the date you give it. <em>Unto this day</em> belongs here: it means the event is far behind the writer.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Take the latest</h3><p>A book cannot have been written before the latest thing it mentions. That year is the earliest the book can have been written, in this form.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare with the author&#x27;s death</h3><p>If the latest event is later than the death, the book is not wholly his. If it is earlier or equal, the test gives no verdict: he may have written it, and the book may still be later.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Dating a book from inside it</h2>
+      <p class="lead-in">Four steps, the same for any text that mentions its own past.</p>
+      <ol class="key-ideas method"><li><strong>Name the traditional author and his death.</strong> Write down who the title or tradition says wrote it, and when he died, on one stated scale. Remember Hobbes's caution that a title may mark a subject and not a writer.</li><li><strong>List what the book mentions.</strong> Collect each event, monument or custom the book refers to as past, with the date you give it. <em>Unto this day</em> belongs here: it means the event is far behind the writer.</li><li><strong>Take the latest.</strong> A book cannot have been written before the latest thing it mentions. That year is the earliest the book can have been written, in this form.</li><li><strong>Compare with the author&#x27;s death.</strong> If the latest event is later than the death, the book is not wholly his. If it is earlier or equal, the test gives no verdict: he may have written it, and the book may still be later.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1451,17 +1497,16 @@ Joshua:  latest event 200  (the stones, unto this day)
 Joshua died in year 30,  200 &gt; 30:  gap 170</div><p>Both books come out as written after their traditional authors. The burial, dated at year 0, does not trip the lab's test, because the lab only compares years. Hobbes's point is sharper: no writer reports his own burial and adds that the grave is unknown unto this day, so that verse alone shows a later hand. He brings the Canaanite only to answer the reply that the last chapter alone is later. For a book with no mentions the lab prints no test, as it should: a book is not shown to be early by saying nothing of its own time.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the test shows who did write the book</strong><span>It only shows a book is later than the latest thing it mentions. It does not say who the real writer was, and Hobbes himself says the books do not name every writer. The lab prints a verdict about dates, never about people.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking Hobbes denies Moses wrote anything</strong><span>He says Moses wrote what he is said to have written, such as the volume of the law in Deuteronomy, and denies only that he compiled the five books as we have them. In the lab the first preset's gap is a gap between Moses and the last hand, not a claim that there was no first one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the second half as another dating argument</strong><span>The authority argument is not about when. It says a rule of life is law only when a lawful power makes it so, and that the church is such a power only if it is the commonwealth. A reader who has accepted the dates has not thereby accepted that.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can date a book from its own mentions.</strong><p>Given a book, its traditional author's death and the events it mentions, find the latest event, say whether the book is later than the author's death, and say what the test cannot show.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The dates are the lab's round figures and Hobbes gives none. The lab shows that if the events are as dated, the books are later than their traditional authors; it cannot show that the dates are right, who wrote the books, or that the sovereign has the authority over the canon that the second half of the chapter claims. Defenders of Mosaic authorship answered then, as now, that later hands added notes to an original that was Moses's.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the test shows who did write the book</strong><span>It only shows a book is later than the latest thing it mentions. It does not say who the real writer was, and Hobbes himself says the books do not name every writer. The lab prints a verdict about dates, never about people.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking Hobbes denies Moses wrote anything</strong><span>He says Moses wrote what he is said to have written, such as the volume of the law in Deuteronomy, and denies only that he compiled the five books as we have them. In the lab the first preset's gap is a gap between Moses and the last hand, not a claim that there was no first one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the second half as another dating argument</strong><span>The authority argument is not about when. It says a rule of life is law only when a lawful power makes it so, and that the church is such a power only if it is the commonwealth. A reader who has accepted the dates has not thereby accepted that.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can date a book from its own mentions.</strong><p>Given a book, its traditional author's death and the events it mentions, find the latest event, say whether the book is later than the author's death, and say what the test cannot show.</p></div></div><div class="note"><strong>Note:</strong> The dates are the lab's round figures and Hobbes gives none. The lab shows that if the events are as dated, the books are later than their traditional authors; it cannot show that the dates are right, who wrote the books, or that the sovereign has the authority over the canon that the second half of the chapter claims. Defenders of Mosaic authorship answered then, as now, that later hands added notes to an original that was Moses's.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The canon is a question of law</summary><p>The canonical books are those that ought to be the rule of Christian life. Rules of life that men are bound in conscience to observe are laws, so Hobbes says the question of Scripture is the question of what is law throughout Christendom. Since sovereigns are the sole legislators in their dominions, the books that are canonical are the ones the sovereign establishes.</p></details><details class="recall"><summary>The books tell us when, not always who</summary><p>History is the only proof of matter of fact, and reason serves only to convince the truth &ldquo;of consequence&rdquo;, so neither names the authors. The light that remains comes from the books themselves, which cannot tell us every writer but can give &ldquo;knowledge of the time, wherein they were written&rdquo;: a writer who says something has remained &ldquo;unto this day&rdquo; is writing after the event.</p></details><details class="recall"><summary>Authority comes from the lawful power, not the writer</summary><p>Asked from whence the Scriptures derive their authority, Hobbes says the question should read: by what authority are they made law? Where they agree with the law of nature they carry their own; otherwise only the commonwealth can make them law, and the church can do it only if it is the same thing as the commonwealth. A universal church over all Christians would make every Christian king a private person.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 33 asks what the Scriptures are, who wrote them and what makes them law. Hobbes answers the second question from the books themselves, by the phrase unto this day and by the latest event each one mentions, and the third by the sovereign's authority. Date a short list of books with that test and see which must be later than their traditional authors.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The canon is a question of law.</strong> The canonical books are those that ought to be the rule of Christian life. Rules of life that men are bound in conscience to observe are laws, so Hobbes says the question of Scripture is the question of what is law throughout Christendom. Since sovereigns are the sole legislators in their dominions, the books that are canonical are the ones the sovereign establishes.</li><li><strong>The books tell us when, not always who.</strong> History is the only proof of matter of fact, and reason serves only to convince the truth &ldquo;of consequence&rdquo;, so neither names the authors. The light that remains comes from the books themselves, which cannot tell us every writer but can give &ldquo;knowledge of the time, wherein they were written&rdquo;: a writer who says something has remained &ldquo;unto this day&rdquo; is writing after the event.</li><li><strong>Authority comes from the lawful power, not the writer.</strong> Asked from whence the Scriptures derive their authority, Hobbes says the question should read: by what authority are they made law? Where they agree with the law of nature they carry their own; otherwise only the commonwealth can make them law, and the church can do it only if it is the same thing as the commonwealth. A universal church over all Christians would make every Christian king a private person.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="written no earlier than its latest event. unto this day, written long after. after the author&#x27;s death, not his last hand. titles name a subject as often as a writer. canon equals the books the sovereign makes law" tabindex="0" role="region" aria-label="Mathematical notation">written no earlier than its latest event
 unto this day: written long after
 after the author&#x27;s death: not his last hand
@@ -2242,11 +2287,42 @@ canon = the books the sovereign makes law</div><figcaption>The antiquity test in
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2314,7 +2390,7 @@ canon = the books the sovereign makes law</div><figcaption>The antiquity test in
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

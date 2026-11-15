@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,38 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Data Structures</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Hash tables</p>
       <h1>Resizing and the Load Factor</h1>
       <p class="lesson-lede">Count the rehash cost of an insert/delete sequence under two threshold policies and identify the one that thrashes.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Rehashing is unavoidable and that is fine</li><li>The two thresholds must leave a gap</li><li>The amortised bound is a claim about every sequence, and the lab can break it</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two thresholds, the potential argument, and the policy that thrashes</h2>
-      <article class="prose reading"><p>A table&rsquo;s cost depends on its load factor, so the load factor has to be kept in a band. Too high and chains grow or probes cluster; too low and most of the memory is empty. The mechanism is to pick thresholds and resize when one is crossed, rehashing every key into the new table.</p><div class="defbox"><span class="label">Definition &middot; Growth and shrink thresholds</span><p>A table grows &mdash; usually doubling <span class="math" data-say="m">m</span> &mdash; when <span class="math" data-say="alpha">α</span> reaches the <strong>growth threshold</strong>, and shrinks &mdash; usually halving <span class="math" data-say="m">m</span> &mdash; when <span class="math" data-say="alpha">α</span> falls to the <strong>shrink threshold</strong>. Both resizes rehash all <span class="math" data-say="n">n</span> keys and cost <span class="math" data-say="theta of n">Θ(n)</span>.</p><p>The standard pair is grow at <span class="math" data-say="alpha equals 1">α = 1</span> and shrink at <span class="math" data-say="alpha equals one quarter">α = ¼</span>. The shrink threshold is deliberately far below half the growth threshold, and the next paragraph is why.</p></div><div class="thm"><span class="label">Theorem &middot; Doubling gives an amortised constant cost</span><p>Under a policy that doubles at <span class="math" data-say="alpha equals 1">α = 1</span> and halves at <span class="math" data-say="alpha equals one quarter">α = ¼</span>, a sequence of <span class="math" data-say="k">k</span> insertions and deletions on a table starting empty costs <span class="math" data-say="big O of k">O(k)</span> in total, so <span class="math" data-say="big O of 1">O(1)</span> amortised per operation.</p><p>The potential method: give the table a potential that measures how close it is to its next resize &mdash; roughly <span class="math" data-say="2 n minus m">2n − m</span> above half full and <span class="math" data-say="m over 2 minus n">m/2 − n</span> below. An ordinary operation changes <span class="math" data-say="n">n</span> by one and so changes the potential by a constant. A resize costs <span class="math" data-say="n">n</span> and releases potential that the operations since the last resize have paid in, because the gap between the thresholds guarantees there were at least about <span class="math" data-say="n over 2">n/2</span> of them. The released potential covers the rehash, and the amortised cost of every operation is constant.</p></div><p>That proof needs the gap. If growth and shrink happen at the same load, then immediately after a resize the table is sitting on the other threshold, no operations have accumulated any potential, and the next operation resizes again. There is nothing to release and the argument has no step to make. The failure is not a worse constant; it is the absence of a bound.</p><h3>Both policies, on the same forty operations</h3><p>The lab&rsquo;s boundary pattern fills a table and then alternates inserting and deleting, which is the mix designed to sit on a threshold. Forty operations from <span class="math" data-say="m equals 4">m = 4</span>:</p><div class="mathblock" data-say="grow at alpha equals 1, shrink at alpha equals 1 over 4. rehashes, 2, at ops 4 4 goes to 8 and 8 8 goes to 16. keys moved, 12. total cost, 52, against the 3 m line at 120. amortised per op, 13 over 10 equals 1.3. final table m equals 16 holding 14 keys, no thrash detected. grow at alpha equals 1 over 2, shrink at alpha equals 1 over 2. rehashes, 39, of 40 operations. keys moved, 455. total cost, 495, against the 3 m line at 120. amortised per op, 99 over 8 equals 12.375. thrashing detected from operation 2" tabindex="0" role="region" aria-label="Mathematical notation">grow at α = 1,  shrink at α = 1/4
-
-  rehashes                 2      at ops 4 (4→8) and 8 (8→16)
-  keys moved              12
-  total cost              52      against the 3m line at 120
-  amortised per op      13/10 = 1.3
-  final table m = 16 holding 14 keys       no thrash detected
-
-grow at α = 1/2,  shrink at α = 1/2
-
-  rehashes                39      of 40 operations
-  keys moved             455
-  total cost             495      against the 3m line at 120
-  amortised per op       99/8 = 12.375
-  thrashing detected from operation 2</div><p>Read the two rehash counts first. Two resizes in forty operations against thirty-nine. The hysteresis policy resizes twice, early, while the table is growing into its final size, and then never again &mdash; the alternating insertions and deletions move <span class="math" data-say="alpha">α</span> around inside the band and never reach an edge of it. The equal-threshold policy resizes on almost every operation, oscillating between <span class="math" data-say="m equals 16">m = 16</span> and <span class="math" data-say="m equals 32">m = 32</span> from operation <span class="math" data-say="8">8</span> onward and moving thirteen or fourteen keys on every resize from operation <span class="math" data-say="13">13</span>.</p><p>The total cost is <span class="math" data-say="52">52</span> against <span class="math" data-say="495">495</span>, and the second one has broken the bound: <span class="math" data-say="3">3</span> per operation would be <span class="math" data-say="120">120</span>. The measured amortised figures are <span class="math" data-say="1.3">1.3</span> and <span class="math" data-say="12.375">12.375</span>, and the second is not a constant &mdash; it grows with the table, because each thrashing resize costs <span class="math" data-say="n">n</span> and <span class="math" data-say="n">n</span> is proportional to <span class="math" data-say="m">m</span>. Doubling the sequence length on the thrashing policy roughly quadruples its cost.</p><div class="example"><span class="label">Example &middot; Growth alone, for the shape of the amortised line</span><p>Forty insertions and no deletions, same thresholds: four rehashes at <span class="math" data-say="m equals 4, 8, 16, 32">m = 4, 8, 16, 32</span>, moving <span class="math" data-say="4 plus 8 plus 16 plus 32 equals 60">4 + 8 + 16 + 32 = 60</span> keys in total, for a cost of <span class="math" data-say="100">100</span> against the <span class="math" data-say="120">120</span> line. The rehash cost of a table that reaches size <span class="math" data-say="n">n</span> is about <span class="math" data-say="2 n">2n</span> whatever the sequence, because the doubling costs form a geometric series &mdash; which is the cleanest case of the amortised argument and the one to look at before the boundary pattern.</p></div><p>One caution about the measured amortised figure. <span class="math" data-say="13 over 10">13/10</span> is the total divided by the number of operations for this sequence, and it is below <span class="math" data-say="3">3</span>, and that is not the bound holding &mdash; it is one sequence coming in under it. A different pattern at the same thresholds could come closer to <span class="math" data-say="3">3</span> and none can exceed it, and the reason none can is the potential argument above rather than anything the lab did. The lab is what shows you the thrashing policy, which no amount of reasoning about the good policy would have revealed.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Resizing, and why the two thresholds differ</h2></div><p>Double at one load, halve at a lower one, or every operation rehashes</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two thresholds, the potential argument, and the policy that thrashes</h2><div class="prose reading"><p>A table&rsquo;s cost depends on its load factor, so the load factor has to be kept in a band. Too high and chains grow or probes cluster; too low and most of the memory is empty. The mechanism is to pick thresholds and resize when one is crossed, rehashing every key into the new table.</p><div class="defbox"><span class="label">Definition &middot; Growth and shrink thresholds</span><p>A table grows &mdash; usually doubling <span class="math" data-say="m">m</span> &mdash; when <span class="math" data-say="alpha">α</span> reaches the <strong>growth threshold</strong>, and shrinks &mdash; usually halving <span class="math" data-say="m">m</span> &mdash; when <span class="math" data-say="alpha">α</span> falls to the <strong>shrink threshold</strong>. Both resizes rehash all <span class="math" data-say="n">n</span> keys and cost <span class="math" data-say="theta of n">Θ(n)</span>.</p><p>The standard pair is grow at <span class="math" data-say="alpha equals 1">α = 1</span> and shrink at <span class="math" data-say="alpha equals one quarter">α = ¼</span>. The shrink threshold is deliberately far below half the growth threshold, and the next paragraph is why.</p></div><div class="thm"><span class="label">Theorem &middot; Doubling gives an amortised constant cost</span><p>Under a policy that doubles at <span class="math" data-say="alpha equals 1">α = 1</span> and halves at <span class="math" data-say="alpha equals one quarter">α = ¼</span>, a sequence of <span class="math" data-say="k">k</span> insertions and deletions on a table starting empty costs <span class="math" data-say="big O of k">O(k)</span> in total, so <span class="math" data-say="big O of 1">O(1)</span> amortised per operation.</p><p>The potential method: give the table a potential that measures how close it is to its next resize &mdash; roughly <span class="math" data-say="2 n minus m">2n − m</span> above half full and <span class="math" data-say="m over 2 minus n">m/2 − n</span> below. An ordinary operation changes <span class="math" data-say="n">n</span> by one and so changes the potential by a constant. A resize costs <span class="math" data-say="n">n</span> and releases potential that the operations since the last resize have paid in, because the gap between the thresholds guarantees there were at least about <span class="math" data-say="n over 2">n/2</span> of them. The released potential covers the rehash, and the amortised cost of every operation is constant.</p></div><p>That proof needs the gap. If growth and shrink happen at the same load, then immediately after a resize the table is sitting on the other threshold, no operations have accumulated any potential, and the next operation resizes again. There is nothing to release and the argument has no step to make. The failure is not a worse constant; it is the absence of a bound.</p><h3>Both policies, on the same forty operations</h3><p>The lab&rsquo;s boundary pattern fills a table and then alternates inserting and deleting, which is the mix designed to sit on a threshold. Forty operations from <span class="math" data-say="m equals 4">m = 4</span>:</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Resizing, and why the two thresholds differ</h2></div><p>Double at one load, halve at a lower one, or every operation rehashes</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Growing, shrinking and the gap between</strong><span>keys moved, counted; the amortised cost, exact</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>cost so far</span><span class="tone-amber"><i class="legend-swatch"></i>the 3m line</span><span class="tone-green"><i class="legend-swatch"></i>table size</span><span class="tone-red"><i class="legend-swatch"></i>thrashing</span></div>
@@ -1419,10 +1448,10 @@ grow at α = 1/2,  shrink at α = 1/2
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="hrTable"></table></div>
       <div class="status-banner" id="hrStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Two thresholds, an operation pattern, and the rehash cost</h3>
-          <p>Set the growth and shrink thresholds and the operation pattern &mdash; monotone growth, alternating at the boundary, or drawn from the stream. Every rehash is reported with the keys it moved, the cumulative cost is plotted against the <span class="math" data-say="3 m">3m</span> line the amortised bound promises, and the panel names the operation at which the policy starts thrashing. Set both thresholds to a half and watch the bound break.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Two thresholds, an operation pattern, and the rehash cost</h3>
+            <p>Set the growth and shrink thresholds and the operation pattern &mdash; monotone growth, alternating at the boundary, or drawn from the stream. Every rehash is reported with the keys it moved, the cumulative cost is plotted against the <span class="math" data-say="3 m">3m</span> line the amortised bound promises, and the panel names the operation at which the policy starts thrashing. Set both thresholds to a half and watch the bound break.</p>
         <div class="field" id="hrPresetField">
           <label for="hrPreset">Worked example</label>
           <select id="hrPreset"><option value="hysteresis" selected>double at 1, halve at a quarter</option><option value="thrash">double at a half, halve at a half</option><option value="growth-only">inserts only, to see the amortised line</option></select>
@@ -1458,12 +1487,29 @@ grow at α = 1/2,  shrink at α = 1/2
         </div>
         <p class="small-copy" id="hrHint" style="margin:0;">Thresholds are exact fractions, so 3/4 is 3/4 and not 0.75. The cost of an operation is 1 plus the keys it moved, and the amortised figure is that total over the number of operations &mdash; a fraction, printed exactly.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="grow at alpha equals 1, shrink at alpha equals 1 over 4. rehashes, 2, at ops 4 4 goes to 8 and 8 8 goes to 16. keys moved, 12. total cost, 52, against the 3 m line at 120. amortised per op, 13 over 10 equals 1.3. final table m equals 16 holding 14 keys, no thrash detected. grow at alpha equals 1 over 2, shrink at alpha equals 1 over 2. rehashes, 39, of 40 operations. keys moved, 455. total cost, 495, against the 3 m line at 120. amortised per op, 99 over 8 equals 12.375. thrashing detected from operation 2" tabindex="0" role="region" aria-label="Mathematical notation">grow at α = 1,  shrink at α = 1/4
+
+  rehashes                 2      at ops 4 (4→8) and 8 (8→16)
+  keys moved              12
+  total cost              52      against the 3m line at 120
+  amortised per op      13/10 = 1.3
+  final table m = 16 holding 14 keys       no thrash detected
+
+grow at α = 1/2,  shrink at α = 1/2
+
+  rehashes                39      of 40 operations
+  keys moved             455
+  total cost             495      against the 3m line at 120
+  amortised per op       99/8 = 12.375
+  thrashing detected from operation 2</div><p>Read the two rehash counts first. Two resizes in forty operations against thirty-nine. The hysteresis policy resizes twice, early, while the table is growing into its final size, and then never again &mdash; the alternating insertions and deletions move <span class="math" data-say="alpha">α</span> around inside the band and never reach an edge of it. The equal-threshold policy resizes on almost every operation, oscillating between <span class="math" data-say="m equals 16">m = 16</span> and <span class="math" data-say="m equals 32">m = 32</span> from operation <span class="math" data-say="8">8</span> onward and moving thirteen or fourteen keys on every resize from operation <span class="math" data-say="13">13</span>.</p><p>The total cost is <span class="math" data-say="52">52</span> against <span class="math" data-say="495">495</span>, and the second one has broken the bound: <span class="math" data-say="3">3</span> per operation would be <span class="math" data-say="120">120</span>. The measured amortised figures are <span class="math" data-say="1.3">1.3</span> and <span class="math" data-say="12.375">12.375</span>, and the second is not a constant &mdash; it grows with the table, because each thrashing resize costs <span class="math" data-say="n">n</span> and <span class="math" data-say="n">n</span> is proportional to <span class="math" data-say="m">m</span>. Doubling the sequence length on the thrashing policy roughly quadruples its cost.</p><div class="example"><span class="label">Example &middot; Growth alone, for the shape of the amortised line</span><p>Forty insertions and no deletions, same thresholds: four rehashes at <span class="math" data-say="m equals 4, 8, 16, 32">m = 4, 8, 16, 32</span>, moving <span class="math" data-say="4 plus 8 plus 16 plus 32 equals 60">4 + 8 + 16 + 32 = 60</span> keys in total, for a cost of <span class="math" data-say="100">100</span> against the <span class="math" data-say="120">120</span> line. The rehash cost of a table that reaches size <span class="math" data-say="n">n</span> is about <span class="math" data-say="2 n">2n</span> whatever the sequence, because the doubling costs form a geometric series &mdash; which is the cleanest case of the amortised argument and the one to look at before the boundary pattern.</p></div><p>One caution about the measured amortised figure. <span class="math" data-say="13 over 10">13/10</span> is the total divided by the number of operations for this sequence, and it is below <span class="math" data-say="3">3</span>, and that is not the bound holding &mdash; it is one sequence coming in under it. A different pattern at the same thresholds could come closer to <span class="math" data-say="3">3</span> and none can exceed it, and the reason none can is the potential argument above rather than anything the lab did. The lab is what shows you the thrashing policy, which no amount of reasoning about the good policy would have revealed.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Choosing and testing a resize policy</h2></div><p>Pick the thresholds, then attack them with the pattern designed to sit between them. A policy tested only on growth has not been tested.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>State both thresholds, and check the gap</h3><p>Grow at <span class="math" data-say="alpha sub g">α_g</span>, shrink at <span class="math" data-say="alpha sub s">α_s</span>, and require <span class="math" data-say="alpha sub s">α_s</span> to be well below <span class="math" data-say="alpha sub g over 2">α_g/2</span>. <span class="math" data-say="1">1</span> and <span class="math" data-say="one quarter">¼</span> is the standard pair. Equal thresholds, or <span class="math" data-say="one half">½</span> and <span class="math" data-say="one quarter">¼</span>, are the ones to be suspicious of, and the reason is arithmetic: after a resize the new load must be far from both edges.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Run the monotone pattern first</h3><p>Insertions only. The rehash costs form a geometric series, the total is about <span class="math" data-say="2 n">2n</span>, and the cumulative line should sit comfortably under the <span class="math" data-say="3 m">3m</span> line. If it does not, the policy is wrong in the easy case and there is no point going further.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Now alternate at the boundary</h3><p>Fill the table to just under the growth threshold, then insert and delete alternately. This is the pattern a bad policy dies on, and it is not exotic &mdash; a cache or a work queue whose size hovers around a threshold produces it naturally.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count rehashes, not just total cost</h3><p>The rehash count is the diagnostic; the cost is the symptom. Two rehashes in forty operations is a healthy policy. Thirty-nine in forty is a policy with no amortised bound, and the count says so immediately while the total needs comparing with something.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Choosing and testing a resize policy</h2>
+      <p class="lead-in">Pick the thresholds, then attack them with the pattern designed to sit between them. A policy tested only on growth has not been tested.</p>
+      <ol class="key-ideas method"><li><strong>State both thresholds, and check the gap.</strong> Grow at <span class="math" data-say="alpha sub g">α_g</span>, shrink at <span class="math" data-say="alpha sub s">α_s</span>, and require <span class="math" data-say="alpha sub s">α_s</span> to be well below <span class="math" data-say="alpha sub g over 2">α_g/2</span>. <span class="math" data-say="1">1</span> and <span class="math" data-say="one quarter">¼</span> is the standard pair. Equal thresholds, or <span class="math" data-say="one half">½</span> and <span class="math" data-say="one quarter">¼</span>, are the ones to be suspicious of, and the reason is arithmetic: after a resize the new load must be far from both edges.</li><li><strong>Run the monotone pattern first.</strong> Insertions only. The rehash costs form a geometric series, the total is about <span class="math" data-say="2 n">2n</span>, and the cumulative line should sit comfortably under the <span class="math" data-say="3 m">3m</span> line. If it does not, the policy is wrong in the easy case and there is no point going further.</li><li><strong>Now alternate at the boundary.</strong> Fill the table to just under the growth threshold, then insert and delete alternately. This is the pattern a bad policy dies on, and it is not exotic &mdash; a cache or a work queue whose size hovers around a threshold produces it naturally.</li><li><strong>Count rehashes, not just total cost.</strong> The rehash count is the diagnostic; the cost is the symptom. Two rehashes in forty operations is a healthy policy. Thirty-nine in forty is a policy with no amortised bound, and the count says so immediately while the total needs comparing with something.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1499,17 +1545,16 @@ after 40 operations:
   3m line 120:  inside                 3m line 120:  broken, 4× over</div><p>The left column stops resizing after operation <span class="math" data-say="8">8</span> and never starts again: <span class="math" data-say="alpha">α</span> wanders between <span class="math" data-say="9 over 16">9/16</span> and <span class="math" data-say="7 over 8">7/8</span> for the remaining thirty-two operations, and neither edge of the band is anywhere near. That is hysteresis working, and it is the whole of the mechanism &mdash; there is no cleverness in it beyond choosing two numbers far apart.</p><p>The right column resizes on twelve of the first thirteen operations, and keeps going for the rest. Look at operation <span class="math" data-say="8">8</span>: the insertion pushes <span class="math" data-say="alpha">α</span> to <span class="math" data-say="1 over 2">1/2</span>, which is the growth threshold, so the table doubles to <span class="math" data-say="32">32</span> and <span class="math" data-say="alpha">α</span> becomes <span class="math" data-say="1 over 4">1/4</span> &mdash; which is below the shrink threshold of <span class="math" data-say="1 over 2">1/2</span>, so the next operation halves it back. The policy has trapped itself between its own two rules.</p><p>For a faded rehearsal, try grow at <span class="math" data-say="1">1</span> and shrink at <span class="math" data-say="1 over 2">1/2</span> &mdash; a gap, but only a factor of two. The supplied observation is that doubling at <span class="math" data-say="alpha equals 1">α = 1</span> leaves <span class="math" data-say="alpha equals 1 over 2">α = 1/2</span>, which is exactly the shrink threshold. Predict what the operation after a growth does, then run it, and say how far apart the thresholds have to be for the potential argument to have anything to release.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Shrinking at half the growth threshold, or at the same one</strong><span>&ldquo;Grow when full, shrink when half empty&rdquo; sounds symmetric and thrashes: doubling at <span class="math" data-say="alpha equals 1">α = 1</span> leaves <span class="math" data-say="alpha equals 1 over 2">α = 1/2</span>, which is the shrink threshold, so the next deletion halves the table back. The standard <span class="math" data-say="1">1</span> and <span class="math" data-say="one quarter">¼</span> is not arbitrary &mdash; the gap is what the potential argument spends, and without it there is no bound to state.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the measured average as the amortised constant</strong><span><span class="math" data-say="52">52</span> over forty operations is <span class="math" data-say="1.3">1.3</span>, and <span class="math" data-say="495">495</span> over the same forty is <span class="math" data-say="12.375">12.375</span>. The first is a sequence that came in under a bound proved elsewhere; the second is a policy with no bound, measured on one sequence that happened to expose it. An average over a run is a number about that run, and the only thing that makes it a guarantee is an argument.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Testing a resize policy on growth only</strong><span>Monotone insertion is the easy case: the geometric series of doubling costs keeps the total near <span class="math" data-say="2 n">2n</span> under almost any threshold. Every policy looks fine there. The pattern that distinguishes them is alternation at the boundary, and a cache or queue whose size hovers near a threshold produces it without anyone constructing it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “shrink when half empty” sounds like a bug report.</strong><p>You should be able to state a growth and a shrink threshold and say what the load factor becomes immediately after each kind of resize, count rehashes and keys moved over a stated sequence, recognise thrashing from the rehash count rather than the total, and separate a measured average from the amortised bound the potential argument proves.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Hash tables answer membership and refuse order: no predecessor, no range, no sorted walk, at any load factor. The next five lessons are about the structure that keeps order and pays for it in constants. &ldquo;Binary Search Trees&rdquo; starts with the invariant &mdash; and with the fact that it is not a check on a node and its children, which the lab settles with a tree that passes the local check and is not a search tree.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Shrinking at half the growth threshold, or at the same one</strong><span>&ldquo;Grow when full, shrink when half empty&rdquo; sounds symmetric and thrashes: doubling at <span class="math" data-say="alpha equals 1">α = 1</span> leaves <span class="math" data-say="alpha equals 1 over 2">α = 1/2</span>, which is the shrink threshold, so the next deletion halves the table back. The standard <span class="math" data-say="1">1</span> and <span class="math" data-say="one quarter">¼</span> is not arbitrary &mdash; the gap is what the potential argument spends, and without it there is no bound to state.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the measured average as the amortised constant</strong><span><span class="math" data-say="52">52</span> over forty operations is <span class="math" data-say="1.3">1.3</span>, and <span class="math" data-say="495">495</span> over the same forty is <span class="math" data-say="12.375">12.375</span>. The first is a sequence that came in under a bound proved elsewhere; the second is a policy with no bound, measured on one sequence that happened to expose it. An average over a run is a number about that run, and the only thing that makes it a guarantee is an argument.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Testing a resize policy on growth only</strong><span>Monotone insertion is the easy case: the geometric series of doubling costs keeps the total near <span class="math" data-say="2 n">2n</span> under almost any threshold. Every policy looks fine there. The pattern that distinguishes them is alternation at the boundary, and a cache or queue whose size hovers near a threshold produces it without anyone constructing it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “shrink when half empty” sounds like a bug report.</strong><p>You should be able to state a growth and a shrink threshold and say what the load factor becomes immediately after each kind of resize, count rehashes and keys moved over a stated sequence, recognise thrashing from the rehash count rather than the total, and separate a measured average from the amortised bound the potential argument proves.</p></div></div><div class="note"><strong>Note:</strong> Hash tables answer membership and refuse order: no predecessor, no range, no sorted walk, at any load factor. The next five lessons are about the structure that keeps order and pays for it in constants. &ldquo;Binary Search Trees&rdquo; starts with the invariant &mdash; and with the fact that it is not a check on a node and its children, which the lab settles with a tree that passes the local check and is not a search tree.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Rehashing is unavoidable and that is fine</summary><p>Every key&rsquo;s slot is computed from <span class="math" data-say="m">m</span>, so changing <span class="math" data-say="m">m</span> means recomputing every slot: a resize is <span class="math" data-say="theta of n">Θ(n)</span> and there is no cleverer way. The bound is amortised, exactly as for the two-stack queue: an operation that triggers a resize is expensive, and the sequence containing it is not, because doubling makes resizes exponentially rare.</p></details><details class="recall"><summary>The two thresholds must leave a gap</summary><p>If the table grows at <span class="math" data-say="alpha equals one half">α = ½</span> and shrinks at <span class="math" data-say="alpha equals one half">α = ½</span>, then one insertion past the boundary doubles the table, which halves <span class="math" data-say="alpha">α</span>, which triggers a shrink, which doubles <span class="math" data-say="alpha">α</span>, and the next operation resizes again. The gap &mdash; grow at <span class="math" data-say="1">1</span>, shrink at <span class="math" data-say="one quarter">¼</span> &mdash; means that after any resize the load is far from both thresholds, so many operations must happen before another one is due. That gap is called hysteresis.</p></details><details class="recall"><summary>The amortised bound is a claim about every sequence, and the lab can break it</summary><p><span class="math" data-say="3">3</span> per operation is the promise: forty operations should cost at most <span class="math" data-say="120">120</span>. The hysteresis policy costs <span class="math" data-say="52">52</span>, comfortably inside. The equal thresholds cost <span class="math" data-say="495">495</span>, four times the bound, on the same forty operations &mdash; which is what it looks like when a policy has no amortised bound at all rather than a loose one.</p></details></div>
+      <h3>Summary</h3>
       <p>A hash table keeps its load factor in range by doubling when it fills and halving when it empties, and the two thresholds must be different. Doubling at <span class="math" data-say="alpha equals 1">α = 1</span> and halving at <span class="math" data-say="alpha equals one quarter">α = ¼</span> costs <span class="math" data-say="52">52</span> over forty operations at the boundary; doubling and halving both at <span class="math" data-say="alpha equals one half">α = ½</span> costs <span class="math" data-say="495">495</span> for the same forty, rehashing on thirty-nine of them. The gap between the thresholds is the whole mechanism.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Rehashing is unavoidable and that is fine.</strong> Every key&rsquo;s slot is computed from <span class="math" data-say="m">m</span>, so changing <span class="math" data-say="m">m</span> means recomputing every slot: a resize is <span class="math" data-say="theta of n">Θ(n)</span> and there is no cleverer way. The bound is amortised, exactly as for the two-stack queue: an operation that triggers a resize is expensive, and the sequence containing it is not, because doubling makes resizes exponentially rare.</li><li><strong>The two thresholds must leave a gap.</strong> If the table grows at <span class="math" data-say="alpha equals one half">α = ½</span> and shrinks at <span class="math" data-say="alpha equals one half">α = ½</span>, then one insertion past the boundary doubles the table, which halves <span class="math" data-say="alpha">α</span>, which triggers a shrink, which doubles <span class="math" data-say="alpha">α</span>, and the next operation resizes again. The gap &mdash; grow at <span class="math" data-say="1">1</span>, shrink at <span class="math" data-say="one quarter">¼</span> &mdash; means that after any resize the load is far from both thresholds, so many operations must happen before another one is due. That gap is called hysteresis.</li><li><strong>The amortised bound is a claim about every sequence, and the lab can break it.</strong> <span class="math" data-say="3">3</span> per operation is the promise: forty operations should cost at most <span class="math" data-say="120">120</span>. The hysteresis policy costs <span class="math" data-say="52">52</span>, comfortably inside. The equal thresholds cost <span class="math" data-say="495">495</span>, four times the bound, on the same forty operations &mdash; which is what it looks like when a policy has no amortised bound at all rather than a loose one.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="grow, alpha is at least 1, double m, rehash every key. shrink, alpha is at most 1 over 4, halve m, rehash every key. the two thresholds must differ, and by a factor of more than 2. 40 operations alternating at the boundary, from m equals 4. grow at 1, shrink at 1 over 4, 2 rehashes, 12 keys moved, total 52. grow at 1 over 2, shrink at 1 over 2, 39 rehashes, 455 keys moved, total 495" tabindex="0" role="region" aria-label="Mathematical notation">grow    α ≥ 1      double m,  rehash every key
 shrink  α ≤ 1/4    halve m,   rehash every key
 
@@ -3081,11 +3126,42 @@ the two thresholds must differ, and by a factor of more than 2
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3153,7 +3229,7 @@ the two thresholds must differ, and by a factor of more than 2
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

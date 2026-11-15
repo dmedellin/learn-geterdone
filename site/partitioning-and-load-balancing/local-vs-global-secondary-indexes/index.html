@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Partitioning and Load Balancing</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Crossing shards</p>
       <h1>Local vs Global Secondary Indexes</h1>
       <p class="lesson-lede">Compute the shard operations a second for both index designs and the read-to-write ratio at which they change places.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A local index puts the scatter on the read</li><li>A global index puts the cost on the write</li><li>The crossover is <span class="math" data-say="1 over the quantity N minus 1">1/(N − 1)</span>, and it depends only on <span class="math" data-say="N">N</span></li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two indexes, two costs, one ratio</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Secondary index</span><p>A <strong>secondary index</strong> maps a non-key attribute to the rows carrying it. In a partitioned store it can be <strong>local</strong> — each shard indexes only its own rows — or <strong>global</strong>, partitioned by the indexed attribute so that all entries for one value live together. The primary key's own index is neither; it is the partitioning function.</p></div><p>The two designs are the same data structure placed differently, and the placement decides which operation pays. What makes the comparison tractable is that both costs can be measured in the same unit — shard operations a second, meaning the total number of per-shard requests the fleet performs — so a read that fans out to sixteen shards counts as sixteen.</p><div class="mathblock" data-say="r equals indexed reads a second, w equals writes a second, N equals shards. local, r times N, plus, w, every read asks all N, every write is local. global, r, plus, 2 w, every read is routed, every write is doubled. r equals 5000 per second, w equals 2000 per second, N equals 16. local, 5000 times 16 plus 2000 equals 80000 plus 2000 equals 82000 ops per second. global, 5000 plus 2 times 2000, equals, 5000 plus 4000 equals, 9000 ops per second. ratio, 82000 over 9000 equals 9.11 times, the global index wins here" tabindex="0" role="region" aria-label="Mathematical notation">r = indexed reads a second      w = writes a second      N = shards
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two indexes, two costs, one ratio</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Secondary index</span><p>A <strong>secondary index</strong> maps a non-key attribute to the rows carrying it. In a partitioned store it can be <strong>local</strong> — each shard indexes only its own rows — or <strong>global</strong>, partitioned by the indexed attribute so that all entries for one value live together. The primary key's own index is neither; it is the partitioning function.</p></div><p>The two designs are the same data structure placed differently, and the placement decides which operation pays. What makes the comparison tractable is that both costs can be measured in the same unit — shard operations a second, meaning the total number of per-shard requests the fleet performs — so a read that fans out to sixteen shards counts as sixteen.</p><div class="mathblock" data-say="r equals indexed reads a second, w equals writes a second, N equals shards. local, r times N, plus, w, every read asks all N, every write is local. global, r, plus, 2 w, every read is routed, every write is doubled. r equals 5000 per second, w equals 2000 per second, N equals 16. local, 5000 times 16 plus 2000 equals 80000 plus 2000 equals 82000 ops per second. global, 5000 plus 2 times 2000, equals, 5000 plus 4000 equals, 9000 ops per second. ratio, 82000 over 9000 equals 9.11 times, the global index wins here" tabindex="0" role="region" aria-label="Mathematical notation">r = indexed reads a second      w = writes a second      N = shards
 
   local    r · N  +  w          every read asks all N, every write is local
   global   r      +  2w         every read is routed, every write is doubled
@@ -1411,12 +1455,11 @@ r/w = 1/(N − 1)
    8         1/7              0.1429          global
   16         1/15             0.0667          global
   32         1/31             0.0323          global
-  64         1/63             0.0159          global</div><p>Read the middle column down and the shape of the trade is obvious. At two shards the two designs meet at equal reads and writes, which is a genuinely balanced decision. By sixty-four shards they meet at one read per sixty-three writes, so any workload that reads the indexed attribute at all is already past the crossover. The local index is a design for small fleets and write-dominated workloads, and the arithmetic says so without any appeal to taste.</p><div class="example"><span class="label">Example &middot; A workload on the other side of the line</span><p>Take an audit log partitioned by record id, indexed on a status field, with <span class="math" data-say="w equals 10000 per second">w = 10 000 /s</span> of writes and <span class="math" data-say="r equals 200 per second">r = 200 /s</span> of status lookups across <span class="math" data-say="N equals 4">N = 4</span> shards. The local index costs <span class="math" data-say="200 times 4 plus 10000 equals 10800">200 × 4 + 10 000 = 10 800</span> ops/s and the global costs <span class="math" data-say="200 plus 20000 equals 20200">200 + 20 000 = 20 200</span> — the local index is cheaper by nearly two to one. The ratio is <span class="math" data-say="r over w equals 0.02">r/w = 0.02</span>, comfortably below the crossover of <span class="math" data-say="1 over 3">1/3</span>, and the same two formulas that chose the global index in the lab choose the local one here.</p></div><h3>What the ratio does not capture</h3><p>Three things, and all of them push the same way. A local index read is a scatter-gather, so it also carries the tail of “Scatter-Gather Cost” — <span class="math" data-say="N">N</span> requests and a wait for the slowest — while a global index read is one routed request with one shard's latency. A global index write touches two shards, so unless it is done in a transaction it is briefly inconsistent with the row, and doing it in a transaction is the cross-shard commit of the next lesson. And the global index has its own hot-key problem: all entries for one attribute value live on one shard, so a heavily skewed attribute reproduces “Hot Keys and Salting” inside the index.</p><p>So <span class="math" data-say="r times N plus w">r·N + w</span> against <span class="math" data-say="r plus 2 w">r + 2w</span> is the first cut and not the whole decision. It is worth doing first anyway, because it is arithmetic on two numbers you already have, and when it comes out at nine to one the qualitative arguments are unlikely to reverse it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Local vs global secondary indexes</h2></div><p>r·N + w against r + 2w, and the crossover at r/w = 1/(N − 1)</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  64         1/63             0.0159          global</div><p>Read the middle column down and the shape of the trade is obvious. At two shards the two designs meet at equal reads and writes, which is a genuinely balanced decision. By sixty-four shards they meet at one read per sixty-three writes, so any workload that reads the indexed attribute at all is already past the crossover. The local index is a design for small fleets and write-dominated workloads, and the arithmetic says so without any appeal to taste.</p><div class="example"><span class="label">Example &middot; A workload on the other side of the line</span><p>Take an audit log partitioned by record id, indexed on a status field, with <span class="math" data-say="w equals 10000 per second">w = 10 000 /s</span> of writes and <span class="math" data-say="r equals 200 per second">r = 200 /s</span> of status lookups across <span class="math" data-say="N equals 4">N = 4</span> shards. The local index costs <span class="math" data-say="200 times 4 plus 10000 equals 10800">200 × 4 + 10 000 = 10 800</span> ops/s and the global costs <span class="math" data-say="200 plus 20000 equals 20200">200 + 20 000 = 20 200</span> — the local index is cheaper by nearly two to one. The ratio is <span class="math" data-say="r over w equals 0.02">r/w = 0.02</span>, comfortably below the crossover of <span class="math" data-say="1 over 3">1/3</span>, and the same two formulas that chose the global index in the lab choose the local one here.</p></div><h3>What the ratio does not capture</h3><p>Three things, and all of them push the same way. A local index read is a scatter-gather, so it also carries the tail of “Scatter-Gather Cost” — <span class="math" data-say="N">N</span> requests and a wait for the slowest — while a global index read is one routed request with one shard's latency. A global index write touches two shards, so unless it is done in a transaction it is briefly inconsistent with the row, and doing it in a transaction is the cross-shard commit of the next lesson. And the global index has its own hot-key problem: all entries for one attribute value live on one shard, so a heavily skewed attribute reproduces “Hot Keys and Salting” inside the index.</p><p>So <span class="math" data-say="r times N plus w">r·N + w</span> against <span class="math" data-say="r plus 2 w">r + 2w</span> is the first cut and not the whole decision. It is worth doing first anyway, because it is arithmetic on two numbers you already have, and when it comes out at nine to one the qualitative arguments are unlikely to reverse it.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Local vs global secondary indexes</h2></div><p>r·N + w against r + 2w, and the crossover at r/w = 1/(N − 1)</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Local index or global index</strong><span>r&middot;N + w against r + 2w &mdash; neither is always better, and the ratio decides</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>local</span><span class="tone-purple"><i class="legend-swatch"></i>global</span><span class="tone-amber"><i class="legend-swatch"></i>the crossover</span></div>
@@ -1424,10 +1467,10 @@ r/w = 1/(N − 1)
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="siPlot" viewBox="0 0 660 240" role="img" aria-label="The cost of a local secondary index and a global one drawn against the read-to-write ratio, with the crossover marked."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="siTable"></table></div>
       <div class="status-banner" id="siStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the workload mix, then move the fleet size</h3>
-          <p>Take the read rate down until the local index wins, and note how far down it has to go. Then hold the workload and move the shard count instead: the crossover is <span class="math" data-say="1 over the quantity N minus 1">1/(N − 1)</span> and it collapses toward zero, which is why fleet size decides this argument more often than workload does.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the workload mix, then move the fleet size</h3>
+            <p>Take the read rate down until the local index wins, and note how far down it has to go. Then hold the workload and move the shard count instead: the crossover is <span class="math" data-say="1 over the quantity N minus 1">1/(N − 1)</span> and it collapses toward zero, which is why fleet size decides this argument more often than workload does.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="siR">Indexed reads a second</label><span class="range-value" id="siROut">5000</span></div>
           <input id="siR" type="range" min="0" max="20000" step="100" value="5000" />
@@ -1449,12 +1492,14 @@ r/w = 1/(N − 1)
           <div class="kpi"><span>Your r/w</span><strong id="siRatio">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="siHint" style="margin:0;">A local index lives beside the rows it indexes, so a write touches one shard and a lookup has to ask every shard: r&middot;N + w. A global index is itself partitioned by the indexed value, so a lookup asks one shard and a write touches two &mdash; the row and the index entry, on different shards: r + 2w. Setting them equal gives r(N &minus; 1) = w, so they cost the same at r/w = 1/(N &minus; 1), exactly.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Choosing an index design</h2></div><p>Two rates and a shard count. Compute the crossover before either cost — it is one division and it usually settles the question on its own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down <span class="math" data-say="r">r</span>, <span class="math" data-say="w">w</span> and <span class="math" data-say="N">N</span></h3><p><span class="math" data-say="r">r</span> is reads <em>that use the index</em>, not all reads; a lookup by primary key is routed and is irrelevant here. <span class="math" data-say="w">w</span> is writes that change the indexed attribute, which may be fewer than all writes.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the crossover <span class="math" data-say="1 over the quantity N minus 1">1/(N − 1)</span> and compare it with <span class="math" data-say="r over w">r/w</span></h3><p>One division each. If <span class="math" data-say="r over w">r/w</span> is above the crossover the global index is cheaper and if it is below the local one is, and at <span class="math" data-say="N equals 16">N = 16</span> the crossover is <span class="math" data-say="0.0667">0.0667</span> against a workload ratio of <span class="math" data-say="2.500">2.500</span> — not a close call.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute both costs anyway, to size the fleet</h3><p><span class="math" data-say="r times N plus w">r·N + w</span> and <span class="math" data-say="r plus 2 w">r + 2w</span> in shard operations a second. The winner's figure is what the fleet has to serve, and the ratio between them — <span class="math" data-say="9.11 times">9.11×</span> at the lab's numbers — is what the decision is worth.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the three things the ratio leaves out</h3><p>The local index inherits the scatter-gather tail; the global index needs two shards written and can be hot on a skewed attribute. If any of those is decisive the arithmetic has not changed, but the answer might.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Choosing an index design</h2>
+      <p class="lead-in">Two rates and a shard count. Compute the crossover before either cost — it is one division and it usually settles the question on its own.</p>
+      <ol class="key-ideas method"><li><strong>Write down <span class="math" data-say="r">r</span>, <span class="math" data-say="w">w</span> and <span class="math" data-say="N">N</span>.</strong> <span class="math" data-say="r">r</span> is reads <em>that use the index</em>, not all reads; a lookup by primary key is routed and is irrelevant here. <span class="math" data-say="w">w</span> is writes that change the indexed attribute, which may be fewer than all writes.</li><li><strong>Compute the crossover <span class="math" data-say="1 over the quantity N minus 1">1/(N − 1)</span> and compare it with <span class="math" data-say="r over w">r/w</span>.</strong> One division each. If <span class="math" data-say="r over w">r/w</span> is above the crossover the global index is cheaper and if it is below the local one is, and at <span class="math" data-say="N equals 16">N = 16</span> the crossover is <span class="math" data-say="0.0667">0.0667</span> against a workload ratio of <span class="math" data-say="2.500">2.500</span> — not a close call.</li><li><strong>Compute both costs anyway, to size the fleet.</strong> <span class="math" data-say="r times N plus w">r·N + w</span> and <span class="math" data-say="r plus 2 w">r + 2w</span> in shard operations a second. The winner's figure is what the fleet has to serve, and the ratio between them — <span class="math" data-say="9.11 times">9.11×</span> at the lab's numbers — is what the decision is worth.</li><li><strong>Check the three things the ratio leaves out.</strong> The local index inherits the scatter-gather tail; the global index needs two shards written and can be hot on a skewed attribute. If any of those is decisive the arithmetic has not changed, but the answer might.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1481,17 +1526,16 @@ what would have to change for the local index to win
   that is 1 indexed read for every 15 writes</div><p>The last block is the useful way to report this. “The global index wins” is a conclusion; “the global index wins unless indexed reads fall below 133 a second” is a conclusion with a margin attached, and it is the version that survives a workload changing after the decision is made.</p><p>For a faded rehearsal, take the same workload to a four-shard fleet. The supplied first move is the crossover, <span class="math" data-say="1 over the quantity 4 minus 1, equals 1 over 3">1/(4 − 1) = 1/3</span>. Compute both costs, say which wins and by how much, and then find the read rate at which the answer would flip. Say in one sentence why the margin is so much narrower here than at sixteen shards.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing the crossover as <span class="math" data-say="1 over N">1/N</span></strong><span>It is <span class="math" data-say="1 over the quantity N minus 1">1/(N − 1)</span>. The <span class="math" data-say="negative 1">−1</span> comes from the row write that both designs perform: <span class="math" data-say="r times N plus w equals r plus 2 w">r·N + w = r + 2w</span> reduces to <span class="math" data-say="r times the quantity N minus 1, equals w">r(N − 1) = w</span>, not <span class="math" data-say="r times N equals w">r·N = w</span>. At small <span class="math" data-say="N">N</span> the difference is large — <span class="math" data-say="1 over 1">1/1</span> against <span class="math" data-say="1 over 2">1/2</span> at two shards — and that is exactly the regime where the decision is close.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting all reads as indexed reads</strong><span><span class="math" data-say="r">r</span> is reads that go through the secondary index. A lookup by primary key is routed by the partitioning function and costs one shard operation under either design. Inflating <span class="math" data-say="r">r</span> with primary-key traffic pushes the arithmetic toward the global index for a reason that does not exist.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the operation count as the whole comparison</strong><span>The local index read is also a scatter-gather with the tail that implies; the global index write touches two shards and is briefly inconsistent unless committed together; and a skewed indexed attribute makes the global index hot in exactly one place. Do the arithmetic first, then check all three.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “local or global?” is a division you perform rather than a preference you hold.</strong><p>You should be able to write both costs in shard operations a second, derive the crossover <span class="math" data-say="1 over the quantity N minus 1">1/(N − 1)</span> from them, report which design wins with the margin that would flip it, and name the three costs the ratio does not include.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A global index write touches two shards, and writing two shards together raises the question this course has been deferring: what does it cost to make an operation over several shards atomic? “Cross-shard Transactions” answers it in two parts — how often a transaction crosses, which is a counting problem, and what crossing costs, which is round trips and fsyncs.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing the crossover as <span class="math" data-say="1 over N">1/N</span></strong><span>It is <span class="math" data-say="1 over the quantity N minus 1">1/(N − 1)</span>. The <span class="math" data-say="negative 1">−1</span> comes from the row write that both designs perform: <span class="math" data-say="r times N plus w equals r plus 2 w">r·N + w = r + 2w</span> reduces to <span class="math" data-say="r times the quantity N minus 1, equals w">r(N − 1) = w</span>, not <span class="math" data-say="r times N equals w">r·N = w</span>. At small <span class="math" data-say="N">N</span> the difference is large — <span class="math" data-say="1 over 1">1/1</span> against <span class="math" data-say="1 over 2">1/2</span> at two shards — and that is exactly the regime where the decision is close.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting all reads as indexed reads</strong><span><span class="math" data-say="r">r</span> is reads that go through the secondary index. A lookup by primary key is routed by the partitioning function and costs one shard operation under either design. Inflating <span class="math" data-say="r">r</span> with primary-key traffic pushes the arithmetic toward the global index for a reason that does not exist.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the operation count as the whole comparison</strong><span>The local index read is also a scatter-gather with the tail that implies; the global index write touches two shards and is briefly inconsistent unless committed together; and a skewed indexed attribute makes the global index hot in exactly one place. Do the arithmetic first, then check all three.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “local or global?” is a division you perform rather than a preference you hold.</strong><p>You should be able to write both costs in shard operations a second, derive the crossover <span class="math" data-say="1 over the quantity N minus 1">1/(N − 1)</span> from them, report which design wins with the margin that would flip it, and name the three costs the ratio does not include.</p></div></div><div class="note"><strong>Note:</strong> A global index write touches two shards, and writing two shards together raises the question this course has been deferring: what does it cost to make an operation over several shards atomic? “Cross-shard Transactions” answers it in two parts — how often a transaction crosses, which is a counting problem, and what crossing costs, which is round trips and fsyncs.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A local index puts the scatter on the read</summary><p>The index entry for a row lives on the same shard as the row, so writing a row writes its index entry locally — one shard touched. But the index is then spread across every shard, so a lookup by the indexed attribute has no idea which shards hold matches and must ask all <span class="math" data-say="N">N</span>. Cost per second: <span class="math" data-say="r times N plus w">r·N + w</span>.</p></details><details class="recall"><summary>A global index puts the cost on the write</summary><p>The index is partitioned by the indexed attribute, so a lookup goes straight to the one shard holding that attribute's entries. The price is that a write now touches two shards — the row's own and the index's — and those are on different machines, which brings the consistency questions of the lesson after next. Cost per second: <span class="math" data-say="r plus 2 w">r + 2w</span>.</p></details><details class="recall"><summary>The crossover is <span class="math" data-say="1 over the quantity N minus 1">1/(N − 1)</span>, and it depends only on <span class="math" data-say="N">N</span></summary><p>Setting <span class="math" data-say="r times N plus w equals r plus 2 w">r·N + w = r + 2w</span> gives <span class="math" data-say="r times the quantity N minus 1, equals w">r(N − 1) = w</span>, so the two designs cost the same when <span class="math" data-say="r over w equals 1 over the quantity N minus 1">r/w = 1/(N − 1)</span>. At two shards that is <span class="math" data-say="r over w equals 1">r/w = 1</span>: any workload with more reads than writes wants the global index. At sixteen shards it is <span class="math" data-say="1 over 15 equals 0.0667">1/15 = 0.0667</span>, so a workload with one indexed read per fifteen writes already prefers the global index. The larger the fleet, the smaller the read share that tips it.</p></details></div>
+      <h3>Summary</h3>
       <p>A local secondary index lives beside the data it indexes, so a write touches one shard and a lookup has to ask all <span class="math" data-say="N">N</span>. A global secondary index is partitioned by the indexed attribute, so a lookup goes to one shard and a write has to touch two. The costs are <span class="math" data-say="r times N plus w">r·N + w</span> against <span class="math" data-say="r plus 2 w">r + 2w</span>, they are equal at <span class="math" data-say="r over w equals 1 over the quantity N minus 1">r/w = 1/(N − 1)</span>, and which of them is cheaper is a fact about the workload rather than about the designs.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A local index puts the scatter on the read.</strong> The index entry for a row lives on the same shard as the row, so writing a row writes its index entry locally — one shard touched. But the index is then spread across every shard, so a lookup by the indexed attribute has no idea which shards hold matches and must ask all <span class="math" data-say="N">N</span>. Cost per second: <span class="math" data-say="r times N plus w">r·N + w</span>.</li><li><strong>A global index puts the cost on the write.</strong> The index is partitioned by the indexed attribute, so a lookup goes straight to the one shard holding that attribute's entries. The price is that a write now touches two shards — the row's own and the index's — and those are on different machines, which brings the consistency questions of the lesson after next. Cost per second: <span class="math" data-say="r plus 2 w">r + 2w</span>.</li><li><strong>The crossover is <span class="math" data-say="1 over the quantity N minus 1">1/(N − 1)</span>, and it depends only on <span class="math" data-say="N">N</span>.</strong> Setting <span class="math" data-say="r times N plus w equals r plus 2 w">r·N + w = r + 2w</span> gives <span class="math" data-say="r times the quantity N minus 1, equals w">r(N − 1) = w</span>, so the two designs cost the same when <span class="math" data-say="r over w equals 1 over the quantity N minus 1">r/w = 1/(N − 1)</span>. At two shards that is <span class="math" data-say="r over w equals 1">r/w = 1</span>: any workload with more reads than writes wants the global index. At sixteen shards it is <span class="math" data-say="1 over 15 equals 0.0667">1/15 = 0.0667</span>, so a workload with one indexed read per fifteen writes already prefers the global index. The larger the fleet, the smaller the read share that tips it.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="local, read all N shards, write 1, cost equals r times N plus w. global, read 1 shard, write 2, cost equals r plus 2 w. equal when r times N plus w equals r plus 2 w, if and only if, r over w equals 1 over the quantity N minus 1. r equals 5000 per second, w equals 2000 per second, N equals 16. local 82000 ops per second, global 9000 ops per second, global cheaper by 9.11 times. crossover 1 over 15 equals 0.0667, this workload is r over w equals 2.500" tabindex="0" role="region" aria-label="Mathematical notation">local    read all N shards, write 1        cost = r·N + w
 global   read 1 shard,       write 2       cost = r + 2w
 equal when r·N + w = r + 2w   ⟺   r/w = 1/(N − 1)
@@ -2944,11 +2988,42 @@ r = 5 000/s, w = 2 000/s, N = 16
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3016,7 +3091,7 @@ r = 5 000/s, w = 2 000/s, N = 16
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

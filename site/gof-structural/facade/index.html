@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Structural Patterns</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 4 · Structural Patterns</p>
       <h1>Facade</h1>
       <p class="lesson-lede">One class in front of a subsystem that offers the common requests in a simpler interface and passes each to the classes that do the work.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Facade and subsystem classes</li><li>Weak coupling</li><li>Public and private subsystem interface</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern, section by section, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Provide a unified interface to a set of interfaces in a subsystem.&rdquo; That is the first sentence of Facade's intent; the second says the facade works a level above those interfaces, so the subsystem is simpler to work with. Its argument starts from the observation that dividing a system into subsystems reduces complexity, and that a common aim is then to have subsystems talk to and rely on each other as little as possible.</p><p>The Motivation is a programming environment's compiler subsystem: a scanner, a parser, the classes for the parse tree, a bytecode stream and a builder. A few specialised tools need those classes directly; most clients only want their code compiled. So the subsystem also offers a compiler class that does the common thing in one call and holds the rest together, without hiding the classes from the tools that want them. Applicability gives three cases: a simple default view of a subsystem that has grown complicated (patterns themselves tend to produce more and smaller classes, the authors note, which makes a subsystem more reusable and harder to use); many dependencies between clients and a subsystem's implementation classes; and layering, with a facade as each layer's entry point.</p><p>The participants are the Facade and the subsystem classes; the subsystem classes do the actual work and know nothing of the facade. Clients that use the facade need not touch the subsystem's objects at all. The Consequences are three benefits. The facade shields clients from the subsystem's components, so they deal with fewer objects. It promotes weak coupling: the subsystem's own classes are often tightly bound together, and a facade lets them change without the clients noticing, can remove complex or circular dependencies, and cuts the rebuilding that a minor edit to a central subsystem would otherwise trigger. And it does not stop applications from using the subsystem's classes when they need to, so each client can trade simplicity for the full set of options.</p><pre class="codeblock" data-say="line 1, comment, The Facade one entry point for what most clients want to do.. line 2, final class lockers. line 3, private final locker bank bank. line 4, private final door controller doors. line 5, private final pin generator pins. line 6, private final sms gateway sms. line 7, lockers of locker bank bank, door controller doors. line 8, pin generator pins, sms gateway sms. line 9, this dot bank is set to bank, this dot doors is set to doors. line 10, this dot pins is set to pins, this dot sms is set to sms. line 12, comment, A courier drops a parcel find a locker, open it, text the PIN.. line 13, locker deposit of parcel p. line 14, locker free is set to bank dot free locker for of p dot size. line 15, doors dot open of free. line 16, string pin is set to pins dot issue of free, p. line 17, sms dot send of p dot phone, Locker plus free dot number plus, PIN plus pin. line 18, return free" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The Facade: one entry point for what most clients want to do.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern, section by section, then the count</h2><div class="prose reading"><p>&ldquo;Provide a unified interface to a set of interfaces in a subsystem.&rdquo; That is the first sentence of Facade's intent; the second says the facade works a level above those interfaces, so the subsystem is simpler to work with. Its argument starts from the observation that dividing a system into subsystems reduces complexity, and that a common aim is then to have subsystems talk to and rely on each other as little as possible.</p><p>The Motivation is a programming environment's compiler subsystem: a scanner, a parser, the classes for the parse tree, a bytecode stream and a builder. A few specialised tools need those classes directly; most clients only want their code compiled. So the subsystem also offers a compiler class that does the common thing in one call and holds the rest together, without hiding the classes from the tools that want them. Applicability gives three cases: a simple default view of a subsystem that has grown complicated (patterns themselves tend to produce more and smaller classes, the authors note, which makes a subsystem more reusable and harder to use); many dependencies between clients and a subsystem's implementation classes; and layering, with a facade as each layer's entry point.</p><p>The participants are the Facade and the subsystem classes; the subsystem classes do the actual work and know nothing of the facade. Clients that use the facade need not touch the subsystem's objects at all. The Consequences are three benefits. The facade shields clients from the subsystem's components, so they deal with fewer objects. It promotes weak coupling: the subsystem's own classes are often tightly bound together, and a facade lets them change without the clients noticing, can remove complex or circular dependencies, and cuts the rebuilding that a minor edit to a central subsystem would otherwise trigger. And it does not stop applications from using the subsystem's classes when they need to, so each client can trade simplicity for the full set of options.</p><pre class="codeblock" data-say="line 1, comment, The Facade one entry point for what most clients want to do.. line 2, final class lockers. line 3, private final locker bank bank. line 4, private final door controller doors. line 5, private final pin generator pins. line 6, private final sms gateway sms. line 7, lockers of locker bank bank, door controller doors. line 8, pin generator pins, sms gateway sms. line 9, this dot bank is set to bank, this dot doors is set to doors. line 10, this dot pins is set to pins, this dot sms is set to sms. line 12, comment, A courier drops a parcel find a locker, open it, text the PIN.. line 13, locker deposit of parcel p. line 14, locker free is set to bank dot free locker for of p dot size. line 15, doors dot open of free. line 16, string pin is set to pins dot issue of free, p. line 17, sms dot send of p dot phone, Locker plus free dot number plus, PIN plus pin. line 18, return free" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The Facade: one entry point for what most clients want to do.</span>
 <span class="cl">final class Lockers {</span>
 <span class="cl">    private final LockerBank bank;</span>
 <span class="cl">    private final DoorController doors;</span>
@@ -1464,22 +1508,21 @@
 <span class="cl">        sms.send(p.phone(), &quot;Locker &quot; + free.number() + &quot;, PIN &quot; + pin);</span>
 <span class="cl">        return free;</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Two implementation issues follow. Coupling can be reduced further by making the facade abstract, with a concrete facade for each implementation of the subsystem, or by configuring one facade with different subsystem objects. And a subsystem, like a class, has a public interface and a private one; making some subsystem classes private would help, but in 1995 few object-oriented languages could, and the authors note that the C++ committee had just added namespaces. The Sample Code builds the compiler facade in C++ and ends by weighing a parameter for the code generator, sensible if there is more than one target, against parameterizing every participant, which adds flexibility but works against the facade's purpose of simplifying the common case. Known Uses are the Smalltalk compiler that inspired the example, ET++'s browsing tools behind one class, and the Choices operating system, whose virtual memory framework has a facade. Related Patterns contrast it with Mediator, whose colleagues talk to it, where subsystem classes do not know a facade exists, and note that a facade is often a Singleton.</p><p>Now the lab, on a parcel locker rather than the book's compiler. The subsystem has five classes: <code>LockerBank</code>, <code>DoorController</code>, <code>PinGenerator</code>, <code>SmsGateway</code> and <code>Ledger</code>. Three applications use it: a courier's app, the kiosk at the lockers and the support desk. Each record is one use, user then used. On the preset <code>direct</code> every client reaches into the subsystem for what it needs: the lab counts 8 classes and 12 distinct uses, so 12 of the 28 possible pairs are connected, 3/7 or about 42.9%. The courier app has the largest fan-out, 4, and <code>LockerBank</code> the largest fan-in, 4. Ten of the twelve uses cross from a client into the subsystem; the other two are the subsystem's own.</p><p>On the preset <code>through-facade</code> a <code>Lockers</code> class stands in front. The courier app and the kiosk use only <code>Lockers</code>; the support desk uses it too, and still reads <code>Ledger</code> directly, because the pattern does not forbid that. The lab counts 9 classes, one more, and 10 uses, 10 of 36 pairs (5/18) or about 27.8%. The largest fan-out is now the facade's, 4, and so is the largest fan-in, 3: every client uses it. Count the uses that cross the boundary yourself from the records: four, three to the facade and the desk's one to the ledger, where there were ten. The subsystem's classes can now change behind <code>Lockers</code>, and only the desk's one direct use goes with them.</p><p>The lab's figures are of the design as written. The facade concentrates the fan-out in one class, which is the point and also a thing to watch: a facade that takes on every client's special case grows into the subsystem's whole interface again, which is the trade-off the Sample Code ends on.</p><h3>Exercise</h3><p>The support desk is changed to read the ledger through <code>Lockers</code> as well, so the facade uses all five subsystem classes. By hand, give the classes, the distinct uses, the uses that cross from a client into the subsystem, and the facade's fan-out. Edit the preset's records in the lab to check.</p><p>Facade puts one object in front of many. The next lesson, Flyweight, goes the other way, making very many objects affordable by sharing a few.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Counting dependencies</h2></div><p>who uses whom, and how connected the modules are</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Two implementation issues follow. Coupling can be reduced further by making the facade abstract, with a concrete facade for each implementation of the subsystem, or by configuring one facade with different subsystem objects. And a subsystem, like a class, has a public interface and a private one; making some subsystem classes private would help, but in 1995 few object-oriented languages could, and the authors note that the C++ committee had just added namespaces. The Sample Code builds the compiler facade in C++ and ends by weighing a parameter for the code generator, sensible if there is more than one target, against parameterizing every participant, which adds flexibility but works against the facade's purpose of simplifying the common case. Known Uses are the Smalltalk compiler that inspired the example, ET++'s browsing tools behind one class, and the Choices operating system, whose virtual memory framework has a facade. Related Patterns contrast it with Mediator, whose colleagues talk to it, where subsystem classes do not know a facade exists, and note that a facade is often a Singleton.</p><p>Now the lab, on a parcel locker rather than the book's compiler. The subsystem has five classes: <code>LockerBank</code>, <code>DoorController</code>, <code>PinGenerator</code>, <code>SmsGateway</code> and <code>Ledger</code>. Three applications use it: a courier's app, the kiosk at the lockers and the support desk. Each record is one use, user then used. On the preset <code>direct</code> every client reaches into the subsystem for what it needs: the lab counts 8 classes and 12 distinct uses, so 12 of the 28 possible pairs are connected, 3/7 or about 42.9%. The courier app has the largest fan-out, 4, and <code>LockerBank</code> the largest fan-in, 4. Ten of the twelve uses cross from a client into the subsystem; the other two are the subsystem's own.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Counting dependencies</h2></div><p>who uses whom, and how connected the modules are</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Counting dependencies</strong><span>who uses whom, and how connected the modules are</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgTable"></table></div>
       <div class="status-banner" id="dgStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Uses across a subsystem&#x27;s boundary, with and without a facade</h3>
-          <p>A count over the structure the lesson states. Each record is one use, written user, used, and each name is a class. The lab counts the classes, the distinct uses, the pairs connected either way, and the largest fan-out and fan-in. The design is the lesson's, and a count shows one consequence of putting a facade in front of a subsystem, not whether the subsystem needs one.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Uses across a subsystem&#x27;s boundary, with and without a facade</h3>
+            <p>A count over the structure the lesson states. Each record is one use, written user, used, and each name is a class. The lab counts the classes, the distinct uses, the pairs connected either way, and the largest fan-out and fan-in. The design is the lesson's, and a count shows one consequence of putting a facade in front of a subsystem, not whether the subsystem needs one.</p>
         <div class="field">
           <label for="dgPreset">Worked example</label>
           <select id="dgPreset"><option value="direct" selected>Three clients using the locker subsystem's classes directly</option><option value="through-facade">The same clients through a Lockers facade; the desk still reads the ledger</option></select>
@@ -1497,12 +1540,15 @@
           <div class="kpi"><span>Largest fan-in</span><strong id="dgFanIn">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>On the preset <code>through-facade</code> a <code>Lockers</code> class stands in front. The courier app and the kiosk use only <code>Lockers</code>; the support desk uses it too, and still reads <code>Ledger</code> directly, because the pattern does not forbid that. The lab counts 9 classes, one more, and 10 uses, 10 of 36 pairs (5/18) or about 27.8%. The largest fan-out is now the facade's, 4, and so is the largest fan-in, 3: every client uses it. Count the uses that cross the boundary yourself from the records: four, three to the facade and the desk's one to the ledger, where there were ten. The subsystem's classes can now change behind <code>Lockers</code>, and only the desk's one direct use goes with them.</p><p>The lab's figures are of the design as written. The facade concentrates the fan-out in one class, which is the point and also a thing to watch: a facade that takes on every client's special case grows into the subsystem's whole interface again, which is the trade-off the Sample Code ends on.</p><h3>Exercise</h3><p>The support desk is changed to read the ledger through <code>Lockers</code> as well, so the facade uses all five subsystem classes. By hand, give the classes, the distinct uses, the uses that cross from a client into the subsystem, and the facade's fan-out. Edit the preset's records in the lab to check.</p><p>Facade puts one object in front of many. The next lesson, Flyweight, goes the other way, making very many objects affordable by sharing a few.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Measuring what a facade changes</h2></div><p>Four steps, the last of them on a subsystem of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Draw the boundary</h3><p>List the subsystem's classes and the clients outside it. A facade belongs inside the boundary, with the classes it fronts.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the uses that cross it</h3><p>Count every use from a client to a class inside, before and after the facade. Leave the subsystem's own uses out: a facade does not change them.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Keep the direct uses that are needed</h3><p>Mark the clients that need something the facade does not offer. They may keep using the subsystem's classes; the pattern allows it.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a subsystem of your own</h3><p>Take a package your code reaches into from several places and write its uses as records. Count the uses that cross its boundary, then sketch the facade's few operations and count again.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Measuring what a facade changes</h2>
+      <p class="lead-in">Four steps, the last of them on a subsystem of your own.</p>
+      <ol class="key-ideas method"><li><strong>Draw the boundary.</strong> List the subsystem's classes and the clients outside it. A facade belongs inside the boundary, with the classes it fronts.</li><li><strong>Count the uses that cross it.</strong> Count every use from a client to a class inside, before and after the facade. Leave the subsystem's own uses out: a facade does not change them.</li><li><strong>Keep the direct uses that are needed.</strong> Mark the clients that need something the facade does not offer. They may keep using the subsystem's classes; the pattern allows it.</li><li><strong>Do it on a subsystem of your own.</strong> Take a package your code reaches into from several places and write its uses as records. Count the uses that cross its boundary, then sketch the facade's few operations and count again.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1521,17 +1567,16 @@ uses from the facade: 4; inside: 2
 uses in the facade design: 4 + 4 + 2 = 10</div><p>The uses that cross the boundary fall from ten to four. The facade's own four uses are inside it, and the two between the subsystem's classes are unchanged.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a facade hides the subsystem</strong><span>The authors say plainly that it does not prevent clients from using the subsystem's classes. It offers a simpler default for most clients, and those who need more look past it. On the lesson's illustration the support desk keeps its one direct use, and the count shows it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting a facade to remove the subsystem&#x27;s own coupling</strong><span>A facade changes the uses that cross the boundary, not the ones inside. The subsystem's classes may still be strongly bound together; the facade lets them change without the clients noticing.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Giving the facade every option the subsystem has</strong><span>A parameter or two can earn its place, as the code generator does in the authors' Sample Code; parameterizing every participant, they note, detracts from the facade's purpose, which is to make the common case simple. A client that needs the options can use the subsystem's classes directly.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a subsystem&#x27;s uses with and without a facade.</strong><p>Given clients and a subsystem as records, state the classes, the distinct uses, the uses crossing the boundary and the largest fan-out and fan-in, before and after a facade, and say what the facade does not prevent.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts uses in the design you state. It cannot tell you which requests most clients share, which is what a facade should offer, or whether a client's direct use is a need or a habit; the boundary and the facade's few operations are design decisions.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a facade hides the subsystem</strong><span>The authors say plainly that it does not prevent clients from using the subsystem's classes. It offers a simpler default for most clients, and those who need more look past it. On the lesson's illustration the support desk keeps its one direct use, and the count shows it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting a facade to remove the subsystem&#x27;s own coupling</strong><span>A facade changes the uses that cross the boundary, not the ones inside. The subsystem's classes may still be strongly bound together; the facade lets them change without the clients noticing.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Giving the facade every option the subsystem has</strong><span>A parameter or two can earn its place, as the code generator does in the authors' Sample Code; parameterizing every participant, they note, detracts from the facade's purpose, which is to make the common case simple. A client that needs the options can use the subsystem's classes directly.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a subsystem&#x27;s uses with and without a facade.</strong><p>Given clients and a subsystem as records, state the classes, the distinct uses, the uses crossing the boundary and the largest fan-out and fan-in, before and after a facade, and say what the facade does not prevent.</p></div></div><div class="note"><strong>Note:</strong> The lab counts uses in the design you state. It cannot tell you which requests most clients share, which is what a facade should offer, or whether a client's direct use is a need or a habit; the boundary and the facade's few operations are design decisions.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Facade and subsystem classes</summary><p>The Facade knows which subsystem classes handle a request and passes it to them, doing a little translation of its own where needed. The subsystem classes do the work and keep no reference to the facade.</p></details><details class="recall"><summary>Weak coupling</summary><p>Few dependencies between a subsystem and its clients, so that the subsystem's classes can change without changing the clients. A facade reduces the uses that cross the subsystem's boundary to the facade itself.</p></details><details class="recall"><summary>Public and private subsystem interface</summary><p>Like a class, a subsystem has a public interface, the classes any client may use, and a private one, for those who extend it. The facade belongs to the public interface but is seldom the whole of it.</p></details></div>
+      <h3>Summary</h3>
       <p>Facade gives a subsystem one higher-level entry point, without hiding the classes behind it from clients that need them. Read the pattern, then count the uses between a parcel locker's three client applications and its subsystem, first going straight to the subsystem's classes and then through a facade.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Facade and subsystem classes.</strong> The Facade knows which subsystem classes handle a request and passes it to them, doing a little translation of its own where needed. The subsystem classes do the work and keep no reference to the facade.</li><li><strong>Weak coupling.</strong> Few dependencies between a subsystem and its clients, so that the subsystem's classes can change without changing the clients. A facade reduces the uses that cross the subsystem's boundary to the facade itself.</li><li><strong>Public and private subsystem interface.</strong> Like a class, a subsystem has a public interface, the classes any client may use, and a private one, for those who extend it. The facade belongs to the public interface but is seldom the whole of it.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="one simpler interface to a subsystem. clients send requests to the facade. the facade forwards to the classes. fewer uses across the boundary. subsystem classes know nothing of it. direct use is still allowed" tabindex="0" role="region" aria-label="Mathematical notation">one simpler interface to a subsystem
 clients send requests to the facade
 the facade forwards to the classes
@@ -2256,11 +2301,42 @@ direct use is still allowed</div><figcaption>Facade in six lines</figcaption></f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2328,7 +2404,7 @@ direct use is still allowed</div><figcaption>Facade in six lines</figcaption></f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

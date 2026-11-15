@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,50 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Networks: Flows, Paths and Assignments</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Integer corners</p>
       <h1>Total Unimodularity and Integer Corners</h1>
       <p class="lesson-lede">Every square submatrix of a node-arc incidence matrix has determinant 0, +1 or −1 — and Cramer&#x27;s rule turns that into whole-numbered corners.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Total unimodularity is a condition on every submatrix, not on the matrix</li><li>Cramer&#x27;s rule is the whole argument</li><li>Direction is what makes it work</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Why a network programme returns whole numbers, and when it stops</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Totally unimodular</span><p>A matrix <span class="math" data-say="A">A</span> is <strong>totally unimodular</strong> when every square submatrix of <span class="math" data-say="A">A</span> &mdash; of every size, formed by choosing any rows and any equally many columns &mdash; has determinant <span class="math" data-say="0">0</span>, <span class="math" data-say="plus 1">+1</span> or <span class="math" data-say="negative 1">−1</span>.</p><p>Every entry of such a matrix is itself a one-by-one submatrix, so every entry is <span class="math" data-say="0">0</span>, <span class="math" data-say="plus 1">+1</span> or <span class="math" data-say="negative 1">−1</span>. The converse fails, and the failure is the interesting part of this lesson.</p></div><div class="thm"><span class="label">Theorem &middot; Integrality of network corners</span><p>Let <span class="math" data-say="A">A</span> be totally unimodular and <span class="math" data-say="b">b</span> an integer vector. Then every basic feasible solution of <span class="math" data-say="A x equals b">Ax = b</span>, <span class="math" data-say="x is at least 0">x ≥ 0</span> is an integer vector.</p><p>The node-arc incidence matrix <span class="math" data-say="N">N</span> of any directed network is totally unimodular. Hence every corner of the minimum-cost flow programme is whole, on whole supplies and whole capacities, with no integrality constraint written anywhere.</p></div><div class="proof"><p>A basic solution takes a square non-singular submatrix <span class="math" data-say="B">B</span> of the columns and sets <span class="math" data-say="x sub B equals B inverse b">x_B = B⁻¹b</span>, with every other variable zero. By Cramer's rule the <span class="math" data-say="k">k</span>-th component of <span class="math" data-say="x sub B">x_B</span> is <span class="math" data-say="the determinant of B sub k over the determinant of B">det(Bₖ) / det(B)</span>, where <span class="math" data-say="B sub k">Bₖ</span> is <span class="math" data-say="B">B</span> with its <span class="math" data-say="k">k</span>-th column replaced by <span class="math" data-say="b">b</span>.</p><p><span class="math" data-say="B">B</span> is a square submatrix of a totally unimodular matrix and is non-singular, so <span class="math" data-say="the determinant of B">det(B)</span> is <span class="math" data-say="plus 1">+1</span> or <span class="math" data-say="negative 1">−1</span>. <span class="math" data-say="B sub k">Bₖ</span> has integer entries throughout &mdash; the columns of <span class="math" data-say="B">B</span> are integer and <span class="math" data-say="b">b</span> is integer &mdash; so <span class="math" data-say="the determinant of B sub k">det(Bₖ)</span> is an integer. An integer divided by <span class="math" data-say="plus or minus 1">±1</span> is an integer, and every component of <span class="math" data-say="x sub B">x_B</span> is therefore whole. The non-basic components are zero.</p><p>Nothing in this depends on the objective, so it holds at the optimum in particular; and since a bounded linear programme attains its optimum at a corner, the optimum is an integer point.</p><p><span class="qed">&#9633;</span></p></div><p>That the incidence matrix satisfies the condition is checkable rather than memorable, and the lab checks it. On the five-arc network from the minimum-cost flow lesson, <span class="math" data-say="N">N</span> is four by five and the sweep runs every submatrix of size one, two and three &mdash; 20, then 60, then 40, which is 120 in all &mdash; and reports every determinant in <span class="math" data-say="the set 0, plus or minus 1">{0, ±1}</span>.</p><div class="mathblock" data-say="N for, s is greater than A, s is greater than b, A is greater than b, A is greater than t, b is greater than t. a table, shown on the page. rows 1, 2, 3 and columns 1, 3, 4, the determinant of, 1. rows 1, 2, and columns 1, 2, the determinant of, 1. rows 1, 2, 3 and columns 1, 2, 3, the determinant of, 0. the whole matrix is singular, every column holds one plus 1 and one negative 1. so the four rows sum to the zero row. sweep to size 3, 20 plus 60 plus 40 equals 120 submatrices, 0 failures" tabindex="0" role="region" aria-label="Mathematical notation">N for  s&gt;a  s&gt;b  a&gt;b  a&gt;t  b&gt;t
-
-   s      1    1    0    0    0
-   a     -1    0    1    1    0
-   b      0   -1   -1    0    1
-   t      0    0    0   -1   -1
-
-   rows 1,2,3 and columns 1,3,4      det  1
-   rows 1,2   and columns 1,2        det  1
-   rows 1,2,3 and columns 1,2,3      det  0
-
-   the whole matrix is singular: every column holds one +1 and one -1,
-   so the four rows sum to the zero row
-
-   sweep to size 3:   20 + 60 + 40 = 120 submatrices,  0 failures</div><h3>The same drawing, undirected, and the corner that is halves</h3><p>Now take the triangle on three vertices and build the <strong>undirected</strong> incidence matrix instead: <span class="math" data-say="plus 1">+1</span> at both ends of each edge rather than <span class="math" data-say="plus 1">+1</span> and <span class="math" data-say="negative 1">−1</span>. Nothing about the picture has changed. The matrix is three by three, and its determinant is 2.</p><div class="mathblock" data-say="undirected incidence of the triangle, directed, same drawing. a table, shown on the page. det equals 2, sweep, unimodular. exactly one submatrix out of 19 fails, and it is the whole matrix. max x 1 plus x 2 plus x 3, subject to that matrix times x is at most 1, x is at least 0. corner, x equals 1 over 2, 1 over 2, 1 over 2, value 3 over 2. no integer point reaches 3 over 2, the best whole answer is 1" tabindex="0" role="region" aria-label="Mathematical notation">undirected incidence of the triangle      directed, same drawing
-
-      1 0 1                                   1  0 -1
-      1 1 0                                  -1  1  0
-      0 1 1                                   0 -1  1
-
-   det = 2                                 sweep: unimodular
-   exactly one submatrix out of 19 fails, and it is the whole matrix
-
-   max x1 + x2 + x3   subject to that matrix times x ≤ 1,  x ≥ 0
-
-      corner   x = (1/2, 1/2, 1/2)      value 3/2
-      no integer point reaches 3/2; the best whole answer is 1</div><div class="example"><span class="label">Example &middot; The halves are real, and exact</span><p>The lab runs the same exact simplex on the same kind of programme and returns <span class="math" data-say="1 over 2">1/2</span> three times, printed as a fraction. There is no rounding anywhere and nothing has gone wrong: <span class="math" data-say="1 over 2, 1 over 2, 1 over 2">(1/2, 1/2, 1/2)</span> is a genuine corner of that polyhedron, and it is strictly better than any lattice point inside it.</p><p>This is the gap that the whole of Integer Programming is about, arriving here as a two-line consequence of one determinant. It is also the reason this course can be solved by the simplex method and that one cannot.</p></div><div class="example"><span class="label">Example &middot; An even cycle keeps its whole corners</span><p>Do the same on the four-cycle. The undirected incidence matrix has determinant <span class="math" data-say="0">0</span>, the sweep finds nothing outside <span class="math" data-say="the set 0, plus or minus 1">{0, ±1}</span>, and the packing programme's corner is <span class="math" data-say="1, 0, 1, 0">(1, 0, 1, 0)</span> worth 2 &mdash; whole.</p><p>So it is not undirectedness as such that breaks integrality; it is the odd cycle. An even cycle is bipartite, and bipartite graphs are where the undirected incidence matrix stays totally unimodular. That observation is what makes the assignment problem behave, and it comes back on the matching lesson.</p></div><p>Two warnings about the direction of the theorem. It says total unimodularity is <em>sufficient</em> for integer corners, not necessary: plenty of programmes have integral polyhedra for other reasons. And it says nothing whatever about a programme whose matrix is not totally unimodular &mdash; such a programme may still happen to have a whole optimum on some instance, and that is luck rather than structure.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Why the corners are integers</h2></div><p>Every square submatrix of a node–arc incidence matrix has determinant 0, +1 or −1 — and an odd cycle does not</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Why a network programme returns whole numbers, and when it stops</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Totally unimodular</span><p>A matrix <span class="math" data-say="A">A</span> is <strong>totally unimodular</strong> when every square submatrix of <span class="math" data-say="A">A</span> &mdash; of every size, formed by choosing any rows and any equally many columns &mdash; has determinant <span class="math" data-say="0">0</span>, <span class="math" data-say="plus 1">+1</span> or <span class="math" data-say="negative 1">−1</span>.</p><p>Every entry of such a matrix is itself a one-by-one submatrix, so every entry is <span class="math" data-say="0">0</span>, <span class="math" data-say="plus 1">+1</span> or <span class="math" data-say="negative 1">−1</span>. The converse fails, and the failure is the interesting part of this lesson.</p></div><div class="thm"><span class="label">Theorem &middot; Integrality of network corners</span><p>Let <span class="math" data-say="A">A</span> be totally unimodular and <span class="math" data-say="b">b</span> an integer vector. Then every basic feasible solution of <span class="math" data-say="A x equals b">Ax = b</span>, <span class="math" data-say="x is at least 0">x ≥ 0</span> is an integer vector.</p><p>The node-arc incidence matrix <span class="math" data-say="N">N</span> of any directed network is totally unimodular. Hence every corner of the minimum-cost flow programme is whole, on whole supplies and whole capacities, with no integrality constraint written anywhere.</p></div><div class="proof"><p>A basic solution takes a square non-singular submatrix <span class="math" data-say="B">B</span> of the columns and sets <span class="math" data-say="x sub B equals B inverse b">x_B = B⁻¹b</span>, with every other variable zero. By Cramer's rule the <span class="math" data-say="k">k</span>-th component of <span class="math" data-say="x sub B">x_B</span> is <span class="math" data-say="the determinant of B sub k over the determinant of B">det(Bₖ) / det(B)</span>, where <span class="math" data-say="B sub k">Bₖ</span> is <span class="math" data-say="B">B</span> with its <span class="math" data-say="k">k</span>-th column replaced by <span class="math" data-say="b">b</span>.</p><p><span class="math" data-say="B">B</span> is a square submatrix of a totally unimodular matrix and is non-singular, so <span class="math" data-say="the determinant of B">det(B)</span> is <span class="math" data-say="plus 1">+1</span> or <span class="math" data-say="negative 1">−1</span>. <span class="math" data-say="B sub k">Bₖ</span> has integer entries throughout &mdash; the columns of <span class="math" data-say="B">B</span> are integer and <span class="math" data-say="b">b</span> is integer &mdash; so <span class="math" data-say="the determinant of B sub k">det(Bₖ)</span> is an integer. An integer divided by <span class="math" data-say="plus or minus 1">±1</span> is an integer, and every component of <span class="math" data-say="x sub B">x_B</span> is therefore whole. The non-basic components are zero.</p><p>Nothing in this depends on the objective, so it holds at the optimum in particular; and since a bounded linear programme attains its optimum at a corner, the optimum is an integer point.</p><p><span class="qed">&#9633;</span></p></div><p>That the incidence matrix satisfies the condition is checkable rather than memorable, and the lab checks it. On the five-arc network from the minimum-cost flow lesson, <span class="math" data-say="N">N</span> is four by five and the sweep runs every submatrix of size one, two and three &mdash; 20, then 60, then 40, which is 120 in all &mdash; and reports every determinant in <span class="math" data-say="the set 0, plus or minus 1">{0, ±1}</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Why the corners are integers</h2></div><p>Every square submatrix of a node–arc incidence matrix has determinant 0, +1 or −1 — and an odd cycle does not</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Every square submatrix, and what its determinant costs</strong><span>det B = &plusmn;1 makes B&#8315;&#185;b whole; det B = 2 makes it halves</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>a determinant in {0, +1, −1}</span><span class="tone-red"><i class="legend-swatch"></i>a determinant outside it</span><span class="tone-purple"><i class="legend-swatch"></i>the rows and columns you picked</span></div>
@@ -1432,10 +1449,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tuSweep"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tuCorner"></table></div>
       <div class="status-banner" id="tuStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Pick rows and columns, or sweep every submatrix at once</h3>
-          <p>Type a network, choose whether to build the directed matrix or the undirected one, and take the determinant of any submatrix you like &mdash; or let the sweep do every submatrix up to size three and report the failures by name. The odd cycle's failure comes with the half-integral corner it produces, solved exactly.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Pick rows and columns, or sweep every submatrix at once</h3>
+            <p>Type a network, choose whether to build the directed matrix or the undirected one, and take the determinant of any submatrix you like &mdash; or let the sweep do every submatrix up to size three and report the failures by name. The odd cycle's failure comes with the half-integral corner it produces, solved exactly.</p>
         <div class="field">
           <label for="tuCase">Worked example</label>
           <select id="tuCase"><option value="network" selected>a network, +1 at the tail and −1 at the head</option><option value="triangle">a triangle, +1 at both ends</option><option value="square">a four-cycle, +1 at both ends</option></select>
@@ -1469,12 +1486,41 @@
           <div class="kpi"><span>Denominator of the corner</span><strong id="tuDenom">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="tuHint" style="margin:0;">The sweep is exhaustive up to the order the slider sets, and stops at three because the count grows as the product of two binomial coefficients &mdash; eight nodes and twelve arcs give 12&nbsp;320 determinants at order three and 34&nbsp;650 at order four. Above three, pick the rows and columns yourself and the lab says which it did.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="N for, s is greater than A, s is greater than b, A is greater than b, A is greater than t, b is greater than t. a table, shown on the page. rows 1, 2, 3 and columns 1, 3, 4, the determinant of, 1. rows 1, 2, and columns 1, 2, the determinant of, 1. rows 1, 2, 3 and columns 1, 2, 3, the determinant of, 0. the whole matrix is singular, every column holds one plus 1 and one negative 1. so the four rows sum to the zero row. sweep to size 3, 20 plus 60 plus 40 equals 120 submatrices, 0 failures" tabindex="0" role="region" aria-label="Mathematical notation">N for  s&gt;a  s&gt;b  a&gt;b  a&gt;t  b&gt;t
+
+   s      1    1    0    0    0
+   a     -1    0    1    1    0
+   b      0   -1   -1    0    1
+   t      0    0    0   -1   -1
+
+   rows 1,2,3 and columns 1,3,4      det  1
+   rows 1,2   and columns 1,2        det  1
+   rows 1,2,3 and columns 1,2,3      det  0
+
+   the whole matrix is singular: every column holds one +1 and one -1,
+   so the four rows sum to the zero row
+
+   sweep to size 3:   20 + 60 + 40 = 120 submatrices,  0 failures</div><h3>The same drawing, undirected, and the corner that is halves</h3><p>Now take the triangle on three vertices and build the <strong>undirected</strong> incidence matrix instead: <span class="math" data-say="plus 1">+1</span> at both ends of each edge rather than <span class="math" data-say="plus 1">+1</span> and <span class="math" data-say="negative 1">−1</span>. Nothing about the picture has changed. The matrix is three by three, and its determinant is 2.</p><div class="mathblock" data-say="undirected incidence of the triangle, directed, same drawing. a table, shown on the page. det equals 2, sweep, unimodular. exactly one submatrix out of 19 fails, and it is the whole matrix. max x 1 plus x 2 plus x 3, subject to that matrix times x is at most 1, x is at least 0. corner, x equals 1 over 2, 1 over 2, 1 over 2, value 3 over 2. no integer point reaches 3 over 2, the best whole answer is 1" tabindex="0" role="region" aria-label="Mathematical notation">undirected incidence of the triangle      directed, same drawing
+
+      1 0 1                                   1  0 -1
+      1 1 0                                  -1  1  0
+      0 1 1                                   0 -1  1
+
+   det = 2                                 sweep: unimodular
+   exactly one submatrix out of 19 fails, and it is the whole matrix
+
+   max x1 + x2 + x3   subject to that matrix times x ≤ 1,  x ≥ 0
+
+      corner   x = (1/2, 1/2, 1/2)      value 3/2
+      no integer point reaches 3/2; the best whole answer is 1</div><div class="example"><span class="label">Example &middot; The halves are real, and exact</span><p>The lab runs the same exact simplex on the same kind of programme and returns <span class="math" data-say="1 over 2">1/2</span> three times, printed as a fraction. There is no rounding anywhere and nothing has gone wrong: <span class="math" data-say="1 over 2, 1 over 2, 1 over 2">(1/2, 1/2, 1/2)</span> is a genuine corner of that polyhedron, and it is strictly better than any lattice point inside it.</p><p>This is the gap that the whole of Integer Programming is about, arriving here as a two-line consequence of one determinant. It is also the reason this course can be solved by the simplex method and that one cannot.</p></div><div class="example"><span class="label">Example &middot; An even cycle keeps its whole corners</span><p>Do the same on the four-cycle. The undirected incidence matrix has determinant <span class="math" data-say="0">0</span>, the sweep finds nothing outside <span class="math" data-say="the set 0, plus or minus 1">{0, ±1}</span>, and the packing programme's corner is <span class="math" data-say="1, 0, 1, 0">(1, 0, 1, 0)</span> worth 2 &mdash; whole.</p><p>So it is not undirectedness as such that breaks integrality; it is the odd cycle. An even cycle is bipartite, and bipartite graphs are where the undirected incidence matrix stays totally unimodular. That observation is what makes the assignment problem behave, and it comes back on the matching lesson.</p></div><p>Two warnings about the direction of the theorem. It says total unimodularity is <em>sufficient</em> for integer corners, not necessary: plenty of programmes have integral polyhedra for other reasons. And it says nothing whatever about a programme whose matrix is not totally unimodular &mdash; such a programme may still happen to have a whole optimum on some instance, and that is luck rather than structure.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding whether a programme&#x27;s corners have to be whole</h2></div><p>Build the matrix, check the condition, and then say which of the two conclusions you are entitled to.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the constraint matrix out, not the drawing</h3><p>Total unimodularity is a property of a matrix. Two different matrices can describe the same picture &mdash; the directed and undirected incidence matrices of the triangle are the standard example &mdash; and one of them is totally unimodular and the other is not.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Check the entries first, because it is free</h3><p>Every entry must already be <span class="math" data-say="0">0</span>, <span class="math" data-say="plus 1">+1</span> or <span class="math" data-say="negative 1">−1</span>, since each is a one-by-one submatrix. An entry of 2 anywhere settles the question immediately and you have spent no effort.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Sweep the small submatrices, and name any failure</h3><p>Every two-by-two, then every three-by-three. A failure is not a verdict of &ldquo;probably not&rdquo;: it is a specific submatrix with a specific determinant, and quoting it is the difference between a check and an impression.</p></article><article class="card concept-card"><div class="icon">4</div><h3>If it passes, state the conclusion with its hypothesis attached</h3><p>Integer right-hand side gives integer corners. On fractional supplies you get fractional corners from a totally unimodular matrix too, and the theorem never claimed otherwise.</p></article><article class="card concept-card"><div class="icon">5</div><h3>If it fails, look for the fractional corner rather than assuming one</h3><p>Failure removes the guarantee; it does not prove a fractional optimum exists. The odd cycle really does produce one, and finding it is what turns the failed check into something you have learned.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Deciding whether a programme&#x27;s corners have to be whole</h2>
+      <p class="lead-in">Build the matrix, check the condition, and then say which of the two conclusions you are entitled to.</p>
+      <ol class="key-ideas method"><li><strong>Write the constraint matrix out, not the drawing.</strong> Total unimodularity is a property of a matrix. Two different matrices can describe the same picture &mdash; the directed and undirected incidence matrices of the triangle are the standard example &mdash; and one of them is totally unimodular and the other is not.</li><li><strong>Check the entries first, because it is free.</strong> Every entry must already be <span class="math" data-say="0">0</span>, <span class="math" data-say="plus 1">+1</span> or <span class="math" data-say="negative 1">−1</span>, since each is a one-by-one submatrix. An entry of 2 anywhere settles the question immediately and you have spent no effort.</li><li><strong>Sweep the small submatrices, and name any failure.</strong> Every two-by-two, then every three-by-three. A failure is not a verdict of &ldquo;probably not&rdquo;: it is a specific submatrix with a specific determinant, and quoting it is the difference between a check and an impression.</li><li><strong>If it passes, state the conclusion with its hypothesis attached.</strong> Integer right-hand side gives integer corners. On fractional supplies you get fractional corners from a totally unimodular matrix too, and the theorem never claimed otherwise.</li><li><strong>If it fails, look for the fractional corner rather than assuming one.</strong> Failure removes the guarantee; it does not prove a fractional optimum exists. The odd cycle really does produce one, and finding it is what turns the failed check into something you have learned.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1515,17 +1561,16 @@ FOUR-CYCLE  undirected, 1-2-3-4-1
    det = 0,  sweep clean,  corner x = (1, 0, 1, 0)  value 2   whole</div><p>The pair of three-by-three matrices differs in three minus signs and in nothing else, and that is the whole of the difference between a problem the simplex method settles and a problem that needs a search. Worth staring at for a minute.</p><p>For a rehearsal, take the four-arc network from the minimum-cost flow lesson and use the lab's row and column pickers to find a three-by-three submatrix with determinant <span class="math" data-say="negative 1">−1</span>, then one with determinant <span class="math" data-say="0">0</span>. Both exist; predicting which is which before you press the button is the exercise.</p><p>The harder rehearsal: build the undirected incidence matrix of the five-cycle and sweep it. It fails, for the same reason the triangle does, and the half-integral corner is worth <span class="math" data-say="5 over 2">5/2</span> against a best whole answer of 2. Then do the six-cycle and watch the failure disappear.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Checking only the whole matrix&#x27;s determinant</strong><span>&ldquo;Totally&rdquo; is doing the work in the name. The directed incidence matrix of any network has determinant zero, because its rows sum to zero, and it is still totally unimodular; the undirected triangle's determinant is 2 and one failing submatrix is enough to lose everything. The condition is over all square submatrices of all sizes.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Concluding that integrality is a property of the problem</strong><span>It is a property of the matrix you wrote. The same triangle gives a totally unimodular matrix read one way and a matrix with a fractional corner read the other. Change the formulation &mdash; add a side constraint, share a capacity between two commodities &mdash; and the structure can be gone while the picture still looks like a network.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading fractional corners as a numerical problem</strong><span><span class="math" data-say="1 over 2, 1 over 2, 1 over 2">(1/2, 1/2, 1/2)</span> is not a rounding artefact and it will not go away with better arithmetic; it is where the optimum of that programme is. The labs carry exact fractions throughout for this reason, and a half printed as a half is the lesson rather than a display detail.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state the theorem with its hypothesis, run the argument from Cramer&#x27;s rule, and produce the counterexample.</strong><p>You should be able to define total unimodularity over all square submatrices, build both incidence matrices of a small graph, explain where <span class="math" data-say="the determinant of B equals plus or minus 1">det(B) = ±1</span> enters the proof, say why an integer right-hand side is part of the hypothesis, and exhibit the odd cycle's half-integral corner.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This is the result the ordering of the whole path was arranged around, and it is why networks and general whole-number problems belong to different courses: a network is a linear programme whose corners are already lattice points, and Integer Programming exists for the linear programmes whose corners are not. &ldquo;The Assignment Problem&rdquo; takes the sharpest special case of the network side &mdash; every supply and every demand equal to one &mdash; and solves it by a method that never writes a tableau at all.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Checking only the whole matrix&#x27;s determinant</strong><span>&ldquo;Totally&rdquo; is doing the work in the name. The directed incidence matrix of any network has determinant zero, because its rows sum to zero, and it is still totally unimodular; the undirected triangle's determinant is 2 and one failing submatrix is enough to lose everything. The condition is over all square submatrices of all sizes.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Concluding that integrality is a property of the problem</strong><span>It is a property of the matrix you wrote. The same triangle gives a totally unimodular matrix read one way and a matrix with a fractional corner read the other. Change the formulation &mdash; add a side constraint, share a capacity between two commodities &mdash; and the structure can be gone while the picture still looks like a network.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading fractional corners as a numerical problem</strong><span><span class="math" data-say="1 over 2, 1 over 2, 1 over 2">(1/2, 1/2, 1/2)</span> is not a rounding artefact and it will not go away with better arithmetic; it is where the optimum of that programme is. The labs carry exact fractions throughout for this reason, and a half printed as a half is the lesson rather than a display detail.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state the theorem with its hypothesis, run the argument from Cramer&#x27;s rule, and produce the counterexample.</strong><p>You should be able to define total unimodularity over all square submatrices, build both incidence matrices of a small graph, explain where <span class="math" data-say="the determinant of B equals plus or minus 1">det(B) = ±1</span> enters the proof, say why an integer right-hand side is part of the hypothesis, and exhibit the odd cycle's half-integral corner.</p></div></div><div class="note"><strong>Note:</strong> This is the result the ordering of the whole path was arranged around, and it is why networks and general whole-number problems belong to different courses: a network is a linear programme whose corners are already lattice points, and Integer Programming exists for the linear programmes whose corners are not. &ldquo;The Assignment Problem&rdquo; takes the sharpest special case of the network side &mdash; every supply and every demand equal to one &mdash; and solves it by a method that never writes a tableau at all.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Total unimodularity is a condition on every submatrix, not on the matrix</summary><p>It is not enough that the determinant of the whole matrix be <span class="math" data-say="plus or minus 1">±1</span>, and it is not about the entries being <span class="math" data-say="0">0</span> and <span class="math" data-say="plus or minus 1">±1</span> either. Every square submatrix of every size must have determinant in <span class="math" data-say="the set 0, plus 1, negative 1">{0, +1, −1}</span>. On a four-by-five incidence matrix that is 120 submatrices up to size three, and the lab sweeps all of them and reports zero failures.</p></details><details class="recall"><summary>Cramer&#x27;s rule is the whole argument</summary><p>A basic solution solves <span class="math" data-say="B x sub B equals b">B x_B = b</span> for a square non-singular submatrix <span class="math" data-say="B">B</span> of the constraint matrix. Cramer's rule gives each component as a ratio of determinants with <span class="math" data-say="the determinant of B">det B</span> underneath. If the data are whole, the numerator is whole; if <span class="math" data-say="the determinant of B equals plus or minus 1">det B = ±1</span>, the division is exact. The corners are then lattice points, and a linear programme attains its optimum at a corner.</p></details><details class="recall"><summary>Direction is what makes it work</summary><p>The <span class="math" data-say="plus 1">+1</span> and <span class="math" data-say="negative 1">−1</span> in each column are not decoration. Replace them with two <span class="math" data-say="plus 1">+1</span>s &mdash; the undirected incidence matrix &mdash; and the property fails on any cycle of odd length: the triangle's determinant is 2. The lab then solves a packing programme on that matrix and returns <span class="math" data-say="x equals 1 over 2, 1 over 2, 1 over 2">x = (1/2, 1/2, 1/2)</span> worth <span class="math" data-say="3 over 2">3/2</span>, which no integer point reaches. Integrality is earned, and this is what earns it.</p></details></div>
+      <h3>Summary</h3>
       <p>Every optimum so far has come out in whole units without anyone asking. The reason is a property of the matrix: every square submatrix of a node-arc incidence matrix has determinant zero, one or minus one, so Cramer's rule divides by one and a basic solution of whole data is whole. Drop the directions and the property fails &mdash; on an odd cycle the determinant is two and the optimal corner is genuinely halves.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Total unimodularity is a condition on every submatrix, not on the matrix.</strong> It is not enough that the determinant of the whole matrix be <span class="math" data-say="plus or minus 1">±1</span>, and it is not about the entries being <span class="math" data-say="0">0</span> and <span class="math" data-say="plus or minus 1">±1</span> either. Every square submatrix of every size must have determinant in <span class="math" data-say="the set 0, plus 1, negative 1">{0, +1, −1}</span>. On a four-by-five incidence matrix that is 120 submatrices up to size three, and the lab sweeps all of them and reports zero failures.</li><li><strong>Cramer&#x27;s rule is the whole argument.</strong> A basic solution solves <span class="math" data-say="B x sub B equals b">B x_B = b</span> for a square non-singular submatrix <span class="math" data-say="B">B</span> of the constraint matrix. Cramer's rule gives each component as a ratio of determinants with <span class="math" data-say="the determinant of B">det B</span> underneath. If the data are whole, the numerator is whole; if <span class="math" data-say="the determinant of B equals plus or minus 1">det B = ±1</span>, the division is exact. The corners are then lattice points, and a linear programme attains its optimum at a corner.</li><li><strong>Direction is what makes it work.</strong> The <span class="math" data-say="plus 1">+1</span> and <span class="math" data-say="negative 1">−1</span> in each column are not decoration. Replace them with two <span class="math" data-say="plus 1">+1</span>s &mdash; the undirected incidence matrix &mdash; and the property fails on any cycle of odd length: the triangle's determinant is 2. The lab then solves a packing programme on that matrix and returns <span class="math" data-say="x equals 1 over 2, 1 over 2, 1 over 2">x = (1/2, 1/2, 1/2)</span> worth <span class="math" data-say="3 over 2">3/2</span>, which no integer point reaches. Integrality is earned, and this is what earns it.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="totally unimodular, EVERY square submatrix has determinant 0, plus 1 or negative 1. a node-A r c incidence matrix is totally unimodular, its own determinant is 0. basic solution, x sub B equals B inverse b equals A d j of B b over the determinant of B, and the determinant of B equals plus or minus 1. so integer b and TU A, implies, every basic feasible solution is an integer point. undirected incidence of an ODD cycle, determinant 2, and the corner is halves. an even cycle is bipartite, its determinant is 0 and its corners stay whole" tabindex="0" role="region" aria-label="Mathematical notation">totally unimodular: EVERY square submatrix has determinant 0, +1 or −1
 a node-arc incidence matrix is totally unimodular; its own determinant is 0
 basic solution   x_B = B⁻¹ b = adj(B) b / det(B),   and det(B) = ±1
@@ -3787,11 +3832,42 @@ an even cycle is bipartite; its determinant is 0 and its corners stay whole</div
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3859,7 +3935,7 @@ an even cycle is bipartite; its determinant is 0 and its corners stay whole</div
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

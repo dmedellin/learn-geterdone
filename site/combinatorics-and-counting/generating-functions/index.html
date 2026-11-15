@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Combinatorics and Counting</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Technique</p>
       <h1>Generating Functions</h1>
       <p class="lesson-lede">Encode a sequence as coefficients and let algebra do the counting.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Coefficients are the answers</li><li>Multiplication is combination</li><li>The series is formal</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Generating functions</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Ordinary generating function</span><p>For a sequence <span class="math" data-say="A sub 0, A sub 1, A sub 2, and so on">a₀, a₁, a₂, …</span>, its <strong>generating function</strong> is the formal power series <span class="math" data-say="G of x equals the sum over k is at least 0 of A sub k x to the power k">G(x) = Σ_{k≥0} a_k x^k</span>. Two series are equal exactly when all their coefficients agree.</p></div><div class="mathblock" data-say="1 over the quantity 1 minus x, equals 1 plus x plus x squared plus x cubed plus and so on, all a sub k equals 1. 1 over the quantity 1 minus x, squared, equals 1 plus 2 x plus 3 x squared plus 4 x cubed plus and so on, a sub k equals k plus 1. 1 over the quantity 1 minus A x, equals 1 plus A x plus A squared x squared plus and so on, a sub k equals A to the power k. the quantity 1 plus x, to the power n, equals the sum over k of n choose k x to the power k, binomial. 1 over the quantity 1 minus x, to the power n, equals the sum over k of n plus k minus 1 choose k x to the power k, stars and bars factorial. the quantity 1 minus x to the power m plus 1, over the quantity 1 minus x, equals 1 plus x, and so on, plus x to the power m, at most m copies" tabindex="0" role="region" aria-label="Mathematical notation">1/(1 − x)      = 1 + x + x² + x³ + …          all a_k = 1
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Generating functions</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Ordinary generating function</span><p>For a sequence <span class="math" data-say="A sub 0, A sub 1, A sub 2, and so on">a₀, a₁, a₂, …</span>, its <strong>generating function</strong> is the formal power series <span class="math" data-say="G of x equals the sum over k is at least 0 of A sub k x to the power k">G(x) = Σ_{k≥0} a_k x^k</span>. Two series are equal exactly when all their coefficients agree.</p></div><div class="mathblock" data-say="1 over the quantity 1 minus x, equals 1 plus x plus x squared plus x cubed plus and so on, all a sub k equals 1. 1 over the quantity 1 minus x, squared, equals 1 plus 2 x plus 3 x squared plus 4 x cubed plus and so on, a sub k equals k plus 1. 1 over the quantity 1 minus A x, equals 1 plus A x plus A squared x squared plus and so on, a sub k equals A to the power k. the quantity 1 plus x, to the power n, equals the sum over k of n choose k x to the power k, binomial. 1 over the quantity 1 minus x, to the power n, equals the sum over k of n plus k minus 1 choose k x to the power k, stars and bars factorial. the quantity 1 minus x to the power m plus 1, over the quantity 1 minus x, equals 1 plus x, and so on, plus x to the power m, at most m copies" tabindex="0" role="region" aria-label="Mathematical notation">1/(1 − x)      = 1 + x + x² + x³ + …          all a_k = 1
 1/(1 − x)²     = 1 + 2x + 3x² + 4x³ + …       a_k = k+1
 1/(1 − ax)     = 1 + ax + a²x² + …            a_k = aᵏ
 (1 + x)ⁿ       = Σ_k C(n,k) xᵏ                binomial
 1/(1 − x)ⁿ     = Σ_k C(n+k−1, k) xᵏ           stars and bars!
-(1 − xᵐ⁺¹)/(1 − x) = 1 + x + … + xᵐ           at most m copies</div><p>The fifth line is “Combinations with Repetition” in a different notation, and that is the point of the method: <span class="math" data-say="1 over the quantity 1 minus x, to the power n">1/(1−x)ⁿ</span> encodes "choose any number from each of <span class="math" data-say="n">n</span> types", and its coefficients are exactly the stars-and-bars counts.</p><h3>Why multiplication combines choices</h3><p>If <span class="math" data-say="A of x">A(x)</span> counts the ways to pick items from source 1 and <span class="math" data-say="B of x">B(x)</span> from source 2, then the coefficient of <span class="math" data-say="x to the power k">xᵏ</span> in <span class="math" data-say="A of x B of x">A(x)B(x)</span> is <span class="math" data-say="the sum over j of a sub j b sub k minus j">Σ_j a_j b_{k−j}</span> &mdash; take <span class="math" data-say="j">j</span> items from the first source and <span class="math" data-say="k minus j">k − j</span> from the second, over all splits. That is precisely the product rule combined with the sum rule.</p><div class="example"><span class="label">Example &middot; Coins</span><p>In how many ways can <span class="math" data-say="n">n</span> cents be made from pennies, nickels and dimes? Each denomination contributes a factor: <span class="math" data-say="1 over the quantity 1 minus x">1/(1−x)</span> for pennies, <span class="math" data-say="1 over the quantity 1 minus x to the power 5">1/(1−x⁵)</span> for nickels, <span class="math" data-say="1 over the quantity 1 minus x to the power 10">1/(1−x¹⁰)</span> for dimes. The answer is the coefficient of <span class="math" data-say="x to the power n">xⁿ</span> in the product. For <span class="math" data-say="n equals 25">n = 25</span> it is 12.</p></div><div class="example"><span class="label">Example &middot; A restricted selection</span><p>How many ways to choose 10 items from 4 types with at most 3 of each? Each type contributes <span class="math" data-say="1 plus x plus x squared plus x cubed">1 + x + x² + x³</span>, so the answer is <span class="math" data-say="x to the power 10 the quantity 1 plus x plus x squared plus x cubed, to the power 4">[x¹⁰](1 + x + x² + x³)⁴</span>. Expanding gives 10. Check it another way: a selection is short of the maximum <span class="math" data-say="12">12</span> by <span class="math" data-say="2">2</span>, spread over four types, and “Combinations with Repetition” counts those spreads as <span class="math" data-say="5 choose 2 equals 10">C(5, 2) = 10</span>. Inclusion and exclusion would also work; the generating function encodes the constraint directly.</p></div><h3>Solving a recurrence</h3><p>Generating functions solve recurrences by turning them into equations. For <span class="math" data-say="A sub n equals 3 a sub n minus 1">aₙ = 3aₙ₋₁</span> with <span class="math" data-say="A sub 0 equals 1">a₀ = 1</span>, write <span class="math" data-say="G of x equals the sum of a sub n x to the power n">G(x) = Σ aₙxⁿ</span>. Multiplying the recurrence by <span class="math" data-say="x to the power n">xⁿ</span> and summing gives <span class="math" data-say="G of x minus 1 equals 3 x G of x">G(x) − 1 = 3xG(x)</span>, so <span class="math" data-say="G of x equals 1 over the quantity 1 minus 3 x">G(x) = 1/(1 − 3x)</span>, whose coefficients are <span class="math" data-say="3 to the power n">3ⁿ</span>.</p><p>The same method handles Fibonacci: <span class="math" data-say="G of x equals x over the quantity 1 minus x minus x squared">G(x) = x/(1 − x − x²)</span>, and a partial-fraction decomposition recovers Binet's formula from “Solving Linear Recurrences” in Induction and Recursion. The method is more general than characteristic roots, and it extends to recurrences those cannot touch.</p><div class="thm"><span class="label">Theorem &middot; Formal manipulation is legitimate</span><p>Addition, multiplication and (when <span class="math" data-say="A sub 0 is not equal to 0">a₀ ≠ 0</span>) inversion of formal power series are well defined coefficient by coefficient, with no convergence question, because each coefficient of a product depends on finitely many coefficients of the factors.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The four counting rules</h2></div><p>Enumerated while enumeration is possible</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+(1 − xᵐ⁺¹)/(1 − x) = 1 + x + … + xᵐ           at most m copies</div><p>The fifth line is “Combinations with Repetition” in a different notation, and that is the point of the method: <span class="math" data-say="1 over the quantity 1 minus x, to the power n">1/(1−x)ⁿ</span> encodes "choose any number from each of <span class="math" data-say="n">n</span> types", and its coefficients are exactly the stars-and-bars counts.</p><h3>Why multiplication combines choices</h3><p>If <span class="math" data-say="A of x">A(x)</span> counts the ways to pick items from source 1 and <span class="math" data-say="B of x">B(x)</span> from source 2, then the coefficient of <span class="math" data-say="x to the power k">xᵏ</span> in <span class="math" data-say="A of x B of x">A(x)B(x)</span> is <span class="math" data-say="the sum over j of a sub j b sub k minus j">Σ_j a_j b_{k−j}</span> &mdash; take <span class="math" data-say="j">j</span> items from the first source and <span class="math" data-say="k minus j">k − j</span> from the second, over all splits. That is precisely the product rule combined with the sum rule.</p><div class="example"><span class="label">Example &middot; Coins</span><p>In how many ways can <span class="math" data-say="n">n</span> cents be made from pennies, nickels and dimes? Each denomination contributes a factor: <span class="math" data-say="1 over the quantity 1 minus x">1/(1−x)</span> for pennies, <span class="math" data-say="1 over the quantity 1 minus x to the power 5">1/(1−x⁵)</span> for nickels, <span class="math" data-say="1 over the quantity 1 minus x to the power 10">1/(1−x¹⁰)</span> for dimes. The answer is the coefficient of <span class="math" data-say="x to the power n">xⁿ</span> in the product. For <span class="math" data-say="n equals 25">n = 25</span> it is 12.</p></div><div class="example"><span class="label">Example &middot; A restricted selection</span><p>How many ways to choose 10 items from 4 types with at most 3 of each? Each type contributes <span class="math" data-say="1 plus x plus x squared plus x cubed">1 + x + x² + x³</span>, so the answer is <span class="math" data-say="x to the power 10 the quantity 1 plus x plus x squared plus x cubed, to the power 4">[x¹⁰](1 + x + x² + x³)⁴</span>. Expanding gives 10. Check it another way: a selection is short of the maximum <span class="math" data-say="12">12</span> by <span class="math" data-say="2">2</span>, spread over four types, and “Combinations with Repetition” counts those spreads as <span class="math" data-say="5 choose 2 equals 10">C(5, 2) = 10</span>. Inclusion and exclusion would also work; the generating function encodes the constraint directly.</p></div><h3>Solving a recurrence</h3><p>Generating functions solve recurrences by turning them into equations. For <span class="math" data-say="A sub n equals 3 a sub n minus 1">aₙ = 3aₙ₋₁</span> with <span class="math" data-say="A sub 0 equals 1">a₀ = 1</span>, write <span class="math" data-say="G of x equals the sum of a sub n x to the power n">G(x) = Σ aₙxⁿ</span>. Multiplying the recurrence by <span class="math" data-say="x to the power n">xⁿ</span> and summing gives <span class="math" data-say="G of x minus 1 equals 3 x G of x">G(x) − 1 = 3xG(x)</span>, so <span class="math" data-say="G of x equals 1 over the quantity 1 minus 3 x">G(x) = 1/(1 − 3x)</span>, whose coefficients are <span class="math" data-say="3 to the power n">3ⁿ</span>.</p><p>The same method handles Fibonacci: <span class="math" data-say="G of x equals x over the quantity 1 minus x minus x squared">G(x) = x/(1 − x − x²)</span>, and a partial-fraction decomposition recovers Binet's formula from “Solving Linear Recurrences” in Induction and Recursion. The method is more general than characteristic roots, and it extends to recurrences those cannot touch.</p><div class="thm"><span class="label">Theorem &middot; Formal manipulation is legitimate</span><p>Addition, multiplication and (when <span class="math" data-say="A sub 0 is not equal to 0">a₀ ≠ 0</span>) inversion of formal power series are well defined coefficient by coefficient, with no convergence question, because each coefficient of a product depends on finitely many coefficients of the factors.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The four counting rules</h2></div><p>Enumerated while enumeration is possible</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Choosing r from n</strong><span>Order matters or not; repetition allowed or not</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>selected rule</span></div>
@@ -1410,10 +1453,10 @@
         <div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cntTable"></table></div>
         <div id="cntList" class="small-copy" style="margin-top:10px;"></div>
       </div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The count a generating function encodes</h3>
-          <p>The CR row is <span class="math" data-say="x to the power r 1 over the quantity 1 minus x, to the power n">[xʳ] 1/(1−x)ⁿ</span>: at <span class="math" data-say="n equals 4">n = 4</span>, <span class="math" data-say="r equals 6">r = 6</span> it is <span class="math" data-say="9 choose 6 equals 84">C(9, 6) = 84</span>, and all 84 multisets are listed. Attach the constraint "at most 3 of each" and the factor becomes <span class="math" data-say="1 plus x plus x squared plus x cubed">1 + x + x² + x³</span>; its coefficient of <span class="math" data-say="x to the power 6">x⁶</span> is 44. Count the chips that use some letter four or more times: there are 40 of them, <span class="math" data-say="4 times 5 choose 2">4 · C(5, 2)</span>, and <span class="math" data-say="84 minus 40 equals 44">84 − 40 = 44</span>. The generating function packs every <span class="math" data-say="r">r</span> at once into one expression, which is what makes a constraint like that easy to attach.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The count a generating function encodes</h3>
+            <p>The CR row is <span class="math" data-say="x to the power r 1 over the quantity 1 minus x, to the power n">[xʳ] 1/(1−x)ⁿ</span>: at <span class="math" data-say="n equals 4">n = 4</span>, <span class="math" data-say="r equals 6">r = 6</span> it is <span class="math" data-say="9 choose 6 equals 84">C(9, 6) = 84</span>, and all 84 multisets are listed. Attach the constraint "at most 3 of each" and the factor becomes <span class="math" data-say="1 plus x plus x squared plus x cubed">1 + x + x² + x³</span>; its coefficient of <span class="math" data-say="x to the power 6">x⁶</span> is 44. Count the chips that use some letter four or more times: there are 40 of them, <span class="math" data-say="4 times 5 choose 2">4 · C(5, 2)</span>, and <span class="math" data-say="84 minus 40 equals 44">84 − 40 = 44</span>. The generating function packs every <span class="math" data-say="r">r</span> at once into one expression, which is what makes a constraint like that easy to attach.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="cntN">n (things to choose from)</label><span class="range-value" id="cntNOut">5</span></div>
           <input id="cntN" type="range" min="1" max="24" value="5" />
@@ -1432,12 +1475,14 @@
           </select>
         </div>
         <div class="status-banner" id="cntStatus">Every total is computed in exact integer arithmetic.</div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Using a generating function</h2></div><p>One factor per source of choice.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write a factor for each source</h3><p>Unlimited supply gives <span class="math" data-say="1 over the quantity 1 minus x">1/(1−x)</span>; at most one gives <span class="math" data-say="1 plus x">1 + x</span>; at most <span class="math" data-say="m">m</span> gives <span class="math" data-say="1 plus x, and so on, plus x to the power m">1 + x + ⋯ + x^m</span>; multiples of <span class="math" data-say="d">d</span> only gives <span class="math" data-say="1 over the quantity 1 minus x to the power d">1/(1−x^d)</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Multiply the factors</h3><p>The product's coefficients count the combined selections, by the convolution argument above.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Extract the coefficient you need</h3><p>By expansion, by a known series, or by partial fractions. This is where the algebra lives.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check against a direct count</h3><p>For small <span class="math" data-say="n">n</span> the answer should match an enumeration. A generating function set up wrongly produces a confident wrong series.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Using a generating function</h2>
+      <p class="lead-in">One factor per source of choice.</p>
+      <ol class="key-ideas method"><li><strong>Write a factor for each source.</strong> Unlimited supply gives <span class="math" data-say="1 over the quantity 1 minus x">1/(1−x)</span>; at most one gives <span class="math" data-say="1 plus x">1 + x</span>; at most <span class="math" data-say="m">m</span> gives <span class="math" data-say="1 plus x, and so on, plus x to the power m">1 + x + ⋯ + x^m</span>; multiples of <span class="math" data-say="d">d</span> only gives <span class="math" data-say="1 over the quantity 1 minus x to the power d">1/(1−x^d)</span>.</li><li><strong>Multiply the factors.</strong> The product's coefficients count the combined selections, by the convolution argument above.</li><li><strong>Extract the coefficient you need.</strong> By expansion, by a known series, or by partial fractions. This is where the algebra lives.</li><li><strong>Check against a direct count.</strong> For small <span class="math" data-say="n">n</span> the answer should match an enumeration. A generating function set up wrongly produces a confident wrong series.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1465,17 +1510,16 @@ The generating function ENCODES this split; the case analysis is
 what extracting the coefficient amounts to.</div><p>For 25 cents the case split is quicker than the algebra. The generating function earns its place when the target is symbolic &mdash; it gives the answer for every <span class="math" data-say="n">n</span> at once, and the cases would have to be redone for each.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Worrying about convergence</strong><span>These are formal series. <span class="math" data-say="x">x</span> never takes a value, and each coefficient depends on finitely many others.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using the wrong factor for a constraint</strong><span>"At most <span class="math" data-say="m">m</span>" is a polynomial with <span class="math" data-say="m plus 1">m+1</span> terms; "multiples of <span class="math" data-say="d">d</span>" is <span class="math" data-say="1 over the quantity 1 minus x to the power d">1/(1−x^d)</span>. Getting the factor wrong makes the whole product count something else.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reaching for generating functions on a small problem</strong><span>For one specific <span class="math" data-say="n">n</span>, a case split is usually faster. The method pays when the answer must hold for all <span class="math" data-say="n">n</span>.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can write the generating function for a constrained selection.</strong><p>Write the generating function for making <span class="math" data-say="n">n</span> cents from pennies, nickels and quarters with at most three of each, and extract the coefficient for <span class="math" data-say="n equals 30">n = 30</span>. The factors are where the constraints live.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Exponential generating functions <span class="math" data-say="the sum of a sub n x to the power n over n factorial">Σ aₙxⁿ/n!</span> are the right tool when the objects are labelled and order matters, and they turn the derangement recurrence into a two-line calculation. This lesson stays with the ordinary kind, which suits unlabelled selection problems.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Worrying about convergence</strong><span>These are formal series. <span class="math" data-say="x">x</span> never takes a value, and each coefficient depends on finitely many others.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using the wrong factor for a constraint</strong><span>"At most <span class="math" data-say="m">m</span>" is a polynomial with <span class="math" data-say="m plus 1">m+1</span> terms; "multiples of <span class="math" data-say="d">d</span>" is <span class="math" data-say="1 over the quantity 1 minus x to the power d">1/(1−x^d)</span>. Getting the factor wrong makes the whole product count something else.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reaching for generating functions on a small problem</strong><span>For one specific <span class="math" data-say="n">n</span>, a case split is usually faster. The method pays when the answer must hold for all <span class="math" data-say="n">n</span>.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can write the generating function for a constrained selection.</strong><p>Write the generating function for making <span class="math" data-say="n">n</span> cents from pennies, nickels and quarters with at most three of each, and extract the coefficient for <span class="math" data-say="n equals 30">n = 30</span>. The factors are where the constraints live.</p></div></div><div class="note"><strong>Note:</strong> Exponential generating functions <span class="math" data-say="the sum of a sub n x to the power n over n factorial">Σ aₙxⁿ/n!</span> are the right tool when the objects are labelled and order matters, and they turn the derangement recurrence into a two-line calculation. This lesson stays with the ordinary kind, which suits unlabelled selection problems.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Coefficients are the answers</summary><p><span class="math" data-say="x to the power k G of x">[xᵏ]G(x)</span> &mdash; the coefficient of <span class="math" data-say="x to the power k">xᵏ</span> &mdash; is the count for size <span class="math" data-say="k">k</span>. The whole sequence travels together.</p></details><details class="recall"><summary>Multiplication is combination</summary><p>Multiplying two generating functions convolves their coefficients, which is exactly "choose some from the first source and the rest from the second".</p></details><details class="recall"><summary>The series is formal</summary><p>Convergence is irrelevant. <span class="math" data-say="x">x</span> is a bookkeeping symbol and the series is a way of writing an infinite sequence, not a function to be evaluated.</p></details></div>
+      <h3>Summary</h3>
       <p>A generating function packs a counting sequence into one formal power series. Multiplying series corresponds to combining choices, so a counting problem becomes an algebra problem.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Coefficients are the answers.</strong> <span class="math" data-say="x to the power k G of x">[xᵏ]G(x)</span> &mdash; the coefficient of <span class="math" data-say="x to the power k">xᵏ</span> &mdash; is the count for size <span class="math" data-say="k">k</span>. The whole sequence travels together.</li><li><strong>Multiplication is combination.</strong> Multiplying two generating functions convolves their coefficients, which is exactly "choose some from the first source and the rest from the second".</li><li><strong>The series is formal.</strong> Convergence is irrelevant. <span class="math" data-say="x">x</span> is a bookkeeping symbol and the series is a way of writing an infinite sequence, not a function to be evaluated.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="G of x equals A sub 0 plus A sub 1 x plus A sub 2 x squared plus and so on, the sequence, packed. 1 over the quantity 1 minus x, equals 1 plus x plus x squared plus and so on, any number of one type. the quantity 1 plus x, to the power n, equals the sum of n choose k x to the power k, at most one of each of n types. MULTIPLY series, corresponds to, COMBINE independent choices" tabindex="0" role="region" aria-label="Mathematical notation">G(x) = a₀ + a₁x + a₂x² + …          the sequence, packed
 1/(1−x)   = 1 + x + x² + …          any number of one type
 (1+x)ⁿ    = Σ C(n,k) xᵏ             at most one of each of n types
@@ -1929,11 +1973,42 @@ MULTIPLY series  ⟷  COMBINE independent choices</div><figcaption>A sequence as
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2001,7 +2076,7 @@ MULTIPLY series  ⟷  COMBINE independent choices</div><figcaption>A sequence as
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

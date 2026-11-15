@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,28 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Maintaining Model Integrity</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 14 · Maintaining Model Integrity</p>
       <h1>Transformations</h1>
       <p class="lesson-lede">Move a relationship along the range from separate ways to one context in small steps, each with its process and its tests.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Merging contexts</li><li>Phasing out a legacy system</li><li>Open Host Service to Published Language</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The game plans first, then the count before and after</h2>
-      <article class="prose reading"><p>&ldquo;These transformations are usually much too big to be taken in a single refactoring or possibly even in a single project iteration.&rdquo; That is from the opening of Transformations, the last section of Chapter 14. This lesson reads its four game plans and the chapter's close.</p><p>Decisions about contexts can be revisited and often must be. Breaking a context up is fairly easy, Evans says; merging contexts or changing their relationship is hard. So each game plan is a series of manageable steps, and he presents them as guidelines to adapt, not procedures.</p><p>Merging from Separate Ways to a Shared Kernel comes first, prompted by translation that costs too much or duplication that is too plain. Even if the goal is one context, go through a kernel. Check that each context is unified inside before unifying them with each other. Set up the process before any shared code: how code is shared, how modules are named, at least weekly integration, and a test suite, which, being empty, is easy to pass at first. Choose a small subdomain duplicated in both, generic rather than core, ideally one already translated, so the translation is proven and thins as you go. A group of two to four developers from both teams works out its model in detail, synonyms included, with a basic set of tests; others implement it; each team integrates; translations no longer needed are removed. Then repeat with more.</p><p>For the merge itself there are three approaches: adopt one context's model wholesale, take pieces from each with care not to make a jumble, or find a new model deeper than both. Two cautions follow. Defer merging parts tailored to different users' jargons until a deep model can replace both. And consider the alternative of moving whole subdomains into the favoured context without sharing anything, which removes redundancy with no integration overhead but keeps Separate Ways' trade-offs meanwhile.</p><p>From Shared Kernel to Continuous Integration is a change of people and language as much as of code. Put each team's integration practices in place and make them alike; circulate people between the teams; distil each model, which is Chapter 15's subject; then merge the core domains into the kernel, quickly once begun, since that phase is costly and error-prone, choosing again between one model, a new one, or a deeper one that keeps both specialised powers. Raise the integration frequency to daily and then continuous, until one team, or two sharing one code base, is left.</p><p>Phasing Out a Legacy System takes a common case: an old system in daily use, newer systems talking to it through an Anticorruption Layer. Decide the testing strategy first; some organisations run old and new in parallel. Each iteration, pick functions that one iteration can move, the layer's needed additions, implement and deploy; once running, remove the parts of the layer no longer needed and, where practical, the unused legacy modules. The layer will shrink and swell as you go; other things equal, move first what makes it smaller. Open Host Service to Published Language, the last plan, uses an industry standard if one exists, or else sharpens the host's core domain into an interchange language, publishes it, builds translators and switches over; the language must be stable, so keep it apart from the host's model.</p><p>The chapter ends with a warning. Contexts are sometimes used for a problem they do not solve: a large model that seems too complex to grasp gets cut into pieces, and integration is lost. If a large context meets real integration needs and is feasible apart from its complexity, look first at the next two chapters' tools, distillation and large-scale structure.</p><p>Now the count, on a theatre box office and the membership scheme that went its separate way years ago, with marketing conforming to the box office and translating membership's data through a layer, and finance translating the box office's. The box office changes its model of a sale. On the preset <code>before</code> the lab counts 4 relationships, 1 model that must change, marketing, 1 translator to update, finance's, and 1 context untouched, membership. On <code>after</code>, with the first step of the merger taken and the separate ways made a Shared Kernel, the same change reaches 2 models, membership and marketing, and 2 translators, finance's and marketing's layer for membership, and leaves 0 untouched.</p><pre class="codeblock" data-say="line 1, boxoffice, membership, shared minus kernel. line 2, boxoffice, marketing, conformist. line 3, membership, marketing, acl. line 4, boxoffice, finance, acl" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">boxoffice, membership, shared-kernel;</span>
-<span class="cl">boxoffice, marketing, conformist;</span>
-<span class="cl">membership, marketing, acl;</span>
-<span class="cl">boxoffice, finance, acl;</span></code></pre><p>The merger makes a change reach further, and that is not a defect in it. A kernel is a promise to change together, and Evans's deployment remark says the same: a kernel ties two contexts' releases, where separate ways leave each free. What the count does not show is what the merger bought: the duplicated membership concepts the box office kept, and the translation the two teams no longer need. Each step of the game plan is a choice of which of those to pay.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, tickets, marketing, conformist. line 2, tickets, finance, acl" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">tickets, marketing, conformist;</span>
-<span class="cl">tickets, finance, acl;</span></code></pre><p>Suppose the plan runs to its end: the kernel grows until box office and membership are one context, <span class="math" data-say="tickets">tickets</span>, under Continuous Integration, and marketing's layer for membership is no longer needed. The map is above. When <span class="math" data-say="tickets">tickets</span> changes, find the models that must change and the translators to update, and compare with <code>before</code> and <code>after</code>. Then check it in the lab.</p><p>Chapter 14 ends by pointing past itself, and so does this course. The next course, Distillation, reads Chapter 15: how to find the Core Domain of a large model and give it the attention it deserves.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Context map</h2></div><p>how far one model change reaches across the map</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The game plans first, then the count before and after</h2><div class="prose reading"><p>&ldquo;These transformations are usually much too big to be taken in a single refactoring or possibly even in a single project iteration.&rdquo; That is from the opening of Transformations, the last section of Chapter 14. This lesson reads its four game plans and the chapter's close.</p><p>Decisions about contexts can be revisited and often must be. Breaking a context up is fairly easy, Evans says; merging contexts or changing their relationship is hard. So each game plan is a series of manageable steps, and he presents them as guidelines to adapt, not procedures.</p><p>Merging from Separate Ways to a Shared Kernel comes first, prompted by translation that costs too much or duplication that is too plain. Even if the goal is one context, go through a kernel. Check that each context is unified inside before unifying them with each other. Set up the process before any shared code: how code is shared, how modules are named, at least weekly integration, and a test suite, which, being empty, is easy to pass at first. Choose a small subdomain duplicated in both, generic rather than core, ideally one already translated, so the translation is proven and thins as you go. A group of two to four developers from both teams works out its model in detail, synonyms included, with a basic set of tests; others implement it; each team integrates; translations no longer needed are removed. Then repeat with more.</p><p>For the merge itself there are three approaches: adopt one context's model wholesale, take pieces from each with care not to make a jumble, or find a new model deeper than both. Two cautions follow. Defer merging parts tailored to different users' jargons until a deep model can replace both. And consider the alternative of moving whole subdomains into the favoured context without sharing anything, which removes redundancy with no integration overhead but keeps Separate Ways' trade-offs meanwhile.</p><p>From Shared Kernel to Continuous Integration is a change of people and language as much as of code. Put each team's integration practices in place and make them alike; circulate people between the teams; distil each model, which is Chapter 15's subject; then merge the core domains into the kernel, quickly once begun, since that phase is costly and error-prone, choosing again between one model, a new one, or a deeper one that keeps both specialised powers. Raise the integration frequency to daily and then continuous, until one team, or two sharing one code base, is left.</p><p>Phasing Out a Legacy System takes a common case: an old system in daily use, newer systems talking to it through an Anticorruption Layer. Decide the testing strategy first; some organisations run old and new in parallel. Each iteration, pick functions that one iteration can move, the layer's needed additions, implement and deploy; once running, remove the parts of the layer no longer needed and, where practical, the unused legacy modules. The layer will shrink and swell as you go; other things equal, move first what makes it smaller. Open Host Service to Published Language, the last plan, uses an industry standard if one exists, or else sharpens the host's core domain into an interchange language, publishes it, builds translators and switches over; the language must be stable, so keep it apart from the host's model.</p><p>The chapter ends with a warning. Contexts are sometimes used for a problem they do not solve: a large model that seems too complex to grasp gets cut into pieces, and integration is lost. If a large context meets real integration needs and is feasible apart from its complexity, look first at the next two chapters' tools, distillation and large-scale structure.</p><p>Now the count, on a theatre box office and the membership scheme that went its separate way years ago, with marketing conforming to the box office and translating membership's data through a layer, and finance translating the box office's. The box office changes its model of a sale. On the preset <code>before</code> the lab counts 4 relationships, 1 model that must change, marketing, 1 translator to update, finance's, and 1 context untouched, membership. On <code>after</code>, with the first step of the merger taken and the separate ways made a Shared Kernel, the same change reaches 2 models, membership and marketing, and 2 translators, finance's and marketing's layer for membership, and leaves 0 untouched.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Context map</h2></div><p>how far one model change reaches across the map</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Context map</strong><span>how far one model change reaches across the map</span></div>
       </div>
@@ -1462,10 +1501,10 @@
       <div class="table-wrap" id="dcxTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dcxTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Kinds: shared-kernel, customer-supplier, conformist, acl (anticorruption layer), ohs (open host service), published-language, separate-ways; two contexts have at most one relationship. A model change crosses a shared kernel in both directions and goes down a conformist or a customer-supplier relationship to the downstream model, and it travels on only from a model that changed. It never travels upstream. An acl stops it at the downstream context's translator, and an ohs or published-language relationship at the upstream's protocol: each is a translator to update, the downstream model unchanged (it changes only if another route reaches it). The ohs and published-language relationships of one upstream share its one protocol, counted once; each acl is its own translator. Separate-ways has no effect. Contexts reached are the other models that change and the contexts whose acl is updated; lists go in the order the contexts are given, translators in the order of the relationships.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>One map before and after a transformation</h3>
-          <p>A count over the small model the lesson states. Each relationship is an upstream context, a downstream context and one of the book's kinds. The lab follows a change in one context's model along the edges whose kind carries it: a Shared Kernel both ways, Conformist and Customer/Supplier downstream. An Anticorruption Layer or an Open Host Service stops it at a translator. The map is the lesson's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>One map before and after a transformation</h3>
+            <p>A count over the small model the lesson states. Each relationship is an upstream context, a downstream context and one of the book's kinds. The lab follows a change in one context's model along the edges whose kind carries it: a Shared Kernel both ways, Conformist and Customer/Supplier downstream. An Anticorruption Layer or an Open Host Service stops it at a translator. The map is the lesson's.</p>
         <div class="field">
           <label for="dcxPreset">Worked example</label>
           <select id="dcxPreset"><option value="before" selected>Before: box office and membership go separate ways</option><option value="after">After the first step: a small Shared Kernel</option></select>
@@ -1490,12 +1529,19 @@
           <div class="kpi"><span>Contexts untouched</span><strong id="dcxUntouched">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, boxoffice, membership, shared minus kernel. line 2, boxoffice, marketing, conformist. line 3, membership, marketing, acl. line 4, boxoffice, finance, acl" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">boxoffice, membership, shared-kernel;</span>
+<span class="cl">boxoffice, marketing, conformist;</span>
+<span class="cl">membership, marketing, acl;</span>
+<span class="cl">boxoffice, finance, acl;</span></code></pre><p>The merger makes a change reach further, and that is not a defect in it. A kernel is a promise to change together, and Evans's deployment remark says the same: a kernel ties two contexts' releases, where separate ways leave each free. What the count does not show is what the merger bought: the duplicated membership concepts the box office kept, and the translation the two teams no longer need. Each step of the game plan is a choice of which of those to pay.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, tickets, marketing, conformist. line 2, tickets, finance, acl" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">tickets, marketing, conformist;</span>
+<span class="cl">tickets, finance, acl;</span></code></pre><p>Suppose the plan runs to its end: the kernel grows until box office and membership are one context, <span class="math" data-say="tickets">tickets</span>, under Continuous Integration, and marketing's layer for membership is no longer needed. The map is above. When <span class="math" data-say="tickets">tickets</span> changes, find the models that must change and the translators to update, and compare with <code>before</code> and <code>after</code>. Then check it in the lab.</p><p>Chapter 14 ends by pointing past itself, and so does this course. The next course, Distillation, reads Chapter 15: how to find the Core Domain of a large model and give it the attention it deserves.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Planning a transformation</h2></div><p>Five steps, the last of them on a boundary you would change.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Map the boundary as it is</h3><p>Draw the two contexts and every relationship they have, and check that each is unified inside before joining them.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Set up the process first</h3><p>Decide how code is shared and named, how often the kernel is integrated, and start its test suite before any shared code exists.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Pick the first subdomain</h3><p>Choose something small, duplicated in both, not in the core, and ideally already translated.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count before and after</h3><p>Trace one likely change on the map before the step and after it, and write down what it reaches and which translations the step removes.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on a boundary you would change</h3><p>Pick two services you know that duplicate one concept. Name the first subdomain you would share, the tests it needs, and the translation it would let you delete.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Planning a transformation</h2>
+      <p class="lead-in">Five steps, the last of them on a boundary you would change.</p>
+      <ol class="key-ideas method"><li><strong>Map the boundary as it is.</strong> Draw the two contexts and every relationship they have, and check that each is unified inside before joining them.</li><li><strong>Set up the process first.</strong> Decide how code is shared and named, how often the kernel is integrated, and start its test suite before any shared code exists.</li><li><strong>Pick the first subdomain.</strong> Choose something small, duplicated in both, not in the core, and ideally already translated.</li><li><strong>Count before and after.</strong> Trace one likely change on the map before the step and after it, and write down what it reaches and which translations the step removes.</li><li><strong>Do it on a boundary you would change.</strong> Pick two services you know that duplicate one concept. Name the first subdomain you would share, the tests it needs, and the translation it would let you delete.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1513,17 +1559,16 @@ boxoffice to finance: layer, translator
 models reached: 2, translators: 2</div><p>Before the step, the separate-ways edge carried nothing, so membership and its layer stayed still. The kernel buys shared concepts with shared changes.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Merging two contexts in one step</strong><span>A single sweeping merge looks quicker than a series of small ones. Evans says these transformations are usually too big for one refactoring or one iteration, and even a full merger should pass through a Shared Kernel grown subdomain by subdomain, with its process and tests set up first. On the lesson's illustration the first step alone doubles what a box office change reaches, which is the coordination each step adds.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Starting the kernel with the Core Domain</strong><span>The core matters most, so it seems the place to begin. The first merger establishes the process, and Evans picks something simple, generic and preferably already translated; the core is merged later, once the people and processes are ready.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the Anticorruption Layer to shrink steadily as legacy goes</strong><span>It alternately shrinks and swells as functions move, Evans says, and some awkward translations may have to be tolerated on the way; moving first what makes it smaller is a preference, not a guarantee.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can plan a transformation and count its effect.</strong><p>Given a map and a transformation, list its first steps in Evans's order and state what one change reaches before and after.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab compares one change on two maps. It does not count the duplication or translation a merger removes, the training and circulation of people Evans puts first, or the weeks a step takes, and it cannot say when a transformation is worth beginning.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Merging two contexts in one step</strong><span>A single sweeping merge looks quicker than a series of small ones. Evans says these transformations are usually too big for one refactoring or one iteration, and even a full merger should pass through a Shared Kernel grown subdomain by subdomain, with its process and tests set up first. On the lesson's illustration the first step alone doubles what a box office change reaches, which is the coordination each step adds.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Starting the kernel with the Core Domain</strong><span>The core matters most, so it seems the place to begin. The first merger establishes the process, and Evans picks something simple, generic and preferably already translated; the core is merged later, once the people and processes are ready.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the Anticorruption Layer to shrink steadily as legacy goes</strong><span>It alternately shrinks and swells as functions move, Evans says, and some awkward translations may have to be tolerated on the way; moving first what makes it smaller is a preference, not a guarantee.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can plan a transformation and count its effect.</strong><p>Given a map and a transformation, list its first steps in Evans's order and state what one change reaches before and after.</p></div></div><div class="note"><strong>Note:</strong> The lab compares one change on two maps. It does not count the duplication or translation a merger removes, the training and circulation of people Evans puts first, or the weeks a step takes, and it cannot say when a transformation is worth beginning.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Merging contexts</summary><p>Moving two contexts toward one model, first from Separate Ways to a small Shared Kernel grown subdomain by subdomain, and then, if wanted, from the kernel to one context under Continuous Integration.</p></details><details class="recall"><summary>Phasing out a legacy system</summary><p>Moving the legacy system's functions into the newer systems one iteration at a time, adding to the Anticorruption Layer as needed and removing what is no longer used once each step is running.</p></details><details class="recall"><summary>Open Host Service to Published Language</summary><p>Replacing a growing set of ad hoc protocols with a formal language: an industry standard if one exists, or one based on the host's sharpened core, published to everyone in the collaboration.</p></details></div>
+      <h3>Summary</h3>
       <p>Decisions about contexts are not final. Read Evans's game plans for four hard changes, merging separate contexts into a Shared Kernel, a kernel into one context, phasing out a legacy system, and an Open Host Service into a Published Language; then count what one change reaches on a map before and after a merger.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Merging contexts.</strong> Moving two contexts toward one model, first from Separate Ways to a small Shared Kernel grown subdomain by subdomain, and then, if wanted, from the kernel to one context under Continuous Integration.</li><li><strong>Phasing out a legacy system.</strong> Moving the legacy system's functions into the newer systems one iteration at a time, adding to the Anticorruption Layer as needed and removing what is no longer used once each step is running.</li><li><strong>Open Host Service to Published Language.</strong> Replacing a growing set of ad hoc protocols with a formal language: an industry standard if one exists, or one based on the host's sharpened core, published to everyone in the collaboration.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="splitting is easy, merging is hard. too big for one iteration, plan steps. to merge, go through A shared kernel. start small, generic, already translated. prepare the people before the code. retire legacy one iteration at a time. keep the language apart from the host" tabindex="0" role="region" aria-label="Mathematical notation">splitting is easy; merging is hard
 too big for one iteration: plan steps
 to merge, go through a Shared Kernel
@@ -2302,11 +2347,42 @@ keep the language apart from the host</div><figcaption>Transformations in seven 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2374,7 +2450,7 @@ keep the language apart from the host</div><figcaption>Transformations in seven 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

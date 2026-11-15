@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Duality and Sensitivity Analysis</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; What the tableau knows</p>
       <h1>The Dual Simplex Method</h1>
       <p class="lesson-lede">Restore feasibility while keeping optimality, one dual ratio test at a time, from the tableau you already have.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Optimal and infeasible is a real state, and a useful one</li><li>The two rules swap places</li><li>The value comes down to meet the answer</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Keeping optimality and hunting feasibility</h2>
-      <article class="prose reading"><p>A new constraint has just been added and the plan breaks it. The temptation is to start again, on the reasoning that the old tableau described the old problem. It described the old <em>basis</em>, and that basis is still a basis of the new problem &mdash; just not a feasible one. Restoring feasibility is cheaper than rebuilding, and this is the method that does it.</p><div class="defbox"><span class="label">Definition &middot; The dual simplex method</span><p>Given a tableau whose objective row is non-negative (optimal) but whose right-hand column has a negative entry (infeasible), one <strong>dual pivot</strong> is: choose as the leaving row <span class="math" data-say="r">r</span> the one with the most negative right-hand entry; choose as the entering column the <span class="math" data-say="j">j</span> minimising <span class="math" data-say="the absolute value of z sub j, divided by the absolute value of a sub rj">|zⱼ| ÷ |a_rj|</span> over the columns with <span class="math" data-say="A sub rj is less than 0">a_rj &lt; 0</span>; and pivot on <span class="math" data-say="r, j">(r, j)</span>.</p><p>The <strong>dual simplex method</strong> repeats that until no right-hand entry is negative, at which point the tableau is both feasible and optimal, or until some leaving row has no negative entry at all, at which point the problem is infeasible.</p></div><p>The ratio is worth reading rather than memorising. The entering column has to have a negative entry in row <span class="math" data-say="r">r</span>, because raising that variable must raise a negative right-hand side towards zero. Among those candidates, <span class="math" data-say="the absolute value of z sub j, divided by the absolute value of a sub rj">|zⱼ| ÷ |a_rj|</span> is the amount of objective given up per unit of infeasibility removed, so choosing the smallest is choosing the cheapest way to become legal. That is why the objective-row entries appear in the numerator: this is a cost-per-unit comparison, not an amount.</p><p>And why it is the primal simplex on the dual. A negative right-hand entry in the primal tableau is a violated dual constraint; the row with the most negative entry is the dual's entering variable under the steepest rule; and the ratio test along that row is the dual's own leaving-variable ratio test. Everything happens in the primal tableau, so no second tableau has to be built, which is the practical point.</p><div class="mathblock" data-say="workshop optimum, then the rule x 1 plus x 2 is at most 5 added as row 4. append the row and clear the basic variables out of it. R 4 goes to R 4 minus R 1, removes x 1, R 4 goes to R 4 minus R 3, removes x 2. x 1, x 2, s 1, s 2, s 3, s 4, rhs. a table, shown on the page. optimal z-row, and negative 3 in the right-hand column, exactly the state. PIVOT 1, leave row 4, whose r h s negative 3 is the most negative. ratios along row 4, over its negative entries only. s 2, the absolute value of 3 over 2, divided by the absolute value of negative 1 over 6, equals, 9. s 3, the absolute value of 1, divided by the absolute value of negative 1 over 3, equals, 3, smallest, so s 3 enters. z, 36 to 27. PIVOT 2, row 1 now has r h s negative 1, the most negative. ratios along row 1. s 2, the absolute value of 1, divided by the absolute value of negative 1 over 2, equals, 2, eligible, and smallest. s 4, entry is plus 1, not negative, raising s 4 cannot help. z, 27 to 25. STOP, every right-hand entry is at least 0, z star equals 25 at 0, 5. a fresh solve of the four-row problem gives 25 as well" tabindex="0" role="region" aria-label="Mathematical notation">workshop optimum, then the rule x1 + x2 ≤ 5 added as row 4
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Keeping optimality and hunting feasibility</h2><div class="prose reading"><p>A new constraint has just been added and the plan breaks it. The temptation is to start again, on the reasoning that the old tableau described the old problem. It described the old <em>basis</em>, and that basis is still a basis of the new problem &mdash; just not a feasible one. Restoring feasibility is cheaper than rebuilding, and this is the method that does it.</p><div class="defbox"><span class="label">Definition &middot; The dual simplex method</span><p>Given a tableau whose objective row is non-negative (optimal) but whose right-hand column has a negative entry (infeasible), one <strong>dual pivot</strong> is: choose as the leaving row <span class="math" data-say="r">r</span> the one with the most negative right-hand entry; choose as the entering column the <span class="math" data-say="j">j</span> minimising <span class="math" data-say="the absolute value of z sub j, divided by the absolute value of a sub rj">|zⱼ| ÷ |a_rj|</span> over the columns with <span class="math" data-say="A sub rj is less than 0">a_rj &lt; 0</span>; and pivot on <span class="math" data-say="r, j">(r, j)</span>.</p><p>The <strong>dual simplex method</strong> repeats that until no right-hand entry is negative, at which point the tableau is both feasible and optimal, or until some leaving row has no negative entry at all, at which point the problem is infeasible.</p></div><p>The ratio is worth reading rather than memorising. The entering column has to have a negative entry in row <span class="math" data-say="r">r</span>, because raising that variable must raise a negative right-hand side towards zero. Among those candidates, <span class="math" data-say="the absolute value of z sub j, divided by the absolute value of a sub rj">|zⱼ| ÷ |a_rj|</span> is the amount of objective given up per unit of infeasibility removed, so choosing the smallest is choosing the cheapest way to become legal. That is why the objective-row entries appear in the numerator: this is a cost-per-unit comparison, not an amount.</p><p>And why it is the primal simplex on the dual. A negative right-hand entry in the primal tableau is a violated dual constraint; the row with the most negative entry is the dual's entering variable under the steepest rule; and the ratio test along that row is the dual's own leaving-variable ratio test. Everything happens in the primal tableau, so no second tableau has to be built, which is the practical point.</p><div class="mathblock" data-say="workshop optimum, then the rule x 1 plus x 2 is at most 5 added as row 4. append the row and clear the basic variables out of it. R 4 goes to R 4 minus R 1, removes x 1, R 4 goes to R 4 minus R 3, removes x 2. x 1, x 2, s 1, s 2, s 3, s 4, rhs. a table, shown on the page. optimal z-row, and negative 3 in the right-hand column, exactly the state. PIVOT 1, leave row 4, whose r h s negative 3 is the most negative. ratios along row 4, over its negative entries only. s 2, the absolute value of 3 over 2, divided by the absolute value of negative 1 over 6, equals, 9. s 3, the absolute value of 1, divided by the absolute value of negative 1 over 3, equals, 3, smallest, so s 3 enters. z, 36 to 27. PIVOT 2, row 1 now has r h s negative 1, the most negative. ratios along row 1. s 2, the absolute value of 1, divided by the absolute value of negative 1 over 2, equals, 2, eligible, and smallest. s 4, entry is plus 1, not negative, raising s 4 cannot help. z, 27 to 25. STOP, every right-hand entry is at least 0, z star equals 25 at 0, 5. a fresh solve of the four-row problem gives 25 as well" tabindex="0" role="region" aria-label="Mathematical notation">workshop optimum, then the rule x1 + x2 ≤ 5 added as row 4
 
   append the row and clear the basic variables out of it:
      R4 → R4 − R1   removes x1        R4 → R4 − R3   removes x2
@@ -1420,12 +1464,11 @@ PIVOT 2   row 1 now has rhs −1, the most negative
      z:  27 → 25
 
 STOP      every right-hand entry ≥ 0.  z* = 25 at (0, 5)
-          a fresh solve of the four-row problem gives 25 as well</div><div class="example"><span class="label">Example &middot; A rule the plan already obeys</span><p>Add <span class="math" data-say="x 1 plus x 2 is at most 10">x1 + x2 ≤ 10</span> instead. After the same two row operations the new row's right-hand entry is <span class="math" data-say="plus 1">+1</span> rather than <span class="math" data-say="negative 3">−3</span>, so there is no negative entry anywhere and the method performs zero pivots. The tableau was already feasible and already optimal.</p><p>That is the cheapest possible outcome and it is the common one. The previous lesson's substitution test predicts it without doing even this much work: the plan reads 8 against a limit of 10.</p></div><div class="example"><span class="label">Example &middot; A cut on the three-activity programme</span><p>The plan <span class="math" data-say="2, 6, 0">(2, 6, 0)</span> earns 46 and uses 8 units in total. Add <span class="math" data-say="x 1 plus x 2 plus x 3 is at most 6">x1 + x2 + x3 ≤ 6</span>, which it breaks by 2. After the row operations the new row reads <span class="math" data-say="0, 0, negative 1, 0, negative 1, 0, 1, negative 2">0, 0, −1, 0, −1, 0, 1 | −2</span>, and the ratio test over its two negative entries gives <span class="math" data-say="the absolute value of 4, divided by the absolute value of negative 1, equals 4">|4| ÷ |−1| = 4</span> for <span class="math" data-say="x 3">x3</span> and <span class="math" data-say="the absolute value of 2, divided by the absolute value of negative 1, equals 2">|2| ÷ |−1| = 2</span> for <span class="math" data-say="s 2">s2</span>.</p><p>So <span class="math" data-say="s 2">s2</span> enters, one pivot is enough, and the answer is 42 at <span class="math" data-say="4, 2, 0">(4, 2, 0)</span>. One pivot to re-optimise a programme that a fresh solve would have restarted from an initial basis.</p></div><h3>The two ways it stops</h3><p>It stops successfully when no right-hand entry is negative: the tableau is feasible, the objective row was never allowed to go negative, so the basis is optimal and the number is real. It stops unsuccessfully when the chosen leaving row has no negative entry at all. That row then asserts that a non-negative combination of non-negative variables equals a negative number, which nothing satisfies, and the new problem is infeasible. Adding <span class="math" data-say="x 1 plus x 2 is at least 9">x1 + x2 ≥ 9</span> to the workshop does exactly that: the region's largest total is 8, and the lab reports the rule as unsatisfiable rather than pivoting for ever.</p><p>One habit is worth building here and the lab's hint asks for it directly: before moving the slider, try to say which plan the method will land on. You will usually be wrong, and being wrong on purpose is how the ratio test along the objective row stops being a rule to apply and starts being a reason. On the workshop cut, most readers predict <span class="math" data-say="2, 3">(2, 3)</span> or <span class="math" data-say="4, 1">(4, 1)</span> &mdash; plans that obey the new rule and look like small adjustments &mdash; and the answer is <span class="math" data-say="0, 5">(0, 5)</span>, which abandons the first product altogether.</p><p>This method is also the reason a search tree is affordable. Integer Programming re-solves every branch-and-bound child exactly this way, starting from its parent's final tableau with one bound added, which is one cut and a handful of dual pivots rather than a fresh solve per node. A tree with hundreds of nodes costs what a few dozen solves would, and this lesson is where that becomes believable rather than asserted.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Optimal in one column, infeasible in the other</h2></div><p>the dual ratio test tabulated at every pivot, and the objective moving the other way</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+          a fresh solve of the four-row problem gives 25 as well</div><div class="example"><span class="label">Example &middot; A rule the plan already obeys</span><p>Add <span class="math" data-say="x 1 plus x 2 is at most 10">x1 + x2 ≤ 10</span> instead. After the same two row operations the new row's right-hand entry is <span class="math" data-say="plus 1">+1</span> rather than <span class="math" data-say="negative 3">−3</span>, so there is no negative entry anywhere and the method performs zero pivots. The tableau was already feasible and already optimal.</p><p>That is the cheapest possible outcome and it is the common one. The previous lesson's substitution test predicts it without doing even this much work: the plan reads 8 against a limit of 10.</p></div><div class="example"><span class="label">Example &middot; A cut on the three-activity programme</span><p>The plan <span class="math" data-say="2, 6, 0">(2, 6, 0)</span> earns 46 and uses 8 units in total. Add <span class="math" data-say="x 1 plus x 2 plus x 3 is at most 6">x1 + x2 + x3 ≤ 6</span>, which it breaks by 2. After the row operations the new row reads <span class="math" data-say="0, 0, negative 1, 0, negative 1, 0, 1, negative 2">0, 0, −1, 0, −1, 0, 1 | −2</span>, and the ratio test over its two negative entries gives <span class="math" data-say="the absolute value of 4, divided by the absolute value of negative 1, equals 4">|4| ÷ |−1| = 4</span> for <span class="math" data-say="x 3">x3</span> and <span class="math" data-say="the absolute value of 2, divided by the absolute value of negative 1, equals 2">|2| ÷ |−1| = 2</span> for <span class="math" data-say="s 2">s2</span>.</p><p>So <span class="math" data-say="s 2">s2</span> enters, one pivot is enough, and the answer is 42 at <span class="math" data-say="4, 2, 0">(4, 2, 0)</span>. One pivot to re-optimise a programme that a fresh solve would have restarted from an initial basis.</p></div><h3>The two ways it stops</h3><p>It stops successfully when no right-hand entry is negative: the tableau is feasible, the objective row was never allowed to go negative, so the basis is optimal and the number is real. It stops unsuccessfully when the chosen leaving row has no negative entry at all. That row then asserts that a non-negative combination of non-negative variables equals a negative number, which nothing satisfies, and the new problem is infeasible. Adding <span class="math" data-say="x 1 plus x 2 is at least 9">x1 + x2 ≥ 9</span> to the workshop does exactly that: the region's largest total is 8, and the lab reports the rule as unsatisfiable rather than pivoting for ever.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Optimal in one column, infeasible in the other</h2></div><p>the dual ratio test tabulated at every pivot, and the objective moving the other way</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Restoring feasibility without losing optimality</strong><span>the leaving row is a negative right-hand side; the entering column comes from a ratio test along it</span></div>
         <div class="inline-legend"><span class="tone-red"><i class="legend-swatch"></i>the row that is negative</span><span class="tone-cyan"><i class="legend-swatch"></i>the column the ratio test picks</span><span class="tone-amber"><i class="legend-swatch"></i>where the objective has got to</span></div>
@@ -1434,10 +1477,10 @@ STOP      every right-hand entry ≥ 0.  z* = 25 at (0, 5)
 </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dsRatio"></table></div>
       <div class="status-banner" id="dsStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Add a rule that cuts the plan off, then walk back</h3>
-          <p>The slider performs the pivots one at a time. At each one the leaving row is the most negative right-hand side and the entering column is whichever costs least to bring in, measured along that row against the objective row &mdash; and the whole ratio test is tabulated, including the entries that were not eligible and why.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Add a rule that cuts the plan off, then walk back</h3>
+            <p>The slider performs the pivots one at a time. At each one the leaving row is the most negative right-hand side and the entering column is whichever costs least to bring in, measured along that row against the objective row &mdash; and the whole ratio test is tabulated, including the entries that were not eligible and why.</p>
         <div class="field">
           <label for="dsPreset">Worked example</label>
           <select id="dsPreset"><option value="workshop" selected>a rule that cuts the workshop's plan off, and two pivots back</option><option value="three">three activities capped in total</option><option value="harmless">a rule the plan already obeys, so there is nothing to restore</option></select>
@@ -1465,12 +1508,15 @@ STOP      every right-hand entry ≥ 0.  z* = 25 at (0, 5)
           <div class="kpi"><span>The objective here</span><strong id="dsZ">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="dsHint" style="margin:0;">Try to say which plan it will land on before moving the slider. You will usually be wrong, and being wrong on purpose is how the ratio test along the objective row stops being a rule and starts being a reason.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>One habit is worth building here and the lab's hint asks for it directly: before moving the slider, try to say which plan the method will land on. You will usually be wrong, and being wrong on purpose is how the ratio test along the objective row stops being a rule to apply and starts being a reason. On the workshop cut, most readers predict <span class="math" data-say="2, 3">(2, 3)</span> or <span class="math" data-say="4, 1">(4, 1)</span> &mdash; plans that obey the new rule and look like small adjustments &mdash; and the answer is <span class="math" data-say="0, 5">(0, 5)</span>, which abandons the first product altogether.</p><p>This method is also the reason a search tree is affordable. Integer Programming re-solves every branch-and-bound child exactly this way, starting from its parent's final tableau with one bound added, which is one cut and a handful of dual pivots rather than a fresh solve per node. A tree with hundreds of nodes costs what a few dozen solves would, and this lesson is where that becomes believable rather than asserted.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running a dual simplex pivot</h2></div><p>Append, clear, then alternate between the right-hand column and one row. Both rules are simpler than their primal counterparts.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Append the new row and clear the basic variables out of it</h3><p>The new row arrives in terms of the original variables, and the basic variables have to be eliminated from it before it is a tableau row. One row operation per basic variable that appears in it; the lab prints each one with the variable it removed.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Choose the leaving row from the right-hand column</h3><p>The most negative entry. Note that this is a choice about infeasibility and involves the objective not at all &mdash; which is the mirror of the primal method, where the entering column is chosen from the objective row and involves feasibility not at all.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Take the ratio test along that row, over its negative entries only</h3><p><span class="math" data-say="the absolute value of z sub j, divided by the absolute value of a sub rj">|zⱼ| ÷ |a_rj|</span> for each nonbasic column with a negative entry in the row. A positive or zero entry is ineligible, because raising that variable cannot lift a negative right-hand side. The smallest ratio enters; a tie is a choice, as it is in the primal method.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Pivot, and check that the value moved the right way</h3><p>For a maximisation it must fall. If it rises, the ratio test was taken over the wrong entries or the wrong row was chosen. Repeat until no right-hand entry is negative &mdash; or until a leaving row has no negative entry, which means the new problem is infeasible.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running a dual simplex pivot</h2>
+      <p class="lead-in">Append, clear, then alternate between the right-hand column and one row. Both rules are simpler than their primal counterparts.</p>
+      <ol class="key-ideas method"><li><strong>Append the new row and clear the basic variables out of it.</strong> The new row arrives in terms of the original variables, and the basic variables have to be eliminated from it before it is a tableau row. One row operation per basic variable that appears in it; the lab prints each one with the variable it removed.</li><li><strong>Choose the leaving row from the right-hand column.</strong> The most negative entry. Note that this is a choice about infeasibility and involves the objective not at all &mdash; which is the mirror of the primal method, where the entering column is chosen from the objective row and involves feasibility not at all.</li><li><strong>Take the ratio test along that row, over its negative entries only.</strong> <span class="math" data-say="the absolute value of z sub j, divided by the absolute value of a sub rj">|zⱼ| ÷ |a_rj|</span> for each nonbasic column with a negative entry in the row. A positive or zero entry is ineligible, because raising that variable cannot lift a negative right-hand side. The smallest ratio enters; a tie is a choice, as it is in the primal method.</li><li><strong>Pivot, and check that the value moved the right way.</strong> For a maximisation it must fall. If it rises, the ratio test was taken over the wrong entries or the wrong row was chosen. Repeat until no right-hand entry is negative &mdash; or until a leaving row has no negative entry, which means the new problem is infeasible.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1520,17 +1566,16 @@ check       solve the four-row problem from scratch:  25.   Same.
             and 25 ≤ 36, because a rule can only ever cost</div><p>The two pivots cost what two pivots cost, and the fresh solve they replace would have started from an initial basis and worked up. On a two-variable programme that difference is a curiosity. On a branch-and-bound tree with one added bound per node it is the difference between a tractable search and an impossible one.</p><p>The ineligible entry at pivot 2 is worth pausing on. <span class="math" data-say="s 4">s4</span> has a <span class="math" data-say="plus 1">+1</span> in row 1, and raising <span class="math" data-say="s 4">s4</span> would make that row's right-hand side more negative rather than less. The ratio test's restriction to negative entries is that observation, and it is the half of the rule most often dropped.</p><p>For a faded rehearsal, cut the three-activity programme with <span class="math" data-say="x 1 plus x 2 plus x 3 is at most 6">x1 + x2 + x3 ≤ 6</span>. The supplied move is that the plan reads 8 there, so the new row's right-hand entry after clearing is <span class="math" data-say="negative 2">−2</span>. Find the ratio test's two candidates, say which enters, predict the plan it lands on, and only then check &mdash; the prediction is the exercise.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Starting again because the problem has changed</strong><span>The old tableau described the old basis, and that basis is still a basis of the new problem &mdash; the columns did not move and the objective row is still non-negative. Only feasibility broke, and restoring it is two pivots on the workshop rather than a fresh solve. This is the misconception that makes branch-and-bound look unaffordable, and it is wrong at every node.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the ratio test over every entry of the leaving row</strong><span>Only the negative entries are eligible, because only they move a negative right-hand side upwards. Including a positive entry produces a ratio that looks like the others and a pivot that makes the tableau worse, and the symptom is a reported value that rises instead of falling.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the new plan to be near the old one</strong><span>The workshop's plan <span class="math" data-say="2, 6">(2, 6)</span> becomes <span class="math" data-say="0, 5">(0, 5)</span> under the rule <span class="math" data-say="x 1 plus x 2 is at most 5">x1 + x2 ≤ 5</span>: the first product is dropped entirely, and plans like <span class="math" data-say="2, 3">(2, 3)</span> that look like small adjustments are not optimal. Predicting the landing point before pivoting is worth doing precisely because the prediction is usually wrong, and the ratio test is the reason it is wrong.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can re-optimise a cut programme from the tableau in hand without reaching for a fresh solve.</strong><p>You should be able to append a row and clear the basic variables out of it, choose the leaving row from the right-hand column, take the ratio test along that row over the negative entries only, state why the value falls at every pivot, and recognise the row with no negative entry as a proof of infeasibility.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Integer Programming re-solves every branch-and-bound child exactly this way, starting from its parent's final tableau with one bound appended. That is why a tree with hundreds of nodes is affordable, and this is the lesson where that stops being an assertion: two pivots to re-optimise a cut programme, against a fresh solve from an initial basis, at every node of the tree.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Starting again because the problem has changed</strong><span>The old tableau described the old basis, and that basis is still a basis of the new problem &mdash; the columns did not move and the objective row is still non-negative. Only feasibility broke, and restoring it is two pivots on the workshop rather than a fresh solve. This is the misconception that makes branch-and-bound look unaffordable, and it is wrong at every node.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the ratio test over every entry of the leaving row</strong><span>Only the negative entries are eligible, because only they move a negative right-hand side upwards. Including a positive entry produces a ratio that looks like the others and a pivot that makes the tableau worse, and the symptom is a reported value that rises instead of falling.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the new plan to be near the old one</strong><span>The workshop's plan <span class="math" data-say="2, 6">(2, 6)</span> becomes <span class="math" data-say="0, 5">(0, 5)</span> under the rule <span class="math" data-say="x 1 plus x 2 is at most 5">x1 + x2 ≤ 5</span>: the first product is dropped entirely, and plans like <span class="math" data-say="2, 3">(2, 3)</span> that look like small adjustments are not optimal. Predicting the landing point before pivoting is worth doing precisely because the prediction is usually wrong, and the ratio test is the reason it is wrong.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can re-optimise a cut programme from the tableau in hand without reaching for a fresh solve.</strong><p>You should be able to append a row and clear the basic variables out of it, choose the leaving row from the right-hand column, take the ratio test along that row over the negative entries only, state why the value falls at every pivot, and recognise the row with no negative entry as a proof of infeasibility.</p></div></div><div class="note"><strong>Note:</strong> Integer Programming re-solves every branch-and-bound child exactly this way, starting from its parent's final tableau with one bound appended. That is why a tree with hundreds of nodes is affordable, and this is the lesson where that stops being an assertion: two pivots to re-optimise a cut programme, against a fresh solve from an initial basis, at every node of the tree.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Optimal and infeasible is a real state, and a useful one</summary><p>The objective row and the right-hand column can be checked independently. The primal simplex keeps the right-hand column non-negative and hunts for a non-negative objective row; the dual simplex keeps the objective row non-negative and hunts for a non-negative right-hand column. Both are walking from a basis to a neighbouring basis; they differ in which property they refuse to give up.</p></details><details class="recall"><summary>The two rules swap places</summary><p>In the primal method the entering column is chosen first, by the objective row, and a ratio test down that column picks the leaving row. Here the leaving row is chosen first, by the right-hand column, and a ratio test along that row picks the entering column. The ratio is <span class="math" data-say="the absolute value of z sub j, divided by the absolute value of a sub rj">|zⱼ| ÷ |a_rj|</span> over the negative entries only, because only a negative entry can lift a negative right-hand side.</p></details><details class="recall"><summary>The value comes down to meet the answer</summary><p>For a maximisation the reported value on an infeasible tableau is an overstatement &mdash; it is what the basis would earn if the plan were legal &mdash; so each pivot lowers it, monotonically, until feasibility is restored and the number is real. On the workshop cut it goes 36, 27, 25. That direction is a check: if the value rises, the ratio test was misapplied.</p></details></div>
+      <h3>Summary</h3>
       <p>A tableau can be optimal in its objective row and infeasible in its right-hand column, which is exactly the state a new constraint or an out-of-range change leaves. The dual simplex method restores feasibility while preserving optimality: the leaving row is a negative right-hand side, and the entering column comes from a ratio test along that row against the objective row. It is the primal simplex run on the dual, seen in the primal tableau, and it is why re-optimisation and branch-and-bound are affordable at all.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Optimal and infeasible is a real state, and a useful one.</strong> The objective row and the right-hand column can be checked independently. The primal simplex keeps the right-hand column non-negative and hunts for a non-negative objective row; the dual simplex keeps the objective row non-negative and hunts for a non-negative right-hand column. Both are walking from a basis to a neighbouring basis; they differ in which property they refuse to give up.</li><li><strong>The two rules swap places.</strong> In the primal method the entering column is chosen first, by the objective row, and a ratio test down that column picks the leaving row. Here the leaving row is chosen first, by the right-hand column, and a ratio test along that row picks the entering column. The ratio is <span class="math" data-say="the absolute value of z sub j, divided by the absolute value of a sub rj">|zⱼ| ÷ |a_rj|</span> over the negative entries only, because only a negative entry can lift a negative right-hand side.</li><li><strong>The value comes down to meet the answer.</strong> For a maximisation the reported value on an infeasible tableau is an overstatement &mdash; it is what the basis would earn if the plan were legal &mdash; so each pivot lowers it, monotonically, until feasibility is restored and the number is real. On the workshop cut it goes 36, 27, 25. That direction is a check: if the value rises, the ratio test was misapplied.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="start, objective row already optimal, right-hand column has a negative entry. leave, the row with the most negative right-hand side. enter, the min over j of the absolute value of z sub j, divided by the absolute value of a sub rj, over the NEGATIVE entries of that row. z falls monotonically for a maximisation, the opposite way from the primal. a table, shown on the page. row 4 at negative 3 goes to s 3 enters 3 beats 9, 36 goes to 27. row 1 at negative 1 goes to s 2 enters 2, 27 goes to 25, at 0, 5" tabindex="0" role="region" aria-label="Mathematical notation">start   objective row already optimal, right-hand column has a negative entry
 leave   the row with the most negative right-hand side
 enter   min over j of |zⱼ| ÷ |a_rj|, over the NEGATIVE entries of that row
@@ -4022,11 +4067,42 @@ workshop + (x1 + x2 ≤ 5):  new row  0  0  0  −1/6  −1/3  1  |  −3
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -4094,7 +4170,7 @@ workshop + (x1 + x2 ≤ 5):  new row  0  0  0  −1/6  −1/3  1  |  −3
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

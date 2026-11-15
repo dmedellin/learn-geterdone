@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,34 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Decision and Rationality</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Puzzles of expected value</p>
       <h1>Pascal&#x27;s Wager</h1>
       <p class="lesson-lede">A cost, a probability and a reward fix the threshold at which wagering wins, and an infinite reward removes the threshold.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The wager as a table</li><li>The threshold</li><li>The infinite reward</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The wager in a table, its tipping point and its limit</h2>
-      <article class="prose reading"><p>Blaise Pascal's wager is an argument that belief in God is the prudent bet. It says nothing about whether God exists. It says that if you are not certain either way, then wagering on God has the larger expected value, because the reward is so great that even a small chance of it outweighs the cost of living as a believer.</p><p>Set it out as a decision table. Let <span class="math" data-say="p">p</span> be your probability that God exists, <span class="math" data-say="c">c</span> the cost of the wager, which stands for everything a life of belief gives up, and <span class="math" data-say="M">M</span> the reward if God exists. Scores are measured from abstaining, which is worth 0.</p><div class="mathblock" data-say="act, God exists, no God. wager, M minus c, negative c. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">act        God exists    no God
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The wager in a table, its tipping point and its limit</h2><div class="prose reading"><p>Blaise Pascal's wager is an argument that belief in God is the prudent bet. It says nothing about whether God exists. It says that if you are not certain either way, then wagering on God has the larger expected value, because the reward is so great that even a small chance of it outweighs the cost of living as a believer.</p><p>Set it out as a decision table. Let <span class="math" data-say="p">p</span> be your probability that God exists, <span class="math" data-say="c">c</span> the cost of the wager, which stands for everything a life of belief gives up, and <span class="math" data-say="M">M</span> the reward if God exists. Scores are measured from abstaining, which is worth 0.</p><div class="mathblock" data-say="act, God exists, no God. wager, M minus c, negative c. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">act        God exists    no God
 wager        M − c        −c
-abstain        0            0</div><p>The expected value of wagering is <span class="math" data-say="p times the quantity M minus c, minus the quantity 1 minus p, times c">p·(M − c) − (1 − p)·c</span>, which simplifies to <span class="math" data-say="p times M minus c">p·M − c</span>. It beats abstaining when this is above zero, that is, when <span class="math" data-say="M">M</span> exceeds <span class="math" data-say="c over p">c / p</span>.</p><div class="thm"><span class="label">Theorem &middot; The wager&#x27;s threshold</span><p>Wagering has higher expected value than abstaining exactly when <span class="math" data-say="M is greater than c over p">M > c / p</span>. At <span class="math" data-say="M equals c over p">M = c / p</span> the two tie, and below it abstaining wins.</p></div><p>Pascal himself denied that the second row was available. You are already embarked, he said; not to wager for God is to wager against, and there is no standing aside. The table survives the point. Read the second act as wagering against, with the same payoff of 0 in each state, and nothing in the arithmetic changes; what changes is that a chooser who takes it can no longer say she has stayed out of the game. That is the argument in its strongest form, and the objections below are aimed at it.</p><p>Take <span class="math" data-say="p equals 1 over 1000">p = 1/1000</span>, <span class="math" data-say="c equals 1">c = 1</span> and <span class="math" data-say="M equals 1000">M = 1000</span>. The threshold is <span class="math" data-say="c over p equals 1000">c / p = 1000</span>, so the wager sits exactly on it: the lab prints a tie, with expected value 0 and the tipping point <span class="math" data-say="p equals 1 over 1000">p = 1/1000</span>. Raise the reward to 1001 and wagering wins, with expected value 1/1000. Lower it to 999 and abstaining wins. One unit either way reverses the advice, so the number to argue about is the reward and not the shape of the argument.</p><p>The first objection is aimed at the premise that the probability is worth counting. A probability of one in a thousand is small, and a reader may be tempted to say that nobody lives by chances like that. The table does not allow it. A chance that small is exactly offset by a reward that large, and that is what an expected value is. Whoever ignores small probabilities must say below which figure they stop counting and why that figure.</p><p>The second objection is the sharper one. Suppose the reward is infinite, as the wager's defender wants, so no finite cost can outweigh it. Then <span class="math" data-say="p times M">p·M</span> is infinite for every <span class="math" data-say="p">p</span> above zero, and the argument no longer needs a probability, only that the probability is not exactly zero. That is also its undoing. Any other god, however improbable, who offers an infinite reward on a different condition has the same argument.</p><div class="example"><span class="label">Example &middot; Two gods</span><p>God A rewards those who wager on A and God B rewards those who wager on B, each with probability 1/1000 and reward 1001, and wagering on the wrong god costs 1 and pays nothing. Wagering on either scores 1/1000. The argument recommends both, and you cannot do both.</p></div><p>The third preset sets this up. The expected values tie between the two wagers and both beat abstaining. With finite rewards the tie is broken by changing a probability or a reward, and the lab shows how much it takes. With infinite rewards there is nothing to break it with, because infinity times any positive probability is the same infinity. The lab cannot take an infinity as input, and the lesson does not pretend that it can.</p><p>Three replies are on offer, and each has a cost. One caps the reward, so that the threshold returns and the argument becomes an ordinary comparison of a probability with a price. One denies that a probability can be assigned to claims like these. One keeps the infinity and accepts that it recommends too much. The lab shows what each does to the table and not which to take.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A decision table under every rule</h2></div><p>the same payoffs, eight ways of choosing, each computed exactly</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+abstain        0            0</div><p>The expected value of wagering is <span class="math" data-say="p times the quantity M minus c, minus the quantity 1 minus p, times c">p·(M − c) − (1 − p)·c</span>, which simplifies to <span class="math" data-say="p times M minus c">p·M − c</span>. It beats abstaining when this is above zero, that is, when <span class="math" data-say="M">M</span> exceeds <span class="math" data-say="c over p">c / p</span>.</p><div class="thm"><span class="label">Theorem &middot; The wager&#x27;s threshold</span><p>Wagering has higher expected value than abstaining exactly when <span class="math" data-say="M is greater than c over p">M > c / p</span>. At <span class="math" data-say="M equals c over p">M = c / p</span> the two tie, and below it abstaining wins.</p></div><p>Pascal himself denied that the second row was available. You are already embarked, he said; not to wager for God is to wager against, and there is no standing aside. The table survives the point. Read the second act as wagering against, with the same payoff of 0 in each state, and nothing in the arithmetic changes; what changes is that a chooser who takes it can no longer say she has stayed out of the game. That is the argument in its strongest form, and the objections below are aimed at it.</p><p>Take <span class="math" data-say="p equals 1 over 1000">p = 1/1000</span>, <span class="math" data-say="c equals 1">c = 1</span> and <span class="math" data-say="M equals 1000">M = 1000</span>. The threshold is <span class="math" data-say="c over p equals 1000">c / p = 1000</span>, so the wager sits exactly on it: the lab prints a tie, with expected value 0 and the tipping point <span class="math" data-say="p equals 1 over 1000">p = 1/1000</span>. Raise the reward to 1001 and wagering wins, with expected value 1/1000. Lower it to 999 and abstaining wins. One unit either way reverses the advice, so the number to argue about is the reward and not the shape of the argument.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A decision table under every rule</h2></div><p>the same payoffs, eight ways of choosing, each computed exactly</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Acts by states</strong><span>a row per act, a column per state; the rule decides</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="deTable"></table></div>
       <div class="status-banner" id="deStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Find the reward at which the wager turns</h3>
-          <p>The first preset sits exactly on the threshold. Change the 999 to 1000 and the wager wins; change it to 998 and abstaining wins. The tipping point tile prints the probability at which the two acts tie for whatever reward is in the box. In the third preset change the probabilities to 2/1000, 1/1000 and 997/1000 and watch the tie break in favour of A.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Find the reward at which the wager turns</h3>
+            <p>The first preset sits exactly on the threshold. Change the 999 to 1000 and the wager wins; change it to 998 and abstaining wins. The tipping point tile prints the probability at which the two acts tie for whatever reward is in the box. In the third preset change the probabilities to 2/1000, 1/1000 and 997/1000 and watch the tie break in favour of A.</p>
         <div class="field">
           <label for="dePreset">Worked example</label>
           <select id="dePreset"><option value="pascal" selected>chance 1/1000, cost 1, reward 1000</option><option value="pascal-wins">the same, with reward 1001</option><option value="many-gods">two gods at 1/1000 each, reward 1001</option></select>
@@ -1448,12 +1491,15 @@ abstain        0            0</div><p>The expected value of wagering is <span cl
           <div class="kpi"><span>Expected utilities tie at</span><strong id="deFlip">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The first objection is aimed at the premise that the probability is worth counting. A probability of one in a thousand is small, and a reader may be tempted to say that nobody lives by chances like that. The table does not allow it. A chance that small is exactly offset by a reward that large, and that is what an expected value is. Whoever ignores small probabilities must say below which figure they stop counting and why that figure.</p><p>The second objection is the sharper one. Suppose the reward is infinite, as the wager's defender wants, so no finite cost can outweigh it. Then <span class="math" data-say="p times M">p·M</span> is infinite for every <span class="math" data-say="p">p</span> above zero, and the argument no longer needs a probability, only that the probability is not exactly zero. That is also its undoing. Any other god, however improbable, who offers an infinite reward on a different condition has the same argument.</p><div class="example"><span class="label">Example &middot; Two gods</span><p>God A rewards those who wager on A and God B rewards those who wager on B, each with probability 1/1000 and reward 1001, and wagering on the wrong god costs 1 and pays nothing. Wagering on either scores 1/1000. The argument recommends both, and you cannot do both.</p></div><p>The third preset sets this up. The expected values tie between the two wagers and both beat abstaining. With finite rewards the tie is broken by changing a probability or a reward, and the lab shows how much it takes. With infinite rewards there is nothing to break it with, because infinity times any positive probability is the same infinity. The lab cannot take an infinity as input, and the lesson does not pretend that it can.</p><p>Three replies are on offer, and each has a cost. One caps the reward, so that the threshold returns and the argument becomes an ordinary comparison of a probability with a price. One denies that a probability can be assigned to claims like these. One keeps the infinity and accepts that it recommends too much. The lab shows what each does to the table and not which to take.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Setting up the wager and finding its threshold</h2></div><p>Five steps, with the cost counted once.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix the baseline</h3><p>Measure every payoff from abstaining, so abstaining scores 0 in every state. What the believer gives up is the cost <span class="math" data-say="c">c</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Fill in the table</h3><p>Wagering pays <span class="math" data-say="M minus c">M − c</span> if God exists and <span class="math" data-say="negative c">−c</span> if not. Write both entries before computing anything.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Score the wager</h3><p>Weight by the probabilities: <span class="math" data-say="p times the quantity M minus c, minus the quantity 1 minus p, times c">p·(M − c) − (1 − p)·c</span>, which reduces to <span class="math" data-say="p times M minus c">p·M − c</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Solve for the threshold</h3><p>Set the score to zero and solve for the reward: <span class="math" data-say="M equals c over p">M = c / p</span>. Above it wagering wins, below it abstaining wins.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Add a rival</h3><p>Give a second state with its own wager. If its expected value matches the first, the argument recommends both and cannot choose.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Setting up the wager and finding its threshold</h2>
+      <p class="lead-in">Five steps, with the cost counted once.</p>
+      <ol class="key-ideas method"><li><strong>Fix the baseline.</strong> Measure every payoff from abstaining, so abstaining scores 0 in every state. What the believer gives up is the cost <span class="math" data-say="c">c</span>.</li><li><strong>Fill in the table.</strong> Wagering pays <span class="math" data-say="M minus c">M − c</span> if God exists and <span class="math" data-say="negative c">−c</span> if not. Write both entries before computing anything.</li><li><strong>Score the wager.</strong> Weight by the probabilities: <span class="math" data-say="p times the quantity M minus c, minus the quantity 1 minus p, times c">p·(M − c) − (1 − p)·c</span>, which reduces to <span class="math" data-say="p times M minus c">p·M − c</span>.</li><li><strong>Solve for the threshold.</strong> Set the score to zero and solve for the reward: <span class="math" data-say="M equals c over p">M = c / p</span>. Above it wagering wins, below it abstaining wins.</li><li><strong>Add a rival.</strong> Give a second state with its own wager. If its expected value matches the first, the argument recommends both and cannot choose.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1470,17 +1516,16 @@ M = 1001:  1/1000·1001 - 1 = 1/1000
 threshold: M = c / p = 1 / (1/1000) = 1000</div><p>At 1000 the wager ties with abstaining, and one more unit tips it. Each factor of ten off the probability moves the threshold by a factor of ten, and a reward that grows without bound passes every threshold.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a tiny probability can be ignored</strong><span>At a chance of one in a thousand and a reward of 1001, wagering scores 1/1000 and beats abstaining. A chance that small is offset exactly by a reward that large. To ignore small probabilities one needs a rule saying how small, and the table then answers to that rule and not to the wager.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the infinite reward as a bigger finite one</strong><span>A finite reward has a threshold <span class="math" data-say="c over p">c / p</span>, and the lab shows the wager flipping at it. An infinite reward has none, because every positive probability reaches it, and the same argument supports every rival wager. The two cases differ in kind and not in size.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the lab&#x27;s verdict as an argument for belief</strong><span>The table scores a wager on a probability that you supply. It says nothing about whether God exists, whether belief can be adopted for a reason like this, or whether the reward and the probability are the right numbers. Those are the premises the argument turns on.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the wager&#x27;s threshold and say what removes it.</strong><p>Given a probability, a cost and a reward, you should be able to set out the table, compute the expected value of wagering, find the reward at which it ties with abstaining, and describe what an infinite reward and a rival god each do to the argument.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Pascal's own text has several arguments and this lesson takes only the decision-theoretic one. The probability and the cost are inputs the reader supplies; the lab does not think any particular value is right, and no value can be derived from the table.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a tiny probability can be ignored</strong><span>At a chance of one in a thousand and a reward of 1001, wagering scores 1/1000 and beats abstaining. A chance that small is offset exactly by a reward that large. To ignore small probabilities one needs a rule saying how small, and the table then answers to that rule and not to the wager.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the infinite reward as a bigger finite one</strong><span>A finite reward has a threshold <span class="math" data-say="c over p">c / p</span>, and the lab shows the wager flipping at it. An infinite reward has none, because every positive probability reaches it, and the same argument supports every rival wager. The two cases differ in kind and not in size.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the lab&#x27;s verdict as an argument for belief</strong><span>The table scores a wager on a probability that you supply. It says nothing about whether God exists, whether belief can be adopted for a reason like this, or whether the reward and the probability are the right numbers. Those are the premises the argument turns on.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the wager&#x27;s threshold and say what removes it.</strong><p>Given a probability, a cost and a reward, you should be able to set out the table, compute the expected value of wagering, find the reward at which it ties with abstaining, and describe what an infinite reward and a rival god each do to the argument.</p></div></div><div class="note"><strong>Note:</strong> Pascal's own text has several arguments and this lesson takes only the decision-theoretic one. The probability and the cost are inputs the reader supplies; the lab does not think any particular value is right, and no value can be derived from the table.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The wager as a table</summary><p>Two acts, wager or abstain, against two states, God exists or not. Wagering costs <span class="math" data-say="c">c</span> in every state and pays a reward <span class="math" data-say="M">M</span> if God exists. Abstaining costs nothing and earns nothing.</p></details><details class="recall"><summary>The threshold</summary><p>Wagering scores <span class="math" data-say="p times M minus c">p·M − c</span>, so it beats abstaining when <span class="math" data-say="M">M</span> exceeds <span class="math" data-say="c over p">c / p</span>. The smaller the probability, the larger the reward has to be, and below the threshold wagering loses.</p></details><details class="recall"><summary>The infinite reward</summary><p>If <span class="math" data-say="M">M</span> is infinite, <span class="math" data-say="p times M">p·M</span> is infinite for any <span class="math" data-say="p">p</span> above zero, however small, and the argument no longer depends on a probability. That is the strongest form, and the one with the worst consequence.</p></details></div>
+      <h3>Summary</h3>
       <p>Pascal argued that one should wager on God's existence, because the reward is large and the cost small. As a decision table the argument turns on a threshold, the reward at which the expected value of wagering reaches zero, and on what an infinite reward does to every act with a positive probability of reaching it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The wager as a table.</strong> Two acts, wager or abstain, against two states, God exists or not. Wagering costs <span class="math" data-say="c">c</span> in every state and pays a reward <span class="math" data-say="M">M</span> if God exists. Abstaining costs nothing and earns nothing.</li><li><strong>The threshold.</strong> Wagering scores <span class="math" data-say="p times M minus c">p·M − c</span>, so it beats abstaining when <span class="math" data-say="M">M</span> exceeds <span class="math" data-say="c over p">c / p</span>. The smaller the probability, the larger the reward has to be, and below the threshold wagering loses.</li><li><strong>The infinite reward.</strong> If <span class="math" data-say="M">M</span> is infinite, <span class="math" data-say="p times M">p·M</span> is infinite for any <span class="math" data-say="p">p</span> above zero, however small, and the argument no longer depends on a probability. That is the strongest form, and the one with the worst consequence.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="wager costs c, God exists with chance p. reward M if God exists. EU of wager equals p times M minus c. EU of abstain equals 0. wagering wins when M is greater than c over p. M infinite, any p above 0 wins. two gods, the argument recommends both" tabindex="0" role="region" aria-label="Mathematical notation">wager costs c; God exists with chance p
 reward M if God exists
 EU(wager) = p·M − c
@@ -2309,11 +2354,42 @@ two gods: the argument recommends both</div><figcaption>A threshold, and what re
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2381,7 +2457,7 @@ two gods: the argument recommends both</div><figcaption>A threshold, and what re
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

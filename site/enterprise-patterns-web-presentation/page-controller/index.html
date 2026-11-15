@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Web Presentation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 14 · Web Presentation Patterns</p>
       <h1>Page Controller</h1>
       <p class="lesson-lede">A Page Controller handles the request for one page or action, and the decisions it makes about which view to show can move to a helper where they are tested without a web server.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>An action</li><li>A helper object</li><li>A decision point</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The section and the pattern, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Things get a lot more messy when you have to make decisions based on the input, such as different display formats for classical and jazz albums.&rdquo; Fowler writes that of server pages in Chapter 4's opening, and you may have seen it happen to a controller of your own: it began by finding one record and showing it, and grew a branch for every case the page had to handle. This lesson reads Input Controller Patterns in Chapter 4 and Page Controller in Chapter 14. Read them in your own copy first.</p><p>Input Controller Patterns is a short section with one argument. The most common design, Fowler says, gives every page on the site its own input controller. In the simplest case that controller is the server page itself, playing view and controller at once; often it is easier to split it out as a separate object that creates the models and picks the view. The match is not quite one controller to one page, though. The more precise thought, he says, is a controller for each action, a button or a link, because a link can lead to different pages depending on some condition.</p><p>Any input controller, the section goes on, does two things: it deals with the HTTP request, and it decides what should happen as a result. It often makes sense to separate them, with a server page handling the request and a helper object deciding. Front Controller, the next lesson, takes that separation further.</p><p>Page Controller, in Chapter 14, is read as a pattern. It starts from the simplest model of the web, one path leading to one file, and gives each logical page of the site its own controller, either a script or a server page. A server page that is also the controller works well as a view and less well as a controller: once there is logic in reading the request or choosing the view, the page fills with awkward scriptlets. Fowler's two ways out are a helper object that the page calls first to handle the logic, and a script that is the controller and forwards to a server page for the view.</p><p>The pattern gives the controller three jobs. It decodes the URL and any form data. It creates and calls the model objects, passing them all the data they need from the request so that the model needs no connection to the request itself. And it decides which view shows the result and forwards the model's information to it. A controller need not be one class; helpers are a good place for code several controllers would otherwise repeat. Fowler also sees no reason to handle every URL the same way: a URL with little logic is best a server page, one with more a script, and teams that insist on one or the other end up, he says, with scriptlet-laden pages or with many trivial pass-through scripts.</p><p>When to use it is set against Front Controller. Page Controller is the more familiar of the two and gives a natural structure, one action to one page or script, and it works particularly well where most of the controller logic is simple; there, Fowler says, a Front Controller adds a lot of overhead. The two mix without much trouble, and a site being moved from one to the other often has both. The pattern's three examples, a servlet controller with a JSP view, a JSP as the handler, and a C# page handler with a code-behind, are worth reading in the book.</p><p>Now the code, written for the lesson. <span class="math" data-say="request">Request</span> and <span class="math" data-say="response">Response</span> stand for a servlet-like API: <span class="math" data-say="req dot param">req.param</span> reads a parameter and <span class="math" data-say="res dot forward">res.forward</span> hands the response to a view with the object it should show. The controller below finds a concert on line 3 and spends lines 4 to 12 choosing one of four views.</p><pre class="codeblock" data-say="line 1, comment, The page controller for one page read input, choose a view.. line 2, void do get of request req, response res throws IO exception. line 3, concert c is set to concerts dot find of req dot param of id. line 4, if c equals null. line 5, res dot forward of missing.jsp, null. line 6, else if c dot is sold out. line 7, res dot forward of waitlist.jsp, c. line 8, else if c dot is seated and c dot has seat map. line 9, res dot forward of seats.jsp, c. line 10, else. line 11, res dot forward of tickets.jsp, c" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The page controller for one page: read input, choose a view.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The section and the pattern, then the count</h2><div class="prose reading"><p>&ldquo;Things get a lot more messy when you have to make decisions based on the input, such as different display formats for classical and jazz albums.&rdquo; Fowler writes that of server pages in Chapter 4's opening, and you may have seen it happen to a controller of your own: it began by finding one record and showing it, and grew a branch for every case the page had to handle. This lesson reads Input Controller Patterns in Chapter 4 and Page Controller in Chapter 14. Read them in your own copy first.</p><p>Input Controller Patterns is a short section with one argument. The most common design, Fowler says, gives every page on the site its own input controller. In the simplest case that controller is the server page itself, playing view and controller at once; often it is easier to split it out as a separate object that creates the models and picks the view. The match is not quite one controller to one page, though. The more precise thought, he says, is a controller for each action, a button or a link, because a link can lead to different pages depending on some condition.</p><p>Any input controller, the section goes on, does two things: it deals with the HTTP request, and it decides what should happen as a result. It often makes sense to separate them, with a server page handling the request and a helper object deciding. Front Controller, the next lesson, takes that separation further.</p><p>Page Controller, in Chapter 14, is read as a pattern. It starts from the simplest model of the web, one path leading to one file, and gives each logical page of the site its own controller, either a script or a server page. A server page that is also the controller works well as a view and less well as a controller: once there is logic in reading the request or choosing the view, the page fills with awkward scriptlets. Fowler's two ways out are a helper object that the page calls first to handle the logic, and a script that is the controller and forwards to a server page for the view.</p><p>The pattern gives the controller three jobs. It decodes the URL and any form data. It creates and calls the model objects, passing them all the data they need from the request so that the model needs no connection to the request itself. And it decides which view shows the result and forwards the model's information to it. A controller need not be one class; helpers are a good place for code several controllers would otherwise repeat. Fowler also sees no reason to handle every URL the same way: a URL with little logic is best a server page, one with more a script, and teams that insist on one or the other end up, he says, with scriptlet-laden pages or with many trivial pass-through scripts.</p><p>When to use it is set against Front Controller. Page Controller is the more familiar of the two and gives a natural structure, one action to one page or script, and it works particularly well where most of the controller logic is simple; there, Fowler says, a Front Controller adds a lot of overhead. The two mix without much trouble, and a site being moved from one to the other often has both. The pattern's three examples, a servlet controller with a JSP view, a JSP as the handler, and a C# page handler with a code-behind, are worth reading in the book.</p><p>Now the code, written for the lesson. <span class="math" data-say="request">Request</span> and <span class="math" data-say="response">Response</span> stand for a servlet-like API: <span class="math" data-say="req dot param">req.param</span> reads a parameter and <span class="math" data-say="res dot forward">res.forward</span> hands the response to a view with the object it should show. The controller below finds a concert on line 3 and spends lines 4 to 12 choosing one of four views.</p><pre class="codeblock" data-say="line 1, comment, The page controller for one page read input, choose a view.. line 2, void do get of request req, response res throws IO exception. line 3, concert c is set to concerts dot find of req dot param of id. line 4, if c equals null. line 5, res dot forward of missing.jsp, null. line 6, else if c dot is sold out. line 7, res dot forward of waitlist.jsp, c. line 8, else if c dot is seated and c dot has seat map. line 9, res dot forward of seats.jsp, c. line 10, else. line 11, res dot forward of tickets.jsp, c" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The page controller for one page: read input, choose a view.</span>
 <span class="cl">void doGet(Request req, Response res) throws IOException {</span>
 <span class="cl">    Concert c = concerts.find(req.param(&quot;id&quot;));</span>
 <span class="cl">    if (c == null) {</span>
@@ -1457,7 +1501,50 @@
 <span class="cl">    } else {</span>
 <span class="cl">        res.forward(&quot;tickets.jsp&quot;, c);</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The lab counts decision points by a stated rule: one, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span> and <span class="math" data-say="case">case</span>, and one for each <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. An <span class="math" data-say="else">else</span> adds nothing; an <span class="math" data-say="else if">else if</span> is an <span class="math" data-say="if">if</span>. On the preset <code>concert-page</code> it prints 5, broken down as <span class="math" data-say="1 plus if 3 plus and 1">1 + if 3 + &amp;&amp; 1</span>. Its other tiles are a band, 0–5, which is McConnell's from Code Complete and not Fowler's (Fowler gives no count); the deepest nesting, 1, counting the blocks inside the routine's own braces; and the first line at that depth, line 5.</p><p>Leave aside the 1 every routine starts with. Of the four decisions, the test <span class="math" data-say="c equals null">c == null</span> on line 4 is about the request: was there such a concert? <span class="math" data-say="is sold out">isSoldOut</span>, <span class="math" data-say="is seated">isSeated</span> and <span class="math" data-say="has seat map">hasSeatMap</span> are questions the concert answers; and using their answers to pick one of four pages is presentation: which view to show. Move that choice to a helper on the presentation side and the controller becomes the listing below.</p><pre class="codeblock" data-say="line 1, comment, The decisions move to a presentation helper the model keeps its. line 2, comment, own predicates, and the controller only forwards.. line 3, void do get of request req, response res throws IO exception. line 4, concert c is set to concerts dot find of req dot param of id. line 5, res dot forward of helper dot view for of c, c" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The decisions move to a presentation helper; the model keeps its</span>
+<span class="cl">}</span></code></pre><p>The lab counts decision points by a stated rule: one, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span> and <span class="math" data-say="case">case</span>, and one for each <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. An <span class="math" data-say="else">else</span> adds nothing; an <span class="math" data-say="else if">else if</span> is an <span class="math" data-say="if">if</span>. On the preset <code>concert-page</code> it prints 5, broken down as <span class="math" data-say="1 plus if 3 plus and 1">1 + if 3 + &amp;&amp; 1</span>. Its other tiles are a band, 0–5, which is McConnell's from Code Complete and not Fowler's (Fowler gives no count); the deepest nesting, 1, counting the blocks inside the routine's own braces; and the first line at that depth, line 5.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The decisions a page controller holds</h3>
+            <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and for each conditional-and or conditional-or operator. The bands beside the count are McConnell's, from Code Complete; Fowler gives no count. The listings are the lesson's.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="concert-page" selected>A page controller choosing among four views</option><option value="concert-page-split">The same controller, with the choice of view in a helper</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
+          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
+          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
+          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
+          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Leave aside the 1 every routine starts with. Of the four decisions, the test <span class="math" data-say="c equals null">c == null</span> on line 4 is about the request: was there such a concert? <span class="math" data-say="is sold out">isSoldOut</span>, <span class="math" data-say="is seated">isSeated</span> and <span class="math" data-say="has seat map">hasSeatMap</span> are questions the concert answers; and using their answers to pick one of four pages is presentation: which view to show. Move that choice to a helper on the presentation side and the controller becomes the listing below.</p><pre class="codeblock" data-say="line 1, comment, The decisions move to a presentation helper the model keeps its. line 2, comment, own predicates, and the controller only forwards.. line 3, void do get of request req, response res throws IO exception. line 4, concert c is set to concerts dot find of req dot param of id. line 5, res dot forward of helper dot view for of c, c" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The decisions move to a presentation helper; the model keeps its</span>
 <span class="cl">// own predicates, and the controller only forwards.</span>
 <span class="cl">void doGet(Request req, Response res) throws IOException {</span>
 <span class="cl">    Concert c = concerts.find(req.param(&quot;id&quot;));</span>
@@ -1478,53 +1565,12 @@
 <span class="cl">        b.setSeats(n);</span>
 <span class="cl">        res.forward(&quot;confirm.jsp&quot;, b);</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>This controller changes the number of seats on a booking. Count its decision points by the lab's rule, with the breakdown. Then sort them: which are about the request, which are rules about a booking that the <span class="math" data-say="booking">Booking</span> class should answer as predicates, and which choose the page. Write the helper method that would choose the page.</p><p>A page controller repeats what every page must do first. The next lesson, Front Controller, reads the pattern that puts those things in one handler.</p></article>
+<span class="cl">}</span></code></pre><p>This controller changes the number of seats on a booking. Count its decision points by the lab's rule, with the breakdown. Then sort them: which are about the request, which are rules about a booking that the <span class="math" data-say="booking">Booking</span> class should answer as predicates, and which choose the page. Write the helper method that would choose the page.</p><p>A page controller repeats what every page must do first. The next lesson, Front Controller, reads the pattern that puts those things in one handler.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The decisions a page controller holds</h3>
-          <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and for each conditional-and or conditional-or operator. The bands beside the count are McConnell's, from Code Complete; Fowler gives no count. The listings are the lesson's.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="concert-page" selected>A page controller choosing among four views</option><option value="concert-page-split">The same controller, with the choice of view in a helper</option></select>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
-          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
-          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
-          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
-          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting a controller&#x27;s decisions</h2></div><p>Four steps, the last of them on a controller of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count by the rule</h3><p>Start at one. Add one for each if, while, for and case, and one for each <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. An <span class="math" data-say="else">else</span> adds nothing.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Sort each decision</h3><p>Mark each test as about the request (is the input there, is it well formed), about the domain (a rule the model should answer) or about the view (which page to show).</p></article><article class="card concept-card"><div class="icon">3</div><h3>Move the view&#x27;s decisions</h3><p>Write a helper method that takes the model object and returns the view's name, and leave the controller one call to it. Give each domain rule to the model as a predicate.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count a controller of your own</h3><p>Take one controller in a system you know and count its decision points by the rule. Write the figure, and mark each decision that is about the domain rather than the request.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting a controller&#x27;s decisions</h2>
+      <p class="lead-in">Four steps, the last of them on a controller of your own.</p>
+      <ol class="key-ideas method"><li><strong>Count by the rule.</strong> Start at one. Add one for each if, while, for and case, and one for each <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. An <span class="math" data-say="else">else</span> adds nothing.</li><li><strong>Sort each decision.</strong> Mark each test as about the request (is the input there, is it well formed), about the domain (a rule the model should answer) or about the view (which page to show).</li><li><strong>Move the view&#x27;s decisions.</strong> Write a helper method that takes the model object and returns the view's name, and leave the controller one call to it. Give each domain rule to the model as a predicate.</li><li><strong>Count a controller of your own.</strong> Take one controller in a system you know and count its decision points by the rule. Write the figure, and mark each decision that is about the domain rather than the request.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1543,17 +1589,16 @@ line 8, and it has a seat map: 5
 line 10, else: adds nothing, still 5</div><p>The breakdown is <span class="math" data-say="1 plus if 3 plus and 1">1 + if 3 + &amp;&amp; 1</span>. Of the four decisions, one is about the request; the other three ask the model's predicates, and using the answers to pick a page is the helper's work, which is why <code>concert-page-split</code> prints 1.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking a page controller to be a page</strong><span>The name suggests one controller for each page, and most of the time that is what you get. Fowler's more precise version is one controller for each action, a button or a link, because one link may lead to two or more pages, chosen by a condition. The concert page's controller is an example: one action, four pages.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking that moving a decision out removes it</strong><span><code>concert-page-split</code> prints 1, and it is tempting to read that as four decisions gone. They are in <span class="math" data-say="concert page helper dot view for">ConcertPageHelper.viewFor</span>, which the lab is not shown. What moved is where they can be tested: a helper takes a concert and returns a page's name, with no request and no web server.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Handling every URL the same way</strong><span>Consistency looks like a virtue, so some teams make every URL a server page or every URL a script. Fowler says the advantage is usually offset by the cost: server pages full of scriptlets, or many trivial scripts that only pass the request through. His advice is a server page where there is little controller logic and a script where there is more.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count and place a controller&#x27;s decisions.</strong><p>Given a page controller, count its decision points by the rule, with the breakdown, and write the helper method that picks the view from the model's predicates.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts the listing it is given; the helper the split controller calls is not in it, so the drop from 5 to 1 is a move and not a saving. The rule and the bands are McConnell's, not Fowler's, and a count does not say whether a controller is too complicated. Sorting the decisions into request, domain and view is the reader's work; the lab cannot tell a domain rule from a page choice.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking a page controller to be a page</strong><span>The name suggests one controller for each page, and most of the time that is what you get. Fowler's more precise version is one controller for each action, a button or a link, because one link may lead to two or more pages, chosen by a condition. The concert page's controller is an example: one action, four pages.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking that moving a decision out removes it</strong><span><code>concert-page-split</code> prints 1, and it is tempting to read that as four decisions gone. They are in <span class="math" data-say="concert page helper dot view for">ConcertPageHelper.viewFor</span>, which the lab is not shown. What moved is where they can be tested: a helper takes a concert and returns a page's name, with no request and no web server.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Handling every URL the same way</strong><span>Consistency looks like a virtue, so some teams make every URL a server page or every URL a script. Fowler says the advantage is usually offset by the cost: server pages full of scriptlets, or many trivial scripts that only pass the request through. His advice is a server page where there is little controller logic and a script where there is more.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count and place a controller&#x27;s decisions.</strong><p>Given a page controller, count its decision points by the rule, with the breakdown, and write the helper method that picks the view from the model's predicates.</p></div></div><div class="note"><strong>Note:</strong> The lab counts the listing it is given; the helper the split controller calls is not in it, so the drop from 5 to 1 is a move and not a saving. The rule and the bands are McConnell's, not Fowler's, and a count does not say whether a controller is too complicated. Sorting the decisions into request, domain and view is the reader's work; the lab cannot tell a domain rule from a page choice.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>An action</summary><p>A button or a link the user can press. Fowler's more precise version of Page Controller has a controller for each action rather than each page, because one link may lead to different pages depending on some condition.</p></details><details class="recall"><summary>A helper object</summary><p>An ordinary class that a page or controller calls to do its logic, so that the page itself holds none. Chapter 14 uses helpers for the controller's decisions here and for the template's in Template View.</p></details><details class="recall"><summary>A decision point</summary><p>A place where the code can go one of two ways. The lab counts them by a stated rule taken from Code Complete: one, plus one for each if, while, for, case and each <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. Fowler gives no count; the rule is a way of seeing where the controller's choices are.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 4's Input Controller Patterns and Chapter 14's Page Controller: one input controller for each page, or more precisely for each action, which decodes the request, asks the model and picks the view. Count the decision points in a page controller, and see where they go when the choice of view moves to a helper and the model keeps only its own predicates.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>An action.</strong> A button or a link the user can press. Fowler's more precise version of Page Controller has a controller for each action rather than each page, because one link may lead to different pages depending on some condition.</li><li><strong>A helper object.</strong> An ordinary class that a page or controller calls to do its logic, so that the page itself holds none. Chapter 14 uses helpers for the controller's decisions here and for the template's in Template View.</li><li><strong>A decision point.</strong> A place where the code can go one of two ways. The lab counts them by a stated rule taken from Code Complete: one, plus one for each if, while, for, case and each <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. Fowler gives no count; the rule is a way of seeing where the controller's choices are.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="one input controller per action. decode, ask the model, pick a view. the model never sees the request. decision points, 1, plus each branch. a helper decides, a page forwards" tabindex="0" role="region" aria-label="Mathematical notation">one input controller per action
 decode, ask the model, pick a view
 the model never sees the request
@@ -2580,11 +2625,42 @@ a helper decides; a page forwards</div><figcaption>Page Controller in five lines
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2652,7 +2728,7 @@ a helper decides; a page forwards</div><figcaption>Page Controller in five lines
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

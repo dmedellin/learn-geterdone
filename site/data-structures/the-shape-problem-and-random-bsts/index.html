@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Data Structures</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Search trees</p>
       <h1>The Shape Problem and Random BSTs</h1>
       <p class="lesson-lede">Predict a tree’s height from its insertion order, and produce one order that degenerates a key set and one that balances it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The insertion order determines the tree completely</li><li>Height and mean depth are different quantities</li><li>O(log n) expected is a statement about the order, not about the tree</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Three orders, one key set, and three numbers that are not the same number</h2>
-      <article class="prose reading"><p>Insertion into a search tree is deterministic given the order. Each new key walks from the root to the empty position where a search for it would have failed, and there is exactly one such position. So the tree is a function of the sequence, and asking &ldquo;how tall is the tree for these keys&rdquo; is not a well-posed question.</p><div class="example"><span class="label">Example &middot; Sorted input is the worst case, and it is not a rare one</span><p>Insert <span class="math" data-say="10, 20, 30, and so on, 150">10, 20, 30, …, 150</span>. Every key is larger than everything present, so every key becomes the right child of the previous one: a path of height <span class="math" data-say="14">14</span> on fifteen keys. Reversed input does the same thing leftwards. Sorted arrival is what you get from a database dump ordered by primary key, a log replayed by timestamp, or an identifier that increments &mdash; so the worst case for this structure is also one of the most common inputs in practice.</p></div><div class="mathblock" data-say="n equals 15, keys 10 20 30 and so on 150, three insertion orders. order, height, mean depth, comparisons to build. sorted, 10 20 and so on 150, 14, 105 over 15 equals 7, 105. reversed, 150140 and so on 10, 14, 105 over 15 equals 7, 105. shuffled, 130 80100110 and so on, 6, 44 over 15 is approximately 2.93, 44. bisect, 80 40 20 10 30 and so on, 3, 34 over 15 is approximately 2.27, 34. 2 times the natural log of 15 equals 5.416, asymptotic mean depth of a RANDOM tree" tabindex="0" role="region" aria-label="Mathematical notation">n = 15,  keys 10 20 30 … 150,  three insertion orders
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Three orders, one key set, and three numbers that are not the same number</h2><div class="prose reading"><p>Insertion into a search tree is deterministic given the order. Each new key walks from the root to the empty position where a search for it would have failed, and there is exactly one such position. So the tree is a function of the sequence, and asking &ldquo;how tall is the tree for these keys&rdquo; is not a well-posed question.</p><div class="example"><span class="label">Example &middot; Sorted input is the worst case, and it is not a rare one</span><p>Insert <span class="math" data-say="10, 20, 30, and so on, 150">10, 20, 30, …, 150</span>. Every key is larger than everything present, so every key becomes the right child of the previous one: a path of height <span class="math" data-say="14">14</span> on fifteen keys. Reversed input does the same thing leftwards. Sorted arrival is what you get from a database dump ordered by primary key, a log replayed by timestamp, or an identifier that increments &mdash; so the worst case for this structure is also one of the most common inputs in practice.</p></div><div class="mathblock" data-say="n equals 15, keys 10 20 30 and so on 150, three insertion orders. order, height, mean depth, comparisons to build. sorted, 10 20 and so on 150, 14, 105 over 15 equals 7, 105. reversed, 150140 and so on 10, 14, 105 over 15 equals 7, 105. shuffled, 130 80100110 and so on, 6, 44 over 15 is approximately 2.93, 44. bisect, 80 40 20 10 30 and so on, 3, 34 over 15 is approximately 2.27, 34. 2 times the natural log of 15 equals 5.416, asymptotic mean depth of a RANDOM tree" tabindex="0" role="region" aria-label="Mathematical notation">n = 15,  keys 10 20 30 … 150,  three insertion orders
 
 order                        height   mean depth   comparisons to build
 
@@ -1400,12 +1444,11 @@ reversed     150 140 … 10         14       105/15 = 7          105
 shuffled  130 80 100 110 …         6        44/15 ≈ 2.93         44
 bisect     80 40 20 10 30 …        3        34/15 ≈ 2.27         34
 
-2 ln 15 = 5.416     asymptotic mean depth of a RANDOM tree</div><p>Read the last line carefully, because it is the one number on this page that was not counted. <span class="math" data-say="2 times the natural log of n">2 ln n</span> is the asymptotic expected depth of a node in a tree built from a uniformly random order. At <span class="math" data-say="n equals 15">n = 15</span> it evaluates to <span class="math" data-say="5.416">5.416</span>, and the lab draws it as a dashed reference curve and labels its readout asymptotic. It is not the height of any of the trees above &mdash; the shuffled tree&rsquo;s height is <span class="math" data-say="6">6</span> and the balanced tree&rsquo;s is <span class="math" data-say="3">3</span> &mdash; and it is not the measured mean depth either, which is <span class="math" data-say="2.93">2.93</span> on the shuffle.</p><p>So there are three numbers on screen and they are three different quantities: the <strong>measured height</strong>, the longest path in the tree drawn; the <strong>measured mean depth</strong>, an exact fraction over the nodes of that tree; and the <strong>asymptote</strong>, a formula about the limit of an average over orders. At <span class="math" data-say="n equals 15">n = 15</span> the asymptote is about <span class="math" data-say="85 percent">85%</span> above the measured mean depth, which is what an asymptotic formula does at small <span class="math" data-say="n">n</span>. Push the size up and the gap narrows; it does not close from above or below in any tidy way, because one shuffle is one sample.</p><div class="thm"><span class="label">Theorem &middot; Expected height of a randomly built search tree</span><p>Insert <span class="math" data-say="n">n</span> distinct keys in an order chosen uniformly at random from all <span class="math" data-say="n factorial">n!</span> orders. The expected height of the resulting tree is <span class="math" data-say="big O of log n">O(log n)</span>, and the expected depth of a node is <span class="math" data-say="2 times the natural log of n plus big O of 1">2 ln n + O(1)</span>.</p><p>This is <strong>stated here and proved elsewhere</strong>. The recurrence it comes from is the one produced by choosing a uniformly random root and recursing on the two pieces &mdash; which is exactly the recurrence &ldquo;Randomised Quicksort&rdquo; solves on the Sorting and Selection course, because a random pivot and a random root are the same object looked at twice. &ldquo;Treaps&rdquo;, on the Randomised Algorithms course, closes the loop by building a tree whose shape is random no matter what order the keys arrive in.</p></div><h3>What a shuffle buys, and what it does not</h3><p>The shuffled order above gives height <span class="math" data-say="6">6</span> where sorted gives <span class="math" data-say="14">14</span>: a factor of more than two, and <span class="math" data-say="44">44</span> comparisons to build rather than <span class="math" data-say="105">105</span>. That is a real and large improvement, and it is one sample. Run a different seed and the height moves. The theorem is about the average over all orders, and no single shuffle establishes it &mdash; which is the same caution as everywhere else on this course, sharpened by the fact that here the quantity in question is itself an average.</p><p>And a shuffle is not always available. It requires having all the keys before inserting any of them, which defeats the point of an online structure. If keys arrive one at a time from a sorted stream there is nothing to shuffle, and the tree degenerates as it grows. That is the gap the rest of this course closes: instead of hoping the order is random, enforce a shape condition on every insertion, which is what &ldquo;Rotations and the AVL Invariant&rdquo; begins.</p><p>One last measurement worth having. The bisect order &mdash; middle key first, then the middle of each half, recursively &mdash; gives height <span class="math" data-say="3">3</span> at <span class="math" data-say="n equals 15">n = 15</span>, which is <span class="math" data-say="the floor of log base 2 15">⌊log₂ 15⌋</span>: the shortest a tree on fifteen nodes can be. It costs <span class="math" data-say="34">34</span> comparisons to build. It is also useless as a strategy, for the same reason a shuffle often is: you have to know all the keys and their order in advance, which is to say you have to have sorted them already.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The shape problem: order decides the tree</h2></div><p>Height and mean depth counted, with 2 ln n drawn dashed as the asymptote it is</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+2 ln 15 = 5.416     asymptotic mean depth of a RANDOM tree</div><p>Read the last line carefully, because it is the one number on this page that was not counted. <span class="math" data-say="2 times the natural log of n">2 ln n</span> is the asymptotic expected depth of a node in a tree built from a uniformly random order. At <span class="math" data-say="n equals 15">n = 15</span> it evaluates to <span class="math" data-say="5.416">5.416</span>, and the lab draws it as a dashed reference curve and labels its readout asymptotic. It is not the height of any of the trees above &mdash; the shuffled tree&rsquo;s height is <span class="math" data-say="6">6</span> and the balanced tree&rsquo;s is <span class="math" data-say="3">3</span> &mdash; and it is not the measured mean depth either, which is <span class="math" data-say="2.93">2.93</span> on the shuffle.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The shape problem: order decides the tree</h2></div><p>Height and mean depth counted, with 2 ln n drawn dashed as the asymptote it is</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>One key set, four insertion orders</strong><span>the height and the mean depth are counted; the dashed curve is an asymptote</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>counted</span><span class="tone-amber"><i class="legend-swatch"></i>2 ln n, asymptotic</span><span class="tone-muted"><i class="legend-swatch"></i>the other orders</span></div>
@@ -1415,10 +1458,10 @@ bisect     80 40 20 10 30 …        3        34/15 ≈ 2.27         34
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="toTable"></table></div>
       <div class="status-banner" id="toStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>One key set, four orders, and three numbers kept apart</h3>
-          <p>Choose the size and the insertion order &mdash; sorted, reversed, a seeded shuffle, middle-first, or your own. The tree is drawn, and the panel prints the measured height, the measured mean depth as an exact fraction, and <span class="math" data-say="2 times the natural log of n">2 ln n</span> as a dashed reference. The last of those is an asymptote and is labelled as one: at <span class="math" data-say="n equals 15">n = 15</span> it reads <span class="math" data-say="5.416">5.416</span> while the balanced tree&rsquo;s height is <span class="math" data-say="3">3</span>.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>One key set, four orders, and three numbers kept apart</h3>
+            <p>Choose the size and the insertion order &mdash; sorted, reversed, a seeded shuffle, middle-first, or your own. The tree is drawn, and the panel prints the measured height, the measured mean depth as an exact fraction, and <span class="math" data-say="2 times the natural log of n">2 ln n</span> as a dashed reference. The last of those is an asymptote and is labelled as one: at <span class="math" data-say="n equals 15">n = 15</span> it reads <span class="math" data-say="5.416">5.416</span> while the balanced tree&rsquo;s height is <span class="math" data-say="3">3</span>.</p>
         <div class="field" id="toPresetField">
           <label for="toPreset">Worked example</label>
           <select id="toPreset"><option value="sorted" selected>sorted input, fifteen keys</option><option value="shuffled">a seeded shuffle of the same keys</option><option value="bisect">middle first, fifteen keys</option></select>
@@ -1449,12 +1492,15 @@ bisect     80 40 20 10 30 …        3        34/15 ≈ 2.27         34
         </div>
         <p class="small-copy" id="toHint" style="margin:0;">Three different numbers sit side by side here and the lesson is that they are different: the HEIGHT of this tree, counted; the MEAN DEPTH of this tree, an exact fraction; and 2 ln n, which is the asymptotic mean depth of a tree built from a uniformly random order and is about neither of them at these sizes.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>So there are three numbers on screen and they are three different quantities: the <strong>measured height</strong>, the longest path in the tree drawn; the <strong>measured mean depth</strong>, an exact fraction over the nodes of that tree; and the <strong>asymptote</strong>, a formula about the limit of an average over orders. At <span class="math" data-say="n equals 15">n = 15</span> the asymptote is about <span class="math" data-say="85 percent">85%</span> above the measured mean depth, which is what an asymptotic formula does at small <span class="math" data-say="n">n</span>. Push the size up and the gap narrows; it does not close from above or below in any tidy way, because one shuffle is one sample.</p><div class="thm"><span class="label">Theorem &middot; Expected height of a randomly built search tree</span><p>Insert <span class="math" data-say="n">n</span> distinct keys in an order chosen uniformly at random from all <span class="math" data-say="n factorial">n!</span> orders. The expected height of the resulting tree is <span class="math" data-say="big O of log n">O(log n)</span>, and the expected depth of a node is <span class="math" data-say="2 times the natural log of n plus big O of 1">2 ln n + O(1)</span>.</p><p>This is <strong>stated here and proved elsewhere</strong>. The recurrence it comes from is the one produced by choosing a uniformly random root and recursing on the two pieces &mdash; which is exactly the recurrence &ldquo;Randomised Quicksort&rdquo; solves on the Sorting and Selection course, because a random pivot and a random root are the same object looked at twice. &ldquo;Treaps&rdquo;, on the Randomised Algorithms course, closes the loop by building a tree whose shape is random no matter what order the keys arrive in.</p></div><h3>What a shuffle buys, and what it does not</h3><p>The shuffled order above gives height <span class="math" data-say="6">6</span> where sorted gives <span class="math" data-say="14">14</span>: a factor of more than two, and <span class="math" data-say="44">44</span> comparisons to build rather than <span class="math" data-say="105">105</span>. That is a real and large improvement, and it is one sample. Run a different seed and the height moves. The theorem is about the average over all orders, and no single shuffle establishes it &mdash; which is the same caution as everywhere else on this course, sharpened by the fact that here the quantity in question is itself an average.</p><p>And a shuffle is not always available. It requires having all the keys before inserting any of them, which defeats the point of an online structure. If keys arrive one at a time from a sorted stream there is nothing to shuffle, and the tree degenerates as it grows. That is the gap the rest of this course closes: instead of hoping the order is random, enforce a shape condition on every insertion, which is what &ldquo;Rotations and the AVL Invariant&rdquo; begins.</p><p>One last measurement worth having. The bisect order &mdash; middle key first, then the middle of each half, recursively &mdash; gives height <span class="math" data-say="3">3</span> at <span class="math" data-say="n equals 15">n = 15</span>, which is <span class="math" data-say="the floor of log base 2 15">⌊log₂ 15⌋</span>: the shortest a tree on fifteen nodes can be. It costs <span class="math" data-say="34">34</span> comparisons to build. It is also useless as a strategy, for the same reason a shuffle often is: you have to know all the keys and their order in advance, which is to say you have to have sorted them already.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Predicting and controlling a shape</h2></div><p>Predict before running. A prediction that turns out wrong is the only cheap way to find out which of the three numbers you were thinking of.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Read the order, not the keys</h3><p>Ask what happens to each arriving key relative to the ones already there. Monotone in either direction gives a path of height <span class="math" data-say="n minus 1">n − 1</span>. Alternating between extremes gives a path too. The keys&rsquo; values matter only through their relative order.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Predict the height, then the mean depth, separately</h3><p>The height is the longest path; the mean depth is the average over nodes. Write both predictions down. Getting the height right and the mean depth wrong is the normal outcome the first few times, and it is the thing worth finding out.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Construct a degenerate order and a balanced one</h3><p>Sorted for the first. Middle-first, recursively, for the second &mdash; and notice while doing it that you needed the sorted key list to build it, which is why it is a diagnostic rather than a strategy.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare the measurements with the asymptote as three separate quantities</h3><p>Measured height, measured mean depth, <span class="math" data-say="2 times the natural log of n">2 ln n</span>. Say aloud which is which before drawing any conclusion. The asymptote is about an average over orders in the limit, and at <span class="math" data-say="n equals 15">n = 15</span> it sits well above the measured mean depth of a shuffled tree.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Predicting and controlling a shape</h2>
+      <p class="lead-in">Predict before running. A prediction that turns out wrong is the only cheap way to find out which of the three numbers you were thinking of.</p>
+      <ol class="key-ideas method"><li><strong>Read the order, not the keys.</strong> Ask what happens to each arriving key relative to the ones already there. Monotone in either direction gives a path of height <span class="math" data-say="n minus 1">n − 1</span>. Alternating between extremes gives a path too. The keys&rsquo; values matter only through their relative order.</li><li><strong>Predict the height, then the mean depth, separately.</strong> The height is the longest path; the mean depth is the average over nodes. Write both predictions down. Getting the height right and the mean depth wrong is the normal outcome the first few times, and it is the thing worth finding out.</li><li><strong>Construct a degenerate order and a balanced one.</strong> Sorted for the first. Middle-first, recursively, for the second &mdash; and notice while doing it that you needed the sorted key list to build it, which is why it is a diagnostic rather than a strategy.</li><li><strong>Compare the measurements with the asymptote as three separate quantities.</strong> Measured height, measured mean depth, <span class="math" data-say="2 times the natural log of n">2 ln n</span>. Say aloud which is which before drawing any conclusion. The asymptote is about an average over orders in the limit, and at <span class="math" data-say="n equals 15">n = 15</span> it sits well above the measured mean depth of a shuffled tree.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1486,17 +1532,16 @@ seeded shuffle:  130 80 100 110 60 140 10 30 150 20 50 40 70 120 90
 2 ln 15 = 5.416      not the height (6), not the mean depth (2.93)</div><p>Every insertion in the sorted case goes to the right of everything, because it is larger than everything, and there is no decision to make anywhere. That is the whole of the degeneracy: the structure is doing exactly what it is defined to do and the order is doing all the damage.</p><p>The shuffle&rsquo;s height is <span class="math" data-say="6">6</span> against the balanced <span class="math" data-say="3">3</span> and the degenerate <span class="math" data-say="14">14</span>. Its mean depth, <span class="math" data-say="44 over 15">44/15</span>, is much closer to the balanced tree&rsquo;s <span class="math" data-say="34 over 15">34/15</span> than to the path&rsquo;s <span class="math" data-say="7">7</span> &mdash; which is the useful way to summarise what randomness buys: it makes the typical search nearly optimal while leaving the worst search a constant factor worse.</p><p>For a faded rehearsal, run <span class="math" data-say="n equals 31">n = 31</span> with each order. The supplied observation is that sorted must give height <span class="math" data-say="30">30</span> and mean depth <span class="math" data-say="15">15</span>, by the same argument as above. Predict the shuffle&rsquo;s height before looking &mdash; the lab reports <span class="math" data-say="9">9</span>, with mean depth <span class="math" data-say="139 over 31 is approximately 4.48">139/31 ≈ 4.48</span> against <span class="math" data-say="2 times the natural log of 31 equals 6.868">2 ln 31 = 6.868</span> &mdash; and then say which of the three numbers on your screen would change if you changed nothing but the seed.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Blaming the keys for the shape</strong><span>&ldquo;These keys are clustered&rdquo; almost never explains a degenerate tree. The same fifteen keys give height <span class="math" data-say="14">14</span>, <span class="math" data-say="6">6</span> or <span class="math" data-say="3">3</span> depending only on the order they arrived in. The diagnostic question is not what the keys look like; it is whether they arrived sorted &mdash; which they very often did, because that is how dumps, logs and autoincrementing identifiers come.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading <span class="math" data-say="2 times the natural log of n">2 ln n</span> as the height</strong><span>It is an asymptotic formula for the expected depth of a node in a randomly built tree, which is a third quantity distinct from both the height and the measured mean depth. At <span class="math" data-say="n equals 15">n = 15</span> it reads <span class="math" data-say="5.416">5.416</span> while the balanced tree&rsquo;s height is <span class="math" data-say="3">3</span> and a shuffled tree&rsquo;s mean depth is <span class="math" data-say="2.93">2.93</span>. The lab prints all three side by side and labels which one is asymptotic, and the reason it does is that reading them as one number is the standard failure of this lesson.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking one shuffle as evidence for the expected-height theorem</strong><span>A single seeded shuffle gives height <span class="math" data-say="6">6</span> at <span class="math" data-say="n equals 15">n = 15</span>. A different seed gives something else. The theorem is about the average over all <span class="math" data-say="n factorial">n!</span> orders, and the proof of it is not on this course &mdash; it is the recurrence &ldquo;Randomised Quicksort&rdquo; solves. Sampling an average is not computing it, and the lab is showing you one order at a time.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the question “how tall is the tree for these keys” sounds ill-posed.</strong><p>You should be able to predict the height and the mean depth of a tree from a stated insertion order, construct an order that degenerates a key set and one that balances it, and say of each number on the lab&rsquo;s panel whether it was counted from the tree drawn or evaluated from an asymptotic formula.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> If the order cannot be trusted, the structure has to fix its own shape. &ldquo;Rotations and the AVL Invariant&rdquo; introduces the one local rewrite that changes heights without changing the in-order sequence, and the balance condition that turns it into a height bound &mdash; by way of a recurrence whose solution is the Fibonacci numbers.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Blaming the keys for the shape</strong><span>&ldquo;These keys are clustered&rdquo; almost never explains a degenerate tree. The same fifteen keys give height <span class="math" data-say="14">14</span>, <span class="math" data-say="6">6</span> or <span class="math" data-say="3">3</span> depending only on the order they arrived in. The diagnostic question is not what the keys look like; it is whether they arrived sorted &mdash; which they very often did, because that is how dumps, logs and autoincrementing identifiers come.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading <span class="math" data-say="2 times the natural log of n">2 ln n</span> as the height</strong><span>It is an asymptotic formula for the expected depth of a node in a randomly built tree, which is a third quantity distinct from both the height and the measured mean depth. At <span class="math" data-say="n equals 15">n = 15</span> it reads <span class="math" data-say="5.416">5.416</span> while the balanced tree&rsquo;s height is <span class="math" data-say="3">3</span> and a shuffled tree&rsquo;s mean depth is <span class="math" data-say="2.93">2.93</span>. The lab prints all three side by side and labels which one is asymptotic, and the reason it does is that reading them as one number is the standard failure of this lesson.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking one shuffle as evidence for the expected-height theorem</strong><span>A single seeded shuffle gives height <span class="math" data-say="6">6</span> at <span class="math" data-say="n equals 15">n = 15</span>. A different seed gives something else. The theorem is about the average over all <span class="math" data-say="n factorial">n!</span> orders, and the proof of it is not on this course &mdash; it is the recurrence &ldquo;Randomised Quicksort&rdquo; solves. Sampling an average is not computing it, and the lab is showing you one order at a time.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the question “how tall is the tree for these keys” sounds ill-posed.</strong><p>You should be able to predict the height and the mean depth of a tree from a stated insertion order, construct an order that degenerates a key set and one that balances it, and say of each number on the lab&rsquo;s panel whether it was counted from the tree drawn or evaluated from an asymptotic formula.</p></div></div><div class="note"><strong>Note:</strong> If the order cannot be trusted, the structure has to fix its own shape. &ldquo;Rotations and the AVL Invariant&rdquo; introduces the one local rewrite that changes heights without changing the in-order sequence, and the balance condition that turns it into a height bound &mdash; by way of a recurrence whose solution is the Fibonacci numbers.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The insertion order determines the tree completely</summary><p>Insertion has no choices: the new key goes where the search for it failed. So the order fixes the tree, and the same key set can produce anything from a path of height <span class="math" data-say="n minus 1">n − 1</span> to a tree of height <span class="math" data-say="the floor of log base 2 n">⌊log₂ n⌋</span>. &ldquo;These keys are badly distributed&rdquo; is almost never the problem; the keys arriving sorted is, and sorted input is the single commonest way real data arrives.</p></details><details class="recall"><summary>Height and mean depth are different quantities</summary><p>The height is the longest path, and it is what a worst-case search costs. The mean depth is the average over all nodes, and it is what a search for a uniformly chosen key costs. At <span class="math" data-say="n equals 15">n = 15</span> the shuffled tree has height <span class="math" data-say="6">6</span> and mean depth <span class="math" data-say="44 over 15 is approximately 2.93">44/15 ≈ 2.93</span> &mdash; the two differ by a factor of two, and a page that printed one number would be ambiguous about which claim it was making.</p></details><details class="recall"><summary>O(log n) expected is a statement about the order, not about the tree</summary><p>Insert <span class="math" data-say="n">n</span> distinct keys in a uniformly random order and the expected height is <span class="math" data-say="big O of log n">O(log n)</span>. The randomness is in the arrival order; the keys themselves can be anything. This is why the fix for the shape problem in the two randomised trees later on is to inject randomness deliberately rather than to hope the input has some.</p></details></div>
+      <h3>Summary</h3>
       <p>The cost of a search tree is fixed by the order the keys arrived in, not by the keys. Fifteen keys inserted in sorted order give a path of height <span class="math" data-say="14">14</span>; the same fifteen in a shuffled order give height <span class="math" data-say="6">6</span>, and middle-first gives <span class="math" data-say="3">3</span>. A uniformly random order gives expected height <span class="math" data-say="big O of log n">O(log n)</span> &mdash; stated here, and the recurrence behind it is the one Sorting and Selection solves for randomised quicksort.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The insertion order determines the tree completely.</strong> Insertion has no choices: the new key goes where the search for it failed. So the order fixes the tree, and the same key set can produce anything from a path of height <span class="math" data-say="n minus 1">n − 1</span> to a tree of height <span class="math" data-say="the floor of log base 2 n">⌊log₂ n⌋</span>. &ldquo;These keys are badly distributed&rdquo; is almost never the problem; the keys arriving sorted is, and sorted input is the single commonest way real data arrives.</li><li><strong>Height and mean depth are different quantities.</strong> The height is the longest path, and it is what a worst-case search costs. The mean depth is the average over all nodes, and it is what a search for a uniformly chosen key costs. At <span class="math" data-say="n equals 15">n = 15</span> the shuffled tree has height <span class="math" data-say="6">6</span> and mean depth <span class="math" data-say="44 over 15 is approximately 2.93">44/15 ≈ 2.93</span> &mdash; the two differ by a factor of two, and a page that printed one number would be ambiguous about which claim it was making.</li><li><strong>O(log n) expected is a statement about the order, not about the tree.</strong> Insert <span class="math" data-say="n">n</span> distinct keys in a uniformly random order and the expected height is <span class="math" data-say="big O of log n">O(log n)</span>. The randomness is in the arrival order; the keys themselves can be anything. This is why the fix for the shape problem in the two randomised trees later on is to inject randomness deliberately rather than to hope the input has some.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the keys do not decide the shape, the ORDER decides the shape. n equals 15, keys 10 20 and so on 150, height, mean depth, comparisons. a table, shown on the page. 2 times the natural log of n, equals, 5.416 at n equals 15, an ASYMPTOTE, and not the height above" tabindex="0" role="region" aria-label="Mathematical notation">the keys do not decide the shape;  the ORDER decides the shape
 
 n = 15, keys 10 20 … 150         height    mean depth   comparisons
@@ -3061,11 +3106,42 @@ n = 15, keys 10 20 … 150         height    mean depth   comparisons
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3133,7 +3209,7 @@ n = 15, keys 10 20 … 150         height    mean depth   comparisons
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Capacity Estimation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Scale and shape</p>
       <h1>Latency Numbers on a Log Scale</h1>
       <p class="lesson-lede">Read the exact ratio between two operations off a logarithmic ruler and state which decade it falls in.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>One disk seek is a hundred thousand memory references</li><li>Only a ratio scale holds a range this wide</li><li>The ratios outlive the numbers</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>A ladder of reference latencies, and the ratios between its rungs</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Reference latency</span><p>A <strong>reference latency</strong> is a measured figure for one elementary operation &mdash; a cache hit, a memory reference, a disk seek, a network round trip &mdash; quoted to one significant figure and used for estimating. It is data rather than a derived quantity: the lab prints every rung in full, and the only thing computed from them is the ratio between two.</p></div><div class="mathblock" data-say="L 1 cache reference, 1 nanoseconds. branch mispredict, 3 nanoseconds. L 2 cache reference, 4 nanoseconds. mutex lock and unlock, 17 nanoseconds. main memory reference, 100 nanoseconds. compress 1 kB, 2000 nanoseconds. send 1 kB over a 1 Gbit over s link, 10000 nanoseconds. SSD random read, 150000 nanoseconds. read 1 megabytes sequentially from memory, 250000 nanoseconds. round trip inside one datacentre, 500000 nanoseconds. read 1 megabytes sequentially from SSD, 1000000 nanoseconds. disk seek, 10000000 nanoseconds. read 1 megabytes sequentially from disk, 20000000 nanoseconds. packet California to the Netherlands 150000000 nanoseconds" tabindex="0" role="region" aria-label="Mathematical notation">L1 cache reference                             1 ns
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>A ladder of reference latencies, and the ratios between its rungs</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Reference latency</span><p>A <strong>reference latency</strong> is a measured figure for one elementary operation &mdash; a cache hit, a memory reference, a disk seek, a network round trip &mdash; quoted to one significant figure and used for estimating. It is data rather than a derived quantity: the lab prints every rung in full, and the only thing computed from them is the ratio between two.</p></div><div class="mathblock" data-say="L 1 cache reference, 1 nanoseconds. branch mispredict, 3 nanoseconds. L 2 cache reference, 4 nanoseconds. mutex lock and unlock, 17 nanoseconds. main memory reference, 100 nanoseconds. compress 1 kB, 2000 nanoseconds. send 1 kB over a 1 Gbit over s link, 10000 nanoseconds. SSD random read, 150000 nanoseconds. read 1 megabytes sequentially from memory, 250000 nanoseconds. round trip inside one datacentre, 500000 nanoseconds. read 1 megabytes sequentially from SSD, 1000000 nanoseconds. disk seek, 10000000 nanoseconds. read 1 megabytes sequentially from disk, 20000000 nanoseconds. packet California to the Netherlands 150000000 nanoseconds" tabindex="0" role="region" aria-label="Mathematical notation">L1 cache reference                             1 ns
 branch mispredict                              3 ns
 L2 cache reference                             4 ns
 mutex lock and unlock                         17 ns
@@ -1404,22 +1448,21 @@ round trip inside one datacentre         500 000 ns
 read 1 MB sequentially from SSD        1 000 000 ns
 disk seek                             10 000 000 ns
 read 1 MB sequentially from disk      20 000 000 ns
-packet California to the Netherlands 150 000 000 ns</div><p>Both ends of any ratio taken from that table are integers, so the ratio is exact. That matters more than it looks: a reader who is handed <span class="math" data-say="99999.99999">99 999.99999</span> cannot tell it from a wrong answer, while <span class="math" data-say="100000">100 000</span> is obviously the number the lesson is about. The only rounded thing in the lab is where each bar is drawn, which goes through a logarithm and is a fact about pixels.</p><div class="example"><span class="label">Example &middot; Memory against a disk seek</span><p><span class="math" data-say="10000000 nanoseconds divided by 100 nanoseconds equals 100000">10 000 000 ns ÷ 100 ns = 100 000</span>. A hundred thousand memory references fit inside one disk seek, and the ratio sits between <span class="math" data-say="10 to the power 5">10⁵</span> and <span class="math" data-say="10 to the power 6">10⁶</span>. Said the other way round: if a memory reference took a second, a disk seek would take rather more than a day.</p></div><h3>Why the ruler is logarithmic</h3><p>Because the alternative shows nothing. Drawn to a linear scale reaching <span class="math" data-say="150000000 nanoseconds">150 000 000 ns</span>, the memory reference at <span class="math" data-say="100 nanoseconds">100 ns</span> is less than one millionth of the width of the picture, and so is everything faster than it. Eleven of the fourteen rungs are crowded into the leftmost few percent of it. The picture would be honest about the largest number and silent about every comparison worth making.</p><p>A logarithmic ruler puts equal ratios at equal distances: the gap from <span class="math" data-say="1">1</span> to <span class="math" data-say="10">10</span> is the same as the gap from <span class="math" data-say="10 to the power 6">10⁶</span> to <span class="math" data-say="10 to the power 7">10⁷</span>. That is the right scale for this table precisely because the questions asked of it are ratio questions &mdash; how many of these fit in one of those &mdash; and never difference questions.</p><h3>“Disk is somewhat slower than SSD”</h3><p>That sentence is true of one comparison and badly wrong about the others, and which one a person has in mind is usually not stated. Reading a megabyte sequentially is <span class="math" data-say="20000000 nanoseconds">20 000 000 ns</span> from disk and <span class="math" data-say="1000000 nanoseconds">1 000 000 ns</span> from SSD, a ratio of <span class="math" data-say="20">20</span>: somewhat slower, fairly described. A disk seek against an SSD random read is <span class="math" data-say="10000000">10 000 000</span> against <span class="math" data-say="150000">150 000</span>, a ratio of <span class="math" data-say="200 over 3">200/3</span>. And a disk seek against a memory reference is <span class="math" data-say="100000">100 000</span>. Same two words, three answers, three different decisions.</p><p>The pattern is that sequential work narrows the gaps and random work widens them, which is a preview of an argument &ldquo;Storage Engines and Indexes&rdquo; makes at length. Here the useful habit is smaller: before saying one thing is slower than another, name which operation on each, then take the ratio.</p><h3>Carrying it around</h3><p>Two forms are worth keeping. The first is a handful of exact ratios: <span class="math" data-say="100000">100 000</span> memory references to a disk seek, <span class="math" data-say="300">300</span> datacentre round trips to a cross-continent one, <span class="math" data-say="20">20</span> sequential megabytes from SSD to one from disk. The second is the decade bracket for anything else &mdash; <span class="math" data-say="10 to the power 5 is at most r is less than 10 to the power 6">10⁵ ≤ r < 10⁶</span> &mdash; which is what the lab prints beside every ratio and is the form that survives new hardware.</p><p>What these numbers are not is a model of a running system. They are single operations measured in isolation, with nothing queued behind them and nothing contending for the same device. A real disk seek under load takes longer than the figure above, and by how much is the subject of &ldquo;Queues and Utilisation&rdquo;. The ladder is a floor and a set of ratios, and it is honest about being only that.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Latency numbers on a log scale</h2></div><p>Pick two rungs; the ratio is the knowledge</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+packet California to the Netherlands 150 000 000 ns</div><p>Both ends of any ratio taken from that table are integers, so the ratio is exact. That matters more than it looks: a reader who is handed <span class="math" data-say="99999.99999">99 999.99999</span> cannot tell it from a wrong answer, while <span class="math" data-say="100000">100 000</span> is obviously the number the lesson is about. The only rounded thing in the lab is where each bar is drawn, which goes through a logarithm and is a fact about pixels.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Latency numbers on a log scale</h2></div><p>Pick two rungs; the ratio is the knowledge</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The latency ladder</strong><span>ten thousand million to one, on the only ruler that holds it</span></div>
         <div class="inline-legend"><span class="tone-amber"><i class="legend-swatch"></i>the slower operation</span><span class="tone-cyan"><i class="legend-swatch"></i>the faster one</span></div>
       </div>
       <div class="lab-stage" id="scStage" tabindex="0" role="region" aria-label="Reference latencies on a logarithmic ruler."><svg id="scRuler" style="min-width:520px" viewBox="0 0 520 320" role="img" aria-label="Each reference latency drawn as a bar on a logarithmic scale."></svg></div>
       <div class="status-banner" id="scStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Pick two operations and read the ratio between them</h3>
-          <p>Every rung is drawn on a logarithmic ruler and every ratio is a quotient of two integers, printed exactly with its decade bracket beside it. Try the pairs the phrase &ldquo;somewhat slower&rdquo; is usually applied to, and compare what they actually come to.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Pick two operations and read the ratio between them</h3>
+            <p>Every rung is drawn on a logarithmic ruler and every ratio is a quotient of two integers, printed exactly with its decade bracket beside it. Try the pairs the phrase &ldquo;somewhat slower&rdquo; is usually applied to, and compare what they actually come to.</p>
         <div class="field" id="scSlowField">
           <label for="scSlow">The slower operation</label>
           <select id="scSlow"><option value="l1">L1 cache reference</option><option value="mispredict">branch mispredict</option><option value="l2">L2 cache reference</option><option value="mutex">mutex lock and unlock</option><option value="ram">main memory reference</option><option value="compress">compress 1 kB</option><option value="net1kb">send 1 kB over a 1 Gbit/s link</option><option value="ssdread">SSD random read</option><option value="ram1mb">read 1 MB sequentially from memory</option><option value="dcrt">round trip inside one datacentre</option><option value="ssd1mb">read 1 MB sequentially from SSD</option><option value="seek" selected>disk seek</option><option value="disk1mb">read 1 MB sequentially from disk</option><option value="continent">packet California to the Netherlands and back</option></select>
@@ -1437,12 +1480,15 @@ packet California to the Netherlands 150 000 000 ns</div><p>Both ends of any rat
           <div class="kpi"><span>The whole ruler spans</span><strong id="scSpan">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="example"><span class="label">Example &middot; Memory against a disk seek</span><p><span class="math" data-say="10000000 nanoseconds divided by 100 nanoseconds equals 100000">10 000 000 ns ÷ 100 ns = 100 000</span>. A hundred thousand memory references fit inside one disk seek, and the ratio sits between <span class="math" data-say="10 to the power 5">10⁵</span> and <span class="math" data-say="10 to the power 6">10⁶</span>. Said the other way round: if a memory reference took a second, a disk seek would take rather more than a day.</p></div><h3>Why the ruler is logarithmic</h3><p>Because the alternative shows nothing. Drawn to a linear scale reaching <span class="math" data-say="150000000 nanoseconds">150 000 000 ns</span>, the memory reference at <span class="math" data-say="100 nanoseconds">100 ns</span> is less than one millionth of the width of the picture, and so is everything faster than it. Eleven of the fourteen rungs are crowded into the leftmost few percent of it. The picture would be honest about the largest number and silent about every comparison worth making.</p><p>A logarithmic ruler puts equal ratios at equal distances: the gap from <span class="math" data-say="1">1</span> to <span class="math" data-say="10">10</span> is the same as the gap from <span class="math" data-say="10 to the power 6">10⁶</span> to <span class="math" data-say="10 to the power 7">10⁷</span>. That is the right scale for this table precisely because the questions asked of it are ratio questions &mdash; how many of these fit in one of those &mdash; and never difference questions.</p><h3>“Disk is somewhat slower than SSD”</h3><p>That sentence is true of one comparison and badly wrong about the others, and which one a person has in mind is usually not stated. Reading a megabyte sequentially is <span class="math" data-say="20000000 nanoseconds">20 000 000 ns</span> from disk and <span class="math" data-say="1000000 nanoseconds">1 000 000 ns</span> from SSD, a ratio of <span class="math" data-say="20">20</span>: somewhat slower, fairly described. A disk seek against an SSD random read is <span class="math" data-say="10000000">10 000 000</span> against <span class="math" data-say="150000">150 000</span>, a ratio of <span class="math" data-say="200 over 3">200/3</span>. And a disk seek against a memory reference is <span class="math" data-say="100000">100 000</span>. Same two words, three answers, three different decisions.</p><p>The pattern is that sequential work narrows the gaps and random work widens them, which is a preview of an argument &ldquo;Storage Engines and Indexes&rdquo; makes at length. Here the useful habit is smaller: before saying one thing is slower than another, name which operation on each, then take the ratio.</p><h3>Carrying it around</h3><p>Two forms are worth keeping. The first is a handful of exact ratios: <span class="math" data-say="100000">100 000</span> memory references to a disk seek, <span class="math" data-say="300">300</span> datacentre round trips to a cross-continent one, <span class="math" data-say="20">20</span> sequential megabytes from SSD to one from disk. The second is the decade bracket for anything else &mdash; <span class="math" data-say="10 to the power 5 is at most r is less than 10 to the power 6">10⁵ ≤ r < 10⁶</span> &mdash; which is what the lab prints beside every ratio and is the form that survives new hardware.</p><p>What these numbers are not is a model of a running system. They are single operations measured in isolation, with nothing queued behind them and nothing contending for the same device. A real disk seek under load takes longer than the figure above, and by how much is the subject of &ldquo;Queues and Utilisation&rdquo;. The ladder is a floor and a set of ratios, and it is honest about being only that.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Comparing two operations honestly</h2></div><p>Name both operations, take the quotient, keep the bracket.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the operation, not the device</h3><p>&ldquo;Disk&rdquo; is not an operation: a seek and a sequential megabyte differ by a factor of two on the same device and by far more against anything else. Almost every confused latency argument is two people comparing different operations and each assuming the other meant theirs.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Divide the slower by the faster and keep it whole</h3><p>The answer is &ldquo;how many of the faster fit inside one of the slower&rdquo;, which is the form the number gets used in. Both figures are integers, so keep the quotient exact rather than turning it into a decimal that has to be trusted.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Round to the decade bracket before quoting it</h3><p><span class="math" data-say="10 to the power 5 is at most r is less than 10 to the power 6">10⁵ ≤ r < 10⁶</span> is the durable statement; the mantissa is not. A bracket stays true across a hardware generation and a three-digit ratio does not, and quoting the second suggests a precision the reference figures never had.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Turn the ratio into the design question</h3><p>A factor of <span class="math" data-say="100000">100 000</span> says an index or a cache pays for itself many times over; a factor of <span class="math" data-say="20">20</span> says the same choice is worth arguing about. The ratio is not the conclusion, but it is what tells you whether the conclusion needs thought or is already obvious.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Comparing two operations honestly</h2>
+      <p class="lead-in">Name both operations, take the quotient, keep the bracket.</p>
+      <ol class="key-ideas method"><li><strong>Name the operation, not the device.</strong> &ldquo;Disk&rdquo; is not an operation: a seek and a sequential megabyte differ by a factor of two on the same device and by far more against anything else. Almost every confused latency argument is two people comparing different operations and each assuming the other meant theirs.</li><li><strong>Divide the slower by the faster and keep it whole.</strong> The answer is &ldquo;how many of the faster fit inside one of the slower&rdquo;, which is the form the number gets used in. Both figures are integers, so keep the quotient exact rather than turning it into a decimal that has to be trusted.</li><li><strong>Round to the decade bracket before quoting it.</strong> <span class="math" data-say="10 to the power 5 is at most r is less than 10 to the power 6">10⁵ ≤ r < 10⁶</span> is the durable statement; the mantissa is not. A bracket stays true across a hardware generation and a three-digit ratio does not, and quoting the second suggests a precision the reference figures never had.</li><li><strong>Turn the ratio into the design question.</strong> A factor of <span class="math" data-say="100000">100 000</span> says an index or a cache pays for itself many times over; a factor of <span class="math" data-say="20">20</span> says the same choice is worth arguing about. The ratio is not the conclusion, but it is what tells you whether the conclusion needs thought or is already obvious.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1471,17 +1517,16 @@ California ↔ Netherlands         150 000 000 ns
                                  ratio    300            10² ≤ r &lt; 10³</div><p>The first two ratios share a decade bracket and the third is four brackets away. That is the whole reason to insist on naming the operation: the first two comparisons are arguments about cost and the third is not an argument at all.</p><p><span class="math" data-say="300">300</span> datacentre round trips in one cross-continent round trip is the other figure worth keeping, because it is the one that makes geography a design input rather than a deployment detail. &ldquo;Latency and the Tail&rdquo; starts from exactly that number.</p><p>For a faded rehearsal, pick two rungs whose ratio you think you know &mdash; sending a kilobyte over a gigabit link against compressing a kilobyte, say &mdash; and write down your guess, the decade bracket you expect, and the design sentence you would base on it. Then select both in the lab. The exercise is worth doing on the pairs you are confident about.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the ladder with a linear intuition</strong><span>&ldquo;Disk is somewhat slower than SSD, and SSD is somewhat slower than memory&rdquo; chains two vague comparisons into a picture in which everything is within reach of everything else. A disk seek is <span class="math" data-say="100000">100 000</span> memory references. The phrase survives because a linear ruler piles every rung below the top decade at the same place, and the picture in most people&rsquo;s heads is linear.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Memorising the figures rather than the ratios</strong><span><span class="math" data-say="100 nanoseconds">100 ns</span> for a memory reference is a measurement on particular hardware and will be wrong before long; the fact that a disk seek is about <span class="math" data-say="10 to the power 5">10⁵</span> of them will still be usable. Someone who has learnt the column of numbers has learnt the part with the shorter shelf life, and &mdash; worse &mdash; has no way to tell when it has expired, because the ratios that would have flagged it were never the thing being remembered.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the log scale is softening the comparison</strong><span>A logarithmic axis looks gentle, and it is easy to read the picture as a presentational kindness that hides how bad disk really is. It is the opposite: the log ruler is the only one on which all fourteen rungs are visible at once, and the linear ruler is the one that hides things, by crowding eleven of them into its left-hand edge. The ratio printed beneath the bars is exact, and it is what the picture is claiming.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “slower” without a named operation and a ratio reads as an incomplete claim.</strong><p>You should be able to state the memory-to-disk-seek ratio and its bracket from memory, produce any other pair&rsquo;s ratio off the ladder, say why the ruler has to be logarithmic, and explain what these figures leave out about a system under load.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The ladder is about one operation at a time. The other quantity this course needs before it can count machines is about a whole day at a time: &ldquo;Peak to Average&rdquo; asks what a daily profile does to a rate, computes the multiplier between the busiest hour and the mean one from twenty-four buckets rather than from a rule of thumb, and names the number you must not size to.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the ladder with a linear intuition</strong><span>&ldquo;Disk is somewhat slower than SSD, and SSD is somewhat slower than memory&rdquo; chains two vague comparisons into a picture in which everything is within reach of everything else. A disk seek is <span class="math" data-say="100000">100 000</span> memory references. The phrase survives because a linear ruler piles every rung below the top decade at the same place, and the picture in most people&rsquo;s heads is linear.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Memorising the figures rather than the ratios</strong><span><span class="math" data-say="100 nanoseconds">100 ns</span> for a memory reference is a measurement on particular hardware and will be wrong before long; the fact that a disk seek is about <span class="math" data-say="10 to the power 5">10⁵</span> of them will still be usable. Someone who has learnt the column of numbers has learnt the part with the shorter shelf life, and &mdash; worse &mdash; has no way to tell when it has expired, because the ratios that would have flagged it were never the thing being remembered.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the log scale is softening the comparison</strong><span>A logarithmic axis looks gentle, and it is easy to read the picture as a presentational kindness that hides how bad disk really is. It is the opposite: the log ruler is the only one on which all fourteen rungs are visible at once, and the linear ruler is the one that hides things, by crowding eleven of them into its left-hand edge. The ratio printed beneath the bars is exact, and it is what the picture is claiming.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “slower” without a named operation and a ratio reads as an incomplete claim.</strong><p>You should be able to state the memory-to-disk-seek ratio and its bracket from memory, produce any other pair&rsquo;s ratio off the ladder, say why the ruler has to be logarithmic, and explain what these figures leave out about a system under load.</p></div></div><div class="note"><strong>Note:</strong> The ladder is about one operation at a time. The other quantity this course needs before it can count machines is about a whole day at a time: &ldquo;Peak to Average&rdquo; asks what a daily profile does to a rate, computes the multiplier between the busiest hour and the mean one from twenty-four buckets rather than from a rule of thumb, and names the number you must not size to.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>One disk seek is a hundred thousand memory references</summary><p>A memory reference is about <span class="math" data-say="100 nanoseconds">100 ns</span> and a disk seek about <span class="math" data-say="10000000 nanoseconds">10 000 000 ns</span>, so the ratio is <span class="math" data-say="100000">100 000</span> exactly &mdash; a quotient of two integers, not a rounded decimal. That single figure decides more design arguments than any other number on this course: it is why an index is worth building, why a cache is worth having, and why &ldquo;just read it from disk&rdquo; and &ldquo;just read it from memory&rdquo; are not variations on one plan.</p></details><details class="recall"><summary>Only a ratio scale holds a range this wide</summary><p>From <span class="math" data-say="1 nanoseconds">1 ns</span> to <span class="math" data-say="150000000 nanoseconds">150 000 000 ns</span> is a hundred and fifty million to one. Drawn linearly, every rung below the top decade lands on top of every other at the left edge, and the picture says only that the last one is large. On a logarithmic ruler a factor of ten is the same distance everywhere, so the gaps between rungs become readable &mdash; and the gaps are the content.</p></details><details class="recall"><summary>The ratios outlive the numbers</summary><p>Every absolute figure here is a measurement on particular hardware and will be wrong within a few years; the ratios move far more slowly, and they are what a design decision actually turns on. So the durable form is the decade bracket: &ldquo;a disk seek is between <span class="math" data-say="10 to the power 5">10⁵</span> and <span class="math" data-say="10 to the power 6">10⁶</span> memory references&rdquo; is a sentence still worth saying when both figures have changed.</p></details></div>
+      <h3>Summary</h3>
       <p>The operations a system is built out of &mdash; a cache reference, a memory read, an SSD read, a disk seek, a packet crossing a continent &mdash; span a hundred and fifty million to one. No linear picture holds that, which is why every version of this table is drawn on a ratio scale. What is worth carrying away is not the individual figures, which drift with the hardware, but the ratios between them, which decide designs and do not.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>One disk seek is a hundred thousand memory references.</strong> A memory reference is about <span class="math" data-say="100 nanoseconds">100 ns</span> and a disk seek about <span class="math" data-say="10000000 nanoseconds">10 000 000 ns</span>, so the ratio is <span class="math" data-say="100000">100 000</span> exactly &mdash; a quotient of two integers, not a rounded decimal. That single figure decides more design arguments than any other number on this course: it is why an index is worth building, why a cache is worth having, and why &ldquo;just read it from disk&rdquo; and &ldquo;just read it from memory&rdquo; are not variations on one plan.</li><li><strong>Only a ratio scale holds a range this wide.</strong> From <span class="math" data-say="1 nanoseconds">1 ns</span> to <span class="math" data-say="150000000 nanoseconds">150 000 000 ns</span> is a hundred and fifty million to one. Drawn linearly, every rung below the top decade lands on top of every other at the left edge, and the picture says only that the last one is large. On a logarithmic ruler a factor of ten is the same distance everywhere, so the gaps between rungs become readable &mdash; and the gaps are the content.</li><li><strong>The ratios outlive the numbers.</strong> Every absolute figure here is a measurement on particular hardware and will be wrong within a few years; the ratios move far more slowly, and they are what a design decision actually turns on. So the durable form is the decade bracket: &ldquo;a disk seek is between <span class="math" data-say="10 to the power 5">10⁵</span> and <span class="math" data-say="10 to the power 6">10⁶</span> memory references&rdquo; is a sentence still worth saying when both figures have changed.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="L 1 cache reference, 1 nanoseconds. main memory reference, 100 nanoseconds. SSD random read, 150000 nanoseconds. disk seek, 10000000 nanoseconds. California if and only if Netherlands and back 150000000 nanoseconds. disk seek over memory reference equals 100000, 10 to the power 5 is at most ratio is less than 10 to the power 6. the whole ruler, end to end, equals 150000000 times" tabindex="0" role="region" aria-label="Mathematical notation">L1 cache reference                         1 ns
 main memory reference                    100 ns
 SSD random read                      150 000 ns
@@ -2474,11 +2519,42 @@ the whole ruler, end to end  = 150 000 000×</div><figcaption>Five rungs, and th
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2546,7 +2622,7 @@ the whole ruler, end to end  = 150 000 000×</div><figcaption>Five rungs, and th
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

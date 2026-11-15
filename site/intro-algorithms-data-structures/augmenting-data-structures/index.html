@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Data Structures</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 14 · Augmenting Data Structures</p>
       <h1>Augmenting Data Structures</h1>
       <p class="lesson-lede">Most new structures are old ones with an extra field; a red-black tree that stores each subtree&#x27;s size finds the i-th smallest key and the rank of a key in O(lg n), and any field computable from a node and its children can be kept up to date at no asymptotic cost.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Order-statistic tree</li><li>The four steps of augmenting</li><li>Theorem 14.1&#x27;s condition</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the walk</h2>
-      <article class="prose reading"><p>&ldquo;As with any prescriptive design method, you should not blindly follow the steps in the order given.&rdquo; The authors say it in Section 14.2 of their own four-step method, and the chapter is in that spirit: design by adapting a structure you already trust, with the maintenance of the new information as the part to get right. This lesson reads Chapter 14, with Section 14.3 named.</p><p>Section 14.1 revisits Chapter 9's order statistics. Selecting the i-th smallest of n keys took <span class="math" data-say="big O of n">O(n)</span> on an unordered set; on a dynamic set, with insertions and deletions in between, the authors want <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>. The device is to store in each node the size of its subtree. A node's rank within its own subtree is then its left child's size plus one, and the rank of a key in the whole tree is that plus whatever lies to its left above it, ties between equal keys being broken by inorder position.</p><p>OS-SELECT finds the node of rank i in the subtree rooted at x. It computes <span class="math" data-say="r equals x, left, size plus 1">r = x.left.size + 1</span>; if i equals r it returns x; if i is smaller it goes left with the same i; if larger it goes right looking for rank <span class="math" data-say="i minus r">i − r</span> there, since r keys have been passed. Each step descends a level, so the cost is <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>. OS-RANK goes the other way: it starts at the node, sets r to its left size plus one, and climbs to the root, adding the left sibling's size plus one each time it climbs from a right child. Its invariant is that r is the node's rank within the subtree rooted where the climb has reached, so at the root it is the rank. It also costs <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>.</p><p>Keeping the sizes right is the part the chapter calls step 3. An insertion's first phase walks down to the new leaf, and adding one to each node passed keeps every size correct, in <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>. Its second phase is the fix-up, which only recolours and rotates; recolouring leaves sizes alone, and a rotation invalidates exactly two, the two nodes it moves. After a left rotation that lifts y over x, y's size becomes x's old size and x's is recomputed from its new children, in <span class="math" data-say="big O of 1">O(1)</span>. At most two rotations means <span class="math" data-say="big O of 1">O(1)</span> extra. Deletion subtracts one along the path from the removed node's position to the root and patches its at most three rotations the same way.</p><div class="defbox"><span class="label">Definition &middot; Augmenting, in four steps</span><p>1. Pick the structure to build on. 2. Decide what extra information it will carry. 3. Make sure its modifying operations can keep that information correct. 4. Write the new operations that use it. For order-statistic trees: red-black trees; subtree sizes; insertion, deletion and rotation patched as above; OS-SELECT and OS-RANK.</p></div><p>The quotation's warning is about order. Steps 2 and 4 are worth nothing if step 3 fails, and in practice all four move forward together, with trial and error. The authors also note the steps are a good outline for documenting an augmented structure. Section 14.2 then generalises step 3 for red-black trees.</p><div class="thm"><span class="label">Theorem &middot; Theorem 14.1</span><p>Suppose every node of an n-node red-black tree carries a field f, and a node's f is computable from the node itself and its two children, their f included. Then insertion and deletion can maintain f in every node and still run in <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>.</p></div><p>The proof is that a change to one node's f can affect only the f of its ancestors, which are <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> in number, and each is recomputed in <span class="math" data-say="big O of 1">O(1)</span> from its children. An insertion changes the new node and its ancestors, and each rotation two nodes and their ancestors; a deletion likewise. The test rules some fields out at once. A node's rank in the whole tree depends on keys far from it: insert a new smallest key and every rank changes, which is <span class="math" data-say="theta of n">Θ(n)</span> updates. A node's depth fails too, since one rotation changes the depth of every node in a moved subtree.</p><p>Section 14.3 is named here, the theorem's second example. An interval tree stores closed intervals in a red-black tree keyed on their low endpoints, and each node also keeps <span class="math" data-say="x, max">x.max</span>, the largest high endpoint in its subtree, which is the largest of x's own high endpoint and its children's max fields, so Theorem 14.1 applies. INTERVAL-SEARCH finds an interval overlapping a query by walking one path: it goes left whenever the left subtree's max reaches the query's low endpoint, and Theorem 14.2 proves that this never misses an overlap. Each operation is <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>.</p><p>Now the lab, the one from the Algorithms Subject's lesson Augmenting a Tree, where the queries are practised further. It builds a search tree from your keys in the order typed, not a red-black tree, and draws each node with its subtree size. Choose a query: select the i-th smallest, the rank of a chosen key, or the number of keys in an interval. The tiles give the answer, whether it agrees with a scan of the sorted keys, the nodes visited out of n, the height, whether every stored size is correct, and whether every size is still correct after one rotation at the root, recomputed as above. The lab's rank walks down from the root and adds at each right turn, the same additions OS-RANK makes climbing up.</p><p>The worked example <code>select</code> builds a tree on nine keys of height 3 and asks for the 3rd smallest: 18, agreeing with a scan, after visiting 4 of 9 nodes. <code>rank</code> asks the rank of the 5th smallest key, 37: 5, after 3 of 9. <code>range</code> counts the keys from 20 to 70 as the keys at most 70 minus the keys below 20, two downward walks: 4, after 7 of 9 visits. Range counting is not in the chapter's text, but it is one more operation the sizes support in time proportional to the height. In all three the sizes stay correct after the rotation, as Theorem 14.1's condition promises.</p><p>Type the worked example's keys, <span class="math" data-say="44 21 70 9 33 58 86 27 39 64">44 21 70 9 33 58 86 27 39 64</span>, choose select and set i to 4: the answer is 33 after 3 of 10 visits. On ten keys a scan would read up to ten; the walk reads one path. On a red-black tree the path has length <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> for every set of keys, and that, not one run, is the chapter's claim.</p><h3>Exercise</h3><p>In the tree built from <span class="math" data-say="44 21 70 9 33 58 86 27 39 64">44 21 70 9 33 58 86 27 39 64</span>, write every node's size. Then run OS-RANK on the node holding 39 by climbing, writing r after each step, and give its rank. Check it in the lab: choose the rank query and move the slider until it reads rank of 39. The lab picks the key by its sorted position, so the answer is no surprise; what to compare is its downward walk, which visits 4 nodes and makes the same additions your climb made.</p><p>This ends Part III. The next course, Advanced Design and Analysis Techniques, reads Part IV: dynamic programming, greedy algorithms and amortized analysis, beginning with rod cutting.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Augmenting a tree with subtree sizes</h2></div><p>Rank and select become walks, and the rotation has to maintain the field</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the walk</h2><div class="prose reading"><p>&ldquo;As with any prescriptive design method, you should not blindly follow the steps in the order given.&rdquo; The authors say it in Section 14.2 of their own four-step method, and the chapter is in that spirit: design by adapting a structure you already trust, with the maintenance of the new information as the part to get right. This lesson reads Chapter 14, with Section 14.3 named.</p><p>Section 14.1 revisits Chapter 9's order statistics. Selecting the i-th smallest of n keys took <span class="math" data-say="big O of n">O(n)</span> on an unordered set; on a dynamic set, with insertions and deletions in between, the authors want <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>. The device is to store in each node the size of its subtree. A node's rank within its own subtree is then its left child's size plus one, and the rank of a key in the whole tree is that plus whatever lies to its left above it, ties between equal keys being broken by inorder position.</p><p>OS-SELECT finds the node of rank i in the subtree rooted at x. It computes <span class="math" data-say="r equals x, left, size plus 1">r = x.left.size + 1</span>; if i equals r it returns x; if i is smaller it goes left with the same i; if larger it goes right looking for rank <span class="math" data-say="i minus r">i − r</span> there, since r keys have been passed. Each step descends a level, so the cost is <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>. OS-RANK goes the other way: it starts at the node, sets r to its left size plus one, and climbs to the root, adding the left sibling's size plus one each time it climbs from a right child. Its invariant is that r is the node's rank within the subtree rooted where the climb has reached, so at the root it is the rank. It also costs <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>.</p><p>Keeping the sizes right is the part the chapter calls step 3. An insertion's first phase walks down to the new leaf, and adding one to each node passed keeps every size correct, in <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>. Its second phase is the fix-up, which only recolours and rotates; recolouring leaves sizes alone, and a rotation invalidates exactly two, the two nodes it moves. After a left rotation that lifts y over x, y's size becomes x's old size and x's is recomputed from its new children, in <span class="math" data-say="big O of 1">O(1)</span>. At most two rotations means <span class="math" data-say="big O of 1">O(1)</span> extra. Deletion subtracts one along the path from the removed node's position to the root and patches its at most three rotations the same way.</p><div class="defbox"><span class="label">Definition &middot; Augmenting, in four steps</span><p>1. Pick the structure to build on. 2. Decide what extra information it will carry. 3. Make sure its modifying operations can keep that information correct. 4. Write the new operations that use it. For order-statistic trees: red-black trees; subtree sizes; insertion, deletion and rotation patched as above; OS-SELECT and OS-RANK.</p></div><p>The quotation's warning is about order. Steps 2 and 4 are worth nothing if step 3 fails, and in practice all four move forward together, with trial and error. The authors also note the steps are a good outline for documenting an augmented structure. Section 14.2 then generalises step 3 for red-black trees.</p><div class="thm"><span class="label">Theorem &middot; Theorem 14.1</span><p>Suppose every node of an n-node red-black tree carries a field f, and a node's f is computable from the node itself and its two children, their f included. Then insertion and deletion can maintain f in every node and still run in <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>.</p></div><p>The proof is that a change to one node's f can affect only the f of its ancestors, which are <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> in number, and each is recomputed in <span class="math" data-say="big O of 1">O(1)</span> from its children. An insertion changes the new node and its ancestors, and each rotation two nodes and their ancestors; a deletion likewise. The test rules some fields out at once. A node's rank in the whole tree depends on keys far from it: insert a new smallest key and every rank changes, which is <span class="math" data-say="theta of n">Θ(n)</span> updates. A node's depth fails too, since one rotation changes the depth of every node in a moved subtree.</p><p>Section 14.3 is named here, the theorem's second example. An interval tree stores closed intervals in a red-black tree keyed on their low endpoints, and each node also keeps <span class="math" data-say="x, max">x.max</span>, the largest high endpoint in its subtree, which is the largest of x's own high endpoint and its children's max fields, so Theorem 14.1 applies. INTERVAL-SEARCH finds an interval overlapping a query by walking one path: it goes left whenever the left subtree's max reaches the query's low endpoint, and Theorem 14.2 proves that this never misses an overlap. Each operation is <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>.</p><p>Now the lab, the one from the Algorithms Subject's lesson Augmenting a Tree, where the queries are practised further. It builds a search tree from your keys in the order typed, not a red-black tree, and draws each node with its subtree size. Choose a query: select the i-th smallest, the rank of a chosen key, or the number of keys in an interval. The tiles give the answer, whether it agrees with a scan of the sorted keys, the nodes visited out of n, the height, whether every stored size is correct, and whether every size is still correct after one rotation at the root, recomputed as above. The lab's rank walks down from the root and adds at each right turn, the same additions OS-RANK makes climbing up.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Augmenting a tree with subtree sizes</h2></div><p>Rank and select become walks, and the rotation has to maintain the field</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Subtree sizes, and the walks they buy</strong><span>rank, select and a range count, none of them a scan</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>a node the walk visited</span><span class="tone-muted"><i class="legend-swatch"></i>its subtree size</span></div>
@@ -1406,10 +1449,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tgTable"></table></div>
       <div class="status-banner" id="tgStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Answer rank queries from subtree sizes</h3>
-          <p>Type keys to build a search tree, each node annotated with its subtree size, and choose a query. The walk that answers it is drawn, its visits counted and its answer checked against a scan. The second drawing is the tree after one rotation, with every size recomputed and checked.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Answer rank queries from subtree sizes</h3>
+            <p>Type keys to build a search tree, each node annotated with its subtree size, and choose a query. The walk that answers it is drawn, its visits counted and its answer checked against a scan. The second drawing is the tree after one rotation, with every size recomputed and checked.</p>
         <div class="field" id="tgPresetField">
           <label for="tgPreset">Worked example</label>
           <select id="tgPreset"><option value="select" selected>select the i-th smallest key</option><option value="rank">rank a key</option><option value="range">count the keys in an interval</option></select>
@@ -1444,12 +1487,15 @@
         </div>
         <p class="small-copy" id="tgHint" style="margin:0;">Every subtree size shown is recomputed from the tree in your browser and checked against its two children, before and after a rotation &mdash; an attribute that goes stale through a rotation shows up here as a failed check rather than as a wrong answer three queries later.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The worked example <code>select</code> builds a tree on nine keys of height 3 and asks for the 3rd smallest: 18, agreeing with a scan, after visiting 4 of 9 nodes. <code>rank</code> asks the rank of the 5th smallest key, 37: 5, after 3 of 9. <code>range</code> counts the keys from 20 to 70 as the keys at most 70 minus the keys below 20, two downward walks: 4, after 7 of 9 visits. Range counting is not in the chapter's text, but it is one more operation the sizes support in time proportional to the height. In all three the sizes stay correct after the rotation, as Theorem 14.1's condition promises.</p><p>Type the worked example's keys, <span class="math" data-say="44 21 70 9 33 58 86 27 39 64">44 21 70 9 33 58 86 27 39 64</span>, choose select and set i to 4: the answer is 33 after 3 of 10 visits. On ten keys a scan would read up to ten; the walk reads one path. On a red-black tree the path has length <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> for every set of keys, and that, not one run, is the chapter's claim.</p><h3>Exercise</h3><p>In the tree built from <span class="math" data-say="44 21 70 9 33 58 86 27 39 64">44 21 70 9 33 58 86 27 39 64</span>, write every node's size. Then run OS-RANK on the node holding 39 by climbing, writing r after each step, and give its rank. Check it in the lab: choose the rank query and move the slider until it reads rank of 39. The lab picks the key by its sorted position, so the answer is no surprise; what to compare is its downward walk, which visits 4 nodes and makes the same additions your climb made.</p><p>This ends Part III. The next course, Advanced Design and Analysis Techniques, reads Part IV: dynamic programming, greedy algorithms and amortized analysis, beginning with rod cutting.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Order statistics by hand</h2></div><p>Four steps on a drawn tree, then one in the lab.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Annotate the sizes from the bottom</h3><p>Every leaf has size 1; every other node has its children's sizes plus one. The root's size is n.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Select by comparing with the left size</h3><p>At each node let r be the left child's size plus one. Stop if i equals r, go left if i is smaller, and go right with <span class="math" data-say="i minus r">i − r</span> if it is larger.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Rank by climbing</h3><p>Start with r equal to the node's left size plus one. Climb to the root, and each time you arrive from a right child add the parent's left size plus one.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Patch a rotation</h3><p>After rotating y above x, give y the old size of x and recompute x from its new children. Check that both agree with a count of their subtrees.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Query a tree of your own</h3><p>Type ten keys of your own into the lab, choose select, predict the walk for two values of i, and compare with the drawn path and the visit count.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Order statistics by hand</h2>
+      <p class="lead-in">Four steps on a drawn tree, then one in the lab.</p>
+      <ol class="key-ideas method"><li><strong>Annotate the sizes from the bottom.</strong> Every leaf has size 1; every other node has its children's sizes plus one. The root's size is n.</li><li><strong>Select by comparing with the left size.</strong> At each node let r be the left child's size plus one. Stop if i equals r, go left if i is smaller, and go right with <span class="math" data-say="i minus r">i − r</span> if it is larger.</li><li><strong>Rank by climbing.</strong> Start with r equal to the node's left size plus one. Climb to the root, and each time you arrive from a right child add the parent's left size plus one.</li><li><strong>Patch a rotation.</strong> After rotating y above x, give y the old size of x and recompute x from its new children. Check that both agree with a count of their subtrees.</li><li><strong>Query a tree of your own.</strong> Type ten keys of your own into the lab, choose select, predict the walk for two values of i, and compare with the drawn path and the visit count.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1468,17 +1514,16 @@ answer 58, after 3 nodes
 inorder: 9 21 27 33 39 44 58 64 70 86</div><p>The walk passed six keys at the root, the five in 44's left subtree and 44 itself, without visiting any of them, which is what the size field buys. The inorder list confirms that 58 is seventh. Choose select in the lab with these keys and i = 7: it prints 58 and 3 of 10.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Storing each node&#x27;s rank in the whole tree instead of its subtree size</strong><span>A global rank would answer rank queries in <span class="math" data-say="big O of 1">O(1)</span>, but inserting a new smallest key changes the rank of every other node, which is <span class="math" data-say="theta of n">Θ(n)</span> updates. A subtree size depends only on the node's children, so an insertion changes it only along one path. That difference is Theorem 14.1's condition, and it is why the chapter stores sizes and computes ranks from them.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Forgetting that rotations change sizes</strong><span>The fix-ups rotate, and a rotation changes the subtrees of exactly the two nodes it moves. Their sizes must be recomputed, the lower one first, since the upper one's new size depends on it. The lab checks every size after a rotation at the root; a structure that patched only the insertion path would show a stale size there.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Following the four steps strictly in order</strong><span>The authors warn against it in the sentence quoted at the top. Choosing a field and writing operations for it, steps 2 and 4, is wasted if step 3 shows the field cannot be maintained, so the steps are worked together and revised. They remain a good way to organise the design and its documentation.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can augment a tree and use the augmentation.</strong><p>Given a search tree, annotate subtree sizes, run OS-SELECT and OS-RANK by hand, patch the sizes after a rotation, and say whether a proposed field meets Theorem 14.1's condition.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab builds a plain search tree in insertion order, not a red-black tree, so its height depends on the order you type; the queries and the size checks are the same. It has no interval tree. Its visit counts are for one tree; the <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> bounds need the red-black height of Chapter 13.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Storing each node&#x27;s rank in the whole tree instead of its subtree size</strong><span>A global rank would answer rank queries in <span class="math" data-say="big O of 1">O(1)</span>, but inserting a new smallest key changes the rank of every other node, which is <span class="math" data-say="theta of n">Θ(n)</span> updates. A subtree size depends only on the node's children, so an insertion changes it only along one path. That difference is Theorem 14.1's condition, and it is why the chapter stores sizes and computes ranks from them.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Forgetting that rotations change sizes</strong><span>The fix-ups rotate, and a rotation changes the subtrees of exactly the two nodes it moves. Their sizes must be recomputed, the lower one first, since the upper one's new size depends on it. The lab checks every size after a rotation at the root; a structure that patched only the insertion path would show a stale size there.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Following the four steps strictly in order</strong><span>The authors warn against it in the sentence quoted at the top. Choosing a field and writing operations for it, steps 2 and 4, is wasted if step 3 shows the field cannot be maintained, so the steps are worked together and revised. They remain a good way to organise the design and its documentation.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can augment a tree and use the augmentation.</strong><p>Given a search tree, annotate subtree sizes, run OS-SELECT and OS-RANK by hand, patch the sizes after a rotation, and say whether a proposed field meets Theorem 14.1's condition.</p></div></div><div class="note"><strong>Note:</strong> The lab builds a plain search tree in insertion order, not a red-black tree, so its height depends on the order you type; the queries and the size checks are the same. It has no interval tree. Its visit counts are for one tree; the <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> bounds need the red-black height of Chapter 13.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Order-statistic tree</summary><p>A red-black tree in which every node x also stores <span class="math" data-say="x, size">x.size</span>, the number of internal nodes in its subtree, with <span class="math" data-say="T, nil, size equals 0">T.nil.size = 0</span>. The sizes obey <span class="math" data-say="x, size equals x, left, size plus x, right, size plus 1">x.size = x.left.size + x.right.size + 1</span>, and from them the rank of any key, its position in sorted order, can be read off one path.</p></details><details class="recall"><summary>The four steps of augmenting</summary><p>Choose an underlying structure; decide what extra information to keep; check that the structure's modifying operations can keep it correct; and write the new operations that use it. The authors present the steps as a focus and a way to document the result, not as a strict sequence.</p></details><details class="recall"><summary>Theorem 14.1&#x27;s condition</summary><p>A field f of a red-black tree can be maintained by insertion and deletion without raising their <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> cost if each node's f can be computed from the node itself and its two children, their f included. Subtree size passes; a node's rank in the whole tree does not.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 14 adds information to a red-black tree instead of inventing a new structure. Section 14.1 stores subtree sizes and answers select and rank queries in O(lg n); Section 14.2 states the four steps of augmenting and a theorem saying which fields come free; Section 14.3, named here, builds the interval tree. Run OS-SELECT and OS-RANK by hand, then let the lab walk a size-annotated tree and count the nodes each query visits.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Order-statistic tree.</strong> A red-black tree in which every node x also stores <span class="math" data-say="x, size">x.size</span>, the number of internal nodes in its subtree, with <span class="math" data-say="T, nil, size equals 0">T.nil.size = 0</span>. The sizes obey <span class="math" data-say="x, size equals x, left, size plus x, right, size plus 1">x.size = x.left.size + x.right.size + 1</span>, and from them the rank of any key, its position in sorted order, can be read off one path.</li><li><strong>The four steps of augmenting.</strong> Choose an underlying structure; decide what extra information to keep; check that the structure's modifying operations can keep it correct; and write the new operations that use it. The authors present the steps as a focus and a way to document the result, not as a strict sequence.</li><li><strong>Theorem 14.1&#x27;s condition.</strong> A field f of a red-black tree can be maintained by insertion and deletion without raising their <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> cost if each node's f can be computed from the node itself and its two children, their f included. Subtree size passes; a node's rank in the whole tree does not.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="store each node&#x27;s subtree size. x, size equals left size plus right size plus 1. select, compare i with left size plus 1. rank, add left size plus 1 at right turns. a rotation fixes two sizes in big O of 1. a field its children determine is free. interval trees keep the max endpoint" tabindex="0" role="region" aria-label="Mathematical notation">store each node&#x27;s subtree size
 x.size = left size + right size + 1
 select: compare i with left size + 1
@@ -2720,11 +2765,42 @@ interval trees keep the max endpoint</div><figcaption>Chapter 14 in seven lines<
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2792,7 +2868,7 @@ interval trees keep the max endpoint</div><figcaption>Chapter 14 in seven lines<
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

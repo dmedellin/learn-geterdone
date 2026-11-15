@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Partitioning and Load Balancing</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Where the keys land</p>
       <h1>Rehashing When N Changes</h1>
       <p class="lesson-lede">Count the keys that move when a shard is added, under mod-N assignment and on a ring, and check that the two counts are the whole key set.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li><span class="math" data-say="mod N">mod N</span> scrambles every key when <span class="math" data-say="N">N</span> changes</li><li>A ring moves only the arc the new node takes</li><li>The two fractions add to one, and that is the argument</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Counting the keys that move, exactly</h2>
-      <article class="prose reading"><p>The expectation almost everybody brings to this is that adding one node to a fleet of seven moves about a seventh of the keys — the share the new node will end up owning. Under <span class="math" data-say="mod N">mod N</span> assignment that is wrong, and it is wrong by a factor of about <span class="math" data-say="N">N</span>: the true figure at <span class="math" data-say="N equals 7">N = 7</span> is seven eighths, which is <span class="math" data-say="6.13">6.13</span> times the one-seventh prediction.</p><div class="thm"><span class="label">Theorem &middot; Keys moved by a mod-N rehash</span><p>Assigning key <span class="math" data-say="k">k</span> to shard <span class="math" data-say="h of k mod N">h(k) mod N</span> and then to <span class="math" data-say="h of k mod N plus 1">h(k) mod (N+1)</span> moves a fraction <span class="math" data-say="N over the quantity N plus 1">N/(N+1)</span> of a complete cycle of hash values. At <span class="math" data-say="N equals 7">N = 7</span> that is <span class="math" data-say="7 over 8">7/8</span>; at <span class="math" data-say="N equals 100">N = 100</span> it is <span class="math" data-say="100 over 101">100/101</span>.</p></div><div class="proof"><p>Take the hash values <span class="math" data-say="h equals 0, 1, and so on, N of the quantity N plus 1, minus 1">h = 0, 1, …, N(N+1) − 1</span>, one complete cycle. A key stays exactly when <span class="math" data-say="h mod N equals h mod N plus 1">h mod N = h mod (N+1)</span>. Write <span class="math" data-say="v">v</span> for that common value; since <span class="math" data-say="v">v</span> is a residue mod <span class="math" data-say="N">N</span> it satisfies <span class="math" data-say="v is at most N minus 1">v ≤ N − 1</span>, and every such <span class="math" data-say="v">v</span> is also its own residue mod <span class="math" data-say="N plus 1">N + 1</span>, so the pairs that agree are exactly <span class="math" data-say="v, v">(v, v)</span> for <span class="math" data-say="v equals 0, 1, and so on, N minus 1">v = 0, 1, …, N − 1</span>.</p><p>Because <span class="math" data-say="N">N</span> and <span class="math" data-say="N plus 1">N + 1</span> are consecutive integers their greatest common divisor is 1, so by the Chinese Remainder Theorem each of the <span class="math" data-say="N of the quantity N plus 1">N(N+1)</span> possible residue pairs occurs exactly once as <span class="math" data-say="h">h</span> runs over the cycle. The <span class="math" data-say="N">N</span> agreeing pairs therefore correspond to exactly <span class="math" data-say="N">N</span> values of <span class="math" data-say="h">h</span>, and the remaining <span class="math" data-say="N of the quantity N plus 1, minus N equals N squared">N(N+1) − N = N²</span> values move.</p><p>The moved fraction is <span class="math" data-say="N squared over the quantity N of the quantity N plus 1, equals N over the quantity N plus 1">N²/(N(N+1)) = N/(N+1)</span>, with no sampling and no approximation anywhere in the argument. The lab performs this enumeration for the <span class="math" data-say="N">N</span> you choose: at <span class="math" data-say="N equals 7">N = 7</span> it reports 49 of 56.</p><p><span class="qed">&#9633;</span></p></div><p>The Chinese Remainder Theorem step is the only piece of machinery here, and it is “The Chinese Remainder Theorem” on the Discrete Mathematics path; the residue arithmetic under it is “Modular Arithmetic” on the same path. Everything else is counting.</p><div class="defbox"><span class="label">Definition &middot; Consistent hashing</span><p>Under <strong>consistent hashing</strong>, nodes and keys are both placed on a ring of hash values. Each node holds one or more <strong>tokens</strong> on the ring, and a key belongs to the first token at or after the key's position, going clockwise and wrapping. Adding a node adds tokens; it changes no existing token's position, so the only keys that move are those in the arcs the new tokens claimed.</p></div><div class="mathblock" data-say="N equals 7 shards, one more added. mod N, moved equals 7 over 8, equals 87.50 percent, enumerated over 56 hashes. ring, moved equals 1 over 8, equals 12.50 percent, in expectation. sum, 7 over 8 plus 1 over 8 equals 1. a seeded sample of 600 keys. mod N, 519 of 600 equals 86.50 percent, near 7 over 8, not equal to it. ring, 82 of 600 equals 13.67 percent, the joining arc measured 12.89 percent. spared, 437 of 600 by the ring" tabindex="0" role="region" aria-label="Mathematical notation">N = 7 shards, one more added
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Counting the keys that move, exactly</h2><div class="prose reading"><p>The expectation almost everybody brings to this is that adding one node to a fleet of seven moves about a seventh of the keys — the share the new node will end up owning. Under <span class="math" data-say="mod N">mod N</span> assignment that is wrong, and it is wrong by a factor of about <span class="math" data-say="N">N</span>: the true figure at <span class="math" data-say="N equals 7">N = 7</span> is seven eighths, which is <span class="math" data-say="6.13">6.13</span> times the one-seventh prediction.</p><div class="thm"><span class="label">Theorem &middot; Keys moved by a mod-N rehash</span><p>Assigning key <span class="math" data-say="k">k</span> to shard <span class="math" data-say="h of k mod N">h(k) mod N</span> and then to <span class="math" data-say="h of k mod N plus 1">h(k) mod (N+1)</span> moves a fraction <span class="math" data-say="N over the quantity N plus 1">N/(N+1)</span> of a complete cycle of hash values. At <span class="math" data-say="N equals 7">N = 7</span> that is <span class="math" data-say="7 over 8">7/8</span>; at <span class="math" data-say="N equals 100">N = 100</span> it is <span class="math" data-say="100 over 101">100/101</span>.</p></div><div class="proof"><p>Take the hash values <span class="math" data-say="h equals 0, 1, and so on, N of the quantity N plus 1, minus 1">h = 0, 1, …, N(N+1) − 1</span>, one complete cycle. A key stays exactly when <span class="math" data-say="h mod N equals h mod N plus 1">h mod N = h mod (N+1)</span>. Write <span class="math" data-say="v">v</span> for that common value; since <span class="math" data-say="v">v</span> is a residue mod <span class="math" data-say="N">N</span> it satisfies <span class="math" data-say="v is at most N minus 1">v ≤ N − 1</span>, and every such <span class="math" data-say="v">v</span> is also its own residue mod <span class="math" data-say="N plus 1">N + 1</span>, so the pairs that agree are exactly <span class="math" data-say="v, v">(v, v)</span> for <span class="math" data-say="v equals 0, 1, and so on, N minus 1">v = 0, 1, …, N − 1</span>.</p><p>Because <span class="math" data-say="N">N</span> and <span class="math" data-say="N plus 1">N + 1</span> are consecutive integers their greatest common divisor is 1, so by the Chinese Remainder Theorem each of the <span class="math" data-say="N of the quantity N plus 1">N(N+1)</span> possible residue pairs occurs exactly once as <span class="math" data-say="h">h</span> runs over the cycle. The <span class="math" data-say="N">N</span> agreeing pairs therefore correspond to exactly <span class="math" data-say="N">N</span> values of <span class="math" data-say="h">h</span>, and the remaining <span class="math" data-say="N of the quantity N plus 1, minus N equals N squared">N(N+1) − N = N²</span> values move.</p><p>The moved fraction is <span class="math" data-say="N squared over the quantity N of the quantity N plus 1, equals N over the quantity N plus 1">N²/(N(N+1)) = N/(N+1)</span>, with no sampling and no approximation anywhere in the argument. The lab performs this enumeration for the <span class="math" data-say="N">N</span> you choose: at <span class="math" data-say="N equals 7">N = 7</span> it reports 49 of 56.</p><p><span class="qed">&#9633;</span></p></div><p>The Chinese Remainder Theorem step is the only piece of machinery here, and it is “The Chinese Remainder Theorem” on the Discrete Mathematics path; the residue arithmetic under it is “Modular Arithmetic” on the same path. Everything else is counting.</p><div class="defbox"><span class="label">Definition &middot; Consistent hashing</span><p>Under <strong>consistent hashing</strong>, nodes and keys are both placed on a ring of hash values. Each node holds one or more <strong>tokens</strong> on the ring, and a key belongs to the first token at or after the key's position, going clockwise and wrapping. Adding a node adds tokens; it changes no existing token's position, so the only keys that move are those in the arcs the new tokens claimed.</p></div><div class="mathblock" data-say="N equals 7 shards, one more added. mod N, moved equals 7 over 8, equals 87.50 percent, enumerated over 56 hashes. ring, moved equals 1 over 8, equals 12.50 percent, in expectation. sum, 7 over 8 plus 1 over 8 equals 1. a seeded sample of 600 keys. mod N, 519 of 600 equals 86.50 percent, near 7 over 8, not equal to it. ring, 82 of 600 equals 13.67 percent, the joining arc measured 12.89 percent. spared, 437 of 600 by the ring" tabindex="0" role="region" aria-label="Mathematical notation">N = 7 shards, one more added
 
 mod N       moved = 7/8  = 87.50%      enumerated over 56 hashes
 ring        moved = 1/8  = 12.50%      in expectation
@@ -1400,12 +1444,11 @@ sum         7/8 + 1/8 = 1
 a seeded sample of 600 keys
   mod N     519 of 600 = 86.50%        near 7/8, not equal to it
   ring       82 of 600 = 13.67%        the joining arc measured 12.89%
-  spared    437 of 600 by the ring</div><h3>Why the sample and the enumeration disagree, and why both are printed</h3><p>The <span class="math" data-say="7 over 8">7/8</span> is a count over a complete cycle of hash values, so it is exact for that object. A real key set is a finite sample of hashes, and the 600 keys the lab draws moved 519 times — <span class="math" data-say="86.50 percent">86.50%</span>, near <span class="math" data-say="87.50 percent">87.50%</span> and not equal to it. Neither figure is a correction of the other. The lab prints both because a reader who has only seen the exact fraction will believe their own measurement is a bug.</p><p>The ring's numbers work the same way with one extra wrinkle: what moves is the arc the joining node actually took, which on this seed was <span class="math" data-say="12.89 percent">12.89%</span> of the ring rather than the <span class="math" data-say="12.50 percent">12.50%</span> its expectation predicts. The 82 keys that moved are the keys in that arc. The expectation is a property of the scheme; the arc is a property of the placement, and “Virtual Nodes” is about how far apart those two can be.</p><div class="example"><span class="label">Example &middot; Reading the identity as a design argument</span><p><span class="math" data-say="7 over 8">7/8</span> and <span class="math" data-say="1 over 8">1/8</span> are not two independent measurements that happen to be different. They partition the same key set: every key either changes shard under <span class="math" data-say="mod N">mod N</span> or does not, and the ones a ring leaves alone are precisely the complement. So the choice between the schemes is not a tuning decision, and a system that reshards regularly under <span class="math" data-say="mod N">mod N</span> is copying its entire dataset every time it grows. The identity is verified by enumeration at eleven shard counts from 1 to 100 rather than asserted once.</p></div><p>One thing the ring does not fix is the imbalance of the previous lesson. It changes what moves when <span class="math" data-say="N">N</span> changes; it does not make the arcs equal, and with one token a node they are wildly unequal. That is the next lesson.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Rehashing when N changes</h2></div><p>Count the keys that move, both ways, and watch the two fractions add to one</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  spared    437 of 600 by the ring</div><h3>Why the sample and the enumeration disagree, and why both are printed</h3><p>The <span class="math" data-say="7 over 8">7/8</span> is a count over a complete cycle of hash values, so it is exact for that object. A real key set is a finite sample of hashes, and the 600 keys the lab draws moved 519 times — <span class="math" data-say="86.50 percent">86.50%</span>, near <span class="math" data-say="87.50 percent">87.50%</span> and not equal to it. Neither figure is a correction of the other. The lab prints both because a reader who has only seen the exact fraction will believe their own measurement is a bug.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Rehashing when N changes</h2></div><p>Count the keys that move, both ways, and watch the two fractions add to one</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>What moves when N changes</strong><span>mod N moves N/(N+1) of the keys and a ring moves 1/(N+1) &mdash; and those are one whole</span></div>
         <div class="inline-legend"><span class="tone-red"><i class="legend-swatch"></i>moves</span><span class="tone-green"><i class="legend-swatch"></i>stays</span><span class="tone-muted"><i class="legend-swatch"></i>the other scheme</span></div>
@@ -1413,10 +1456,10 @@ a seeded sample of 600 keys
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="srBars" viewBox="0 0 660 210" role="img" aria-label="Two bars showing the fraction of keys that move under mod-N rehashing and under a consistent-hash ring, adding to one whole."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="srTable"></table></div>
       <div class="status-banner" id="srStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Add one shard, and count what moved</h3>
-          <p>Every key's old home and new home is listed under both schemes, with the moved ones marked, so the two fractions are a count you can scroll through rather than a formula. Move the shard count and watch the exact fractions and the sampled ones move together without ever meeting.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Add one shard, and count what moved</h3>
+            <p>Every key's old home and new home is listed under both schemes, with the moved ones marked, so the two fractions are a count you can scroll through rather than a formula. Move the shard count and watch the exact fractions and the sampled ones move together without ever meeting.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="srShards">Shards now (N)</label><span class="range-value" id="srShardsOut">7</span></div>
           <input id="srShards" type="range" min="2" max="24" step="1" value="7" />
@@ -1442,12 +1485,15 @@ a seeded sample of 600 keys
           <div class="kpi"><span>Keys spared by the ring</span><strong id="srSpared">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="srHint" style="margin:0;">The exact mod-N figure is an <strong>enumeration</strong>, not a sample: over a complete cycle of N(N+1) consecutive hashes, h mod N equals h mod (N+1) only when both are the same value below N, and by the Chinese Remainder Theorem each pair of residues occurs exactly once &mdash; so exactly N of every N(N+1) keys stay. The ring is drawn with one token a node under successor ownership: a key belongs to the first token at or after it, going clockwise.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The ring's numbers work the same way with one extra wrinkle: what moves is the arc the joining node actually took, which on this seed was <span class="math" data-say="12.89 percent">12.89%</span> of the ring rather than the <span class="math" data-say="12.50 percent">12.50%</span> its expectation predicts. The 82 keys that moved are the keys in that arc. The expectation is a property of the scheme; the arc is a property of the placement, and “Virtual Nodes” is about how far apart those two can be.</p><div class="example"><span class="label">Example &middot; Reading the identity as a design argument</span><p><span class="math" data-say="7 over 8">7/8</span> and <span class="math" data-say="1 over 8">1/8</span> are not two independent measurements that happen to be different. They partition the same key set: every key either changes shard under <span class="math" data-say="mod N">mod N</span> or does not, and the ones a ring leaves alone are precisely the complement. So the choice between the schemes is not a tuning decision, and a system that reshards regularly under <span class="math" data-say="mod N">mod N</span> is copying its entire dataset every time it grows. The identity is verified by enumeration at eleven shard counts from 1 to 100 rather than asserted once.</p></div><p>One thing the ring does not fix is the imbalance of the previous lesson. It changes what moves when <span class="math" data-say="N">N</span> changes; it does not make the arcs equal, and with one token a node they are wildly unequal. That is the next lesson.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Pricing a change in the shard count</h2></div><p>Two fractions, and the check that they add to one. The check is the part that catches an arithmetic slip before it becomes a migration plan.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the mod-N fraction as <span class="math" data-say="N over the quantity N plus 1">N/(N+1)</span>, from the current <span class="math" data-say="N">N</span></h3><p>Not <span class="math" data-say="1 over N">1/N</span>, and not <span class="math" data-say="1 over the quantity N plus 1">1/(N+1)</span>. At seven shards going to eight it is <span class="math" data-say="7 over 8">7/8</span>. The quickest sanity check is that the fraction should be close to 1 and get closer as the fleet grows, which is the opposite of what intuition offers.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the ring fraction as <span class="math" data-say="1 over the quantity N plus 1">1/(N+1)</span></h3><p>It is the share of the ring the joining node takes in expectation. On any particular placement the keys that move are the ones in the arcs it actually took, which will be near that fraction rather than on it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add them and require exactly 1</h3><p><span class="math" data-say="N over the quantity N plus 1, plus 1 over the quantity N plus 1, equals 1">N/(N+1) + 1/(N+1) = 1</span>. If your two fractions do not sum to one, one of them is wrong, and it is almost always the first: <span class="math" data-say="1 over N">1/N</span> and <span class="math" data-say="1 over the quantity N plus 1">1/(N+1)</span> do not add to one with anything.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Turn the fraction into bytes and hours before deciding</h3><p>A fraction is not yet a cost. <span class="math" data-say="7 over 8">7/8</span> of a 48 TB dataset is 42 TB to move, and “Rebalancing Cost” turns that into a duration and a utilisation. The argument for a ring is that the same growth step moves 6 TB instead.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Pricing a change in the shard count</h2>
+      <p class="lead-in">Two fractions, and the check that they add to one. The check is the part that catches an arithmetic slip before it becomes a migration plan.</p>
+      <ol class="key-ideas method"><li><strong>Write the mod-N fraction as <span class="math" data-say="N over the quantity N plus 1">N/(N+1)</span>, from the current <span class="math" data-say="N">N</span>.</strong> Not <span class="math" data-say="1 over N">1/N</span>, and not <span class="math" data-say="1 over the quantity N plus 1">1/(N+1)</span>. At seven shards going to eight it is <span class="math" data-say="7 over 8">7/8</span>. The quickest sanity check is that the fraction should be close to 1 and get closer as the fleet grows, which is the opposite of what intuition offers.</li><li><strong>Write the ring fraction as <span class="math" data-say="1 over the quantity N plus 1">1/(N+1)</span>.</strong> It is the share of the ring the joining node takes in expectation. On any particular placement the keys that move are the ones in the arcs it actually took, which will be near that fraction rather than on it.</li><li><strong>Add them and require exactly 1.</strong> <span class="math" data-say="N over the quantity N plus 1, plus 1 over the quantity N plus 1, equals 1">N/(N+1) + 1/(N+1) = 1</span>. If your two fractions do not sum to one, one of them is wrong, and it is almost always the first: <span class="math" data-say="1 over N">1/N</span> and <span class="math" data-say="1 over the quantity N plus 1">1/(N+1)</span> do not add to one with anything.</li><li><strong>Turn the fraction into bytes and hours before deciding.</strong> A fraction is not yet a cost. <span class="math" data-say="7 over 8">7/8</span> of a 48 TB dataset is 42 TB to move, and “Rebalancing Cost” turns that into a duration and a utilisation. The argument for a ring is that the same growth step moves 6 TB instead.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1476,17 +1522,16 @@ the seeded sample, 600 keys
   the ring spared 519 − 82 = 437 of the 600</div><p>The line worth memorising is <span class="math" data-say="49 equals 7 squared">49 = 7²</span>. The count of moved hashes over a complete cycle is <span class="math" data-say="N squared">N²</span> out of <span class="math" data-say="N of the quantity N plus 1">N(N+1)</span>, which is where the whole result comes from, and it is a fact about consecutive integers rather than about hashing.</p><p>For a faded rehearsal, take <span class="math" data-say="N equals 12">N = 12</span> going to 13. The supplied first move is the cycle length, <span class="math" data-say="12 times 13 equals 156">12 × 13 = 156</span>. Produce the count that stays, the count that moves, both fractions as exact ratios, and their sum; then predict the sampled figure the lab will report for 600 keys — not the exact fraction, but the range you would accept — and check it. Say which of your five numbers is exact and which is a draw.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Predicting that adding a node moves <span class="math" data-say="1 over N">1/N</span> of the keys</strong><span>It is the share the new node will <em>own</em>, not the share that moves. Under <span class="math" data-say="mod N">mod N</span> the moved fraction is <span class="math" data-say="N over the quantity N plus 1">N/(N+1)</span>, which at seven shards is <span class="math" data-say="6.13">6.13</span> times the prediction. The two numbers are so far apart that a migration plan built on the wrong one is not conservative, it is fiction.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding <span class="math" data-say="1 over N">1/N</span> and <span class="math" data-say="1 over the quantity N plus 1">1/(N+1)</span> and expecting one</strong><span>The identity is <span class="math" data-say="N over the quantity N plus 1, plus 1 over the quantity N plus 1, equals 1">N/(N+1) + 1/(N+1) = 1</span>, and it is the check that catches the previous mistake immediately. If your two fractions do not sum to exactly one, you are not describing the same key set twice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a sampled measurement to equal the exact fraction</strong><span>600 keys moved 86.50% of the time against an exact 87.50%, and the ring's 82 moves came from an arc that measured 12.89% rather than 12.50%. A finite key set is a draw. Chasing the difference is chasing noise; reporting the sample without its size is worse.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we will just add a node” sounds to you like a proposal to copy the dataset.</strong><p>You should be able to state both fractions for any <span class="math" data-say="N">N</span>, justify the mod-N one by the cycle argument, check the pair sums to one, and say why a sampled measurement of either will be near its fraction without matching it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A ring fixes what moves and does not fix how evenly the keys sit, because one token a node produces arcs that are nothing like equal. “Virtual Nodes” measures how unequal, and prices the fix: the relative spread falls like the square root of the number of tokens, which is a slower purchase than it looks.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Predicting that adding a node moves <span class="math" data-say="1 over N">1/N</span> of the keys</strong><span>It is the share the new node will <em>own</em>, not the share that moves. Under <span class="math" data-say="mod N">mod N</span> the moved fraction is <span class="math" data-say="N over the quantity N plus 1">N/(N+1)</span>, which at seven shards is <span class="math" data-say="6.13">6.13</span> times the prediction. The two numbers are so far apart that a migration plan built on the wrong one is not conservative, it is fiction.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding <span class="math" data-say="1 over N">1/N</span> and <span class="math" data-say="1 over the quantity N plus 1">1/(N+1)</span> and expecting one</strong><span>The identity is <span class="math" data-say="N over the quantity N plus 1, plus 1 over the quantity N plus 1, equals 1">N/(N+1) + 1/(N+1) = 1</span>, and it is the check that catches the previous mistake immediately. If your two fractions do not sum to exactly one, you are not describing the same key set twice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a sampled measurement to equal the exact fraction</strong><span>600 keys moved 86.50% of the time against an exact 87.50%, and the ring's 82 moves came from an arc that measured 12.89% rather than 12.50%. A finite key set is a draw. Chasing the difference is chasing noise; reporting the sample without its size is worse.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we will just add a node” sounds to you like a proposal to copy the dataset.</strong><p>You should be able to state both fractions for any <span class="math" data-say="N">N</span>, justify the mod-N one by the cycle argument, check the pair sums to one, and say why a sampled measurement of either will be near its fraction without matching it.</p></div></div><div class="note"><strong>Note:</strong> A ring fixes what moves and does not fix how evenly the keys sit, because one token a node produces arcs that are nothing like equal. “Virtual Nodes” measures how unequal, and prices the fix: the relative spread falls like the square root of the number of tokens, which is a slower purchase than it looks.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary><span class="math" data-say="mod N">mod N</span> scrambles every key when <span class="math" data-say="N">N</span> changes</summary><p>A key sits on shard <span class="math" data-say="h mod N">h mod N</span>. Change <span class="math" data-say="N">N</span> to <span class="math" data-say="N plus 1">N + 1</span> and <span class="math" data-say="h mod N plus 1">h mod (N+1)</span> is a different residue for almost every <span class="math" data-say="h">h</span>: the two agree only when both equal the same value below <span class="math" data-say="N">N</span>. Adding one node does not perturb the placement, it replaces it, and the keys that happen to stay are a coincidence rather than a design.</p></details><details class="recall"><summary>A ring moves only the arc the new node takes</summary><p>On a consistent-hash ring each node owns the arc ending at its token, and a key belongs to the first token at or after its position. Adding a node adds tokens and moves nothing else, so the keys that relocate are exactly the keys in the arcs the newcomer claimed — <span class="math" data-say="1 over the quantity N plus 1">1/(N+1)</span> of the ring in expectation, and whatever the newcomer's arcs actually measure on a given placement.</p></details><details class="recall"><summary>The two fractions add to one, and that is the argument</summary><p><span class="math" data-say="N over the quantity N plus 1, plus 1 over the quantity N plus 1, equals 1">N/(N+1) + 1/(N+1) = 1</span>. The keys that <span class="math" data-say="mod N">mod N</span> moves and the keys that a ring moves are the entire key set between them, so the comparison is not “somewhat better” — one scheme moves all but a sliver and the other moves the sliver. At <span class="math" data-say="N equals 7">N = 7</span> that is 87.50% against 12.50%, and the ratio only widens as the fleet grows.</p></details></div>
+      <h3>Summary</h3>
       <p>Adding one node to a <span class="math" data-say="mod N">mod N</span> placement does not move a small share of the keys; it moves <span class="math" data-say="N over the quantity N plus 1">N/(N+1)</span> of them, which is nearly all. A consistent-hash ring moves <span class="math" data-say="1 over the quantity N plus 1">1/(N+1)</span>, which is the rest of the same whole. The two fractions add to exactly one, and that single line is the entire argument for consistent hashing.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong><span class="math" data-say="mod N">mod N</span> scrambles every key when <span class="math" data-say="N">N</span> changes.</strong> A key sits on shard <span class="math" data-say="h mod N">h mod N</span>. Change <span class="math" data-say="N">N</span> to <span class="math" data-say="N plus 1">N + 1</span> and <span class="math" data-say="h mod N plus 1">h mod (N+1)</span> is a different residue for almost every <span class="math" data-say="h">h</span>: the two agree only when both equal the same value below <span class="math" data-say="N">N</span>. Adding one node does not perturb the placement, it replaces it, and the keys that happen to stay are a coincidence rather than a design.</li><li><strong>A ring moves only the arc the new node takes.</strong> On a consistent-hash ring each node owns the arc ending at its token, and a key belongs to the first token at or after its position. Adding a node adds tokens and moves nothing else, so the keys that relocate are exactly the keys in the arcs the newcomer claimed — <span class="math" data-say="1 over the quantity N plus 1">1/(N+1)</span> of the ring in expectation, and whatever the newcomer's arcs actually measure on a given placement.</li><li><strong>The two fractions add to one, and that is the argument.</strong> <span class="math" data-say="N over the quantity N plus 1, plus 1 over the quantity N plus 1, equals 1">N/(N+1) + 1/(N+1) = 1</span>. The keys that <span class="math" data-say="mod N">mod N</span> moves and the keys that a ring moves are the entire key set between them, so the comparison is not “somewhat better” — one scheme moves all but a sliver and the other moves the sliver. At <span class="math" data-say="N equals 7">N = 7</span> that is 87.50% against 12.50%, and the ratio only widens as the fleet grows.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="mod N to mod N plus 1 moves, N over the quantity N plus 1, exact, by enumeration. a ring moves, 1 over the quantity N plus 1, the arc the joining node took. their sum, N over the quantity N plus 1, plus 1 over the quantity N plus 1, equals 1. N equals 7 goes to 8, 7 over 8 equals 87.50 percent, against, 1 over 8 equals 12.50 percent. the it moves 1 over N intuition is wrong by 6.13 times at N equals 7" tabindex="0" role="region" aria-label="Mathematical notation">mod N → mod N+1 moves  N/(N+1)      exact, by enumeration
 a ring moves           1/(N+1)      the arc the joining node took
 their sum              N/(N+1) + 1/(N+1) = 1
@@ -2940,11 +2985,42 @@ the “it moves 1/N” intuition is wrong by 6.13× at N = 7</div><figcaption>Tw
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3012,7 +3088,7 @@ the “it moves 1/N” intuition is wrong by 6.13× at N = 7</div><figcaption>Tw
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

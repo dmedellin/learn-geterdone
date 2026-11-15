@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Replication and Consistency</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; What it costs</p>
       <h1>Synchronous Writes Wait for the Slowest</h1>
       <p class="lesson-lede">Compute a synchronous write&#x27;s p99 as the maximum of <span class="math" data-say="N minus 1">N − 1</span> replicas, and price the asynchronous alternative in bytes.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The write waits for the last follower, not the typical one</li><li>A maximum is a power, and a power is not a product</li><li>Asynchronous does not remove the cost, it changes the currency</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The distribution of the slowest follower</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Synchronous write, and its acknowledged-by distribution</span><p>A <strong>synchronous write</strong> is acknowledged to the client only after every follower has applied it. If each follower's reply time is independent with CDF <span class="math" data-say="F">F</span>, the write is acknowledged by <span class="math" data-say="t">t</span> with probability <span class="math" data-say="F of t to the power the quantity N minus 1">F(t)^(N − 1)</span>, the CDF of the <strong>maximum</strong> of the <span class="math" data-say="N minus 1">N − 1</span> followers.</p></div><p>Independence is a real assumption and it is named here rather than buried. Two replicas sharing a rack switch, a hypervisor or a garbage collector do not fail to reply independently, and this lesson's arithmetic describes replicas that do.</p><div class="mathblock" data-say="one replica&#x27;s ack time, as ms, weight over a total weight of 1000. t, weight, F of t, F of t squared, equals P of both followers acked by t. a table, shown on the page. p 99 of one replica, equals 16 milliseconds, first t with F of t, is at least 0.99. p 99 of the maximum, equals 24 milliseconds, first t with F of t squared is at least 0.99" tabindex="0" role="region" aria-label="Mathematical notation">one replica&#x27;s ack time, as ms:weight over a total weight of 1000
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The distribution of the slowest follower</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Synchronous write, and its acknowledged-by distribution</span><p>A <strong>synchronous write</strong> is acknowledged to the client only after every follower has applied it. If each follower's reply time is independent with CDF <span class="math" data-say="F">F</span>, the write is acknowledged by <span class="math" data-say="t">t</span> with probability <span class="math" data-say="F of t to the power the quantity N minus 1">F(t)^(N − 1)</span>, the CDF of the <strong>maximum</strong> of the <span class="math" data-say="N minus 1">N − 1</span> followers.</p></div><p>Independence is a real assumption and it is named here rather than buried. Two replicas sharing a rack switch, a hypervisor or a garbage collector do not fail to reply independently, and this lesson's arithmetic describes replicas that do.</p><div class="mathblock" data-say="one replica&#x27;s ack time, as ms, weight over a total weight of 1000. t, weight, F of t, F of t squared, equals P of both followers acked by t. a table, shown on the page. p 99 of one replica, equals 16 milliseconds, first t with F of t, is at least 0.99. p 99 of the maximum, equals 24 milliseconds, first t with F of t squared is at least 0.99" tabindex="0" role="region" aria-label="Mathematical notation">one replica&#x27;s ack time, as ms:weight over a total weight of 1000
 
    t    weight    F(t)      F(t)²  = P(both followers acked by t)
    2      600     0.600     0.360000
@@ -1411,12 +1455,11 @@ p99 of the maximum   = 24 ms     first t with F(t)² ≥ 0.99</div><p>Read the f
 and the mean is not the story either
   mean ack, one replica          = 3.536 ms
   mean wait, slowest of two      = 4.704224 ms
-  p99 wait, slowest of two       = 24 ms</div><p>The mean wait rises by about a third and the p99 rises by half, while the multiplicative claim charges three times. The reason is that latencies of parallel requests do not add — only latencies of <em>sequential</em> requests add. Three replicas contacted one after another really would cost something like <span class="math" data-say="3 times">3×</span>; three contacted at once cost the slowest of them.</p><div class="example"><span class="label">Example &middot; The asynchronous alternative, priced in bytes</span><p>Drop the wait and replicate in the background. The write's latency becomes the leader's alone, and the data that has been acknowledged to a client but reached no other machine is <span class="math" data-say="rate times l A g times bytes">rate × lag × bytes</span>: at <span class="math" data-say="2000">2000</span> writes/s, a mean lag of <span class="math" data-say="3.536 milliseconds">3.536 ms</span> and <span class="math" data-say="400">400</span> bytes a write, <span class="math" data-say="2000 times 0.003536 times 400 is approximately 2828">2000 × 0.003536 × 400 ≈ 2828</span> bytes, about <span class="math" data-say="2.83 kB">2.83 kB</span>. If the leader's disk is lost in that instant, those writes are gone and their clients were told they succeeded. That is the durability window, it is small here, and it is a number rather than a feeling.</p></div><p>Neither option is free and both are computable, which is the useful position to argue a design from: <span class="math" data-say="8 milliseconds">8 ms</span> added to the p99 of every write, or <span class="math" data-say="2.83 kB">2.83 kB</span> of acknowledged data living in one place. Which is worse is a question about the business; which is which is a question this page answers.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Synchronous writes wait for the slowest</h2></div><p>The maximum of N − 1 replicas, enumerated exactly</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  p99 wait, slowest of two       = 24 ms</div><p>The mean wait rises by about a third and the p99 rises by half, while the multiplicative claim charges three times. The reason is that latencies of parallel requests do not add — only latencies of <em>sequential</em> requests add. Three replicas contacted one after another really would cost something like <span class="math" data-say="3 times">3×</span>; three contacted at once cost the slowest of them.</p><div class="example"><span class="label">Example &middot; The asynchronous alternative, priced in bytes</span><p>Drop the wait and replicate in the background. The write's latency becomes the leader's alone, and the data that has been acknowledged to a client but reached no other machine is <span class="math" data-say="rate times l A g times bytes">rate × lag × bytes</span>: at <span class="math" data-say="2000">2000</span> writes/s, a mean lag of <span class="math" data-say="3.536 milliseconds">3.536 ms</span> and <span class="math" data-say="400">400</span> bytes a write, <span class="math" data-say="2000 times 0.003536 times 400 is approximately 2828">2000 × 0.003536 × 400 ≈ 2828</span> bytes, about <span class="math" data-say="2.83 kB">2.83 kB</span>. If the leader's disk is lost in that instant, those writes are gone and their clients were told they succeeded. That is the durability window, it is small here, and it is a number rather than a feeling.</p></div><p>Neither option is free and both are computable, which is the useful position to argue a design from: <span class="math" data-say="8 milliseconds">8 ms</span> added to the p99 of every write, or <span class="math" data-say="2.83 kB">2.83 kB</span> of acknowledged data living in one place. Which is worse is a question about the business; which is which is a question this page answers.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Synchronous writes wait for the slowest</h2></div><p>The maximum of N − 1 replicas, enumerated exactly</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A synchronous write waits for the slowest</strong><span>P(max of N &minus; 1 &le; t) = F(t)<sup>N&minus;1</sup></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>one replica</span><span class="tone-purple"><i class="legend-swatch"></i>the maximum of N &minus; 1</span><span class="tone-red"><i class="legend-swatch"></i>what N&times; would predict</span></div>
@@ -1425,10 +1468,10 @@ and the mean is not the story either
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="syTable"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="sySweep"></table></div>
       <div class="status-banner" id="syStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the replicas and their reply times</h3>
-          <p>The maximum's distribution is enumerated at every attainable time rather than sampled, so both percentiles are exact. Take <span class="math" data-say="N">N</span> to 5 and then to 9 and watch how slowly the p99 moves against what the claim in red is charging.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the replicas and their reply times</h3>
+            <p>The maximum's distribution is enumerated at every attainable time rather than sampled, so both percentiles are exact. Take <span class="math" data-say="N">N</span> to 5 and then to 9 and watch how slowly the p99 moves against what the claim in red is charging.</p>
         <div class="field">
           <label for="syPmf">One replica&rsquo;s ack time, as ms:weight pairs</label>
           <input id="syPmf" type="text" value="2:600, 4:300, 8:70, 16:22, 24:6, 40:2" inputmode="text" autocomplete="off">
@@ -1454,12 +1497,14 @@ and the mean is not the story either
           <div class="kpi"><span>Async instead: bytes at risk</span><strong id="syRisk">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="syHint" style="margin:0;">The maximum&rsquo;s distribution is F(t)<sup>N&minus;1</sup> evaluated at every attainable time, so the whole pmf is exact. Synchronising to three replicas does not cost three times one replica&rsquo;s latency &mdash; it costs whatever the slower of the two followers costs, and a maximum is not a sum.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Costing a synchronous write</h2></div><p>Four steps, and the third is the one that separates this from the arithmetic most people do in their heads.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Get one replica&#x27;s reply distribution, not its average</h3><p>A mean reply time cannot answer a question about a p99, and a maximum is almost entirely a question about the tail. What you need is the distribution, or at least several of its percentiles.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the followers, which is <span class="math" data-say="N minus 1">N − 1</span></h3><p>The leader's own apply is not a network wait and the write is not waiting for it in the same sense. Three replicas means two followers and an exponent of two; five replicas means an exponent of four.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Raise the CDF to that power and read the percentile off the result</h3><p><span class="math" data-say="F of t to the power the quantity N minus 1">F(t)^(N − 1)</span> at each attainable <span class="math" data-say="t">t</span>, then the smallest <span class="math" data-say="t">t</span> where it reaches <span class="math" data-say="0.99">0.99</span>. Do not multiply a percentile by anything: the percentile of a maximum is not a function of the percentile of one replica, it is a function of the whole curve.</p></article><article class="card concept-card"><div class="icon">4</div><h3>If you choose asynchronous instead, compute the window</h3><p><span class="math" data-say="write rate times mean l A g times bytes per write">write rate × mean lag × bytes per write</span> is the acknowledged data that exists in one place. State it in bytes and in seconds of writes, and say which failure would lose it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Costing a synchronous write</h2>
+      <p class="lead-in">Four steps, and the third is the one that separates this from the arithmetic most people do in their heads.</p>
+      <ol class="key-ideas method"><li><strong>Get one replica&#x27;s reply distribution, not its average.</strong> A mean reply time cannot answer a question about a p99, and a maximum is almost entirely a question about the tail. What you need is the distribution, or at least several of its percentiles.</li><li><strong>Count the followers, which is <span class="math" data-say="N minus 1">N − 1</span>.</strong> The leader's own apply is not a network wait and the write is not waiting for it in the same sense. Three replicas means two followers and an exponent of two; five replicas means an exponent of four.</li><li><strong>Raise the CDF to that power and read the percentile off the result.</strong> <span class="math" data-say="F of t to the power the quantity N minus 1">F(t)^(N − 1)</span> at each attainable <span class="math" data-say="t">t</span>, then the smallest <span class="math" data-say="t">t</span> where it reaches <span class="math" data-say="0.99">0.99</span>. Do not multiply a percentile by anything: the percentile of a maximum is not a function of the percentile of one replica, it is a function of the whole curve.</li><li><strong>If you choose asynchronous instead, compute the window.</strong> <span class="math" data-say="write rate times mean l A g times bytes per write">write rate × mean lag × bytes per write</span> is the acknowledged data that exists in one place. State it in bytes and in seconds of writes, and say which failure would lose it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1491,17 +1536,16 @@ asynchronous instead, at 2000 writes/s and 400 B a write
   2000 × 3.536 ms × 400 B / 1000 = 2828 B ≈ 2.83 kB at risk</div><p>The <span class="math" data-say="24 milliseconds">24 ms</span> is not a small penalty and nobody should pretend it is: half as much again on the p99 of every write is a real cost, and it is the price of not having an unreplicated window. What it is not is <span class="math" data-say="48 milliseconds">48 ms</span>, and a team that budgeted <span class="math" data-say="48 milliseconds">48 ms</span> has given up a design option on the strength of arithmetic that was never right.</p><p>Notice which part of the distribution did the work. The move from <span class="math" data-say="16">16</span> to <span class="math" data-say="24">24</span> happened because <span class="math" data-say="0.992 squared">0.992²</span> fell below <span class="math" data-say="0.99">0.99</span>, a shortfall of about eight thousandths. Everything below the <span class="math" data-say="99 t h">99th</span> percentile — the <span class="math" data-say="600">600</span> weight at <span class="math" data-say="2 milliseconds">2 ms</span>, the <span class="math" data-say="300">300</span> at <span class="math" data-say="4 milliseconds">4 ms</span> — contributed nothing at all to the answer. Tail questions are answered by tails.</p><p>For a faded rehearsal, take <span class="math" data-say="N">N</span> to <span class="math" data-say="5">5</span> and then to <span class="math" data-say="9">9</span> on the same distribution. The supplied first move is that the exponents are <span class="math" data-say="4">4</span> and <span class="math" data-say="8">8</span>, so the quantities to test are <span class="math" data-say="0.998 to the power 4">0.998⁴</span> and <span class="math" data-say="0.998 to the power 8">0.998⁸</span>. Predict both p99s before computing them, then check both in the lab, and say in one sentence why one of them did not move at all.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding replica latencies together</strong><span>Three replicas contacted in parallel cost the slowest of them, not the sum of them. The sum is right only for sequential calls — a leader that forwards to follower one, waits, then forwards to follower two. If your system does that, <span class="math" data-say="3 times">3×</span> is the correct arithmetic and the fix is to fan out rather than to accept the latency.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Answering a tail question with a mean</strong><span>The mean wait for the slowest of two here is <span class="math" data-say="4.704224 milliseconds">4.704224 ms</span> and the p99 is <span class="math" data-say="24 milliseconds">24 ms</span>, a factor of five apart. A maximum concentrates whatever mass the distribution has in its tail, so the mean of the maximum tells you almost nothing about the percentile a client experiences. Carry the distribution, not a summary of it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the independence assumption as free</strong><span><span class="math" data-say="F of t to the power the quantity N minus 1">F(t)^(N − 1)</span> assumes the followers are slow independently. Positively correlated replicas — a shared switch, a shared host, a synchronised compaction — have a maximum closer to a single replica's own time, so this arithmetic is pessimistic; but a shared cause of slowness also shifts each replica's own distribution, and then neither the exponent nor the measured <span class="math" data-say="F">F</span> describes the system you have. Where you can, measure the maximum directly and compare it with what the model predicts.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “three replicas cost three times one replica” sounds like an arithmetic error rather than a rule of thumb.</strong><p>You should be able to raise a measured CDF to the power <span class="math" data-say="N minus 1">N − 1</span>, read a p99 off the result, say how far the multiplicative claim is from it, compute the asynchronous alternative's window in bytes, and name the independence assumption the exponent rests on.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both options on this page leave something behind. The synchronous write leaves a longer p99; the asynchronous one leaves a follower that does not yet have the data — and a reader who reaches that follower gets the old value. “Replication Lag and Stale Reads” turns that into a probability you can read off a distribution, and it is the number behind every complaint that begins “I saved it and it did not save”.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding replica latencies together</strong><span>Three replicas contacted in parallel cost the slowest of them, not the sum of them. The sum is right only for sequential calls — a leader that forwards to follower one, waits, then forwards to follower two. If your system does that, <span class="math" data-say="3 times">3×</span> is the correct arithmetic and the fix is to fan out rather than to accept the latency.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Answering a tail question with a mean</strong><span>The mean wait for the slowest of two here is <span class="math" data-say="4.704224 milliseconds">4.704224 ms</span> and the p99 is <span class="math" data-say="24 milliseconds">24 ms</span>, a factor of five apart. A maximum concentrates whatever mass the distribution has in its tail, so the mean of the maximum tells you almost nothing about the percentile a client experiences. Carry the distribution, not a summary of it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the independence assumption as free</strong><span><span class="math" data-say="F of t to the power the quantity N minus 1">F(t)^(N − 1)</span> assumes the followers are slow independently. Positively correlated replicas — a shared switch, a shared host, a synchronised compaction — have a maximum closer to a single replica's own time, so this arithmetic is pessimistic; but a shared cause of slowness also shifts each replica's own distribution, and then neither the exponent nor the measured <span class="math" data-say="F">F</span> describes the system you have. Where you can, measure the maximum directly and compare it with what the model predicts.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “three replicas cost three times one replica” sounds like an arithmetic error rather than a rule of thumb.</strong><p>You should be able to raise a measured CDF to the power <span class="math" data-say="N minus 1">N − 1</span>, read a p99 off the result, say how far the multiplicative claim is from it, compute the asynchronous alternative's window in bytes, and name the independence assumption the exponent rests on.</p></div></div><div class="note"><strong>Note:</strong> Both options on this page leave something behind. The synchronous write leaves a longer p99; the asynchronous one leaves a follower that does not yet have the data — and a reader who reaches that follower gets the old value. “Replication Lag and Stale Reads” turns that into a probability you can read off a distribution, and it is the number behind every complaint that begins “I saved it and it did not save”.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The write waits for the last follower, not the typical one</summary><p>A synchronous write is acknowledged when every follower has acked, so its wait is the <em>maximum</em> of <span class="math" data-say="N minus 1">N − 1</span> reply times. Under independence, <span class="math" data-say="P of max at most t equals F of t to the power the quantity N minus 1">P(max ≤ t) = F(t)^(N − 1)</span>, because all <span class="math" data-say="N minus 1">N − 1</span> must land by <span class="math" data-say="t">t</span>. The median follower is irrelevant; the write is held by whichever one is slow this time, and which one that is changes every request.</p></details><details class="recall"><summary>A maximum is a power, and a power is not a product</summary><p>Raising a number below one to a power pushes it down, but nothing like as fast as multiplying a time by <span class="math" data-say="N">N</span> pushes that up. Here <span class="math" data-say="F of 16 equals 0.992">F(16) = 0.992</span> for one replica and <span class="math" data-say="0.992 squared equals 0.984064">0.992² = 0.984064</span> for two, which is still close to one — so the p99 moves from <span class="math" data-say="16 milliseconds">16 ms</span> to <span class="math" data-say="24 milliseconds">24 ms</span>, not to <span class="math" data-say="48 milliseconds">48 ms</span>. The penalty for replication is real and it is a fraction of the one intuition charges.</p></details><details class="recall"><summary>Asynchronous does not remove the cost, it changes the currency</summary><p>Replicating in the background removes the wait entirely and puts acknowledged-but-unreplicated data at risk instead: <span class="math" data-say="write rate times mean l A g times bytes per write">write rate × mean lag × bytes per write</span>. At <span class="math" data-say="2000">2000</span> writes/s, a mean lag of <span class="math" data-say="3.536 milliseconds">3.536 ms</span> and <span class="math" data-say="400">400</span> bytes a write that is about <span class="math" data-say="2.83 kB">2.83 kB</span> living on the leader and nowhere else. The trade is latency against a durability window, and both sides of it are computable.</p></details></div>
+      <h3>Summary</h3>
       <p>A write that waits for its followers is acknowledged when the last of them replies, so its distribution is the maximum of <span class="math" data-say="N minus 1">N − 1</span> reply times and its CDF is <span class="math" data-say="F of t">F(t)</span> raised to the power <span class="math" data-say="N minus 1">N − 1</span>. Maxima do not add: on a real reply distribution, three replicas cost <span class="math" data-say="24 milliseconds">24 ms</span> at the p99 against <span class="math" data-say="16 milliseconds">16 ms</span> for one, while “three replicas cost three times one replica” predicts <span class="math" data-say="48 milliseconds">48 ms</span> — exactly twice the truth. The asynchronous alternative charges no latency and risks un-replicated bytes instead.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The write waits for the last follower, not the typical one.</strong> A synchronous write is acknowledged when every follower has acked, so its wait is the <em>maximum</em> of <span class="math" data-say="N minus 1">N − 1</span> reply times. Under independence, <span class="math" data-say="P of max at most t equals F of t to the power the quantity N minus 1">P(max ≤ t) = F(t)^(N − 1)</span>, because all <span class="math" data-say="N minus 1">N − 1</span> must land by <span class="math" data-say="t">t</span>. The median follower is irrelevant; the write is held by whichever one is slow this time, and which one that is changes every request.</li><li><strong>A maximum is a power, and a power is not a product.</strong> Raising a number below one to a power pushes it down, but nothing like as fast as multiplying a time by <span class="math" data-say="N">N</span> pushes that up. Here <span class="math" data-say="F of 16 equals 0.992">F(16) = 0.992</span> for one replica and <span class="math" data-say="0.992 squared equals 0.984064">0.992² = 0.984064</span> for two, which is still close to one — so the p99 moves from <span class="math" data-say="16 milliseconds">16 ms</span> to <span class="math" data-say="24 milliseconds">24 ms</span>, not to <span class="math" data-say="48 milliseconds">48 ms</span>. The penalty for replication is real and it is a fraction of the one intuition charges.</li><li><strong>Asynchronous does not remove the cost, it changes the currency.</strong> Replicating in the background removes the wait entirely and puts acknowledged-but-unreplicated data at risk instead: <span class="math" data-say="write rate times mean l A g times bytes per write">write rate × mean lag × bytes per write</span>. At <span class="math" data-say="2000">2000</span> writes/s, a mean lag of <span class="math" data-say="3.536 milliseconds">3.536 ms</span> and <span class="math" data-say="400">400</span> bytes a write that is about <span class="math" data-say="2.83 kB">2.83 kB</span> living on the leader and nowhere else. The trade is latency against a durability window, and both sides of it are computable.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="P of acked by t equals F of t to the power the quantity N minus 1, the slowest follower, not the average. one replica, p 99 equals 16 milliseconds. synchronous to 3, p 99 equals 24 milliseconds, the maximum of 2 followers. 3 replicas cost 3 times predicts 48 milliseconds, exactly 2.00 times the truth. asynchronous instead, writes over s times mean l A g times bytes, on the leader alone" tabindex="0" role="region" aria-label="Mathematical notation">P(acked by t) = F(t)^(N − 1)        the slowest follower, not the average
 one replica          p99 = 16 ms
 synchronous to 3     p99 = 24 ms    the maximum of 2 followers
@@ -2971,11 +3015,42 @@ asynchronous instead: writes/s × mean lag × bytes, on the leader alone</div><f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3043,7 +3118,7 @@ asynchronous instead: writes/s × mean lag × bytes, on the leader alone</div><f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

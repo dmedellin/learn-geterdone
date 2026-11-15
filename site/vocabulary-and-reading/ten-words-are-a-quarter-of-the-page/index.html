@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,37 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Vocabulary and Reading</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The commonest words</p>
       <h1>Ten Words Are a Quarter of the Page</h1>
       <p class="lesson-lede">Rank the words of a page by how often they appear, and the top ten turn out to be the small words that hold a sentence together.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A few words do a great deal of the work</li><li>The top is made of grammar words</li><li>Each text has its own top</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The ten commonest words of the passage</h2>
-      <article class="prose reading"><p>The last lesson counted how much of a page a list covers. This one turns the question round. Ignore the list and count the page: which words appear most, and how much of the page do they fill? The answer does not depend on any list. It is a fact about the text.</p><h3>The rank of a word</h3><p>The lab counts every word of the text, ranks the different ones from the commonest down, and adds up the share as it goes. The passage has 936 words and 361 different ones. The commonest, <em>I</em>, appears 30 times and is 3.2% of the page. The commonest ten together are 25.6%.</p><h3>Ten, fifty, a hundred</h3><p>Three numbers sum up the shape of the list. On the passage, the ten commonest words cover 25.6%, the fifty commonest cover 54.5% and the hundred commonest cover 67.7%. On the play excerpt, with 605 different words, they cover 24.9%, 50.5% and 63.3%. On the modern documents, with 603 different words, 24.7%, 47.3% and 60.6%. The shapes are close. A quarter of a page is ten words, and about two thirds is a hundred.</p><h3>What kind of word</h3><p>Read the first ten of the passage and sort them. There are three pronouns for people, <em>I</em>, <em>she</em> and <em>you</em>, and <em>it</em>, which stands for a thing. There is <em>and</em>, which joins, and <em>that</em>, which in this passage joins too: in fourteen of its seventeen places it ties a verb to what follows (<em>persuaded that</em>, <em>I find that</em>), and in three it points (<em>on that point</em>). There are <em>the</em>, <em>to</em> and <em>of</em>, which go in front of a noun or a verb. And there is <em>was</em>, the past of <em>be</em>. Do not call it a helping verb here: the course Helping Verbs found that <em>be</em> is mostly a main verb, and in this passage not one of the twenty <em>was</em> is followed by an <em>-ing</em> verb. It stands before a quality (<em>was proud</em>), a participle (<em>was roused</em>) or a thing (<em>there was a time</em>).</p><p>This is why a quarter of a page costs a reader almost nothing, and also why knowing the ten does not get you through the page. They are the frame. The words that say what the page is about are in the other three quarters.</p><h3>Where the subject shows</h3><p>Text by text, the grammar part of the list stays the same and the subject part changes. In the play, the speakers' names <em>Cecily</em> and <em>Algernon</em> are in the ten. In the modern documents, <em>age</em> is, because a report on an older population says it again and again. The lab shows this when you switch the text, and the switch is worth making before you read the quiz.</p><h3>The rest of the page</h3><p>After the hundred, the list falls steeply. The passage's 361 different words, less the first hundred, share 32.3% of the page. Many of them appear once. These are the words that say what the passage is about, and the table of words not covered, in the lesson before, lists the ones you have to look up.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>How much of a page the 2,800 words cover</h2></div><p>Every word of the text checked against the list, by the rules of the nine courses before</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The ten commonest words of the passage</h2><div class="prose reading"><p>The last lesson counted how much of a page a list covers. This one turns the question round. Ignore the list and count the page: which words appear most, and how much of the page do they fill? The answer does not depend on any list. It is a fact about the text.</p><h3>The rank of a word</h3><p>The lab counts every word of the text, ranks the different ones from the commonest down, and adds up the share as it goes. The passage has 936 words and 361 different ones. The commonest, <em>I</em>, appears 30 times and is 3.2% of the page. The commonest ten together are 25.6%.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>How much of a page the 2,800 words cover</h2></div><p>Every word of the text checked against the list, by the rules of the nine courses before</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
 <div class="kpi-grid"><div class="kpi"><span>words read</span><strong id="cvN">&mdash;</strong></div><div class="kpi"><span>first band, 1,050 headwords</span><strong id="cvB1">&mdash;</strong></div><div class="kpi"><span>first two bands, 2,050</span><strong id="cvB2">&mdash;</strong></div><div class="kpi"><span>all three, 2,859</span><strong id="cvB3">&mdash;</strong></div><div class="kpi"><span>and names</span><strong id="cvNames">&mdash;</strong></div><div class="kpi"><span>and families</span><strong id="cvFam">&mdash;</strong></div><div class="kpi"><span>words not covered</span><strong id="cvOff">&mdash;</strong></div><div class="kpi"><span>different words</span><strong id="cvDistinct">&mdash;</strong></div></div><div class="kpi-grid"><div class="kpi"><span>the commonest ten</span><strong id="cvTop10">&mdash;</strong></div><div class="kpi"><span>fifty</span><strong id="cvTop50">&mdash;</strong></div><div class="kpi"><span>a hundred</span><strong id="cvTop100">&mdash;</strong></div></div><p class="small-copy" id="cvLimit"></p><div class="table-wrap" style="max-height:20rem;overflow-y:auto;" tabindex="0" role="region" aria-label="Data table"><table id="cvTable"><thead><tr id="cvCols"></tr></thead><tbody id="cvBody"></tbody></table></div><details><summary>The text, printed in full</summary><div class="mathblock" id="cvText" style="font-size:0.84rem;line-height:1.9;" tabindex="0" role="region" aria-label="Mathematical notation"></div></details>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Rank the words of a page</h3>
-          <p>The table lists the hundred commonest words of the text you choose, with the number of times each appears and the share of the page so far. Words with the same count are put in the order of the alphabet. A name is a word too, so it is ranked with the rest.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Rank the words of a page</h3>
+            <p>The table lists the hundred commonest words of the text you choose, with the number of times each appears and the share of the page so far. Words with the same count are put in the order of the alphabet. A name is a word too, so it is ranked with the rest.</p>
 <label for="cvPreset">Text</label> <select id="cvPreset"><option value="passage" selected="selected">the 936-word passage from the novel (1813)</option><option value="wilde">1,975 words of the play (1895)</option><option value="modern">the two modern documents</option><option value="own">a text of your own</option></select> <label for="cvShow">List</label> <select id="cvShow"><option value="bands">the words not covered</option><option value="top" selected="selected">the commonest words, ranked</option><option value="family">the words a family adds</option></select><div id="cvOwnBox"><label for="cvOwn">Paste a text of fifty words or more</label><textarea id="cvOwn" rows="6" style="width:100%;"></textarea></div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Ten, fifty, a hundred</h3><p>Three numbers sum up the shape of the list. On the passage, the ten commonest words cover 25.6%, the fifty commonest cover 54.5% and the hundred commonest cover 67.7%. On the play excerpt, with 605 different words, they cover 24.9%, 50.5% and 63.3%. On the modern documents, with 603 different words, 24.7%, 47.3% and 60.6%. The shapes are close. A quarter of a page is ten words, and about two thirds is a hundred.</p><h3>What kind of word</h3><p>Read the first ten of the passage and sort them. There are three pronouns for people, <em>I</em>, <em>she</em> and <em>you</em>, and <em>it</em>, which stands for a thing. There is <em>and</em>, which joins, and <em>that</em>, which in this passage joins too: in fourteen of its seventeen places it ties a verb to what follows (<em>persuaded that</em>, <em>I find that</em>), and in three it points (<em>on that point</em>). There are <em>the</em>, <em>to</em> and <em>of</em>, which go in front of a noun or a verb. And there is <em>was</em>, the past of <em>be</em>. Do not call it a helping verb here: the course Helping Verbs found that <em>be</em> is mostly a main verb, and in this passage not one of the twenty <em>was</em> is followed by an <em>-ing</em> verb. It stands before a quality (<em>was proud</em>), a participle (<em>was roused</em>) or a thing (<em>there was a time</em>).</p><p>This is why a quarter of a page costs a reader almost nothing, and also why knowing the ten does not get you through the page. They are the frame. The words that say what the page is about are in the other three quarters.</p><h3>Where the subject shows</h3><p>Text by text, the grammar part of the list stays the same and the subject part changes. In the play, the speakers' names <em>Cecily</em> and <em>Algernon</em> are in the ten. In the modern documents, <em>age</em> is, because a report on an older population says it again and again. The lab shows this when you switch the text, and the switch is worth making before you read the quiz.</p><h3>The rest of the page</h3><p>After the hundred, the list falls steeply. The passage's 361 different words, less the first hundred, share 32.3% of the page. Many of them appear once. These are the words that say what the passage is about, and the table of words not covered, in the lesson before, lists the ones you have to look up.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a ranked list for a text in front of you</h2></div><p>Four steps.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Switch the list to the commonest words</h3><p>Choose &ldquo;the commonest words, ranked&rdquo; under the text. The table now shows rank, word, times, and the share of the page so far.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read down the share so far</h3><p>The last number in the row for rank 10 is the share the top ten cover. Do the same at rank 50 and rank 100.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Name the kind of each word at the top</h3><p>Is it a word for a thing, an act or a quality? Or is it a small word that joins, stands for another word, goes in front of a noun, or is a form of <em>be</em>? Count each kind.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare two texts</h3><p>Switch the text and read the top ten again. Which words stayed, and which are the new text's own?</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a ranked list for a text in front of you</h2>
+      <p class="lead-in">Four steps.</p>
+      <ol class="key-ideas method"><li><strong>Switch the list to the commonest words.</strong> Choose &ldquo;the commonest words, ranked&rdquo; under the text. The table now shows rank, word, times, and the share of the page so far.</li><li><strong>Read down the share so far.</strong> The last number in the row for rank 10 is the share the top ten cover. Do the same at rank 50 and rank 100.</li><li><strong>Name the kind of each word at the top.</strong> Is it a word for a thing, an act or a quality? Or is it a small word that joins, stands for another word, goes in front of a noun, or is a form of <em>be</em>? Count each kind.</li><li><strong>Compare two texts.</strong> Switch the text and read the top ten again. Which words stayed, and which are the new text's own?</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1431,17 +1477,16 @@
 10  that   17   25.6%</div><p>Add the ten counts: 30, 29, 27, 26, 26, 25, 21, 20, 19 and 17 make 240, and 240 of 936 is 25.6%. Not one of the ten names a thing or an act. Three are pronouns for people (<em>I</em>, <em>she</em>, <em>you</em>) and one for a thing (<em>it</em>); the rest join, stand in front of a noun or a verb, or are the verb <em>be</em>. <em>And</em> and <em>the</em> have the same count, 26, and the lab puts <em>and</em> first only because it comes first in the alphabet.</p><p>The passage is a conversation, which is why <em>I</em> and <em>you</em> are so high. Switch to the play and the ten are <em>I</em> (89), <em>you</em> (68), <em>Cecily</em> (64), <em>the</em> (51), <em>to</em> (47), <em>of</em> (38), <em>Algernon</em> (37), <em>a</em> (34), <em>it</em> (33) and <em>is</em> (31). Two of them are names, and most of those counts are the name printed before each speech. On the modern documents the ten are <em>the</em> (117), <em>to</em>, <em>and</em>, <em>in</em>, <em>of</em>, <em>a</em>, <em>for</em>, <em>age</em> (21), <em>as</em> and <em>that</em>. Nine of them are grammar words; <em>age</em> is the subject of the report.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the commonest words are the ones to learn first because they carry the meaning</strong><span>They carry the grammar. The passage's ten commonest words fill a quarter of the page and say almost nothing about what it is about. A reader at this level has almost certainly met every one of them. The words that stand between you and an easy read are further down, and the lab's other list, the words not covered, is where they are printed. The course called Listening shows the same small words from the other side: they are the ones fast speech says weakly.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the share as a count of words learned</strong><span>The first hundred words cover 67.7% of the passage, but they are 100 of its 361 different words. Every repeat of a word counts, so the first words you learn are worth far more than the last. The next hundred are worth less than the first hundred, and the last 261 share 32.3% between them.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the top of one text for the top of every text</strong><span>The play puts two names in its ten and the modern documents put <em>age</em> in theirs. A ranked list is a list for one text. Its grammar part travels from text to text and its subject part does not.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can rank a page&#x27;s words by count and say what the top ten, fifty and hundred cover.</strong><p>You should be able to read a ranked list off the lab, work out the share the first ten, fifty and hundred words cover, name the kind of word that fills the top, and say why the top of one text is not the top of another.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab ranks spellings. <em>Light</em> as a thing and <em>light</em> as a quality are one word to it, and so are <em>can</em> the verb and <em>can</em> the tin. The whole novel was counted once, which no page can carry, and the quoted result is 22.4% for the top ten, 48.1% for fifty and 58.9% for a hundred, in 6,308 different words. It is a longer text with more kinds of word in it, so the shares are lower.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the commonest words are the ones to learn first because they carry the meaning</strong><span>They carry the grammar. The passage's ten commonest words fill a quarter of the page and say almost nothing about what it is about. A reader at this level has almost certainly met every one of them. The words that stand between you and an easy read are further down, and the lab's other list, the words not covered, is where they are printed. The course called Listening shows the same small words from the other side: they are the ones fast speech says weakly.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the share as a count of words learned</strong><span>The first hundred words cover 67.7% of the passage, but they are 100 of its 361 different words. Every repeat of a word counts, so the first words you learn are worth far more than the last. The next hundred are worth less than the first hundred, and the last 261 share 32.3% between them.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the top of one text for the top of every text</strong><span>The play puts two names in its ten and the modern documents put <em>age</em> in theirs. A ranked list is a list for one text. Its grammar part travels from text to text and its subject part does not.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can rank a page&#x27;s words by count and say what the top ten, fifty and hundred cover.</strong><p>You should be able to read a ranked list off the lab, work out the share the first ten, fifty and hundred words cover, name the kind of word that fills the top, and say why the top of one text is not the top of another.</p></div></div><div class="note"><strong>Note:</strong> The lab ranks spellings. <em>Light</em> as a thing and <em>light</em> as a quality are one word to it, and so are <em>can</em> the verb and <em>can</em> the tin. The whole novel was counted once, which no page can carry, and the quoted result is 22.4% for the top ten, 48.1% for fifty and 58.9% for a hundred, in 6,308 different words. It is a longer text with more kinds of word in it, so the shares are lower.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A few words do a great deal of the work</summary><p>On the passage, ten words fill 240 of the 936 places, which is 25.6%. Fifty words fill 54.5%, and a hundred fill 67.7%. The other 261 different words share the last 32.3%. A page is mostly the same small words, over and over, with the rest of the words as the thin part.</p></details><details class="recall"><summary>The top is made of grammar words</summary><p>The passage's ten are <em>I</em>, <em>she</em>, <em>you</em>, <em>and</em>, <em>the</em>, <em>to</em>, <em>of</em>, <em>was</em>, <em>it</em> and <em>that</em>. Four are pronouns; <em>and</em> and <em>that</em> join one part of a sentence to the next; <em>the</em>, <em>to</em> and <em>of</em> stand in front of a noun or a verb; and <em>was</em> is the verb <em>be</em>. They carry the grammar, and they say very little about what the page is about.</p></details><details class="recall"><summary>Each text has its own top</summary><p>The play has <em>I</em> first and <em>you</em> second, and then a name, <em>Cecily</em>. The modern documents, which include a report on an older population, have <em>age</em> itself in the ten. The shares are close, 25.6%, 24.9% and 24.7%, but the words are not the same, and the difference is the text's own subject.</p></details></div>
+      <h3>Summary</h3>
       <p>Rank the 361 different words of the passage by how often they appear, and the first ten cover 25.6% of the page. The first fifty cover 54.5%, and the first hundred 67.7%. None of the ten names a thing or an act: they are <em>I</em>, <em>she</em>, <em>you</em>, <em>and</em>, <em>the</em>, <em>to</em>, <em>of</em>, <em>was</em>, <em>it</em> and <em>that</em>. They hold the sentence together, and a page is built round them.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A few words do a great deal of the work.</strong> On the passage, ten words fill 240 of the 936 places, which is 25.6%. Fifty words fill 54.5%, and a hundred fill 67.7%. The other 261 different words share the last 32.3%. A page is mostly the same small words, over and over, with the rest of the words as the thin part.</li><li><strong>The top is made of grammar words.</strong> The passage's ten are <em>I</em>, <em>she</em>, <em>you</em>, <em>and</em>, <em>the</em>, <em>to</em>, <em>of</em>, <em>was</em>, <em>it</em> and <em>that</em>. Four are pronouns; <em>and</em> and <em>that</em> join one part of a sentence to the next; <em>the</em>, <em>to</em> and <em>of</em> stand in front of a noun or a verb; and <em>was</em> is the verb <em>be</em>. They carry the grammar, and they say very little about what the page is about.</li><li><strong>Each text has its own top.</strong> The play has <em>I</em> first and <em>you</em> second, and then a name, <em>Cecily</em>. The modern documents, which include a report on an older population, have <em>age</em> itself in the ten. The shares are close, 25.6%, 24.9% and 24.7%, but the words are not the same, and the difference is the text's own subject.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the passage, ten 25.6 percent, fifty 54.5 percent. hundred 67.7 percent. the play, ten 24.9 percent, fifty 50.5 percent. hundred 63.3 percent. modern papers, ten 24.7 percent, fifty 47.3 percent. hundred 60.6 percent" tabindex="0" role="region" aria-label="Mathematical notation">the passage    ten 25.6%   fifty 54.5%
                hundred 67.7%
 the play       ten 24.9%   fifty 50.5%
@@ -2121,11 +2166,42 @@ var cvFamily = function (t) {
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2193,7 +2269,7 @@ var cvFamily = function (t) {
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Guided Practice</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Pushing the pace</p>
       <h1>Repeated Reading and Transfer</h1>
       <p class="lesson-lede">Read one passage three times and a new one once, and see which gain belongs to the passage and which to you.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The repeat gain</li><li>The transfer gain</li><li>A method from another field</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Whose gain is it?</h2>
-      <article class="prose reading"><p>The drill below asks for four readings. Read the first passage three times at your natural pace, pressing Start for each; the third reading has six questions. Then read the new passage once, with its six questions. Do all four in one sitting, with a short pause between: this drill is the one exception to the Daily Drill's limit of two timed readings a sitting.</p><p>S. Jay Samuels described the method of repeated readings in 1979, for children learning to read fluently: read a short passage again and again until it goes smoothly, then move to the next. Therrien's 2004 meta-analysis of studies with school-age students, with and without learning disabilities, found that it improved their reading of the practised passages and also of new ones, though less on the new ones.</p><p>For a skilled adult reader that finding is a question, not an answer: the studies were not of readers like you. This drill's new-passage reading is the test. The gain on the repeated passage will almost certainly be large, and it is a gain in knowing that passage.</p><p>The preset <strong>practice-effect</strong> is a reader whose three readings of the repeated passage ran at 240, 300 and 340 words a minute, and whose new passage ran at 248. The repeat gain is 340 − 240 = +100 words a minute; the transfer gain is 248 − 240 = +8. A hundred words a minute came from knowing the text; eight went with the reader to a new one, and eight is well inside the difference two passages make on their own.</p><p>The preset <strong>transfer</strong> keeps the three readings and puts the new passage at 275: a transfer gain of 275 − 240 = +35. That is a bigger number, and still one reading of one new passage, compared with the first reading of a different one. Measured against this reader's baseline range, it would be at best above the range once.</p><p>The first reading is the baseline the two gains share, and it is itself one reading of one passage. A slow first reading inflates both gains; a fast one shrinks both. That is a reason to compare the new passage with your baseline range as well as with reading one, which the tile does not do and your log can.</p><h3>Why the method can still be useful</h3><p>None of this makes repeated reading worthless. Reading a passage you need to know well several times does help you know it, and for school-age readers the gains reached new passages too. What the drill rules out is reading the third reading's rate as a new speed. If your new passage gained nothing, you have not refuted Therrien, whose readers were children, and the meta-analysis has not refuted you.</p><p>The three readings of the repeated passage are logged as a condition and stay out of the verdicts. The new passage, read at your natural pace with its questions, is logged as a test, like the Daily Drill's tests, and counts in your log.</p><p>Then today's Daily Drill. The next course, How the Eyes Read, computes the limits every technique here is read against: what a stop of the eyes costs, and how far one glance can reach.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Timed reading drill</h2></div><p>rate, comprehension and the effective rate, measured on your own reading</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Whose gain is it?</h2><div class="prose reading"><p>The drill below asks for four readings. Read the first passage three times at your natural pace, pressing Start for each; the third reading has six questions. Then read the new passage once, with its six questions. Do all four in one sitting, with a short pause between: this drill is the one exception to the Daily Drill's limit of two timed readings a sitting.</p><p>S. Jay Samuels described the method of repeated readings in 1979, for children learning to read fluently: read a short passage again and again until it goes smoothly, then move to the next. Therrien's 2004 meta-analysis of studies with school-age students, with and without learning disabilities, found that it improved their reading of the practised passages and also of new ones, though less on the new ones.</p><p>For a skilled adult reader that finding is a question, not an answer: the studies were not of readers like you. This drill's new-passage reading is the test. The gain on the repeated passage will almost certainly be large, and it is a gain in knowing that passage.</p><p>The preset <strong>practice-effect</strong> is a reader whose three readings of the repeated passage ran at 240, 300 and 340 words a minute, and whose new passage ran at 248. The repeat gain is 340 − 240 = +100 words a minute; the transfer gain is 248 − 240 = +8. A hundred words a minute came from knowing the text; eight went with the reader to a new one, and eight is well inside the difference two passages make on their own.</p><p>The preset <strong>transfer</strong> keeps the three readings and puts the new passage at 275: a transfer gain of 275 − 240 = +35. That is a bigger number, and still one reading of one new passage, compared with the first reading of a different one. Measured against this reader's baseline range, it would be at best above the range once.</p><p>The first reading is the baseline the two gains share, and it is itself one reading of one passage. A slow first reading inflates both gains; a fast one shrinks both. That is a reason to compare the new passage with your baseline range as well as with reading one, which the tile does not do and your log can.</p><h3>Why the method can still be useful</h3><p>None of this makes repeated reading worthless. Reading a passage you need to know well several times does help you know it, and for school-age readers the gains reached new passages too. What the drill rules out is reading the third reading's rate as a new speed. If your new passage gained nothing, you have not refuted Therrien, whose readers were children, and the meta-analysis has not refuted you.</p><p>The three readings of the repeated passage are logged as a condition and stay out of the verdicts. The new passage, read at your natural pace with its questions, is logged as a test, like the Daily Drill's tests, and counts in your log.</p><p>Then today's Daily Drill. The next course, How the Eyes Read, computes the limits every technique here is read against: what a stop of the eyes costs, and how far one glance can reach.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Timed reading drill</h2></div><p>rate, comprehension and the effective rate, measured on your own reading</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Timed reading drill</strong><span>rate, comprehension and the effective rate, measured on your own reading</span></div>
       </div>
@@ -1437,10 +1480,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="drTable"></table></div>
       <div class="status-banner" id="drStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Four readings, in numbers</h3>
-          <p>Your measurement: read the first passage three times, then the new one, pressing Start, Done and Score for each. Each reading fills its own boxes; until then they hold a worked example. Only readings 3 and 4 have questions. One question is <span data-say="is approximately 16.7">≈ 16.7</span> points; a one-question difference is not a result.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Four readings, in numbers</h3>
+            <p>Your measurement: read the first passage three times, then the new one, pressing Start, Done and Score for each. Each reading fills its own boxes; until then they hold a worked example. Only readings 3 and 4 have questions. One question is <span data-say="is approximately 16.7">≈ 16.7</span> points; a one-question difference is not a result.</p>
         <div class="field">
           <label for="drPreset">Worked example</label>
           <select id="drPreset"><option value="practice-effect" selected>practice-effect: new passage at 248</option><option value="transfer">transfer: new passage at 275</option></select>
@@ -1518,12 +1561,14 @@
           <div class="kpi"><span>Gain on the new passage (4 − 1)</span><strong id="drTransferGain">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing transfer on another day</h2></div><p>The same question on your own texts: does practice on one help on the next?</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Choose two matched texts</h3><p>Two passages of about the same length, kind and difficulty, neither of which you have read.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read the first three times</h3><p>Time each reading at your natural pace. Answer questions, or write a two-sentence summary, after the third.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read the second once</h3><p>Time it at your natural pace and check your understanding the same way.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compute both gains, and judge the second</h3><p>Subtract reading one from reading three, and from the new reading. Judge the new reading against your baseline range, by the Subject's rule.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Open The Daily Drill for today's session. Four readings are more than a sitting should hold, so if this drill was today's sitting, the session waits until tomorrow.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing transfer on another day</h2>
+      <p class="lead-in">The same question on your own texts: does practice on one help on the next?</p>
+      <ol class="key-ideas method"><li><strong>Choose two matched texts.</strong> Two passages of about the same length, kind and difficulty, neither of which you have read.</li><li><strong>Read the first three times.</strong> Time each reading at your natural pace. Answer questions, or write a two-sentence summary, after the third.</li><li><strong>Read the second once.</strong> Time it at your natural pace and check your understanding the same way.</li><li><strong>Compute both gains, and judge the second.</strong> Subtract reading one from reading three, and from the new reading. Judge the new reading against your baseline range, by the Subject's rule.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Open The Daily Drill for today's session. Four readings are more than a sitting should hold, so if this drill was today's sitting, the session waits until tomorrow.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1540,17 +1585,16 @@ repeat gain = 340 − 240 = +100
 transfer gain = 248 − 240 = +8</div><p>The hundred belongs to the passage. The eight is the only part that could belong to the reader, and one question or one passage can make more difference than that.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing the third reading shows your new speed</strong><span>It shows that you know the passage. By the third reading the words, the order of the ideas and the ending are familiar, and the rate rises for that reason. Repeated reading is a fluency method from work with school-age readers, where it also improved new passages, less than the practised one (Therrien 2004); for a skilled adult, this drill's new-passage reading is the test.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Measuring the transfer gain against a slow first reading</strong><span>Both gains are measured from reading one. If that reading was slow for reasons of its own, both gains look larger. Check the new passage's rate against your baseline range too.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a school-age finding as an adult one</strong><span>Therrien's meta-analysis was of school-age students. That it found transfer there is a reason to test it on yourself, not a result about you.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can tell the two gains apart without the lab.</strong><p>Given four rates, three on one passage and one on a new passage, compute the repeat gain and the transfer gain, name the one that measures the reader, and say what else you would need to call it a change.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The two passages are matched, not identical, and the new one always comes last, after three readings' practice and some tiredness: the two confounds of any two-reading comparison, here in a fixed order. The transfer gain is one reading against one other reading, which is why it is read against your baseline range as well.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing the third reading shows your new speed</strong><span>It shows that you know the passage. By the third reading the words, the order of the ideas and the ending are familiar, and the rate rises for that reason. Repeated reading is a fluency method from work with school-age readers, where it also improved new passages, less than the practised one (Therrien 2004); for a skilled adult, this drill's new-passage reading is the test.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Measuring the transfer gain against a slow first reading</strong><span>Both gains are measured from reading one. If that reading was slow for reasons of its own, both gains look larger. Check the new passage's rate against your baseline range too.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a school-age finding as an adult one</strong><span>Therrien's meta-analysis was of school-age students. That it found transfer there is a reason to test it on yourself, not a result about you.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can tell the two gains apart without the lab.</strong><p>Given four rates, three on one passage and one on a new passage, compute the repeat gain and the transfer gain, name the one that measures the reader, and say what else you would need to call it a change.</p></div></div><div class="note"><strong>Note:</strong> The two passages are matched, not identical, and the new one always comes last, after three readings' practice and some tiredness: the two confounds of any two-reading comparison, here in a fixed order. The transfer gain is one reading against one other reading, which is why it is read against your baseline range as well.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The repeat gain</summary><p>The third reading of a passage minus the first. It is large for almost everyone, because by the third time you know the words, the order of the ideas and where the passage is going.</p></details><details class="recall"><summary>The transfer gain</summary><p>The rate on a new, matched passage minus the first reading of the repeated one. It is the part of any gain that went with you to a text you had not seen.</p></details><details class="recall"><summary>A method from another field</summary><p>Repeated reading is a fluency method from work with school-age readers. It is here because its evidence asks the right question: whether practice on one text helps on the next.</p></details></div>
+      <h3>Summary</h3>
       <p>Read a passage three times, then a matched passage you have never seen. The rate on the repeated passage rises because you know it; the rate on the new one is the only one that measures you. The lab computes both gains against the first reading.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The repeat gain.</strong> The third reading of a passage minus the first. It is large for almost everyone, because by the third time you know the words, the order of the ideas and where the passage is going.</li><li><strong>The transfer gain.</strong> The rate on a new, matched passage minus the first reading of the repeated one. It is the part of any gain that went with you to a text you had not seen.</li><li><strong>A method from another field.</strong> Repeated reading is a fluency method from work with school-age readers. It is here because its evidence asks the right question: whether practice on one text helps on the next.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="repeat gain equals reading 3 minus reading 1. transfer gain equals new passage minus reading 1. the repeat gain measures the passage. the transfer gain measures the reader" tabindex="0" role="region" aria-label="Mathematical notation">repeat gain = reading 3 − reading 1
 transfer gain = new passage − reading 1
 the repeat gain measures the passage
@@ -2534,11 +2578,42 @@ the transfer gain measures the reader</div><figcaption>Two gains in four lines</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2606,7 +2681,7 @@ the transfer gain measures the reader</div><figcaption>Two gains in four lines</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Graphs and Trees</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Basics</p>
       <h1>Graphs and Graph Models</h1>
       <p class="lesson-lede">Vertices, edges, and the things they model.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A graph is a relation, drawn</li><li>The drawing is not the graph</li><li>The variants are not interchangeable</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>What a graph is</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Simple graph</span><p>A <strong>simple graph</strong> <span class="math" data-say="G equals V, E">G = (V, E)</span> is a finite set <span class="math" data-say="V">V</span> of <strong>vertices</strong> together with a set <span class="math" data-say="E">E</span> of <strong>edges</strong>, each an unordered pair of distinct vertices. No loops and no repeated edges.</p></div><p>Two vertices joined by an edge are <strong>adjacent</strong> or <strong>neighbours</strong>; a vertex and an edge meeting are <strong>incident</strong>. <span class="math" data-say="the size of V">|V|</span> is the <strong>order</strong> and <span class="math" data-say="the size of E">|E|</span> the <strong>size</strong>.</p><div class="mathblock" data-say="variant, edges may and so on, example use. simple graph, neither loop nor repeat, friendship. multigraph, repeat, road networks with. parallel routes. pseudograph, loop and repeat, state machines. directed graph, have a direction, dependencies, the web. weighted graph, carry a number, distances, costs" tabindex="0" role="region" aria-label="Mathematical notation">variant           edges may…                  example use
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>What a graph is</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Simple graph</span><p>A <strong>simple graph</strong> <span class="math" data-say="G equals V, E">G = (V, E)</span> is a finite set <span class="math" data-say="V">V</span> of <strong>vertices</strong> together with a set <span class="math" data-say="E">E</span> of <strong>edges</strong>, each an unordered pair of distinct vertices. No loops and no repeated edges.</p></div><p>Two vertices joined by an edge are <strong>adjacent</strong> or <strong>neighbours</strong>; a vertex and an edge meeting are <strong>incident</strong>. <span class="math" data-say="the size of V">|V|</span> is the <strong>order</strong> and <span class="math" data-say="the size of E">|E|</span> the <strong>size</strong>.</p><div class="mathblock" data-say="variant, edges may and so on, example use. simple graph, neither loop nor repeat, friendship. multigraph, repeat, road networks with. parallel routes. pseudograph, loop and repeat, state machines. directed graph, have a direction, dependencies, the web. weighted graph, carry a number, distances, costs" tabindex="0" role="region" aria-label="Mathematical notation">variant           edges may…                  example use
 simple graph      neither loop nor repeat     friendship
 multigraph        repeat                      road networks with
                                               parallel routes
@@ -1402,12 +1446,11 @@ Cₙ        cycle                 a single closed ring   n edges
 Pₙ        path                  a single open chain    n−1 edges
 K_{m,n}   complete bipartite    every left–right pair  mn edges
 Qₙ        hypercube             bit strings differing  n·2^{n−1} edges
-                                in one position</div><p><span class="math" data-say="K sub 5">K₅</span> and <span class="math" data-say="K sub 3, 3">K_{3,3}</span> matter later: “Planar Graphs and Euler's Formula” shows they are precisely the obstructions to drawing a graph in the plane without crossings.</p><h3>Four models</h3><ul><li><strong>Social networks.</strong> Vertices are people, edges are acquaintance. Sets, Relations, and Functions's pigeonhole result &mdash; two people share a degree &mdash; is a statement about this graph.</li><li><strong>Road networks.</strong> Vertices are junctions, edges are roads, weights are distances. Shortest paths are “Shortest Paths and Dijkstra's Algorithm”.</li><li><strong>Dependencies.</strong> Vertices are tasks, directed edges are "must precede". A valid schedule exists exactly when there is no cycle, which is Sets, Relations, and Functions's partial order again.</li><li><strong>Molecules.</strong> Vertices are atoms, edges are bonds. Two molecules with the same formula and different structures are non-isomorphic graphs, which is “Subgraphs and Graph Isomorphism”.</li></ul><p>The common thread: whenever the data is "a set of things and which pairs are related", it is a graph, and every theorem in this course applies to it at once. That generality is the reason graph theory is worth a course.</p><div class="thm"><span class="label">Theorem &middot; Maximum edges</span><p>A simple graph on <span class="math" data-say="n">n</span> vertices has at most <span class="math" data-say="n choose 2 equals n times the quantity n minus 1, over 2">C(n,2) = n(n−1)/2</span> edges, with equality exactly for <span class="math" data-say="K sub n">Kₙ</span>.</p></div><div class="proof"><p>Each edge is an unordered pair of distinct vertices, and no pair may repeat, so the edges form a subset of the <span class="math" data-say="n choose 2">C(n,2)</span> pairs. “Combinations” in Combinatorics and Counting counts them.</p><p><span class="qed">&#9633;</span></p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Graph workbench</h2></div><p>Your graph, the course&#x27;s algorithms</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+                                in one position</div><p><span class="math" data-say="K sub 5">K₅</span> and <span class="math" data-say="K sub 3, 3">K_{3,3}</span> matter later: “Planar Graphs and Euler's Formula” shows they are precisely the obstructions to drawing a graph in the plane without crossings.</p><h3>Four models</h3><ul><li><strong>Social networks.</strong> Vertices are people, edges are acquaintance. Sets, Relations, and Functions's pigeonhole result &mdash; two people share a degree &mdash; is a statement about this graph.</li><li><strong>Road networks.</strong> Vertices are junctions, edges are roads, weights are distances. Shortest paths are “Shortest Paths and Dijkstra's Algorithm”.</li><li><strong>Dependencies.</strong> Vertices are tasks, directed edges are "must precede". A valid schedule exists exactly when there is no cycle, which is Sets, Relations, and Functions's partial order again.</li><li><strong>Molecules.</strong> Vertices are atoms, edges are bonds. Two molecules with the same formula and different structures are non-isomorphic graphs, which is “Subgraphs and Graph Isomorphism”.</li></ul><p>The common thread: whenever the data is "a set of things and which pairs are related", it is a graph, and every theorem in this course applies to it at once. That generality is the reason graph theory is worth a course.</p><div class="thm"><span class="label">Theorem &middot; Maximum edges</span><p>A simple graph on <span class="math" data-say="n">n</span> vertices has at most <span class="math" data-say="n choose 2 equals n times the quantity n minus 1, over 2">C(n,2) = n(n−1)/2</span> edges, with equality exactly for <span class="math" data-say="K sub n">Kₙ</span>.</p></div><div class="proof"><p>Each edge is an unordered pair of distinct vertices, and no pair may repeat, so the edges form a subset of the <span class="math" data-say="n choose 2">C(n,2)</span> pairs. “Combinations” in Combinatorics and Counting counts them.</p><p><span class="qed">&#9633;</span></p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Graph workbench</h2></div><p>Your graph, the course&#x27;s algorithms</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Build a graph, run the algorithms</strong><span id="gCaption">Click a cell in the adjacency matrix to toggle an edge</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>in the result</span><span class="tone-amber"><i class="legend-swatch"></i>visited / root</span><span class="tone-muted"><i class="legend-swatch"></i>not used</span></div>
@@ -1420,10 +1463,10 @@ Qₙ        hypercube             bit strings differing  n·2^{n−1} edges
         <div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gFacts"></table></div>
       </div>
       <div class="status-banner" id="gStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Build any graph</h3>
-          <p><span class="math" data-say="K sub 5">K₅</span> is loaded: five vertices, <span class="math" data-say="the size of E, equals 10 equals 5 choose 2">|E| = 10 = C(5, 2)</span>, every degree 4 and <span class="math" data-say="the sum of deg equals 20">Σ deg = 20</span>. Switch the preset to Complete bipartite at 6 vertices for <span class="math" data-say="K sub 3, 3">K_{3,3}</span> and its 9 edges, to Cycle for <span class="math" data-say="C sub n">Cₙ</span> with <span class="math" data-say="n">n</span> edges and every degree 2, and to Path for <span class="math" data-say="n minus 1">n − 1</span>. Everything else is yours: toggle any cell of the adjacency matrix and every algorithm re-derives from what you build.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Build any graph</h3>
+            <p><span class="math" data-say="K sub 5">K₅</span> is loaded: five vertices, <span class="math" data-say="the size of E, equals 10 equals 5 choose 2">|E| = 10 = C(5, 2)</span>, every degree 4 and <span class="math" data-say="the sum of deg equals 20">Σ deg = 20</span>. Switch the preset to Complete bipartite at 6 vertices for <span class="math" data-say="K sub 3, 3">K_{3,3}</span> and its 9 edges, to Cycle for <span class="math" data-say="C sub n">Cₙ</span> with <span class="math" data-say="n">n</span> edges and every degree 2, and to Path for <span class="math" data-say="n minus 1">n − 1</span>. Everything else is yours: toggle any cell of the adjacency matrix and every algorithm re-derives from what you build.</p>
         <div class="field">
           <label for="gAlgo">Algorithm</label>
           <select id="gAlgo">
@@ -1468,12 +1511,14 @@ Qₙ        hypercube             bit strings differing  n·2^{n−1} edges
           <div class="kpi"><span>|E|</span><strong id="gE">&mdash;</strong></div>
           <div class="kpi"><span>Σ deg</span><strong id="gSum">&mdash;</strong></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Modelling with a graph</h2></div><p>Vertices first, then decide what an edge means.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Say what a vertex is</h3><p>One per entity: person, junction, task, atom. If the answer is unclear the model is not ready.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Say exactly what an edge means</h3><p>"Have met", "a road exists", "must precede". The relation must be checkable for every pair.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Decide the variant</h3><p>Symmetric relation: undirected. Asymmetric: directed. Repeated connections: multigraph. Costs: weighted.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Restate the question in graph terms</h3><p>"Can everyone be reached" is connectivity; "is there a route using every road once" is an Euler circuit. The translation is where the theorems become available.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Modelling with a graph</h2>
+      <p class="lead-in">Vertices first, then decide what an edge means.</p>
+      <ol class="key-ideas method"><li><strong>Say what a vertex is.</strong> One per entity: person, junction, task, atom. If the answer is unclear the model is not ready.</li><li><strong>Say exactly what an edge means.</strong> "Have met", "a road exists", "must precede". The relation must be checkable for every pair.</li><li><strong>Decide the variant.</strong> Symmetric relation: undirected. Asymmetric: directed. Repeated connections: multigraph. Costs: weighted.</li><li><strong>Restate the question in graph terms.</strong> "Can everyone be reached" is connectivity; "is there a route using every road once" is an Euler circuit. The translation is where the theorems become available.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1499,17 +1544,16 @@ Qₙ        vertices = bit strings of length n  (2ⁿ of them)
           each vertex has degree n, so |E| = n·2ⁿ/2 = n·2^{n−1}</div><p>The hypercube count used the handshake theorem of “Degree and the Handshake Theorem” before it was stated: <span class="math" data-say="2 times the size of E, equals the sum of the degree of v equals n times 2 to the power n">2|E| = Σ deg(v) = n · 2ⁿ</span>. Counting edges through degrees is the standard move and it is worth having early.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a graph as a plot</strong><span>The word means two different things. A graph here is vertices and edges; nothing is being plotted.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the drawing as the object</strong><span>Position and edge curvature carry no information. Two unrecognisably different pictures can be the same graph.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using an undirected graph for an asymmetric relation</strong><span>"Follows" and "must precede" both need direction. Dropping it discards the information the model existed to carry.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state what a vertex and an edge are before anything else.</strong><p>Model "which pairs of countries share a land border" as a graph. Say what the vertices are, what an edge means, and whether the graph is simple &mdash; then ask what the degree of a vertex tells you.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Graph theory begins with Euler's 1736 paper on the bridges of Königsberg, which “Euler and Hamilton Paths” revisits. He solved it by discarding the map entirely and keeping only which land masses were connected &mdash; the first abstraction of this kind.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a graph as a plot</strong><span>The word means two different things. A graph here is vertices and edges; nothing is being plotted.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the drawing as the object</strong><span>Position and edge curvature carry no information. Two unrecognisably different pictures can be the same graph.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using an undirected graph for an asymmetric relation</strong><span>"Follows" and "must precede" both need direction. Dropping it discards the information the model existed to carry.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state what a vertex and an edge are before anything else.</strong><p>Model "which pairs of countries share a land border" as a graph. Say what the vertices are, what an edge means, and whether the graph is simple &mdash; then ask what the degree of a vertex tells you.</p></div></div><div class="note"><strong>Note:</strong> Graph theory begins with Euler's 1736 paper on the bridges of Königsberg, which “Euler and Hamilton Paths” revisits. He solved it by discarding the map entirely and keeping only which land masses were connected &mdash; the first abstraction of this kind.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A graph is a relation, drawn</summary><p>Sets, Relations, and Functions's symmetric irreflexive relation on <span class="math" data-say="V">V</span> is exactly a simple graph. The picture adds nothing mathematically and a great deal practically.</p></details><details class="recall"><summary>The drawing is not the graph</summary><p>Position and edge shape carry no information. Two very different pictures can be the same graph, which is “Subgraphs and Graph Isomorphism”'s subject.</p></details><details class="recall"><summary>The variants are not interchangeable</summary><p>Loops, multiple edges and directions each change which theorems hold. "Simple graph" is the default here and is stated where it matters.</p></details></div>
+      <h3>Summary</h3>
       <p>A graph is a set of vertices and a set of edges joining them. The definition is deliberately spare, which is why the same object models networks, dependencies, molecules and schedules.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A graph is a relation, drawn.</strong> Sets, Relations, and Functions's symmetric irreflexive relation on <span class="math" data-say="V">V</span> is exactly a simple graph. The picture adds nothing mathematically and a great deal practically.</li><li><strong>The drawing is not the graph.</strong> Position and edge shape carry no information. Two very different pictures can be the same graph, which is “Subgraphs and Graph Isomorphism”'s subject.</li><li><strong>The variants are not interchangeable.</strong> Loops, multiple edges and directions each change which theorems hold. "Simple graph" is the default here and is stated where it matters.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="G equals V, E, V vertices, E edges pairs of vertices. simple graph, no loops, no repeated edges, undirected. adjacent, joined by an edge, incident, vertex meets edge. A GRAPH is not a plot" tabindex="0" role="region" aria-label="Mathematical notation">G = (V, E)      V vertices,  E edges (pairs of vertices)
 simple graph: no loops, no repeated edges, undirected
 adjacent: joined by an edge      incident: vertex meets edge
@@ -2657,11 +2701,42 @@ a GRAPH is not a plot</div><figcaption>The definition</figcaption></figure>
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2729,7 +2804,7 @@ a GRAPH is not a plot</div><figcaption>The definition</figcaption></figure>
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

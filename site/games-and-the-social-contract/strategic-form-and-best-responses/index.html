@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Games and the Social Contract</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; One-shot games</p>
       <h1>Strategic Form and Best Responses</h1>
       <p class="lesson-lede">A game is a table of payoffs, and a best response is the reply that pays most against one particular move.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A game is a table</li><li>A best response answers one particular move</li><li>Marks that meet pick out cells</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Reading a bimatrix</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Strategic form</span><p>A game in <strong>strategic form</strong> lists the players, the strategies open to each, and a payoff for each player at every combination of strategies. With two players it is a <strong>bimatrix</strong>: the row player's strategies run down the side, the column player's run across the top, and each cell shows <em>row payoff, column payoff</em> in that order.</p></div><p>A payoff is a number that stands for how much the outcome is worth to the player who gets it. Where the number comes from is a question the lab cannot answer; it uses whatever you type, and every verdict in this course is a verdict about the payoffs as stated. Decision and Rationality is where the numbers earn their meaning as utilities.</p><p>Here is the smallest interesting case. Two people must each choose the left path or the right path to a meeting point, and they cannot talk. If both take the left path they meet at a place both like very much. If both take the right they meet at a place they like less. If they choose differently they do not meet.</p><div class="mathblock" data-say="column L, column R. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">                 column L    column R
-     row L        2, 2         0, 0
-     row R        0, 0         1, 1</div><div class="defbox"><span class="label">Definition &middot; Best response</span><p>A strategy is a <strong>best response</strong> to a given strategy of the other player when no other strategy of one's own pays more against it. Ties are allowed: a best response need only be among the largest.</p></div><p>To find the row player's best responses, go column by column. If the column player takes L, the row player compares <span class="math" data-say="2">2</span> for L with <span class="math" data-say="0">0</span> for R, and L is the best response. If the column player takes R, the comparison is <span class="math" data-say="0">0</span> for L against <span class="math" data-say="1">1</span> for R, and R is the best response. The column player's marks are found the same way, going row by row.</p><p>The two cells where both players' marks fall are the L, L cell and the R, R cell. The other two cells carry no pair of marks: in the L, R cell the row player gets <span class="math" data-say="0">0</span> and would prefer to be playing R.</p><h3>The model to drop</h3><p>A tempting shortcut is to look for the row with the largest number anywhere in it and play that. In the table above the largest number is <span class="math" data-say="2">2</span>, in row L. But the row player's task is not to find a good row in the abstract; it is to answer what the other player does. Against column R, row L pays <span class="math" data-say="0">0</span> and row R pays <span class="math" data-say="1">1</span>, so the row with the biggest number is the worse reply.</p><div class="example"><span class="label">Example &middot; Two other tables</span><p>The lab also holds a game whose only marked cell is D, D (each player's best reply is D whatever the other does) and a game, matching pennies, in which no cell carries both marks. In matching pennies one player wins if the two coins match and the other wins if they do not, so in every cell exactly one player would rather have chosen otherwise.</p></div><p>Marking a table is mechanical, and it is meant to be. What is not mechanical is deciding which table describes the situation. The same two people with different feelings about the right-hand meeting place are playing a different game.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A game in a table</h2></div><p>best responses, equilibria, dominance and efficiency, computed from the payoffs</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Reading a bimatrix</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Strategic form</span><p>A game in <strong>strategic form</strong> lists the players, the strategies open to each, and a payoff for each player at every combination of strategies. With two players it is a <strong>bimatrix</strong>: the row player's strategies run down the side, the column player's run across the top, and each cell shows <em>row payoff, column payoff</em> in that order.</p></div><p>A payoff is a number that stands for how much the outcome is worth to the player who gets it. Where the number comes from is a question the lab cannot answer; it uses whatever you type, and every verdict in this course is a verdict about the payoffs as stated. Decision and Rationality is where the numbers earn their meaning as utilities.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A game in a table</h2></div><p>best responses, equilibria, dominance and efficiency, computed from the payoffs</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Two players, payoffs row first</strong><span>an equilibrium is a cell where both are best-responding</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gaTable"></table></div>
       <div class="status-banner" id="gaStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Mark the best responses</h3>
-          <p>Each payoff cell carries an asterisk against the player for whom it is a best response. Change a payoff and watch which asterisks move; the tile lists the cells where both fall.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Mark the best responses</h3>
+            <p>Each payoff cell carries an asterisk against the player for whom it is a best response. Change a payoff and watch which asterisks move; the tile lists the cells where both fall.</p>
         <div class="field">
           <label for="gaPreset">Worked example</label>
           <select id="gaPreset"><option value="coordination" selected>Two paths to a meeting, L and R</option><option value="unique">Cooperate or defect, 3 / 0 / 5 / 1</option><option value="none-pure">Matching pennies</option></select>
@@ -1436,12 +1477,17 @@
           <div class="kpi"><span>Pareto</span><strong id="gaPareto">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Here is the smallest interesting case. Two people must each choose the left path or the right path to a meeting point, and they cannot talk. If both take the left path they meet at a place both like very much. If both take the right they meet at a place they like less. If they choose differently they do not meet.</p><div class="mathblock" data-say="column L, column R. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">                 column L    column R
+     row L        2, 2         0, 0
+     row R        0, 0         1, 1</div><div class="defbox"><span class="label">Definition &middot; Best response</span><p>A strategy is a <strong>best response</strong> to a given strategy of the other player when no other strategy of one's own pays more against it. Ties are allowed: a best response need only be among the largest.</p></div><p>To find the row player's best responses, go column by column. If the column player takes L, the row player compares <span class="math" data-say="2">2</span> for L with <span class="math" data-say="0">0</span> for R, and L is the best response. If the column player takes R, the comparison is <span class="math" data-say="0">0</span> for L against <span class="math" data-say="1">1</span> for R, and R is the best response. The column player's marks are found the same way, going row by row.</p><p>The two cells where both players' marks fall are the L, L cell and the R, R cell. The other two cells carry no pair of marks: in the L, R cell the row player gets <span class="math" data-say="0">0</span> and would prefer to be playing R.</p><h3>The model to drop</h3><p>A tempting shortcut is to look for the row with the largest number anywhere in it and play that. In the table above the largest number is <span class="math" data-say="2">2</span>, in row L. But the row player's task is not to find a good row in the abstract; it is to answer what the other player does. Against column R, row L pays <span class="math" data-say="0">0</span> and row R pays <span class="math" data-say="1">1</span>, so the row with the biggest number is the worse reply.</p><div class="example"><span class="label">Example &middot; Two other tables</span><p>The lab also holds a game whose only marked cell is D, D (each player's best reply is D whatever the other does) and a game, matching pennies, in which no cell carries both marks. In matching pennies one player wins if the two coins match and the other wins if they do not, so in every cell exactly one player would rather have chosen otherwise.</p></div><p>Marking a table is mechanical, and it is meant to be. What is not mechanical is deciding which table describes the situation. The same two people with different feelings about the right-hand meeting place are playing a different game.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Marking a bimatrix</h2></div><p>Five moves, and the third is the one people skip.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the strategies down the side and across the top</h3><p>Row player's down the side, column player's across the top. Each cell holds two numbers, row first.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Fix one of the column player&#x27;s strategies</h3><p>Take one column. The row player cannot change what the other has chosen, only answer it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compare the row player&#x27;s two numbers inside that column only</h3><p>Not the whole table, and not the other player's numbers. The larger one gets the mark; a tie marks both.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Repeat for every column, then do the column player&#x27;s marks row by row</h3><p>The column player compares along a row, the mirror image of the row player's comparison.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Read off the cells with two marks</h3><p>Those are the cells where each player is already best-responding. A table can have one, several, or none.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Marking a bimatrix</h2>
+      <p class="lead-in">Five moves, and the third is the one people skip.</p>
+      <ol class="key-ideas method"><li><strong>Write the strategies down the side and across the top.</strong> Row player's down the side, column player's across the top. Each cell holds two numbers, row first.</li><li><strong>Fix one of the column player&#x27;s strategies.</strong> Take one column. The row player cannot change what the other has chosen, only answer it.</li><li><strong>Compare the row player&#x27;s two numbers inside that column only.</strong> Not the whole table, and not the other player's numbers. The larger one gets the mark; a tie marks both.</li><li><strong>Repeat for every column, then do the column player&#x27;s marks row by row.</strong> The column player compares along a row, the mirror image of the row player's comparison.</li><li><strong>Read off the cells with two marks.</strong> Those are the cells where each player is already best-responding. A table can have one, several, or none.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1459,17 +1505,16 @@ Row plays R:     column L pays 0, R pays 1   -&gt; R
 Both marks fall on: (L, L) and (R, R)</div><p>The two diagonal cells are each a best response to the other. The off-diagonal cells are not: in each of them one player gets <span class="math" data-say="0">0</span> and would switch. Which diagonal cell the pair ends up in is not settled by the table, which is the question “Coordination, Conventions and the Stag Hunt” takes up.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Playing the row with the biggest number in it</strong><span>A row is judged against a column, never alone. In the meeting game row L holds the table's largest payoff, 2, and still pays only 0 against column R, where row R pays 1. The question to ask is &ldquo;what is best given what the other does?&rdquo; and the answer can differ from column to column.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Comparing numbers in the wrong direction</strong><span>The row player compares down a column, the column player compares along a row, and each looks only at their own number in the cell. Comparing the two players' numbers with each other answers a different question, who is better off, which is no part of a best response.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting every game to have a cell with both marks</strong><span>Matching pennies has none. A game can have one cell with both marks, several, or none, and the next two lessons show what to say in the cases where the answer is not one.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can mark a table and say why the marks fall where they do.</strong><p>Given any two-by-two bimatrix, mark each player's best replies to each move of the other, list the cells with both marks, and say for one unmarked cell which player would switch and to what.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab accepts games up to four strategies a side, and changing a payoff in the text box redraws the marks at once. Try raising a single payoff in the meeting game until row L is the best response to both columns: then the table has a cell where the row player no longer needs to guess. The lab also prints a mixed equilibrium and a Pareto verdict; those tiles belong to “The Prisoner's Dilemma” and “Nash Equilibrium in Pure and Mixed Strategies”, and nothing here depends on them.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Playing the row with the biggest number in it</strong><span>A row is judged against a column, never alone. In the meeting game row L holds the table's largest payoff, 2, and still pays only 0 against column R, where row R pays 1. The question to ask is &ldquo;what is best given what the other does?&rdquo; and the answer can differ from column to column.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Comparing numbers in the wrong direction</strong><span>The row player compares down a column, the column player compares along a row, and each looks only at their own number in the cell. Comparing the two players' numbers with each other answers a different question, who is better off, which is no part of a best response.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting every game to have a cell with both marks</strong><span>Matching pennies has none. A game can have one cell with both marks, several, or none, and the next two lessons show what to say in the cases where the answer is not one.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can mark a table and say why the marks fall where they do.</strong><p>Given any two-by-two bimatrix, mark each player's best replies to each move of the other, list the cells with both marks, and say for one unmarked cell which player would switch and to what.</p></div></div><div class="note"><strong>Note:</strong> The lab accepts games up to four strategies a side, and changing a payoff in the text box redraws the marks at once. Try raising a single payoff in the meeting game until row L is the best response to both columns: then the table has a cell where the row player no longer needs to guess. The lab also prints a mixed equilibrium and a Pareto verdict; those tiles belong to “The Prisoner's Dilemma” and “Nash Equilibrium in Pure and Mixed Strategies”, and nothing here depends on them.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A game is a table</summary><p>Each player has a short list of strategies, and every pair of choices, one from each list, is a cell. The cell holds two numbers: what the row player gets, then what the column player gets. The players choose without seeing each other's choice, so the table is all there is.</p></details><details class="recall"><summary>A best response answers one particular move</summary><p>Hold the other player's strategy fixed and compare your own payoffs along that line of the table. The largest is your best response to that strategy. Change what the other does and the best response may change with it.</p></details><details class="recall"><summary>Marks that meet pick out cells</summary><p>Mark each player's best replies. A cell carrying both players' marks is one where each is already doing the best available against what the other is doing. The next lessons call such a cell an equilibrium.</p></details></div>
+      <h3>Summary</h3>
       <p>Two players each choose once, without seeing the other's choice, and the table says what each receives. Mark every player's best reply to every move of the other, and the cells where both marks fall are the cells no one wants to leave. The wrong model is to pick the row with the biggest number in it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A game is a table.</strong> Each player has a short list of strategies, and every pair of choices, one from each list, is a cell. The cell holds two numbers: what the row player gets, then what the column player gets. The players choose without seeing each other's choice, so the table is all there is.</li><li><strong>A best response answers one particular move.</strong> Hold the other player's strategy fixed and compare your own payoffs along that line of the table. The largest is your best response to that strategy. Change what the other does and the best response may change with it.</li><li><strong>Marks that meet pick out cells.</strong> Mark each player's best replies. A cell carrying both players' marks is one where each is already doing the best available against what the other is doing. The next lessons call such a cell an equilibrium.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a game, players, strategies, payoffs. best response, the reply that pays most. fix the other&#x27;s move, then compare. a cell with both marks is stable" tabindex="0" role="region" aria-label="Mathematical notation">a game: players, strategies, payoffs
 best response: the reply that pays most
 fix the other&#x27;s move, then compare
@@ -2249,11 +2294,42 @@ a cell with both marks is stable</div><figcaption>A table, two marks, one readin
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2321,7 +2397,7 @@ a cell with both marks is stable</div><figcaption>A table, two marks, one readin
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

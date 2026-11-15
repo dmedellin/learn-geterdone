@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,40 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Building Blocks of a Model-Driven Design</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · A Model Expressed in Software</p>
       <h1>Value Objects</h1>
       <p class="lesson-lede">An object we care about only for what it is, made immutable so that it can be shared, copied and passed around without anyone being surprised.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Value Object</li><li>Immutable</li><li>Surprised holder</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The section&#x27;s argument, then the design choices, then the count</h2>
-      <article class="prose reading"><p>&ldquo;To protect against this, in order for an object to be shared safely, it must be immutable: it cannot be changed except by full replacement.&rdquo; That is Evans in Designing Value Objects, the section after the pattern Value Objects in Chapter 5. This lesson reads both, with Designing Associations That Involve Value Objects. Enterprise Application Patterns reads Fowler's version in its lesson Value Object, where the question is equality and safe sharing in the code; Evans asks first what in the domain has no identity, and only then how to build it.</p><p>His opening image is a child drawing with markers, who cares about a marker's colour and tip but not which of two identical markers he holds, though he cares very much which drawings are his and which his sister's. Since the conspicuous objects of a model are usually entities, it is tempting to give every object an identity, and some frameworks do. Evans counts the cost: the system must track it all, optimisations are ruled out, defining meaningful identities takes analysis, and an artificial identity misleads, making every object look alike. Design, he says, is a running fight against complexity, and special handling belongs only where it is needed.</p><p>A value object, then, describes something and has no conceptual identity; we care what it is, not which one it is. Whether a thing is one depends on who is asking, and Evans's address sidebar shows it: to a mail-order firm an address is a value, to a postal service organising rounds it is an entity in a hierarchy, and to an electricity company it is an entity, or a value of a dwelling that is one. Values need not be simple. They can be assembled from other values, and can even refer to entities, as a route between two cities does. They are often passed as parameters, often transient, and often the attributes of entities: a person is an entity, and the person's name is a value.</p><p>Put as a rule to apply: if nobody cares which instance they hold, only what it says, make it a value; let it carry the meaning and operations of what it describes, never change it in place, and give it no identity. Its parts should belong together as one idea, Ward Cunningham's Whole Value: a street, a city and a postal code belong together as an address, not as three fields of a person.</p><p>Designing Value Objects turns that freedom into choices about copying, sharing and immutability. Two people who share a name are still two people, but their name objects are interchangeable; the two people could share one, until one of them changes name and the other's changes too. Hence the sentence at the top of the lesson. The same danger arises when an object hands one of its attributes to another as an argument, and the cure is the same, immutability or a copy. Sharing can save enormous numbers of objects, the Flyweight of Gamma and his colleagues, though in a distributed system a copy may be cheaper than a reference; Evans restricts sharing to where space matters, communication is cheap and the value is strictly immutable.</p><p>He allows mutable values in special cases, for performance: values that change often, objects expensive to create or delete, replacement that would disturb how the database clusters data, or little sharing in the first place. The rule that goes with it is absolute: a mutable value must not be shared. The last section adds that a two-way association between two value objects makes no sense, since without identity it means nothing to say that a value refers back to the very one that refers to it; if such a link seems needed, the object may have an identity not yet recognised.</p><p>Now the count, on a bakery whose orders each hold a pickup slot. The lab takes the holders as records of an order and the value it holds, the value in question, the holder through which it is changed, and whether the value is mutable. On the preset <code>slot-shared-mutable</code> three orders hold the one slot Saturday nine to eleven, and the customer of order 18 moves her pickup an hour later by changing the slot in place. The lab counts 3 holders of the value, 3 that see the change, 2 surprised, orders 17 and 19, and 0 new values. Two customers have been moved without asking.</p><p>The preset <code>slot-shared-immutable</code> is the same orders with an immutable slot, written below. Moving order 18 now builds a new slot and gives order 18 the reference; the old one is untouched. The lab counts 3 holders, 1 that sees the change, 0 surprised and 1 new value. The new object is the price of the safety, and the reason Evans lists object creation among his grounds for allowing mutability.</p><pre class="codeblock" data-say="line 1, final class pickup slot. line 2, private final day of week day. line 3, private final local time from. line 4, private final local time to. line 6, pickup slot of day of week day, local time from, local time to. line 7, this dot day is set to day. line 8, this dot from is set to from. line 9, this dot to is set to to. line 12, pickup slot later of duration d. line 13, return new pickup slot of day, from dot plus of d, to dot plus of d. line 15, comment, equals and hashCode compare day, from and to. line 17, comment, To move one order order.slot order.slot.later Duration.ofHours 1" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">final class PickupSlot {</span>
-<span class="cl">    private final DayOfWeek day;</span>
-<span class="cl">    private final LocalTime from;</span>
-<span class="cl">    private final LocalTime to;</span>
-<span class="cl"></span>
-<span class="cl">    PickupSlot(DayOfWeek day, LocalTime from, LocalTime to) {</span>
-<span class="cl">        this.day = day;</span>
-<span class="cl">        this.from = from;</span>
-<span class="cl">        this.to = to;</span>
-<span class="cl">    }</span>
-<span class="cl"></span>
-<span class="cl">    PickupSlot later(Duration d) {</span>
-<span class="cl">        return new PickupSlot(day, from.plus(d), to.plus(d));</span>
-<span class="cl">    }</span>
-<span class="cl">    // equals and hashCode compare day, from and to</span>
-<span class="cl">}</span>
-<span class="cl">// To move one order: order.slot = order.slot.later(Duration.ofHours(1));</span></code></pre><p>The preset <code>slot-copied-mutable</code> is Evans's special case done properly: the slot is mutable, but each order holds its own copy. Changing order 18's copy reaches 1 holder, surprises 0 and creates 0 new values. It is safe for the reason his rule gives, that nothing is shared, and it gives up the sharing that made values cheap. The counts are of the lesson's illustration; which trade-off a real bakery should take depends on how often slots change and how many orders hold them, which the lab does not know.</p><h3>Exercise</h3><ul><li>A school's classes and the term dates each holds: <span class="math" data-say="class minus 7 A, autumn, class minus 7 b, autumn, class minus 7 c, autumn, class minus 8 A, autumn, class minus 8 b, spring">class-7a, autumn; class-7b, autumn; class-7c, autumn; class-8a, autumn; class-8b, spring</span>.</li><li>Class 7c's trip moves its last day, and the change is made through <span class="math" data-say="class 7 C">class-7c</span> to the value <span class="math" data-say="autumn">autumn</span>.</li></ul><p>Count, for a mutable and for an immutable value, the holders of <code>autumn</code>, the holders that see the change, the holders surprised and the new values made. Then say in one sentence whether a term's dates are a value to this school at all.</p><p>Some things in a domain are neither who nor what but an action. The next lesson, Services, reads the third kind of model element.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Identity and value</h2></div><p>a change through one holder of a shared value</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The section&#x27;s argument, then the design choices, then the count</h2><div class="prose reading"><p>&ldquo;To protect against this, in order for an object to be shared safely, it must be immutable: it cannot be changed except by full replacement.&rdquo; That is Evans in Designing Value Objects, the section after the pattern Value Objects in Chapter 5. This lesson reads both, with Designing Associations That Involve Value Objects. Enterprise Application Patterns reads Fowler's version in its lesson Value Object, where the question is equality and safe sharing in the code; Evans asks first what in the domain has no identity, and only then how to build it.</p><p>His opening image is a child drawing with markers, who cares about a marker's colour and tip but not which of two identical markers he holds, though he cares very much which drawings are his and which his sister's. Since the conspicuous objects of a model are usually entities, it is tempting to give every object an identity, and some frameworks do. Evans counts the cost: the system must track it all, optimisations are ruled out, defining meaningful identities takes analysis, and an artificial identity misleads, making every object look alike. Design, he says, is a running fight against complexity, and special handling belongs only where it is needed.</p><p>A value object, then, describes something and has no conceptual identity; we care what it is, not which one it is. Whether a thing is one depends on who is asking, and Evans's address sidebar shows it: to a mail-order firm an address is a value, to a postal service organising rounds it is an entity in a hierarchy, and to an electricity company it is an entity, or a value of a dwelling that is one. Values need not be simple. They can be assembled from other values, and can even refer to entities, as a route between two cities does. They are often passed as parameters, often transient, and often the attributes of entities: a person is an entity, and the person's name is a value.</p><p>Put as a rule to apply: if nobody cares which instance they hold, only what it says, make it a value; let it carry the meaning and operations of what it describes, never change it in place, and give it no identity. Its parts should belong together as one idea, Ward Cunningham's Whole Value: a street, a city and a postal code belong together as an address, not as three fields of a person.</p><p>Designing Value Objects turns that freedom into choices about copying, sharing and immutability. Two people who share a name are still two people, but their name objects are interchangeable; the two people could share one, until one of them changes name and the other's changes too. Hence the sentence at the top of the lesson. The same danger arises when an object hands one of its attributes to another as an argument, and the cure is the same, immutability or a copy. Sharing can save enormous numbers of objects, the Flyweight of Gamma and his colleagues, though in a distributed system a copy may be cheaper than a reference; Evans restricts sharing to where space matters, communication is cheap and the value is strictly immutable.</p><p>He allows mutable values in special cases, for performance: values that change often, objects expensive to create or delete, replacement that would disturb how the database clusters data, or little sharing in the first place. The rule that goes with it is absolute: a mutable value must not be shared. The last section adds that a two-way association between two value objects makes no sense, since without identity it means nothing to say that a value refers back to the very one that refers to it; if such a link seems needed, the object may have an identity not yet recognised.</p><p>Now the count, on a bakery whose orders each hold a pickup slot. The lab takes the holders as records of an order and the value it holds, the value in question, the holder through which it is changed, and whether the value is mutable. On the preset <code>slot-shared-mutable</code> three orders hold the one slot Saturday nine to eleven, and the customer of order 18 moves her pickup an hour later by changing the slot in place. The lab counts 3 holders of the value, 3 that see the change, 2 surprised, orders 17 and 19, and 0 new values. Two customers have been moved without asking.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Identity and value</h2></div><p>a change through one holder of a shared value</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Identity and value</strong><span>a change through one holder of a shared value</span></div>
       </div>
@@ -1474,10 +1501,10 @@
       <div class="table-wrap" id="didTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="didTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record says which value a holder refers to; several holders may share one. A change is made through one holder. If the value is mutable it changes in place, so every holder of it sees the change; if it is immutable the changing holder gets a new value (named with ′) and every other holder keeps the old one. A holder is surprised when it sees a change it did not make. Lists follow the record order.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Who sees a change to a shared value</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Who sees a change to a shared value</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
         <div class="field">
           <label for="didPreset">Worked example</label>
           <select id="didPreset"><option value="slot-shared-mutable" selected>Three orders share one mutable pickup slot</option><option value="slot-shared-immutable">The same orders sharing an immutable slot</option><option value="slot-copied-mutable">A mutable slot, but a copy for each order</option></select>
@@ -1505,12 +1532,31 @@
           <div class="kpi"><span>New values created</span><strong id="didNew">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>slot-shared-immutable</code> is the same orders with an immutable slot, written below. Moving order 18 now builds a new slot and gives order 18 the reference; the old one is untouched. The lab counts 3 holders, 1 that sees the change, 0 surprised and 1 new value. The new object is the price of the safety, and the reason Evans lists object creation among his grounds for allowing mutability.</p><pre class="codeblock" data-say="line 1, final class pickup slot. line 2, private final day of week day. line 3, private final local time from. line 4, private final local time to. line 6, pickup slot of day of week day, local time from, local time to. line 7, this dot day is set to day. line 8, this dot from is set to from. line 9, this dot to is set to to. line 12, pickup slot later of duration d. line 13, return new pickup slot of day, from dot plus of d, to dot plus of d. line 15, comment, equals and hashCode compare day, from and to. line 17, comment, To move one order order.slot order.slot.later Duration.ofHours 1" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">final class PickupSlot {</span>
+<span class="cl">    private final DayOfWeek day;</span>
+<span class="cl">    private final LocalTime from;</span>
+<span class="cl">    private final LocalTime to;</span>
+<span class="cl"></span>
+<span class="cl">    PickupSlot(DayOfWeek day, LocalTime from, LocalTime to) {</span>
+<span class="cl">        this.day = day;</span>
+<span class="cl">        this.from = from;</span>
+<span class="cl">        this.to = to;</span>
+<span class="cl">    }</span>
+<span class="cl"></span>
+<span class="cl">    PickupSlot later(Duration d) {</span>
+<span class="cl">        return new PickupSlot(day, from.plus(d), to.plus(d));</span>
+<span class="cl">    }</span>
+<span class="cl">    // equals and hashCode compare day, from and to</span>
+<span class="cl">}</span>
+<span class="cl">// To move one order: order.slot = order.slot.later(Duration.ofHours(1));</span></code></pre><p>The preset <code>slot-copied-mutable</code> is Evans's special case done properly: the slot is mutable, but each order holds its own copy. Changing order 18's copy reaches 1 holder, surprises 0 and creates 0 new values. It is safe for the reason his rule gives, that nothing is shared, and it gives up the sharing that made values cheap. The counts are of the lesson's illustration; which trade-off a real bakery should take depends on how often slots change and how many orders hold them, which the lab does not know.</p><h3>Exercise</h3><ul><li>A school's classes and the term dates each holds: <span class="math" data-say="class minus 7 A, autumn, class minus 7 b, autumn, class minus 7 c, autumn, class minus 8 A, autumn, class minus 8 b, spring">class-7a, autumn; class-7b, autumn; class-7c, autumn; class-8a, autumn; class-8b, spring</span>.</li><li>Class 7c's trip moves its last day, and the change is made through <span class="math" data-say="class 7 C">class-7c</span> to the value <span class="math" data-say="autumn">autumn</span>.</li></ul><p>Count, for a mutable and for an immutable value, the holders of <code>autumn</code>, the holders that see the change, the holders surprised and the new values made. Then say in one sentence whether a term's dates are a value to this school at all.</p><p>Some things in a domain are neither who nor what but an action. The next lesson, Services, reads the third kind of model element.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Making a value safe to share</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Ask whether anyone cares which one</h3><p>For the object in question, ask whether swapping it for an equal one would matter to anyone. If not, make it a value object.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Gather a whole</h3><p>Collect the attributes that belong together into one value with the behaviour of what they mean, as a slot's day and times are.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Change by replacement</h3><p>Make every field final and every change a method that returns a new value, and replace the holder's reference to change it.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own code</h3><p>Find a small object in a system you know that several others hold, type its holders into the lab, and count the holders surprised if it were changed in place. Write down whether it is immutable today.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Making a value safe to share</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>Ask whether anyone cares which one.</strong> For the object in question, ask whether swapping it for an equal one would matter to anyone. If not, make it a value object.</li><li><strong>Gather a whole.</strong> Collect the attributes that belong together into one value with the behaviour of what they mean, as a slot's day and times are.</li><li><strong>Change by replacement.</strong> Make every field final and every change a method that returns a new value, and replace the holder's reference to change it.</li><li><strong>Do it on your own code.</strong> Find a small object in a system you know that several others hold, type its holders into the lab, and count the holders surprised if it were changed in place. Write down whether it is immutable today.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1528,17 +1574,16 @@ immutable: order 18 gets its own new slot
 sees it: 18 only; surprised 0; new 1</div><p>Order 20 holds another value and is never counted. The difference between 2 surprised and 0 is the whole of Evans's rule; the one new object is its price.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Giving every domain object an identity, in case it is needed</strong><span>Evans counts the cost of doing so: all that tracking, optimisations ruled out, analysis spent on meaningless identities, and a model in which every object looks the same. Identity belongs where the domain needs it; a value object is the positive category for everything else, with meaning and behaviour of its own.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sharing a mutable value</strong><span>Sharing is safe only when the value cannot change except by replacement; otherwise a change through one holder reaches every other, as the lesson's illustration counts. Evans allows a mutable value for performance, and then forbids sharing it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking a value object must be simple</strong><span>Strings and numbers are values, but so is a rich object with behaviour, an assembly of other values, or a route that refers to entities. What makes a value is having no conceptual identity, not being small.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say who sees a change to a shared value.</strong><p>Given holders of a value, the holder that changes it and whether it is mutable, count the holders who see the change and those surprised, and say what immutability costs.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab follows references as stated. It cannot tell whether an object should be a value in your domain, whether a holder wanted the change it saw, or whether new objects or shared references cost more on your platform; Evans leaves that to the implementation environment.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Giving every domain object an identity, in case it is needed</strong><span>Evans counts the cost of doing so: all that tracking, optimisations ruled out, analysis spent on meaningless identities, and a model in which every object looks the same. Identity belongs where the domain needs it; a value object is the positive category for everything else, with meaning and behaviour of its own.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sharing a mutable value</strong><span>Sharing is safe only when the value cannot change except by replacement; otherwise a change through one holder reaches every other, as the lesson's illustration counts. Evans allows a mutable value for performance, and then forbids sharing it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking a value object must be simple</strong><span>Strings and numbers are values, but so is a rich object with behaviour, an assembly of other values, or a route that refers to entities. What makes a value is having no conceptual identity, not being small.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say who sees a change to a shared value.</strong><p>Given holders of a value, the holder that changes it and whether it is mutable, count the holders who see the change and those surprised, and say what immutability costs.</p></div></div><div class="note"><strong>Note:</strong> The lab follows references as stated. It cannot tell whether an object should be a value in your domain, whether a holder wanted the change it saw, or whether new objects or shared references cost more on your platform; Evans leaves that to the implementation environment.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Value Object</summary><p>An object that describes some aspect of the domain and has no conceptual identity: two with the same attributes are interchangeable. Colours, amounts, names and addresses are common examples, though whether an address is one depends on the domain.</p></details><details class="recall"><summary>Immutable</summary><p>Unable to be changed once made. An immutable value is changed only by full replacement: the holder is given a new value and the old one is left as it was.</p></details><details class="recall"><summary>Surprised holder</summary><p>A holder of a shared value that sees it change through a change another holder made. The lab counts them for a mutable value, where every holder sees the change, and for an immutable one, where only the holder whose reference was replaced does.</p></details></div>
+      <h3>Summary</h3>
       <p>Evans's second kind of model element has no identity worth tracking. Read why giving everything an identity costs, what makes a value conceptually whole, and why a shared value must be immutable, then change a pickup slot that three bakery orders share and count who sees the change when the slot is mutable and when it is replaced.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Value Object.</strong> An object that describes some aspect of the domain and has no conceptual identity: two with the same attributes are interchangeable. Colours, amounts, names and addresses are common examples, though whether an address is one depends on the domain.</li><li><strong>Immutable.</strong> Unable to be changed once made. An immutable value is changed only by full replacement: the holder is given a new value and the old one is left as it was.</li><li><strong>Surprised holder.</strong> A holder of a shared value that sees it change through a change another holder made. The lab counts them for a mutable value, where every holder sees the change, and for an immutable one, where only the holder whose reference was replaced does.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="no conceptual identity. care about what, not which. attributes that form a whole. immutable, change by replacement. share freely only when immutable. a mutable value must not be shared" tabindex="0" role="region" aria-label="Mathematical notation">no conceptual identity
 care about what, not which
 attributes that form a whole
@@ -2284,11 +2329,42 @@ a mutable value must not be shared</div><figcaption>Value Objects in six lines</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2356,7 +2432,7 @@ a mutable value must not be shared</div><figcaption>Value Objects in six lines</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

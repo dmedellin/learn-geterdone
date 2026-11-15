@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Statements</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 17 · Unusual Control Structures</p>
       <h1>Unusual Control Structures</h1>
       <p class="lesson-lede">Early returns, recursion and the goto each make some code clearer and other code harder to follow, and Chapter 17 asks you to use each where it helps and to know what it costs.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Guard clause</li><li>Recursion</li><li>goto</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the calls</h2>
-      <article class="prose reading"><p><strong>Chapter 17, p. 410.</strong> &ldquo;Multiple returns can enhance a routine&rsquo;s readability and maintainability, and they help prevent deeply nested logic. They should, nevertheless, be used carefully.&rdquo; It is the first of the chapter's key points. Read Chapter 17, pp. 391&ndash;410, in your own copy first.</p><p>Which control structures are safe to use, and when? Chapter 17 opens by placing its three structures somewhere between the leading edge and the discredited, and sometimes in both camps at once: useful, with care, in the languages that offer them. Section 17.1 (p. 391) is returns from the middle of a routine. Use a return when it makes the routine easier to read, as when the answer is known and nothing is left to clean up. Use guard clauses, early returns that check the error cases first, to simplify complicated error processing: otherwise the nominal path ends up indented inside every check. McConnell is careful about the gain. Once each guard clause has to set an error status before it returns, the code before the nominal path grows, and his verdict is that the guard version is still the more readable and maintainable, though only by a small margin (p. 393). And minimize the number of returns, because a reader at the bottom of a routine may not know it can return above.</p><p>Section 17.2 (p. 393) is recursion, which McConnell says is not useful often but gives elegant solutions when used judiciously, as in a sorting routine or a search through a maze. His tips: make sure the recursion stops, with a test that takes a path without a recursive call; use a safety counter where no such test is simple; keep the recursion within one routine; and watch the stack. Then a warning: do not use recursion for factorials or Fibonacci numbers, the textbook examples, where it is slower, less predictable in memory and harder to read than a loop. A programmer of his who did, he says, would be replaced (p. 397). His conclusion is not that recursion is to be avoided but that it is more powerful than those examples suggest, and that its alternatives, iteration and an explicit stack, should be considered before it is chosen.</p><p>Section 17.3 (p. 398) is the <span class="math" data-say="goto">goto</span>, and it gives both sides. Against it: code with <span class="math" data-say="goto">goto</span>s is harder to format, to analyse and to optimize; it is rarely the fastest or smallest; and once a few are allowed, more follow. For it: careful use in particular cases, to avoid duplicating code or to release resources in one place, and the book's report that decades of research failed to show the <span class="math" data-say="goto">goto</span> harmful (p. 399). McConnell's own position is that in a modern language almost every <span class="math" data-say="goto">goto</span> can be replaced, easily or with effort, and that in the rare case where one is the right solution it should be documented and used. Section 17.4 (p. 408) closes the chapter with a perspective: the field has advanced largely by restricting what programmers may do, and he views unusual control structures with strong skepticism.</p><p>Here is the guard-clause transformation on a small routine written for the lesson. The nested version wrapped <span class="math" data-say="return read first line of file">return readFirstLine(file);</span> in <span class="math" data-say="if file is not equal to null">if (file != null)</span> and, inside that, <span class="math" data-say="if file dot can read">if (file.canRead())</span>, with <span class="math" data-say="return the empty string">return "";</span> after both. Each enclosing condition becomes its own negation at the top, returning what the routine returns when it fails, and the nominal case ends the routine unindented:</p><pre class="codeblock" data-say="line 1, string first line of file file. line 2, if file equals null. line 3, return the empty string. line 5, if not file dot can read. line 6, return the empty string. line 8, return read first line of file" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">String firstLine(File file) {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the calls</h2><div class="prose reading"><p><strong>Chapter 17, p. 410.</strong> &ldquo;Multiple returns can enhance a routine&rsquo;s readability and maintainability, and they help prevent deeply nested logic. They should, nevertheless, be used carefully.&rdquo; It is the first of the chapter's key points. Read Chapter 17, pp. 391&ndash;410, in your own copy first.</p><p>Which control structures are safe to use, and when? Chapter 17 opens by placing its three structures somewhere between the leading edge and the discredited, and sometimes in both camps at once: useful, with care, in the languages that offer them. Section 17.1 (p. 391) is returns from the middle of a routine. Use a return when it makes the routine easier to read, as when the answer is known and nothing is left to clean up. Use guard clauses, early returns that check the error cases first, to simplify complicated error processing: otherwise the nominal path ends up indented inside every check. McConnell is careful about the gain. Once each guard clause has to set an error status before it returns, the code before the nominal path grows, and his verdict is that the guard version is still the more readable and maintainable, though only by a small margin (p. 393). And minimize the number of returns, because a reader at the bottom of a routine may not know it can return above.</p><p>Section 17.2 (p. 393) is recursion, which McConnell says is not useful often but gives elegant solutions when used judiciously, as in a sorting routine or a search through a maze. His tips: make sure the recursion stops, with a test that takes a path without a recursive call; use a safety counter where no such test is simple; keep the recursion within one routine; and watch the stack. Then a warning: do not use recursion for factorials or Fibonacci numbers, the textbook examples, where it is slower, less predictable in memory and harder to read than a loop. A programmer of his who did, he says, would be replaced (p. 397). His conclusion is not that recursion is to be avoided but that it is more powerful than those examples suggest, and that its alternatives, iteration and an explicit stack, should be considered before it is chosen.</p><p>Section 17.3 (p. 398) is the <span class="math" data-say="goto">goto</span>, and it gives both sides. Against it: code with <span class="math" data-say="goto">goto</span>s is harder to format, to analyse and to optimize; it is rarely the fastest or smallest; and once a few are allowed, more follow. For it: careful use in particular cases, to avoid duplicating code or to release resources in one place, and the book's report that decades of research failed to show the <span class="math" data-say="goto">goto</span> harmful (p. 399). McConnell's own position is that in a modern language almost every <span class="math" data-say="goto">goto</span> can be replaced, easily or with effort, and that in the rare case where one is the right solution it should be documented and used. Section 17.4 (p. 408) closes the chapter with a perspective: the field has advanced largely by restricting what programmers may do, and he views unusual control structures with strong skepticism.</p><p>Here is the guard-clause transformation on a small routine written for the lesson. The nested version wrapped <span class="math" data-say="return read first line of file">return readFirstLine(file);</span> in <span class="math" data-say="if file is not equal to null">if (file != null)</span> and, inside that, <span class="math" data-say="if file dot can read">if (file.canRead())</span>, with <span class="math" data-say="return the empty string">return "";</span> after both. Each enclosing condition becomes its own negation at the top, returning what the routine returns when it fails, and the nominal case ends the routine unindented:</p><pre class="codeblock" data-say="line 1, string first line of file file. line 2, if file equals null. line 3, return the empty string. line 5, if not file dot can read. line 6, return the empty string. line 8, return read first line of file" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">String firstLine(File file) {</span>
 <span class="cl">    if (file == null) {</span>
 <span class="cl">        return &quot;&quot;;</span>
 <span class="cl">    }</span>
@@ -1453,7 +1497,44 @@
 <span class="cl">        return &quot;&quot;;</span>
 <span class="cl">    }</span>
 <span class="cl">    return readFirstLine(file);</span>
-<span class="cl">}</span></code></pre><p>Count it as the exercise will ask you to: two <span class="math" data-say="if">if</span>s before and two after, so 1 + 2 = 3 decision points either way; the deepest statement was inside two <span class="math" data-say="if">if</span>s and is now inside one.</p><p>Now the counting. The lab's <em>recursion</em> view takes a routine, <span class="math" data-say="factorial">factorial</span> or <span class="math" data-say="fibonacci">fibonacci</span>, and an <span class="math" data-say="n">n</span>, and prints four figures: <strong>calls</strong>, how many times the recursive version is called; <strong>deepest call</strong>, how many calls are open at once at the deepest point; <strong>value</strong>, the answer; and <strong>iterations of a loop</strong>, how many passes the loop version makes. Here are the two versions of Fibonacci it models, written for this lesson. First the recursive one:</p><pre class="codeblock" data-say="line 1, long fibonacci of int n. line 2, if n is less than 2. line 3, return n. line 5, return fibonacci of n minus 1 plus fibonacci of n minus 2" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">long fibonacci(int n) {</span>
+<span class="cl">}</span></code></pre><p>Count it as the exercise will ask you to: two <span class="math" data-say="if">if</span>s before and two after, so 1 + 2 = 3 decision points either way; the deepest statement was inside two <span class="math" data-say="if">if</span>s and is now inside one.</p><p>Now the counting. The lab's <em>recursion</em> view takes a routine, <span class="math" data-say="factorial">factorial</span> or <span class="math" data-say="fibonacci">fibonacci</span>, and an <span class="math" data-say="n">n</span>, and prints four figures: <strong>calls</strong>, how many times the recursive version is called; <strong>deepest call</strong>, how many calls are open at once at the deepest point; <strong>value</strong>, the answer; and <strong>iterations of a loop</strong>, how many passes the loop version makes. Here are the two versions of Fibonacci it models, written for this lesson. First the recursive one:</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Counting what runs</h2></div><p>calls made by a recursive routine</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Counting what runs</strong><span>calls made by a recursive routine</span></div>
+      </div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="lpTable"></table></div>
+      <div class="status-banner" id="lpStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Recursion against its loop</h3>
+            <p>A count over the structure the lesson states. The lab counts the calls the recursive version makes, its deepest chain of open calls, the value, and the passes the loop version makes. It counts; it does not time anything or measure the stack.</p>
+        <div class="field">
+          <label for="lpPreset">Worked example</label>
+          <select id="lpPreset"><option value="factorial-10">factorial(10)</option><option value="fibonacci-30" selected>fibonacci(30), the lesson's routine</option><option value="fibonacci-40">fibonacci(40)</option></select>
+        </div>
+        <div class="field">
+          <label for="lpInFn">Function (factorial or fibonacci)</label>
+          <input id="lpInFn" type="text" value="fibonacci" inputmode="text" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field">
+          <label for="lpInN">n (to 20 for factorial, 90 for fibonacci)</label>
+          <input id="lpInN" type="text" value="30" inputmode="text" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Calls</span><strong id="lpCalls">&mdash;</strong></div>
+          <div class="kpi"><span>Deepest call</span><strong id="lpDepth">&mdash;</strong></div>
+          <div class="kpi"><span>Value</span><strong id="lpValue">&mdash;</strong></div>
+          <div class="kpi"><span>Iterations of a loop</span><strong id="lpLoop">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, long fibonacci of int n. line 2, if n is less than 2. line 3, return n. line 5, return fibonacci of n minus 1 plus fibonacci of n minus 2" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">long fibonacci(int n) {</span>
 <span class="cl">    if (n &lt; 2) {</span>
 <span class="cl">        return n;</span>
 <span class="cl">    }</span>
@@ -1478,47 +1559,12 @@
 <span class="cl">        }</span>
 <span class="cl">    }</span>
 <span class="cl">    return refund;</span>
-<span class="cl">}</span></code></pre><p>Rewrite <span class="math" data-say="refund amount">refundAmount</span> with guard clauses, so that the nominal case, returning the order's total, comes last and unindented. Then count the decision points before and after, as 1 plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>, and the deepest nesting of a statement, counting a statement directly in the routine's body as depth 0 and each pair of braces it sits inside below the routine's own as one more. Nesting and Complexity counts both with the lab on a larger routine; you can paste your two versions into its lab to check.</p><p>The history behind Section 17.3 is a story with people in it, and this course tells it once. In March 1968 Edsger Dijkstra's letter &ldquo;Go To Statement Considered Harmful&rdquo; appeared in <em>Communications of the ACM</em>, observing that the quality of programmers fell as the density of <span class="math" data-say="goto">goto</span>s in their programs rose, which the book renders as the quality of code. In 1974 Donald Knuth answered with &ldquo;Structured Programming with go to Statements&rdquo;, which showed cases where a <span class="math" data-say="goto">goto</span> made code slower and larger and a few where it made a real gain. The book reports both, and that by the time it was written many languages, Java among them, had no <span class="math" data-say="goto">goto</span> at all. Since then the jump has survived mostly in disguise. Java gives its uses names, a labelled <span class="math" data-say="break">break</span>, an early <span class="math" data-say="return">return</span>, <span class="math" data-say="finally">finally</span> for cleanup; some large C programs still use a forward <span class="math" data-say="goto">goto</span> to a single cleanup label, the very case the book's argument for the <span class="math" data-say="goto">goto</span> describes; and the debates in which McConnell saw the argument still cropping up, over multiple returns, loop exits and exception handling (p. 398), are argued in those terms today. Whether those structures are the <span class="math" data-say="goto">goto</span> tamed or the <span class="math" data-say="goto">goto</span> back by another name is a question this lesson leaves with you.</p><p>Every structure so far has been written as code. The next lesson, Table-Driven Methods, moves some of the logic out of the code and into data.</p></article>
+<span class="cl">}</span></code></pre><p>Rewrite <span class="math" data-say="refund amount">refundAmount</span> with guard clauses, so that the nominal case, returning the order's total, comes last and unindented. Then count the decision points before and after, as 1 plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>, and the deepest nesting of a statement, counting a statement directly in the routine's body as depth 0 and each pair of braces it sits inside below the routine's own as one more. Nesting and Complexity counts both with the lab on a larger routine; you can paste your two versions into its lab to check.</p><p>The history behind Section 17.3 is a story with people in it, and this course tells it once. In March 1968 Edsger Dijkstra's letter &ldquo;Go To Statement Considered Harmful&rdquo; appeared in <em>Communications of the ACM</em>, observing that the quality of programmers fell as the density of <span class="math" data-say="goto">goto</span>s in their programs rose, which the book renders as the quality of code. In 1974 Donald Knuth answered with &ldquo;Structured Programming with go to Statements&rdquo;, which showed cases where a <span class="math" data-say="goto">goto</span> made code slower and larger and a few where it made a real gain. The book reports both, and that by the time it was written many languages, Java among them, had no <span class="math" data-say="goto">goto</span> at all. Since then the jump has survived mostly in disguise. Java gives its uses names, a labelled <span class="math" data-say="break">break</span>, an early <span class="math" data-say="return">return</span>, <span class="math" data-say="finally">finally</span> for cleanup; some large C programs still use a forward <span class="math" data-say="goto">goto</span> to a single cleanup label, the very case the book's argument for the <span class="math" data-say="goto">goto</span> describes; and the debates in which McConnell saw the argument still cropping up, over multiple returns, loop exits and exception handling (p. 398), are argued in those terms today. Whether those structures are the <span class="math" data-say="goto">goto</span> tamed or the <span class="math" data-say="goto">goto</span> back by another name is a question this lesson leaves with you.</p><p>Every structure so far has been written as code. The next lesson, Table-Driven Methods, moves some of the logic out of the code and into data.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Counting what runs</h2></div><p>calls made by a recursive routine</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Counting what runs</strong><span>calls made by a recursive routine</span></div>
-      </div>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="lpTable"></table></div>
-      <div class="status-banner" id="lpStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Recursion against its loop</h3>
-          <p>A count over the structure the lesson states. The lab counts the calls the recursive version makes, its deepest chain of open calls, the value, and the passes the loop version makes. It counts; it does not time anything or measure the stack.</p>
-        <div class="field">
-          <label for="lpPreset">Worked example</label>
-          <select id="lpPreset"><option value="factorial-10">factorial(10)</option><option value="fibonacci-30" selected>fibonacci(30), the lesson's routine</option><option value="fibonacci-40">fibonacci(40)</option></select>
-        </div>
-        <div class="field">
-          <label for="lpInFn">Function (factorial or fibonacci)</label>
-          <input id="lpInFn" type="text" value="fibonacci" inputmode="text" autocomplete="off" spellcheck="false">
-        </div>
-        <div class="field">
-          <label for="lpInN">n (to 20 for factorial, 90 for fibonacci)</label>
-          <input id="lpInN" type="text" value="30" inputmode="text" autocomplete="off" spellcheck="false">
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Calls</span><strong id="lpCalls">&mdash;</strong></div>
-          <div class="kpi"><span>Deepest call</span><strong id="lpDepth">&mdash;</strong></div>
-          <div class="kpi"><span>Value</span><strong id="lpValue">&mdash;</strong></div>
-          <div class="kpi"><span>Iterations of a loop</span><strong id="lpLoop">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Flattening a routine and counting a recursion</h2></div><p>Five steps, the last of which is yours.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the nominal path</h3><p>In a routine with nested ifs, find the statement that does the routine's real work, and the conditions it sits inside.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Turn each condition into a guard</h3><p>For each enclosing condition, write its negation as an if at the top that returns what the routine returns when the condition fails.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count what changed</h3><p>Count the decision points and the deepest nesting before and after. Guard clauses move the tests; they do not remove them.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count a recursion</h3><p>For a recursive routine, count the calls for a small n by drawing the tree of calls, and compare them with the passes of the loop that does the same work.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on your own code</h3><p>Take one routine of your own with an if nested inside another, rewrite it with guard clauses, and write down its decision points and deepest nesting before and after.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Flattening a routine and counting a recursion</h2>
+      <p class="lead-in">Five steps, the last of which is yours.</p>
+      <ol class="key-ideas method"><li><strong>Find the nominal path.</strong> In a routine with nested ifs, find the statement that does the routine's real work, and the conditions it sits inside.</li><li><strong>Turn each condition into a guard.</strong> For each enclosing condition, write its negation as an if at the top that returns what the routine returns when the condition fails.</li><li><strong>Count what changed.</strong> Count the decision points and the deepest nesting before and after. Guard clauses move the tests; they do not remove them.</li><li><strong>Count a recursion.</strong> For a recursive routine, count the calls for a small n by drawing the tree of calls, and compare them with the passes of the loop that does the same work.</li><li><strong>Do it on your own code.</strong> Take one routine of your own with an if nested inside another, rewrite it with guard clauses, and write down its decision points and deepest nesting before and after.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1537,17 +1583,16 @@ calls(30): 2 · 1346269 - 1 gives 2692537
 the loop: i from 2 to 30, 29 passes</div><p>The recursive version makes 2,692,537 calls for an answer the loop reaches in 29 additions. The definition of the Fibonacci numbers is recursive; the computation does not have to be.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking recursion is the natural way to compute Fibonacci numbers</strong><span>The definition is recursive, but the computation need not be, and the book says not to make it so. On the lesson's routine the recursive version makes 2,692,537 calls for fibonacci(30), recomputing the same smaller values over and over, where a loop makes 29 passes. The lab illustrates what Section 17.2 argues: the recursive version is slower and harder to follow than the iterative one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Insisting on exactly one return per routine</strong><span>A single exit is a rule some programmers take from structured programming. Chapter 17 does not hold to it: use a return when it makes the routine easier to read, use guard clauses to keep the nominal path clear, and keep the number of returns small, because a reader can miss one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the warning as a rule against recursion</strong><span>The warning is about two textbook examples. The same section calls recursion a powerful tool that gives elegant solutions when used judiciously, as in a sort or a maze search, where the alternative would be much more complicated, and asks only that you consider iteration before you choose it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can flatten a nested routine with guard clauses and compare a recursion with its loop.</strong><p>For a routine with two nested ifs and a single return, write the guard-clause version and say what changes in its nesting and what does not in its decision points; for naive recursive Fibonacci at n, state the calls, <span data-say="2 times F of the quantity n plus 1, minus 1">2·F(n + 1) − 1</span>, and the loop's iterations, by hand.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts calls and passes; it does not time either version, and it does not model the stack, so how deep a recursion a Java program can go before it fails is outside it. Its two routines are the lesson's, and the value fits a Java <span class="math" data-say="long">long</span> for every n it accepts. Nothing in it speaks to the <span class="math" data-say="goto">goto</span>, where the chapter's argument is about code in general and has to be weighed, not counted.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking recursion is the natural way to compute Fibonacci numbers</strong><span>The definition is recursive, but the computation need not be, and the book says not to make it so. On the lesson's routine the recursive version makes 2,692,537 calls for fibonacci(30), recomputing the same smaller values over and over, where a loop makes 29 passes. The lab illustrates what Section 17.2 argues: the recursive version is slower and harder to follow than the iterative one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Insisting on exactly one return per routine</strong><span>A single exit is a rule some programmers take from structured programming. Chapter 17 does not hold to it: use a return when it makes the routine easier to read, use guard clauses to keep the nominal path clear, and keep the number of returns small, because a reader can miss one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the warning as a rule against recursion</strong><span>The warning is about two textbook examples. The same section calls recursion a powerful tool that gives elegant solutions when used judiciously, as in a sort or a maze search, where the alternative would be much more complicated, and asks only that you consider iteration before you choose it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can flatten a nested routine with guard clauses and compare a recursion with its loop.</strong><p>For a routine with two nested ifs and a single return, write the guard-clause version and say what changes in its nesting and what does not in its decision points; for naive recursive Fibonacci at n, state the calls, <span data-say="2 times F of the quantity n plus 1, minus 1">2·F(n + 1) − 1</span>, and the loop's iterations, by hand.</p></div></div><div class="note"><strong>Note:</strong> The lab counts calls and passes; it does not time either version, and it does not model the stack, so how deep a recursion a Java program can go before it fails is outside it. Its two routines are the lesson's, and the value fits a Java <span class="math" data-say="long">long</span> for every n it accepts. Nothing in it speaks to the <span class="math" data-say="goto">goto</span>, where the chapter's argument is about code in general and has to be weighed, not counted.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Guard clause</summary><p>A test at the top of a routine that returns at once when an error or special case holds, so that the rest of the routine, the nominal path, runs unindented instead of inside a stack of nested ifs.</p></details><details class="recall"><summary>Recursion</summary><p>A routine that solves part of a problem itself and calls itself on the smaller pieces. It needs a case that does not call itself, or it never stops.</p></details><details class="recall"><summary>goto</summary><p>An unconditional jump to a label. Java reserves the word and has no goto statement; C, C++ and Visual Basic have one. Chapter 17 sets out the case against it and the case for its careful use.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 17 takes the control structures that sit between leading-edge and discredited: returns from the middle of a routine, guard clauses, recursion and the goto. Count the calls a recursive Fibonacci makes against the passes of its loop, and flatten a nested routine with guard clauses.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Guard clause.</strong> A test at the top of a routine that returns at once when an error or special case holds, so that the rest of the routine, the nominal path, runs unindented instead of inside a stack of nested ifs.</li><li><strong>Recursion.</strong> A routine that solves part of a problem itself and calls itself on the smaller pieces. It needs a case that does not call itself, or it never stops.</li><li><strong>goto.</strong> An unconditional jump to a label. Java reserves the word and has no goto statement; C, C++ and Visual Basic have one. Chapter 17 sets out the case against it and the case for its careful use.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="return early when it reads better. guard clauses clear the nominal path. make sure recursion stops. no recursion for fibonacci. calls, twice F of the quantity n plus 1, less one" tabindex="0" role="region" aria-label="Mathematical notation">return early when it reads better
 guard clauses clear the nominal path
 make sure recursion stops
@@ -2243,11 +2288,42 @@ calls: twice F(n + 1), less one</div><figcaption>The chapter in five lines</figc
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2315,7 +2391,7 @@ calls: twice F(n + 1), less one</div><figcaption>The chapter in five lines</figc
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Life Cycle of a Domain Object</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 6 · The Life Cycle of a Domain Object</p>
       <h1>Repositories and Relational Databases</h1>
       <p class="lesson-lede">An object that lets a client treat the stored roots of one type as a collection in memory, asked in the model&#x27;s terms for the ones it wants.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Repository</li><li>Global access</li><li>Specification</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern&#x27;s argument, then a query counted</h2>
-      <article class="prose reading"><p>&ldquo;To do anything with an object, you have to hold a reference to it. How do you get that reference?&rdquo; Evans counts three ways in the Repositories pattern of Chapter 6. You can create the object; you can traverse an association from an object you hold; or you can search the database by attributes and rebuild what you find. He tells of a team that tried to manage with the first two alone, on an object database, and built the very tangle the last chapters warned against before giving up on it.</p><p>The third way is necessary and dangerous. A search can reach any object, so not everything has to be linked to everything. But a client that writes its own queries, gets rows back and feeds them to constructors is thinking about the technology, not the domain, and is tempted to grab exactly the data it wants, past the aggregates and past encapsulation. Rules drift into query code, and the entities become containers of data. Evans narrows the problem: transient values need no search; objects easy to reach by traversal need none; and no object inside an aggregate may be fetched except through its root. A value found by global search, he adds, may be an entity whose identity nobody has noticed.</p><p>The pattern, as the reader would apply it: when clients must look up objects of some type by their attributes, give that type one object that clients can treat as if it simply held every such object in memory. Clients put objects in and take them out through it, and ask it for the ones matching a condition, getting whole objects back; it alone talks to the store. Only aggregate roots get one, and only those that clients cannot reach by following references. Its advantages, in his list: a simple model for clients, persistence decoupled from the domain, design decisions about access made visible, and an in-memory stand-in for tests.</p><p>Querying a Repository describes a range. The easiest repository has hard-coded queries: by identity, by an attribute, by a range of dates, and summary queries such as a count or a total. Where there is a lot of querying, a framework can accept a Specification instead, which Chapter 9 develops; Evans calls this elegant and warns it may be a modest framework or prohibitively hard, pointing to Rob Mee and Edward Hieatt's discussion in Fowler's book. Even then, hard-coded queries should remain possible.</p><p>Encapsulation does not excuse ignorance. Client code can ignore how a repository works, Evans says, but its developers cannot: Kyle Brown's story is of a system that ran out of memory after hours in production because a summary was computed by fetching every object in the plant. In implementing one, abstract the type, use the freedom to cache or change strategy, and leave the commit to the client, which knows where the unit of work begins and ends. Work with your framework rather than against it, and look for affinities; his example is J2EE's entity beans and the EJB Home, with the warning that dressing the EJB Home up as a repository could cause problems of its own.</p><p>Factories and repositories meet at reconstitution. Technically a repository that rebuilds objects from rows is creating them, but Evans keeps the roles apart in the domain view: one creates what did not exist, the other finds what already does, and a repository may delegate the rebuilding to a factory. He advises against a combined find-or-create, since the difference between a new object and an existing one usually matters in the domain.</p><p>The Enterprise Application Patterns lesson Metadata Mapping, Query Object and Repository reads the same pattern from the database side, as a layer over the mapping. Evans's emphasis is on what the repository's interface says about the model: which roots can be found at all, and in what terms.</p><p>Designing Objects for Relational Databases closes the chapter. When the schema exists to store this system's objects, keep the tables close to the model, even at some cost to the model's richness or to normalization: a row holds an object, perhaps with its aggregate's inner parts, and a foreign key becomes a reference to another entity, with names that match. Keep other processes out of such a store, since they can break the objects' invariants. A legacy schema means two models in one system, which Chapter 14 takes up; and a schema deliberately separate from the model can be a sound choice, if it is chosen and not drifted into.</p><p>The bike-share's repository below answers the workshop's question with a specification: a bike is due for service if it is docked and has either done 800 kilometres since its last service or has an open fault report. Docks belong to a station's aggregate and get no repository of their own.</p><pre class="codeblock" data-say="line 1, public interface bike repository. line 2, optional of bike with number of bike number number. line 3, list of bike satisfying of bike specification spec. line 4, int count satisfying of bike specification spec. line 5, void add of bike bike. line 6, void remove of bike bike. line 9, comment, The workshop&#x27;s question docked, and either worn or reported faulty.. line 10, public class due for service implements bike specification. line 11, public boolean is satisfied by of bike b. line 12, return b dot is docked and, open bracket, b dot kilometres is at least 800 or b dot open faults is at least 1, close bracket" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">public interface BikeRepository {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern&#x27;s argument, then a query counted</h2><div class="prose reading"><p>&ldquo;To do anything with an object, you have to hold a reference to it. How do you get that reference?&rdquo; Evans counts three ways in the Repositories pattern of Chapter 6. You can create the object; you can traverse an association from an object you hold; or you can search the database by attributes and rebuild what you find. He tells of a team that tried to manage with the first two alone, on an object database, and built the very tangle the last chapters warned against before giving up on it.</p><p>The third way is necessary and dangerous. A search can reach any object, so not everything has to be linked to everything. But a client that writes its own queries, gets rows back and feeds them to constructors is thinking about the technology, not the domain, and is tempted to grab exactly the data it wants, past the aggregates and past encapsulation. Rules drift into query code, and the entities become containers of data. Evans narrows the problem: transient values need no search; objects easy to reach by traversal need none; and no object inside an aggregate may be fetched except through its root. A value found by global search, he adds, may be an entity whose identity nobody has noticed.</p><p>The pattern, as the reader would apply it: when clients must look up objects of some type by their attributes, give that type one object that clients can treat as if it simply held every such object in memory. Clients put objects in and take them out through it, and ask it for the ones matching a condition, getting whole objects back; it alone talks to the store. Only aggregate roots get one, and only those that clients cannot reach by following references. Its advantages, in his list: a simple model for clients, persistence decoupled from the domain, design decisions about access made visible, and an in-memory stand-in for tests.</p><p>Querying a Repository describes a range. The easiest repository has hard-coded queries: by identity, by an attribute, by a range of dates, and summary queries such as a count or a total. Where there is a lot of querying, a framework can accept a Specification instead, which Chapter 9 develops; Evans calls this elegant and warns it may be a modest framework or prohibitively hard, pointing to Rob Mee and Edward Hieatt's discussion in Fowler's book. Even then, hard-coded queries should remain possible.</p><p>Encapsulation does not excuse ignorance. Client code can ignore how a repository works, Evans says, but its developers cannot: Kyle Brown's story is of a system that ran out of memory after hours in production because a summary was computed by fetching every object in the plant. In implementing one, abstract the type, use the freedom to cache or change strategy, and leave the commit to the client, which knows where the unit of work begins and ends. Work with your framework rather than against it, and look for affinities; his example is J2EE's entity beans and the EJB Home, with the warning that dressing the EJB Home up as a repository could cause problems of its own.</p><p>Factories and repositories meet at reconstitution. Technically a repository that rebuilds objects from rows is creating them, but Evans keeps the roles apart in the domain view: one creates what did not exist, the other finds what already does, and a repository may delegate the rebuilding to a factory. He advises against a combined find-or-create, since the difference between a new object and an existing one usually matters in the domain.</p><p>The Enterprise Application Patterns lesson Metadata Mapping, Query Object and Repository reads the same pattern from the database side, as a layer over the mapping. Evans's emphasis is on what the repository's interface says about the model: which roots can be found at all, and in what terms.</p><p>Designing Objects for Relational Databases closes the chapter. When the schema exists to store this system's objects, keep the tables close to the model, even at some cost to the model's richness or to normalization: a row holds an object, perhaps with its aggregate's inner parts, and a foreign key becomes a reference to another entity, with names that match. Keep other processes out of such a store, since they can break the objects' invariants. A legacy schema means two models in one system, which Chapter 14 takes up; and a schema deliberately separate from the model can be a sound choice, if it is chosen and not drifted into.</p><p>The bike-share's repository below answers the workshop's question with a specification: a bike is due for service if it is docked and has either done 800 kilometres since its last service or has an open fault report. Docks belong to a station's aggregate and get no repository of their own.</p><pre class="codeblock" data-say="line 1, public interface bike repository. line 2, optional of bike with number of bike number number. line 3, list of bike satisfying of bike specification spec. line 4, int count satisfying of bike specification spec. line 5, void add of bike bike. line 6, void remove of bike bike. line 9, comment, The workshop&#x27;s question docked, and either worn or reported faulty.. line 10, public class due for service implements bike specification. line 11, public boolean is satisfied by of bike b. line 12, return b dot is docked and, open bracket, b dot kilometres is at least 800 or b dot open faults is at least 1, close bracket" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">public interface BikeRepository {</span>
 <span class="cl">    Optional&lt;Bike&gt; withNumber(BikeNumber number);</span>
 <span class="cl">    List&lt;Bike&gt; satisfying(BikeSpecification spec);</span>
 <span class="cl">    int countSatisfying(BikeSpecification spec);</span>
@@ -1458,12 +1502,11 @@
 <span class="cl">    public boolean isSatisfiedBy(Bike b) {</span>
 <span class="cl">        return b.isDocked() &amp;&amp; (b.kilometres() &gt;= 800 || b.openFaults() &gt;= 1);</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>On <code>fleet</code> the lab holds five bikes, the roots the repository contains, and asks <span class="math" data-say="status is set to docked and of km is at least 800 or faults is at least 1">status = docked and (km &gt;= 800 or faults &gt;= 1)</span>. It selects 2: b101, docked at 950 kilometres, and b102, docked at 300 with 2 faults. Of the 3 that fail, b103 fails first on <span class="math" data-say="status is set to docked">status = docked</span>, being out on a ride; b104 and b105 fail first on <span class="math" data-say="km is at least 800">km &gt;= 800</span>, at 420 and at 799, with no faults to rescue them. The preset <code>worn-only</code> asks the hard-coded query a simpler repository might offer, <span class="math" data-say="status is set to docked and km is at least 800">status = docked and km &gt;= 800</span>, and selects only b101: b102's faults no longer count.</p><h3>Exercise</h3><p>Three more bikes: b201 with status=docked, km=800, faults=0; b202 with status=repair, km=50, faults=3; b203 with status=docked, km=640, faults=0. Say which the specification <span class="math" data-say="status is set to docked and of km is at least 800 or faults is at least 1">status = docked and (km &gt;= 800 or faults &gt;= 1)</span> selects and, for each of the others, the first clause in the order written that is false. Type them into the lab to check.</p><p>That ends Chapter 6's patterns. The next lesson, Using the Language: An Extended Example, reads Chapter 7, where Evans uses them all together on one model.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Specifications</h2></div><p>a rule as a query over candidates</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>On <code>fleet</code> the lab holds five bikes, the roots the repository contains, and asks <span class="math" data-say="status is set to docked and of km is at least 800 or faults is at least 1">status = docked and (km &gt;= 800 or faults &gt;= 1)</span>. It selects 2: b101, docked at 950 kilometres, and b102, docked at 300 with 2 faults. Of the 3 that fail, b103 fails first on <span class="math" data-say="status is set to docked">status = docked</span>, being out on a ride; b104 and b105 fail first on <span class="math" data-say="km is at least 800">km &gt;= 800</span>, at 420 and at 799, with no faults to rescue them. The preset <code>worn-only</code> asks the hard-coded query a simpler repository might offer, <span class="math" data-say="status is set to docked and km is at least 800">status = docked and km &gt;= 800</span>, and selects only b101: b102's faults no longer count.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Specifications</h2></div><p>a rule as a query over candidates</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Specifications</strong><span>a rule as a query over candidates</span></div>
       </div>
@@ -1471,10 +1514,10 @@
       <div class="table-wrap" id="dspTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dspTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A specification is clauses attribute op value, with op one of = != &lt; &lt;= &gt; &gt;=, joined by and, or, not and parentheses (not binds tightest, then and, then or); a value is a number or a word beginning with a letter. Numbers compare exactly; a word compares only by = and != (an ordering op on a word is refused), and words compare exactly, letter case counted. A clause on an attribute the candidate lacks is false whatever its op, so not of it is true; an ordering clause on a word value is false. Candidates are listed in record order. A failing candidate is shown with the clause that rejects it, found from the left: a false and is blamed on its first false part, a true or on its first true part, and under a not a clause rejects by being true (for clauses joined only by and, this is the first false clause in the order written).</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The roots a repository returns for a specification</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The roots a repository returns for a specification</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
         <div class="field">
           <label for="dspPreset">Worked example</label>
           <select id="dspPreset"><option value="fleet" selected>Five bikes, asked which are due for service</option><option value="worn-only">The same bikes, a hard-coded query on distance only</option></select>
@@ -1493,12 +1536,15 @@
           <div class="kpi"><span>Failing, each with the clause that rejects it</span><strong id="dspFailing">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Exercise</h3><p>Three more bikes: b201 with status=docked, km=800, faults=0; b202 with status=repair, km=50, faults=3; b203 with status=docked, km=640, faults=0. Say which the specification <span class="math" data-say="status is set to docked and of km is at least 800 or faults is at least 1">status = docked and (km &gt;= 800 or faults &gt;= 1)</span> selects and, for each of the others, the first clause in the order written that is false. Type them into the lab to check.</p><p>That ends Chapter 6's patterns. The next lesson, Using the Language: An Extended Example, reads Chapter 7, where Evans uses them all together on one model.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Asking a repository in the model&#x27;s terms</h2></div><p>Four steps, the last of them on a repository of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide which roots need finding</h3><p>List the aggregate roots that a client must reach by search, and give every other object a path by traversal from one of them.</p></article><article class="card concept-card"><div class="icon">2</div><h3>State the question as a condition</h3><p>Write the client's request as clauses on the root's attributes, combined with and, or and not, in the experts' terms.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check each candidate</h3><p>For each root, evaluate the clauses in the order written; it is selected if the whole condition holds, and otherwise note the first clause that is false.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own repository</h3><p>Find a query in a system you know that a client builds itself in SQL or a query language. Rewrite it as one repository method in the model's terms, and count how many places that build the same query it would replace.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Asking a repository in the model&#x27;s terms</h2>
+      <p class="lead-in">Four steps, the last of them on a repository of your own.</p>
+      <ol class="key-ideas method"><li><strong>Decide which roots need finding.</strong> List the aggregate roots that a client must reach by search, and give every other object a path by traversal from one of them.</li><li><strong>State the question as a condition.</strong> Write the client's request as clauses on the root's attributes, combined with and, or and not, in the experts' terms.</li><li><strong>Check each candidate.</strong> For each root, evaluate the clauses in the order written; it is selected if the whole condition holds, and otherwise note the first clause that is false.</li><li><strong>Do it on your own repository.</strong> Find a query in a system you know that a client builds itself in SQL or a query language. Rewrite it as one repository method in the model's terms, and count how many places that build the same query it would replace.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1517,17 +1563,16 @@ b105: 799 km, no fault: fails km
 2 selected out of 5</div><p>b105 misses by one kilometre, which is the rule as written, not a judgement about the bike. The repository's client never sees how the five were fetched, only the two that satisfy the specification.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Giving every stored class a repository</strong><span>Evans limits repositories to the aggregate roots that need direct access. Inner objects are reached through their root, and objects easy to reach by traversal need no search. On the lesson's illustration the docks belong to a station's aggregate and have no repository of their own.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a repository&#x27;s client need not understand what it costs</strong><span>The client code is decoupled from the implementation; its developers are not. Kyle Brown's story, in Client Code Ignores Repository Implementation, is of a summary that loaded every object into memory and kept running out of memory in production.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a repository as a factory because it builds objects from rows</strong><span>Technically it does create instances, and Evans says so; but in the domain view a rebuilt object is the same object in the middle of its life. New objects come from factories and existing ones from repositories, and the repository may hand the rebuilding to a factory.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a repository returns for a specification.</strong><p>Given a set of roots with their attributes and a specification, list the roots it selects and the first false clause for each of the rest.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab evaluates a specification over the roots you list, as an in-memory repository would. It knows nothing of the database, the mapping or the cost of a query, which Evans says the developer must still understand, and it cannot say which roots deserve a repository at all.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Giving every stored class a repository</strong><span>Evans limits repositories to the aggregate roots that need direct access. Inner objects are reached through their root, and objects easy to reach by traversal need no search. On the lesson's illustration the docks belong to a station's aggregate and have no repository of their own.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a repository&#x27;s client need not understand what it costs</strong><span>The client code is decoupled from the implementation; its developers are not. Kyle Brown's story, in Client Code Ignores Repository Implementation, is of a summary that loaded every object into memory and kept running out of memory in production.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a repository as a factory because it builds objects from rows</strong><span>Technically it does create instances, and Evans says so; but in the domain view a rebuilt object is the same object in the middle of its life. New objects come from factories and existing ones from repositories, and the repository may hand the rebuilding to a factory.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a repository returns for a specification.</strong><p>Given a set of roots with their attributes and a specification, list the roots it selects and the first false clause for each of the rest.</p></div></div><div class="note"><strong>Note:</strong> The lab evaluates a specification over the roots you list, as an in-memory repository would. It knows nothing of the database, the mapping or the cost of a query, which Evans says the developer must still understand, and it cannot say which roots deserve a repository at all.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Repository</summary><p>An object that stands for all the stored objects of one type as if they were a collection in memory. Clients add, remove and ask for objects through it, and it hides the database and the mapping behind it.</p></details><details class="recall"><summary>Global access</summary><p>Being reachable by a search on attributes rather than by following a reference from another object. Evans reserves it for the aggregate roots that are not convenient to reach any other way.</p></details><details class="recall"><summary>Specification</summary><p>An object stating a condition that another object either satisfies or does not. A repository can take one as its query, so a client says what it wants without saying how to find it.</p></details></div>
+      <h3>Summary</h3>
       <p>The third pattern of Chapter 6 deals with the middle and end of an object's life. Read why Evans wants a starting point for traversal that does not drag the client into query code, what a repository promises, how it relates to factories and to the relational database underneath, and then ask a bike-share's repository for the bikes that satisfy a specification.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Repository.</strong> An object that stands for all the stored objects of one type as if they were a collection in memory. Clients add, remove and ask for objects through it, and it hides the database and the mapping behind it.</li><li><strong>Global access.</strong> Being reachable by a search on attributes rather than by following a reference from another object. Evans reserves it for the aggregate roots that are not convenient to reach any other way.</li><li><strong>Specification.</strong> An object stating a condition that another object either satisfies or does not. A repository can take one as its query, so a client says what it wants without saying how to find it.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a starting point for traversal. only roots that need finding. a collection in memory, in effect. queries in the model the character s terms. the client, not it, commits. factories make, repositories find. keep tables close to the model" tabindex="0" role="region" aria-label="Mathematical notation">a starting point for traversal
 only roots that need finding
 a collection in memory, in effect
@@ -2437,11 +2482,42 @@ keep tables close to the model</div><figcaption>Repositories in seven lines</fig
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2509,7 +2585,7 @@ keep tables close to the model</div><figcaption>Repositories in seven lines</fig
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

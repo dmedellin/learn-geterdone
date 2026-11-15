@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,24 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Strings, Geometry and Hardness</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 35 · Approximation Algorithms</p>
       <h1>Approximating Vertex Cover and TSP</h1>
       <p class="lesson-lede">An approximation ratio is proved against a lower bound the algorithm can see: a matching for vertex cover, a minimum spanning tree for a tour that obeys the triangle inequality.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>An approximation ratio</li><li>The triangle inequality</li><li>A computable lower bound</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Even if a problem is NP-complete, there may be hope.&rdquo; Chapter 35 opens by listing three kinds: inputs small enough for an exponential algorithm, special cases that are easy, and algorithms that find answers near the optimum in polynomial time. The chapter is about the third, and it insists that near be a proved factor. This lesson reads the chapter's opening and sections 35.1 and 35.2, and then measures one such factor on a graph of its own.</p><p>The opening defines the approximation ratio so that it works for minimization and maximization alike: the larger of C/C* and C*/C, never less than 1. An algorithm with ratio <span data-say="rho of n">ρ(n)</span> is a <span data-say="rho of n minus approximation">ρ(n)-approximation</span> algorithm. Some problems have small constant ratios; for others, such as set cover, the best known ratio grows with n. An approximation scheme takes an extra input <span data-say="epsilon is greater than 0">ε > 0</span> and achieves ratio <span data-say="1 plus epsilon">1 + ε</span>; it is polynomial-time if it runs in polynomial time for each fixed <span data-say="epsilon">ε</span>, and fully polynomial-time if its running time is polynomial in <span data-say="1 over epsilon">1/ε</span> as well, so that halving <span data-say="epsilon">ε</span> costs only a constant factor.</p><p>Section 35.1 recalls that a vertex cover is a set of vertices touching every edge, and that finding a smallest one is NP-hard, which the previous lesson's chain proved. APPROX-VERTEX-COVER is short: while edges remain, take any edge (u, v), put both u and v in the cover, and delete every edge touching either. With adjacency lists it runs in <span class="math" data-say="big O of the quantity V plus E">O(V + E)</span> time.</p><p>Theorem 35.1's proof is the chapter's model. Let A be the set of edges the algorithm picked. No two of them share a vertex, because picking an edge deletes every edge touching its ends, so A is a matching. Any cover, an optimal one included, must contain at least one end of each edge of A, and those ends are distinct, so <span data-say="the size of C star, is at least the size of A">|C*| ≥ |A|</span>. The algorithm's cover has exactly <span data-say="2 times the size of A">2|A|</span> vertices. Therefore <span data-say="the size of C, equals 2 times the size of A, is at most 2 times the size of C star">|C| = 2|A| ≤ 2|C*|</span>. The optimum appears in the proof only through the inequality <span data-say="the size of A, is at most the size of C star">|A| ≤ |C*|</span>; nobody had to know it.</p><p>Section 35.2 turns to the travelling-salesman problem with the triangle inequality. APPROX-TSP-TOUR picks a root, grows a minimum spanning tree with Prim's algorithm, and visits the vertices in preorder. The lower bound is the tree: deleting any edge from an optimal tour leaves a spanning tree, so the tree's weight is at most the optimal tour's. A full walk around the tree crosses every edge twice and costs twice the tree; skipping repeated vertices can only shorten the walk under the triangle inequality. So the tour costs at most twice the optimum (Theorem 35.2).</p><p>Then the section shows the hypothesis is doing the work. Without the triangle inequality, Theorem 35.3 says, no polynomial-time algorithm has any constant ratio <span data-say="rho">ρ</span> unless P = NP. The proof reduces HAM-CYCLE: give the graph's edges cost 1 and every missing edge cost <span data-say="rho times the size of V, plus 1">ρ·|V| + 1</span>. A hamiltonian cycle is a tour of cost <span data-say="the size of V">|V|</span>, and any tour that uses a missing edge costs more than <span data-say="rho times the size of V">ρ·|V|</span>, so a <span data-say="rho minus approximation">ρ-approximation</span> would tell the two cases apart. The Algorithms lessons Twice a Matching and The Hypothesis Doing the Work run both algorithms.</p><p>Now the lab, which runs the vertex-cover algorithm, taking edges in the order you list them. It prints the vertices and edges, the matching it found (the lower bound), the cover it built, the optimum found by searching every subset of vertices, the realised ratio against the promised 2, and whether the promise held. A second panel enumerates every graph on 3, 4 or 5 vertices, runs the algorithm and the exhaustive search on each, and reports the worst ratio any of them produced; at 4 vertices that is 2, over 63 graphs with an edge.</p><p>Its presets: <code>matching</code> is three disjoint edges, so the matching has 3 edges, the cover 6 vertices, the optimum 3, and the ratio is 2. <code>star</code> is a hub with four leaves: matching 1, cover 2, optimum 1, ratio 2. <code>cycle5</code> gives matching 2, cover 4, optimum 3, ratio 4/3; <code>cycle6</code> gives 3, 6, 3 and ratio 2; <code>path5</code> gives a cover of 4 against an optimum of 2. <code>triangles</code>, two disjoint triangles, gives a cover of 4 equal to the optimum, ratio 1.</p><p>Then type the lesson's graph: <span class="math" data-say="edges 1 2, 2 3, 3 4, 4 5, 2 6, 3 6 and 6 7">1-2, 2-3, 3-4, 4-5, 2-6, 3-6, 6-7</span>. The algorithm takes 1-2, which removes 2-3 and 2-6; then 3-4, which removes 3-6 and 4-5; then 6-7. The matching has 3 edges and the cover is {1, 2, 3, 4, 6, 7}, 6 vertices. The exhaustive search finds an optimum of 3, for instance {2, 4, 6}, so the ratio is exactly 2 on this graph: the bound is met, not merely respected. List the edges in another order and the cover can change; the guarantee cannot.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, 1 minus 2, 1 minus 3, 1 minus 4, 2 minus 3, 4 minus 5" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">1-2, 1-3, 1-4, 2-3, 4-5</span></code></pre><p>Run APPROX-VERTEX-COVER by hand, taking edges in the order listed. Give the matching, the cover and its size, then find the optimum by reasoning about the triangle 1, 2, 3 and the edge 4-5, and compute the ratio. Say why the matching's size, 2, is below the optimum here. Check in the lab.</p><p>Vertex cover and the metric tour have constant ratios. The next lesson, Set Cover, Randomization and Subset Sum, meets a ratio that grows with the input, one that holds only in expectation, and one you can buy down with time.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Vertex cover in two: a matching is the lower bound</h2></div><p>The matched edges share no vertex, so the optimum is above the matching; the cover is twice it — and the optimum appears only in the last line</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the count</h2><div class="prose reading"><p>&ldquo;Even if a problem is NP-complete, there may be hope.&rdquo; Chapter 35 opens by listing three kinds: inputs small enough for an exponential algorithm, special cases that are easy, and algorithms that find answers near the optimum in polynomial time. The chapter is about the third, and it insists that near be a proved factor. This lesson reads the chapter's opening and sections 35.1 and 35.2, and then measures one such factor on a graph of its own.</p><p>The opening defines the approximation ratio so that it works for minimization and maximization alike: the larger of C/C* and C*/C, never less than 1. An algorithm with ratio <span data-say="rho of n">ρ(n)</span> is a <span data-say="rho of n minus approximation">ρ(n)-approximation</span> algorithm. Some problems have small constant ratios; for others, such as set cover, the best known ratio grows with n. An approximation scheme takes an extra input <span data-say="epsilon is greater than 0">ε > 0</span> and achieves ratio <span data-say="1 plus epsilon">1 + ε</span>; it is polynomial-time if it runs in polynomial time for each fixed <span data-say="epsilon">ε</span>, and fully polynomial-time if its running time is polynomial in <span data-say="1 over epsilon">1/ε</span> as well, so that halving <span data-say="epsilon">ε</span> costs only a constant factor.</p><p>Section 35.1 recalls that a vertex cover is a set of vertices touching every edge, and that finding a smallest one is NP-hard, which the previous lesson's chain proved. APPROX-VERTEX-COVER is short: while edges remain, take any edge (u, v), put both u and v in the cover, and delete every edge touching either. With adjacency lists it runs in <span class="math" data-say="big O of the quantity V plus E">O(V + E)</span> time.</p><p>Theorem 35.1's proof is the chapter's model. Let A be the set of edges the algorithm picked. No two of them share a vertex, because picking an edge deletes every edge touching its ends, so A is a matching. Any cover, an optimal one included, must contain at least one end of each edge of A, and those ends are distinct, so <span data-say="the size of C star, is at least the size of A">|C*| ≥ |A|</span>. The algorithm's cover has exactly <span data-say="2 times the size of A">2|A|</span> vertices. Therefore <span data-say="the size of C, equals 2 times the size of A, is at most 2 times the size of C star">|C| = 2|A| ≤ 2|C*|</span>. The optimum appears in the proof only through the inequality <span data-say="the size of A, is at most the size of C star">|A| ≤ |C*|</span>; nobody had to know it.</p><p>Section 35.2 turns to the travelling-salesman problem with the triangle inequality. APPROX-TSP-TOUR picks a root, grows a minimum spanning tree with Prim's algorithm, and visits the vertices in preorder. The lower bound is the tree: deleting any edge from an optimal tour leaves a spanning tree, so the tree's weight is at most the optimal tour's. A full walk around the tree crosses every edge twice and costs twice the tree; skipping repeated vertices can only shorten the walk under the triangle inequality. So the tour costs at most twice the optimum (Theorem 35.2).</p><p>Then the section shows the hypothesis is doing the work. Without the triangle inequality, Theorem 35.3 says, no polynomial-time algorithm has any constant ratio <span data-say="rho">ρ</span> unless P = NP. The proof reduces HAM-CYCLE: give the graph's edges cost 1 and every missing edge cost <span data-say="rho times the size of V, plus 1">ρ·|V| + 1</span>. A hamiltonian cycle is a tour of cost <span data-say="the size of V">|V|</span>, and any tour that uses a missing edge costs more than <span data-say="rho times the size of V">ρ·|V|</span>, so a <span data-say="rho minus approximation">ρ-approximation</span> would tell the two cases apart. The Algorithms lessons Twice a Matching and The Hypothesis Doing the Work run both algorithms.</p><p>Now the lab, which runs the vertex-cover algorithm, taking edges in the order you list them. It prints the vertices and edges, the matching it found (the lower bound), the cover it built, the optimum found by searching every subset of vertices, the realised ratio against the promised 2, and whether the promise held. A second panel enumerates every graph on 3, 4 or 5 vertices, runs the algorithm and the exhaustive search on each, and reports the worst ratio any of them produced; at 4 vertices that is 2, over 63 graphs with an edge.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Vertex cover in two: a matching is the lower bound</h2></div><p>The matched edges share no vertex, so the optimum is above the matching; the cover is twice it — and the optimum appears only in the last line</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Vertex cover in two: a matching is the lower bound</strong><span>every matched edge needs an endpoint, so the matching is below the optimum and its endpoints are above it</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>in the cover the algorithm built</span><span class="tone-purple"><i class="legend-swatch"></i>a matched edge</span><span class="tone-green"><i class="legend-swatch"></i>the true optimum</span><span class="tone-red"><i class="legend-swatch"></i>the promise, twice the matching</span></div>
@@ -1459,10 +1502,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="vcChain"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="vcWorst"></table></div>
       <div class="status-banner" id="vcStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Build the cover from a matching, and compare it with the optimum</h3>
-          <p>Type edges as u-v, separated by commas; the algorithm takes them in the order typed. The lab prints the matching, the cover, the optimum by exhaustive search and the realised ratio, and the slider searches every graph on that many vertices for the worst ratio. Type the lesson's graph, then the exercise's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Build the cover from a matching, and compare it with the optimum</h3>
+            <p>Type edges as u-v, separated by commas; the algorithm takes them in the order typed. The lab prints the matching, the cover, the optimum by exhaustive search and the realised ratio, and the slider searches every graph on that many vertices for the worst ratio. Type the lesson's graph, then the exercise's.</p>
         <div class="field">
           <label for="vcPreset">Worked example</label>
           <select id="vcPreset"><option value="matching" selected>three disjoint edges</option><option value="star">a star — one hub, four leaves</option><option value="cycle5">a five-cycle</option><option value="cycle6">a six-cycle</option><option value="path5">a path on five vertices</option><option value="triangles">two disjoint triangles</option></select>
@@ -1486,12 +1529,15 @@
           <div class="kpi"><span>A graph that attains it</span><strong id="vcWorstGraph">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="vcHint" style="margin:0;">Take edges one at a time, skipping any that touches a vertex already used: that is a <em>maximal</em> matching. Every one of its edges needs at least one endpoint in any cover, and its edges share no vertex, so the optimum is at least the matching size. Taking <em>both</em> ends of every matched edge covers the whole graph, because an uncovered edge would have been addable to the matching. So the cover is at most twice a number that is at most the optimum &mdash; and neither half of that sentence mentions the optimum itself.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Its presets: <code>matching</code> is three disjoint edges, so the matching has 3 edges, the cover 6 vertices, the optimum 3, and the ratio is 2. <code>star</code> is a hub with four leaves: matching 1, cover 2, optimum 1, ratio 2. <code>cycle5</code> gives matching 2, cover 4, optimum 3, ratio 4/3; <code>cycle6</code> gives 3, 6, 3 and ratio 2; <code>path5</code> gives a cover of 4 against an optimum of 2. <code>triangles</code>, two disjoint triangles, gives a cover of 4 equal to the optimum, ratio 1.</p><p>Then type the lesson's graph: <span class="math" data-say="edges 1 2, 2 3, 3 4, 4 5, 2 6, 3 6 and 6 7">1-2, 2-3, 3-4, 4-5, 2-6, 3-6, 6-7</span>. The algorithm takes 1-2, which removes 2-3 and 2-6; then 3-4, which removes 3-6 and 4-5; then 6-7. The matching has 3 edges and the cover is {1, 2, 3, 4, 6, 7}, 6 vertices. The exhaustive search finds an optimum of 3, for instance {2, 4, 6}, so the ratio is exactly 2 on this graph: the bound is met, not merely respected. List the edges in another order and the cover can change; the guarantee cannot.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, 1 minus 2, 1 minus 3, 1 minus 4, 2 minus 3, 4 minus 5" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">1-2, 1-3, 1-4, 2-3, 4-5</span></code></pre><p>Run APPROX-VERTEX-COVER by hand, taking edges in the order listed. Give the matching, the cover and its size, then find the optimum by reasoning about the triangle 1, 2, 3 and the edge 4-5, and compute the ratio. Say why the matching's size, 2, is below the optimum here. Check in the lab.</p><p>Vertex cover and the metric tour have constant ratios. The next lesson, Set Cover, Randomization and Subset Sum, meets a ratio that grows with the input, one that holds only in expectation, and one you can buy down with time.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running APPROX-VERTEX-COVER and checking its ratio</h2></div><p>Four steps run the algorithm and its proof; the fifth is a graph of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Take an edge and both its ends</h3><p>Pick any remaining edge (u, v), add u and v to the cover, and record the edge in the matching A.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Delete every edge they touch</h3><p>Remove all edges with u or v as an endpoint. Repeat until no edges remain.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Name the lower bound</h3><p>The recorded edges share no vertex, so any cover needs at least <span data-say="the size of A">|A|</span> vertices. Write <span data-say="the size of A">|A|</span> beside the cover's size, <span data-say="2 times the size of A">2|A|</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare with the optimum when you can</h3><p>On a small graph, find the smallest cover by trying subsets, and compute the realised ratio C/C*. It is at most 2, and it can be less.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Find a graph where the ratio is below 2</h3><p>Type a graph of your own on six vertices into the lab whose realised ratio is strictly between 1 and 2. Write down the matching, the cover and the optimum, and say where the matching's lower bound is loose.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running APPROX-VERTEX-COVER and checking its ratio</h2>
+      <p class="lead-in">Four steps run the algorithm and its proof; the fifth is a graph of your own.</p>
+      <ol class="key-ideas method"><li><strong>Take an edge and both its ends.</strong> Pick any remaining edge (u, v), add u and v to the cover, and record the edge in the matching A.</li><li><strong>Delete every edge they touch.</strong> Remove all edges with u or v as an endpoint. Repeat until no edges remain.</li><li><strong>Name the lower bound.</strong> The recorded edges share no vertex, so any cover needs at least <span data-say="the size of A">|A|</span> vertices. Write <span data-say="the size of A">|A|</span> beside the cover's size, <span data-say="2 times the size of A">2|A|</span>.</li><li><strong>Compare with the optimum when you can.</strong> On a small graph, find the smallest cover by trying subsets, and compute the realised ratio C/C*. It is at most 2, and it can be less.</li><li><strong>Find a graph where the ratio is below 2.</strong> Type a graph of your own on six vertices into the lab whose realised ratio is strictly between 1 and 2. Write down the matching, the cover and the optimum, and say where the matching's lower bound is loose.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1511,17 +1557,16 @@ optimum: {2, 4, 6} covers all 7 edges
 |A| = 3 ≤ |C*| = 3,  |C| = 6 = 2·|C*|</div><p>The three matched edges share no vertex, so no cover has fewer than 3 vertices, and {2, 4, 6} shows 3 is enough. The lower bound is exact here and the cover is twice it, so the ratio is exactly 2. On the lab's cycle5 preset the bound is loose: the matching has 2 edges, the optimum is 3, and the cover of 4 gives a ratio of 4/3.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the ratio needs the optimum</strong><span>A ratio of 2 is a statement about the optimum, which no one can compute fast. The proof never computes it: it compares the answer with the matching, which the algorithm builds anyway and which can only be smaller than the optimum. The lab computes the optimum by exhaustive search only to show you the realised ratio on small graphs.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a realised ratio as the algorithm&#x27;s ratio</strong><span>On the lab's cycle5 preset the ratio is 4/3, and on the exercise's graph also 4/3; on the lesson's graph it is 2. The guarantee is the worst over every input, and a single graph shows one value under it. The lab's sweep over all graphs of a size finds 2 at every size it can search, which matches the theorem without proving it for larger graphs.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Dropping the triangle inequality</strong><span>The MST tour's factor of 2 rests on the triangle inequality at the shortcutting step. Section 35.2 does not leave this as a technicality: Theorem 35.3 shows that without it no constant ratio is achievable in polynomial time unless P = NP.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can prove a ratio of 2 from a lower bound.</strong><p>Run APPROX-VERTEX-COVER on a small graph, name the matching, prove from it that the cover is at most twice the optimum, compute the realised ratio against the optimum, and say where the triangle inequality enters the TSP argument.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's optimum is an exhaustive search, so it works only on small graphs, and its sweep covers every graph on at most five vertices; both are evidence about those graphs. The theorem's ratio holds for every graph, and only its proof establishes that. This lab does not run the TSP algorithm.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the ratio needs the optimum</strong><span>A ratio of 2 is a statement about the optimum, which no one can compute fast. The proof never computes it: it compares the answer with the matching, which the algorithm builds anyway and which can only be smaller than the optimum. The lab computes the optimum by exhaustive search only to show you the realised ratio on small graphs.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a realised ratio as the algorithm&#x27;s ratio</strong><span>On the lab's cycle5 preset the ratio is 4/3, and on the exercise's graph also 4/3; on the lesson's graph it is 2. The guarantee is the worst over every input, and a single graph shows one value under it. The lab's sweep over all graphs of a size finds 2 at every size it can search, which matches the theorem without proving it for larger graphs.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Dropping the triangle inequality</strong><span>The MST tour's factor of 2 rests on the triangle inequality at the shortcutting step. Section 35.2 does not leave this as a technicality: Theorem 35.3 shows that without it no constant ratio is achievable in polynomial time unless P = NP.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can prove a ratio of 2 from a lower bound.</strong><p>Run APPROX-VERTEX-COVER on a small graph, name the matching, prove from it that the cover is at most twice the optimum, compute the realised ratio against the optimum, and say where the triangle inequality enters the TSP argument.</p></div></div><div class="note"><strong>Note:</strong> The lab's optimum is an exhaustive search, so it works only on small graphs, and its sweep covers every graph on at most five vertices; both are evidence about those graphs. The theorem's ratio holds for every graph, and only its proof establishes that. This lab does not run the TSP algorithm.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>An approximation ratio</summary><p>An algorithm has ratio <span data-say="rho of n">ρ(n)</span> if, whatever the input and its size n, the cost C of its answer and the optimal cost C* satisfy max(C/C*, <span data-say="C star over C is at most rho of n">C*/C) ≤ ρ(n</span>). The ratio is never below 1, and 1 means the answer is optimal.</p></details><details class="recall"><summary>The triangle inequality</summary><p>A cost function on the edges of a complete graph obeys it when going directly from u to w never costs more than going through a third vertex <span data-say="v, c times u, w is at most c times u, v plus c times v, w">v: c(u, w) ≤ c(u, v) + c(v, w)</span>. Distances in the plane obey it.</p></details><details class="recall"><summary>A computable lower bound</summary><p>The optimum is unknown, so the proofs compare the answer with something the algorithm can compute that is no larger than the optimum: the size of a matching for vertex cover, the weight of a minimum spanning tree for the tour.</p></details></div>
+      <h3>Summary</h3>
       <p>The opening of Chapter 35 and sections 35.1 and 35.2: the approximation ratio and approximation schemes, APPROX-VERTEX-COVER and its ratio of 2 through a matching, APPROX-TSP-TOUR's ratio of 2 under the triangle inequality, and the theorem that without it no constant ratio is possible unless P = NP. Run the vertex-cover algorithm on a graph written for the lesson and set its answer against the matching and the optimum.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>An approximation ratio.</strong> An algorithm has ratio <span data-say="rho of n">ρ(n)</span> if, whatever the input and its size n, the cost C of its answer and the optimal cost C* satisfy max(C/C*, <span data-say="C star over C is at most rho of n">C*/C) ≤ ρ(n</span>). The ratio is never below 1, and 1 means the answer is optimal.</li><li><strong>The triangle inequality.</strong> A cost function on the edges of a complete graph obeys it when going directly from u to w never costs more than going through a third vertex <span data-say="v, c times u, w is at most c times u, v plus c times v, w">v: c(u, w) ≤ c(u, v) + c(v, w)</span>. Distances in the plane obey it.</li><li><strong>A computable lower bound.</strong> The optimum is unknown, so the proofs compare the answer with something the algorithm can compute that is no larger than the optimum: the size of a matching for vertex cover, the weight of a minimum spanning tree for the tour.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="ratio rho of n, the larger of C over C star and C star over C is at most rho of n. vertex cover, take both ends of any edge. the chosen edges form a matching A. any cover has at least the size of A, vertices. the algorithm&#x27;s cover has exactly 2 times the size of A. TSP, preorder walk of an MST, ratio 2. needs the triangle inequality" tabindex="0" role="region" aria-label="Mathematical notation">ratio ρ(n): max(C/C*, C*/C) ≤ ρ(n)
 vertex cover: take both ends of any edge
 the chosen edges form a matching A
@@ -3514,11 +3559,42 @@ needs the triangle inequality</div><figcaption>Sections 35.1 and 35.2 in seven l
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3586,7 +3662,7 @@ needs the triangle inequality</div><figcaption>Sections 35.1 and 35.2 in seven l
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

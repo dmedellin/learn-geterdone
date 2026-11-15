@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Caching and Hit Rates</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Beyond one cache</p>
       <h1>CDN Egress and Origin Load</h1>
       <p class="lesson-lede">Compute origin gigabytes per day and the monthly egress bill from a byte hit rate, and the gap between that and the request hit rate.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The byte hit rate weights each rank by its size</li><li>They are equal only when size does not vary with rank</li><li>The gap runs the wrong way for a CDN</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two hit rates, the size profile that separates them, and the bill</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Request hit rate and byte hit rate</span><p>For a cache holding the top <span class="math" data-say="C">C</span> of <span class="math" data-say="N">N</span> ranked objects, the <strong>request hit rate</strong> is the share of requests served from it and the <strong>byte hit rate</strong> is the share of bytes served from it. With Zipf popularity <span class="math" data-say="p sub i is proportional to 1 over i to the power s">p_i ∝ 1/iˢ</span> and sizes <span class="math" data-say="size sub i is proportional to i to the power b">size_i ∝ i^b</span>, the second is <span class="math" data-say="the sum of i to the power the quantity b minus s">Σ i^(b−s)</span> over the cached ranks divided by the same sum over all ranks.</p><p><span class="math" data-say="b">b</span> is a <strong>size exponent</strong>, positive when popular objects are small. Setting <span class="math" data-say="b equals 0">b = 0</span> recovers the request hit rate exactly, which is how you can tell the two formulas are one formula.</p></div><p>Everything that follows is that one ratio evaluated at three exponents, and each case arrives as arithmetic rather than as an assertion.</p><ul><li><span class="math" data-say="b equals 0">b = 0</span> &mdash; every object the same size. Byte hit rate equals request hit rate. The control.</li><li><span class="math" data-say="b equals s">b = s</span> &mdash; size grows exactly as fast as popularity falls, so every rank carries the same bytes and the byte hit rate is exactly <span class="math" data-say="C over N">C/N</span>, the uniform answer.</li><li><span class="math" data-say="b is greater than 0">b > 0</span> in general &mdash; popular objects are smaller, so the byte hit rate is below the request hit rate, and the gap widens with <span class="math" data-say="b">b</span>.</li></ul><div class="example"><span class="label">Example &middot; Twenty objects, classic Zipf, size proportional to rank</span><p><span class="math" data-say="N equals 20">N = 20</span>, <span class="math" data-say="s equals 1">s = 1</span>, <span class="math" data-say="C equals 4">C = 4</span>, <span class="math" data-say="b equals 1">b = 1</span>. The top four objects are <span class="math" data-say="57.91 percent">57.91%</span> of the requests and exactly <span class="math" data-say="20.00 percent">20.00%</span> of the bytes &mdash; which is <span class="math" data-say="C over N equals 4 over 20">C/N = 4/20</span>, because <span class="math" data-say="b equals s">b = s</span> here. A gap of <span class="math" data-say="37.91">37.91</span> points between two numbers people use interchangeably.</p></div><p>Push the size profile harder and the gap widens. At <span class="math" data-say="b equals 2">b = 2</span> on the same catalogue the byte hit rate falls to <span class="math" data-say="4.76 percent">4.76%</span> while the request hit rate is unchanged at <span class="math" data-say="57.91 percent">57.91%</span>: the edge is still serving more than half of the requests and is now serving one twentieth of the bytes, because the objects it is not holding are enormous.</p><h3>The invoice follows the byte rate</h3><p>Origin egress is <span class="math" data-say="the quantity 1 minus byte hit rate, times total bytes">(1 − byte hit rate) × total bytes</span>, and the bill is that times the price per gigabyte times the days. At <span class="math" data-say="50000 gigabytes per day">50 000 GB/day</span> of edge egress with a <span class="math" data-say="20.00 percent">20.00%</span> byte hit rate, <span class="math" data-say="40000 gigabytes per day">40 000 GB/day</span> still leaves the origin, and at two cents a gigabyte over thirty days that is <span class="math" data-say="$24000">$24 000</span>.</p><div class="mathblock" data-say="total edge egress, 50000 gigabytes per day. byte hit rate, 20.00 percent. origin, equals the quantity 1 minus 0.20, times 50000, equals, 40000 gigabytes per day. bill, equals 40000 times 30 times $0.02, equals, $24000.00. billing from the REQUEST hit rate instead 57.91 percent. origin, equals the quantity 1 minus 0.5791, times 50000 is approximately, 21047 gigabytes per day. bill, is approximately $12627.98, barely half the real invoice" tabindex="0" role="region" aria-label="Mathematical notation">total edge egress      50 000 GB/day
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two hit rates, the size profile that separates them, and the bill</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Request hit rate and byte hit rate</span><p>For a cache holding the top <span class="math" data-say="C">C</span> of <span class="math" data-say="N">N</span> ranked objects, the <strong>request hit rate</strong> is the share of requests served from it and the <strong>byte hit rate</strong> is the share of bytes served from it. With Zipf popularity <span class="math" data-say="p sub i is proportional to 1 over i to the power s">p_i ∝ 1/iˢ</span> and sizes <span class="math" data-say="size sub i is proportional to i to the power b">size_i ∝ i^b</span>, the second is <span class="math" data-say="the sum of i to the power the quantity b minus s">Σ i^(b−s)</span> over the cached ranks divided by the same sum over all ranks.</p><p><span class="math" data-say="b">b</span> is a <strong>size exponent</strong>, positive when popular objects are small. Setting <span class="math" data-say="b equals 0">b = 0</span> recovers the request hit rate exactly, which is how you can tell the two formulas are one formula.</p></div><p>Everything that follows is that one ratio evaluated at three exponents, and each case arrives as arithmetic rather than as an assertion.</p><ul><li><span class="math" data-say="b equals 0">b = 0</span> &mdash; every object the same size. Byte hit rate equals request hit rate. The control.</li><li><span class="math" data-say="b equals s">b = s</span> &mdash; size grows exactly as fast as popularity falls, so every rank carries the same bytes and the byte hit rate is exactly <span class="math" data-say="C over N">C/N</span>, the uniform answer.</li><li><span class="math" data-say="b is greater than 0">b > 0</span> in general &mdash; popular objects are smaller, so the byte hit rate is below the request hit rate, and the gap widens with <span class="math" data-say="b">b</span>.</li></ul><div class="example"><span class="label">Example &middot; Twenty objects, classic Zipf, size proportional to rank</span><p><span class="math" data-say="N equals 20">N = 20</span>, <span class="math" data-say="s equals 1">s = 1</span>, <span class="math" data-say="C equals 4">C = 4</span>, <span class="math" data-say="b equals 1">b = 1</span>. The top four objects are <span class="math" data-say="57.91 percent">57.91%</span> of the requests and exactly <span class="math" data-say="20.00 percent">20.00%</span> of the bytes &mdash; which is <span class="math" data-say="C over N equals 4 over 20">C/N = 4/20</span>, because <span class="math" data-say="b equals s">b = s</span> here. A gap of <span class="math" data-say="37.91">37.91</span> points between two numbers people use interchangeably.</p></div><p>Push the size profile harder and the gap widens. At <span class="math" data-say="b equals 2">b = 2</span> on the same catalogue the byte hit rate falls to <span class="math" data-say="4.76 percent">4.76%</span> while the request hit rate is unchanged at <span class="math" data-say="57.91 percent">57.91%</span>: the edge is still serving more than half of the requests and is now serving one twentieth of the bytes, because the objects it is not holding are enormous.</p><h3>The invoice follows the byte rate</h3><p>Origin egress is <span class="math" data-say="the quantity 1 minus byte hit rate, times total bytes">(1 − byte hit rate) × total bytes</span>, and the bill is that times the price per gigabyte times the days. At <span class="math" data-say="50000 gigabytes per day">50 000 GB/day</span> of edge egress with a <span class="math" data-say="20.00 percent">20.00%</span> byte hit rate, <span class="math" data-say="40000 gigabytes per day">40 000 GB/day</span> still leaves the origin, and at two cents a gigabyte over thirty days that is <span class="math" data-say="$24000">$24 000</span>.</p><div class="mathblock" data-say="total edge egress, 50000 gigabytes per day. byte hit rate, 20.00 percent. origin, equals the quantity 1 minus 0.20, times 50000, equals, 40000 gigabytes per day. bill, equals 40000 times 30 times $0.02, equals, $24000.00. billing from the REQUEST hit rate instead 57.91 percent. origin, equals the quantity 1 minus 0.5791, times 50000 is approximately, 21047 gigabytes per day. bill, is approximately $12627.98, barely half the real invoice" tabindex="0" role="region" aria-label="Mathematical notation">total edge egress      50 000 GB/day
 byte hit rate          20.00%
 
 origin  = (1 − 0.20) × 50 000  =  40 000 GB/day
@@ -1399,12 +1443,11 @@ bill    = 40 000 × 30 × $0.02  =  $24 000.00
 
 billing from the REQUEST hit rate instead (57.91%):
 origin  = (1 − 0.5791) × 50 000 ≈  21 047 GB/day
-bill    ≈ $12 627.98                  barely half the real invoice</div><p>Nearly twice the bill, from using the number that was on the dashboard. And the error is one-sided: because <span class="math" data-say="b is greater than 0">b > 0</span> is the normal shape of an edge workload, substituting the request hit rate always <em>under</em>-estimates origin egress. A capacity plan made this way is optimistic exactly where being wrong is expensive.</p><p>The same gap applies to the origin&rsquo;s capacity, not only its bill. The origin must actually serve <span class="math" data-say="40000 gigabytes">40 000 GB</span> a day; the request hit rate predicted <span class="math" data-say="21047 gigabytes">21 047 GB</span>, and a link, an origin fleet and an autoscaling policy sized against the second number meet the first one on the day the video catalogue gets popular.</p><h3>What to do about it</h3><p>Two moves change the byte rate rather than the request rate. Caching by <em>bytes served</em> rather than by request count &mdash; admitting large popular objects even though they cost more slots &mdash; moves the byte hit rate directly. And splitting large objects into range-cacheable pieces turns one big miss into many small hits, which is why video is served in segments.</p><p>One caution on the model. <span class="math" data-say="size sub i is proportional to i to the power b">size_i ∝ i^b</span> is a smooth profile, and real catalogues are lumpy: a handful of very large objects can dominate the byte totals without being anywhere near a clean curve. Use this to understand the direction and the rough size of the gap, and measure the byte hit rate itself before writing a number into a budget.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>CDN egress and origin load</h2></div><p>The byte hit rate is a different number, and it is the one on the invoice</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+bill    ≈ $12 627.98                  barely half the real invoice</div><p>Nearly twice the bill, from using the number that was on the dashboard. And the error is one-sided: because <span class="math" data-say="b is greater than 0">b > 0</span> is the normal shape of an edge workload, substituting the request hit rate always <em>under</em>-estimates origin egress. A capacity plan made this way is optimistic exactly where being wrong is expensive.</p><p>The same gap applies to the origin&rsquo;s capacity, not only its bill. The origin must actually serve <span class="math" data-say="40000 gigabytes">40 000 GB</span> a day; the request hit rate predicted <span class="math" data-say="21047 gigabytes">21 047 GB</span>, and a link, an origin fleet and an autoscaling policy sized against the second number meet the first one on the day the video catalogue gets popular.</p><h3>What to do about it</h3><p>Two moves change the byte rate rather than the request rate. Caching by <em>bytes served</em> rather than by request count &mdash; admitting large popular objects even though they cost more slots &mdash; moves the byte hit rate directly. And splitting large objects into range-cacheable pieces turns one big miss into many small hits, which is why video is served in segments.</p><p>One caution on the model. <span class="math" data-say="size sub i is proportional to i to the power b">size_i ∝ i^b</span> is a smooth profile, and real catalogues are lumpy: a handful of very large objects can dominate the byte totals without being anywhere near a clean curve. Use this to understand the direction and the rough size of the gap, and measure the byte hit rate itself before writing a number into a budget.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>CDN egress and origin load</h2></div><p>The byte hit rate is a different number, and it is the one on the invoice</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Request hits and byte hits are two numbers</strong><span>a CDN is billed in bytes, and the popular objects are the small ones</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>request hit rate</span><span class="tone-purple"><i class="legend-swatch"></i>byte hit rate</span><span class="tone-red"><i class="legend-swatch"></i>origin bytes</span><span class="tone-muted"><i class="legend-swatch"></i>object size by rank</span></div>
@@ -1412,10 +1455,10 @@ bill    ≈ $12 627.98                  barely half the real invoice</div><p>Nea
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="hbPlot" viewBox="0 0 520 210" role="img" aria-label="Requests by rank and bytes by rank drawn as two profiles, with the cached prefix shaded in each."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="hbTable"></table></div>
       <div class="status-banner" id="hbStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the catalogue, the skew and the size profile</h3>
-          <p>The byte hit rate is not a second slider: it is computed from the same ranks, weighted by object size. Set b = 0 and the two rates coincide.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the catalogue, the skew and the size profile</h3>
+            <p>The byte hit rate is not a second slider: it is computed from the same ranks, weighted by object size. Set b = 0 and the two rates coincide.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="hbN">Catalogue size N (objects)</label><span class="range-value" id="hbNOut">20</span></div>
           <input id="hbN" type="range" min="4" max="120" step="1" value="20" />
@@ -1447,12 +1490,14 @@ bill    ≈ $12 627.98                  barely half the real invoice</div><p>Nea
           <div class="kpi"><span>Origin egress, 30 days</span><strong id="hbCost">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="hbHint" style="margin:0;">Both hit rates are the same harmonic ratio: the request one weights each rank by its popularity, the byte one by popularity times size. At b = 0 they are equal, which is the control; at b = s the byte hit rate is exactly C/N.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Estimating origin load and egress cost</h2></div><p>Get the byte hit rate first. Every number after it is a multiplication, and every one of them is wrong if you used the other rate.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Ask which hit rate you have been given</h3><p>A CDN dashboard reports both and they are labelled similarly. If only one is available, assume it is the request hit rate, because that is the one that is easier to compute and the one more often displayed by default.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Get or estimate the byte hit rate</h3><p>Measure it if you can: bytes served from the edge over total bytes served. If you have to estimate, use the size profile &mdash; the same harmonic ratio at exponent <span class="math" data-say="s minus b">s − b</span> &mdash; and carry an interval rather than a figure.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply out the origin egress</h3><p><span class="math" data-say="the quantity 1 minus byte hit rate, times total bytes per day">(1 − byte hit rate) × total bytes per day</span>. Keep decimal gigabytes, <span class="math" data-say="1 gigabytes equals 10 to the power 9 B">1 GB = 10⁹ B</span>, because that is what egress is billed in and mixing it with binary gibibytes moves the answer by seven per cent.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Price it, and state the gap</h3><p>Multiply by the price per gigabyte and the days. Then compute what the request hit rate would have predicted and report both, because the difference between them is the single most useful sentence in the estimate.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Estimating origin load and egress cost</h2>
+      <p class="lead-in">Get the byte hit rate first. Every number after it is a multiplication, and every one of them is wrong if you used the other rate.</p>
+      <ol class="key-ideas method"><li><strong>Ask which hit rate you have been given.</strong> A CDN dashboard reports both and they are labelled similarly. If only one is available, assume it is the request hit rate, because that is the one that is easier to compute and the one more often displayed by default.</li><li><strong>Get or estimate the byte hit rate.</strong> Measure it if you can: bytes served from the edge over total bytes served. If you have to estimate, use the size profile &mdash; the same harmonic ratio at exponent <span class="math" data-say="s minus b">s − b</span> &mdash; and carry an interval rather than a figure.</li><li><strong>Multiply out the origin egress.</strong> <span class="math" data-say="the quantity 1 minus byte hit rate, times total bytes per day">(1 − byte hit rate) × total bytes per day</span>. Keep decimal gigabytes, <span class="math" data-say="1 gigabytes equals 10 to the power 9 B">1 GB = 10⁹ B</span>, because that is what egress is billed in and mixing it with binary gibibytes moves the answer by seven per cent.</li><li><strong>Price it, and state the gap.</strong> Multiply by the price per gigabyte and the days. Then compute what the request hit rate would have predicted and report both, because the difference between them is the single most useful sentence in the estimate.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1481,17 +1526,16 @@ if you had billed from the request hit rate:
   the forecast would have been barely half the real invoice</div><p>The <span class="math" data-say="b equals s">b = s</span> coincidence is worth noticing rather than relying on: at this catalogue the byte hit rate is exactly the uniform rate <span class="math" data-say="C over N">C/N</span>, which makes the arithmetic clean and is not a general fact. Move <span class="math" data-say="b">b</span> to <span class="math" data-say="2">2</span> and it falls to <span class="math" data-say="4.76 percent">4.76%</span>, taking the bill to <span class="math" data-say="$28571.43">$28 571.43</span>.</p><p>For a faded rehearsal, keep <span class="math" data-say="N equals 20">N = 20</span> and <span class="math" data-say="s equals 1">s = 1</span> but set <span class="math" data-say="b equals 0">b = 0</span>. The supplied first move is that the two hit rates must now be equal; confirm that, compute the origin egress and the bill, and say which of the three cases &mdash; <span class="math" data-say="b equals 0">b = 0</span>, <span class="math" data-say="b equals s">b = s</span>, <span class="math" data-say="b is greater than 0">b > 0</span> &mdash; describes a video CDN and which describes a cache of thumbnails.</p><p>The lab draws the share of requests by rank and the share of bytes by rank as two profiles with the cached prefix shaded in both. The gap between the two shaded areas is the whole lesson, and setting <span class="math" data-say="b equals 0">b = 0</span> closes it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using the request hit rate to forecast egress</strong><span>At <span class="math" data-say="N equals 20">N = 20</span>, <span class="math" data-say="s equals 1">s = 1</span>, <span class="math" data-say="C equals 4">C = 4</span> and <span class="math" data-say="b equals 1">b = 1</span> the request rate is <span class="math" data-say="57.91 percent">57.91%</span> and the byte rate is <span class="math" data-say="20.00 percent">20.00%</span>: the bill is <span class="math" data-say="$24000">$24 000</span> and the forecast made from the wrong rate is <span class="math" data-say="$12627.98">$12 627.98</span>. Because <span class="math" data-say="b is greater than 0">b > 0</span> is the normal shape of an edge workload, this error is one-sided and always optimistic.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming the two rates must be close</strong><span>They are equal only at <span class="math" data-say="b equals 0">b = 0</span>, where every object is the same size. Nothing bounds the gap otherwise: at <span class="math" data-say="b equals 2">b = 2</span> on the same catalogue the byte hit rate is <span class="math" data-say="4.76 percent">4.76%</span> against a request hit rate of <span class="math" data-say="57.91 percent">57.91%</span>, a factor of twelve. Check the size profile before assuming either number stands in for the other.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Mixing decimal and binary gigabytes</strong><span>Egress is billed in decimal units, <span class="math" data-say="1 gigabytes equals 10 to the power 9 B">1 GB = 10⁹ B</span>. Computing origin volume in gibibytes and pricing it as gigabytes overstates or understates the bill by about seven per cent, which is small enough to survive review and large enough to matter on a <span class="math" data-say="$24000">$24 000</span> line.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “which hit rate is that” is the first thing you ask a CDN dashboard.</strong><p>You should be able to distinguish a request hit rate from a byte hit rate, compute the second from a size profile, turn it into origin gigabytes per day and a monthly bill, and state the gap between the two forecasts as the reason the distinction is worth making.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That is the course: a cache is a miss rate, and every question about one &mdash; backend load, latency, size, policy, staleness, bursts, writes, levels and bytes &mdash; is arithmetic on that number. What it cannot tell you is what happens when a component is simply gone, which is where “Nines and Downtime” starts the next course.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using the request hit rate to forecast egress</strong><span>At <span class="math" data-say="N equals 20">N = 20</span>, <span class="math" data-say="s equals 1">s = 1</span>, <span class="math" data-say="C equals 4">C = 4</span> and <span class="math" data-say="b equals 1">b = 1</span> the request rate is <span class="math" data-say="57.91 percent">57.91%</span> and the byte rate is <span class="math" data-say="20.00 percent">20.00%</span>: the bill is <span class="math" data-say="$24000">$24 000</span> and the forecast made from the wrong rate is <span class="math" data-say="$12627.98">$12 627.98</span>. Because <span class="math" data-say="b is greater than 0">b > 0</span> is the normal shape of an edge workload, this error is one-sided and always optimistic.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming the two rates must be close</strong><span>They are equal only at <span class="math" data-say="b equals 0">b = 0</span>, where every object is the same size. Nothing bounds the gap otherwise: at <span class="math" data-say="b equals 2">b = 2</span> on the same catalogue the byte hit rate is <span class="math" data-say="4.76 percent">4.76%</span> against a request hit rate of <span class="math" data-say="57.91 percent">57.91%</span>, a factor of twelve. Check the size profile before assuming either number stands in for the other.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Mixing decimal and binary gigabytes</strong><span>Egress is billed in decimal units, <span class="math" data-say="1 gigabytes equals 10 to the power 9 B">1 GB = 10⁹ B</span>. Computing origin volume in gibibytes and pricing it as gigabytes overstates or understates the bill by about seven per cent, which is small enough to survive review and large enough to matter on a <span class="math" data-say="$24000">$24 000</span> line.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “which hit rate is that” is the first thing you ask a CDN dashboard.</strong><p>You should be able to distinguish a request hit rate from a byte hit rate, compute the second from a size profile, turn it into origin gigabytes per day and a monthly bill, and state the gap between the two forecasts as the reason the distinction is worth making.</p></div></div><div class="note"><strong>Note:</strong> That is the course: a cache is a miss rate, and every question about one &mdash; backend load, latency, size, policy, staleness, bursts, writes, levels and bytes &mdash; is arithmetic on that number. What it cannot tell you is what happens when a component is simply gone, which is where “Nines and Downtime” starts the next course.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The byte hit rate weights each rank by its size</summary><p>The request hit rate sums <span class="math" data-say="p sub i">p_i</span> over the cached ranks. The byte hit rate sums <span class="math" data-say="p sub i times size sub i">p_i × size_i</span> over the same ranks, divided by the same sum over all ranks. With <span class="math" data-say="size sub i is proportional to i to the power b">size_i ∝ i^b</span> the weights are <span class="math" data-say="i to the power the quantity b minus s">i^(b−s)</span>, so it is the identical harmonic ratio at exponent <span class="math" data-say="s minus b">s − b</span> &mdash; one formula, not a second model.</p></details><details class="recall"><summary>They are equal only when size does not vary with rank</summary><p>At <span class="math" data-say="b equals 0">b = 0</span> every object is the same size and the two rates are the same number under two names: that is the control. Move <span class="math" data-say="b">b</span> off zero and they separate, and at <span class="math" data-say="b equals s">b = s</span> the byte hit rate collapses to exactly <span class="math" data-say="C over N">C/N</span>, the uniform rate, because size grows exactly as fast as popularity falls.</p></details><details class="recall"><summary>The gap runs the wrong way for a CDN</summary><p>Real edge workloads have <span class="math" data-say="b is greater than 0">b > 0</span>: thumbnails and API responses are popular and small, video segments and installers are unpopular and large. So the byte hit rate is the lower of the two, and an origin-load estimate made from the request hit rate is optimistic. At <span class="math" data-say="N equals 20">N = 20</span>, <span class="math" data-say="s equals 1">s = 1</span>, <span class="math" data-say="C equals 4">C = 4</span> and <span class="math" data-say="b equals 1">b = 1</span> it is <span class="math" data-say="57.91 percent">57.91%</span> against <span class="math" data-say="20.00 percent">20.00%</span>.</p></details></div>
+      <h3>Summary</h3>
       <p>A CDN is billed in bytes, so the hit rate that decides the invoice is a byte hit rate: the share of bytes served from the edge, not the share of requests. The two come apart whenever object size varies with popularity, and it usually does in the unhelpful direction &mdash; the popular objects are the small ones, so the cheap hits are the cheap ones.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The byte hit rate weights each rank by its size.</strong> The request hit rate sums <span class="math" data-say="p sub i">p_i</span> over the cached ranks. The byte hit rate sums <span class="math" data-say="p sub i times size sub i">p_i × size_i</span> over the same ranks, divided by the same sum over all ranks. With <span class="math" data-say="size sub i is proportional to i to the power b">size_i ∝ i^b</span> the weights are <span class="math" data-say="i to the power the quantity b minus s">i^(b−s)</span>, so it is the identical harmonic ratio at exponent <span class="math" data-say="s minus b">s − b</span> &mdash; one formula, not a second model.</li><li><strong>They are equal only when size does not vary with rank.</strong> At <span class="math" data-say="b equals 0">b = 0</span> every object is the same size and the two rates are the same number under two names: that is the control. Move <span class="math" data-say="b">b</span> off zero and they separate, and at <span class="math" data-say="b equals s">b = s</span> the byte hit rate collapses to exactly <span class="math" data-say="C over N">C/N</span>, the uniform rate, because size grows exactly as fast as popularity falls.</li><li><strong>The gap runs the wrong way for a CDN.</strong> Real edge workloads have <span class="math" data-say="b is greater than 0">b > 0</span>: thumbnails and API responses are popular and small, video segments and installers are unpopular and large. So the byte hit rate is the lower of the two, and an origin-load estimate made from the request hit rate is optimistic. At <span class="math" data-say="N equals 20">N = 20</span>, <span class="math" data-say="s equals 1">s = 1</span>, <span class="math" data-say="C equals 4">C = 4</span> and <span class="math" data-say="b equals 1">b = 1</span> it is <span class="math" data-say="57.91 percent">57.91%</span> against <span class="math" data-say="20.00 percent">20.00%</span>.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="request hit rate equals share of REQUESTS served at the edge. byte hit rate, equals share of BYTES served at the edge. N equals 20, s equals 1, top C equals 4 cached, size is proportional to rank to the power 1. requests, 57.91 percent, bytes, 20.00 percent, a gap of 37.91 points. origin GB per day equals the quantity 1 minus byte hit, times total GB per day. 50000 gigabytes per day goes to 40000 gigabytes per day to the origin goes to $24000 over 30 days" tabindex="0" role="region" aria-label="Mathematical notation">request hit rate = share of REQUESTS served at the edge
 byte hit rate    = share of BYTES served at the edge
 
@@ -2721,11 +2765,42 @@ origin GB/day = (1 − byte hit) × total GB/day
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2793,7 +2868,7 @@ origin GB/day = (1 − byte hit) × total GB/day
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,37 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Tense Tables</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; A rule needs a count</p>
       <h1>Scoring a Rule on 1,210 Real Verbs</h1>
       <p class="lesson-lede">A rule you cannot count is an opinion; this one is counted, and every miss is printed.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A hit rate is a count, not a feeling</li><li>Every miss has a reason</li><li>A rule plus a short list beats a long list</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>What the rules got wrong</h2>
-      <article class="prose reading"><p>A rule with no number beside it is only an opinion. The last lesson gave you four rules that build the forms of a verb. This one asks how good they are, and the answer is a count.</p><h3>How the count is made</h3><p>The rules are run, on this page, over the 1,210 regular verbs in a list of the 2,800 most common English words. For each verb the rule writes a form, and the form is checked against the forms the list already records for that verb. A match is a hit and anything else is a miss. The lab prints both.</p><p>They are right 99.92% of the time for <em>-s</em>, 99.34% for <em>-ing</em>, and 99.26% for the past. All three are counted on this page: 1209 of 1210, 1202 of 1210 and 1201 of 1210. The words they miss are listed in the lab and again in the worked example, and there are not many.</p><h3>Reading the misses</h3><p>The nine words the past rule misses are not random, and not all of them are mistakes. They sort into five kinds.</p><ul><li><strong>A spelling that differs by country</strong>: <em>initial</em> and <em>counsel</em>. The list has only the British <em>-ll-</em>, so the American form is marked wrong where nothing is wrong.</li><li><strong>A letter no rule here knows</strong>: <em>panic</em> and <em>traffic</em> take a <em>-k</em>.</li><li><strong>Doubling against the strong part</strong>: <em>format</em>, <em>input</em> and <em>output</em>.</li><li><strong>Both spellings in use</strong>: <em>bus</em>, <em>busing</em> in the list and <em>bussing</em> from the rule.</li><li><strong>No consonant before the vowel</strong>: <em>up</em>, where the rule never doubles.</li></ul><p>Each kind has a reason you can state. That is what a hit rate should come with, and it is why the lab prints the words and not only the number.</p><h3>The list had to be cleaned first</h3><p>The word list was made by a machine, and a machine can record a spelling nobody writes. The raw list had <em>offerring</em>, <em>commiting</em> and <em>councilling</em>; it gave verb forms to words that are not verbs, such as <em>able</em> and <em>son</em>; and it recorded <em>comed</em> and <em>maked</em>, so the past rule was being marked right for forms nobody writes. Scored against that list, a right rule looks wrong and a wrong rule looks right.</p><p>So the list was cleaned by one test, applied to every spelling the same way: a spelling stays if a <dfn>dictionary</dfn>, a book that records the real spellings of a language, has it, or if it is the British spelling of one the dictionary has. In all, 146 words were left out, each with its reason, and the lab prints them all under <em>List</em>. Ninety of them are irregular verbs, left out because their past is not made by any rule; the course called Irregular Verbs takes them.</p><h3>A rule that sounded right and was not</h3><p>When the <em>-s</em> rule first ran, every <em>-o</em> took <em>-es</em>, and it turned <em>radio</em> and <em>video</em> into forms nobody writes. Choose <em>the -s rule before the -o fix</em> in the lab and you can watch it: 1207 of 1210, 99.75%, with <em>radio</em> and <em>video</em> among the misses. The fix was easy: <em>-o</em> takes <em>-es</em> only after a consonant, as in <em>goes</em>, and plain <em>-s</em> after a vowel.</p><p>At the same time a second rule was added, because it also looked right: <em>-f</em> becomes <em>-ves</em>. For nouns that is often true: one <em>leaf</em>, two <em>leaves</em>. Choose it in the lab and the count falls to 1205 of 1210, 99.59%, because <em>brief</em>, <em>golf</em>, <em>proof</em> and <em>roof</em> are verbs and they simply take <em>-s</em>.</p><p>This is worth more than any single rule in the lesson. A rule can sound right, come from a real pattern, and still cost you accuracy. The only way to know is to run it over real words and count. That is what every lesson on this path does.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Twelve cells, five rules, and the verb you typed</h2></div><p>Every cell is formed on the page by the rule named beside it</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>What the rules got wrong</h2><div class="prose reading"><p>A rule with no number beside it is only an opinion. The last lesson gave you four rules that build the forms of a verb. This one asks how good they are, and the answer is a count.</p><h3>How the count is made</h3><p>The rules are run, on this page, over the 1,210 regular verbs in a list of the 2,800 most common English words. For each verb the rule writes a form, and the form is checked against the forms the list already records for that verb. A match is a hit and anything else is a miss. The lab prints both.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Twelve cells, five rules, and the verb you typed</h2></div><p>Every cell is formed on the page by the rule named beside it</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
 <p class="small-copy" id="tbsHead">The rules scored on every regular verb in the printed list below.</p><div class="kpi-grid"><div class="kpi"><span>rule</span><strong id="tbsRule">&mdash;</strong></div><div class="kpi"><span>right</span><strong id="tbsHit">&mdash;</strong></div><div class="kpi"><span>share right</span><strong id="tbsPct">&mdash;</strong></div><div class="kpi"><span>missed</span><strong id="tbsMiss">&mdash;</strong></div><div class="kpi"><span>the words it missed</span><strong id="tbsFirst">&mdash;</strong></div></div><div class="table-wrap" style="max-height:18rem;overflow-y:auto;" tabindex="0" role="region" aria-label="Data table"><table id="tbsTable"><thead><tr id="tbsCols"></tr></thead><tbody id="tbsBody"></tbody></table></div><div class="kpi-grid"><div class="kpi"><span>he / she / it</span><strong id="tbThird">walks</strong></div><div class="kpi"><span>-ing form</span><strong id="tbIng">walking</strong></div><div class="kpi"><span>past form</span><strong id="tbEd">walked</strong></div><div class="kpi"><span>rule that fired</span><strong id="tbRule">nothing special</strong></div></div><div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table id="tbGrid"><thead><tr><th>time</th><th>simple</th><th>progressive</th><th>perfect</th><th>perfect progressive</th></tr></thead><tbody id="tbBody"></tbody></table></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Score a rule on the printed list</h3>
-          <p>The score comes first on this page. Choose a rule under <em>Score a rule on the list</em> and the page runs it on every regular verb in a list of the 2,800 most common words of English, 1,210 verbs, and counts the verbs where the form it writes is a spelling the list records. The table prints every word the rule misses; under <em>List</em> you can print every verb, or the words that were left out and the reason for each. The twelve boxes are below the score, and they work as before.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Score a rule on the printed list</h3>
+            <p>The score comes first on this page. Choose a rule under <em>Score a rule on the list</em> and the page runs it on every regular verb in a list of the 2,800 most common words of English, 1,210 verbs, and counts the verbs where the form it writes is a spelling the list records. The table prints every word the rule misses; under <em>List</em> you can print every verb, or the words that were left out and the reason for each. The twelve boxes are below the score, and they work as before.</p>
 <label for="tbVerb">A verb</label> <input id="tbVerb" type="text" value="walk" size="14" /> <label for="tbPreset">or one that shows a rule</label> <select id="tbPreset"><option value="walk">walk — nothing special happens</option><option value="stop">stop — the last letter doubles</option><option value="carry">carry — -y becomes -ies</option><option value="hope">hope — the silent -e goes</option><option value="listen">listen — CVC, but the stress is early, so no doubling</option><option value="go">go — irregular: looked up, not formed</option></select> <label for="tbScore">Score a rule on the list</label> <select id="tbScore"><option value="s">the -s rule (he / she / it)</option><option value="oes">the -s rule before the -o fix (every -o takes -es)</option><option value="ves">the -s rule with f becoming -ves added</option><option value="ing">the -ing rule</option><option value="ed">the past (-ed) rule</option></select> <label for="tbShow">List</label> <select id="tbShow"><option value="residue" selected>the words the rule misses</option><option value="all">every verb in the list</option><option value="excluded">the words left out of the list, and why</option></select>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>They are right 99.92% of the time for <em>-s</em>, 99.34% for <em>-ing</em>, and 99.26% for the past. All three are counted on this page: 1209 of 1210, 1202 of 1210 and 1201 of 1210. The words they miss are listed in the lab and again in the worked example, and there are not many.</p><h3>Reading the misses</h3><p>The nine words the past rule misses are not random, and not all of them are mistakes. They sort into five kinds.</p><ul><li><strong>A spelling that differs by country</strong>: <em>initial</em> and <em>counsel</em>. The list has only the British <em>-ll-</em>, so the American form is marked wrong where nothing is wrong.</li><li><strong>A letter no rule here knows</strong>: <em>panic</em> and <em>traffic</em> take a <em>-k</em>.</li><li><strong>Doubling against the strong part</strong>: <em>format</em>, <em>input</em> and <em>output</em>.</li><li><strong>Both spellings in use</strong>: <em>bus</em>, <em>busing</em> in the list and <em>bussing</em> from the rule.</li><li><strong>No consonant before the vowel</strong>: <em>up</em>, where the rule never doubles.</li></ul><p>Each kind has a reason you can state. That is what a hit rate should come with, and it is why the lab prints the words and not only the number.</p><h3>The list had to be cleaned first</h3><p>The word list was made by a machine, and a machine can record a spelling nobody writes. The raw list had <em>offerring</em>, <em>commiting</em> and <em>councilling</em>; it gave verb forms to words that are not verbs, such as <em>able</em> and <em>son</em>; and it recorded <em>comed</em> and <em>maked</em>, so the past rule was being marked right for forms nobody writes. Scored against that list, a right rule looks wrong and a wrong rule looks right.</p><p>So the list was cleaned by one test, applied to every spelling the same way: a spelling stays if a <dfn>dictionary</dfn>, a book that records the real spellings of a language, has it, or if it is the British spelling of one the dictionary has. In all, 146 words were left out, each with its reason, and the lab prints them all under <em>List</em>. Ninety of them are irregular verbs, left out because their past is not made by any rule; the course called Irregular Verbs takes them.</p><h3>A rule that sounded right and was not</h3><p>When the <em>-s</em> rule first ran, every <em>-o</em> took <em>-es</em>, and it turned <em>radio</em> and <em>video</em> into forms nobody writes. Choose <em>the -s rule before the -o fix</em> in the lab and you can watch it: 1207 of 1210, 99.75%, with <em>radio</em> and <em>video</em> among the misses. The fix was easy: <em>-o</em> takes <em>-es</em> only after a consonant, as in <em>goes</em>, and plain <em>-s</em> after a vowel.</p><p>At the same time a second rule was added, because it also looked right: <em>-f</em> becomes <em>-ves</em>. For nouns that is often true: one <em>leaf</em>, two <em>leaves</em>. Choose it in the lab and the count falls to 1205 of 1210, 99.59%, because <em>brief</em>, <em>golf</em>, <em>proof</em> and <em>roof</em> are verbs and they simply take <em>-s</em>.</p><p>This is worth more than any single rule in the lesson. A rule can sound right, come from a real pattern, and still cost you accuracy. The only way to know is to run it over real words and count. That is what every lesson on this path does.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Scoring a rule yourself</h2></div><p>To judge any rule, do this.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Choose the rule</h3><p>Pick one under <em>Score a rule on the list</em>. The lab names it in words beside the score.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read the count and the share</h3><p><em>Right</em> is how many verbs the rule got right out of how many it was run on. <em>Share right</em> is the same count as a percent.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read every word it missed</h3><p>The table under the score lists each one, with the form the rule wrote and the forms the list records.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Sort the misses into kinds and name each kind</h3><p>A spelling that differs by country, a letter the rule does not know, a strong part it cannot hear. A kind with one word is a word to learn; a kind with ten is a new rule.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Scoring a rule yourself</h2>
+      <p class="lead-in">To judge any rule, do this.</p>
+      <ol class="key-ideas method"><li><strong>Choose the rule.</strong> Pick one under <em>Score a rule on the list</em>. The lab names it in words beside the score.</li><li><strong>Read the count and the share.</strong> <em>Right</em> is how many verbs the rule got right out of how many it was run on. <em>Share right</em> is the same count as a percent.</li><li><strong>Read every word it missed.</strong> The table under the score lists each one, with the form the rule wrote and the forms the list records.</li><li><strong>Sort the misses into kinds and name each kind.</strong> A spelling that differs by country, a letter the rule does not know, a strong part it cannot hear. A kind with one word is a word to learn; a kind with ten is a new rule.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1428,17 +1474,16 @@ both spellings in use            bus
 no consonant before the vowel    up</div><p><em>Initial</em> and <em>counsel</em> are written one way in British English and another in American English. The list records only the British <em>-ll-</em>, so the rule's American form is marked wrong where nothing is wrong. <em>Panic</em> and <em>traffic</em> take a <em>-k</em> before the ending, <em>panicking</em>, which no rule here knows. <em>Format</em>, <em>input</em> and <em>output</em> double their last letter though the strong part comes first. <em>Bus</em> is <em>busing</em> in the list where the rule writes <em>bussing</em>, and writers use both. And <em>up</em> has no consonant before its vowel, so the rule never doubles it.</p><p>The <em>-ing</em> rule misses the same words without <em>counsel</em>, which is eight. The <em>-s</em> rule misses one: <em>stomach</em> ends in <em>-ch</em> but does not hiss, so the rule writes <em>stomaches</em> and the list records <em>stomachs</em>. The rule reads letters and cannot hear.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a rule because it sounds right</strong><span>A rule turning <em>-f</em> into <em>-ves</em> looks correct, and for nouns it often is. Added here it made the results worse, because <em>brief</em>, <em>golf</em>, <em>proof</em> and <em>roof</em> are all verbs that simply add <em>-s</em>. The count caught it; the ear did not.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Scoring a rule against a list that is wrong</strong><span>The raw list had <em>offerring</em> and <em>commiting</em>. Scored against that, a right rule looks wrong and a wrong rule looks right. Read the list before you trust the score.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a high score as a finished rule</strong><span>99.26% still leaves nine verbs. The score tells you how much is left; the words tell you what it is. A rule with its misses printed is a tool, and a rule with only its score is a claim.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can read a rule&#x27;s hit rate off the printed list, name the reason for each word it misses, and say why the list had to be cleaned first.</strong><p>You should be able to run each of the three forming rules over the list, read its score and every word it misses, sort the misses into kinds, say which rule change made the results worse and why, and explain why a list can make a right rule look wrong.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The three lists of missed words are short enough to learn directly. That is the whole saving: a rule plus a short list beats a long list.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a rule because it sounds right</strong><span>A rule turning <em>-f</em> into <em>-ves</em> looks correct, and for nouns it often is. Added here it made the results worse, because <em>brief</em>, <em>golf</em>, <em>proof</em> and <em>roof</em> are all verbs that simply add <em>-s</em>. The count caught it; the ear did not.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Scoring a rule against a list that is wrong</strong><span>The raw list had <em>offerring</em> and <em>commiting</em>. Scored against that, a right rule looks wrong and a wrong rule looks right. Read the list before you trust the score.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a high score as a finished rule</strong><span>99.26% still leaves nine verbs. The score tells you how much is left; the words tell you what it is. A rule with its misses printed is a tool, and a rule with only its score is a claim.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can read a rule&#x27;s hit rate off the printed list, name the reason for each word it misses, and say why the list had to be cleaned first.</strong><p>You should be able to run each of the three forming rules over the list, read its score and every word it misses, sort the misses into kinds, say which rule change made the results worse and why, and explain why a list can make a right rule look wrong.</p></div></div><div class="note"><strong>Note:</strong> The three lists of missed words are short enough to learn directly. That is the whole saving: a rule plus a short list beats a long list.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A hit rate is a count, not a feeling</summary><p>The lab runs the rule on every verb in the printed list and marks it right when the form it writes is one the list records. The share right is the number of rights over the number of verbs. Nobody had to be asked their opinion, and you can read every row.</p></details><details class="recall"><summary>Every miss has a reason</summary><p>A rule that is right 99.26% of the time is wrong on nine verbs. Those nine are not random. A British spelling, a letter no rule knows about, a word that doubles against the strong part: each kind can be named, and a named kind is something you can learn once.</p></details><details class="recall"><summary>A rule plus a short list beats a long list</summary><p>The alternative to a rule is a list of every form of every verb. The rule is right on all but nine, and the nine fit on one line. That is the whole saving, and it is why the rule is worth learning.</p></details></div>
+      <h3>Summary</h3>
       <p>The last lesson stated rules. This one counts them. Each rule is run over 1,210 regular verbs and checked against the forms a word list records, and each is right more than 99 times in 100. The nine words the past rule misses are the content: every one has a reason, and one rule added for good reasons made the score worse.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A hit rate is a count, not a feeling.</strong> The lab runs the rule on every verb in the printed list and marks it right when the form it writes is one the list records. The share right is the number of rights over the number of verbs. Nobody had to be asked their opinion, and you can read every row.</li><li><strong>Every miss has a reason.</strong> A rule that is right 99.26% of the time is wrong on nine verbs. Those nine are not random. A British spelling, a letter no rule knows about, a word that doubles against the strong part: each kind can be named, and a named kind is something you can learn once.</li><li><strong>A rule plus a short list beats a long list.</strong> The alternative to a rule is a list of every form of every verb. The rule is right on all but nine, and the nine fit on one line. That is the whole saving, and it is why the rule is worth learning.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the s rule 99.92 percent, the ing rule 99.34 percent, the ed rule 99.26 percent. 1210 verbs, every miss printed. a rule plus a short list of misses. beats a long list of everything" tabindex="0" role="region" aria-label="Mathematical notation">-s 99.92%    -ing 99.34%    -ed 99.26%
 
 1,210 verbs, every miss printed
@@ -2067,11 +2112,42 @@ var vbPct2 = function (hit, total) {
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2139,7 +2215,7 @@ var vbPct2 = function (hit, total) {
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

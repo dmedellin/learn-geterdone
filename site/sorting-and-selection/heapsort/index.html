@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Sorting and Selection</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Quicksort and heapsort</p>
       <h1>Heapsort</h1>
       <p class="lesson-lede">Run heapsort by hand on eight keys, counting sift-down comparisons, and name the two promises it breaks.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The array holds the heap and the output at once</li><li>The bound holds on every input, which is also the bad news</li><li>Stability is not implied by the class, and heapsort has none</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Build, then tear down, in the array itself</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Heapsort</span><p><strong>Heapsort</strong> sorts <span class="math" data-say="A at 1, n">a[1..n]</span> in two phases. <strong>Build</strong>: rearrange <span class="math" data-say="A">a</span> into a max-heap in place, bottom up. <strong>Teardown</strong>: for <span class="math" data-say="m equals n">m = n</span> down to <span class="math" data-say="2">2</span>, swap <span class="math" data-say="A at 1">a[1]</span> with <span class="math" data-say="A at m">a[m]</span>, treat the heap as having <span class="math" data-say="m minus 1">m − 1</span> elements, and sift the new <span class="math" data-say="A at 1">a[1]</span> down until the heap property holds again.</p></div><p>The max-heap is the choice that makes the sort ascending. The root is the largest remaining key, and the slot it is swapped into is the last slot the heap still owns, so the largest key lands where the sorted array wants it and is immediately outside the heap.</p><ol><li>Build the max-heap, bottom up, from the last internal node to the root.</li><li>Swap <span class="math" data-say="A at 1">a[1]</span> with <span class="math" data-say="A at m">a[m]</span>. The key now at <span class="math" data-say="A at m">a[m]</span> is final.</li><li>Shrink the heap to <span class="math" data-say="m minus 1">m − 1</span> slots, so <span class="math" data-say="A at m">a[m]</span> is no longer part of it.</li><li>Sift <span class="math" data-say="A at 1">a[1]</span> down: compare it with its children, swap with the larger if the larger is bigger, and repeat.</li><li>Repeat from step two until <span class="math" data-say="m equals 1">m = 1</span>.</li></ol><div class="example"><span class="label">Example &middot; Eight keys, counted</span><p>On <span class="math" data-say="8 1 3 6 5 2 7 4">8 1 3 6 5 2 7 4</span> the build costs 8 comparisons and produces the heap <span class="math" data-say="8 6 7 4 5 2 3 1">8 6 7 4 5 2 3 1</span>. The seven rounds of teardown cost 18 more, so heapsort spends 26 comparisons in all and performs 20 swaps. Merge sort on the same eight keys spends 17, and <span class="math" data-say="the ceiling of log base 2 8 factorial, equals 16">⌈log₂ 8!⌉ = 16</span> comparisons are necessary for any comparison sort on any array of eight. Every one of those three numbers was produced by running something.</p></div><p>The build is the cheap half and it is the half readers expect to dominate. At 16 keys the lab measures 22 comparisons for the build and 58 for the teardown, out of 80. The asymmetry is structural: the build's cost is dominated by the many nodes near the bottom, which sift down almost no distance, while every round of the teardown drops a key from the root and usually carries it most of the way back down.</p><h3>The two promises heapsort does not make</h3><p>It is not adaptive. The comparison counts at 16 keys are 85 for increasing input, 80 for a shuffle, 72 for decreasing input: not only is sorted input no cheaper, it is the most expensive of the three, because an ascending array is the worst possible starting shape for a max-heap build and every key has to travel. A reader who expects &ldquo;nearly sorted input is cheaper&rdquo; is expecting a property insertion sort has and this algorithm does not.</p><p>It is not stable. The lab's tie test builds eight records with four distinct keys, <span class="math" data-say="1 number 1 2 number 2 3 number 3 4 number 4 1 number 5 2 number 6 3 number 7 4 number 8">1#1 2#2 3#3 4#4 1#5 2#6 3#7 4#8</span>, and heapsort returns <span class="math" data-say="1 number 5 1 number 1 2 number 6 2 number 2 3 number 3 3 number 7 4 number 8 4 number 4">1#5 1#1 2#6 2#2 3#3 3#7 4#8 4#4</span>. Three pairs of equal keys come out reversed. One would have been enough.</p><p>What it does promise is worth being clear about, because it is the reason the algorithm is used. <span class="math" data-say="theta of 1">Θ(1)</span> extra memory, and a <span class="math" data-say="theta of n times log n">Θ(n log n)</span> worst case with no bad input and no randomness &mdash; which is exactly what quicksort cannot offer and merge sort can only offer at the cost of a second array. When memory is the binding constraint and a guarantee is wanted, this is the sort.</p><p>The cost of those two promises is a constant factor, and the lab prints it as a ratio. At 16 keys heapsort spends 80 comparisons against merge sort's 48 on the same array: both are <span class="math" data-say="theta of n times log n">Θ(n log n)</span> and heapsort's constant is larger, chiefly because a sift-down compares the key with both children at every level. That same factor of about two reappears in &ldquo;k-Way Merging and Sorting in Practice&rdquo;, where a heap merges <span class="math" data-say="k">k</span> runs and pays for it in exactly the same way.</p><p>Two figures on this page are measurements of one array each &mdash; 26 at eight keys, 80 at sixteen &mdash; and one is a proof: <span class="math" data-say="the ceiling of log base 2 n factorial">⌈log₂ n!⌉</span>, which no comparison sort can go under on any array. At 16 keys that is 45, and merge sort's 48 and heapsort's 80 both sit above it. The gap between 45 and 80 is not slack in the bound; it is the price of the two promises.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Heapsort, in place</h2></div><p>Build, then swap the root to the end and sift down</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Build, then tear down, in the array itself</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Heapsort</span><p><strong>Heapsort</strong> sorts <span class="math" data-say="A at 1, n">a[1..n]</span> in two phases. <strong>Build</strong>: rearrange <span class="math" data-say="A">a</span> into a max-heap in place, bottom up. <strong>Teardown</strong>: for <span class="math" data-say="m equals n">m = n</span> down to <span class="math" data-say="2">2</span>, swap <span class="math" data-say="A at 1">a[1]</span> with <span class="math" data-say="A at m">a[m]</span>, treat the heap as having <span class="math" data-say="m minus 1">m − 1</span> elements, and sift the new <span class="math" data-say="A at 1">a[1]</span> down until the heap property holds again.</p></div><p>The max-heap is the choice that makes the sort ascending. The root is the largest remaining key, and the slot it is swapped into is the last slot the heap still owns, so the largest key lands where the sorted array wants it and is immediately outside the heap.</p><ol><li>Build the max-heap, bottom up, from the last internal node to the root.</li><li>Swap <span class="math" data-say="A at 1">a[1]</span> with <span class="math" data-say="A at m">a[m]</span>. The key now at <span class="math" data-say="A at m">a[m]</span> is final.</li><li>Shrink the heap to <span class="math" data-say="m minus 1">m − 1</span> slots, so <span class="math" data-say="A at m">a[m]</span> is no longer part of it.</li><li>Sift <span class="math" data-say="A at 1">a[1]</span> down: compare it with its children, swap with the larger if the larger is bigger, and repeat.</li><li>Repeat from step two until <span class="math" data-say="m equals 1">m = 1</span>.</li></ol><div class="example"><span class="label">Example &middot; Eight keys, counted</span><p>On <span class="math" data-say="8 1 3 6 5 2 7 4">8 1 3 6 5 2 7 4</span> the build costs 8 comparisons and produces the heap <span class="math" data-say="8 6 7 4 5 2 3 1">8 6 7 4 5 2 3 1</span>. The seven rounds of teardown cost 18 more, so heapsort spends 26 comparisons in all and performs 20 swaps. Merge sort on the same eight keys spends 17, and <span class="math" data-say="the ceiling of log base 2 8 factorial, equals 16">⌈log₂ 8!⌉ = 16</span> comparisons are necessary for any comparison sort on any array of eight. Every one of those three numbers was produced by running something.</p></div><p>The build is the cheap half and it is the half readers expect to dominate. At 16 keys the lab measures 22 comparisons for the build and 58 for the teardown, out of 80. The asymmetry is structural: the build's cost is dominated by the many nodes near the bottom, which sift down almost no distance, while every round of the teardown drops a key from the root and usually carries it most of the way back down.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Heapsort, in place</h2></div><p>Build, then swap the root to the end and sift down</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Heapsort against merge sort</strong><span>the same array, both comparison counts, and the two promises heapsort breaks</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>heapsort</span><span class="tone-purple"><i class="legend-swatch"></i>merge sort</span><span class="tone-red"><i class="legend-swatch"></i>a tie left out of order</span></div>
@@ -1405,10 +1448,10 @@
       <div class="lab-stage" id="hsStage" tabindex="0" role="region" aria-label="Comparisons made by heapsort and by merge sort on the same array, at every size up to the one chosen."><svg id="hsPlot" style="min-width:520px" viewBox="0 0 520 220" role="img" aria-label="Comparisons made by heapsort and by merge sort on the same array, at every size up to the one chosen."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="hsTable"></table></div>
       <div class="status-banner" id="hsStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Sort in place and count what it cost</h3>
-          <p>Heapsort builds a max-heap, then repeatedly swaps the root to the end and sifts down: no extra memory at all. Merge sort's comparison total beside it comes from running merge sort on the very same array, so the two columns are two counts of one input rather than two claims about a complexity class.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Sort in place and count what it cost</h3>
+            <p>Heapsort builds a max-heap, then repeatedly swaps the root to the end and sifts down: no extra memory at all. Merge sort's comparison total beside it comes from running merge sort on the very same array, so the two columns are two counts of one input rather than two claims about a complexity class.</p>
         <div class="field" id="hsPresetField">
           <label for="hsPreset">Worked example</label>
           <select id="hsPreset"><option value="shuffled" selected>one fixed shuffle</option><option value="sorted-input">already in increasing order</option><option value="reversed-input">in decreasing order</option></select>
@@ -1438,12 +1481,15 @@
           <div class="kpi"><span>Equal keys</span><strong id="hsStable">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>The two promises heapsort does not make</h3><p>It is not adaptive. The comparison counts at 16 keys are 85 for increasing input, 80 for a shuffle, 72 for decreasing input: not only is sorted input no cheaper, it is the most expensive of the three, because an ascending array is the worst possible starting shape for a max-heap build and every key has to travel. A reader who expects &ldquo;nearly sorted input is cheaper&rdquo; is expecting a property insertion sort has and this algorithm does not.</p><p>It is not stable. The lab's tie test builds eight records with four distinct keys, <span class="math" data-say="1 number 1 2 number 2 3 number 3 4 number 4 1 number 5 2 number 6 3 number 7 4 number 8">1#1 2#2 3#3 4#4 1#5 2#6 3#7 4#8</span>, and heapsort returns <span class="math" data-say="1 number 5 1 number 1 2 number 6 2 number 2 3 number 3 3 number 7 4 number 8 4 number 4">1#5 1#1 2#6 2#2 3#3 3#7 4#8 4#4</span>. Three pairs of equal keys come out reversed. One would have been enough.</p><p>What it does promise is worth being clear about, because it is the reason the algorithm is used. <span class="math" data-say="theta of 1">Θ(1)</span> extra memory, and a <span class="math" data-say="theta of n times log n">Θ(n log n)</span> worst case with no bad input and no randomness &mdash; which is exactly what quicksort cannot offer and merge sort can only offer at the cost of a second array. When memory is the binding constraint and a guarantee is wanted, this is the sort.</p><p>The cost of those two promises is a constant factor, and the lab prints it as a ratio. At 16 keys heapsort spends 80 comparisons against merge sort's 48 on the same array: both are <span class="math" data-say="theta of n times log n">Θ(n log n)</span> and heapsort's constant is larger, chiefly because a sift-down compares the key with both children at every level. That same factor of about two reappears in &ldquo;k-Way Merging and Sorting in Practice&rdquo;, where a heap merges <span class="math" data-say="k">k</span> runs and pays for it in exactly the same way.</p><p>Two figures on this page are measurements of one array each &mdash; 26 at eight keys, 80 at sixteen &mdash; and one is a proof: <span class="math" data-say="the ceiling of log base 2 n factorial">⌈log₂ n!⌉</span>, which no comparison sort can go under on any array. At 16 keys that is 45, and merge sort's 48 and heapsort's 80 both sit above it. The gap between 45 and 80 is not slack in the bound; it is the price of the two promises.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running heapsort on paper</h2></div><p>Draw the array once and keep two marks on it: where the heap ends, and where the sorted suffix begins.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Build bottom up, and count as you go</h3><p>Start at the last internal node, <span class="math" data-say="the floor of n over 2">⌊n/2⌋</span>, and work back to the root, sifting each down. Count one comparison per pair of children examined plus one against the parent. On eight keys this is 8 comparisons; check yours against the lab's build column.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Swap the root out and shrink</h3><p>Exchange <span class="math" data-say="A at 1">a[1]</span> with the last slot the heap owns. Write the boundary down. That key is final and will not be looked at again &mdash; which is the whole reason no second array is needed.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Sift the new root down, comparing both children</h3><p>At each level compare the two children with each other, then the larger with the parent. Stop when the parent wins or the node has no children. The number of levels it travels is what varies between rounds; the maximum is <span class="math" data-say="the floor of log base 2 m">⌊log₂ m⌋</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the ratio, not just the total</h3><p>Put heapsort's count beside merge sort's on the same array and beside <span class="math" data-say="the ceiling of log base 2 n factorial">⌈log₂ n!⌉</span>. Both sorts are above the bound and heapsort is above merge sort; the question that has an answer here is how big the constant is, not which sort is faster.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Change the arrival order and watch the count refuse to improve</h3><p>Run increasing, decreasing and shuffled at the same length. If sorted input came out cheapest you would have found an adaptive algorithm; it comes out dearest, and that is the promise heapsort does not make.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running heapsort on paper</h2>
+      <p class="lead-in">Draw the array once and keep two marks on it: where the heap ends, and where the sorted suffix begins.</p>
+      <ol class="key-ideas method"><li><strong>Build bottom up, and count as you go.</strong> Start at the last internal node, <span class="math" data-say="the floor of n over 2">⌊n/2⌋</span>, and work back to the root, sifting each down. Count one comparison per pair of children examined plus one against the parent. On eight keys this is 8 comparisons; check yours against the lab's build column.</li><li><strong>Swap the root out and shrink.</strong> Exchange <span class="math" data-say="A at 1">a[1]</span> with the last slot the heap owns. Write the boundary down. That key is final and will not be looked at again &mdash; which is the whole reason no second array is needed.</li><li><strong>Sift the new root down, comparing both children.</strong> At each level compare the two children with each other, then the larger with the parent. Stop when the parent wins or the node has no children. The number of levels it travels is what varies between rounds; the maximum is <span class="math" data-say="the floor of log base 2 m">⌊log₂ m⌋</span>.</li><li><strong>Read the ratio, not just the total.</strong> Put heapsort's count beside merge sort's on the same array and beside <span class="math" data-say="the ceiling of log base 2 n factorial">⌈log₂ n!⌉</span>. Both sorts are above the bound and heapsort is above merge sort; the question that has an answer here is how big the constant is, not which sort is faster.</li><li><strong>Change the arrival order and watch the count refuse to improve.</strong> Run increasing, decreasing and shuffled at the same length. If sorted input came out cheapest you would have found an adaptive algorithm; it comes out dearest, and that is the promise heapsort does not make.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1479,17 +1525,16 @@ merge sort    17 comparisons on the same array, and Θ(n) extra slots
 ⌈log₂ 8!⌉     16 comparisons, necessary for every comparison sort</div><p>Two things in that trace are worth pausing on. The build made 8 comparisons and the teardown 18, so the phase that sounds expensive is the cheap one. And the sorted suffix grows from the right while the heap shrinks from the same boundary, which is why the extra memory is a single index.</p><p>The comparison totals are not a verdict about speed. Merge sort made fewer comparisons on this array and needs <span class="math" data-say="theta of n">Θ(n)</span> more memory to do it; the bound of 16 says neither of them is doing anything impossible. What heapsort bought with its 26 is a guarantee that holds on every array of eight keys and a memory footprint of zero.</p><p>For a faded rehearsal, set the arrival order to already increasing at the same length. The supplied first move is a prediction: the build has more work to do, not less, because an ascending array is the worst possible shape for a max-heap. Count the build's comparisons by hand before you read them off, then compare the total with the 26 above.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Inferring stability, or adaptivity, from <span class="math" data-say="theta of n times log n">Θ(n log n)</span></strong><span>The class bounds the growth of a comparison count and says nothing else. Heapsort and merge sort share it and agree about nothing else that matters: one is stable, the other is in place, neither is adaptive. If a situation needs a promise, the promise has to come from the algorithm's structure.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the build to be the expensive phase</strong><span>It is the cheap one. At 16 keys the build costs 22 comparisons and the teardown 58. Most nodes in a heap are near the bottom and sift down almost no distance, which is the linear-time build argument; every teardown round, by contrast, starts at the root and usually travels the full height.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading “in place” as “no memory” or as “no movement”</strong><span>In place means <span class="math" data-say="theta of 1">Θ(1)</span> extra memory, not that nothing moves: heapsort performs 20 swaps on eight keys, which is more movement than merge sort's, and all that movement is what costs it stability. The promise is about space, and it is the only promise of the four that heapsort makes outright.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run heapsort on eight keys, count its comparisons, and name what it gave up.</strong><p>You should be able to build a max-heap bottom up by hand, carry out the teardown with the boundary marked, count build and teardown separately, and say which two of the four promises heapsort breaks and why no complexity class was going to decide either.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every sort so far has been a comparison sort, so every one of them is under <span class="math" data-say="the ceiling of log base 2 n factorial">⌈log₂ n!⌉</span>. The next three lessons leave that world. If the keys are integers in a known range they can be used as addresses instead of being compared, and &ldquo;Counting Sort&rdquo; is the first of those &mdash; not a sort that beats the bound, but one the bound does not describe.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Inferring stability, or adaptivity, from <span class="math" data-say="theta of n times log n">Θ(n log n)</span></strong><span>The class bounds the growth of a comparison count and says nothing else. Heapsort and merge sort share it and agree about nothing else that matters: one is stable, the other is in place, neither is adaptive. If a situation needs a promise, the promise has to come from the algorithm's structure.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the build to be the expensive phase</strong><span>It is the cheap one. At 16 keys the build costs 22 comparisons and the teardown 58. Most nodes in a heap are near the bottom and sift down almost no distance, which is the linear-time build argument; every teardown round, by contrast, starts at the root and usually travels the full height.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading “in place” as “no memory” or as “no movement”</strong><span>In place means <span class="math" data-say="theta of 1">Θ(1)</span> extra memory, not that nothing moves: heapsort performs 20 swaps on eight keys, which is more movement than merge sort's, and all that movement is what costs it stability. The promise is about space, and it is the only promise of the four that heapsort makes outright.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run heapsort on eight keys, count its comparisons, and name what it gave up.</strong><p>You should be able to build a max-heap bottom up by hand, carry out the teardown with the boundary marked, count build and teardown separately, and say which two of the four promises heapsort breaks and why no complexity class was going to decide either.</p></div></div><div class="note"><strong>Note:</strong> Every sort so far has been a comparison sort, so every one of them is under <span class="math" data-say="the ceiling of log base 2 n factorial">⌈log₂ n!⌉</span>. The next three lessons leave that world. If the keys are integers in a known range they can be used as addresses instead of being compared, and &ldquo;Counting Sort&rdquo; is the first of those &mdash; not a sort that beats the bound, but one the bound does not describe.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The array holds the heap and the output at once</summary><p>Slots <span class="math" data-say="1 and so on m">1 … m</span> are the heap and slots <span class="math" data-say="m plus 1 and so on n">m+1 … n</span> are the finished suffix, in increasing order. Each round swaps the largest remaining key, which is at the root, into slot <span class="math" data-say="m">m</span>, then decrements <span class="math" data-say="m">m</span> and sifts the displaced key down through the smaller heap. Nothing is allocated, and the boundary between &ldquo;heap&rdquo; and &ldquo;sorted&rdquo; is a single index.</p></details><details class="recall"><summary>The bound holds on every input, which is also the bad news</summary><p>A sift-down through a heap of <span class="math" data-say="m">m</span> elements costs at most <span class="math" data-say="2 times the floor of log base 2 m">2⌊log₂ m⌋</span> comparisons, so the teardown is <span class="math" data-say="theta of n times log n">Θ(n log n)</span> whatever the input was, and the build is <span class="math" data-say="theta of n">Θ(n)</span> by the argument of &ldquo;Building a Heap in Linear Time&rdquo;. No input is bad. Equally, no input is good: at 16 keys the lab measures 85 comparisons on already-increasing input, 80 on a shuffle and 72 on decreasing input. Already-sorted input was the dearest of the three.</p></details><details class="recall"><summary>Stability is not implied by the class, and heapsort has none</summary><p>The build alone moves keys across the whole array: slot <span class="math" data-say="n">n</span> can end up at the root. So two equal keys can be swapped past each other before the sort proper begins, and the lab shows it on eight records with four distinct keys, where three pairs come out reversed. Merge sort shares heapsort's complexity class and is stable; the class was never the reason.</p></details></div>
+      <h3>Summary</h3>
       <p>Build a max-heap in the array itself, then repeatedly swap the root to the end, shrink the heap by one and sift the new root down. The array is a heap and a sorted suffix at the same time, so no extra memory is needed at all, and the comparison count is <span class="math" data-say="theta of n times log n">Θ(n log n)</span> on every input. What it gives up is stability and adaptivity, neither of which any complexity class was ever going to supply.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The array holds the heap and the output at once.</strong> Slots <span class="math" data-say="1 and so on m">1 … m</span> are the heap and slots <span class="math" data-say="m plus 1 and so on n">m+1 … n</span> are the finished suffix, in increasing order. Each round swaps the largest remaining key, which is at the root, into slot <span class="math" data-say="m">m</span>, then decrements <span class="math" data-say="m">m</span> and sifts the displaced key down through the smaller heap. Nothing is allocated, and the boundary between &ldquo;heap&rdquo; and &ldquo;sorted&rdquo; is a single index.</li><li><strong>The bound holds on every input, which is also the bad news.</strong> A sift-down through a heap of <span class="math" data-say="m">m</span> elements costs at most <span class="math" data-say="2 times the floor of log base 2 m">2⌊log₂ m⌋</span> comparisons, so the teardown is <span class="math" data-say="theta of n times log n">Θ(n log n)</span> whatever the input was, and the build is <span class="math" data-say="theta of n">Θ(n)</span> by the argument of &ldquo;Building a Heap in Linear Time&rdquo;. No input is bad. Equally, no input is good: at 16 keys the lab measures 85 comparisons on already-increasing input, 80 on a shuffle and 72 on decreasing input. Already-sorted input was the dearest of the three.</li><li><strong>Stability is not implied by the class, and heapsort has none.</strong> The build alone moves keys across the whole array: slot <span class="math" data-say="n">n</span> can end up at the root. So two equal keys can be swapped past each other before the sort proper begins, and the lab shows it on eight records with four distinct keys, where three pairs come out reversed. Merge sort shares heapsort's complexity class and is stable; the class was never the reason.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="build a max-heap in place, bottom up, theta of n. n minus 1 times, swap A at 1 with the last heap slot, shrink, sift down. in place, theta of 1 extra memory, theta of n times log n on every input. not stable, not adaptive, and no complexity class implies either. 8 keys, one shuffle, heapsort 26 comparisons, merge sort 17" tabindex="0" role="region" aria-label="Mathematical notation">build a max-heap in place, bottom up                       Θ(n)
 n − 1 times:  swap a[1] with the last heap slot, shrink, sift down
 in place   Θ(1) extra memory        Θ(n log n) on every input
@@ -2993,11 +3038,42 @@ not stable      not adaptive        and no complexity class implies either
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3065,7 +3141,7 @@ not stable      not adaptive        and no complexity class implies either
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

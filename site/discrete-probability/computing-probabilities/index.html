@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,30 +1424,28 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Discrete Probability</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The model</p>
       <h1>Computing Probabilities</h1>
       <p class="lesson-lede">Counting the event, counting the space, dividing.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Count with the same tools</li><li>The complement rule saves work</li><li>The answer is bounded</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Probability as a ratio</h2>
-      <article class="prose reading"><div class="thm"><span class="label">Theorem &middot; Equally likely outcomes</span><p>If <span class="math" data-say="S">S</span> is finite and its outcomes are equally likely, then for any event <span class="math" data-say="E">E</span>, <span class="math" data-say="P of E equals the size of E, over the size of S">P(E) = |E|/|S|</span>.</p></div><div class="thm"><span class="label">Theorem &middot; Complement rule</span><p><span class="math" data-say="P of E bar equals 1 minus P of E">P(Ē) = 1 − P(E)</span>, because <span class="math" data-say="the size of E bar, equals the size of S, minus the size of E">|Ē| = |S| − |E|</span>.</p></div><div class="example"><span class="label">Example &middot; Poker: a flush</span><p>Five cards from 52: <span class="math" data-say="52 choose 5 equals 2598960">C(52,5) = 2 598 960</span> hands. A flush is five cards of one suit: choose the suit (4 ways) and five of its thirteen cards (<span class="math" data-say="13 choose 5 equals 1287">C(13,5) = 1287</span>), giving <span class="math" data-say="5148">5148</span>. So <span class="math" data-say="P equals 5148 over 2598960 is approximately 0.00198">P = 5148/2598960 ≈ 0.00198</span>. (This includes straight flushes; excluding them subtracts 40.)</p></div><div class="example"><span class="label">Example &middot; At least one six</span><p>Roll four dice. <span class="math" data-say="P of at least one 6 equals 1 minus P of no 6 equals 1 minus the quantity 5 over 6, to the power 4 equals 1 minus 625 over 1296 equals 671 over 1296 is approximately 0.518">P(at least one 6) = 1 − P(no 6) = 1 − (5/6)⁴ = 1 − 625/1296 = 671/1296 ≈ 0.518</span>. Counting the ways to get at least one six directly requires inclusion and exclusion over the four dice; the complement is one line.</p></div><p>The answer most people give first is <span class="math" data-say="4 times 1 over 6 equals 2 over 3">4 × 1/6 = 2/3</span>. That adds the four events "die <span class="math" data-say="i">i</span> shows a 6", which overlap &mdash; the roll <span class="math" data-say="6, 6, 1, 2">(6,6,1,2)</span> is counted twice &mdash; and the same reasoning with six dice would give a probability of 1. Adding gives an upper bound, which “The Probability Axioms” names the union bound, and it gives the answer only when the events are disjoint.</p><h3>The birthday problem</h3><div class="thm"><span class="label">Theorem &middot; Shared birthdays</span><p>With <span class="math" data-say="n">n</span> people and 365 equally likely birthdays, <span class="math" data-say="P of some pair shares equals 1 minus the quantity 365 times 364 and so on 365 minus n plus 1, over 365 to the power n">P(some pair shares) = 1 − (365 · 364 ⋯ (365−n+1)) / 365ⁿ</span>.</p></div><div class="mathblock" data-say="n, P of a shared birthday. 10, 0.117. 20, 0.411. a table, shown on the page. 30, 0.706. 50, 0.970. 70, 0.999" tabindex="0" role="region" aria-label="Mathematical notation">n     P(a shared birthday)
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Probability as a ratio</h2><div class="prose reading"><div class="thm"><span class="label">Theorem &middot; Equally likely outcomes</span><p>If <span class="math" data-say="S">S</span> is finite and its outcomes are equally likely, then for any event <span class="math" data-say="E">E</span>, <span class="math" data-say="P of E equals the size of E, over the size of S">P(E) = |E|/|S|</span>.</p></div><div class="thm"><span class="label">Theorem &middot; Complement rule</span><p><span class="math" data-say="P of E bar equals 1 minus P of E">P(Ē) = 1 − P(E)</span>, because <span class="math" data-say="the size of E bar, equals the size of S, minus the size of E">|Ē| = |S| − |E|</span>.</p></div><div class="example"><span class="label">Example &middot; Poker: a flush</span><p>Five cards from 52: <span class="math" data-say="52 choose 5 equals 2598960">C(52,5) = 2 598 960</span> hands. A flush is five cards of one suit: choose the suit (4 ways) and five of its thirteen cards (<span class="math" data-say="13 choose 5 equals 1287">C(13,5) = 1287</span>), giving <span class="math" data-say="5148">5148</span>. So <span class="math" data-say="P equals 5148 over 2598960 is approximately 0.00198">P = 5148/2598960 ≈ 0.00198</span>. (This includes straight flushes; excluding them subtracts 40.)</p></div><div class="example"><span class="label">Example &middot; At least one six</span><p>Roll four dice. <span class="math" data-say="P of at least one 6 equals 1 minus P of no 6 equals 1 minus the quantity 5 over 6, to the power 4 equals 1 minus 625 over 1296 equals 671 over 1296 is approximately 0.518">P(at least one 6) = 1 − P(no 6) = 1 − (5/6)⁴ = 1 − 625/1296 = 671/1296 ≈ 0.518</span>. Counting the ways to get at least one six directly requires inclusion and exclusion over the four dice; the complement is one line.</p></div><p>The answer most people give first is <span class="math" data-say="4 times 1 over 6 equals 2 over 3">4 × 1/6 = 2/3</span>. That adds the four events "die <span class="math" data-say="i">i</span> shows a 6", which overlap &mdash; the roll <span class="math" data-say="6, 6, 1, 2">(6,6,1,2)</span> is counted twice &mdash; and the same reasoning with six dice would give a probability of 1. Adding gives an upper bound, which “The Probability Axioms” names the union bound, and it gives the answer only when the events are disjoint.</p><h3>The birthday problem</h3><div class="thm"><span class="label">Theorem &middot; Shared birthdays</span><p>With <span class="math" data-say="n">n</span> people and 365 equally likely birthdays, <span class="math" data-say="P of some pair shares equals 1 minus the quantity 365 times 364 and so on 365 minus n plus 1, over 365 to the power n">P(some pair shares) = 1 − (365 · 364 ⋯ (365−n+1)) / 365ⁿ</span>.</p></div><div class="mathblock" data-say="n, P of a shared birthday. 10, 0.117. 20, 0.411. a table, shown on the page. 30, 0.706. 50, 0.970. 70, 0.999" tabindex="0" role="region" aria-label="Mathematical notation">n     P(a shared birthday)
 10           0.117
 20           0.411
 23           0.507        ← passes one half
 30           0.706
 50           0.970
-70           0.999</div><p>Twenty-three people suffice for a better-than-even chance, which surprises nearly everyone. The reason is that the question is about <em>pairs</em>: 23 people form <span class="math" data-say="23 choose 2 equals 253">C(23,2) = 253</span> pairs, and each has about a <span class="math" data-say="1 over 365">1/365</span> chance of matching. The intuition that fails is comparing 23 with 365 rather than 253 with 365.</p><p>This is a different question from the pigeonhole statement in “The Pigeonhole Principle” in Sets, Relations, and Functions. That one said 367 people <em>guarantee</em> a match; this one says 23 make it likely. Certainty and probability are different claims and neither implies the other.</p><h3>When outcomes are not equally likely</h3><p>Then probabilities are assigned to outcomes directly, subject to being non-negative and summing to 1, and <span class="math" data-say="P of E equals the sum over s in E of P of s">P(E) = Σ_{s ∈ E} P(s)</span>. A loaded die, a biased coin and a weighted lottery all work this way, and “The Probability Axioms” states the axioms that govern them.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Sample space, event, condition</h2></div><p>Exact fractions, every outcome listed</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+70           0.999</div><p>Twenty-three people suffice for a better-than-even chance, which surprises nearly everyone. The reason is that the question is about <em>pairs</em>: 23 people form <span class="math" data-say="23 choose 2 equals 253">C(23,2) = 253</span> pairs, and each has about a <span class="math" data-say="1 over 365">1/365</span> chance of matching. The intuition that fails is comparing 23 with 365 rather than 253 with 365.</p><p>This is a different question from the pigeonhole statement in “The Pigeonhole Principle” in Sets, Relations, and Functions. That one said 367 people <em>guarantee</em> a match; this one says 23 make it likely. Certainty and probability are different claims and neither implies the other.</p><h3>When outcomes are not equally likely</h3><p>Then probabilities are assigned to outcomes directly, subject to being non-negative and summing to 1, and <span class="math" data-say="P of E equals the sum over s in E of P of s">P(E) = Σ_{s ∈ E} P(s)</span>. A loaded die, a biased coin and a weighted lottery all work this way, and “The Probability Axioms” states the axioms that govern them.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Sample space, event, condition</h2></div><p>Exact fractions, every outcome listed</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="prExp">Sample space</strong><span id="prCount"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>in A</span><span class="tone-purple"><i class="legend-swatch"></i>in B</span><span class="tone-green"><i class="legend-swatch"></i>in both</span></div>
@@ -1410,10 +1453,10 @@
       <div class="lab-stage"><div id="prSpace"></div></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="prTable"></table></div>
       <div class="status-banner" id="prStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Count, count, divide</h3>
-          <p>The 66 two-card hands from the 12-card deck are the chips, and every row of the table is a count over a count before it is a fraction. A = at least one A holds in 21 of them, and 21 is <span class="math" data-say="66 minus 10 choose 2 equals 66 minus 45">66 − C(10,2) = 66 − 45</span>: the complement rule on the screen, with the 45 hands drawn from the ten non-aces the chips that are neither cyan nor green. B = a pair holds in 6, so <span class="math" data-say="P of B equals 6 over 66 equals 1 over 11">P(B) = 6/66 = 1/11</span>, and the one green chip is the pair of aces. The conditional rows are “Conditional Probability”’s.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Count, count, divide</h3>
+            <p>The 66 two-card hands from the 12-card deck are the chips, and every row of the table is a count over a count before it is a fraction. A = at least one A holds in 21 of them, and 21 is <span class="math" data-say="66 minus 10 choose 2 equals 66 minus 45">66 − C(10,2) = 66 − 45</span>: the complement rule on the screen, with the 45 hands drawn from the ten non-aces the chips that are neither cyan nor green. B = a pair holds in 6, so <span class="math" data-say="P of B equals 6 over 66 equals 1 over 11">P(B) = 6/66 = 1/11</span>, and the one green chip is the pair of aces. The conditional rows are “Conditional Probability”’s.</p>
         <div class="field">
           <label for="prExperiment">Experiment</label>
           <select id="prExperiment">
@@ -1436,12 +1479,14 @@
           <div class="kpi"><span>P(B)</span><strong id="prPB">&mdash;</strong></div>
           <div class="kpi"><span>P(A|B)</span><strong id="prPAB">&mdash;</strong></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing a probability</h2></div><p>Denominator first; it is often easier and it anchors the model.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the sample space</h3><p>This confirms what an outcome is. If <span class="math" data-say="the size of S">|S|</span> is hard to write down, the model is probably wrong.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the event</h3><p>Using Combinatorics and Counting. Classify by order and repetition exactly as there.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Consider the complement</h3><p>"At least one" and "not all" almost always count more easily the other way round.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the answer lies in <span class="math" data-say="0, 1">[0,1]</span></h3><p>And that it is plausible. A probability of 0.99 for a rare event is a counting error announcing itself.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing a probability</h2>
+      <p class="lead-in">Denominator first; it is often easier and it anchors the model.</p>
+      <ol class="key-ideas method"><li><strong>Count the sample space.</strong> This confirms what an outcome is. If <span class="math" data-say="the size of S">|S|</span> is hard to write down, the model is probably wrong.</li><li><strong>Count the event.</strong> Using Combinatorics and Counting. Classify by order and repetition exactly as there.</li><li><strong>Consider the complement.</strong> "At least one" and "not all" almost always count more easily the other way round.</li><li><strong>Check the answer lies in <span class="math" data-say="0, 1">[0,1]</span>.</strong> And that it is plausible. A probability of 0.99 for a rare event is a counting error announcing itself.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1467,17 +1512,16 @@ CHECK by summing over the number of aces:
  = 1712304 + 778320 + 103776 + 4512 + 48  =  2 598 960     ✓</div><p>The check is Vandermonde's identity from “Binomial Coefficients and Pascal's Triangle” in Combinatorics and Counting, appearing as a probability check: the five disjoint cases must exhaust the hands. It would catch a wrong <span class="math" data-say="48 choose 3">C(48,3)</span> immediately.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Counting the event with a different model from the space</strong><span>If the denominator counts ordered outcomes, the numerator must too. Mixing ordered and unordered counts is the commonest arithmetic-looking error.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting &quot;at least one&quot; directly</strong><span>It produces overlapping cases. <span class="math" data-say="1 minus P of none">1 − P(none)</span> cannot double-count.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Confusing certainty with high probability</strong><span>367 people guarantee a shared birthday; 23 make it likely. Sets, Relations, and Functions's pigeonhole and this lesson answer different questions.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you check your answer against a complementary count.</strong><p>Compute the probability that a five-card hand contains at least one ace, both directly (four cases) and by complement. The complement is one line and the agreement is the check.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The birthday calculation assumes birthdays are uniform and independent, and neither is exactly true. Real birth data makes coincidences slightly MORE likely, so 23 remains a safe answer &mdash; but the assumptions should be stated rather than assumed away.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Counting the event with a different model from the space</strong><span>If the denominator counts ordered outcomes, the numerator must too. Mixing ordered and unordered counts is the commonest arithmetic-looking error.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting &quot;at least one&quot; directly</strong><span>It produces overlapping cases. <span class="math" data-say="1 minus P of none">1 − P(none)</span> cannot double-count.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Confusing certainty with high probability</strong><span>367 people guarantee a shared birthday; 23 make it likely. Sets, Relations, and Functions's pigeonhole and this lesson answer different questions.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you check your answer against a complementary count.</strong><p>Compute the probability that a five-card hand contains at least one ace, both directly (four cases) and by complement. The complement is one line and the agreement is the check.</p></div></div><div class="note"><strong>Note:</strong> The birthday calculation assumes birthdays are uniform and independent, and neither is exactly true. Real birth data makes coincidences slightly MORE likely, so 23 remains a safe answer &mdash; but the assumptions should be stated rather than assumed away.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Count with the same tools</summary><p>Permutations, combinations, complements and inclusion&ndash;exclusion. The denominator is a count too and is often the easier one.</p></details><details class="recall"><summary>The complement rule saves work</summary><p><span class="math" data-say="P of at least one equals 1 minus P of none">P(at least one) = 1 − P(none)</span>, exactly as in “Counting with Restrictions” in Combinatorics and Counting and for the same reason.</p></details><details class="recall"><summary>The answer is bounded</summary><p>Any probability outside <span class="math" data-say="0, 1">[0, 1]</span> is a counting error, and that check costs nothing.</p></details></div>
+      <h3>Summary</h3>
       <p>With equally likely outcomes, every probability is a ratio of two counts, so Combinatorics and Counting is the whole technique. Complementary counting is as useful here as it was there.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Count with the same tools.</strong> Permutations, combinations, complements and inclusion&ndash;exclusion. The denominator is a count too and is often the easier one.</li><li><strong>The complement rule saves work.</strong> <span class="math" data-say="P of at least one equals 1 minus P of none">P(at least one) = 1 − P(none)</span>, exactly as in “Counting with Restrictions” in Combinatorics and Counting and for the same reason.</li><li><strong>The answer is bounded.</strong> Any probability outside <span class="math" data-say="0, 1">[0, 1]</span> is a counting error, and that check costs nothing.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="P of E equals the size of E, over the size of S. P of E bar equals 1 minus P of E, complement. at least one, implies, 1 minus P of none. The hard part is the counting, not the division" tabindex="0" role="region" aria-label="Mathematical notation">P(E) = |E| / |S|
 P(Ē) = 1 − P(E)                 complement
 &quot;at least one&quot;  ⟹  1 − P(none)
@@ -1996,11 +2040,42 @@ The hard part is the counting, not the division.</div><figcaption>Two counts and
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2068,7 +2143,7 @@ The hard part is the counting, not the division.</div><figcaption>Two counts and
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

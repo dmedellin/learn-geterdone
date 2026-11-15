@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Wealth, Counsel, Law and the Office of the Sovereign</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 25 · Of Counsell</p>
       <h1>Of Counsel</h1>
       <p class="lesson-lede">Command is for the commander&#x27;s benefit and counsel for the counselled, and a sovereign is better advised by men heard apart than by an assembly.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Command and counsel</li><li>Exhortation</li><li>The marks of a good counsellor</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The passage first, then the argument for hearing counsellors apart</h2>
-      <article class="prose reading"><p><strong>Chapter 25.</strong> &ldquo;Supposing the number of Counsellors equall, a man is better Counselled by hearing them apart, then in an Assembly; and that for many causes. First, in hearing them apart, you have the advice of every man; but in an Assembly many of them deliver their advise with I, or No, or with their hands, or feet, not moved by their own sense, but by the eloquence of another, or for feare of displeasing some that have spoken, or the whole Assembly, by contradiction&rdquo;</p><p>Think of the last time you asked three friends what to do about something, one at a time, and the time you asked them all at once in a group chat. Hobbes thinks you got more out of the first. His chapter begins by noticing that &ldquo;Doe this&rdquo; is said by the man who commands, by the man who advises and by the man who exhorts, and that people mistake one for another according to what they want to conclude. He fixes the words. &ldquo;COMMAND is, where a man saith, Doe this, or Doe not this, without expecting other reason than the Will of him that sayes it&rdquo;; &ldquo;COUNSELL, is where a man saith, Doe, or Doe not this, and deduceth his reasons from the benefit that arriveth by it to him to whom he saith it&rdquo;. From these come three differences. Command is to the commander's benefit and counsel to the other man's; a man may be obliged to do what he is commanded but not what he is counselled, because if he covenants to follow counsel it has turned into command; and no man may claim a right to be of another's counsel.</p><p>His examples are from Scripture. &ldquo;Kill not&rdquo; and &ldquo;Honour thy Parents&rdquo; are commands, because the reason is the will of God our King. &ldquo;Sell all thou hast; give it to the poore; and follow me&rdquo; is counsel, because the reason offered is our own treasure in heaven, and so is &ldquo;Repent, and be Baptized&rdquo;, because God &ldquo;shall still be King in what manner soever we rebell&rdquo;. A counsellor also has a protection: he who asks counsel is its author, and so cannot punish it. Hobbes adds that a counsellor to the sovereign cannot in equity be punished for what he said when asked.</p><p>Then the good counsellor. Since counsel is &ldquo;but the Speech whereby that experience is made known to another&rdquo;, the virtues of a counsellor are the intellectual virtues of Chapter 8, and to the artificial man his counsellors serve &ldquo;in the place of Memory, and Mentall Discourse&rdquo;. But there is a difference from the natural man, whose experience comes from objects that work upon him without passion or interest of their own. A counsellor to a commonwealth has his own ends. So the first condition of a good counsellor is that his ends and interest be not inconsistent with those of the man he counsels, and the second, third and fourth are the marks of a mind able to reason clearly, long experienced in the business and informed of foreign affairs.</p><p>Now go back to the fifth condition, the one quoted at the top. Hobbes gives four reasons for hearing counsellors apart. In an assembly men vote with &ldquo;I, or No&rdquo;, moved by another's eloquence or by fear of looking duller than the others. Some will have interests contrary to the public, and &ldquo;Passion eloquent&rdquo; draws others to the same advice, as many brands enflame one another. Apart, one may interrupt and examine a man's reasons, which cannot be done in an assembly where a man is &ldquo;astonied, and dazled with the variety of discourse&rdquo;, and where there is always somebody after applause for his orations. And the counsels of many are dangerous where secrecy is needed. He closes with the tennis image: a man does best with able seconds placed each in his proper station, worst of all when carried in a frame heavy of itself, like a man taken to the ball in a wheelbarrow.</p><p>There is a famous argument on the other side. In 1785 the Marquis de Condorcet showed that if each member of a group is right with a chance greater than one half, and their votes are independent, the majority is right more often than any one member, and the more members the better. Hobbes could not have known it, and the lab computes it: with three counsellors each right with <span class="math" data-say="3 over 5">3/5</span> the majority is right with <span class="math" data-say="81 over 125">81/125</span>, about 65 per cent, in the apart-three preset, and with eleven in apart-eleven it is <span class="math" data-say="36791901 over 48828125">36791901/48828125</span>, about 75 per cent. Hearing more counsellors apart helps.</p><p>But look at what the figure assumes. It assumes the votes are independent, and every one of Hobbes's four reasons is a reason they are not: men follow an orator, fear the room, catch one another's passions. Take the extreme case. If ten of eleven always vote as the first speaker did, the assembly is one man's opinion eleven times over, and the one-voice preset (n = 1) gives <span class="math" data-say="3 over 5">3/5</span>, no better than the orator alone. The theorem is also a theorem of competence: with each counsellor right only <span class="math" data-say="2 over 5">2/5</span> of the time the poor preset gives <span class="math" data-say="12036224 over 48828125">12036224/48828125</span>, about 25 per cent, and a bigger body is wrong more often. Hobbes's point about interests is a doubt about competence as well, and the lab cannot tell which case is the real one.</p><p>Hobbes also says something the theorem does not. &ldquo;many eys see more then one; yet it is not to be understood of many Counsellours; but then only, when the finall Resolution is in one man.&rdquo; The counsellors advise and one man decides, so the lab's majority vote is not Hobbes's institution: he does not tally votes, he hears reasons. The model shows only that his preference for hearing apart can be read as a preference for independent evidence, and that is a reading, not his claim. The next lesson, <em>Of Civil Laws</em>, takes up the sovereign's own relation to the laws.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Collective choice</h2></div><p>six voting rules, the majority relation, judgment aggregation and the jury theorem</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The passage first, then the argument for hearing counsellors apart</h2><div class="prose reading"><p><strong>Chapter 25.</strong> &ldquo;Supposing the number of Counsellors equall, a man is better Counselled by hearing them apart, then in an Assembly; and that for many causes. First, in hearing them apart, you have the advice of every man; but in an Assembly many of them deliver their advise with I, or No, or with their hands, or feet, not moved by their own sense, but by the eloquence of another, or for feare of displeasing some that have spoken, or the whole Assembly, by contradiction&rdquo;</p><p>Think of the last time you asked three friends what to do about something, one at a time, and the time you asked them all at once in a group chat. Hobbes thinks you got more out of the first. His chapter begins by noticing that &ldquo;Doe this&rdquo; is said by the man who commands, by the man who advises and by the man who exhorts, and that people mistake one for another according to what they want to conclude. He fixes the words. &ldquo;COMMAND is, where a man saith, Doe this, or Doe not this, without expecting other reason than the Will of him that sayes it&rdquo;; &ldquo;COUNSELL, is where a man saith, Doe, or Doe not this, and deduceth his reasons from the benefit that arriveth by it to him to whom he saith it&rdquo;. From these come three differences. Command is to the commander's benefit and counsel to the other man's; a man may be obliged to do what he is commanded but not what he is counselled, because if he covenants to follow counsel it has turned into command; and no man may claim a right to be of another's counsel.</p><p>His examples are from Scripture. &ldquo;Kill not&rdquo; and &ldquo;Honour thy Parents&rdquo; are commands, because the reason is the will of God our King. &ldquo;Sell all thou hast; give it to the poore; and follow me&rdquo; is counsel, because the reason offered is our own treasure in heaven, and so is &ldquo;Repent, and be Baptized&rdquo;, because God &ldquo;shall still be King in what manner soever we rebell&rdquo;. A counsellor also has a protection: he who asks counsel is its author, and so cannot punish it. Hobbes adds that a counsellor to the sovereign cannot in equity be punished for what he said when asked.</p><p>Then the good counsellor. Since counsel is &ldquo;but the Speech whereby that experience is made known to another&rdquo;, the virtues of a counsellor are the intellectual virtues of Chapter 8, and to the artificial man his counsellors serve &ldquo;in the place of Memory, and Mentall Discourse&rdquo;. But there is a difference from the natural man, whose experience comes from objects that work upon him without passion or interest of their own. A counsellor to a commonwealth has his own ends. So the first condition of a good counsellor is that his ends and interest be not inconsistent with those of the man he counsels, and the second, third and fourth are the marks of a mind able to reason clearly, long experienced in the business and informed of foreign affairs.</p><p>Now go back to the fifth condition, the one quoted at the top. Hobbes gives four reasons for hearing counsellors apart. In an assembly men vote with &ldquo;I, or No&rdquo;, moved by another's eloquence or by fear of looking duller than the others. Some will have interests contrary to the public, and &ldquo;Passion eloquent&rdquo; draws others to the same advice, as many brands enflame one another. Apart, one may interrupt and examine a man's reasons, which cannot be done in an assembly where a man is &ldquo;astonied, and dazled with the variety of discourse&rdquo;, and where there is always somebody after applause for his orations. And the counsels of many are dangerous where secrecy is needed. He closes with the tennis image: a man does best with able seconds placed each in his proper station, worst of all when carried in a frame heavy of itself, like a man taken to the ball in a wheelbarrow.</p><p>There is a famous argument on the other side. In 1785 the Marquis de Condorcet showed that if each member of a group is right with a chance greater than one half, and their votes are independent, the majority is right more often than any one member, and the more members the better. Hobbes could not have known it, and the lab computes it: with three counsellors each right with <span class="math" data-say="3 over 5">3/5</span> the majority is right with <span class="math" data-say="81 over 125">81/125</span>, about 65 per cent, in the apart-three preset, and with eleven in apart-eleven it is <span class="math" data-say="36791901 over 48828125">36791901/48828125</span>, about 75 per cent. Hearing more counsellors apart helps.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Collective choice</h2></div><p>six voting rules, the majority relation, judgment aggregation and the jury theorem</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>From individual verdicts to a group's</strong><span>every winner recomputed from the profile as typed</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="voTable"></table></div>
       <div class="status-banner" id="voStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Compute a majority of counsellors</h3>
-          <p>A group reads n=3 p=3/5: an odd number of independent counsellors, each right with the chance p. The tile gives the chance their majority is right. It follows from those two numbers; whether counsellors in a real assembly are independent is what Hobbes denies.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Compute a majority of counsellors</h3>
+            <p>A group reads n=3 p=3/5: an odd number of independent counsellors, each right with the chance p. The tile gives the chance their majority is right. It follows from those two numbers; whether counsellors in a real assembly are independent is what Hobbes denies.</p>
         <div class="field">
           <label for="voPreset">Worked example</label>
           <select id="voPreset"><option value="apart-three" selected>Three counsellors heard apart, each right with 3/5</option><option value="apart-eleven">Eleven counsellors heard apart, each right with 3/5</option><option value="one-voice">An assembly that votes as one man, right with 3/5</option><option value="poor">Eleven counsellors, each right with 2/5</option></select>
@@ -1436,12 +1479,15 @@
           <div class="kpi"><span>One vote decisive</span><strong id="voPivot">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>But look at what the figure assumes. It assumes the votes are independent, and every one of Hobbes's four reasons is a reason they are not: men follow an orator, fear the room, catch one another's passions. Take the extreme case. If ten of eleven always vote as the first speaker did, the assembly is one man's opinion eleven times over, and the one-voice preset (n = 1) gives <span class="math" data-say="3 over 5">3/5</span>, no better than the orator alone. The theorem is also a theorem of competence: with each counsellor right only <span class="math" data-say="2 over 5">2/5</span> of the time the poor preset gives <span class="math" data-say="12036224 over 48828125">12036224/48828125</span>, about 25 per cent, and a bigger body is wrong more often. Hobbes's point about interests is a doubt about competence as well, and the lab cannot tell which case is the real one.</p><p>Hobbes also says something the theorem does not. &ldquo;many eys see more then one; yet it is not to be understood of many Counsellours; but then only, when the finall Resolution is in one man.&rdquo; The counsellors advise and one man decides, so the lab's majority vote is not Hobbes's institution: he does not tally votes, he hears reasons. The model shows only that his preference for hearing apart can be read as a preference for independent evidence, and that is a reading, not his claim. The next lesson, <em>Of Civil Laws</em>, takes up the sovereign's own relation to the laws.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing the majority of independent counsellors</h2></div><p>Four steps, for an odd number of counsellors.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>State the question and the chance</h3><p>The question has a right answer, and each counsellor is right with the same chance <span class="math" data-say="p">p</span>, independently of the others. Write down <span class="math" data-say="n">n</span> and <span class="math" data-say="p">p</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>List the counts that win</h3><p>The majority is right when more than half are right: from <span class="math" data-say="the quantity n plus 1, over 2">(n + 1)/2</span> up to <span class="math" data-say="n">n</span> counsellors.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the chance of each count</h3><p>A particular set of <span class="math" data-say="k">k</span> right counsellors has chance <span class="math" data-say="p">p</span> to the power <span class="math" data-say="k">k</span> times <span class="math" data-say="1 minus p">1 - p</span> to the power <span class="math" data-say="n minus k">n - k</span>, and there are as many such sets as ways to choose them.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Add, and compare with <span class="math" data-say="p">p</span></h3><p>The sum is the chance the majority is right. If it is above <span class="math" data-say="p">p</span>, hearing them together has beaten hearing one. Then ask whether the independence the sum assumes is true of these counsellors.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing the majority of independent counsellors</h2>
+      <p class="lead-in">Four steps, for an odd number of counsellors.</p>
+      <ol class="key-ideas method"><li><strong>State the question and the chance.</strong> The question has a right answer, and each counsellor is right with the same chance <span class="math" data-say="p">p</span>, independently of the others. Write down <span class="math" data-say="n">n</span> and <span class="math" data-say="p">p</span>.</li><li><strong>List the counts that win.</strong> The majority is right when more than half are right: from <span class="math" data-say="the quantity n plus 1, over 2">(n + 1)/2</span> up to <span class="math" data-say="n">n</span> counsellors.</li><li><strong>Find the chance of each count.</strong> A particular set of <span class="math" data-say="k">k</span> right counsellors has chance <span class="math" data-say="p">p</span> to the power <span class="math" data-say="k">k</span> times <span class="math" data-say="1 minus p">1 - p</span> to the power <span class="math" data-say="n minus k">n - k</span>, and there are as many such sets as ways to choose them.</li><li><strong>Add, and compare with <span class="math" data-say="p">p</span>.</strong> The sum is the chance the majority is right. If it is above <span class="math" data-say="p">p</span>, hearing them together has beaten hearing one. Then ask whether the independence the sum assumes is true of these counsellors.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1458,17 +1504,16 @@ majority right:  54/125 + 27/125 = 81/125
 one counsellor alone:  3/5 = 75/125</div><p><span class="math" data-say="81 over 125">81/125</span> is 6/125 above <span class="math" data-say="75 over 125">75/125</span>. The gain is real and small, and it exists only if the three do not copy one another.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking more counsellors always make better counsel</strong><span>The majority figure rises with the number of counsellors only if each is right more than half the time and they are independent. At <span class="math" data-say="2 over 5">2/5</span> it falls (the poor preset), and if the group copies one voice it is flat at the one counsellor's chance.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the majority theorem for Hobbes&#x27;s argument</strong><span>Hobbes does not recommend counting votes. He recommends that a man hear each counsellor apart, examine his reasons, and decide, so that the final resolution is in one man. The lab reads one of his reasons as a claim about independence; the rest of his case, such as examining a man's reasons by interruption, the lab cannot see.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating command and counsel as differing in tone</strong><span>Hobbes says they differ in whose benefit the reason names. A kindly worded command remains a command, and Hobbes allows a father or a general to sweeten commands &ldquo;in the tune and phrase of Counsell&rdquo;, but then they are commands and no longer counsels.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute a majority and say what it assumes.</strong><p>Given the number of counsellors and the chance each is right, compute the chance their majority is right, compare it with one counsellor, and name the assumption that Hobbes's reasons for hearing them apart call into question.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The jury figure is Condorcet's, of 1785, applied to Hobbes's chapter; it is not in the text. It treats each counsellor as right with a fixed chance and independent of the rest, and the chapter's four reasons are exactly the claim that in assemblies they are not. The lab can show what follows if they are, and cannot say how far any real assembly was.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking more counsellors always make better counsel</strong><span>The majority figure rises with the number of counsellors only if each is right more than half the time and they are independent. At <span class="math" data-say="2 over 5">2/5</span> it falls (the poor preset), and if the group copies one voice it is flat at the one counsellor's chance.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the majority theorem for Hobbes&#x27;s argument</strong><span>Hobbes does not recommend counting votes. He recommends that a man hear each counsellor apart, examine his reasons, and decide, so that the final resolution is in one man. The lab reads one of his reasons as a claim about independence; the rest of his case, such as examining a man's reasons by interruption, the lab cannot see.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating command and counsel as differing in tone</strong><span>Hobbes says they differ in whose benefit the reason names. A kindly worded command remains a command, and Hobbes allows a father or a general to sweeten commands &ldquo;in the tune and phrase of Counsell&rdquo;, but then they are commands and no longer counsels.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute a majority and say what it assumes.</strong><p>Given the number of counsellors and the chance each is right, compute the chance their majority is right, compare it with one counsellor, and name the assumption that Hobbes's reasons for hearing them apart call into question.</p></div></div><div class="note"><strong>Note:</strong> The jury figure is Condorcet's, of 1785, applied to Hobbes's chapter; it is not in the text. It treats each counsellor as right with a fixed chance and independent of the rest, and the chapter's four reasons are exactly the claim that in assemblies they are not. The lab can show what follows if they are, and cannot say how far any real assembly was.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Command and counsel</summary><p>Command says do this without any reason but the will of the speaker, so the commander pretends his own benefit, and a man may be obliged to obey it. Counsel gives reasons from the benefit of the man advised, so he cannot be obliged to follow it, because the hurt of not following it is his own.</p></details><details class="recall"><summary>Exhortation</summary><p>Exhortation and dehortation are counsel pressed with vehemence, using similitudes, metaphors and examples, so as to move the passions. Hobbes says this shows the speaker's own benefit, so that those who exhort when asked for counsel are corrupt counsellors.</p></details><details class="recall"><summary>The marks of a good counsellor</summary><p>His ends must not be inconsistent with the ends of the man he counsels; he must speak so that the truth appears, with firm reasoning and without metaphor; he must have experience and study in the business at hand; and for matters touching another state he must know its letters and treaties.</p></details></div>
+      <h3>Summary</h3>
       <p>Hobbes separates counsel from command and from exhortation, lists what makes a good counsellor and argues that counsellors should be heard apart, not in an assembly. A majority of independent counsellors, each right with a stated chance, is right more often than any one of them; the lab computes it, and then shows what happens when the counsellors are not independent.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Command and counsel.</strong> Command says do this without any reason but the will of the speaker, so the commander pretends his own benefit, and a man may be obliged to obey it. Counsel gives reasons from the benefit of the man advised, so he cannot be obliged to follow it, because the hurt of not following it is his own.</li><li><strong>Exhortation.</strong> Exhortation and dehortation are counsel pressed with vehemence, using similitudes, metaphors and examples, so as to move the passions. Hobbes says this shows the speaker's own benefit, so that those who exhort when asked for counsel are corrupt counsellors.</li><li><strong>The marks of a good counsellor.</strong> His ends must not be inconsistent with the ends of the man he counsels; he must speak so that the truth appears, with firm reasoning and without metaphor; he must have experience and study in the business at hand; and for matters touching another state he must know its letters and treaties.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="command, for the commander&#x27;s benefit. counsel, for the counselled man&#x27;s benefit. heard apart, every man&#x27;s own advice. right if more than n over 2 are right. this assumes the votes are independent" tabindex="0" role="region" aria-label="Mathematical notation">command: for the commander&#x27;s benefit
 counsel: for the counselled man&#x27;s benefit
 heard apart: every man&#x27;s own advice
@@ -2451,11 +2496,42 @@ this assumes the votes are independent</div><figcaption>Counsel in five lines</f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2523,7 +2599,7 @@ this assumes the votes are independent</div><figcaption>Counsel in five lines</f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

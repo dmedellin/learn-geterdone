@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Creational Patterns</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 3 · Creational Patterns</p>
       <h1>Singleton</h1>
       <p class="lesson-lede">A class that keeps its one instance itself and gives every client a single, well-known way to reach it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Singleton</li><li>Lazy initialisation</li><li>Registry of singletons</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Ensure a class only has one instance, and provide a global point of access to it.&rdquo; That is the intent of Singleton, the last pattern of Chapter 3 and an object creational pattern. Read it in your own copy first. The lesson reads it as a tool, sets its benefits beside the costs its implementation section admits, and counts the instances and the cost a run of requests adds up to with one shared instance and without.</p><p>The motivation is a short list of things a system should have only one of: one printer spooler however many printers, one file system, one window manager, one company served by an accounting system. A global variable makes an object easy to reach but does nothing to stop a second one being made. The authors' answer is to make the class itself responsible: it keeps track of its sole instance, intercepts requests to create new ones, and offers a way to get the one it has.</p><p>Singleton fits, in the authors' list, when a second instance would be an error and every client needs one known place to find the first, and when that one object may later belong to a subclass, chosen without touching the clients' code. There is one participant, the Singleton class, with an Instance operation that is a class operation, a static method in Java as in C++, and that may create the instance itself. Clients reach the instance only through that operation.</p><pre class="codeblock" data-say="line 1, comment, One registry of lockers, made on first use and shared.. line 2, final class locker registry. line 3, private static locker registry instance, comment, none until asked for. line 5, private locker registry, comment, no client can call new. line 6, load banks from disk, comment, the cost, paid once. line 9, static synchronized locker registry instance. line 10, if instance equals null. line 11, instance is set to new locker registry. line 13, return instance. line 16, private void load banks from disk. line 17, comment, read every bank&#x27;s doors and sizes" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One registry of lockers, made on first use and shared.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the count</h2><div class="prose reading"><p>&ldquo;Ensure a class only has one instance, and provide a global point of access to it.&rdquo; That is the intent of Singleton, the last pattern of Chapter 3 and an object creational pattern. Read it in your own copy first. The lesson reads it as a tool, sets its benefits beside the costs its implementation section admits, and counts the instances and the cost a run of requests adds up to with one shared instance and without.</p><p>The motivation is a short list of things a system should have only one of: one printer spooler however many printers, one file system, one window manager, one company served by an accounting system. A global variable makes an object easy to reach but does nothing to stop a second one being made. The authors' answer is to make the class itself responsible: it keeps track of its sole instance, intercepts requests to create new ones, and offers a way to get the one it has.</p><p>Singleton fits, in the authors' list, when a second instance would be an error and every client needs one known place to find the first, and when that one object may later belong to a subclass, chosen without touching the clients' code. There is one participant, the Singleton class, with an Instance operation that is a class operation, a static method in Java as in C++, and that may create the instance itself. Clients reach the instance only through that operation.</p><pre class="codeblock" data-say="line 1, comment, One registry of lockers, made on first use and shared.. line 2, final class locker registry. line 3, private static locker registry instance, comment, none until asked for. line 5, private locker registry, comment, no client can call new. line 6, load banks from disk, comment, the cost, paid once. line 9, static synchronized locker registry instance. line 10, if instance equals null. line 11, instance is set to new locker registry. line 13, return instance. line 16, private void load banks from disk. line 17, comment, read every bank&#x27;s doors and sizes" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One registry of lockers, made on first use and shared.</span>
 <span class="cl">final class LockerRegistry {</span>
 <span class="cl">    private static LockerRegistry instance;   // none until asked for</span>
 <span class="cl"></span>
@@ -1463,12 +1507,11 @@
 <span class="cl">    private void loadBanksFromDisk() {</span>
 <span class="cl">        // read every bank&#x27;s doors and sizes</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The authors list five benefits. Access to the sole instance is controlled, because the class holds it. The name space is reduced, an improvement on global variables that would each hold a sole instance. Operations and representation can be refined, by subclassing the Singleton and configuring the application with the subclass's instance. A variable number of instances is easy, since only the access operation changes if you later want two, or a fixed pool. And the pattern is more flexible than class operations, static methods, which make that change hard and which in C++ are never virtual, so a subclass cannot override them.</p><p>The costs are in the implementation section. To ensure a unique instance the constructor is hidden, protected in the book's C++ and private here, and the class operation creates the instance lazily, on first access. The authors explain why a C++ global or static object will not do: nothing stops a second one being declared, the values it needs may not be known when static objects are initialised, and C++ fixes no order of initialisation across files, so singletons that depend on each other fail; and a static object forces every singleton to be made whether used or not. Subclassing is harder still. Choosing the subclass inside the access operation with conditionals hard-wires the set of subclasses; choosing at link time fixes it before the program runs; a registry, in which each singleton registers itself by name, frees the access operation from knowing the subclasses, but only if every candidate is created so that it can register. The section does not discuss threads; in Java the lazy check must be safe for them, which is why the sketch's method is synchronized.</p><p>The Sample Code makes the maze factory of the Abstract Factory lesson a singleton, first with no subclasses and then choosing the bombed or enchanted subclass from an environment variable inside the access operation, and the authors point out that the operation must then be edited for every new subclass, which a registry would avoid. Read it in the book. The known uses are Smalltalk-80's current change set; the metaclasses of Smalltalk, each the class of one class and with exactly one instance; and InterViews's Session and WidgetKit, the second an abstract factory whose subclass is chosen from an environment variable. Related Patterns says only that many patterns can be built with Singleton, naming Abstract Factory, Builder and Prototype.</p><p>Singleton is also the pattern in the catalog most argued over since. A common later view holds that a singleton reached through a static operation is global state under another name: every class that calls it depends on it without saying so, and a test cannot easily put a different instance in its place, so many designs now create the one instance at start-up and pass it to the objects that need it. The authors' text meets part of this, in the registry and in the benefit that only the access operation must change to allow more instances; it does not discuss testing. Read both, and weigh them against the design in front of you.</p><p>Now the lab, on a parcel locker network rather than a printer spooler. Its registry of locker banks costs 50 to load from disk and its audit log costs 20 to open; five requests reach the registry in turn, from a kiosk, the app, a courier, the kiosk again and a night job, and none reaches the log. The access view counts the requests, the instances created, the cost at the start, the cost in all, the subjects never requested, the instances alive at the end and the first request's cost. On <code>registry-fresh</code>, where every request constructs its own registry, there are 5 requests, 5 instances created and still alive, a cost of 250, and the log is the 1 subject never requested.</p><p>On <code>registry-lazy</code>, the sketch above, the first request creates the registry and the other four reuse it: 1 instance, a cost of 50, nothing paid at the start, and the first request pays the 50. On <code>registry-eager</code>, the static-object approach the authors argue against, both objects are made before any request: 2 instances, 70 paid at the start and 70 in all, the first request's cost 0, and the log made though no one asks for it, the small liability the authors name. The comparison tile sets the three schemes side by side: eager 70, lazy 50, fresh 250. The count of requests refused belongs to the Proxy lesson in the next course and is 0 here, since no access rights are stated.</p><h3>Exercise</h3><ul><li>A thermostat app has two shared objects: <span class="math" data-say="settings">settings</span>, which costs 12 to load, and <span class="math" data-say="sensor minus bus">sensor-bus</span>, which costs 40 to open.</li><li>The requests, in order: <span class="math" data-say="screen, settings, scheduler, settings, screen, sensor minus bus, app, settings, scheduler, sensor minus bus, screen, settings">screen, settings; scheduler, settings; screen, sensor-bus; app, settings; scheduler, sensor-bus; screen, settings</span>.</li></ul><p>By hand, count the instances created and the cost in all when every request makes a new object, and when each object is a singleton made on first use. Then type the subjects and requests into the lab and check both schemes.</p><p>That completes the chapter's five patterns. The next lesson, Discussion of Creational Patterns, reads the authors' comparison of them and counts one design three ways.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Creating costly subjects</h2></div><p>objects created and cost spent, eagerly, lazily behind a proxy, or afresh</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The authors list five benefits. Access to the sole instance is controlled, because the class holds it. The name space is reduced, an improvement on global variables that would each hold a sole instance. Operations and representation can be refined, by subclassing the Singleton and configuring the application with the subclass's instance. A variable number of instances is easy, since only the access operation changes if you later want two, or a fixed pool. And the pattern is more flexible than class operations, static methods, which make that change hard and which in C++ are never virtual, so a subclass cannot override them.</p><p>The costs are in the implementation section. To ensure a unique instance the constructor is hidden, protected in the book's C++ and private here, and the class operation creates the instance lazily, on first access. The authors explain why a C++ global or static object will not do: nothing stops a second one being declared, the values it needs may not be known when static objects are initialised, and C++ fixes no order of initialisation across files, so singletons that depend on each other fail; and a static object forces every singleton to be made whether used or not. Subclassing is harder still. Choosing the subclass inside the access operation with conditionals hard-wires the set of subclasses; choosing at link time fixes it before the program runs; a registry, in which each singleton registers itself by name, frees the access operation from knowing the subclasses, but only if every candidate is created so that it can register. The section does not discuss threads; in Java the lazy check must be safe for them, which is why the sketch's method is synchronized.</p><p>The Sample Code makes the maze factory of the Abstract Factory lesson a singleton, first with no subclasses and then choosing the bombed or enchanted subclass from an environment variable inside the access operation, and the authors point out that the operation must then be edited for every new subclass, which a registry would avoid. Read it in the book. The known uses are Smalltalk-80's current change set; the metaclasses of Smalltalk, each the class of one class and with exactly one instance; and InterViews's Session and WidgetKit, the second an abstract factory whose subclass is chosen from an environment variable. Related Patterns says only that many patterns can be built with Singleton, naming Abstract Factory, Builder and Prototype.</p><p>Singleton is also the pattern in the catalog most argued over since. A common later view holds that a singleton reached through a static operation is global state under another name: every class that calls it depends on it without saying so, and a test cannot easily put a different instance in its place, so many designs now create the one instance at start-up and pass it to the objects that need it. The authors' text meets part of this, in the registry and in the benefit that only the access operation must change to allow more instances; it does not discuss testing. Read both, and weigh them against the design in front of you.</p><p>Now the lab, on a parcel locker network rather than a printer spooler. Its registry of locker banks costs 50 to load from disk and its audit log costs 20 to open; five requests reach the registry in turn, from a kiosk, the app, a courier, the kiosk again and a night job, and none reaches the log. The access view counts the requests, the instances created, the cost at the start, the cost in all, the subjects never requested, the instances alive at the end and the first request's cost. On <code>registry-fresh</code>, where every request constructs its own registry, there are 5 requests, 5 instances created and still alive, a cost of 250, and the log is the 1 subject never requested.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Creating costly subjects</h2></div><p>objects created and cost spent, eagerly, lazily behind a proxy, or afresh</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Creating costly subjects</strong><span>objects created and cost spent, eagerly, lazily behind a proxy, or afresh</span></div>
       </div>
@@ -1476,10 +1519,10 @@
       <div class="table-wrap" id="gpxTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gpxTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Eager creates every subject at the start; lazy (a virtual proxy, or a singleton made on first use) creates a subject on its first request and reuses it; fresh creates a new instance on every request. Each creation costs the subject's cost. With rights given, a protection proxy refuses any request whose client is not listed or whose subject is not among the client's; a refused request creates nothing and costs nothing, and its subject does not count as requested. Nothing is freed, so every instance created is alive at the end. The first request's cost is what the first request served pays (0 under eager, whose cost is paid at the start).</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Instances and cost, with one shared instance and without</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Instances and cost, with one shared instance and without</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gpxPreset">Worked example</label>
           <select id="gpxPreset"><option value="registry-fresh" selected>A locker registry made afresh for every request</option><option value="registry-lazy">The registry as a singleton made on first use</option><option value="registry-eager">Every shared object made at start-up</option></select>
@@ -1512,12 +1555,15 @@
           <div class="kpi"><span>Cost in all, each scheme</span><strong id="gpxCompare">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>On <code>registry-lazy</code>, the sketch above, the first request creates the registry and the other four reuse it: 1 instance, a cost of 50, nothing paid at the start, and the first request pays the 50. On <code>registry-eager</code>, the static-object approach the authors argue against, both objects are made before any request: 2 instances, 70 paid at the start and 70 in all, the first request's cost 0, and the log made though no one asks for it, the small liability the authors name. The comparison tile sets the three schemes side by side: eager 70, lazy 50, fresh 250. The count of requests refused belongs to the Proxy lesson in the next course and is 0 here, since no access rights are stated.</p><h3>Exercise</h3><ul><li>A thermostat app has two shared objects: <span class="math" data-say="settings">settings</span>, which costs 12 to load, and <span class="math" data-say="sensor minus bus">sensor-bus</span>, which costs 40 to open.</li><li>The requests, in order: <span class="math" data-say="screen, settings, scheduler, settings, screen, sensor minus bus, app, settings, scheduler, sensor minus bus, screen, settings">screen, settings; scheduler, settings; screen, sensor-bus; app, settings; scheduler, sensor-bus; screen, settings</span>.</li></ul><p>By hand, count the instances created and the cost in all when every request makes a new object, and when each object is a singleton made on first use. Then type the subjects and requests into the lab and check both schemes.</p><p>That completes the chapter's five patterns. The next lesson, Discussion of Creational Patterns, reads the authors' comparison of them and counts one design three ways.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Making a class keep its one instance</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Ask whether one is a fact or a convenience</h3><p>A single instance is a fact when two would be an error, as two spoolers would; it is a convenience when one simply suffices. Only the first needs the class to forbid a second.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Hide the constructor</h3><p>Make the constructor private and give the class one static operation that returns the instance.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Choose when it is made</h3><p>Create it on first use when it is costly or needs values known only later, and make the check safe if threads share it.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own code</h3><p>Find a shared object in a system you know: a configuration, a connection pool, a cache. Type its cost and a day's requests into the lab, count instances and cost under fresh and lazy, and note how a test would replace it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Making a class keep its one instance</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>Ask whether one is a fact or a convenience.</strong> A single instance is a fact when two would be an error, as two spoolers would; it is a convenience when one simply suffices. Only the first needs the class to forbid a second.</li><li><strong>Hide the constructor.</strong> Make the constructor private and give the class one static operation that returns the instance.</li><li><strong>Choose when it is made.</strong> Create it on first use when it is costly or needs values known only later, and make the check safe if threads share it.</li><li><strong>Do it on your own code.</strong> Find a shared object in a system you know: a configuration, a connection pool, a cache. Type its cost and a day's requests into the lab, count instances and cost under fresh and lazy, and note how a test would replace it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1535,17 +1581,16 @@ lazy cost: 50, nothing at the start
 eager: 50 + 20 = 70 before any request</div><p>Eager and lazy both keep one registry. They differ on the log, made under eager though no one asks for it, and on who pays: the program at start-up, or the first request.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating a global variable as a singleton</strong><span>A global variable makes an object reachable, but nothing stops a second one being made, and every sole instance it holds adds a name to the global space. The pattern makes the class keep its own instance; on the lab's fresh preset five clients each making a registry pay 250 where one shared registry costs 50.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Creating every singleton at start-up</strong><span>The static-object approach makes each singleton whether used or not, possibly before the values it needs are known, and in C++ in no defined order. Lazy creation in the access operation avoids all three; the lab's eager preset pays 20 for a log nobody asks for.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Choosing the subclass with conditionals in the access operation</strong><span>It works, but the operation must be edited for every new subclass, which the authors say may matter for a framework's factories. Their registry of singletons removes the list, at the cost that every candidate must be created in order to register.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count instances and cost with one shared instance and without.</strong><p>Given a resource's cost and a run of requests, state the instances created and the cost under fresh, lazy and eager creation, the five benefits the authors list, and the costs their implementation section admits.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts instances and cost for the requests you state, and frees nothing. It cannot tell whether a second instance would be an error in your design or merely wasteful, how threads reach the instance, or how a test would replace it; those decide whether a Singleton or one instance passed around fits better.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating a global variable as a singleton</strong><span>A global variable makes an object reachable, but nothing stops a second one being made, and every sole instance it holds adds a name to the global space. The pattern makes the class keep its own instance; on the lab's fresh preset five clients each making a registry pay 250 where one shared registry costs 50.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Creating every singleton at start-up</strong><span>The static-object approach makes each singleton whether used or not, possibly before the values it needs are known, and in C++ in no defined order. Lazy creation in the access operation avoids all three; the lab's eager preset pays 20 for a log nobody asks for.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Choosing the subclass with conditionals in the access operation</strong><span>It works, but the operation must be edited for every new subclass, which the authors say may matter for a framework's factories. Their registry of singletons removes the list, at the cost that every candidate must be created in order to register.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count instances and cost with one shared instance and without.</strong><p>Given a resource's cost and a run of requests, state the instances created and the cost under fresh, lazy and eager creation, the five benefits the authors list, and the costs their implementation section admits.</p></div></div><div class="note"><strong>Note:</strong> The lab counts instances and cost for the requests you state, and frees nothing. It cannot tell whether a second instance would be an error in your design or merely wasteful, how threads reach the instance, or how a test would replace it; those decide whether a Singleton or one instance passed around fits better.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Singleton</summary><p>A class that makes sure it has one instance and gives every client one well-known way to reach it, through a class operation rather than a global variable.</p></details><details class="recall"><summary>Lazy initialisation</summary><p>Creating the instance the first time it is asked for, not when the program starts. The instance is made only if it is used, and with whatever the program knows by then.</p></details><details class="recall"><summary>Registry of singletons</summary><p>A well-known table in which singleton classes register their instance by name, so the access operation can hand out the one chosen at run time without listing every possible subclass.</p></details></div>
+      <h3>Summary</h3>
       <p>Singleton makes a class responsible for having exactly one instance and for handing it out. Read the pattern, its five benefits and the costs its implementation section admits, then count the instances and the cost a parcel locker network's requests run up when each makes its own registry, when one is made on first use, and when all are made at start-up.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Singleton.</strong> A class that makes sure it has one instance and gives every client one well-known way to reach it, through a class operation rather than a global variable.</li><li><strong>Lazy initialisation.</strong> Creating the instance the first time it is asked for, not when the program starts. The instance is made only if it is used, and with whatever the program knows by then.</li><li><strong>Registry of singletons.</strong> A well-known table in which singleton classes register their instance by name, so the access operation can hand out the one chosen at run time without listing every possible subclass.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="exactly one instance, one access point. the class keeps its sole instance. hide the constructor. create it on first use. only the access operation must change. a registry chooses the subclass" tabindex="0" role="region" aria-label="Mathematical notation">exactly one instance, one access point
 the class keeps its sole instance
 hide the constructor
@@ -2342,11 +2387,42 @@ a registry chooses the subclass</div><figcaption>Singleton in six lines</figcapt
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2414,7 +2490,7 @@ a registry chooses the subclass</div><figcaption>Singleton in six lines</figcapt
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

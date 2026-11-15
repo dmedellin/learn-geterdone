@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Technical Practices and Architecture</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 4 · Technical Practices</p>
       <h1>The Impact of Continuous Delivery</h1>
       <p class="lesson-lede">What the survey found continuous delivery goes with, from delivery performance to burnout, and the proxy it used for quality.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Construct</li><li>Unplanned work and rework</li><li>Share of time</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Unplanned work and rework are useful proxies for quality because they represent a failure to build quality into our products.&rdquo; The authors say this in the second of the chapter's impact sections, and it answers a problem the first leaves open: what does continuous delivery do for a team, and how do you measure that without a number for quality itself? Read the first section for the research, the second for the proxy.</p><p>The research starts with the first iterations, from 2014 to 2016, which modelled a list of capabilities: version control for code, system configuration and build scripts; test automation that is reliable and runs regularly; deployment automation; continuous integration; shifting security left; trunk-based development; and test data management. Most were measured as constructs from several statements on an agree-disagree scale, the method Measuring and Changing Culture read, with deployment automation the exception. Taken together they predicted delivery performance strongly, and also how work felt: less deployment pain and less team burnout. The authors reason that when delivery is routine, deploying is no big-bang event but something done in office hours as part of the day. Teams that did well also identified more strongly with their organization, which Chapter 10 treats as a predictor of organizational performance, and the authors found that continuous delivery predicts the more generative culture that Chapter 3 measured.</p><p>In 2017 the authors measured continuous delivery directly, as a construct of its own, covering whether a team can release on demand and whether feedback on quality and deployability reaches everyone and is acted on first. A subset of the capabilities of 2014 to 2016, the authors note, was strongly and significantly associated with that construct, and so were two new ones: a loosely coupled, well-encapsulated architecture and teams that can choose their own tools. Both are Chapter 5's, and this course's lessons on architecture read them. Figures 4.1 to 4.3 draw these as arrows: the drivers into continuous delivery, and from it to identification with the organization, higher delivery performance, lower change fail rates, a generative culture, less deployment pain and less burnout. The book draws them as findings of a survey, from analysis that tests whether the answers move together as the theory says.</p><p>Then the chapter asks whether continuous delivery improves quality. The authors first concede that quality is contextual and subjective, and quote Jerry Weinberg: quality is value to some person. They already had one proxy, the change fail rate that Chapter 2 introduced. They tried three more: how well the application performs and how good it is, as its own team sees it; how much of the working week goes on rework or unplanned work; and the share spent on defects found by end users. All three correlated with delivery performance. The strongest was the share of time on rework and unplanned work, and continuous delivery predicted less of it, in a statistically significant way.</p><p>Figure 4.4 compares the survey's high and low performers, the groups Chapter 2 formed. The high performers reported 49 percent new work and 21 percent unplanned work or rework; the low performers 38 and 27 percent. These are the survey's figures for its respondents, and the page does not give a year at that point. The authors explain the proxy with an image from The Visible Ops Handbook, that unplanned work is the difference between heeding a low-fuel warning light and running dry on the highway, where six engineers drop everything to carry fuel to a truck. They add John Seddon's idea of failure demand, the work created by failing to do the right thing first time.</p><p>Now the count. The lab takes a list of kinds of work with the hours spent on each, and optionally a kind to scale. The team here is invented for this lesson: in one month it spent 440 hours on new work, 190 on unplanned work, 130 on rework and 240 on everything else. The preset <code>month</code> reports 1,000 hours in all and the shares 44 percent new, 19 percent unplanned, 13 percent rework and 24 percent other, so unplanned work and rework together take 32 percent. The preset <code>half-rework</code> halves the rework. That frees 65 hours, and if all of them went to new work its share would rise from 44 to 50.5 percent.</p><p>Read those figures as the authors read theirs, as a proxy and not a verdict. The 65 hours assume the team spends everything it saves on new work, which a real team might not; the lab says what the arithmetic gives and not what would happen. Nor does halving rework say how to halve it. The chapter's answer, at the end of the section, is small batches with continuous testing; the next section adds the practices that went with performance.</p><h3>Exercise</h3><ul><li>A team's month, in hours: <span class="math" data-say="new, 320, unplanned, 200, rework, 160, other, 120">new, 320; unplanned, 200; rework, 160; other, 120</span>.</li><li>Scale <span class="math" data-say="rework, 1 divided by 2">rework, 1/2</span>.</li></ul><p>Work out the total and each kind's share, then the hours freed when rework is halved, and the new share if they all go to new work. Type the records into the lab to check them. Then say which would please the authors more, that team's shares or <code>month</code>'s, and why neither tells you whether the team is a high performer.</p><p>The next lesson, Version Control, Test Automation and Test Data, reads the part of the chapter that says which practices work and which do not, and counts a share of teams against a ratio.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Where the time goes</h2></div><p>hours by kind of work, and what less rework frees</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument, then the count</h2><div class="prose reading"><p>&ldquo;Unplanned work and rework are useful proxies for quality because they represent a failure to build quality into our products.&rdquo; The authors say this in the second of the chapter's impact sections, and it answers a problem the first leaves open: what does continuous delivery do for a team, and how do you measure that without a number for quality itself? Read the first section for the research, the second for the proxy.</p><p>The research starts with the first iterations, from 2014 to 2016, which modelled a list of capabilities: version control for code, system configuration and build scripts; test automation that is reliable and runs regularly; deployment automation; continuous integration; shifting security left; trunk-based development; and test data management. Most were measured as constructs from several statements on an agree-disagree scale, the method Measuring and Changing Culture read, with deployment automation the exception. Taken together they predicted delivery performance strongly, and also how work felt: less deployment pain and less team burnout. The authors reason that when delivery is routine, deploying is no big-bang event but something done in office hours as part of the day. Teams that did well also identified more strongly with their organization, which Chapter 10 treats as a predictor of organizational performance, and the authors found that continuous delivery predicts the more generative culture that Chapter 3 measured.</p><p>In 2017 the authors measured continuous delivery directly, as a construct of its own, covering whether a team can release on demand and whether feedback on quality and deployability reaches everyone and is acted on first. A subset of the capabilities of 2014 to 2016, the authors note, was strongly and significantly associated with that construct, and so were two new ones: a loosely coupled, well-encapsulated architecture and teams that can choose their own tools. Both are Chapter 5's, and this course's lessons on architecture read them. Figures 4.1 to 4.3 draw these as arrows: the drivers into continuous delivery, and from it to identification with the organization, higher delivery performance, lower change fail rates, a generative culture, less deployment pain and less burnout. The book draws them as findings of a survey, from analysis that tests whether the answers move together as the theory says.</p><p>Then the chapter asks whether continuous delivery improves quality. The authors first concede that quality is contextual and subjective, and quote Jerry Weinberg: quality is value to some person. They already had one proxy, the change fail rate that Chapter 2 introduced. They tried three more: how well the application performs and how good it is, as its own team sees it; how much of the working week goes on rework or unplanned work; and the share spent on defects found by end users. All three correlated with delivery performance. The strongest was the share of time on rework and unplanned work, and continuous delivery predicted less of it, in a statistically significant way.</p><p>Figure 4.4 compares the survey's high and low performers, the groups Chapter 2 formed. The high performers reported 49 percent new work and 21 percent unplanned work or rework; the low performers 38 and 27 percent. These are the survey's figures for its respondents, and the page does not give a year at that point. The authors explain the proxy with an image from The Visible Ops Handbook, that unplanned work is the difference between heeding a low-fuel warning light and running dry on the highway, where six engineers drop everything to carry fuel to a truck. They add John Seddon's idea of failure demand, the work created by failing to do the right thing first time.</p><p>Now the count. The lab takes a list of kinds of work with the hours spent on each, and optionally a kind to scale. The team here is invented for this lesson: in one month it spent 440 hours on new work, 190 on unplanned work, 130 on rework and 240 on everything else. The preset <code>month</code> reports 1,000 hours in all and the shares 44 percent new, 19 percent unplanned, 13 percent rework and 24 percent other, so unplanned work and rework together take 32 percent. The preset <code>half-rework</code> halves the rework. That frees 65 hours, and if all of them went to new work its share would rise from 44 to 50.5 percent.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Where the time goes</h2></div><p>hours by kind of work, and what less rework frees</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Where the time goes</strong><span>hours by kind of work, and what less rework frees</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="awkTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="awkTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Entries are summed by kind; a kind may appear in several entries, and a kind with none has 0 hours. An entry may name a stage (where the work was found or done); hours by stage sum the entries that give one, in the order first met. A share is the kind's hours over the total, exact. A scaling multiplies one kind's hours by the factor (1/2 halves it); the hours freed are the difference. When freed hours go to new work, they are added to the new-work kind and the total stays the same; otherwise the total falls by them. Kinds are listed in the order given.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Where the month&#x27;s hours went</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Where the month&#x27;s hours went</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="awkPreset">Worked example</label>
           <select id="awkPreset"><option value="month" selected>A team's month: 1,000 hours by kind of work</option><option value="half-rework">The same month with the rework halved</option></select>
@@ -1443,12 +1486,15 @@
           <div class="kpi"><span>New work's share after</span><strong id="awkNewAfter">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Read those figures as the authors read theirs, as a proxy and not a verdict. The 65 hours assume the team spends everything it saves on new work, which a real team might not; the lab says what the arithmetic gives and not what would happen. Nor does halving rework say how to halve it. The chapter's answer, at the end of the section, is small batches with continuous testing; the next section adds the practices that went with performance.</p><h3>Exercise</h3><ul><li>A team's month, in hours: <span class="math" data-say="new, 320, unplanned, 200, rework, 160, other, 120">new, 320; unplanned, 200; rework, 160; other, 120</span>.</li><li>Scale <span class="math" data-say="rework, 1 divided by 2">rework, 1/2</span>.</li></ul><p>Work out the total and each kind's share, then the hours freed when rework is halved, and the new share if they all go to new work. Type the records into the lab to check them. Then say which would please the authors more, that team's shares or <code>month</code>'s, and why neither tells you whether the team is a high performer.</p><p>The next lesson, Version Control, Test Automation and Test Data, reads the part of the chapter that says which practices work and which do not, and counts a share of teams against a ratio.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Splitting a month by kind of work</h2></div><p>Four steps, the last of them on your own team's month.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the kinds of work</h3><p>Choose a few kinds and decide in advance where a piece of work goes. New work, unplanned work, rework and other is the lesson's split; the chapter does not give a rule for edge cases.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Total the hours</h3><p>Add the hours in each kind, then add the kinds. Every share is the kind's hours divided by that total.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Scale one kind</h3><p>Halve the rework and work out the hours freed. Decide where the freed hours would actually go before adding them to new work.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own team</h3><p>Take last month's tickets or time records, sort each into a kind and type the totals into the lab. Write down which kind was hardest to sort and why.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Splitting a month by kind of work</h2>
+      <p class="lead-in">Four steps, the last of them on your own team's month.</p>
+      <ol class="key-ideas method"><li><strong>Name the kinds of work.</strong> Choose a few kinds and decide in advance where a piece of work goes. New work, unplanned work, rework and other is the lesson's split; the chapter does not give a rule for edge cases.</li><li><strong>Total the hours.</strong> Add the hours in each kind, then add the kinds. Every share is the kind's hours divided by that total.</li><li><strong>Scale one kind.</strong> Halve the rework and work out the hours freed. Decide where the freed hours would actually go before adding them to new work.</li><li><strong>Do it on your own team.</strong> Take last month's tickets or time records, sort each into a kind and type the totals into the lab. Write down which kind was hardest to sort and why.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1468,17 +1514,16 @@ new if all 65 go to it: 440 + 65 = 505
 505 / 1,000 = 50.5 percent</div><p>The total stays 1,000 because the freed hours are spent, not lost. If they were not spent on new work, the share of new work would stay at 44 percent and the total would fall to 935.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the benefit of continuous delivery is only speed</strong><span>The chapter's findings go further than delivery performance. In the survey, teams that did well at continuous delivery also reported less deployment pain, less burnout, a stronger identification with the organization and a more generative culture. The authors argue that investment in technology is investment in people.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating a proxy as the quantity itself</strong><span>The authors open the quality section by saying quality is contextual and subjective. The share of time on unplanned work and rework is a stand-in, chosen because it correlated most strongly with delivery performance and because the work it measures is caused by something not built right the first time. A team with little of it might still be building the wrong thing.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding that the goal is zero unplanned work</strong><span>The chapter reports that even the high performers spent about a fifth of their time on unplanned work or rework, and does not set zero as the goal. A team that allowed itself no slack for urgent work would only be hiding it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a share of time shows.</strong><p>Given a team's hours by kind of work, work out each kind's share and the hours freed by scaling one kind, and say why the authors read the share of unplanned work and rework as a proxy for quality and not a measure of it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab turns hours into shares. It cannot say how a team should classify its work, whether freed time goes where the arithmetic puts it, or whether the survey's percentages are typical of a team like yours: they are self-reported, from a sample the book describes elsewhere, and the chapter's own claim is about prediction, not proof.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the benefit of continuous delivery is only speed</strong><span>The chapter's findings go further than delivery performance. In the survey, teams that did well at continuous delivery also reported less deployment pain, less burnout, a stronger identification with the organization and a more generative culture. The authors argue that investment in technology is investment in people.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating a proxy as the quantity itself</strong><span>The authors open the quality section by saying quality is contextual and subjective. The share of time on unplanned work and rework is a stand-in, chosen because it correlated most strongly with delivery performance and because the work it measures is caused by something not built right the first time. A team with little of it might still be building the wrong thing.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding that the goal is zero unplanned work</strong><span>The chapter reports that even the high performers spent about a fifth of their time on unplanned work or rework, and does not set zero as the goal. A team that allowed itself no slack for urgent work would only be hiding it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a share of time shows.</strong><p>Given a team's hours by kind of work, work out each kind's share and the hours freed by scaling one kind, and say why the authors read the share of unplanned work and rework as a proxy for quality and not a measure of it.</p></div></div><div class="note"><strong>Note:</strong> The lab turns hours into shares. It cannot say how a team should classify its work, whether freed time goes where the arithmetic puts it, or whether the survey's percentages are typical of a team like yours: they are self-reported, from a sample the book describes elsewhere, and the chapter's own claim is about prediction, not proof.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Construct</summary><p>A quantity the survey cannot ask about directly and so measures from several statements, each rated on a scale. Most of the capabilities in this chapter are constructs; deployment automation is the exception the chapter notes.</p></details><details class="recall"><summary>Unplanned work and rework</summary><p>Time spent on break and fix work, emergency deployments and patches, urgent audit requests and the like, rather than on new work. The chapter treats the share of time it takes as a stand-in for quality, because it is work caused by something not built right the first time.</p></details><details class="recall"><summary>Share of time</summary><p>A kind of work's hours divided by all the hours counted, as a percentage. The lab gives each kind's share, and what new work's share would be if some hours were freed.</p></details></div>
+      <h3>Summary</h3>
       <p>The chapter's two impact sections: what the authors measured, what they found continuous delivery predicts, and why they use the share of time spent on unplanned work and rework as a stand-in for quality. Then split a team's month by kind of work and see what halving the rework would free.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Construct.</strong> A quantity the survey cannot ask about directly and so measures from several statements, each rated on a scale. Most of the capabilities in this chapter are constructs; deployment automation is the exception the chapter notes.</li><li><strong>Unplanned work and rework.</strong> Time spent on break and fix work, emergency deployments and patches, urgent audit requests and the like, rather than on new work. The chapter treats the share of time it takes as a stand-in for quality, because it is work caused by something not built right the first time.</li><li><strong>Share of time.</strong> A kind of work's hours divided by all the hours counted, as a percentage. The lab gives each kind's share, and what new work's share would be if some hours were freed.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="capabilities measured as survey constructs. cd predicts delivery performance. and less deployment pain and burnout. and a more generative culture. quality is value to some person. unplanned work and rework as a proxy. high performers spend less on it" tabindex="0" role="region" aria-label="Mathematical notation">capabilities measured as survey constructs
 CD predicts delivery performance
 and less deployment pain and burnout
@@ -2340,11 +2385,42 @@ high performers spend less on it</div><figcaption>The impact of continuous deliv
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2412,7 +2488,7 @@ high performers spend less on it</div><figcaption>The impact of continuous deliv
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

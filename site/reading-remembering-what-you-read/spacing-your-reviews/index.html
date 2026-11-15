@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,26 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Remembering What You Read</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Keeping it</p>
       <h1>Spacing Your Reviews</h1>
       <p class="lesson-lede">Lay out review days from a first gap and a multiplier, and set spaced reviews against one massed session.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Spaced and massed</li><li>A schedule is arithmetic</li><li>Expanding or equal</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>When to come back to a text</h2>
-      <article class="prose reading"><p>If the delayed test from Retrieval Beats Rereading is due, this page shows its banner in place of the warm-up: take the test first, from the link, and come back. Otherwise the warm-up reading above the panel is today's timed reading, a hard passage with six questions, logged as practice; another visit serves a second one.</p><p>The first measurements of forgetting were Hermann Ebbinghaus's, published in 1885. Testing his own memory for lists of nonsense syllables, he measured how quickly it faded, and he reported that learning spread over several days held better than the same learning massed together.</p><p>Cepeda and colleagues (2006) gathered the later studies of verbal recall into one review. Spaced practice beat massed practice, and the best gap grew with how long the material had to be remembered: the longer you need a text, the longer the gaps between reviews can be.</p><p>The expanding preset is the schedule the lab opens with: a first gap of 1 day, each gap twice the last, five reviews of 10 minutes. The gaps are 1, 2, 4, 8 and 16 days, so the reviews fall on days 1, 3, 7, 15 and 31, and they cost 5 &times; 10 = 50 minutes.</p><div class="mathblock" data-say="a table, shown on the page. 5 times 10 equals 50 minutes" tabindex="0" role="region" aria-label="Mathematical notation">gaps:   1   2   4   8   16
-days:   1   3   7   15  31
-5 × 10 = 50 minutes</div><p>The equal preset spends the same 50 minutes with a first gap of 6 days and a multiplier of 1, so every gap is 6 days: reviews on days 6, 12, 18, 24 and 30. It ends near the same day as the expanding schedule, with its gaps all the same size.</p><p>The massed preset spends the 50 minutes the other way: a first gap of 1 day and a multiplier of 0, so every later gap is 0 and all five reviews fall on day 1, one after another. (The lab takes no first gap of 0, so day 1 stands for the day of the cramming; what matters is that the five reviews share one day.)</p><p>Massed review is the one that feels best. By the fifth pass in a row the text is fluent, a self-test during the session scores high, and each review is easier than the last. Spaced reviews feel worse, because each one starts with something forgotten. The spaced schedule is the one retained better at a delay (Cepeda et al. 2006).</p><p>Should the gaps grow? Expanding gaps are one reasonable schedule, but they are not what the review found. On expanding against equal gaps the evidence is mixed: Karpicke and Roediger (2007) found that expanding retrieval helped retention in the short term, and that equally spaced retrieval did as well or better over the longer term.</p><p>A review of a reading is best done as Retrieval Beats Rereading suggests: a free recall with the text closed, then a look back at what you missed, rather than a reread. Ten minutes covers an article.</p><p>Next, Notes in Your Own Words turns the recall into something you keep: a short summary written from memory, counted by the idea units it holds.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A review schedule</h2></div><p>what is kept, measured by you</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>When to come back to a text</h2><div class="prose reading"><p>If the delayed test from Retrieval Beats Rereading is due, this page shows its banner in place of the warm-up: take the test first, from the link, and come back. Otherwise the warm-up reading above the panel is today's timed reading, a hard passage with six questions, logged as practice; another visit serves a second one.</p><p>The first measurements of forgetting were Hermann Ebbinghaus's, published in 1885. Testing his own memory for lists of nonsense syllables, he measured how quickly it faded, and he reported that learning spread over several days held better than the same learning massed together.</p><p>Cepeda and colleagues (2006) gathered the later studies of verbal recall into one review. Spaced practice beat massed practice, and the best gap grew with how long the material had to be remembered: the longer you need a text, the longer the gaps between reviews can be.</p><p>The expanding preset is the schedule the lab opens with: a first gap of 1 day, each gap twice the last, five reviews of 10 minutes. The gaps are 1, 2, 4, 8 and 16 days, so the reviews fall on days 1, 3, 7, 15 and 31, and they cost 5 &times; 10 = 50 minutes.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A review schedule</h2></div><p>what is kept, measured by you</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A review schedule</strong><span>what is kept, measured by you</span></div>
       </div>
@@ -1415,10 +1456,10 @@ days:   1   3   7   15  31
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="reTable"></table></div>
       <div class="status-banner" id="reStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>When the reviews fall, and what they cost</h3>
-          <p>A stated schedule, computed: the days are the running totals of the gaps, and each gap is the last one times the multiplier. The lab says when the reviews fall, not what they will keep.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>When the reviews fall, and what they cost</h3>
+            <p>A stated schedule, computed: the days are the running totals of the gaps, and each gap is the last one times the multiplier. The lab says when the reviews fall, not what they will keep.</p>
         <div class="field">
           <label for="rePreset">Worked example</label>
           <select id="rePreset"><option value="expanding" selected>Expanding: gaps doubling from 1 day</option><option value="equal">Equal: a gap of 6 days each time</option><option value="massed">Massed: all five reviews on day 1</option></select>
@@ -1445,12 +1486,17 @@ days:   1   3   7   15  31
           <div class="kpi"><span>Minutes in all</span><strong id="reMinutes">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="a table, shown on the page. 5 times 10 equals 50 minutes" tabindex="0" role="region" aria-label="Mathematical notation">gaps:   1   2   4   8   16
+days:   1   3   7   15  31
+5 × 10 = 50 minutes</div><p>The equal preset spends the same 50 minutes with a first gap of 6 days and a multiplier of 1, so every gap is 6 days: reviews on days 6, 12, 18, 24 and 30. It ends near the same day as the expanding schedule, with its gaps all the same size.</p><p>The massed preset spends the 50 minutes the other way: a first gap of 1 day and a multiplier of 0, so every later gap is 0 and all five reviews fall on day 1, one after another. (The lab takes no first gap of 0, so day 1 stands for the day of the cramming; what matters is that the five reviews share one day.)</p><p>Massed review is the one that feels best. By the fifth pass in a row the text is fluent, a self-test during the session scores high, and each review is easier than the last. Spaced reviews feel worse, because each one starts with something forgotten. The spaced schedule is the one retained better at a delay (Cepeda et al. 2006).</p><p>Should the gaps grow? Expanding gaps are one reasonable schedule, but they are not what the review found. On expanding against equal gaps the evidence is mixed: Karpicke and Roediger (2007) found that expanding retrieval helped retention in the short term, and that equally spaced retrieval did as well or better over the longer term.</p><p>A review of a reading is best done as Retrieval Beats Rereading suggests: a free recall with the text closed, then a look back at what you missed, rather than a reread. Ten minutes covers an article.</p><p>Next, Notes in Your Own Words turns the recall into something you keep: a short summary written from memory, counted by the idea units it holds.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Planning reviews for a text you need</h2></div><p>Five steps. The second is a choice, not a formula.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide how long you need it</h3><p>A text you need next week and a text you need in a year want different gaps; the longer you need it, the longer the gaps can be.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Choose a first gap and a rule</h3><p>A day, then doubling, is one reasonable start; equal gaps of a few days are another. Put the review days in your calendar.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Review by recalling</h3><p>At each review, write what you remember with the text closed, then check it against the text and note what you missed.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count the minutes</h3><p>Reviews times minutes each. If the total is more than the text is worth to you, drop a review rather than closing the gaps.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Run The Daily Drill as usual; the warm-up here does not replace it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Planning reviews for a text you need</h2>
+      <p class="lead-in">Five steps. The second is a choice, not a formula.</p>
+      <ol class="key-ideas method"><li><strong>Decide how long you need it.</strong> A text you need next week and a text you need in a year want different gaps; the longer you need it, the longer the gaps can be.</li><li><strong>Choose a first gap and a rule.</strong> A day, then doubling, is one reasonable start; equal gaps of a few days are another. Put the review days in your calendar.</li><li><strong>Review by recalling.</strong> At each review, write what you remember with the text closed, then check it against the text and note what you missed.</li><li><strong>Count the minutes.</strong> Reviews times minutes each. If the total is more than the text is worth to you, drop a review rather than closing the gaps.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Run The Daily Drill as usual; the warm-up here does not replace it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1466,17 +1512,16 @@ days:  1, 1 + 2 = 3, 3 + 4 = 7, 7 + 8 = 15, 15 + 16 = 31
 minutes:  5 × 10 = 50</div><p>The equal preset reaches day 30 with gaps of 6 days for the same 50 minutes, and the massed preset spends all 50 on day 1.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Massed review works better, because it feels better</strong><span>Review crammed into one sitting feels fluent and produces high scores during the session; spaced review is retained better at a delay (Cepeda et al. 2006). The massed and the expanding presets both cost 50 minutes; only the second spreads them to day 31.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the expanding schedule to be the proven one</strong><span>Doubling gaps are one reasonable schedule, not a finding. The evidence for spacing is strong; on expanding against equal gaps it is mixed, and Karpicke and Roediger (2007) found equal gaps as good or better over the longer term.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reviewing by rereading</strong><span>A review that rereads the text is a second reading, with the fluency problem of Retrieval Beats Rereading. Recall first with the text closed, then check: the review is then a retrieval, spaced.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can lay out a schedule and its cost.</strong><p>Given a first gap, a multiplier and a number of reviews, list the review days as running totals of the gaps and compute the minutes, and say which of a spaced and a massed plan of the same minutes is retained better at a delay. The days, the minutes and the comparison right is the pass.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The schedule is arithmetic, not a measurement: the lab computes when the reviews fall, not what they will keep. The spacing studies used word lists, facts and short texts under laboratory conditions; which gaps suit your reading only a delayed test of your own can show.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Massed review works better, because it feels better</strong><span>Review crammed into one sitting feels fluent and produces high scores during the session; spaced review is retained better at a delay (Cepeda et al. 2006). The massed and the expanding presets both cost 50 minutes; only the second spreads them to day 31.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the expanding schedule to be the proven one</strong><span>Doubling gaps are one reasonable schedule, not a finding. The evidence for spacing is strong; on expanding against equal gaps it is mixed, and Karpicke and Roediger (2007) found equal gaps as good or better over the longer term.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reviewing by rereading</strong><span>A review that rereads the text is a second reading, with the fluency problem of Retrieval Beats Rereading. Recall first with the text closed, then check: the review is then a retrieval, spaced.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can lay out a schedule and its cost.</strong><p>Given a first gap, a multiplier and a number of reviews, list the review days as running totals of the gaps and compute the minutes, and say which of a spaced and a massed plan of the same minutes is retained better at a delay. The days, the minutes and the comparison right is the pass.</p></div></div><div class="note"><strong>Note:</strong> The schedule is arithmetic, not a measurement: the lab computes when the reviews fall, not what they will keep. The spacing studies used word lists, facts and short texts under laboratory conditions; which gaps suit your reading only a delayed test of your own can show.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Spaced and massed</summary><p>Massed review is all of it in one sitting; spaced review divides the same minutes among sessions with gaps between them. The total can be the same; what changes is when.</p></details><details class="recall"><summary>A schedule is arithmetic</summary><p>Take a first gap and multiply each gap by the same number to get the next. The review days are the running totals of the gaps: gaps of 1, 2, 4, 8 and 16 days put reviews on days 1, 3, 7, 15 and 31.</p></details><details class="recall"><summary>Expanding or equal</summary><p>Gaps that grow are one reasonable choice, and gaps that stay the same are another. The evidence that spacing helps is strong; the evidence that the gaps should grow is mixed.</p></details></div>
+      <h3>Summary</h3>
       <p>A review schedule is a first gap, a rule for the next gap, a number of reviews and their length. Compute the days the reviews fall on and the minutes they cost, for gaps that double, gaps that stay equal and reviews crammed into one day. Spaced review keeps more at a delay than massed review; whether the gaps should grow is less settled.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Spaced and massed.</strong> Massed review is all of it in one sitting; spaced review divides the same minutes among sessions with gaps between them. The total can be the same; what changes is when.</li><li><strong>A schedule is arithmetic.</strong> Take a first gap and multiply each gap by the same number to get the next. The review days are the running totals of the gaps: gaps of 1, 2, 4, 8 and 16 days put reviews on days 1, 3, 7, 15 and 31.</li><li><strong>Expanding or equal.</strong> Gaps that grow are one reasonable choice, and gaps that stay the same are another. The evidence that spacing helps is strong; the evidence that the gaps should grow is mixed.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="review day equals the sum of the gaps so far. gaps 1, 2, 4, 8, 16 goes to days 1, 3, 7, 15, 31. minutes equals reviews times minutes each. 5 times 10 equals 50 minutes. spaced keeps more than massed" tabindex="0" role="region" aria-label="Mathematical notation">review day = the sum of the gaps so far
 gaps 1, 2, 4, 8, 16 → days 1, 3, 7, 15, 31
 minutes = reviews × minutes each
@@ -2447,11 +2492,42 @@ spaced keeps more than massed</div><figcaption>A schedule in five lines</figcapt
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2519,7 +2595,7 @@ spaced keeps more than massed</div><figcaption>A schedule in five lines</figcapt
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

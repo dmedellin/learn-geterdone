@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Graph Algorithms</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 23 · Minimum Spanning Trees</p>
       <h1>Minimum Spanning Trees: Kruskal and Prim</h1>
       <p class="lesson-lede">Grow a spanning tree one safe edge at a time, where a light edge across any cut that respects the edges so far is always safe.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A safe edge</li><li>A cut, and a cut that respects A</li><li>A light edge</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the cut</h2>
-      <article class="prose reading"><p>&ldquo;The greedy strategy advocates making the choice that is the best at the moment.&rdquo; Chapter 23 of CLRS recalls Chapter 16's greedy strategy on its first page, notes that it does not in general find an optimum, and then proves that for this problem it does. The problem is to connect every vertex of a weighted, connected, undirected graph using edges of least total weight. The cheapest such set has no cycle, so it is a tree that spans the graph, with exactly <span data-say="the size of V, minus 1">|V| − 1</span> edges.</p><p>Section 23.1 states a generic method before either algorithm. Keep a set A of edges with one invariant: A lies inside some minimum spanning tree. Start with A empty, which satisfies it trivially. While A is not yet a spanning tree, find an edge that is safe for A, meaning A plus that edge is still inside some minimum spanning tree, and add it. The loop runs <span data-say="the size of V, minus 1">|V| − 1</span> times, and at every moment A is a forest. Everything depends on finding a safe edge without knowing the tree.</p><p>Theorem 23.1 gives the rule. Take any cut that respects A and any light edge crossing it; that edge is safe for A. The proof is an exchange. Let T be a minimum spanning tree containing A. If T already holds the light edge, done. If not, adding it to T closes a cycle, and that cycle must cross the cut somewhere else, at an edge of T that A cannot contain, since no edge of A crosses. Swap that edge out for the light one: the result is still a spanning tree, and no heavier, so it is minimum too, and it contains A and the light edge.</p><p>Corollary 23.2 is the form both algorithms use: a light edge joining one tree of the forest A to a different tree is safe, taking the cut around that one tree. Exercise 23.1-2 warns against the converse: a safe edge crossing a cut that respects A need not be light for that cut.</p><p>Section 23.2 gives two ways to find such an edge quickly. Kruskal's algorithm sorts all the edges by weight and takes them in order, keeping each edge whose ends lie in different trees of the forest and skipping each edge whose ends are already connected; the authors' MST-KRUSKAL decides that with the disjoint-set forest of Chapter 21, one FIND-SET per end and a UNION per edge kept. Sorting costs O(E lg E), the set operations are cheaper, and since E is less than <span data-say="V squared, log base 2 of E">V², lg E</span> is O(lg V): O(E lg V) in all.</p><p>Prim's algorithm grows a single tree from a root. Each vertex outside the tree carries a key, the weight of its lightest edge to the tree, in a min-priority queue; the procedure MST-PRIM repeatedly extracts the vertex of least key, adds it with that edge, and lowers the keys of its neighbours. With a binary heap the <span data-say="the size of V">|V|</span> extractions and up to <span data-say="the size of E">|E|</span> key decreases cost O(E lg V); with a Fibonacci heap, whose decrease-key is O(1) amortized, O(E + V lg V). Each step adds a light edge across the cut around the tree, so Corollary 23.2 again calls it safe.</p><p>The lab tests the theorem rather than stating it. You type a weighted graph and the set S on one side of a cut; it lists the crossing edges, finds the lightest, enumerates every spanning tree of the graph (it can, up to seven vertices), and reports whether the light edge is in some minimum tree and in every one. It opens on its preset <code>distinct</code>, seven edges with distinct weights: 2 edges cross, 1 minimum tree of weight 17, and the light edge is in every minimum tree. The preset <code>tie</code> has 2 crossing edges tied at the lightest, 2 minimum trees of weight 7; <code>cycle</code> shows a cycle's heaviest edge left out of the 1 minimum tree, of weight 6.</p><p>This lesson's graph has six vertices, nine edges and one tie: <code>1-2 3, 1-3 1, 2-3 3, 2-4 2, 3-5 4, 4-5 5, 4-6 6, 5-6 2, 3-4 7</code>. Type it, with S set to <code>1, 3</code>. The lab finds 4 edges crossing the cut, 2 of them tied at the lightest weight 3 (<span class="math" data-say="1 to 2">1–2</span> and <span class="math" data-say="2 to 3">2–3</span>); it lists all 55 spanning trees, of which 2 have the minimum weight 12; and it reports that the light edge <span class="math" data-say="1 to 2">1–2</span> is in at least one minimum tree but not in every one. That is exactly the theorem's promise. It says a light edge is safe, which means some minimum tree holds it; with a tie, the other light edge <span class="math" data-say="2 to 3">2–3</span> is in the other tree.</p><p>The table of every edge says more. <span class="math" data-say="1 to 3">1–3</span>, <span class="math" data-say="2 to 4">2–4</span>, <span class="math" data-say="5 to 6">5–6</span> and <span class="math" data-say="3 to 5">3–5</span> are in every minimum tree; <span class="math" data-say="4 to 5">4–5</span>, <span class="math" data-say="4 to 6">4–6</span> and <span class="math" data-say="3 to 4">3–4</span> are in none, each being the heaviest edge on some cycle. The lab also takes each vertex's own lightest edge, a safe edge by Corollary 23.2, and finds that together they make 3 edges of weight 5, leaving the graph in 3 pieces: safe edges, but not yet a tree.</p><p>Run Kruskal's algorithm by hand on the same graph, taking tied edges in typed order. Sorted: <span class="math" data-say="1 to 3">1–3</span> 1, <span class="math" data-say="2 to 4">2–4</span> 2, <span class="math" data-say="5 to 6">5–6</span> 2, <span class="math" data-say="1 to 2">1–2</span> 3, <span class="math" data-say="2 to 3">2–3</span> 3, <span class="math" data-say="3 to 5">3–5</span> 4, then 5, 6 and 7. Keep <span class="math" data-say="1 to 3">1–3</span>, <span class="math" data-say="2 to 4">2–4</span>, <span class="math" data-say="5 to 6">5–6</span> and <span class="math" data-say="1 to 2">1–2</span>; skip <span class="math" data-say="2 to 3">2–3</span>, whose ends are now joined; keep <span class="math" data-say="3 to 5">3–5</span>; skip the last three. Five edges, weight 12. Prim's algorithm from 1 adds <span class="math" data-say="1 to 3">1–3</span> (key 1), then one of the two edges of weight 3, then <span class="math" data-say="2 to 4">2–4</span>, <span class="math" data-say="3 to 5">3–5</span> and <span class="math" data-say="5 to 6">5–6</span>: weight 12 again. The Algorithms Subject's lessons The Cut Property, Kruskal's Algorithm and Prim's Algorithm run each step in its own lab.</p><h3>Exercise</h3><p>Take the graph <code>1-2 2, 1-3 2, 2-3 1, 2-4 4, 3-4 3, 3-5 5, 4-5 2</code>. Run Kruskal's algorithm and Prim's algorithm from 1 by hand, listing each edge kept and the cut that makes it light. Is the minimum spanning tree unique? Check your answer by typing the graph into the lab with S set to <code>1</code>, then <code>1, 2, 3</code>.</p><p>Spanning trees connect everything cheaply; shortest paths connect one vertex to each other vertex cheaply, and the two are different problems. The next lesson, Bellman-Ford and Shortest Paths in DAGs, opens Chapter 24.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The cut and cycle properties, against every spanning tree</h2></div><p>Pick a set; the lightest edge leaving it is in a minimum tree, and the page lists them all to show it</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the cut</h2><div class="prose reading"><p>&ldquo;The greedy strategy advocates making the choice that is the best at the moment.&rdquo; Chapter 23 of CLRS recalls Chapter 16's greedy strategy on its first page, notes that it does not in general find an optimum, and then proves that for this problem it does. The problem is to connect every vertex of a weighted, connected, undirected graph using edges of least total weight. The cheapest such set has no cycle, so it is a tree that spans the graph, with exactly <span data-say="the size of V, minus 1">|V| − 1</span> edges.</p><p>Section 23.1 states a generic method before either algorithm. Keep a set A of edges with one invariant: A lies inside some minimum spanning tree. Start with A empty, which satisfies it trivially. While A is not yet a spanning tree, find an edge that is safe for A, meaning A plus that edge is still inside some minimum spanning tree, and add it. The loop runs <span data-say="the size of V, minus 1">|V| − 1</span> times, and at every moment A is a forest. Everything depends on finding a safe edge without knowing the tree.</p><p>Theorem 23.1 gives the rule. Take any cut that respects A and any light edge crossing it; that edge is safe for A. The proof is an exchange. Let T be a minimum spanning tree containing A. If T already holds the light edge, done. If not, adding it to T closes a cycle, and that cycle must cross the cut somewhere else, at an edge of T that A cannot contain, since no edge of A crosses. Swap that edge out for the light one: the result is still a spanning tree, and no heavier, so it is minimum too, and it contains A and the light edge.</p><p>Corollary 23.2 is the form both algorithms use: a light edge joining one tree of the forest A to a different tree is safe, taking the cut around that one tree. Exercise 23.1-2 warns against the converse: a safe edge crossing a cut that respects A need not be light for that cut.</p><p>Section 23.2 gives two ways to find such an edge quickly. Kruskal's algorithm sorts all the edges by weight and takes them in order, keeping each edge whose ends lie in different trees of the forest and skipping each edge whose ends are already connected; the authors' MST-KRUSKAL decides that with the disjoint-set forest of Chapter 21, one FIND-SET per end and a UNION per edge kept. Sorting costs O(E lg E), the set operations are cheaper, and since E is less than <span data-say="V squared, log base 2 of E">V², lg E</span> is O(lg V): O(E lg V) in all.</p><p>Prim's algorithm grows a single tree from a root. Each vertex outside the tree carries a key, the weight of its lightest edge to the tree, in a min-priority queue; the procedure MST-PRIM repeatedly extracts the vertex of least key, adds it with that edge, and lowers the keys of its neighbours. With a binary heap the <span data-say="the size of V">|V|</span> extractions and up to <span data-say="the size of E">|E|</span> key decreases cost O(E lg V); with a Fibonacci heap, whose decrease-key is O(1) amortized, O(E + V lg V). Each step adds a light edge across the cut around the tree, so Corollary 23.2 again calls it safe.</p><p>The lab tests the theorem rather than stating it. You type a weighted graph and the set S on one side of a cut; it lists the crossing edges, finds the lightest, enumerates every spanning tree of the graph (it can, up to seven vertices), and reports whether the light edge is in some minimum tree and in every one. It opens on its preset <code>distinct</code>, seven edges with distinct weights: 2 edges cross, 1 minimum tree of weight 17, and the light edge is in every minimum tree. The preset <code>tie</code> has 2 crossing edges tied at the lightest, 2 minimum trees of weight 7; <code>cycle</code> shows a cycle's heaviest edge left out of the 1 minimum tree, of weight 6.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The cut and cycle properties, against every spanning tree</h2></div><p>Pick a set; the lightest edge leaving it is in a minimum tree, and the page lists them all to show it</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A cut, its crossing edges, and every spanning tree</strong><span>the lemma is read off the list, not quoted</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the lightest crossing edge</span><span class="tone-purple"><i class="legend-swatch"></i>another crossing edge</span><span class="tone-muted"><i class="legend-swatch"></i>inside one side or the other</span></div>
@@ -1405,10 +1448,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cpCross"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cpArcs"></table></div>
       <div class="status-banner" id="cpStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Choose a cut, then check its light edge against every tree</h3>
-          <p>Type weighted edges as one-other w and the vertices on one side of the cut. The lab finds the crossing edges and the lightest, lists every spanning tree, and says whether the light edge is in some minimum tree and in every one. Paste the lesson's graph with S set to 1, 3.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Choose a cut, then check its light edge against every tree</h3>
+            <p>Type weighted edges as one-other w and the vertices on one side of the cut. The lab finds the crossing edges and the lightest, lists every spanning tree, and says whether the light edge is in some minimum tree and in every one. Paste the lesson's graph with S set to 1, 3.</p>
         <div class="field">
           <label for="cpPreset">Worked example</label>
           <select id="cpPreset"><option value="distinct" selected>seven edges on six vertices, all weights different</option><option value="tie">two crossing edges of equal weight</option><option value="pervertex">a path of six vertices, weights 1, 5, 1, 6, 1</option><option value="cycle">a cycle with one heaviest edge</option></select>
@@ -1430,12 +1473,15 @@
           <div class="kpi"><span>In every minimum tree</span><strong id="cpEvery">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="cpHint" style="margin:0;">An edge is <span class="tt">1&minus;2 4</span>: two labels and a weight. The set is a list of labels, and the cut is that set against everything else. Every spanning tree is then enumerated exactly, so “in some minimum tree” is a fact read off a list. Seven vertices is the limit and it is refused above that rather than run slowly.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>This lesson's graph has six vertices, nine edges and one tie: <code>1-2 3, 1-3 1, 2-3 3, 2-4 2, 3-5 4, 4-5 5, 4-6 6, 5-6 2, 3-4 7</code>. Type it, with S set to <code>1, 3</code>. The lab finds 4 edges crossing the cut, 2 of them tied at the lightest weight 3 (<span class="math" data-say="1 to 2">1–2</span> and <span class="math" data-say="2 to 3">2–3</span>); it lists all 55 spanning trees, of which 2 have the minimum weight 12; and it reports that the light edge <span class="math" data-say="1 to 2">1–2</span> is in at least one minimum tree but not in every one. That is exactly the theorem's promise. It says a light edge is safe, which means some minimum tree holds it; with a tie, the other light edge <span class="math" data-say="2 to 3">2–3</span> is in the other tree.</p><p>The table of every edge says more. <span class="math" data-say="1 to 3">1–3</span>, <span class="math" data-say="2 to 4">2–4</span>, <span class="math" data-say="5 to 6">5–6</span> and <span class="math" data-say="3 to 5">3–5</span> are in every minimum tree; <span class="math" data-say="4 to 5">4–5</span>, <span class="math" data-say="4 to 6">4–6</span> and <span class="math" data-say="3 to 4">3–4</span> are in none, each being the heaviest edge on some cycle. The lab also takes each vertex's own lightest edge, a safe edge by Corollary 23.2, and finds that together they make 3 edges of weight 5, leaving the graph in 3 pieces: safe edges, but not yet a tree.</p><p>Run Kruskal's algorithm by hand on the same graph, taking tied edges in typed order. Sorted: <span class="math" data-say="1 to 3">1–3</span> 1, <span class="math" data-say="2 to 4">2–4</span> 2, <span class="math" data-say="5 to 6">5–6</span> 2, <span class="math" data-say="1 to 2">1–2</span> 3, <span class="math" data-say="2 to 3">2–3</span> 3, <span class="math" data-say="3 to 5">3–5</span> 4, then 5, 6 and 7. Keep <span class="math" data-say="1 to 3">1–3</span>, <span class="math" data-say="2 to 4">2–4</span>, <span class="math" data-say="5 to 6">5–6</span> and <span class="math" data-say="1 to 2">1–2</span>; skip <span class="math" data-say="2 to 3">2–3</span>, whose ends are now joined; keep <span class="math" data-say="3 to 5">3–5</span>; skip the last three. Five edges, weight 12. Prim's algorithm from 1 adds <span class="math" data-say="1 to 3">1–3</span> (key 1), then one of the two edges of weight 3, then <span class="math" data-say="2 to 4">2–4</span>, <span class="math" data-say="3 to 5">3–5</span> and <span class="math" data-say="5 to 6">5–6</span>: weight 12 again. The Algorithms Subject's lessons The Cut Property, Kruskal's Algorithm and Prim's Algorithm run each step in its own lab.</p><h3>Exercise</h3><p>Take the graph <code>1-2 2, 1-3 2, 2-3 1, 2-4 4, 3-4 3, 3-5 5, 4-5 2</code>. Run Kruskal's algorithm and Prim's algorithm from 1 by hand, listing each edge kept and the cut that makes it light. Is the minimum spanning tree unique? Check your answer by typing the graph into the lab with S set to <code>1</code>, then <code>1, 2, 3</code>.</p><p>Spanning trees connect everything cheaply; shortest paths connect one vertex to each other vertex cheaply, and the two are different problems. The next lesson, Bellman-Ford and Shortest Paths in DAGs, opens Chapter 24.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding safe edges by hand</h2></div><p>Five steps, the last on a graph of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Pick a cut that respects A</h3><p>Write a set S so that no edge already chosen has one end in S and one outside. At the start, with nothing chosen, every cut respects A.</p></article><article class="card concept-card"><div class="icon">2</div><h3>List the crossing edges and find the light ones</h3><p>Write every edge with exactly one end in S and its weight. The least weight marks the light edges; if two tie, either is safe.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Run Kruskal&#x27;s order</h3><p>Sort the edges by weight, then keep each edge whose ends are in different trees of the forest so far and skip each edge that would close a cycle.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Run Prim&#x27;s order</h3><p>From a root, repeatedly add the lightest edge from the tree to a vertex outside it, and update the keys of that vertex's neighbours.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on a graph of your own</h3><p>Draw six to seven places you could link, such as rooms to cable or offices to network, with costs, and type the graph into the lab. Choose two different cuts and note whether each light edge is in every minimum tree.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding safe edges by hand</h2>
+      <p class="lead-in">Five steps, the last on a graph of your own.</p>
+      <ol class="key-ideas method"><li><strong>Pick a cut that respects A.</strong> Write a set S so that no edge already chosen has one end in S and one outside. At the start, with nothing chosen, every cut respects A.</li><li><strong>List the crossing edges and find the light ones.</strong> Write every edge with exactly one end in S and its weight. The least weight marks the light edges; if two tie, either is safe.</li><li><strong>Run Kruskal&#x27;s order.</strong> Sort the edges by weight, then keep each edge whose ends are in different trees of the forest so far and skip each edge that would close a cycle.</li><li><strong>Run Prim&#x27;s order.</strong> From a root, repeatedly add the lightest edge from the tree to a vertex outside it, and update the keys of that vertex's neighbours.</li><li><strong>Do it on a graph of your own.</strong> Draw six to seven places you could link, such as rooms to cable or offices to network, with costs, and type the graph into the lab. Choose two different cuts and note whether each light edge is in every minimum tree.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1454,17 +1500,16 @@
 weight 1 + 2 + 2 + 3 + 4 = 12</div><p>Five edges of weight 12, matching the lab's minimum. Had <span class="math" data-say="2 to 3">2–3</span> come before <span class="math" data-say="1 to 2">1–2</span> in the order, Kruskal would have kept it instead, giving the other minimum tree the lab lists, also of weight 12.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a light edge must be in every minimum spanning tree</strong><span>The theorem says a light edge is safe: some minimum spanning tree containing A also contains it. With ties that is weaker than every tree. On the lesson's graph the lab lists 2 minimum trees of weight 12 and finds the light edge <span class="math" data-say="1 to 2">1–2</span> in only 1 of them; its tied rival <span class="math" data-say="2 to 3">2–3</span> is in the other.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking every vertex&#x27;s lightest edge and calling it a tree</strong><span>Each vertex's lightest edge is safe by Corollary 23.2, so it is tempting to take them all at once. On the lesson's graph they are 3 edges of weight 5 and leave the graph in 3 pieces. The generic method needs <span data-say="the size of V, minus 1">|V| − 1</span> edges and keeps choosing until the forest is one tree.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting Kruskal and Prim to return the same tree</strong><span>They return trees of the same weight, but where weights tie they may choose different edges. On the lesson's graph Kruskal with ties in typed order keeps <span class="math" data-say="1 to 2">1–2</span>. Prim rooted at 3 gives vertex 2 the key 3 through <span class="math" data-say="2 to 3">2–3</span> first, and when 1 joins, <span class="math" data-say="1 to 2">1–2</span> offers 3 again, which is not smaller, so it keeps <span class="math" data-say="2 to 3">2–3</span>. Both trees weigh 12.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find a safe edge from a cut and run both algorithms by hand.</strong><p>For a weighted graph of six or seven vertices, name a cut that respects a given A, its light edges, and the edges Kruskal's and Prim's algorithms add, with the total weight.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab enumerates every spanning tree, so on a graph of seven or fewer vertices its verdict on the light edge is complete for that graph. It does not take a set A, so it tests cuts against an empty A; the theorem for every A and every graph is the exchange proof in Section 23.1.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a light edge must be in every minimum spanning tree</strong><span>The theorem says a light edge is safe: some minimum spanning tree containing A also contains it. With ties that is weaker than every tree. On the lesson's graph the lab lists 2 minimum trees of weight 12 and finds the light edge <span class="math" data-say="1 to 2">1–2</span> in only 1 of them; its tied rival <span class="math" data-say="2 to 3">2–3</span> is in the other.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking every vertex&#x27;s lightest edge and calling it a tree</strong><span>Each vertex's lightest edge is safe by Corollary 23.2, so it is tempting to take them all at once. On the lesson's graph they are 3 edges of weight 5 and leave the graph in 3 pieces. The generic method needs <span data-say="the size of V, minus 1">|V| − 1</span> edges and keeps choosing until the forest is one tree.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting Kruskal and Prim to return the same tree</strong><span>They return trees of the same weight, but where weights tie they may choose different edges. On the lesson's graph Kruskal with ties in typed order keeps <span class="math" data-say="1 to 2">1–2</span>. Prim rooted at 3 gives vertex 2 the key 3 through <span class="math" data-say="2 to 3">2–3</span> first, and when 1 joins, <span class="math" data-say="1 to 2">1–2</span> offers 3 again, which is not smaller, so it keeps <span class="math" data-say="2 to 3">2–3</span>. Both trees weigh 12.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find a safe edge from a cut and run both algorithms by hand.</strong><p>For a weighted graph of six or seven vertices, name a cut that respects a given A, its light edges, and the edges Kruskal's and Prim's algorithms add, with the total weight.</p></div></div><div class="note"><strong>Note:</strong> The lab enumerates every spanning tree, so on a graph of seven or fewer vertices its verdict on the light edge is complete for that graph. It does not take a set A, so it tests cuts against an empty A; the theorem for every A and every graph is the exchange proof in Section 23.1.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A safe edge</summary><p>The generic method keeps a set A of edges that is contained in some minimum spanning tree. An edge is safe for A if adding it keeps that true. The whole chapter is a search for a cheap way to recognise safe edges.</p></details><details class="recall"><summary>A cut, and a cut that respects A</summary><p>A cut splits the vertices into a set S and the rest. An edge crosses the cut if one end is in S and the other is not. A cut respects A if no edge of A crosses it: the edges chosen so far all lie on one side or the other.</p></details><details class="recall"><summary>A light edge</summary><p>An edge crossing a cut whose weight is the least of all crossing edges. With ties, a cut can have several light edges, and that is where minimum spanning trees stop being unique.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 23 grows a minimum spanning tree greedily and proves the greed safe with one theorem about cuts. Kruskal's algorithm takes edges in increasing weight and Prim's grows one tree from a root, and both add only edges the theorem calls safe. Test the theorem on a six-vertex graph written for the lesson against every one of its 55 spanning trees, and run both algorithms by hand.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A safe edge.</strong> The generic method keeps a set A of edges that is contained in some minimum spanning tree. An edge is safe for A if adding it keeps that true. The whole chapter is a search for a cheap way to recognise safe edges.</li><li><strong>A cut, and a cut that respects A.</strong> A cut splits the vertices into a set S and the rest. An edge crosses the cut if one end is in S and the other is not. A cut respects A if no edge of A crosses it: the edges chosen so far all lie on one side or the other.</li><li><strong>A light edge.</strong> An edge crossing a cut whose weight is the least of all crossing edges. With ties, a cut can have several light edges, and that is where minimum spanning trees stop being unique.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a spanning tree has one edge fewer than there are vertices. cut respects A, no edge of A crosses. light edge, least weight across a cut. light edge across such a cut is safe. Kruskal, sorted edges, disjoint sets. Prim, one tree, a min-priority queue. both big O of E times log base 2 of V with binary heaps" tabindex="0" role="region" aria-label="Mathematical notation">a spanning tree has |V| − 1 edges
 cut respects A: no edge of A crosses
 light edge: least weight across a cut
@@ -3479,11 +3524,42 @@ both O(E lg V) with binary heaps</div><figcaption>Sections 23.1 and 23.2 in seve
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3551,7 +3627,7 @@ both O(E lg V) with binary heaps</div><figcaption>Sections 23.1 and 23.2 in seve
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

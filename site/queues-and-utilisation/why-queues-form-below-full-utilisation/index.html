@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Queues and Utilisation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Randomness</p>
       <h1>Why Queues Form at ρ &lt; 1</h1>
       <p class="lesson-lede">Compare the mean queue of random and clockwork arrivals at the same utilisation and name the difference.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Determinism does not queue below one</li><li>Randomness bunches, and bunching waits</li><li>A simulation is a model, so it has to be named</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The same utilisation, twice</h2>
-      <article class="prose reading"><p>&ldquo;We are only at 70% &mdash; nobody should be waiting.&rdquo; The sentence assumes that a server with headroom is a server with no queue, and it is true of exactly one system: the one where work arrives on a timetable and takes the same time every time.</p><div class="example"><span class="label">Example &middot; Clockwork, at <span data-say="rho equals 4 over 5">ρ = 4/5</span></span><p>One arrival every five slots; each takes exactly four slots to serve. The server finishes a slot before the next arrival appears, so the system holds one customer four slots in five and none in the fifth. <span class="math" data-say="L equals 4 over 5">L = 4/5</span>, and the largest number ever present is <span class="math" data-say="1">1</span>. Nothing queues, ever, at any utilisation below one.</p></div><div class="defbox"><span class="label">Definition &middot; The slotted model, named</span><p>Time advances in slots. In each slot <strong>one arrival occurs with probability <span class="math" data-say="p">p</span></strong>, independently of everything else. A customer in service <strong>completes with probability <span class="math" data-say="q">q</span></strong> in each slot, so service times are geometric with mean <span class="math" data-say="1 over q">1/q</span> slots. Within a slot the departure is resolved first and the arrival second &mdash; the <strong>late-arrival convention</strong> &mdash; so a customer arriving in slot <span class="math" data-say="t">t</span> cannot leave before slot <span class="math" data-say="t plus 1">t + 1</span>.</p><p>That is a discrete-time chain, written <strong>Geo/Geo/1</strong>. It is not M/M/1, and the convention in the last sentence is part of the model: change it and the exact answer changes.</p></div><p>The utilisation of that chain is <span class="math" data-say="rho equals p over q">ρ = p/q</span>: arrivals come at <span class="math" data-say="p">p</span> per slot, each takes <span class="math" data-say="1 over q">1/q</span> slots of the server, so the server is busy <span class="math" data-say="p over q">p/q</span> of the time. At <span class="math" data-say="p equals 2 over 5">p = 2/5</span> and <span class="math" data-say="q equals 1 over 2">q = 1/2</span> that is <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span> &mdash; the same utilisation as the clockwork run, the same mean service time of two slots, and the same throughput.</p><div class="mathblock" data-say="at rho equals 4 over 5, three numbers for the mean number in system. clockwork, D over D over 1, L equals 4 over 5, equals 0.8, and never more than 1. slotted, G e o over G e o over 1, L equals 12 over 5, equals 2.4, exact, p equals 2 over 5, q equals 1 over 2. 12 over 5 divided by 4 over 5 equals 3, randomness alone, at identical utilisation. for comparison, the continuous M over M over 1 formula. M over M over 1, rho over the quantity 1 minus rho, equals 4. 4 divided by 12 over 5, equals 5 over 3, which is a different model, not this one" tabindex="0" role="region" aria-label="Mathematical notation">at ρ = 4/5, three numbers for the mean number in system
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The same utilisation, twice</h2><div class="prose reading"><p>&ldquo;We are only at 70% &mdash; nobody should be waiting.&rdquo; The sentence assumes that a server with headroom is a server with no queue, and it is true of exactly one system: the one where work arrives on a timetable and takes the same time every time.</p><div class="example"><span class="label">Example &middot; Clockwork, at <span data-say="rho equals 4 over 5">ρ = 4/5</span></span><p>One arrival every five slots; each takes exactly four slots to serve. The server finishes a slot before the next arrival appears, so the system holds one customer four slots in five and none in the fifth. <span class="math" data-say="L equals 4 over 5">L = 4/5</span>, and the largest number ever present is <span class="math" data-say="1">1</span>. Nothing queues, ever, at any utilisation below one.</p></div><div class="defbox"><span class="label">Definition &middot; The slotted model, named</span><p>Time advances in slots. In each slot <strong>one arrival occurs with probability <span class="math" data-say="p">p</span></strong>, independently of everything else. A customer in service <strong>completes with probability <span class="math" data-say="q">q</span></strong> in each slot, so service times are geometric with mean <span class="math" data-say="1 over q">1/q</span> slots. Within a slot the departure is resolved first and the arrival second &mdash; the <strong>late-arrival convention</strong> &mdash; so a customer arriving in slot <span class="math" data-say="t">t</span> cannot leave before slot <span class="math" data-say="t plus 1">t + 1</span>.</p><p>That is a discrete-time chain, written <strong>Geo/Geo/1</strong>. It is not M/M/1, and the convention in the last sentence is part of the model: change it and the exact answer changes.</p></div><p>The utilisation of that chain is <span class="math" data-say="rho equals p over q">ρ = p/q</span>: arrivals come at <span class="math" data-say="p">p</span> per slot, each takes <span class="math" data-say="1 over q">1/q</span> slots of the server, so the server is busy <span class="math" data-say="p over q">p/q</span> of the time. At <span class="math" data-say="p equals 2 over 5">p = 2/5</span> and <span class="math" data-say="q equals 1 over 2">q = 1/2</span> that is <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span> &mdash; the same utilisation as the clockwork run, the same mean service time of two slots, and the same throughput.</p><div class="mathblock" data-say="at rho equals 4 over 5, three numbers for the mean number in system. clockwork, D over D over 1, L equals 4 over 5, equals 0.8, and never more than 1. slotted, G e o over G e o over 1, L equals 12 over 5, equals 2.4, exact, p equals 2 over 5, q equals 1 over 2. 12 over 5 divided by 4 over 5 equals 3, randomness alone, at identical utilisation. for comparison, the continuous M over M over 1 formula. M over M over 1, rho over the quantity 1 minus rho, equals 4. 4 divided by 12 over 5, equals 5 over 3, which is a different model, not this one" tabindex="0" role="region" aria-label="Mathematical notation">at ρ = 4/5, three numbers for the mean number in system
 
 clockwork  D/D/1          L = 4/5   = 0.8     and never more than 1
 slotted    Geo/Geo/1      L = 12/5  = 2.4     exact, p = 2/5, q = 1/2
@@ -1400,12 +1444,11 @@ slotted    Geo/Geo/1      L = 12/5  = 2.4     exact, p = 2/5, q = 1/2
 
 for comparison, the continuous M/M/1 formula
            M/M/1          ρ/(1 − ρ) = 4
-4 ÷ 12/5   = 5/3          which is a different model, not this one</div><p>The <span class="math" data-say="12 over 5">12/5</span> is exact, and it is not this lesson's to derive. The chain above is solved in closed form in Operations Research, <span class="math" data-say="markov-chains-decisions-and-queues over queues-in-discrete-time">markov-chains-decisions-and-queues/queues-in-discrete-time</span>, which gives the stationary distribution and the mean <span class="math" data-say="L equals p times the quantity 1 minus p, over the quantity q minus p">L = p(1 − p)/(q − p)</span> &mdash; equivalently <span class="math" data-say="rho times the quantity 1 minus p, over the quantity 1 minus rho">ρ(1 − p)/(1 − ρ)</span> &mdash; for any <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> under this convention. What belongs here is the phenomenon: waiting appears well below <span class="math" data-say="rho equals 1">ρ = 1</span>, and the lab shows it happening.</p><p>Note what the third line of the table does <em>not</em> say. <span class="math" data-say="rho over the quantity 1 minus rho">ρ/(1 − ρ)</span> is <span class="math" data-say="4">4</span> at this utilisation, and <span class="math" data-say="4">4</span> is not the slotted system's answer: it overstates the exact <span class="math" data-say="12 over 5">12/5</span> by a factor of <span class="math" data-say="5 over 3">5/3</span>. The continuous formula describes the limit of this chain as the slot shrinks, not the chain at a slot of one. &ldquo;The M/M/1 Queue&rdquo; states that limit precisely and shows the convergence; treating the two as the same model is the error that comparison is designed to prevent.</p><h3>The simulation starts empty</h3><p>A run begins with nothing in the system, which is a state the settled chain visits only a fifth of the time. Averaging from <span class="math" data-say="t equals 0">t = 0</span> therefore includes a stretch that is unrepresentatively quiet, and the mean comes out biased low. The lab prints the mean twice &mdash; from <span class="math" data-say="t equals 0">t = 0</span> and after discarding a warm-up &mdash; and draws the ensemble occupancy rising from zero so that the bias is visible rather than argued about. The general treatment is Operations Research, <span class="math" data-say="simulation over warm-u p-and-the-initial-transient">simulation/warm-up-and-the-initial-transient</span>.</p><p>Neither printed mean is the exact answer. One run is a sample: the same seed gives the same run and a different seed gives a different number, and with a few thousand slots the sampling error is larger than the difference between many wrong formulas. What is stable across seeds is the comparison &mdash; the random arm above the clockwork arm, by a factor near three &mdash; and that comparison is what the lesson claims.</p><ul><li>Identical in both arms: the arrival rate, the mean service time, the utilisation <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span>, and the throughput.</li><li>Different in the random arm: when the arrivals land, and how long each service actually takes.</li><li>Consequence: a mean number in system of <span class="math" data-say="12 over 5">12/5</span> rather than <span class="math" data-say="4 over 5">4/5</span>, from nothing but the pattern.</li></ul><p>So the honest version of the opening sentence is: at 70% utilisation the server is idle 30% of the time, and whether anyone waits depends entirely on how that idleness is distributed. Randomness guarantees it is distributed badly.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Why queues form below full utilisation</h2></div><p>A seeded slotted run against a clockwork one, at exactly the same ρ</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+4 ÷ 12/5   = 5/3          which is a different model, not this one</div><p>The <span class="math" data-say="12 over 5">12/5</span> is exact, and it is not this lesson's to derive. The chain above is solved in closed form in Operations Research, <span class="math" data-say="markov-chains-decisions-and-queues over queues-in-discrete-time">markov-chains-decisions-and-queues/queues-in-discrete-time</span>, which gives the stationary distribution and the mean <span class="math" data-say="L equals p times the quantity 1 minus p, over the quantity q minus p">L = p(1 − p)/(q − p)</span> &mdash; equivalently <span class="math" data-say="rho times the quantity 1 minus p, over the quantity 1 minus rho">ρ(1 − p)/(1 − ρ)</span> &mdash; for any <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> under this convention. What belongs here is the phenomenon: waiting appears well below <span class="math" data-say="rho equals 1">ρ = 1</span>, and the lab shows it happening.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Why queues form below full utilisation</h2></div><p>A seeded slotted run against a clockwork one, at exactly the same ρ</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Bunching, not overload</strong><span>Bernoulli arrivals against a clockwork schedule, at exactly the same &rho;</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>Bernoulli arrivals</span><span class="tone-green"><i class="legend-swatch"></i>D/D/1, same &rho;</span><span class="tone-amber"><i class="legend-swatch"></i>running mean</span><span class="tone-purple"><i class="legend-swatch"></i>exact Geo/Geo/1</span></div>
@@ -1413,10 +1456,10 @@ for comparison, the continuous M/M/1 formula
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="slPlot" viewBox="0 0 520 210" role="img" aria-label="The random queue-length trace above a deterministic one, with both running means below."></svg><svg id="slTrans" viewBox="0 0 520 128" role="img" aria-label="The mean occupancy at each slot averaged over many runs, rising from zero."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="slTable"></table></div>
       <div class="status-banner" id="slStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the slotted model and run both arms</h3>
-          <p><span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> set the chain; the clockwork arm is drawn at the same <span class="math" data-say="rho">ρ</span> beside it. The mean from <span class="math" data-say="t equals 0">t = 0</span>, the mean after the warm-up you discard, and the exact Geo/Geo/1 answer are printed together, so the sampling error and the initial bias are both visible.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the slotted model and run both arms</h3>
+            <p><span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> set the chain; the clockwork arm is drawn at the same <span class="math" data-say="rho">ρ</span> beside it. The mean from <span class="math" data-say="t equals 0">t = 0</span>, the mean after the warm-up you discard, and the exact Geo/Geo/1 answer are printed together, so the sampling error and the initial bias are both visible.</p>
         <div>
           <div class="range-row"><label class="small-copy" id="slPLab" for="slP">p &mdash; arrival probability per slot (twentieths)</label><span class="range-value" id="slPOut">8</span></div>
           <input id="slP" type="range" min="1" max="19" step="1" value="8" />
@@ -1444,12 +1487,15 @@ for comparison, the continuous M/M/1 formula
           <div class="kpi"><span>Random &divide; clockwork</span><strong id="slRatio">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="slHint" style="margin:0;">The model is named, because a slotted simulation is a model and not a measurement: one Bernoulli arrival per slot with probability p, geometric service with parameter q, under the <em>late-arrival</em> convention &mdash; a departure is resolved before an arrival inside the same slot. That is the Geo/Geo/1 chain, and its exact answer is solved in Operations Research, <span class="tt">queues-in-discrete-time</span>. It is not M/M/1, and at &Delta; = 1 it is not close to it.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Note what the third line of the table does <em>not</em> say. <span class="math" data-say="rho over the quantity 1 minus rho">ρ/(1 − ρ)</span> is <span class="math" data-say="4">4</span> at this utilisation, and <span class="math" data-say="4">4</span> is not the slotted system's answer: it overstates the exact <span class="math" data-say="12 over 5">12/5</span> by a factor of <span class="math" data-say="5 over 3">5/3</span>. The continuous formula describes the limit of this chain as the slot shrinks, not the chain at a slot of one. &ldquo;The M/M/1 Queue&rdquo; states that limit precisely and shows the convergence; treating the two as the same model is the error that comparison is designed to prevent.</p><h3>The simulation starts empty</h3><p>A run begins with nothing in the system, which is a state the settled chain visits only a fifth of the time. Averaging from <span class="math" data-say="t equals 0">t = 0</span> therefore includes a stretch that is unrepresentatively quiet, and the mean comes out biased low. The lab prints the mean twice &mdash; from <span class="math" data-say="t equals 0">t = 0</span> and after discarding a warm-up &mdash; and draws the ensemble occupancy rising from zero so that the bias is visible rather than argued about. The general treatment is Operations Research, <span class="math" data-say="simulation over warm-u p-and-the-initial-transient">simulation/warm-up-and-the-initial-transient</span>.</p><p>Neither printed mean is the exact answer. One run is a sample: the same seed gives the same run and a different seed gives a different number, and with a few thousand slots the sampling error is larger than the difference between many wrong formulas. What is stable across seeds is the comparison &mdash; the random arm above the clockwork arm, by a factor near three &mdash; and that comparison is what the lesson claims.</p><ul><li>Identical in both arms: the arrival rate, the mean service time, the utilisation <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span>, and the throughput.</li><li>Different in the random arm: when the arrivals land, and how long each service actually takes.</li><li>Consequence: a mean number in system of <span class="math" data-say="12 over 5">12/5</span> rather than <span class="math" data-say="4 over 5">4/5</span>, from nothing but the pattern.</li></ul><p>So the honest version of the opening sentence is: at 70% utilisation the server is idle 30% of the time, and whether anyone waits depends entirely on how that idleness is distributed. Randomness guarantees it is distributed badly.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Comparing two arrival patterns honestly</h2></div><p>The comparison is only worth anything if the two arms differ in exactly one respect.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix the utilisation before anything else</h3><p><span class="math" data-say="rho equals p over q">ρ = p/q</span> for the random arm. Choose <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> first, compute <span class="math" data-say="rho">ρ</span>, and give the clockwork arm the same one. A comparison at two different <span class="math" data-say="rho">ρ</span> values measures nothing.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read the clockwork arm&#x27;s mean</h3><p>It is exact and it is small: at <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span> the mean number in system is <span class="math" data-say="4 over 5">4/5</span>, and the maximum is <span class="math" data-say="1">1</span>. This arm has no sampling error because there is nothing random in it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Run the random arm and discard a warm-up</h3><p>Take the mean from <span class="math" data-say="t equals 0">t = 0</span> and the mean after the warm-up and note the gap between them. The run starts empty, so the first is the biased one.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Change the seed and run it again</h3><p>Whatever moves between seeds is sampling error, not signal. The factor of about three does not move; the third decimal place does.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Compare against the exact chain, not against <span data-say="rho over the quantity 1 minus rho">ρ/(1 − ρ)</span></h3><p>The exact answer for this model is <span class="math" data-say="12 over 5">12/5</span>. <span class="math" data-say="rho over the quantity 1 minus rho, equals 4">ρ/(1 − ρ) = 4</span> is the answer for a different model and is <span class="math" data-say="5 over 3">5/3</span> too large here, so a run landing near <span class="math" data-say="2.4">2.4</span> is agreement and a run landing near <span class="math" data-say="4">4</span> would be a bug.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Comparing two arrival patterns honestly</h2>
+      <p class="lead-in">The comparison is only worth anything if the two arms differ in exactly one respect.</p>
+      <ol class="key-ideas method"><li><strong>Fix the utilisation before anything else.</strong> <span class="math" data-say="rho equals p over q">ρ = p/q</span> for the random arm. Choose <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> first, compute <span class="math" data-say="rho">ρ</span>, and give the clockwork arm the same one. A comparison at two different <span class="math" data-say="rho">ρ</span> values measures nothing.</li><li><strong>Read the clockwork arm&#x27;s mean.</strong> It is exact and it is small: at <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span> the mean number in system is <span class="math" data-say="4 over 5">4/5</span>, and the maximum is <span class="math" data-say="1">1</span>. This arm has no sampling error because there is nothing random in it.</li><li><strong>Run the random arm and discard a warm-up.</strong> Take the mean from <span class="math" data-say="t equals 0">t = 0</span> and the mean after the warm-up and note the gap between them. The run starts empty, so the first is the biased one.</li><li><strong>Change the seed and run it again.</strong> Whatever moves between seeds is sampling error, not signal. The factor of about three does not move; the third decimal place does.</li><li><strong>Compare against the exact chain, not against <span data-say="rho over the quantity 1 minus rho">ρ/(1 − ρ)</span>.</strong> The exact answer for this model is <span class="math" data-say="12 over 5">12/5</span>. <span class="math" data-say="rho over the quantity 1 minus rho, equals 4">ρ/(1 − ρ) = 4</span> is the answer for a different model and is <span class="math" data-say="5 over 3">5/3</span> too large here, so a run landing near <span class="math" data-say="2.4">2.4</span> is agreement and a run landing near <span class="math" data-say="4">4</span> would be a bug.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1477,17 +1523,16 @@ not this      ρ/(1 − ρ) = (4/5)/(1/5) = 4
               4 ÷ 12/5 = 5/3       the continuous formula, overstating</div><p>The clockwork column is the intuition being corrected: it really is true that a deterministic system with headroom never queues. Every real system fails its assumption, and the cost of failing it is the factor of three.</p><p>The last block is worth reading twice. <span class="math" data-say="rho over the quantity 1 minus rho">ρ/(1 − ρ)</span> is the right formula for a different model, and reaching for it here would overstate the queue by <span class="math" data-say="5 over 3">5/3</span>. The two agree only in the limit of a vanishing slot, which is the subject of &ldquo;The M/M/1 Queue&rdquo;.</p><p>For a faded rehearsal, set <span class="math" data-say="p equals 1 over 4">p = 1/4</span> and <span class="math" data-say="q equals 1 over 2">q = 1/2</span>. The supplied first move is <span class="math" data-say="rho equals 1 over 2">ρ = 1/2</span>. Predict whether the gap between the random and clockwork arms is larger or smaller than it was at <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span>, then run it and see.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>“At 70% utilisation nobody waits”</strong><span>Utilisation says how much of the time the server is busy, not when. Random arrivals put work in front of a busy server and leave the idle time scattered where nothing needs it, and the result at <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span> is three times the clockwork queue. The threshold at which waiting begins is not <span class="math" data-say="rho equals 1">ρ = 1</span>; there is no such threshold.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a simulated mean as the exact answer</strong><span>One seeded run of a few thousand slots is a sample, and it starts empty, so it carries both sampling error and a downward bias. Quote it as a demonstration of the effect, and quote the chain's closed form &mdash; <span class="math" data-say="12 over 5">12/5</span> here &mdash; when an exact number is wanted.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting this simulation to produce <span class="math" data-say="rho over the quantity 1 minus rho">ρ/(1 − ρ)</span></strong><span>It will not, and a run that did would mean the simulator was wrong. At <span class="math" data-say="p equals 2 over 5">p = 2/5</span>, <span class="math" data-say="q equals 1 over 2">q = 1/2</span> the exact slotted mean is <span class="math" data-say="12 over 5">12/5</span> while <span class="math" data-say="rho over the quantity 1 minus rho">ρ/(1 − ρ)</span> is <span class="math" data-say="4">4</span> &mdash; the continuous formula overstates this system by <span class="math" data-say="5 over 3">5/3</span>. They meet only as the slot shrinks, which is a limit rather than a check.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we have headroom, so nothing is waiting” reads as a statement about a timetable.</strong><p>You should be able to compute <span class="math" data-say="rho equals p over q">ρ = p/q</span> for the slotted model, say what the clockwork arm does at that <span class="math" data-say="rho">ρ</span>, name the model a simulation is running, and say why <span class="math" data-say="rho over the quantity 1 minus rho">ρ/(1 − ρ)</span> is not the number to compare a slotted run against.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The random service time above was geometric: a fixed chance of finishing in each slot, whatever has happened so far. “Memoryless Waiting: from Geometric to Exponential” takes that property seriously, shrinks the slot, and arrives at the exponential distribution without writing a density.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>“At 70% utilisation nobody waits”</strong><span>Utilisation says how much of the time the server is busy, not when. Random arrivals put work in front of a busy server and leave the idle time scattered where nothing needs it, and the result at <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span> is three times the clockwork queue. The threshold at which waiting begins is not <span class="math" data-say="rho equals 1">ρ = 1</span>; there is no such threshold.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a simulated mean as the exact answer</strong><span>One seeded run of a few thousand slots is a sample, and it starts empty, so it carries both sampling error and a downward bias. Quote it as a demonstration of the effect, and quote the chain's closed form &mdash; <span class="math" data-say="12 over 5">12/5</span> here &mdash; when an exact number is wanted.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting this simulation to produce <span class="math" data-say="rho over the quantity 1 minus rho">ρ/(1 − ρ)</span></strong><span>It will not, and a run that did would mean the simulator was wrong. At <span class="math" data-say="p equals 2 over 5">p = 2/5</span>, <span class="math" data-say="q equals 1 over 2">q = 1/2</span> the exact slotted mean is <span class="math" data-say="12 over 5">12/5</span> while <span class="math" data-say="rho over the quantity 1 minus rho">ρ/(1 − ρ)</span> is <span class="math" data-say="4">4</span> &mdash; the continuous formula overstates this system by <span class="math" data-say="5 over 3">5/3</span>. They meet only as the slot shrinks, which is a limit rather than a check.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we have headroom, so nothing is waiting” reads as a statement about a timetable.</strong><p>You should be able to compute <span class="math" data-say="rho equals p over q">ρ = p/q</span> for the slotted model, say what the clockwork arm does at that <span class="math" data-say="rho">ρ</span>, name the model a simulation is running, and say why <span class="math" data-say="rho over the quantity 1 minus rho">ρ/(1 − ρ)</span> is not the number to compare a slotted run against.</p></div></div><div class="note"><strong>Note:</strong> The random service time above was geometric: a fixed chance of finishing in each slot, whatever has happened so far. “Memoryless Waiting: from Geometric to Exponential” takes that property seriously, shrinks the slot, and arrives at the exponential distribution without writing a density.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Determinism does not queue below one</summary><p>One arrival every five slots, served in exactly four: the server is busy <span class="math" data-say="4 over 5">4/5</span> of the time and no second customer ever exists. The mean number in the system is exactly <span class="math" data-say="4 over 5">4/5</span> &mdash; the one in service, counted for the fraction of time it is there &mdash; and the largest the system ever holds is one.</p></details><details class="recall"><summary>Randomness bunches, and bunching waits</summary><p>Keep <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span> and make the arrivals random and the service random. Now the mean number in the system is <span class="math" data-say="12 over 5">12/5</span>, three times the clockwork answer. The server is idle exactly as often as before; it is idle at the wrong moments, and the work that arrives while it is busy is what waits.</p></details><details class="recall"><summary>A simulation is a model, so it has to be named</summary><p>&ldquo;I ran a simulation&rdquo; is not a measurement of anything until the model is stated. This one is a Bernoulli arrival per slot, a geometric service, and a rule about what happens when both land in the same slot. Change any of the three and the number changes.</p></details></div>
+      <h3>Summary</h3>
       <p>A server busy four fifths of the time has a fifth of itself spare, and yet work waits. It waits because arrivals bunch: run clockwork arrivals and clockwork service at <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span> and nothing ever queues, then run random ones at exactly the same <span class="math" data-say="rho">ρ</span> and the mean number in the system triples. Bunching, not overload.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Determinism does not queue below one.</strong> One arrival every five slots, served in exactly four: the server is busy <span class="math" data-say="4 over 5">4/5</span> of the time and no second customer ever exists. The mean number in the system is exactly <span class="math" data-say="4 over 5">4/5</span> &mdash; the one in service, counted for the fraction of time it is there &mdash; and the largest the system ever holds is one.</li><li><strong>Randomness bunches, and bunching waits.</strong> Keep <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span> and make the arrivals random and the service random. Now the mean number in the system is <span class="math" data-say="12 over 5">12/5</span>, three times the clockwork answer. The server is idle exactly as often as before; it is idle at the wrong moments, and the work that arrives while it is busy is what waits.</li><li><strong>A simulation is a model, so it has to be named.</strong> &ldquo;I ran a simulation&rdquo; is not a measurement of anything until the model is stated. This one is a Bernoulli arrival per slot, a geometric service, and a rule about what happens when both land in the same slot. Change any of the three and the number changes.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="clockwork in, clockwork out, nothing waits at all below rho equals 1. Bernoulli of p in, Geometric of q, rho equals p over q, and now things wait. p equals 2 over 5, q equals 1 over 2, rho equals 4 over 5, D over D over 1, L equals 4 over 5, G e o over G e o over 1, L equals 12 over 5. 12 over 5 divided by 4 over 5 equals 3, three times as many, at the same rho. rho over the quantity 1 minus rho, equals 4, a different model&#x27;s answer, 5 over 3 too big here" tabindex="0" role="region" aria-label="Mathematical notation">clockwork in, clockwork out     nothing waits at all below ρ = 1
 Bernoulli(p) in, Geometric(q)   ρ = p/q, and now things wait
 p = 2/5, q = 1/2, ρ = 4/5       D/D/1: L = 4/5    Geo/Geo/1: L = 12/5
@@ -2877,11 +2922,42 @@ p = 2/5, q = 1/2, ρ = 4/5       D/D/1: L = 4/5    Geo/Geo/1: L = 12/5
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2949,7 +3025,7 @@ p = 2/5, q = 1/2, ρ = 4/5       D/D/1: L = 4/5    Geo/Geo/1: L = 12/5
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Large-Scale Structure and Strategy</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 17 · Bringing the Strategy Together</p>
       <h1>Who Sets the Strategy, and a Conclusion</h1>
       <p class="lesson-lede">Strategy that grows out of application development, the six essentials Evans asks of any way of deciding it, and the book&#x27;s closing stories.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Emergent structure</li><li>Customer-focused architecture team</li><li>Reach of a change on the map</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Who decides, the six essentials, the book&#x27;s ending, then the map</h2>
-      <article class="prose reading"><p>&ldquo;Make the objects into specialists; let the developers be generalists.&rdquo; It is the last of the six essentials in Chapter 17's Who Sets the Strategy?, and close to the last word of the book's argument. This lesson reads that section, the sections after it, and the Conclusion. Read them in your own copy first.</p><p>Architecture, Evans observes, is traditionally handed down: made before development starts, by a team with more organisational power than the application developers. It need not be, and he says it usually does not work well. Strategic design must apply across the project, and without prescribing one organisation he describes two arrangements he has seen work, setting aside the one he calls wisdom from on high.</p><p>The first is emergent structure from application development. A team that keeps its own discipline and communicates very well can follow Evolving Order to shared principles without central authority, as Extreme Programming teams do. Usually one person, or a few, takes some oversight of the structure, and it works best when that person is a developer who writes code and who arbitrates and explains, rather than the only source of ideas. Across several teams an informal committee of their representatives can adopt, modify or shelve a proposal, which works when the teams are few, committed to coordinating, comparable in design skill and similar in their structural needs.</p><p>The second is a customer-focused architecture team: when several teams share a strategy, some centralisation is attractive, and the ivory tower is not the only form it can take. Such a team works as a peer of the application teams, discovering patterns with them, experimenting with them toward distillations, and getting its hands dirty. On an organisation chart it may look like the traditional team; in every activity it differs.</p><p>Then come the six essentials, which Evans says any way of deciding needs. Decisions must reach the entire team, and what matters is the developers' actual relation to the strategy, not the authority management grants it; architects without feedback from applying their own rules are ignored or bypassed. The decision process must absorb feedback, because only the application developers know the project deeply enough; one architecture team he describes rotated its members through the application teams to get it. The plan must allow for evolution, since decisions set in stone leave a team few options when things change.</p><p>Architecture teams must not take all the best and brightest, which leaves applications to the least experienced designers and cuts the architects off from developers with deep domain knowledge; strong designers belong on every application team. Minimalism and humility are essential, because even a slight misfit gets in the way, and Evans admits to having built an overbuilt architecture himself. And objects are specialists while developers are generalists: the narrow responsibilities good objects need are no model for a team, on which architects write application code and developers play with frameworks.</p><p>The same holds, he says, for technical frameworks: evolution, minimalism and involvement with application teams keep a framework helpful, and an architecture that ignores them is stifling or bypassed. He singles out frameworks built on the assumption that application developers cannot design, which underrate how hard application work is; his test is to ask the framework's designers what they expect of its users. The chapter closes with Christopher Alexander's group of building architects, whose account in The Oregon Experiment of why master plans fail, too rigid to adapt and alienating the people who live with them, leads them to principles that every act of piecemeal growth applies, so that an organic order emerges.</p><p>The Conclusion's Epilogues follow five of Evans's projects years later, and they are summarised here only. The circuit-board tool of Chapter 1 outlived its company in a few engineers' hands; the lending system of Chapter 9 kept growing after a spin-off and leads its field. A utility with an Abstract Core was handed to a new team that first kept its design alive and later rebuilt it around deeper insight, and Evans is unsentimental about it: &ldquo;The success of a design is not necessarily marked by its stasis.&rdquo; The shipping project behind the book's examples was hurt by a culture that resisted iteration and fossilised into legacy, though its shared language still held the system together. And Evant, an inventory-management software company cut to four developers after the dot-com crash, survived because a supple design let those four scale the product for one of the world's largest retailers.</p><p>What makes a project domain-driven, Evans ends, is not using every technique but putting understanding of the domain first: attention to language, dissatisfaction with the model as learning continues, refinement treated as opportunity, design skill taken seriously. Looking Forward compares the messiness of business domains to the complex systems the sciences have learned to take seriously, asks for tools that extend skilled developers rather than replace their thinking, and insists that good software is a matter of learning and thought.</p><p>Now the lab, the kind of reading a team does together. A school's systems are seven contexts on one map; each relationship is written upstream first, with the book's name for its kind:</p><ul><li>enrolment supplies timetable as customer and supplier</li><li>rooms and timetable share a kernel</li><li>timetable reads staff-records through an anticorruption layer</li><li>timetable serves parent-portal as an open host service</li><li>exam-board publishes a published language that enrolment reads</li><li>parent-portal conforms to enrolment</li><li>timetable and cafeteria go separate ways</li></ul><p>On the preset <code>enrolment-changes</code> the enrolment model changes. The lab follows the edges that pass a change on: timetable, as enrolment's customer, and parent-portal, as its conformist, must change; timetable's shared kernel carries the change on to rooms, 3 models in all. Timetable's open host service to parent-portal is a translator timetable updates, 1, and cafeteria, staff-records and exam-board, 3 contexts, are untouched; the lab counts the 3 models as the contexts reached. The table shows what the change does on each of the seven relationships.</p><p>The preset <code>staff-records-changes</code> changes the system the school bought for staff records. The anticorruption layer absorbs it: 1 translator to update, timetable's layer in front of staff-records, 0 models that must change, timetable the 1 context reached, at its layer and nowhere else, and the other 5 untouched. That difference is the result of a decision someone took, to put a translator in front of a model the school does not control, and the six essentials are about who takes such decisions and whether the whole team knows they were taken.</p><h3>Exercise</h3><ul><li>A bike-share's map: payment-provider is upstream of rentals, which reads it through an anticorruption layer; rentals and maintenance share a kernel; city-reporting conforms to rentals.</li><li>The rentals model changes.</li></ul><p>By hand, find the models that must change, the translators to update, and the contexts untouched. Then draw the map of a project you work on with the book's kinds, type it into the lab, change its most central context, and compare the reach with what your team would have guessed.</p><p>That is the end of the read-along. The book's Appendix on the use of patterns and its Glossary are worth keeping beside you; for the patterns this book shares with Fowler's, the Enterprise Application Patterns read-along in this library reads them from the other side, the side of the database and the layers.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Context map</h2></div><p>how far one model change reaches across the map</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Who decides, the six essentials, the book&#x27;s ending, then the map</h2><div class="prose reading"><p>&ldquo;Make the objects into specialists; let the developers be generalists.&rdquo; It is the last of the six essentials in Chapter 17's Who Sets the Strategy?, and close to the last word of the book's argument. This lesson reads that section, the sections after it, and the Conclusion. Read them in your own copy first.</p><p>Architecture, Evans observes, is traditionally handed down: made before development starts, by a team with more organisational power than the application developers. It need not be, and he says it usually does not work well. Strategic design must apply across the project, and without prescribing one organisation he describes two arrangements he has seen work, setting aside the one he calls wisdom from on high.</p><p>The first is emergent structure from application development. A team that keeps its own discipline and communicates very well can follow Evolving Order to shared principles without central authority, as Extreme Programming teams do. Usually one person, or a few, takes some oversight of the structure, and it works best when that person is a developer who writes code and who arbitrates and explains, rather than the only source of ideas. Across several teams an informal committee of their representatives can adopt, modify or shelve a proposal, which works when the teams are few, committed to coordinating, comparable in design skill and similar in their structural needs.</p><p>The second is a customer-focused architecture team: when several teams share a strategy, some centralisation is attractive, and the ivory tower is not the only form it can take. Such a team works as a peer of the application teams, discovering patterns with them, experimenting with them toward distillations, and getting its hands dirty. On an organisation chart it may look like the traditional team; in every activity it differs.</p><p>Then come the six essentials, which Evans says any way of deciding needs. Decisions must reach the entire team, and what matters is the developers' actual relation to the strategy, not the authority management grants it; architects without feedback from applying their own rules are ignored or bypassed. The decision process must absorb feedback, because only the application developers know the project deeply enough; one architecture team he describes rotated its members through the application teams to get it. The plan must allow for evolution, since decisions set in stone leave a team few options when things change.</p><p>Architecture teams must not take all the best and brightest, which leaves applications to the least experienced designers and cuts the architects off from developers with deep domain knowledge; strong designers belong on every application team. Minimalism and humility are essential, because even a slight misfit gets in the way, and Evans admits to having built an overbuilt architecture himself. And objects are specialists while developers are generalists: the narrow responsibilities good objects need are no model for a team, on which architects write application code and developers play with frameworks.</p><p>The same holds, he says, for technical frameworks: evolution, minimalism and involvement with application teams keep a framework helpful, and an architecture that ignores them is stifling or bypassed. He singles out frameworks built on the assumption that application developers cannot design, which underrate how hard application work is; his test is to ask the framework's designers what they expect of its users. The chapter closes with Christopher Alexander's group of building architects, whose account in The Oregon Experiment of why master plans fail, too rigid to adapt and alienating the people who live with them, leads them to principles that every act of piecemeal growth applies, so that an organic order emerges.</p><p>The Conclusion's Epilogues follow five of Evans's projects years later, and they are summarised here only. The circuit-board tool of Chapter 1 outlived its company in a few engineers' hands; the lending system of Chapter 9 kept growing after a spin-off and leads its field. A utility with an Abstract Core was handed to a new team that first kept its design alive and later rebuilt it around deeper insight, and Evans is unsentimental about it: &ldquo;The success of a design is not necessarily marked by its stasis.&rdquo; The shipping project behind the book's examples was hurt by a culture that resisted iteration and fossilised into legacy, though its shared language still held the system together. And Evant, an inventory-management software company cut to four developers after the dot-com crash, survived because a supple design let those four scale the product for one of the world's largest retailers.</p><p>What makes a project domain-driven, Evans ends, is not using every technique but putting understanding of the domain first: attention to language, dissatisfaction with the model as learning continues, refinement treated as opportunity, design skill taken seriously. Looking Forward compares the messiness of business domains to the complex systems the sciences have learned to take seriously, asks for tools that extend skilled developers rather than replace their thinking, and insists that good software is a matter of learning and thought.</p><p>Now the lab, the kind of reading a team does together. A school's systems are seven contexts on one map; each relationship is written upstream first, with the book's name for its kind:</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Context map</h2></div><p>how far one model change reaches across the map</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Context map</strong><span>how far one model change reaches across the map</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="dcxTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dcxTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Kinds: shared-kernel, customer-supplier, conformist, acl (anticorruption layer), ohs (open host service), published-language, separate-ways; two contexts have at most one relationship. A model change crosses a shared kernel in both directions and goes down a conformist or a customer-supplier relationship to the downstream model, and it travels on only from a model that changed. It never travels upstream. An acl stops it at the downstream context's translator, and an ohs or published-language relationship at the upstream's protocol: each is a translator to update, the downstream model unchanged (it changes only if another route reaches it). The ohs and published-language relationships of one upstream share its one protocol, counted once; each acl is its own translator. Separate-ways has no effect. Contexts reached are the other models that change and the contexts whose acl is updated; lists go in the order the contexts are given, translators in the order of the relationships.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>How far one change reaches on a context map</h3>
-          <p>A count over the small model the lesson states. Each relationship is written upstream first with one of the book's kinds; the lab follows the kinds that pass a change on and stops at those that translate it. The map is the lesson's, not the book's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>How far one change reaches on a context map</h3>
+            <p>A count over the small model the lesson states. Each relationship is written upstream first with one of the book's kinds; the lab follows the kinds that pass a change on and stops at those that translate it. The map is the lesson's, not the book's.</p>
         <div class="field">
           <label for="dcxPreset">Worked example</label>
           <select id="dcxPreset"><option value="enrolment-changes" selected>A school's map, with the enrolment model changing</option><option value="staff-records-changes">The same map, with the bought staff-records model changing</option></select>
@@ -1432,12 +1475,15 @@
           <div class="kpi"><span>Contexts untouched</span><strong id="dcxUntouched">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><ul><li>enrolment supplies timetable as customer and supplier</li><li>rooms and timetable share a kernel</li><li>timetable reads staff-records through an anticorruption layer</li><li>timetable serves parent-portal as an open host service</li><li>exam-board publishes a published language that enrolment reads</li><li>parent-portal conforms to enrolment</li><li>timetable and cafeteria go separate ways</li></ul><p>On the preset <code>enrolment-changes</code> the enrolment model changes. The lab follows the edges that pass a change on: timetable, as enrolment's customer, and parent-portal, as its conformist, must change; timetable's shared kernel carries the change on to rooms, 3 models in all. Timetable's open host service to parent-portal is a translator timetable updates, 1, and cafeteria, staff-records and exam-board, 3 contexts, are untouched; the lab counts the 3 models as the contexts reached. The table shows what the change does on each of the seven relationships.</p><p>The preset <code>staff-records-changes</code> changes the system the school bought for staff records. The anticorruption layer absorbs it: 1 translator to update, timetable's layer in front of staff-records, 0 models that must change, timetable the 1 context reached, at its layer and nowhere else, and the other 5 untouched. That difference is the result of a decision someone took, to put a translator in front of a model the school does not control, and the six essentials are about who takes such decisions and whether the whole team knows they were taken.</p><h3>Exercise</h3><ul><li>A bike-share's map: payment-provider is upstream of rentals, which reads it through an anticorruption layer; rentals and maintenance share a kernel; city-reporting conforms to rentals.</li><li>The rentals model changes.</li></ul><p>By hand, find the models that must change, the translators to update, and the contexts untouched. Then draw the map of a project you work on with the book's kinds, type it into the lab, change its most central context, and compare the reach with what your team would have guessed.</p><p>That is the end of the read-along. The book's Appendix on the use of patterns and its Glossary are worth keeping beside you; for the patterns this book shares with Fowler's, the Enterprise Application Patterns read-along in this library reads them from the other side, the side of the database and the layers.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a map as a team</h2></div><p>Four steps, the last of them on your own project.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write every relationship with its kind</h3><p>Name the upstream and downstream context and one of the book's kinds. A relationship nobody can classify is a finding to discuss, not to guess.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Follow one change</h3><p>From the changed context, pass the change along customer-supplier and conformist edges downstream and along shared kernels both ways; stop at anticorruption layers, open host services and published languages, and count the translators there.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Name who decided each stop</h3><p>For each translator that stopped the change, say who chose to build it and whether the teams on both sides know it is there.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own project</h3><p>Draw your project's map, change its most central context in the lab, and write down how many models the lab says must change against how many your team would have guessed.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a map as a team</h2>
+      <p class="lead-in">Four steps, the last of them on your own project.</p>
+      <ol class="key-ideas method"><li><strong>Write every relationship with its kind.</strong> Name the upstream and downstream context and one of the book's kinds. A relationship nobody can classify is a finding to discuss, not to guess.</li><li><strong>Follow one change.</strong> From the changed context, pass the change along customer-supplier and conformist edges downstream and along shared kernels both ways; stop at anticorruption layers, open host services and published languages, and count the translators there.</li><li><strong>Name who decided each stop.</strong> For each translator that stopped the change, say who chose to build it and whether the teams on both sides know it is there.</li><li><strong>Do it on your own project.</strong> Draw your project's map, change its most central context in the lab, and write down how many models the lab says must change against how many your team would have guessed.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1456,17 +1502,16 @@ exam-board is upstream: untouched
 staff-records, cafeteria: untouched</div><p>Three models change and one translator is updated. Parent-portal is reached twice, once as a conformist and once through the open host service, and is counted once.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Concluding that Evans rejects architecture teams</strong><span>He rejects the ivory tower, not the team. A customer-focused architecture team that works as a peer of the application teams, discovers patterns with them and writes code is one of the two arrangements he has seen work, and the six essentials apply to it as much as to an emergent structure.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Moving the strongest designers into strategy so that their decisions are good</strong><span>The fourth essential is the opposite: a strategy team that takes all the best designers leaves application teams unable to follow even a good strategy, and loses touch with developers who know the domain. Evans asks for strong designers on every application team and domain knowledge on any team doing strategic design.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the lab&#x27;s reach as the cost of a change</strong><span>The lab counts which models must change and which translators are updated on the map you give it, by the book's kinds. On the lesson's illustration it treats every edge of a kind alike; a real conformist may be barely affected, and a real translator may be a week's work. Who decides, and whether the team knows, are what the chapter is about.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can follow a change across a context map.</strong><p>Given a map with the book's kinds and one changed context, name the models that must change, the translators to update and the contexts untouched, and say which decision placed each translator.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab follows one change across the map you give it, by the kind of each relationship. It cannot tell you who should decide your strategy, whether the team knows the decisions taken, or whether the map is true; Evans's six essentials are about people, and no map counts them.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Concluding that Evans rejects architecture teams</strong><span>He rejects the ivory tower, not the team. A customer-focused architecture team that works as a peer of the application teams, discovers patterns with them and writes code is one of the two arrangements he has seen work, and the six essentials apply to it as much as to an emergent structure.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Moving the strongest designers into strategy so that their decisions are good</strong><span>The fourth essential is the opposite: a strategy team that takes all the best designers leaves application teams unable to follow even a good strategy, and loses touch with developers who know the domain. Evans asks for strong designers on every application team and domain knowledge on any team doing strategic design.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the lab&#x27;s reach as the cost of a change</strong><span>The lab counts which models must change and which translators are updated on the map you give it, by the book's kinds. On the lesson's illustration it treats every edge of a kind alike; a real conformist may be barely affected, and a real translator may be a week's work. Who decides, and whether the team knows, are what the chapter is about.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can follow a change across a context map.</strong><p>Given a map with the book's kinds and one changed context, name the models that must change, the translators to update and the contexts untouched, and say which decision placed each translator.</p></div></div><div class="note"><strong>Note:</strong> The lab follows one change across the map you give it, by the kind of each relationship. It cannot tell you who should decide your strategy, whether the team knows the decisions taken, or whether the map is true; Evans's six essentials are about people, and no map counts them.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Emergent structure</summary><p>Strategy arrived at by the application developers themselves, following Evolving Order, usually with one hands-on member or an informal committee of teams keeping it unified.</p></details><details class="recall"><summary>Customer-focused architecture team</summary><p>An architecture team that works as a peer of the application teams, discovering patterns with them and writing code, rather than handing down designs.</p></details><details class="recall"><summary>Reach of a change on the map</summary><p>In the lab, the contexts whose models must change when one context's model changes, following the relationships that pass a change on and stopping at the ones that translate it.</p></details></div>
+      <h3>Summary</h3>
       <p>The rest of Chapter 17 asks who should make strategic design decisions, and the Conclusion follows five of Evans's projects years later. Read his two workable arrangements, his six essentials and his warning against the master plan; then read a school's context map the way a team would, by following one change across it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Emergent structure.</strong> Strategy arrived at by the application developers themselves, following Evolving Order, usually with one hands-on member or an informal committee of teams keeping it unified.</li><li><strong>Customer-focused architecture team.</strong> An architecture team that works as a peer of the application teams, discovering patterns with them and writing code, rather than handing down designs.</li><li><strong>Reach of a change on the map.</strong> In the lab, the contexts whose models must change when one context's model changes, following the relationships that pass a change on and stopping at the ones that translate it.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="strategy grows from application work. decisions must reach the whole team. the process must absorb feedback. the plan must allow for evolution. keep strong designers on every team. minimalism, humility, generalists" tabindex="0" role="region" aria-label="Mathematical notation">strategy grows from application work
 decisions must reach the whole team
 the process must absorb feedback
@@ -2244,11 +2289,42 @@ minimalism, humility, generalists</div><figcaption>Who sets the strategy, in six
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2316,7 +2392,7 @@ minimalism, humility, generalists</div><figcaption>Who sets the strategy, in six
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

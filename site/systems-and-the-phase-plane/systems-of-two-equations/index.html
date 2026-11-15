@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Systems and the Phase Plane</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Linear systems</p>
       <h1>Systems of Two Equations</h1>
       <p class="lesson-lede">A pair of equations sends every point of a plane an arrow, and a solution is a curve that follows the arrows.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A system gives every point an arrow</li><li>A solution is a curve that follows the arrows</li><li>Euler steps both unknowns at once</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>From one equation to two, and from a graph to a path</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; A linear system in the plane</span><p>Two equations <span class="math" data-say="x prime equals A times x plus b times y">x′ = a·x + b·y</span> and <span class="math" data-say="y prime equals c times x plus d times y">y′ = c·x + d·y</span>, where <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span>, <span class="math" data-say="c">c</span> and <span class="math" data-say="d">d</span> are numbers. Written with a matrix it is <span class="math" data-say="x prime equals A times x">x′ = A·x</span>, where <span class="math" data-say="x">x</span> is the pair <span class="math" data-say="x, y">(x, y)</span> and <span class="math" data-say="A">A</span> has the rows <span class="math" data-say="A b">a b</span> and <span class="math" data-say="c d">c d</span>.</p><p>A <strong>solution</strong> is a pair of functions <span class="math" data-say="x of t">x(t)</span>, <span class="math" data-say="y of t">y(t)</span> that satisfy both equations. The <strong>phase plane</strong> is the plane with the unknowns <span class="math" data-say="x">x</span> and <span class="math" data-say="y">y</span> as its axes, and the <strong>orbit</strong> of a solution is the curve it traces.</p></div><p>One equation <span class="math" data-say="y prime equals f of t and y">y′ = f(t, y)</span> gave a field of slopes on a plane with time across the bottom. A system has two unknowns and no time on either axis, and the field is a field of arrows instead. The equations here have no <span class="math" data-say="t">t</span> on the right-hand side, so the arrow at a point is the same whenever the solution gets there. That is why the picture can leave time out: two solutions that meet the same point leave it in the same direction.</p><div class="mathblock" data-say="x prime equals x. y prime equals negative y. at 1, 1 the arrow is 1, negative 1. at 2, 1 the arrow is 2, negative 1. at 0, 3 the arrow is 0, negative 3" tabindex="0" role="region" aria-label="Mathematical notation">x′ = x
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>From one equation to two, and from a graph to a path</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; A linear system in the plane</span><p>Two equations <span class="math" data-say="x prime equals A times x plus b times y">x′ = a·x + b·y</span> and <span class="math" data-say="y prime equals c times x plus d times y">y′ = c·x + d·y</span>, where <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span>, <span class="math" data-say="c">c</span> and <span class="math" data-say="d">d</span> are numbers. Written with a matrix it is <span class="math" data-say="x prime equals A times x">x′ = A·x</span>, where <span class="math" data-say="x">x</span> is the pair <span class="math" data-say="x, y">(x, y)</span> and <span class="math" data-say="A">A</span> has the rows <span class="math" data-say="A b">a b</span> and <span class="math" data-say="c d">c d</span>.</p><p>A <strong>solution</strong> is a pair of functions <span class="math" data-say="x of t">x(t)</span>, <span class="math" data-say="y of t">y(t)</span> that satisfy both equations. The <strong>phase plane</strong> is the plane with the unknowns <span class="math" data-say="x">x</span> and <span class="math" data-say="y">y</span> as its axes, and the <strong>orbit</strong> of a solution is the curve it traces.</p></div><p>One equation <span class="math" data-say="y prime equals f of t and y">y′ = f(t, y)</span> gave a field of slopes on a plane with time across the bottom. A system has two unknowns and no time on either axis, and the field is a field of arrows instead. The equations here have no <span class="math" data-say="t">t</span> on the right-hand side, so the arrow at a point is the same whenever the solution gets there. That is why the picture can leave time out: two solutions that meet the same point leave it in the same direction.</p><div class="mathblock" data-say="x prime equals x. y prime equals negative y. at 1, 1 the arrow is 1, negative 1. at 2, 1 the arrow is 2, negative 1. at 0, 3 the arrow is 0, negative 3" tabindex="0" role="region" aria-label="Mathematical notation">x′ = x
 y′ = −y
 at (1, 1) the arrow is (1, −1)
 at (2, 1) the arrow is (2, −1)
@@ -1399,12 +1443,11 @@ at (0, 3) the arrow is (0, −3)</div><h3>A curve in the plane is not a graph ag
   0           1           1
   1          5/4         3/4
   2         25/16        9/16
-  3        125/64       27/64</div><p>The first preset in the lab is this system, and it is set to eight steps rather than three, so the point it prints is the eighth. Drag the step control down to three and the third row above appears in the last-point tile. Notice that the arithmetic was the same one-line rule each time: <span class="math" data-say="x">x</span> is multiplied by <span class="math" data-say="1 plus h">1 + h</span> and <span class="math" data-say="y">y</span> by <span class="math" data-say="1 minus h">1 − h</span>.</p><div class="thm"><span class="label">Theorem &middot; A quantity the true solution keeps</span><p>Every solution of <span class="math" data-say="x prime equals x">x′ = x</span>, <span class="math" data-say="y prime equals negative y">y′ = −y</span> keeps the product <span class="math" data-say="x times y">x·y</span> constant.</p></div><div class="proof"><p>By the product rule <span class="math" data-say="the derivative of x times y equals x prime times y plus x times y prime">(x·y)′ = x′·y + x·y′</span>.</p><p>Substituting the equations gives <span class="math" data-say="x times y minus x times y equals 0">x·y − x·y = 0</span>, so the product never changes. The solution through <span class="math" data-say="1, 1">(1, 1)</span> therefore lies on the curve <span class="math" data-say="x times y equals 1">x·y = 1</span>. The Euler points above do not: <span class="math" data-say="the quantity 125 over 64, times the quantity 27 over 64, equals 3375 over 4096">(125/64)·(27/64) = 3375/4096</span>, which is <span class="math" data-say="the quantity 15 over 16, cubed">(15/16)³</span>. Each step multiplies the product by <span class="math" data-say="the quantity 1 plus h, times the quantity 1 minus h, equals 15 over 16">(1 + h)·(1 − h) = 15/16</span>, so the polygon slips inside the curve.</p><p><span class="qed">&#9633;</span></p></div><p>That is the difference between the method and the solution, shown with two fractions. Each Euler step is computed exactly, and the polygon is still not the curve. Sixteen steps of <span class="math" data-say="h equals 1 over 16">h = 1/16</span> would stay much closer, and the lab lets you try. What it cannot do is make the product exactly one.</p><div class="example"><span class="label">Example &middot; A system that goes round</span><p>Take <span class="math" data-say="x prime equals y">x′ = y</span>, <span class="math" data-say="y prime equals negative x">y′ = −x</span> from <span class="math" data-say="1, 0">(1, 0)</span>. The arrow at <span class="math" data-say="1, 0">(1, 0)</span> is <span class="math" data-say="0, negative 1">(0, −1)</span>, so with <span class="math" data-say="h equals 1 over 4">h = 1/4</span> the first step goes to <span class="math" data-say="1, negative 1 over 4">(1, −1/4)</span>.</p><p>The true solutions here are circles about the origin, and the squared distance from the origin is <span class="math" data-say="1">1</span> at the start. After the step it is <span class="math" data-say="1 plus 1 over 16 equals 17 over 16">1 + 1/16 = 17/16</span>. The lab prints that ratio, and it is the same at every step: Euler's polygon on a rotation spirals outwards by an exact factor of <span class="math" data-say="1 plus h squared">1 + h²</span>, because each step moves along the tangent, and a tangent always leaves the circle. &ldquo;Euler on an Oscillator&rdquo; proved that factor for <span class="math" data-say="x prime equals v">x′ = v</span>, <span class="math" data-say="v prime equals negative x">v′ = −x</span>; this is the same system with <span class="math" data-say="y">y</span> written for <span class="math" data-say="v">v</span>, seen in the phase plane.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The phase plane</h2></div><p>Trace, determinant, eigenvalues and exact Euler steps</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  3        125/64       27/64</div><p>The first preset in the lab is this system, and it is set to eight steps rather than three, so the point it prints is the eighth. Drag the step control down to three and the third row above appears in the last-point tile. Notice that the arithmetic was the same one-line rule each time: <span class="math" data-say="x">x</span> is multiplied by <span class="math" data-say="1 plus h">1 + h</span> and <span class="math" data-say="y">y</span> by <span class="math" data-say="1 minus h">1 − h</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The phase plane</h2></div><p>Trace, determinant, eigenvalues and exact Euler steps</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A linear system in the plane</strong><span>x′ = A·x: the matrix decides the picture</span></div>
         <div class="inline-legend"><span class="tone-muted"><i class="legend-swatch"></i>the field</span><span class="tone-green"><i class="legend-swatch"></i>Euler's steps (exact)</span><span class="tone-cyan"><i class="legend-swatch"></i>drawn by stepping in floating point</span></div>
@@ -1412,10 +1455,10 @@ at (0, 3) the arrow is (0, −3)</div><h3>A curve in the plane is not a graph ag
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="ppPlot" viewBox="0 0 660 420" role="img" aria-label="the phase plane of the linear system"></svg></div>
       <div class="status-banner" id="ppStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Read a system as a field of arrows</h3>
-          <p>Pick a preset and look at the field, then switch the view to the exact Euler steps and compare the polygon with the curve drawn behind it. The tiles are exact. Change the step count to three on the first preset and check the last point against the table above. Then type your own matrix by rows, as 0 1; -2 -3, which means <span data-say="x prime equals y">x′ = y</span> and <span data-say="y prime equals negative 2 x minus 3 y">y′ = −2x − 3y</span>.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Read a system as a field of arrows</h3>
+            <p>Pick a preset and look at the field, then switch the view to the exact Euler steps and compare the polygon with the curve drawn behind it. The tiles are exact. Change the step count to three on the first preset and check the last point against the table above. Then type your own matrix by rows, as 0 1; -2 -3, which means <span data-say="x prime equals y">x′ = y</span> and <span data-say="y prime equals negative 2 x minus 3 y">y′ = −2x − 3y</span>.</p>
         <div class="field">
           <label for="ppPreset">Matrix</label>
           <select id="ppPreset"><option value="saddle" selected>x′ = x, y′ = −y</option><option value="rotate">x′ = y, y′ = −x</option><option value="decay">x′ = −x, y′ = −2y</option></select>
@@ -1454,12 +1497,15 @@ at (0, 3) the arrow is (0, −3)</div><h3>A curve in the plane is not a graph ag
         </div>
         <p class="small-copy" style="margin:0;">Type the matrix by rows: 0 1; -2 -3 means x′ = y, y′ = −2x − 3y.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="thm"><span class="label">Theorem &middot; A quantity the true solution keeps</span><p>Every solution of <span class="math" data-say="x prime equals x">x′ = x</span>, <span class="math" data-say="y prime equals negative y">y′ = −y</span> keeps the product <span class="math" data-say="x times y">x·y</span> constant.</p></div><div class="proof"><p>By the product rule <span class="math" data-say="the derivative of x times y equals x prime times y plus x times y prime">(x·y)′ = x′·y + x·y′</span>.</p><p>Substituting the equations gives <span class="math" data-say="x times y minus x times y equals 0">x·y − x·y = 0</span>, so the product never changes. The solution through <span class="math" data-say="1, 1">(1, 1)</span> therefore lies on the curve <span class="math" data-say="x times y equals 1">x·y = 1</span>. The Euler points above do not: <span class="math" data-say="the quantity 125 over 64, times the quantity 27 over 64, equals 3375 over 4096">(125/64)·(27/64) = 3375/4096</span>, which is <span class="math" data-say="the quantity 15 over 16, cubed">(15/16)³</span>. Each step multiplies the product by <span class="math" data-say="the quantity 1 plus h, times the quantity 1 minus h, equals 15 over 16">(1 + h)·(1 − h) = 15/16</span>, so the polygon slips inside the curve.</p><p><span class="qed">&#9633;</span></p></div><p>That is the difference between the method and the solution, shown with two fractions. Each Euler step is computed exactly, and the polygon is still not the curve. Sixteen steps of <span class="math" data-say="h equals 1 over 16">h = 1/16</span> would stay much closer, and the lab lets you try. What it cannot do is make the product exactly one.</p><div class="example"><span class="label">Example &middot; A system that goes round</span><p>Take <span class="math" data-say="x prime equals y">x′ = y</span>, <span class="math" data-say="y prime equals negative x">y′ = −x</span> from <span class="math" data-say="1, 0">(1, 0)</span>. The arrow at <span class="math" data-say="1, 0">(1, 0)</span> is <span class="math" data-say="0, negative 1">(0, −1)</span>, so with <span class="math" data-say="h equals 1 over 4">h = 1/4</span> the first step goes to <span class="math" data-say="1, negative 1 over 4">(1, −1/4)</span>.</p><p>The true solutions here are circles about the origin, and the squared distance from the origin is <span class="math" data-say="1">1</span> at the start. After the step it is <span class="math" data-say="1 plus 1 over 16 equals 17 over 16">1 + 1/16 = 17/16</span>. The lab prints that ratio, and it is the same at every step: Euler's polygon on a rotation spirals outwards by an exact factor of <span class="math" data-say="1 plus h squared">1 + h²</span>, because each step moves along the tangent, and a tangent always leaves the circle. &ldquo;Euler on an Oscillator&rdquo; proved that factor for <span class="math" data-say="x prime equals v">x′ = v</span>, <span class="math" data-say="v prime equals negative x">v′ = −x</span>; this is the same system with <span class="math" data-say="y">y</span> written for <span class="math" data-say="v">v</span>, seen in the phase plane.</p></div></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Stepping a system and reading what it does</h2></div><p>Read the arrow, take the step on both coordinates, and then ask what the path is doing in the plane.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the system as an arrow</h3><p>At the point <span class="math" data-say="x, y">(x, y)</span> the arrow is <span class="math" data-say="A times x plus b times y, c times x plus d times y">(a·x + b·y, c·x + d·y)</span>. For <span class="math" data-say="x prime equals x">x′ = x</span>, <span class="math" data-say="y prime equals negative y">y′ = −y</span> it is <span class="math" data-say="x, negative y">(x, −y)</span>, so at <span class="math" data-say="2, 1">(2, 1)</span> it is <span class="math" data-say="2, negative 1">(2, −1)</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Multiply the arrow by the step</h3><p>With <span class="math" data-say="h equals 1 over 4">h = 1/4</span> the arrow <span class="math" data-say="2, negative 1">(2, −1)</span> becomes the displacement <span class="math" data-say="1 over 2, negative 1 over 4">(1/2, −1/4)</span>. Both components are scaled by the same <span class="math" data-say="h">h</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add the displacement to the point</h3><p>The new point is <span class="math" data-say="2 plus 1 over 2, 1 minus 1 over 4">(2 + 1/2, 1 − 1/4)</span>, which is <span class="math" data-say="5 over 2, 3 over 4">(5/2, 3/4)</span>. Read the next arrow from this new point and repeat.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Describe the path, not the graph</h3><p>Say where the point is heading in the plane: away from the origin along one axis and toward it along the other, round and round, or in toward the origin. Do not say how <span class="math" data-say="x">x</span> varies with <span class="math" data-say="t">t</span> unless you also say that you have left the phase plane.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Ask what is conserved or lost</h3><p>Where the true solution keeps a quantity (the product <span class="math" data-say="x times y">x·y</span>, or the squared distance on a rotation), compute that quantity at the Euler point and compare. The gap is the method's error, and it is exact.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Stepping a system and reading what it does</h2>
+      <p class="lead-in">Read the arrow, take the step on both coordinates, and then ask what the path is doing in the plane.</p>
+      <ol class="key-ideas method"><li><strong>Write the system as an arrow.</strong> At the point <span class="math" data-say="x, y">(x, y)</span> the arrow is <span class="math" data-say="A times x plus b times y, c times x plus d times y">(a·x + b·y, c·x + d·y)</span>. For <span class="math" data-say="x prime equals x">x′ = x</span>, <span class="math" data-say="y prime equals negative y">y′ = −y</span> it is <span class="math" data-say="x, negative y">(x, −y)</span>, so at <span class="math" data-say="2, 1">(2, 1)</span> it is <span class="math" data-say="2, negative 1">(2, −1)</span>.</li><li><strong>Multiply the arrow by the step.</strong> With <span class="math" data-say="h equals 1 over 4">h = 1/4</span> the arrow <span class="math" data-say="2, negative 1">(2, −1)</span> becomes the displacement <span class="math" data-say="1 over 2, negative 1 over 4">(1/2, −1/4)</span>. Both components are scaled by the same <span class="math" data-say="h">h</span>.</li><li><strong>Add the displacement to the point.</strong> The new point is <span class="math" data-say="2 plus 1 over 2, 1 minus 1 over 4">(2 + 1/2, 1 − 1/4)</span>, which is <span class="math" data-say="5 over 2, 3 over 4">(5/2, 3/4)</span>. Read the next arrow from this new point and repeat.</li><li><strong>Describe the path, not the graph.</strong> Say where the point is heading in the plane: away from the origin along one axis and toward it along the other, round and round, or in toward the origin. Do not say how <span class="math" data-say="x">x</span> varies with <span class="math" data-say="t">t</span> unless you also say that you have left the phase plane.</li><li><strong>Ask what is conserved or lost.</strong> Where the true solution keeps a quantity (the product <span class="math" data-say="x times y">x·y</span>, or the squared distance on a rotation), compute that quantity at the Euler point and compare. The gap is the method's error, and it is exact.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1479,17 +1525,16 @@ trace = 1 + (−1) = 0     determinant = −1
 the curve leaves along the x-axis: a saddle</div><p>The path heads away from the origin along the <span class="math" data-say="x">x</span>-axis while its <span class="math" data-say="y">y</span> dies away, and no start on the <span class="math" data-say="y">y</span>-axis ever leaves it. That mixture of going in along one direction and out along another is what a saddle is, and the trace and determinant tiles, <span class="math" data-say="0">0</span> and <span class="math" data-say="negative 1">−1</span>, are the first look at the two numbers the rest of this course sorts by.</p><p>The product of the steps' coordinates is <span class="math" data-say="3375 over 4096">3375/4096</span>, not <span class="math" data-say="1">1</span>, so this polygon is inside the true curve <span class="math" data-say="x times y equals 1">x·y = 1</span>. That is not a slip in the arithmetic. It is what one step size does to a curve that bends.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the phase plane as x plotted against time</strong><span>A reader who takes the horizontal axis for time sees the path from <span class="math" data-say="1, 1">(1, 1)</span> to <span class="math" data-say="5 over 4, 3 over 4">(5/4, 3/4)</span> as <span class="math" data-say="x">x</span> rising and <span class="math" data-say="y">y</span> being a second graph. The axes are <span class="math" data-say="x">x</span> and <span class="math" data-say="y">y</span>: the point moved right and down in space. Two different solutions can cross the same vertical line at different moments, and the plane does not show when. The refutation is the table above, where every row has a step number beside it and none of them is an axis.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Multiplying h by the coefficient but not by the coordinate</strong><span>The step is <span class="math" data-say="h">h</span> times the arrow, and the arrow is <span class="math" data-say="A times x plus b times y, c times x plus d times y">(a·x + b·y, c·x + d·y)</span>, not the coefficients alone. From <span class="math" data-say="2, 1">(2, 1)</span> with <span class="math" data-say="x prime equals x">x′ = x</span>, the displacement is <span class="math" data-say="the quantity 1 over 4, times 2 equals 1 over 2">(1/4)·2 = 1/2</span>, not <span class="math" data-say="1 over 4">1/4</span>. Using the coefficient alone moves <span class="math" data-say="x">x</span> from <span class="math" data-say="2">2</span> to <span class="math" data-say="9 over 4">9/4</span>, the same displacement wherever the point is, and the orbit would never speed up as it moves away.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating Euler&#x27;s polygon as the solution</strong><span>The points <span class="math" data-say="5 over 4, 3 over 4">(5/4, 3/4)</span>, <span class="math" data-say="25 over 16, 9 over 16">(25/16, 9/16)</span> and <span class="math" data-say="125 over 64, 27 over 64">(125/64, 27/64)</span> are exact, and they are not on the curve <span class="math" data-say="x times y equals 1">x·y = 1</span>: their product is <span class="math" data-say="15 over 16">15/16</span> after one step and <span class="math" data-say="3375 over 4096">3375/4096</span> after three. The solution keeps the product at <span class="math" data-say="1">1</span> for every <span class="math" data-say="t">t</span>. The polygon is a recipe that is near the curve for reasons the error lessons measure.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can take a system <span data-say="x prime equals A times x plus b times y, y prime equals c times x plus d times y">x′ = a·x + b·y, y′ = c·x + d·y</span> and a start, and describe where it goes.</strong><p>You should be able to name the arrow at a point, take an Euler step on both unknowns as exact fractions, say that the orbit is a curve in the plane with no time axis, and say what quantity the true solution keeps that the polygon does not.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A system can be solved once the directions in which it moves in a straight line are known. Finding them is a question about the matrix alone, and the next lesson, &ldquo;Straight-Line Solutions and Eigenvectors&rdquo;, answers it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the phase plane as x plotted against time</strong><span>A reader who takes the horizontal axis for time sees the path from <span class="math" data-say="1, 1">(1, 1)</span> to <span class="math" data-say="5 over 4, 3 over 4">(5/4, 3/4)</span> as <span class="math" data-say="x">x</span> rising and <span class="math" data-say="y">y</span> being a second graph. The axes are <span class="math" data-say="x">x</span> and <span class="math" data-say="y">y</span>: the point moved right and down in space. Two different solutions can cross the same vertical line at different moments, and the plane does not show when. The refutation is the table above, where every row has a step number beside it and none of them is an axis.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Multiplying h by the coefficient but not by the coordinate</strong><span>The step is <span class="math" data-say="h">h</span> times the arrow, and the arrow is <span class="math" data-say="A times x plus b times y, c times x plus d times y">(a·x + b·y, c·x + d·y)</span>, not the coefficients alone. From <span class="math" data-say="2, 1">(2, 1)</span> with <span class="math" data-say="x prime equals x">x′ = x</span>, the displacement is <span class="math" data-say="the quantity 1 over 4, times 2 equals 1 over 2">(1/4)·2 = 1/2</span>, not <span class="math" data-say="1 over 4">1/4</span>. Using the coefficient alone moves <span class="math" data-say="x">x</span> from <span class="math" data-say="2">2</span> to <span class="math" data-say="9 over 4">9/4</span>, the same displacement wherever the point is, and the orbit would never speed up as it moves away.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating Euler&#x27;s polygon as the solution</strong><span>The points <span class="math" data-say="5 over 4, 3 over 4">(5/4, 3/4)</span>, <span class="math" data-say="25 over 16, 9 over 16">(25/16, 9/16)</span> and <span class="math" data-say="125 over 64, 27 over 64">(125/64, 27/64)</span> are exact, and they are not on the curve <span class="math" data-say="x times y equals 1">x·y = 1</span>: their product is <span class="math" data-say="15 over 16">15/16</span> after one step and <span class="math" data-say="3375 over 4096">3375/4096</span> after three. The solution keeps the product at <span class="math" data-say="1">1</span> for every <span class="math" data-say="t">t</span>. The polygon is a recipe that is near the curve for reasons the error lessons measure.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can take a system <span data-say="x prime equals A times x plus b times y, y prime equals c times x plus d times y">x′ = a·x + b·y, y′ = c·x + d·y</span> and a start, and describe where it goes.</strong><p>You should be able to name the arrow at a point, take an Euler step on both unknowns as exact fractions, say that the orbit is a curve in the plane with no time axis, and say what quantity the true solution keeps that the polygon does not.</p></div></div><div class="note"><strong>Note:</strong> A system can be solved once the directions in which it moves in a straight line are known. Finding them is a question about the matrix alone, and the next lesson, &ldquo;Straight-Line Solutions and Eigenvectors&rdquo;, answers it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A system gives every point an arrow</summary><p>The right-hand sides <span class="math" data-say="A times x plus b times y">a·x + b·y</span> and <span class="math" data-say="c times x plus d times y">c·x + d·y</span> are functions of the point <span class="math" data-say="x, y">(x, y)</span>, and nothing else. At <span class="math" data-say="1, 1">(1, 1)</span> the system <span class="math" data-say="x prime equals x">x′ = x</span>, <span class="math" data-say="y prime equals negative y">y′ = −y</span> names the arrow <span class="math" data-say="1, negative 1">(1, −1)</span>: <span class="math" data-say="x">x</span> is growing at rate <span class="math" data-say="1">1</span> and <span class="math" data-say="y">y</span> is shrinking at rate <span class="math" data-say="1">1</span>. The collection of all those arrows is a vector field, and the system is a rule for drawing it.</p></details><details class="recall"><summary>A solution is a curve that follows the arrows</summary><p>A pair of functions <span class="math" data-say="x of t">x(t)</span> and <span class="math" data-say="y of t">y(t)</span> solves the system when, at every <span class="math" data-say="t">t</span>, the velocity <span class="math" data-say="x prime, y prime">(x′, y′)</span> is the arrow at the point <span class="math" data-say="x of t, y of t">(x(t), y(t))</span>. Plot the points <span class="math" data-say="x of t, y of t">(x(t), y(t))</span> as <span class="math" data-say="t">t</span> runs and you get a curve in the plane that is tangent to the field everywhere it goes. That plane, with the unknowns for axes, is the phase plane.</p></details><details class="recall"><summary>Euler steps both unknowns at once</summary><p>From the point <span class="math" data-say="x, y">(x, y)</span> with step <span class="math" data-say="h">h</span> the next point is <span class="math" data-say="x plus h times x prime, y plus h times y prime">(x + h·x′, y + h·y′)</span>, each rate read from the arrow at the old point. Both coordinates move before either rate is read again. With rational coefficients every step is a pair of fractions, and the lab prints them exactly.</p></details></div>
+      <h3>Summary</h3>
       <p>Two quantities that change together are described by a system such as <span class="math" data-say="x prime equals A times x plus b times y">x′ = a·x + b·y</span>, <span class="math" data-say="y prime equals c times x plus d times y">y′ = c·x + d·y</span>. At each point <span class="math" data-say="x, y">(x, y)</span> it names a direction and a speed, and Euler's method steps both quantities at once. A solution is a curve <span class="math" data-say="x of t, y of t">(x(t), y(t))</span> in the phase plane, and the plane has no axis for time: time is how far along the curve you have gone.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A system gives every point an arrow.</strong> The right-hand sides <span class="math" data-say="A times x plus b times y">a·x + b·y</span> and <span class="math" data-say="c times x plus d times y">c·x + d·y</span> are functions of the point <span class="math" data-say="x, y">(x, y)</span>, and nothing else. At <span class="math" data-say="1, 1">(1, 1)</span> the system <span class="math" data-say="x prime equals x">x′ = x</span>, <span class="math" data-say="y prime equals negative y">y′ = −y</span> names the arrow <span class="math" data-say="1, negative 1">(1, −1)</span>: <span class="math" data-say="x">x</span> is growing at rate <span class="math" data-say="1">1</span> and <span class="math" data-say="y">y</span> is shrinking at rate <span class="math" data-say="1">1</span>. The collection of all those arrows is a vector field, and the system is a rule for drawing it.</li><li><strong>A solution is a curve that follows the arrows.</strong> A pair of functions <span class="math" data-say="x of t">x(t)</span> and <span class="math" data-say="y of t">y(t)</span> solves the system when, at every <span class="math" data-say="t">t</span>, the velocity <span class="math" data-say="x prime, y prime">(x′, y′)</span> is the arrow at the point <span class="math" data-say="x of t, y of t">(x(t), y(t))</span>. Plot the points <span class="math" data-say="x of t, y of t">(x(t), y(t))</span> as <span class="math" data-say="t">t</span> runs and you get a curve in the plane that is tangent to the field everywhere it goes. That plane, with the unknowns for axes, is the phase plane.</li><li><strong>Euler steps both unknowns at once.</strong> From the point <span class="math" data-say="x, y">(x, y)</span> with step <span class="math" data-say="h">h</span> the next point is <span class="math" data-say="x plus h times x prime, y plus h times y prime">(x + h·x′, y + h·y′)</span>, each rate read from the arrow at the old point. Both coordinates move before either rate is read again. With rational coefficients every step is a pair of fractions, and the lab prints them exactly.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="x prime equals A times x plus b times y, y prime equals c times x plus d times y. the arrow at x, y is A times x plus b times y, c times x plus d times y. a solution is a curve x of t, y of t. the phase plane has no t axis. Euler, new point equals point plus h times arrow" tabindex="0" role="region" aria-label="Mathematical notation">x′ = a·x + b·y,   y′ = c·x + d·y
 the arrow at (x, y) is (a·x + b·y, c·x + d·y)
 a solution is a curve (x(t), y(t))
@@ -3084,11 +3129,42 @@ Euler: new point = point + h·arrow</div><figcaption>A system is an arrow at eve
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3156,7 +3232,7 @@ Euler: new point = point + h·arrow</div><figcaption>A system is an arrow at eve
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

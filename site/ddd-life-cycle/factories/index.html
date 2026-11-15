@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,60 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Life Cycle of a Domain Object</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 6 · The Life Cycle of a Domain Object</p>
       <h1>Factories</h1>
       <p class="lesson-lede">Creation moved out of both the object and its client into something whose one job is to build a whole, consistent aggregate or refuse.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Factory</li><li>Atomic creation</li><li>Reconstitution</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern&#x27;s argument, then the rule counted</h2>
-      <article class="prose reading"><p>&ldquo;Complex object creation is a responsibility of the domain layer, yet that task does not belong to the objects that express the model.&rdquo; That sentence, from the Factories pattern in Chapter 6, holds the whole problem: creation has to live somewhere, and the two obvious homes are both wrong.</p><p>The first wrong home is the object itself. Evans's picture is a car engine: nobody designs a block that grabs its own pistons, and the mechanic or robot that assembles it is not with you when you drive. Assembling a compound object is a different job from the one it does once built, and combining the two makes an awkward class. The second wrong home is the client. A client that assembles must know the product's internal structure and some of its rules, and even a constructor call ties it to concrete classes, so the product cannot be refactored without changing the client. If the client is in the application layer, domain knowledge has leaked out of the domain layer altogether.</p><p>So he adds an element that is not an entity, value or service, and says plainly that this departs from the previous chapter: it corresponds to nothing in the model, yet it is the domain layer's work. Stated as the reader would apply it, the pattern says: when building an object or a whole aggregate is complicated, or would expose its insides, make building it the job of a separate element; let clients ask that element for what they want in their own terms, never naming the classes it puts together; and have it hand back each aggregate complete, its rules already checked.</p><p>Two requirements follow. Each creation method is atomic and produces only a consistent product: for an entity, the whole aggregate with its invariants met, perhaps with optional parts still to add; for an immutable value, every attribute in its final state; and a request that cannot be met raises an exception or otherwise cannot return something improper. And the factory returns the abstract type wanted rather than the concrete class built. For Factory Method, Abstract Factory and Builder, the detailed patterns of construction, Evans points to Gamma and colleagues' Design Patterns.</p><p>Where to put one follows from what it hides. A factory method on an aggregate's root adds elements inside it while the root keeps the aggregate whole. A factory method on an object closely involved in spawning another, though it will not own the product, keeps that object's data and rules where they are; the book's case is a brokerage account that creates trade orders. With no natural host, a standalone factory or service builds the whole aggregate and returns its root. And sometimes a constructor is all you need: when the class is the type, with no interesting hierarchy, the client cares which implementation it gets, every attribute is available, and construction is simple. Even then the constructor must be atomic and leave the object valid.</p><p>On the interface, Evans asks for one call that carries everything a complete product needs, a decision about what happens on failure (an exception or a null, chosen once as a team standard), and parameters chosen with care, since a factory is coupled to its arguments, more tightly the more it picks them apart. On invariants, the factory may delegate checking to the product, which is often best, but a rule that can only matter at creation, such as one on an entity's identity, can sit in the factory and keep the product simpler. Entity factories take the essentials and let details come later; value factories need the full description, because the product is immutable.</p><p>The seed bank's factory below creates a new accession, a stored lot of seed, with its germination test inside the aggregate. It issues the accession number itself and refuses a lot that would make a poor store: fewer than 400 seeds, germination under 70 percent, moisture over 8 percent, or an unknown origin. The lab states the same four rules as one specification, <span class="math" data-say="seeds is at least 400 and germination is at least 70 and moisture is at most 8 and origin is set to known">seeds &gt;= 400 and germination &gt;= 70 and moisture &lt;= 8 and origin = known</span>, and checks a request against it clause by clause, in the order written, as the factory's tests run.</p><pre class="codeblock" data-say="line 1, public class accession factory. line 2, private final accession numbers numbers, comment, issues new numbers. line 4, public accession new accession of seed sample sample, germination test test. line 5, if sample dot seeds is less than 400. line 6, throw new accession refused of fewer than 400 seeds. line 8, if test dot percent is less than 70. line 9, throw new accession refused of germination under 70 percent. line 11, if sample dot moisture percent is greater than 8. line 12, throw new accession refused of too damp to store. line 14, if not sample dot origin known. line 15, throw new accession refused of origin not recorded. line 17, return new accession of numbers dot next, sample, test" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">public class AccessionFactory {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern&#x27;s argument, then the rule counted</h2><div class="prose reading"><p>&ldquo;Complex object creation is a responsibility of the domain layer, yet that task does not belong to the objects that express the model.&rdquo; That sentence, from the Factories pattern in Chapter 6, holds the whole problem: creation has to live somewhere, and the two obvious homes are both wrong.</p><p>The first wrong home is the object itself. Evans's picture is a car engine: nobody designs a block that grabs its own pistons, and the mechanic or robot that assembles it is not with you when you drive. Assembling a compound object is a different job from the one it does once built, and combining the two makes an awkward class. The second wrong home is the client. A client that assembles must know the product's internal structure and some of its rules, and even a constructor call ties it to concrete classes, so the product cannot be refactored without changing the client. If the client is in the application layer, domain knowledge has leaked out of the domain layer altogether.</p><p>So he adds an element that is not an entity, value or service, and says plainly that this departs from the previous chapter: it corresponds to nothing in the model, yet it is the domain layer's work. Stated as the reader would apply it, the pattern says: when building an object or a whole aggregate is complicated, or would expose its insides, make building it the job of a separate element; let clients ask that element for what they want in their own terms, never naming the classes it puts together; and have it hand back each aggregate complete, its rules already checked.</p><p>Two requirements follow. Each creation method is atomic and produces only a consistent product: for an entity, the whole aggregate with its invariants met, perhaps with optional parts still to add; for an immutable value, every attribute in its final state; and a request that cannot be met raises an exception or otherwise cannot return something improper. And the factory returns the abstract type wanted rather than the concrete class built. For Factory Method, Abstract Factory and Builder, the detailed patterns of construction, Evans points to Gamma and colleagues' Design Patterns.</p><p>Where to put one follows from what it hides. A factory method on an aggregate's root adds elements inside it while the root keeps the aggregate whole. A factory method on an object closely involved in spawning another, though it will not own the product, keeps that object's data and rules where they are; the book's case is a brokerage account that creates trade orders. With no natural host, a standalone factory or service builds the whole aggregate and returns its root. And sometimes a constructor is all you need: when the class is the type, with no interesting hierarchy, the client cares which implementation it gets, every attribute is available, and construction is simple. Even then the constructor must be atomic and leave the object valid.</p><p>On the interface, Evans asks for one call that carries everything a complete product needs, a decision about what happens on failure (an exception or a null, chosen once as a team standard), and parameters chosen with care, since a factory is coupled to its arguments, more tightly the more it picks them apart. On invariants, the factory may delegate checking to the product, which is often best, but a rule that can only matter at creation, such as one on an entity's identity, can sit in the factory and keep the product simpler. Entity factories take the essentials and let details come later; value factories need the full description, because the product is immutable.</p><p>The seed bank's factory below creates a new accession, a stored lot of seed, with its germination test inside the aggregate. It issues the accession number itself and refuses a lot that would make a poor store: fewer than 400 seeds, germination under 70 percent, moisture over 8 percent, or an unknown origin. The lab states the same four rules as one specification, <span class="math" data-say="seeds is at least 400 and germination is at least 70 and moisture is at most 8 and origin is set to known">seeds &gt;= 400 and germination &gt;= 70 and moisture &lt;= 8 and origin = known</span>, and checks a request against it clause by clause, in the order written, as the factory's tests run.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Specifications</h2></div><p>one candidate against one rule</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Specifications</strong><span>one candidate against one rule</span></div>
+      </div>
+      <div class="status-banner" id="dspStatus" style="margin-top:12px;" aria-live="polite"></div>
+      <div class="table-wrap" id="dspTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dspTable"></table></div>
+      <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A specification is clauses attribute op value, with op one of = != &lt; &lt;= &gt; &gt;=, joined by and, or, not and parentheses (not binds tightest, then and, then or); a value is a number or a word beginning with a letter. Numbers compare exactly; a word compares only by = and != (an ordering op on a word is refused), and words compare exactly, letter case counted. A clause on an attribute the candidate lacks is false whatever its op, so not of it is true; an ordering clause on a word value is false. Clauses are numbered in the order written; the first false clause is the first in that order, whether or not the whole is satisfied.</p>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What the accession factory admits, and which rule refuses</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
+        <div class="field">
+          <label for="dspPreset">Worked example</label>
+          <select id="dspPreset"><option value="sound-lot" selected>A sound lot: 1,200 seeds, 88 percent, dry, known origin</option><option value="damp-lot">A damp lot: 11 percent moisture</option><option value="small-lot">A small lot of unknown origin</option></select>
+        </div>
+        <div class="field">
+          <label for="dspInCandidates">Candidates (name, then attribute=value cells)</label>
+          <textarea id="dspInCandidates" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:0.85rem;line-height:1.5;">sound-lot, seeds=1200, germination=88, moisture=6, origin=known; damp-lot, seeds=900, germination=81, moisture=11, origin=known; small-lot, seeds=150, germination=92, moisture=7, origin=unknown</textarea>
+        </div>
+        <div class="field">
+          <label for="dspInCandidate">The candidate to validate</label>
+          <input id="dspInCandidate" type="text" value="sound-lot" inputmode="text" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field">
+          <label for="dspInSpec">The specification</label>
+          <textarea id="dspInSpec" rows="2" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Satisfied</span><strong id="dspSatisfied">&mdash;</strong></div>
+          <div class="kpi"><span>Clauses true</span><strong id="dspTrue">&mdash;</strong></div>
+          <div class="kpi"><span>The first false clause, in the order written</span><strong id="dspFirstFalse">&mdash;</strong></div>
+          <div class="kpi"><span>Every false clause</span><strong id="dspFalse">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, public class accession factory. line 2, private final accession numbers numbers, comment, issues new numbers. line 4, public accession new accession of seed sample sample, germination test test. line 5, if sample dot seeds is less than 400. line 6, throw new accession refused of fewer than 400 seeds. line 8, if test dot percent is less than 70. line 9, throw new accession refused of germination under 70 percent. line 11, if sample dot moisture percent is greater than 8. line 12, throw new accession refused of too damp to store. line 14, if not sample dot origin known. line 15, throw new accession refused of origin not recorded. line 17, return new accession of numbers dot next, sample, test" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">public class AccessionFactory {</span>
 <span class="cl">    private final AccessionNumbers numbers;   // issues new numbers</span>
 <span class="cl"></span>
 <span class="cl">    public Accession newAccession(SeedSample sample, GerminationTest test) {</span>
@@ -1471,52 +1557,12 @@
 <span class="cl">        lot.flagForRegeneration();   // stored before the rule: repair it</span>
 <span class="cl">    }</span>
 <span class="cl">    return lot;</span>
-<span class="cl">}</span></code></pre><h3>Exercise</h3><p>A request arrives with seeds=450, germination=69, moisture=9 and origin=known. By the specification above, checked clause by clause in the order written, say how many clauses are false, which one the factory reports first, and what the reconstitution method would do with a stored lot of the same figures. To check the first two, add the request to the lab's candidates as a record named <span class="math" data-say="request">request</span>, with the four attributes as cells, and set the candidate to <span class="math" data-say="request">request</span>.</p><p>A factory begins an object's life. The next lesson, Repositories and Relational Databases, reads the pattern for its middle and end: finding an object that already exists.</p></article>
+<span class="cl">}</span></code></pre><h3>Exercise</h3><p>A request arrives with seeds=450, germination=69, moisture=9 and origin=known. By the specification above, checked clause by clause in the order written, say how many clauses are false, which one the factory reports first, and what the reconstitution method would do with a stored lot of the same figures. To check the first two, add the request to the lab's candidates as a record named <span class="math" data-say="request">request</span>, with the four attributes as cells, and set the candidate to <span class="math" data-say="request">request</span>.</p><p>A factory begins an object's life. The next lesson, Repositories and Relational Databases, reads the pattern for its middle and end: finding an object that already exists.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Specifications</h2></div><p>one candidate against one rule</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Specifications</strong><span>one candidate against one rule</span></div>
-      </div>
-      <div class="status-banner" id="dspStatus" style="margin-top:12px;" aria-live="polite"></div>
-      <div class="table-wrap" id="dspTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dspTable"></table></div>
-      <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A specification is clauses attribute op value, with op one of = != &lt; &lt;= &gt; &gt;=, joined by and, or, not and parentheses (not binds tightest, then and, then or); a value is a number or a word beginning with a letter. Numbers compare exactly; a word compares only by = and != (an ordering op on a word is refused), and words compare exactly, letter case counted. A clause on an attribute the candidate lacks is false whatever its op, so not of it is true; an ordering clause on a word value is false. Clauses are numbered in the order written; the first false clause is the first in that order, whether or not the whole is satisfied.</p>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What the accession factory admits, and which rule refuses</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
-        <div class="field">
-          <label for="dspPreset">Worked example</label>
-          <select id="dspPreset"><option value="sound-lot" selected>A sound lot: 1,200 seeds, 88 percent, dry, known origin</option><option value="damp-lot">A damp lot: 11 percent moisture</option><option value="small-lot">A small lot of unknown origin</option></select>
-        </div>
-        <div class="field">
-          <label for="dspInCandidates">Candidates (name, then attribute=value cells)</label>
-          <textarea id="dspInCandidates" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:0.85rem;line-height:1.5;">sound-lot, seeds=1200, germination=88, moisture=6, origin=known; damp-lot, seeds=900, germination=81, moisture=11, origin=known; small-lot, seeds=150, germination=92, moisture=7, origin=unknown</textarea>
-        </div>
-        <div class="field">
-          <label for="dspInCandidate">The candidate to validate</label>
-          <input id="dspInCandidate" type="text" value="sound-lot" inputmode="text" autocomplete="off" spellcheck="false">
-        </div>
-        <div class="field">
-          <label for="dspInSpec">The specification</label>
-          <textarea id="dspInSpec" rows="2" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Satisfied</span><strong id="dspSatisfied">&mdash;</strong></div>
-          <div class="kpi"><span>Clauses true</span><strong id="dspTrue">&mdash;</strong></div>
-          <div class="kpi"><span>The first false clause, in the order written</span><strong id="dspFirstFalse">&mdash;</strong></div>
-          <div class="kpi"><span>Every false clause</span><strong id="dspFalse">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Designing a factory&#x27;s refusal</h2></div><p>Four steps, the last of them on an object of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the invariants</h3><p>Write every rule a new product must satisfy, including those on the inner objects of its aggregate, as clauses you could test one by one.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Put them in the order a caller needs</h3><p>Order the checks so the first refusal is the most useful message, and decide once whether a refusal throws or returns nothing.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Separate creation from rebuilding</h3><p>For the same product, say which rules a reconstitution method must repair or flag rather than refuse, and which identifying attributes it takes as arguments.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own object</h3><p>Find an object in a system you know whose callers assemble it by setting fields after construction. Write the one factory call that would build it whole, with the clauses it would check, and count how many callers it would replace.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Designing a factory&#x27;s refusal</h2>
+      <p class="lead-in">Four steps, the last of them on an object of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the invariants.</strong> Write every rule a new product must satisfy, including those on the inner objects of its aggregate, as clauses you could test one by one.</li><li><strong>Put them in the order a caller needs.</strong> Order the checks so the first refusal is the most useful message, and decide once whether a refusal throws or returns nothing.</li><li><strong>Separate creation from rebuilding.</strong> For the same product, say which rules a reconstitution method must repair or flag rather than refuse, and which identifying attributes it takes as arguments.</li><li><strong>Do it on your own object.</strong> Find an object in a system you know whose callers assemble it by setting fields after construction. Write the one factory call that would build it whole, with the clauses it would check, and count how many callers it would replace.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1536,17 +1582,16 @@ first false: seeds &gt;= 400
 refused: fewer than 400 seeds</div><p>The factory stops at its first failed test, so its caller hears only about the seed count. The lab lists every false clause, which is what a caller fixing the request needs; whether the factory should report all of them is a choice about its interface.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a factory must stand for something in the domain</strong><span>Evans says the opposite in so many words: factories are design elements that correspond to nothing in the model, and they are still the domain layer's responsibility. Opening an account may be a milestone the experts talk about, but usually creation is a need of the implementation, and the factory keeps it out of the objects that do express the model.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing a factory may hand back a half-built object to be finished later</strong><span>Each creation is atomic: the product comes out consistent or not at all. An entity factory may leave optional parts for later, but only those no invariant requires. On the lesson's illustration the accession factory refuses the damp lot outright rather than returning it to be dried.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a reconstituted object to pass the creation rules</strong><span>A stored object already exists, so a rule broken since it was stored has to be repaired, not refused. The lesson's reconstitution method flags a lot below the new minimum instead of throwing, which a factory for new lots must not do.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a factory admits and why it refuses.</strong><p>Given a factory's invariants as a specification and a request, state each clause's truth, the first that fails, and how a reconstituting factory would treat the same figures.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab checks a request against the rules you write; it cannot say whether those are the right rules, or whether the factory belongs on a root, on a spawning object or on its own. It treats the specification as a list of clauses in order, which is how this factory's tests run, and says nothing about reconstitution, which needs a repair the model has to decide.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a factory must stand for something in the domain</strong><span>Evans says the opposite in so many words: factories are design elements that correspond to nothing in the model, and they are still the domain layer's responsibility. Opening an account may be a milestone the experts talk about, but usually creation is a need of the implementation, and the factory keeps it out of the objects that do express the model.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing a factory may hand back a half-built object to be finished later</strong><span>Each creation is atomic: the product comes out consistent or not at all. An entity factory may leave optional parts for later, but only those no invariant requires. On the lesson's illustration the accession factory refuses the damp lot outright rather than returning it to be dried.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a reconstituted object to pass the creation rules</strong><span>A stored object already exists, so a rule broken since it was stored has to be repaired, not refused. The lesson's reconstitution method flags a lot below the new minimum instead of throwing, which a factory for new lots must not do.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a factory admits and why it refuses.</strong><p>Given a factory's invariants as a specification and a request, state each clause's truth, the first that fails, and how a reconstituting factory would treat the same figures.</p></div></div><div class="note"><strong>Note:</strong> The lab checks a request against the rules you write; it cannot say whether those are the right rules, or whether the factory belongs on a root, on a spawning object or on its own. It treats the specification as a list of clauses in order, which is how this factory's tests run, and says nothing about reconstitution, which needs a repair the model has to decide.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Factory</summary><p>An element of the design whose one job is building other objects. It need not stand for anything in the domain, but it belongs to the domain layer, and it hides how a complex object or aggregate is put together.</p></details><details class="recall"><summary>Atomic creation</summary><p>Creation in one step that hands back a complete product with every invariant satisfied, or hands back nothing. A factory that cannot build a valid product throws or otherwise makes an improper result impossible.</p></details><details class="recall"><summary>Reconstitution</summary><p>Evans's word for rebuilding a stored or transmitted object as a live one. It is the middle of the object's life, not a new birth, so the object keeps its old identity.</p></details></div>
+      <h3>Summary</h3>
       <p>The second pattern of Chapter 6 deals with the start of an object's life. Read why Evans keeps complex creation out of both the product and the client, his two requirements for a good factory, where to put one, and how rebuilding a stored object differs; then send requests to a seed bank's factory and see which it admits and which rule refuses the rest.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Factory.</strong> An element of the design whose one job is building other objects. It need not stand for anything in the domain, but it belongs to the domain layer, and it hides how a complex object or aggregate is put together.</li><li><strong>Atomic creation.</strong> Creation in one step that hands back a complete product with every invariant satisfied, or hands back nothing. A factory that cannot build a valid product throws or otherwise makes an improper result impossible.</li><li><strong>Reconstitution.</strong> Evans's word for rebuilding a stored or transmitted object as a live one. It is the middle of the object's life, not a new birth, so the object keeps its old identity.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="assembly is a job of its own. the client should not know the parts. each creation is atomic. a factory refuses what is invalid. return the abstract type. rebuilding keeps the old identity" tabindex="0" role="region" aria-label="Mathematical notation">assembly is a job of its own
 the client should not know the parts
 each creation is atomic
@@ -2460,11 +2505,42 @@ rebuilding keeps the old identity</div><figcaption>Factories in six lines</figca
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2532,7 +2608,7 @@ rebuilding keeps the old identity</div><figcaption>Factories in six lines</figca
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Storage Engines and Indexes</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Durability and layout</p>
       <h1>Row vs Column Storage</h1>
       <p class="lesson-lede">Compute the bytes a scan reads in each layout and the time each takes, then find the query on which the ordering reverses.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A scan reads what the layout makes contiguous</li><li>The compression ratio belongs to the layout</li><li>The crossover is a column count, and there is a query past every crossover</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Bytes scanned, and the query where the answer reverses</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Row store, column store, bytes scanned</span><p>A <strong>row store</strong> keeps the values of one row contiguously; a <strong>column store</strong> keeps the values of one column contiguously. <strong>Bytes scanned</strong> is the volume a query must read from storage.</p><p>For <span class="math" data-say="r">r</span> rows of total width <span class="math" data-say="w">w</span> across <span class="math" data-say="c">c</span> columns, with <span class="math" data-say="j">j</span> columns named and compression ratios <span class="math" data-say="rho sub row">ρ_row</span> and <span class="math" data-say="rho sub col">ρ_col</span>, the row store scans <span class="math" data-say="r times w over rho sub row">r·w/ρ_row</span> and the column store scans <span class="math" data-say="r times the quantity w over c, times j over rho sub col">r·(w/c)·j/ρ_col</span>.</p></div><p>The row store's formula contains no <span class="math" data-say="j">j</span>. That is the entire asymmetry: naming fewer columns cannot make a row store read less, because the unit it stores and the unit the device delivers are both the row. A query naming one column of twenty scans exactly as many bytes as a query naming all twenty.</p><div class="mathblock" data-say="10 to the power 9 rows, 200 B a row, 20 columns, so 10 B a column, 3 named. row store compresses 2 times, column store compresses 5 times, scan 1 gigabytes per second. row store, 10 to the power 9 times 200 B divided by 2, equals 100.00 gigabytes, divided by 1 gigabytes per second, equals 100.00 seconds. column store, 10 to the power 9 times the quantity 3 times 10 B, divided by 5, equals, 6.00 gigabytes, divided by 1 gigabytes per second, equals, 6.00 seconds. ratio, 16.67 times. crossover, columns times c o l ratio over row ratio equals 20 times 5 over 2, equals, 50 columns. there are only 20, so no selection flips the scan here" tabindex="0" role="region" aria-label="Mathematical notation">10⁹ rows     200 B a row     20 columns, so 10 B a column     3 named
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Bytes scanned, and the query where the answer reverses</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Row store, column store, bytes scanned</span><p>A <strong>row store</strong> keeps the values of one row contiguously; a <strong>column store</strong> keeps the values of one column contiguously. <strong>Bytes scanned</strong> is the volume a query must read from storage.</p><p>For <span class="math" data-say="r">r</span> rows of total width <span class="math" data-say="w">w</span> across <span class="math" data-say="c">c</span> columns, with <span class="math" data-say="j">j</span> columns named and compression ratios <span class="math" data-say="rho sub row">ρ_row</span> and <span class="math" data-say="rho sub col">ρ_col</span>, the row store scans <span class="math" data-say="r times w over rho sub row">r·w/ρ_row</span> and the column store scans <span class="math" data-say="r times the quantity w over c, times j over rho sub col">r·(w/c)·j/ρ_col</span>.</p></div><p>The row store's formula contains no <span class="math" data-say="j">j</span>. That is the entire asymmetry: naming fewer columns cannot make a row store read less, because the unit it stores and the unit the device delivers are both the row. A query naming one column of twenty scans exactly as many bytes as a query naming all twenty.</p><div class="mathblock" data-say="10 to the power 9 rows, 200 B a row, 20 columns, so 10 B a column, 3 named. row store compresses 2 times, column store compresses 5 times, scan 1 gigabytes per second. row store, 10 to the power 9 times 200 B divided by 2, equals 100.00 gigabytes, divided by 1 gigabytes per second, equals 100.00 seconds. column store, 10 to the power 9 times the quantity 3 times 10 B, divided by 5, equals, 6.00 gigabytes, divided by 1 gigabytes per second, equals, 6.00 seconds. ratio, 16.67 times. crossover, columns times c o l ratio over row ratio equals 20 times 5 over 2, equals, 50 columns. there are only 20, so no selection flips the scan here" tabindex="0" role="region" aria-label="Mathematical notation">10⁹ rows     200 B a row     20 columns, so 10 B a column     3 named
 row store compresses 2×      column store compresses 5×      scan 1 GB/s
 
 row store      10⁹ × 200 B ÷ 2          = 100.00 GB  ÷ 1 GB/s  = 100.00 s
@@ -1400,12 +1444,11 @@ column store   10⁹ × (3 × 10 B) ÷ 5     =   6.00 GB  ÷ 1 GB/s  =   6.00 s
 ratio                                                          16.67×
 
 crossover      columns × col ratio / row ratio = 20 × 5/2  =  50 columns
-               there are only 20, so no selection flips the scan here</div><p>A factor of <span class="math" data-say="16.67">16.67</span> from a query that named a seventh of the columns is more than the seven you might expect, and the extra comes from the compression ratios: <span class="math" data-say="10 over 3">10/3</span> from the columns and <span class="math" data-say="5 over 2">5/2</span> from the compression, multiplied. That is why the ratio has to travel with the claim.</p><h3>Where the answer reverses</h3><p>Set the two byte counts equal and solve for the number of named columns: <span class="math" data-say="j star equals c times rho sub col over rho sub row">j* = c × ρ_col/ρ_row</span>. At <span class="math" data-say="c equals 20">c = 20</span>, <span class="math" data-say="rho sub col equals 5">ρ_col = 5</span> and <span class="math" data-say="rho sub row equals 2">ρ_row = 2</span> that is <span class="math" data-say="50">50</span>, which is past all twenty columns — so at these ratios no scan, however wide, makes the row store cheaper. Drop the columnar ratio to <span class="math" data-say="2 times">2×</span>, which is what happens when the columns hold high-cardinality values that do not compress, and the crossover falls to exactly <span class="math" data-say="20">20</span>: the two layouts tie on a query that reads everything.</p><div class="example"><span class="label">Example &middot; The query that actually flips it</span><p>Fetch one whole row by key. In a row store it is one page read: the row is contiguous, so the page holding any of its columns holds all of them. In a column store it is twenty page reads, one per column, because the twenty values live in twenty different places. That is a factor of twenty in the row store's favour on the same table, and it is not a scan at all.</p></div><p>So “columnar is always faster” is a claim about analytical scans wearing the clothes of a claim about storage. The honest form names the query shape: for scans over a few columns of many rows, columnar by a large factor; for retrieving whole rows one at a time, row store by a factor of the column count. A system doing both is a system that keeps the data twice, and that is a decision with a storage bill rather than a clever trick.</p><p>Two things held fixed here. The scan runs at <span class="math" data-say="1 gigabytes per second">1 GB/s</span> in both layouts, so nothing in the comparison is hiding a bandwidth difference — the whole effect is bytes. And the compression ratio is an input on this course rather than something derived: what a codec achieves on your data is measured, and the break-even between the ratio and the CPU it costs to decompress belongs to Scaling Laws and Cost.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Row against column, in bytes scanned</h2></div><p>And the whole-row lookup where the answer reverses</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+               there are only 20, so no selection flips the scan here</div><p>A factor of <span class="math" data-say="16.67">16.67</span> from a query that named a seventh of the columns is more than the seven you might expect, and the extra comes from the compression ratios: <span class="math" data-say="10 over 3">10/3</span> from the columns and <span class="math" data-say="5 over 2">5/2</span> from the compression, multiplied. That is why the ratio has to travel with the claim.</p><h3>Where the answer reverses</h3><p>Set the two byte counts equal and solve for the number of named columns: <span class="math" data-say="j star equals c times rho sub col over rho sub row">j* = c × ρ_col/ρ_row</span>. At <span class="math" data-say="c equals 20">c = 20</span>, <span class="math" data-say="rho sub col equals 5">ρ_col = 5</span> and <span class="math" data-say="rho sub row equals 2">ρ_row = 2</span> that is <span class="math" data-say="50">50</span>, which is past all twenty columns — so at these ratios no scan, however wide, makes the row store cheaper. Drop the columnar ratio to <span class="math" data-say="2 times">2×</span>, which is what happens when the columns hold high-cardinality values that do not compress, and the crossover falls to exactly <span class="math" data-say="20">20</span>: the two layouts tie on a query that reads everything.</p><div class="example"><span class="label">Example &middot; The query that actually flips it</span><p>Fetch one whole row by key. In a row store it is one page read: the row is contiguous, so the page holding any of its columns holds all of them. In a column store it is twenty page reads, one per column, because the twenty values live in twenty different places. That is a factor of twenty in the row store's favour on the same table, and it is not a scan at all.</p></div><p>So “columnar is always faster” is a claim about analytical scans wearing the clothes of a claim about storage. The honest form names the query shape: for scans over a few columns of many rows, columnar by a large factor; for retrieving whole rows one at a time, row store by a factor of the column count. A system doing both is a system that keeps the data twice, and that is a decision with a storage bill rather than a clever trick.</p><p>Two things held fixed here. The scan runs at <span class="math" data-say="1 gigabytes per second">1 GB/s</span> in both layouts, so nothing in the comparison is hiding a bandwidth difference — the whole effect is bytes. And the compression ratio is an input on this course rather than something derived: what a codec achieves on your data is measured, and the break-even between the ratio and the CPU it costs to decompress belongs to Scaling Laws and Cost.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Row against column, in bytes scanned</h2></div><p>And the whole-row lookup where the answer reverses</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Bytes scanned is a question about the layout</strong><span>rows &times; selected widths, against rows &times; the whole row &mdash; then &divide; the ratio</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>columns the query reads</span><span class="tone-muted"><i class="legend-swatch"></i>columns it does not</span><span class="tone-red"><i class="legend-swatch"></i>row store, all of it</span><span class="tone-amber"><i class="legend-swatch"></i>the whole-row lookup</span></div>
@@ -1413,10 +1456,10 @@ crossover      columns × col ratio / row ratio = 20 × 5/2  =  50 columns
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="clGrid" viewBox="0 0 660 240" role="img" aria-label="A grid of columns with the selected ones highlighted, beside bars for the bytes each layout has to read."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="clTable"></table></div>
       <div class="status-banner" id="clStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the row, the columns named and the compression</h3>
-          <p>Bytes scanned is rows times the width the layout forces you to read, divided by what that layout compresses to. Walk the named columns from one to twenty and watch the columnar time climb toward the row store's; then drop the columnar ratio to <span class="math" data-say="2 times">2×</span> and watch the crossover move inside the table.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the row, the columns named and the compression</h3>
+            <p>Bytes scanned is rows times the width the layout forces you to read, divided by what that layout compresses to. Walk the named columns from one to twenty and watch the columnar time climb toward the row store's; then drop the columnar ratio to <span class="math" data-say="2 times">2×</span> and watch the crossover move inside the table.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="clRows">Rows in the table (millions)</label><span class="range-value" id="clRowsOut">1000</span></div>
           <input id="clRows" type="range" min="10" max="2000" step="10" value="1000" />
@@ -1446,12 +1489,14 @@ crossover      columns × col ratio / row ratio = 20 × 5/2  =  50 columns
           <div class="kpi"><span>Columns at which they tie</span><strong id="clCross">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="clHint" style="margin:0;">The row store compresses 2&times; and is fixed; the columnar ratio is yours to move, because a column of like values is what compresses and that is half of why the comparison goes the way it does. The scan runs at 1 GB/s in both layouts.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Costing a query against a layout</h2></div><p>Four steps, and the fourth is the one that keeps the answer honest.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down what the query actually needs</h3><p>Which columns, and how many rows. The column list is the only input the two formulas disagree about, and it is the one people summarise away when they describe a workload.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute both byte counts</h3><p><span class="math" data-say="rows times full width divided by row ratio">rows × full width ÷ row ratio</span> and <span class="math" data-say="rows times named widths divided by column ratio">rows × named widths ÷ column ratio</span>. Keep both compression ratios in the arithmetic; leaving them out is the most common way to get a plausible wrong answer here.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Divide both by the same bandwidth</h3><p>The comparison is about bytes, so hold the scan rate fixed across the two layouts. If you want to argue that one layout also reads faster, that is a separate claim and it needs its own measurement.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Ask the other query</h3><p>Price a whole-row fetch as well as the scan: <span class="math" data-say="1">1</span> I/O against one per column. A layout decision made on the scan alone is a decision made on half of the workload.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Costing a query against a layout</h2>
+      <p class="lead-in">Four steps, and the fourth is the one that keeps the answer honest.</p>
+      <ol class="key-ideas method"><li><strong>Write down what the query actually needs.</strong> Which columns, and how many rows. The column list is the only input the two formulas disagree about, and it is the one people summarise away when they describe a workload.</li><li><strong>Compute both byte counts.</strong> <span class="math" data-say="rows times full width divided by row ratio">rows × full width ÷ row ratio</span> and <span class="math" data-say="rows times named widths divided by column ratio">rows × named widths ÷ column ratio</span>. Keep both compression ratios in the arithmetic; leaving them out is the most common way to get a plausible wrong answer here.</li><li><strong>Divide both by the same bandwidth.</strong> The comparison is about bytes, so hold the scan rate fixed across the two layouts. If you want to argue that one layout also reads faster, that is a separate claim and it needs its own measurement.</li><li><strong>Ask the other query.</strong> Price a whole-row fetch as well as the scan: <span class="math" data-say="1">1</span> I/O against one per column. A layout decision made on the scan alone is a decision made on half of the workload.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1481,17 +1526,16 @@ one whole row  row store    1 I/O      the row is contiguous
                column store 20 I/O     one page per column</div><p>The row store is not reading more rows. It is reading whole rows, because a row is what is contiguous there, and the query named three columns out of twenty. Every byte of the difference is layout.</p><p>The crossover is worth computing even when it lands outside the table, because it says how far outside. A query would have to name fifty of twenty columns to make the row store cheaper, which is not close; drop the columnar ratio to <span class="math" data-say="2 times">2×</span> and it falls to exactly <span class="math" data-say="20">20</span>, at which point a full-width scan ties. That is the number to quote when someone asks how robust the comparison is.</p><p>For a faded rehearsal, keep the table and make the query name ten columns instead of three. The supplied first move is that the columnar scan becomes <span class="math" data-say="20.00 gigabytes">20.00 GB</span>. Compute the two times and the ratio, then say what the crossover becomes if the columnar compression falls to <span class="math" data-say="3 times">3×</span>. Check all three in the lab before opening the quiz.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the comparison as a property of the storage rather than of the query</strong><span>The same table gives <span class="math" data-say="16.67 times">16.67×</span> to the column store on a three-column scan and <span class="math" data-say="20 times">20×</span> to the row store on a whole-row fetch. A layout is fast at a query shape, and the sentence that omits the shape will be quoted at the one workload where it is backwards.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Leaving the compression ratio out of the comparison</strong><span>Here it is <span class="math" data-say="2 times">2×</span> against <span class="math" data-say="5 times">5×</span>, and it supplies <span class="math" data-say="2.50">2.50</span> of the <span class="math" data-say="16.67">16.67</span>. A columnar figure quoted without its ratio is not checkable, and the ratio is the part most sensitive to the actual data — high-cardinality columns compress like rows do, and the advantage shrinks with them.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Costing a point lookup at a scan&#x27;s rate</strong><span>A scan is priced in bytes at a bandwidth; a whole-row fetch is priced in I/Os at a seek. <span class="math" data-say="1">1</span> against <span class="math" data-say="20">20</span> is an I/O count, and converting it into bytes to compare it with the scan is the mistake the first lesson of this course exists to prevent.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the first question you ask about a layout is which query.</strong><p>You should be able to compute bytes scanned in both layouts from a row width, a column count, a selection and two compression ratios; convert both to times at a stated bandwidth; and find the crossover in named columns.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both scans here went to disk. How much of the data is on disk <em>at the moment a query asks for it</em> is a question about memory, and it is the cache arithmetic of Caching and Hit Rates wearing a different set of names. “Working Set and the Page Cache” is that callback, and it is deliberately not new material.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the comparison as a property of the storage rather than of the query</strong><span>The same table gives <span class="math" data-say="16.67 times">16.67×</span> to the column store on a three-column scan and <span class="math" data-say="20 times">20×</span> to the row store on a whole-row fetch. A layout is fast at a query shape, and the sentence that omits the shape will be quoted at the one workload where it is backwards.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Leaving the compression ratio out of the comparison</strong><span>Here it is <span class="math" data-say="2 times">2×</span> against <span class="math" data-say="5 times">5×</span>, and it supplies <span class="math" data-say="2.50">2.50</span> of the <span class="math" data-say="16.67">16.67</span>. A columnar figure quoted without its ratio is not checkable, and the ratio is the part most sensitive to the actual data — high-cardinality columns compress like rows do, and the advantage shrinks with them.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Costing a point lookup at a scan&#x27;s rate</strong><span>A scan is priced in bytes at a bandwidth; a whole-row fetch is priced in I/Os at a seek. <span class="math" data-say="1">1</span> against <span class="math" data-say="20">20</span> is an I/O count, and converting it into bytes to compare it with the scan is the mistake the first lesson of this course exists to prevent.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the first question you ask about a layout is which query.</strong><p>You should be able to compute bytes scanned in both layouts from a row width, a column count, a selection and two compression ratios; convert both to times at a stated bandwidth; and find the crossover in named columns.</p></div></div><div class="note"><strong>Note:</strong> Both scans here went to disk. How much of the data is on disk <em>at the moment a query asks for it</em> is a question about memory, and it is the cache arithmetic of Caching and Hit Rates wearing a different set of names. “Working Set and the Page Cache” is that callback, and it is deliberately not new material.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A scan reads what the layout makes contiguous</summary><p>In a row store a row is one run of bytes, so reading any column of it reads all of it: a query naming three columns of twenty still moves the full <span class="math" data-say="200 B">200 B</span> per row. In a column store each column is its own run, so the same query moves <span class="math" data-say="3 times 10 B">3 × 10 B</span> per row. Neither engine is reading the wrong number of rows; they are reading different amounts of each row.</p></details><details class="recall"><summary>The compression ratio belongs to the layout</summary><p>A column holds a million values of one type and often one distribution, which is what compresses; a row holds a timestamp, a name and a price side by side, which does not. Quoting a columnar scan without its ratio hides half the effect — here <span class="math" data-say="5 times">5×</span> against <span class="math" data-say="2 times">2×</span>, which turns a factor of ten in bytes named into a factor of <span class="math" data-say="16.67">16.67</span> in bytes read.</p></details><details class="recall"><summary>The crossover is a column count, and there is a query past every crossover</summary><p>The two scans tie when the named columns reach <span class="math" data-say="columns times column ratio over row ratio">columns × column ratio / row ratio</span>, which at these ratios is <span class="math" data-say="50">50</span> of <span class="math" data-say="20">20</span> — so no selection flips the scan here. The flip comes from a different query: fetching one whole row is <span class="math" data-say="1">1</span> I/O in a row store and <span class="math" data-say="20">20</span> in a column store, one page per column.</p></details></div>
+      <h3>Summary</h3>
       <p>A scan reads whatever the layout makes contiguous. A row store reads whole rows even when the query named three columns of twenty; a column store reads only the named columns, and compresses them better because a column holds like values. Over a billion two-hundred-byte rows that is <span class="math" data-say="100.00 gigabytes">100.00 GB</span> against <span class="math" data-say="6.00 gigabytes">6.00 GB</span> — and one I/O against twenty when the query wants a whole row back.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A scan reads what the layout makes contiguous.</strong> In a row store a row is one run of bytes, so reading any column of it reads all of it: a query naming three columns of twenty still moves the full <span class="math" data-say="200 B">200 B</span> per row. In a column store each column is its own run, so the same query moves <span class="math" data-say="3 times 10 B">3 × 10 B</span> per row. Neither engine is reading the wrong number of rows; they are reading different amounts of each row.</li><li><strong>The compression ratio belongs to the layout.</strong> A column holds a million values of one type and often one distribution, which is what compresses; a row holds a timestamp, a name and a price side by side, which does not. Quoting a columnar scan without its ratio hides half the effect — here <span class="math" data-say="5 times">5×</span> against <span class="math" data-say="2 times">2×</span>, which turns a factor of ten in bytes named into a factor of <span class="math" data-say="16.67">16.67</span> in bytes read.</li><li><strong>The crossover is a column count, and there is a query past every crossover.</strong> The two scans tie when the named columns reach <span class="math" data-say="columns times column ratio over row ratio">columns × column ratio / row ratio</span>, which at these ratios is <span class="math" data-say="50">50</span> of <span class="math" data-say="20">20</span> — so no selection flips the scan here. The flip comes from a different query: fetching one whole row is <span class="math" data-say="1">1</span> I/O in a row store and <span class="math" data-say="20">20</span> in a column store, one page per column.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="row store, bytes equals rows times full row width divided by row ratio. column store, bytes equals rows times the sum of named column widths divided by column ratio. 10 to the power 9 rows, 200 B a row, 20 columns, 3 named, 1 gigabytes per second scan. a table, shown on the page. one whole row, 1 I over O in the row store, 20 in the column store" tabindex="0" role="region" aria-label="Mathematical notation">row store      bytes = rows × full row width ÷ row ratio
 column store   bytes = rows × Σ named column widths ÷ column ratio
 
@@ -2649,11 +2693,42 @@ one whole row:   1 I/O in the row store,   20 in the column store</div><figcapti
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2721,7 +2796,7 @@ one whole row:   1 I/O in the row store,   20 in the column store</div><figcapti
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

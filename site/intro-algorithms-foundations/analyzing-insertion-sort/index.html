@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,28 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Foundations</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 2 · Getting Started</p>
       <h1>Analyzing Insertion Sort</h1>
       <p class="lesson-lede">Charge each line of insertion sort a constant per execution, count how often each line runs, and the running time is linear on a sorted array, quadratic on a reversed one, and <span data-say="theta of n squared">Θ(n²)</span> in the worst case.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The RAM model</li><li>Running time on an input</li><li>Order of growth</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The section&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Analyzing an algorithm has come to mean predicting the resources that the algorithm requires.&rdquo; Section 2.2 opens with that sentence and spends the rest of its pages making the prediction precise for insertion sort. Memory, bandwidth or hardware sometimes matter most, the authors say, but most often the resource is time. This lesson reads the section: the model of computation, the line-by-line count, the best and worst cases, and the order of growth.</p><p>To count steps you need a machine to count them on. The book's is the random-access machine, the RAM: one processor, instructions executed one after another, and the instructions real computers have, arithmetic, loading and storing, branching and calling, each taking constant time. A RAM with a sort instruction would sort in one step, which is why the authors take real computers as their guide. Words hold about <span class="math" data-say="c times log base 2 of n">c·lg n</span> bits for a constant <span class="math" data-say="c is at least 1">c ≥ 1</span>, enough to index the input but not so many that one word could carry it all.</p><p>The authors admit gray areas. Raising a number to a power is not one instruction in general, but computing <span class="math" data-say="2 to the power k">2ᵏ</span> is, by shifting 1 left k places, as long as k fits in a word. The model leaves out caches and virtual memory; models that include them are much harder to work with, and the authors judge RAM analyses to be usually excellent predictors of real performance. Input size depends on the problem: the number of items for sorting, the number of bits for multiplying integers, two numbers, vertices and edges, for a graph.</p><div class="defbox"><span class="label">Definition &middot; <span data-say="t sub j">t_j</span></span><p>For each j from 2 to n, <span class="math" data-say="t sub j">t_j</span> is the number of times the inner while loop's test runs in the pass that inserts <span class="math" data-say="A at j">A[j]</span>. A loop's test runs once more than its body, so <span class="math" data-say="t sub j">t_j</span> is the number of shifts in that pass plus one, whether the loop stopped at a smaller key or at the front of the array.</p></div><p>With each line i charged <span class="math" data-say="c sub i">c_i</span> per execution, the running time is the sum of cost times count over the lines of INSERTION-SORT. The loop header runs n times, counting the final failing test; the three lines that set up and finish each pass run n − 1 times; the while test runs <span class="math" data-say="the sum of t sub j">Σ t_j</span> times; and the two lines of its body run <span class="math" data-say="the sum of the quantity t sub j minus 1">Σ (t_j − 1)</span> times each, with every sum over j from 2 to n. The comment line costs nothing. The book writes this sum out with all seven constants; the lab uses the same sum with every <span class="math" data-say="c sub i">c_i</span> equal to 1.</p><div class="mathblock" data-say="the line-cost sum with every c sub i equals 1. lines executed equals n plus 3 times the quantity n minus 1, plus the sum of t sub j, plus 2 times the sum of the quantity t sub j minus 1. best, t sub j equals 1, 5 n minus 4. worst, t sub j equals j, the quantity 3 n squared plus 7 n minus 8, over 2" tabindex="0" role="region" aria-label="Mathematical notation">the line-cost sum with every c_i = 1
-
-lines executed = n + 3·(n − 1) + Σt_j + 2·Σ(t_j − 1)
-best,  t_j = 1:  5n − 4
-worst, t_j = j:  (3n² + 7n − 8)/2</div><p>The best case is an array already sorted: every test fails at once, <span class="math" data-say="t sub j equals 1">t_j = 1</span>, and the time is <span class="math" data-say="A times n plus b">a·n + b</span> for constants depending on the <span class="math" data-say="c sub i">c_i</span>, a linear function. The worst case is an array in decreasing order: each key is compared with every element of the prefix, <span class="math" data-say="t sub j equals j">t_j = j</span>, and with the sums of Appendix A the time is <span class="math" data-say="A times n squared plus b times n plus c">a·n² + b·n + c</span>, a quadratic. Same algorithm, same n, two different functions.</p><p>Which one should an analysis report? The book usually reports the worst case, for three reasons. It is an upper bound on the time for every input of that size, a guarantee. For some algorithms it happens often, as when a search looks for something absent. And the average case is often about as bad: on random input a key passes about half the prefix, <span class="math" data-say="t sub j">t_j</span> is about j/2, and the time is still quadratic. Average-case and randomized analyses return in Chapter 5.</p><p>The last step is one more abstraction. Constants and lower-order terms matter less than the rate of growth for large inputs, so the analysis keeps only the leading term, <span class="math" data-say="A times n squared">a·n²</span>, drops its coefficient, and describes insertion sort's worst case as <span class="math" data-say="theta of n squared">Θ(n²)</span>. One algorithm is then counted more efficient than another if its worst case has a lower order of growth, with the warning from Chapter 1 that this is a statement about large enough inputs.</p><p>Now the lab, which runs INSERTION-SORT on your array and counts. The tiles are the list of <span class="math" data-say="t sub j">t_j</span>, their sum, the key comparisons, the shifts, the best-case and worst-case comparisons for your n, and the lines executed with every <span class="math" data-say="c sub i equals 1">c_i = 1</span>, beside the best and worst values of that sum. The shifts equal the inversions of the array, the pairs of positions whose keys are out of order, which is the subject of the book's Problem 2-4.</p><p>The worked example <code>eight</code> is <span class="math" data-say="6, 1, 8, 3, 7, 2, 5, 4">[6, 1, 8, 3, 7, 2, 5, 4]</span>. Its <span class="math" data-say="t sub j">t_j</span> are 2, 1, 3, 2, 5, 4 and 5, summing to 22; there are 21 key comparisons and 15 shifts; and 81 lines run, between the best case of 36 and the worst of 120. Choose <code>sorted</code> and the lines are 36, exactly <span class="math" data-say="5 n minus 4">5n − 4</span>; choose <code>reversed</code> and they are 120, exactly <span class="math" data-say="the quantity 3 n squared plus 7 n minus 8, over 2">(3n² + 7n − 8)/2</span>. The formulas are not estimates; they are the counts on those two arrays.</p><p>Choose <code>nearly-sorted</code>, <span class="math" data-say="1, 2, 3, 5, 4, 6, 8, 7">[1, 2, 3, 5, 4, 6, 8, 7]</span>, two adjacent pairs swapped: <span class="math" data-say="the sum of t sub j">Σ t_j</span> is 9, the shifts are 2, and 42 lines run, close to the best case. Insertion sort's cost tracks how unsorted its input is, which is why it is used on small or nearly sorted arrays. Then choose <code>reversed-thirty</code>, thirty keys in decreasing order: 435 comparisons and 1,451 lines, against 146 lines had they arrived sorted. Thirty keys is small, and the quadratic term already does most of the work.</p><h3>Exercise</h3><p>For the array <span class="math" data-say="5, 9, 2, 6, 3">[5, 9, 2, 6, 3]</span>, write down <span class="math" data-say="t sub j">t_j</span> for j = 2 to 5 by hand. Then evaluate the line-cost sum with every <span class="math" data-say="c sub i equals 1">c_i = 1</span>, and compare with the lab's lines tile.</p><p>Insertion sort is quadratic in the worst case because it is incremental: it grows the sorted part one key at a time. The next lesson, Merge Sort and Divide-and-Conquer, tries a different design and gets a different order of growth.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Sorting, counted</h2></div><p>the line-cost sum with t_j</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The section&#x27;s argument first, then the count</h2><div class="prose reading"><p>&ldquo;Analyzing an algorithm has come to mean predicting the resources that the algorithm requires.&rdquo; Section 2.2 opens with that sentence and spends the rest of its pages making the prediction precise for insertion sort. Memory, bandwidth or hardware sometimes matter most, the authors say, but most often the resource is time. This lesson reads the section: the model of computation, the line-by-line count, the best and worst cases, and the order of growth.</p><p>To count steps you need a machine to count them on. The book's is the random-access machine, the RAM: one processor, instructions executed one after another, and the instructions real computers have, arithmetic, loading and storing, branching and calling, each taking constant time. A RAM with a sort instruction would sort in one step, which is why the authors take real computers as their guide. Words hold about <span class="math" data-say="c times log base 2 of n">c·lg n</span> bits for a constant <span class="math" data-say="c is at least 1">c ≥ 1</span>, enough to index the input but not so many that one word could carry it all.</p><p>The authors admit gray areas. Raising a number to a power is not one instruction in general, but computing <span class="math" data-say="2 to the power k">2ᵏ</span> is, by shifting 1 left k places, as long as k fits in a word. The model leaves out caches and virtual memory; models that include them are much harder to work with, and the authors judge RAM analyses to be usually excellent predictors of real performance. Input size depends on the problem: the number of items for sorting, the number of bits for multiplying integers, two numbers, vertices and edges, for a graph.</p><div class="defbox"><span class="label">Definition &middot; <span data-say="t sub j">t_j</span></span><p>For each j from 2 to n, <span class="math" data-say="t sub j">t_j</span> is the number of times the inner while loop's test runs in the pass that inserts <span class="math" data-say="A at j">A[j]</span>. A loop's test runs once more than its body, so <span class="math" data-say="t sub j">t_j</span> is the number of shifts in that pass plus one, whether the loop stopped at a smaller key or at the front of the array.</p></div><p>With each line i charged <span class="math" data-say="c sub i">c_i</span> per execution, the running time is the sum of cost times count over the lines of INSERTION-SORT. The loop header runs n times, counting the final failing test; the three lines that set up and finish each pass run n − 1 times; the while test runs <span class="math" data-say="the sum of t sub j">Σ t_j</span> times; and the two lines of its body run <span class="math" data-say="the sum of the quantity t sub j minus 1">Σ (t_j − 1)</span> times each, with every sum over j from 2 to n. The comment line costs nothing. The book writes this sum out with all seven constants; the lab uses the same sum with every <span class="math" data-say="c sub i">c_i</span> equal to 1.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Sorting, counted</h2></div><p>the line-cost sum with t_j</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Sorting, counted</strong><span>the line-cost sum with t_j</span></div>
       </div>
@@ -1408,10 +1447,10 @@ worst, t_j = j:  (3n² + 7n − 8)/2</div><p>The best case is an array already s
       <div class="table-wrap" id="stiTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="stiTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> t_j is the number of times the while-loop test runs in pass j: once for each shift, and once more when it fails. Lines executed: n + 3(n − 1) + Σt_j + 2Σ(t_j − 1), the book's line-cost sum with every c_i = 1 (the comment line costs 0).</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Add up insertion sort&#x27;s lines</h3>
-          <p>A count over the situation the lesson states. Type an array of whole numbers. The lab runs INSERTION-SORT, records <span data-say="t sub j">t_j</span> for each pass, and evaluates the book's line-cost sum with every line costing 1, beside the best and worst cases for the same n.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Add up insertion sort&#x27;s lines</h3>
+            <p>A count over the situation the lesson states. Type an array of whole numbers. The lab runs INSERTION-SORT, records <span data-say="t sub j">t_j</span> for each pass, and evaluates the book's line-cost sum with every line costing 1, beside the best and worst cases for the same n.</p>
         <div class="field">
           <label for="stiPreset">Worked example</label>
           <select id="stiPreset"><option value="eight" selected>Eight keys in a shuffled order</option><option value="sorted">Eight keys already sorted</option><option value="reversed">Eight keys in decreasing order</option><option value="nearly-sorted">Eight keys with two adjacent pairs swapped</option><option value="reversed-thirty">Thirty keys in decreasing order</option></select>
@@ -1430,12 +1469,19 @@ worst, t_j = j:  (3n² + 7n − 8)/2</div><p>The best case is an array already s
           <div class="kpi"><span>Lines executed, every c_i = 1</span><strong id="stiLines">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="the line-cost sum with every c sub i equals 1. lines executed equals n plus 3 times the quantity n minus 1, plus the sum of t sub j, plus 2 times the sum of the quantity t sub j minus 1. best, t sub j equals 1, 5 n minus 4. worst, t sub j equals j, the quantity 3 n squared plus 7 n minus 8, over 2" tabindex="0" role="region" aria-label="Mathematical notation">the line-cost sum with every c_i = 1
+
+lines executed = n + 3·(n − 1) + Σt_j + 2·Σ(t_j − 1)
+best,  t_j = 1:  5n − 4
+worst, t_j = j:  (3n² + 7n − 8)/2</div><p>The best case is an array already sorted: every test fails at once, <span class="math" data-say="t sub j equals 1">t_j = 1</span>, and the time is <span class="math" data-say="A times n plus b">a·n + b</span> for constants depending on the <span class="math" data-say="c sub i">c_i</span>, a linear function. The worst case is an array in decreasing order: each key is compared with every element of the prefix, <span class="math" data-say="t sub j equals j">t_j = j</span>, and with the sums of Appendix A the time is <span class="math" data-say="A times n squared plus b times n plus c">a·n² + b·n + c</span>, a quadratic. Same algorithm, same n, two different functions.</p><p>Which one should an analysis report? The book usually reports the worst case, for three reasons. It is an upper bound on the time for every input of that size, a guarantee. For some algorithms it happens often, as when a search looks for something absent. And the average case is often about as bad: on random input a key passes about half the prefix, <span class="math" data-say="t sub j">t_j</span> is about j/2, and the time is still quadratic. Average-case and randomized analyses return in Chapter 5.</p><p>The last step is one more abstraction. Constants and lower-order terms matter less than the rate of growth for large inputs, so the analysis keeps only the leading term, <span class="math" data-say="A times n squared">a·n²</span>, drops its coefficient, and describes insertion sort's worst case as <span class="math" data-say="theta of n squared">Θ(n²)</span>. One algorithm is then counted more efficient than another if its worst case has a lower order of growth, with the warning from Chapter 1 that this is a statement about large enough inputs.</p><p>Now the lab, which runs INSERTION-SORT on your array and counts. The tiles are the list of <span class="math" data-say="t sub j">t_j</span>, their sum, the key comparisons, the shifts, the best-case and worst-case comparisons for your n, and the lines executed with every <span class="math" data-say="c sub i equals 1">c_i = 1</span>, beside the best and worst values of that sum. The shifts equal the inversions of the array, the pairs of positions whose keys are out of order, which is the subject of the book's Problem 2-4.</p><p>The worked example <code>eight</code> is <span class="math" data-say="6, 1, 8, 3, 7, 2, 5, 4">[6, 1, 8, 3, 7, 2, 5, 4]</span>. Its <span class="math" data-say="t sub j">t_j</span> are 2, 1, 3, 2, 5, 4 and 5, summing to 22; there are 21 key comparisons and 15 shifts; and 81 lines run, between the best case of 36 and the worst of 120. Choose <code>sorted</code> and the lines are 36, exactly <span class="math" data-say="5 n minus 4">5n − 4</span>; choose <code>reversed</code> and they are 120, exactly <span class="math" data-say="the quantity 3 n squared plus 7 n minus 8, over 2">(3n² + 7n − 8)/2</span>. The formulas are not estimates; they are the counts on those two arrays.</p><p>Choose <code>nearly-sorted</code>, <span class="math" data-say="1, 2, 3, 5, 4, 6, 8, 7">[1, 2, 3, 5, 4, 6, 8, 7]</span>, two adjacent pairs swapped: <span class="math" data-say="the sum of t sub j">Σ t_j</span> is 9, the shifts are 2, and 42 lines run, close to the best case. Insertion sort's cost tracks how unsorted its input is, which is why it is used on small or nearly sorted arrays. Then choose <code>reversed-thirty</code>, thirty keys in decreasing order: 435 comparisons and 1,451 lines, against 146 lines had they arrived sorted. Thirty keys is small, and the quadratic term already does most of the work.</p><h3>Exercise</h3><p>For the array <span class="math" data-say="5, 9, 2, 6, 3">[5, 9, 2, 6, 3]</span>, write down <span class="math" data-say="t sub j">t_j</span> for j = 2 to 5 by hand. Then evaluate the line-cost sum with every <span class="math" data-say="c sub i equals 1">c_i = 1</span>, and compare with the lab's lines tile.</p><p>Insertion sort is quadratic in the worst case because it is incremental: it grows the sorted part one key at a time. The next lesson, Merge Sort and Divide-and-Conquer, tries a different design and gets a different order of growth.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting insertion sort&#x27;s lines by hand</h2></div><p>Four steps for one array, then one array of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Run the sort and record <span data-say="t sub j">t_j</span></h3><p>For each pass, count the shifts and add 1. That is <span class="math" data-say="t sub j">t_j</span>, the runs of the inner test, including the one that fails or finds i = 0.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Add the sums</h3><p>Compute <span class="math" data-say="the sum of t sub j">Σ t_j</span> and <span class="math" data-say="the sum of the quantity t sub j minus 1">Σ (t_j − 1)</span>. The second is the number of shifts.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Evaluate the line-cost sum</h3><p>With every <span class="math" data-say="c sub i equals 1">c_i = 1</span>, the lines executed are <span class="math" data-say="n plus 3 times the quantity n minus 1, plus the sum of t sub j, plus 2 times the sum of the quantity t sub j minus 1">n + 3·(n − 1) + Σ t_j + 2·Σ (t_j − 1)</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Place it between the cases</h3><p>Compute <span class="math" data-say="5 n minus 4">5n − 4</span> and <span class="math" data-say="the quantity 3 n squared plus 7 n minus 8, over 2">(3n² + 7n − 8)/2</span> for your n. Your total must lie between them, at the bottom only for a sorted array and at the top only for a reversed one.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Count an array of your own</h3><p>Write ten distinct keys with exactly three inversions, predict <span class="math" data-say="the sum of t sub j">Σ t_j</span> (it is n − 1 plus the inversions) and the lines, then check both in the lab.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting insertion sort&#x27;s lines by hand</h2>
+      <p class="lead-in">Four steps for one array, then one array of your own.</p>
+      <ol class="key-ideas method"><li><strong>Run the sort and record <span data-say="t sub j">t_j</span>.</strong> For each pass, count the shifts and add 1. That is <span class="math" data-say="t sub j">t_j</span>, the runs of the inner test, including the one that fails or finds i = 0.</li><li><strong>Add the sums.</strong> Compute <span class="math" data-say="the sum of t sub j">Σ t_j</span> and <span class="math" data-say="the sum of the quantity t sub j minus 1">Σ (t_j − 1)</span>. The second is the number of shifts.</li><li><strong>Evaluate the line-cost sum.</strong> With every <span class="math" data-say="c sub i equals 1">c_i = 1</span>, the lines executed are <span class="math" data-say="n plus 3 times the quantity n minus 1, plus the sum of t sub j, plus 2 times the sum of the quantity t sub j minus 1">n + 3·(n − 1) + Σ t_j + 2·Σ (t_j − 1)</span>.</li><li><strong>Place it between the cases.</strong> Compute <span class="math" data-say="5 n minus 4">5n − 4</span> and <span class="math" data-say="the quantity 3 n squared plus 7 n minus 8, over 2">(3n² + 7n − 8)/2</span> for your n. Your total must lie between them, at the bottom only for a sorted array and at the top only for a reversed one.</li><li><strong>Count an array of your own.</strong> Write ten distinct keys with exactly three inversions, predict <span class="math" data-say="the sum of t sub j">Σ t_j</span> (it is n − 1 plus the inversions) and the lines, then check both in the lab.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1456,17 +1502,16 @@ j = 8, key 4: 4 shifts, t = 5
 Σt = 22, shifts 15: 8 + 21 + 22 + 30 = 81</div><p>The four terms are n = 8, <span class="math" data-say="3 times the quantity n minus 1, equals 21">3·(n − 1) = 21</span>, <span class="math" data-say="the sum of t sub j equals 22">Σ t_j = 22</span> and <span class="math" data-say="2 times the sum of the quantity t sub j minus 1, equals 30">2·Σ (t_j − 1) = 30</span>. Only key 1 reached the front, so the key comparisons are 22 − 1 = 21. The 15 shifts are the array's 15 inversions.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading insertion sort&#x27;<span data-say="s theta of n squared">s Θ(n²)</span> as its time on every input</strong><span>The <span class="math" data-say="theta of n squared">Θ(n²)</span> is the order of growth of the worst case. On a sorted array every test fails at once and the time is linear, <span class="math" data-say="A times n plus b">a·n + b</span>. On the lesson's eight keys the line count runs from 36 for the sorted array to 120 for the reversed one, and a nearly sorted array costs 42. The next chapter gives the precise words: the running time is <span class="math" data-say="big O of n squared">O(n²)</span> and <span class="math" data-say="omega of n">Ω(n)</span>, and over all inputs it is neither <span class="math" data-say="theta of n squared">Θ(n²)</span> nor <span class="math" data-say="theta of n">Θ(n)</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking <span data-say="t sub j">t_j</span> for the number of comparisons or shifts</strong><span><span class="math" data-say="t sub j">t_j</span> counts the runs of the inner test, which is one more than the shifts in that pass. It equals the key comparisons except when the key reaches the front, where the test stops on <span class="math" data-say="i is greater than 0">i > 0</span> without comparing. The difference is small, but every line count in the analysis depends on getting it right.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the line costs as known</strong><span>The constants <span class="math" data-say="c sub i">c_i</span> stand for costs the analysis does not know and does not need. Setting them all to 1, as the lab does, counts executed lines, not seconds; and the order of growth comes out the same whatever positive values they take, which is why the book drops them.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can carry out the line-cost analysis of a short procedure.</strong><p>Given an array, record insertion sort's <span data-say="t sub j">t_j</span> and evaluate the line-cost sum; given a procedure with nested loops, write its best and worst cases and their orders of growth.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts executed lines with every cost equal to 1, which is the book's sum under one choice of constants, not a running time in seconds. Its best and worst figures are exact for your n; the order of growth they share with every choice of constants is the analysis, which the lab cannot carry out for you.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading insertion sort&#x27;<span data-say="s theta of n squared">s Θ(n²)</span> as its time on every input</strong><span>The <span class="math" data-say="theta of n squared">Θ(n²)</span> is the order of growth of the worst case. On a sorted array every test fails at once and the time is linear, <span class="math" data-say="A times n plus b">a·n + b</span>. On the lesson's eight keys the line count runs from 36 for the sorted array to 120 for the reversed one, and a nearly sorted array costs 42. The next chapter gives the precise words: the running time is <span class="math" data-say="big O of n squared">O(n²)</span> and <span class="math" data-say="omega of n">Ω(n)</span>, and over all inputs it is neither <span class="math" data-say="theta of n squared">Θ(n²)</span> nor <span class="math" data-say="theta of n">Θ(n)</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking <span data-say="t sub j">t_j</span> for the number of comparisons or shifts</strong><span><span class="math" data-say="t sub j">t_j</span> counts the runs of the inner test, which is one more than the shifts in that pass. It equals the key comparisons except when the key reaches the front, where the test stops on <span class="math" data-say="i is greater than 0">i > 0</span> without comparing. The difference is small, but every line count in the analysis depends on getting it right.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the line costs as known</strong><span>The constants <span class="math" data-say="c sub i">c_i</span> stand for costs the analysis does not know and does not need. Setting them all to 1, as the lab does, counts executed lines, not seconds; and the order of growth comes out the same whatever positive values they take, which is why the book drops them.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can carry out the line-cost analysis of a short procedure.</strong><p>Given an array, record insertion sort's <span data-say="t sub j">t_j</span> and evaluate the line-cost sum; given a procedure with nested loops, write its best and worst cases and their orders of growth.</p></div></div><div class="note"><strong>Note:</strong> The lab counts executed lines with every cost equal to 1, which is the book's sum under one choice of constants, not a running time in seconds. Its best and worst figures are exact for your n; the order of growth they share with every choice of constants is the analysis, which the lab cannot carry out for you.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The RAM model</summary><p>A generic one-processor machine that executes one instruction after another. Arithmetic, data movement and control instructions each take constant time, words hold about <span class="math" data-say="c times log base 2 of n">c·lg n</span> bits for a constant c, and caches and virtual memory are not modelled.</p></details><details class="recall"><summary>Running time on an input</summary><p>The number of primitive steps executed on that input, as a function of the input's size. Charging line i a constant <span class="math" data-say="c sub i">c_i</span> each time it runs makes the running time a sum of cost times count over the lines.</p></details><details class="recall"><summary>Order of growth</summary><p>The leading term of the running time with its coefficient dropped. Insertion sort's worst case <span class="math" data-say="A times n squared plus b times n plus c">a·n² + b·n + c</span> has order of growth <span class="math" data-say="n squared">n²</span>, written <span class="math" data-say="theta of n squared">Θ(n²)</span>, a notation the next chapter makes precise.</p></details></div>
+      <h3>Summary</h3>
       <p>Section 2.2 fixes a model of computation, the RAM, and analyses insertion sort in it line by line. The count turns on <span data-say="t sub j">t_j</span>, the number of times the inner loop's test runs in pass j: one in the best case, j in the worst. Keeping only the leading term gives the order of growth. Count <span data-say="t sub j">t_j</span> by hand for a short array, then let the lab add up every line on arrays of your own and set the best and worst cases beside them.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The RAM model.</strong> A generic one-processor machine that executes one instruction after another. Arithmetic, data movement and control instructions each take constant time, words hold about <span class="math" data-say="c times log base 2 of n">c·lg n</span> bits for a constant c, and caches and virtual memory are not modelled.</li><li><strong>Running time on an input.</strong> The number of primitive steps executed on that input, as a function of the input's size. Charging line i a constant <span class="math" data-say="c sub i">c_i</span> each time it runs makes the running time a sum of cost times count over the lines.</li><li><strong>Order of growth.</strong> The leading term of the running time with its coefficient dropped. Insertion sort's worst case <span class="math" data-say="A times n squared plus b times n plus c">a·n² + b·n + c</span> has order of growth <span class="math" data-say="n squared">n²</span>, written <span class="math" data-say="theta of n squared">Θ(n²)</span>, a notation the next chapter makes precise.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="RAM, one processor, constant-time steps. line i costs c sub i each time it runs. t sub j, runs of the inner test in pass j. best, t sub j equals 1, time A times n plus b. worst, t sub j equals j, time A times n squared plus b times n plus c. keep the leading term, theta of n squared" tabindex="0" role="region" aria-label="Mathematical notation">RAM: one processor, constant-time steps
 line i costs c_i each time it runs
 t_j: runs of the inner test in pass j
@@ -2196,11 +2241,42 @@ keep the leading term: Θ(n²)</div><figcaption>Section 2.2 in six lines</figcap
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2268,7 +2344,7 @@ keep the leading term: Θ(n²)</div><figcaption>Section 2.2 in six lines</figcap
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

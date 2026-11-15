@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Queues and Utilisation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Shedding and overload</p>
       <h1>Token Buckets and Rate Limiting</h1>
       <p class="lesson-lede">Run a trace through a bucket and a fixed window, and count admissions, rejections and the largest burst each allows.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A bucket accumulates permission, not requests</li><li><span class="math" data-say="b">b</span> is the burst you are choosing to allow</li><li>A fixed window is a weaker promise than it looks</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The bucket, its bound, and the counter it replaces</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Token bucket</span><p>A bucket has a capacity <span class="math" data-say="b">b</span> and refills at <span class="math" data-say="r">r</span> tokens per unit time. Between two arrivals separated by <span class="math" data-say="delta t">Δt</span>, the level rises by <span class="math" data-say="r times delta t">r·Δt</span> and is then capped at <span class="math" data-say="b">b</span>. An arrival is <strong>admitted</strong> if at least one whole token is present, and it spends one; otherwise it is <strong>rejected</strong> and the level is unchanged.</p></div><div class="thm"><span class="label">Theorem &middot; The bucket&#x27;s guarantee</span><p>Over any window of length <span class="math" data-say="t">t</span>, the number of admissions is at most <span class="math" data-say="b plus r times t">b + r·t</span>: the tokens that were in the bucket at the start, plus the tokens that arrived during the window.</p></div><p>That bound is the reason a bucket is used at all. It holds for every window &mdash; not for aligned windows, not on average &mdash; because every admission consumed a token, and the tokens available in an interval are the starting level plus the refill, with the starting level capped at <span class="math" data-say="b">b</span>. With <span class="math" data-say="r equals 5">r = 5</span> a second and <span class="math" data-say="b equals 3">b = 3</span>, no second anywhere in any trace carries more than <span class="math" data-say="8">8</span> admissions.</p><div class="mathblock" data-say="trace, 20 arrivals over 2.2 seconds, bunched at 900 milliseconds and 1000 milliseconds. r equals 5 tokens per second, b equals 3. bucket, admitted 13, rejected 7. largest second it allowed, 7, bound is b plus r equals 8. fixed window at 5 per second, on the same trace. admitted 12, rejected 8. largest second it allowed, 9, while advertising 5" tabindex="0" role="region" aria-label="Mathematical notation">trace: 20 arrivals over 2.2 seconds, bunched at 900 ms and 1000 ms
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The bucket, its bound, and the counter it replaces</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Token bucket</span><p>A bucket has a capacity <span class="math" data-say="b">b</span> and refills at <span class="math" data-say="r">r</span> tokens per unit time. Between two arrivals separated by <span class="math" data-say="delta t">Δt</span>, the level rises by <span class="math" data-say="r times delta t">r·Δt</span> and is then capped at <span class="math" data-say="b">b</span>. An arrival is <strong>admitted</strong> if at least one whole token is present, and it spends one; otherwise it is <strong>rejected</strong> and the level is unchanged.</p></div><div class="thm"><span class="label">Theorem &middot; The bucket&#x27;s guarantee</span><p>Over any window of length <span class="math" data-say="t">t</span>, the number of admissions is at most <span class="math" data-say="b plus r times t">b + r·t</span>: the tokens that were in the bucket at the start, plus the tokens that arrived during the window.</p></div><p>That bound is the reason a bucket is used at all. It holds for every window &mdash; not for aligned windows, not on average &mdash; because every admission consumed a token, and the tokens available in an interval are the starting level plus the refill, with the starting level capped at <span class="math" data-say="b">b</span>. With <span class="math" data-say="r equals 5">r = 5</span> a second and <span class="math" data-say="b equals 3">b = 3</span>, no second anywhere in any trace carries more than <span class="math" data-say="8">8</span> admissions.</p><div class="mathblock" data-say="trace, 20 arrivals over 2.2 seconds, bunched at 900 milliseconds and 1000 milliseconds. r equals 5 tokens per second, b equals 3. bucket, admitted 13, rejected 7. largest second it allowed, 7, bound is b plus r equals 8. fixed window at 5 per second, on the same trace. admitted 12, rejected 8. largest second it allowed, 9, while advertising 5" tabindex="0" role="region" aria-label="Mathematical notation">trace: 20 arrivals over 2.2 seconds, bunched at 900 ms and 1000 ms
 r = 5 tokens / s      b = 3
 
 bucket        admitted 13,  rejected 7
@@ -1399,12 +1443,11 @@ bucket        admitted 13,  rejected 7
 
 fixed window at 5 per second, on the same trace
               admitted 12,  rejected 8
-              largest second it allowed:  9      while advertising 5</div><p>The two limiters admit almost the same number of requests overall, which is what makes the comparison interesting: they differ in <em>when</em>. The window admitted fewer requests in total and let nine of them through in one second, because the trace was built to straddle a boundary. The bucket's worst second was seven, under its own bound of eight.</p><h3>What the downstream service sees</h3><p>The number that matters to whatever sits behind the limiter is the worst second, not the total: it is the one that sets the queue of the previous lessons, and a limiter advertising five that delivers nine has sized the downstream system's headroom incorrectly by a factor of nearly two. A bucket's worst case is <span class="math" data-say="b plus r times t">b + r·t</span>, which is a number you chose.</p><div class="example"><span class="label">Example &middot; Twenty idle seconds buy three tokens</span><p>With <span class="math" data-say="r equals 1">r = 1</span> a second and <span class="math" data-say="b equals 3">b = 3</span>, a bucket left alone for twenty seconds holds three tokens, not twenty. Seven arrivals at once therefore see three admitted and four refused. The cap is what makes <span class="math" data-say="b">b</span> mean &ldquo;the burst I am willing to absorb&rdquo; rather than &ldquo;whatever has accumulated since the last quiet period&rdquo;.</p></div><p>Choosing the two parameters is a design conversation with two separate questions in it. <span class="math" data-say="r">r</span> is the sustained rate the downstream system can carry &mdash; a capacity question, answered by the earlier courses. <span class="math" data-say="b">b</span> is how much bunching you are willing to pass through in one go, and its cost is paid by the queue behind it: the burst arrives, and everything this course has said about waiting says what that does to it.</p><p>Two smaller points worth knowing. Rate limiting is loss, not delay: a rejected request is refused immediately, which is a bounded, honest failure that a client can retry &mdash; and retries are exactly the <span class="math" data-say="c sub a squared">c_a²</span> that the variability lesson warns about, so they want jitter. And a bucket can also be run as a shaper rather than a limiter, holding arrivals until a token appears instead of refusing them, which converts the same bound back into waiting.</p><p>Token levels here are exact fractions of a token computed from integer millisecond gaps, not floating-point approximations, so a long trace cannot drift. That matters for a limiter more than for most arithmetic on this course: a drift of a thousandth of a token per arrival is a different limit after a million requests.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Token buckets and rate limiting</h2></div><p>b + rt in any window, and what a fixed window does instead</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+              largest second it allowed:  9      while advertising 5</div><p>The two limiters admit almost the same number of requests overall, which is what makes the comparison interesting: they differ in <em>when</em>. The window admitted fewer requests in total and let nine of them through in one second, because the trace was built to straddle a boundary. The bucket's worst second was seven, under its own bound of eight.</p><h3>What the downstream service sees</h3><p>The number that matters to whatever sits behind the limiter is the worst second, not the total: it is the one that sets the queue of the previous lessons, and a limiter advertising five that delivers nine has sized the downstream system's headroom incorrectly by a factor of nearly two. A bucket's worst case is <span class="math" data-say="b plus r times t">b + r·t</span>, which is a number you chose.</p><div class="example"><span class="label">Example &middot; Twenty idle seconds buy three tokens</span><p>With <span class="math" data-say="r equals 1">r = 1</span> a second and <span class="math" data-say="b equals 3">b = 3</span>, a bucket left alone for twenty seconds holds three tokens, not twenty. Seven arrivals at once therefore see three admitted and four refused. The cap is what makes <span class="math" data-say="b">b</span> mean &ldquo;the burst I am willing to absorb&rdquo; rather than &ldquo;whatever has accumulated since the last quiet period&rdquo;.</p></div><p>Choosing the two parameters is a design conversation with two separate questions in it. <span class="math" data-say="r">r</span> is the sustained rate the downstream system can carry &mdash; a capacity question, answered by the earlier courses. <span class="math" data-say="b">b</span> is how much bunching you are willing to pass through in one go, and its cost is paid by the queue behind it: the burst arrives, and everything this course has said about waiting says what that does to it.</p><p>Two smaller points worth knowing. Rate limiting is loss, not delay: a rejected request is refused immediately, which is a bounded, honest failure that a client can retry &mdash; and retries are exactly the <span class="math" data-say="c sub a squared">c_a²</span> that the variability lesson warns about, so they want jitter. And a bucket can also be run as a shaper rather than a limiter, holding arrivals until a token appears instead of refusing them, which converts the same bound back into waiting.</p><p>Token levels here are exact fractions of a token computed from integer millisecond gaps, not floating-point approximations, so a long trace cannot drift. That matters for a limiter more than for most arithmetic on this course: a drift of a thousandth of a token per arrival is a different limit after a million requests.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Token buckets and rate limiting</h2></div><p>b + rt in any window, and what a fixed window does instead</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Token buckets and rate limiting</strong><span>b + rt in any window of t &mdash; which is not the same as r per second</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>admitted</span><span class="tone-red"><i class="legend-swatch"></i>rejected</span><span class="tone-cyan"><i class="legend-swatch"></i>tokens in the bucket</span><span class="tone-amber"><i class="legend-swatch"></i>the fixed window</span></div>
@@ -1412,10 +1455,10 @@ fixed window at 5 per second, on the same trace
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="bkPlot" viewBox="0 0 520 200" role="img" aria-label="The token level over time with each arrival marked admitted or rejected, above the same trace through a fixed window."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="bkTable"></table></div>
       <div class="status-banner" id="bkStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Edit the trace and the limiter</h3>
-          <p>The token level is drawn over the trace and every arrival is marked admitted or rejected, with the same trace through a fixed window beneath it. Move the arrivals across a window boundary and watch only one of the two limiters notice.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Edit the trace and the limiter</h3>
+            <p>The token level is drawn over the trace and every arrival is marked admitted or rejected, with the same trace through a fixed window beneath it. Move the arrivals across a window boundary and watch only one of the two limiters notice.</p>
         <div class="field">
           <label for="bkPreset">Worked example</label>
           <select id="bkPreset"><option value="boundary-burst" selected>a burst straddling a window boundary — the lesson's trace</option><option value="steady">arrivals at exactly the rate — nothing is refused</option><option value="one-big-burst">everything at once — the burst size is the whole allowance</option></select>
@@ -1439,12 +1482,14 @@ fixed window at 5 per second, on the same trace
           <div class="kpi"><span>Largest second the fixed window allows</span><strong id="bkFixedBurst">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="bkHint" style="margin:0;">A bucket of b tokens refilling at r admits at most b + rt in any window of length t, so it is not a cap of r per second &mdash; it is a cap on the <em>average</em> with b of slack. A fixed window claims to be a cap of r per second and is not even that: two full windows back to back put 2r through in one window's width.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Choosing and checking a rate limit</h2></div><p>Pick the sustained rate and the burst separately; they answer different questions.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Set <span class="math" data-say="r">r</span> from what the downstream system can sustain</h3><p>This is a capacity number, and it is the one the earlier courses compute. A limiter set above the sustained capacity is a limiter that does not limit.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Set <span class="math" data-say="b">b</span> from the bunching you are willing to pass</h3><p>The worst second the downstream service can see is <span class="math" data-say="b plus r">b + r</span>, and that is the number its headroom must cover. Choosing <span class="math" data-say="b">b</span> is choosing that peak.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Run a real trace through it and count</h3><p>Admissions, rejections and the largest burst in any window. A trace that straddles a boundary is the one worth running, because it is the case a fixed window fails.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the worst window against the bound</h3><p>No window of length <span class="math" data-say="t">t</span> may exceed <span class="math" data-say="b plus r times t">b + r·t</span>. If one does, the implementation is not a token bucket &mdash; most often because the level was allowed to exceed <span class="math" data-say="b">b</span>.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Choosing and checking a rate limit</h2>
+      <p class="lead-in">Pick the sustained rate and the burst separately; they answer different questions.</p>
+      <ol class="key-ideas method"><li><strong>Set <span class="math" data-say="r">r</span> from what the downstream system can sustain.</strong> This is a capacity number, and it is the one the earlier courses compute. A limiter set above the sustained capacity is a limiter that does not limit.</li><li><strong>Set <span class="math" data-say="b">b</span> from the bunching you are willing to pass.</strong> The worst second the downstream service can see is <span class="math" data-say="b plus r">b + r</span>, and that is the number its headroom must cover. Choosing <span class="math" data-say="b">b</span> is choosing that peak.</li><li><strong>Run a real trace through it and count.</strong> Admissions, rejections and the largest burst in any window. A trace that straddles a boundary is the one worth running, because it is the case a fixed window fails.</li><li><strong>Check the worst window against the bound.</strong> No window of length <span class="math" data-say="t">t</span> may exceed <span class="math" data-say="b plus r times t">b + r·t</span>. If one does, the implementation is not a token bucket &mdash; most often because the level was allowed to exceed <span class="math" data-say="b">b</span>.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1470,17 +1515,16 @@ the nine: four admitted late in the first window, at 200-800 ms,
           and five more the instant the counter reset at 1000 ms</div><p>Both limiters passed about the same volume. Only one of them kept its promise about every second, and the one that did not is the one that is easier to implement &mdash; a counter and a timestamp &mdash; which is why it is so common.</p><p>The bucket's worst second of seven is under its bound of eight rather than equal to it, because the trace's bunching does not line up perfectly with the refill. The bound is what you design against; seven is what this particular trace produced.</p><p>For a faded rehearsal, keep the trace and set <span class="math" data-say="b equals 1">b = 1</span>. The supplied first move is that the bound becomes <span class="math" data-say="1 plus 5 equals 6">1 + 5 = 6</span> per second. Predict whether the total admitted goes up or down, and what happens to the largest second.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>“100 per second” read as at most 100 in any one second</strong><span>A fixed-window counter guarantees that only for windows aligned to its own boundaries; across a boundary it admits up to twice the limit, and on the lesson's trace a limit of five delivered nine. If the promise needs to hold for every second, the limiter has to be a bucket or a sliding window.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Letting the token level exceed <span class="math" data-say="b">b</span></strong><span>An implementation that accumulates tokens without a cap turns a burst allowance into a savings account, and the <span class="math" data-say="b plus r times t">b + r·t</span> bound fails by however long the system was quiet. The cap is applied when the level is topped up, before the arrival is charged.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Sizing the downstream system for <span class="math" data-say="r">r</span> rather than for <span class="math" data-say="b plus r">b + r</span></strong><span>The limiter's worst second is <span class="math" data-say="b plus r times t">b + r·t</span>, and that is the load the queue behind it actually sees. Sizing that queue for the sustained rate alone leaves it exposed to exactly the bursts the limiter was configured to permit.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would ask “over which window?” before accepting any rate limit.</strong><p>You should be able to run a trace through a bucket by hand, state the <span class="math" data-say="b plus r times t">b + r·t</span> bound and check a trace against it, show how a fixed window doubles its advertised limit across a boundary, and choose <span class="math" data-say="r">r</span> and <span class="math" data-say="b">b</span> from two separate design questions.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Limiters and buffers both assume the overload is something to refuse. The last lesson takes the other case: the surge is legitimate, it is accepted, and “Transient Overload and Draining the Backlog” measures what it leaves behind and how long the system takes to give it back.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>“100 per second” read as at most 100 in any one second</strong><span>A fixed-window counter guarantees that only for windows aligned to its own boundaries; across a boundary it admits up to twice the limit, and on the lesson's trace a limit of five delivered nine. If the promise needs to hold for every second, the limiter has to be a bucket or a sliding window.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Letting the token level exceed <span class="math" data-say="b">b</span></strong><span>An implementation that accumulates tokens without a cap turns a burst allowance into a savings account, and the <span class="math" data-say="b plus r times t">b + r·t</span> bound fails by however long the system was quiet. The cap is applied when the level is topped up, before the arrival is charged.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Sizing the downstream system for <span class="math" data-say="r">r</span> rather than for <span class="math" data-say="b plus r">b + r</span></strong><span>The limiter's worst second is <span class="math" data-say="b plus r times t">b + r·t</span>, and that is the load the queue behind it actually sees. Sizing that queue for the sustained rate alone leaves it exposed to exactly the bursts the limiter was configured to permit.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would ask “over which window?” before accepting any rate limit.</strong><p>You should be able to run a trace through a bucket by hand, state the <span class="math" data-say="b plus r times t">b + r·t</span> bound and check a trace against it, show how a fixed window doubles its advertised limit across a boundary, and choose <span class="math" data-say="r">r</span> and <span class="math" data-say="b">b</span> from two separate design questions.</p></div></div><div class="note"><strong>Note:</strong> Limiters and buffers both assume the overload is something to refuse. The last lesson takes the other case: the surge is legitimate, it is accepted, and “Transient Overload and Draining the Backlog” measures what it leaves behind and how long the system takes to give it back.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A bucket accumulates permission, not requests</summary><p>Tokens arrive at <span class="math" data-say="r">r</span> a second and each admission spends one. Because the level carries over between arrivals, the limiter has memory of how much of its allowance has recently been used &mdash; which is what lets it be precise about every window rather than about aligned ones.</p></details><details class="recall"><summary><span class="math" data-say="b">b</span> is the burst you are choosing to allow</summary><p>The level is capped at <span class="math" data-say="b">b</span>, so an idle hour buys exactly <span class="math" data-say="b">b</span> tokens and not one more. Without that cap a quiet night would pay for an unbounded morning and the <span class="math" data-say="b plus r times t">b + r·t</span> guarantee would be gone. The cap is the difference between a burst allowance and a savings account.</p></details><details class="recall"><summary>A fixed window is a weaker promise than it looks</summary><p>Counting to <span class="math" data-say="limit">limit</span> and resetting at each boundary admits <span class="math" data-say="limit">limit</span> at the end of one window and <span class="math" data-say="limit">limit</span> again at the start of the next, so a client that straddles the boundary gets up to twice the advertised rate in one window's width. The advertised number is true only of the windows the counter is aligned to.</p></details></div>
+      <h3>Summary</h3>
       <p>A token bucket admits at most <span class="math" data-say="b plus r times t">b + r·t</span> in any window of length <span class="math" data-say="t">t</span>: a sustained rate <span class="math" data-say="r">r</span> with a burst allowance <span class="math" data-say="b">b</span> on top of it. A fixed window of the same nominal limit admits nearly twice the limit across a boundary &mdash; on the lesson's trace, nine in one second while advertising five.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A bucket accumulates permission, not requests.</strong> Tokens arrive at <span class="math" data-say="r">r</span> a second and each admission spends one. Because the level carries over between arrivals, the limiter has memory of how much of its allowance has recently been used &mdash; which is what lets it be precise about every window rather than about aligned ones.</li><li><strong><span class="math" data-say="b">b</span> is the burst you are choosing to allow.</strong> The level is capped at <span class="math" data-say="b">b</span>, so an idle hour buys exactly <span class="math" data-say="b">b</span> tokens and not one more. Without that cap a quiet night would pay for an unbounded morning and the <span class="math" data-say="b plus r times t">b + r·t</span> guarantee would be gone. The cap is the difference between a burst allowance and a savings account.</li><li><strong>A fixed window is a weaker promise than it looks.</strong> Counting to <span class="math" data-say="limit">limit</span> and resetting at each boundary admits <span class="math" data-say="limit">limit</span> at the end of one window and <span class="math" data-say="limit">limit</span> again at the start of the next, so a client that straddles the boundary gets up to twice the advertised rate in one window's width. The advertised number is true only of the windows the counter is aligned to.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="tokens plus equals r times delta t, capped at b, one token per admission. admitted in any window of t, at most b plus r times t. b is a burst allowance, not a savings account, the cap is the point. trace of 20, r equals 5 per second, b equals 3, bucket admits 13, largest second 7. same trace, fixed window of 5 per second, admits 12, largest second 9" tabindex="0" role="region" aria-label="Mathematical notation">tokens += r·Δt, capped at b        one token per admission
 admitted in any window of t        at most b + r·t
 b is a burst allowance             not a savings account: the cap is the point
@@ -2835,11 +2879,42 @@ same trace, fixed window of 5/s    admits 12; largest second 9</div><figcaption>
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2907,7 +2982,7 @@ same trace, fixed window of 5/s    admits 12; largest second 9</div><figcaption>
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

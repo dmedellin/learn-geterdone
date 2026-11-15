@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Statements</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 18 · Table-Driven Methods</p>
       <h1>Table-Driven Methods</h1>
       <p class="lesson-lede">A lookup table moves a program&#x27;s knowledge out of its if statements and into data, and the logic that remains, how a key finds its entry, is where a table&#x27;s mistakes are made.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Table-driven method</li><li>Stair-step access</li><li>The endpoint rule</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the staircase</h2>
-      <article class="prose reading"><p><strong>Chapter 18, p. 430.</strong> &ldquo;One key consideration in using a table is deciding how to access the table. You can access tables by using direct access, indexed access, or stair-step access.&rdquo; It is the second of the chapter's three key points. Read Chapter 18, pp. 411&ndash;430, in your own copy first.</p><p>When should a chain of tests become a table? Section 18.1 (p. 411) answers that almost anything you can select with logic statements you can select with a table instead; in simple cases the logic is easier, and as the logic grows the table becomes more attractive. A routine that classifies characters with a long chain of comparisons can be replaced by one array lookup indexed by the character, and the program's knowledge then sits in its data instead of its tests. Every table raises two questions: how to look an entry up, and what to store in it, which may be data or, in some languages, a routine to run.</p><p>Section 18.2 (p. 413) is direct access, where the key leads straight to the entry: days in a month by the month's number, insurance rates by age and other factors. Its long example, a program that prints messages in many formats, is McConnell's case that a table can be simpler than an object-oriented design with a class per format, and his introduction points readers to it as an example of an object-oriented design that is not better merely because it is object-oriented. Where a key does not fit the table directly, the section offers ways of fudging it: duplicate entries so that it does, or transform the key, and in either case put the transformation in a routine of its own. Section 18.3 (p. 425) is indexed access: a large, mostly empty index maps the key to a position in a smaller main table, which saves space when the main entries are large and lets one table be reached by several indexes.</p><p>Section 18.4 (p. 426) is stair-step access, for entries that hold for ranges of keys rather than single values. Store the upper end of each range and search for the first one the key falls under. The section's subtleties are the lesson's subject: watch the endpoints, being careful not to mistake <span class="math" data-say="is less than">&lt;</span> for <span class="math" data-say="is at most">&lt;=</span>, and make sure keys at the top fall into the top range; for a long table consider a binary search, which he calls quasi-binary because it finds a category rather than a value; consider an indexed table instead when speed matters more than space; and put the lookup in a routine of its own. Section 18.5 (p. 429) lists where else in the book tables appear.</p><p>Now a staircase. The lesson's library charges a late fee by the days a book is overdue: nothing under 7 days, 2 under 14, 5 under 30, 10 under 60 and 20 under 365. As code it is two arrays and a loop:</p><pre class="codeblock" data-say="line 1, static final array of int days below is set to 7, 14, 30, 60, 365. line 2, static final array of int fee is set to 0, 2, 5, 10, 20. line 4, int late fee of int days overdue. line 5, for int step is set to 0, step is less than days below dot length, step is incremented. line 6, if days overdue is less than days below at index step. line 7, return fee at index step. line 10, return fee at index fee dot length minus 1" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">static final int[] DAYS_BELOW = {7, 14, 30, 60, 365};</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the staircase</h2><div class="prose reading"><p><strong>Chapter 18, p. 430.</strong> &ldquo;One key consideration in using a table is deciding how to access the table. You can access tables by using direct access, indexed access, or stair-step access.&rdquo; It is the second of the chapter's three key points. Read Chapter 18, pp. 411&ndash;430, in your own copy first.</p><p>When should a chain of tests become a table? Section 18.1 (p. 411) answers that almost anything you can select with logic statements you can select with a table instead; in simple cases the logic is easier, and as the logic grows the table becomes more attractive. A routine that classifies characters with a long chain of comparisons can be replaced by one array lookup indexed by the character, and the program's knowledge then sits in its data instead of its tests. Every table raises two questions: how to look an entry up, and what to store in it, which may be data or, in some languages, a routine to run.</p><p>Section 18.2 (p. 413) is direct access, where the key leads straight to the entry: days in a month by the month's number, insurance rates by age and other factors. Its long example, a program that prints messages in many formats, is McConnell's case that a table can be simpler than an object-oriented design with a class per format, and his introduction points readers to it as an example of an object-oriented design that is not better merely because it is object-oriented. Where a key does not fit the table directly, the section offers ways of fudging it: duplicate entries so that it does, or transform the key, and in either case put the transformation in a routine of its own. Section 18.3 (p. 425) is indexed access: a large, mostly empty index maps the key to a position in a smaller main table, which saves space when the main entries are large and lets one table be reached by several indexes.</p><p>Section 18.4 (p. 426) is stair-step access, for entries that hold for ranges of keys rather than single values. Store the upper end of each range and search for the first one the key falls under. The section's subtleties are the lesson's subject: watch the endpoints, being careful not to mistake <span class="math" data-say="is less than">&lt;</span> for <span class="math" data-say="is at most">&lt;=</span>, and make sure keys at the top fall into the top range; for a long table consider a binary search, which he calls quasi-binary because it finds a category rather than a value; consider an indexed table instead when speed matters more than space; and put the lookup in a routine of its own. Section 18.5 (p. 429) lists where else in the book tables appear.</p><p>Now a staircase. The lesson's library charges a late fee by the days a book is overdue: nothing under 7 days, 2 under 14, 5 under 30, 10 under 60 and 20 under 365. As code it is two arrays and a loop:</p><pre class="codeblock" data-say="line 1, static final array of int days below is set to 7, 14, 30, 60, 365. line 2, static final array of int fee is set to 0, 2, 5, 10, 20. line 4, int late fee of int days overdue. line 5, for int step is set to 0, step is less than days below dot length, step is incremented. line 6, if days overdue is less than days below at index step. line 7, return fee at index step. line 10, return fee at index fee dot length minus 1" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">static final int[] DAYS_BELOW = {7, 14, 30, 60, 365};</span>
 <span class="cl">static final int[] FEE = {0, 2, 5, 10, 20};</span>
 <span class="cl"></span>
 <span class="cl">int lateFee(int daysOverdue) {</span>
@@ -1455,24 +1499,21 @@
 <span class="cl">        }</span>
 <span class="cl">    }</span>
 <span class="cl">    return FEE[FEE.length - 1];</span>
-<span class="cl">}</span></code></pre><p>The lab's <em>stairs</em> view takes the same table as records of upper bound and value, a key, and a rule: <code>below</code>, the key belongs to the first step whose bound it is below, as the loop's <span class="math" data-say="is less than">&lt;</span> says, or <code>atmost</code>, at or below it. It prints the <strong>value</strong> and two counts. <strong>Tests, linear search</strong> is how many steps the loop compares the key with, from the first, before one passes. <strong>Tests, binary search</strong> is how many probes a search makes that tests the middle step, keeps the half where the answer must lie, and stops when one place is left; it counts the place above the last bound as a place too, so a five-step table has six. In the <code>days-20</code> preset a book 20 days overdue pays 5, after 3 linear tests, and the binary search finds it in 2.</p><p>The two <code>days-60</code> presets look up the same key in the same table. In <code>days-60-below</code>, 60 is not below 60, so the book falls to the last step and pays 20, after 5 linear tests and 3 binary probes. In <code>days-60-atmost</code>, 60 is at or below 60 and pays 10, after 4 tests and 3 probes. The table holds no logic, but the endpoint rule does, and it is a decision about the library's policy that the code has to state. The <code>brackets</code> preset is a staircase of sixteen tax brackets, 1,000 wide, from 0% rising by 5% to 75%. An income of 14,500 falls in the fifteenth, at 70%, after 15 linear tests; the binary search takes 4, and no key in this table takes more than 5 (those below 2,000 take 5). That is the long table the chapter has in mind for a binary search. On a short one it can lose: a book 5 days overdue needs 1 linear test and 3 binary probes.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, comment, the top of each weight step in kilograms, and its price. line 2, static final array of int step kg is set to 1, 5, 20, 70. line 3, static final array of int price is set to 5, 9, 15, 40" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// the top of each weight step in kilograms, and its price</span>
-<span class="cl">static final int[] STEP_KG = {1, 5, 20, 70};</span>
-<span class="cl">static final int[] PRICE = {5, 9, 15, 40};</span></code></pre><p>A parcel weighs 5 kg. Using the two arrays as a stair-step table, what does it cost, and how many comparisons do a linear search and the lab's binary search make, if a parcel belongs to the first step whose top it is below; and what if it belongs to the first step whose top it is at or below? Work it by hand, then check both in the lab, with the rule typed as <code>below</code> and then <code>atmost</code>, and say what the two arrays leave unstated.</p><p>A table replaced the tests; the conditions inside tests remain. The next lesson, Boolean Expressions, goes into them.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Counting tests</h2></div><p>a staircase table searched two ways</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The lab's <em>stairs</em> view takes the same table as records of upper bound and value, a key, and a rule: <code>below</code>, the key belongs to the first step whose bound it is below, as the loop's <span class="math" data-say="is less than">&lt;</span> says, or <code>atmost</code>, at or below it. It prints the <strong>value</strong> and two counts. <strong>Tests, linear search</strong> is how many steps the loop compares the key with, from the first, before one passes. <strong>Tests, binary search</strong> is how many probes a search makes that tests the middle step, keeps the half where the answer must lie, and stops when one place is left; it counts the place above the last bound as a place too, so a five-step table has six. In the <code>days-20</code> preset a book 20 days overdue pays 5, after 3 linear tests, and the binary search finds it in 2.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Counting tests</h2></div><p>a staircase table searched two ways</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Counting tests</strong><span>a staircase table searched two ways</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="seTable"></table></div>
       <div class="status-banner" id="seStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A key on the staircase</h3>
-          <p>A count over the structure the lesson states. Each step is an upper bound and a value. The lab finds the key's step by a linear scan from the first step and by a binary search, and counts the comparisons each makes. The tables are the lesson's illustrations.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A key on the staircase</h3>
+            <p>A count over the structure the lesson states. Each step is an upper bound and a value. The lab finds the key's step by a linear scan from the first step and by a binary search, and counts the comparisons each makes. The tables are the lesson's illustrations.</p>
         <div class="field">
           <label for="sePreset">Worked example</label>
           <select id="sePreset"><option value="days-20" selected>20 days overdue, below (the lesson's late-fee table)</option><option value="days-60-below">60 days overdue, below</option><option value="days-60-atmost">60 days overdue, at or below</option><option value="brackets">Sixteen tax brackets, an income of 14,500 (illustrative)</option></select>
@@ -1495,12 +1536,17 @@
           <div class="kpi"><span>Tests, binary search</span><strong id="seBinary">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The two <code>days-60</code> presets look up the same key in the same table. In <code>days-60-below</code>, 60 is not below 60, so the book falls to the last step and pays 20, after 5 linear tests and 3 binary probes. In <code>days-60-atmost</code>, 60 is at or below 60 and pays 10, after 4 tests and 3 probes. The table holds no logic, but the endpoint rule does, and it is a decision about the library's policy that the code has to state. The <code>brackets</code> preset is a staircase of sixteen tax brackets, 1,000 wide, from 0% rising by 5% to 75%. An income of 14,500 falls in the fifteenth, at 70%, after 15 linear tests; the binary search takes 4, and no key in this table takes more than 5 (those below 2,000 take 5). That is the long table the chapter has in mind for a binary search. On a short one it can lose: a book 5 days overdue needs 1 linear test and 3 binary probes.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, comment, the top of each weight step in kilograms, and its price. line 2, static final array of int step kg is set to 1, 5, 20, 70. line 3, static final array of int price is set to 5, 9, 15, 40" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// the top of each weight step in kilograms, and its price</span>
+<span class="cl">static final int[] STEP_KG = {1, 5, 20, 70};</span>
+<span class="cl">static final int[] PRICE = {5, 9, 15, 40};</span></code></pre><p>A parcel weighs 5 kg. Using the two arrays as a stair-step table, what does it cost, and how many comparisons do a linear search and the lab's binary search make, if a parcel belongs to the first step whose top it is below; and what if it belongs to the first step whose top it is at or below? Work it by hand, then check both in the lab, with the rule typed as <code>below</code> and then <code>atmost</code>, and say what the two arrays leave unstated.</p><p>A table replaced the tests; the conditions inside tests remain. The next lesson, Boolean Expressions, goes into them.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Looking a key up on a staircase</h2></div><p>Five steps, the last of which is yours.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>State the endpoint rule</h3><p>Decide, and write down, whether a key equal to a step's upper bound belongs to that step or the next.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Scan from the bottom</h3><p>Compare the key with each upper bound from the first, counting comparisons, until one passes. Its value is the answer.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Search by halving</h3><p>Probe the middle step; if the key passes it, the answer is that step or an earlier one, otherwise a later one. Repeat on the half that is left, counting probes, until one place remains, counting the place above the top bound as one.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the boundaries</h3><p>Look up a key equal to each upper bound, and one past the top, under the rule you stated. Those are where a table and its code disagree.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on your own code</h3><p>Find one lookup in your own code written as a chain of ifs, write the table that would replace it with its endpoint rule stated, and type the table and one boundary key into the lab.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Looking a key up on a staircase</h2>
+      <p class="lead-in">Five steps, the last of which is yours.</p>
+      <ol class="key-ideas method"><li><strong>State the endpoint rule.</strong> Decide, and write down, whether a key equal to a step's upper bound belongs to that step or the next.</li><li><strong>Scan from the bottom.</strong> Compare the key with each upper bound from the first, counting comparisons, until one passes. Its value is the answer.</li><li><strong>Search by halving.</strong> Probe the middle step; if the key passes it, the answer is that step or an earlier one, otherwise a later one. Repeat on the half that is left, counting probes, until one place remains, counting the place above the top bound as one.</li><li><strong>Check the boundaries.</strong> Look up a key equal to each upper bound, and one past the top, under the rule you stated. Those are where a table and its code disagree.</li><li><strong>Do it on your own code.</strong> Find one lookup in your own code written as a chain of ifs, write the table that would replace it with its endpoint rule stated, and type the table and one boundary key into the lab.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1518,17 +1564,16 @@ probe step 2 (14): fails, keep step 3
 one step left: fee 5, after 2 probes</div><p>Both searches find the third step and the fee of 5. The binary search saves one comparison here and would lose two for a key of 5; on the sixteen-step table, for 14,500, it saves eleven.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a table is just a faster if chain</strong><span>Speed is one of the chapter's reasons (p. 411), beside simplicity and ease of change. Its case is that a table moves the program's knowledge from the logic into data, where it is easier to read and to change. The logic that remains is the lookup, and the two days-60 presets show where it sits: the same key in the same table pays 20 under below and 10 under at or below. On the lesson's illustration, the decision that the if chain spread across its tests is now one rule.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming a binary search always beats a linear one</strong><span>On the late-fee table a key of 20 takes 3 linear tests and 2 binary probes, but a key of 5 takes 1 linear test and 3 probes. A binary search pays off on a long table, such as the sixteen tax brackets, which is the case Section 18.4 has in mind.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a stair-step table to hold every key</strong><span>That is a direct-access table. A staircase stores one upper bound per range, which is why it suits keys that are not whole numbers or not evenly spaced, and why its endpoints need the care the chapter asks for.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can look a key up in a stair-step table and count both searches.</strong><p>For a five-step table and a key, state the value and the comparisons a linear scan and a binary search make, and say which endpoint rule the table uses, by hand.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts comparisons, not time, and its binary search always runs until one place is left, counting the place above the last bound; a search that stops on an exact match could take fewer. A key past the last bound is reported as above the table, where the lesson's code returns the top fee instead. Which endpoint rule a business means is not something the lab or the code can know.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a table is just a faster if chain</strong><span>Speed is one of the chapter's reasons (p. 411), beside simplicity and ease of change. Its case is that a table moves the program's knowledge from the logic into data, where it is easier to read and to change. The logic that remains is the lookup, and the two days-60 presets show where it sits: the same key in the same table pays 20 under below and 10 under at or below. On the lesson's illustration, the decision that the if chain spread across its tests is now one rule.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming a binary search always beats a linear one</strong><span>On the late-fee table a key of 20 takes 3 linear tests and 2 binary probes, but a key of 5 takes 1 linear test and 3 probes. A binary search pays off on a long table, such as the sixteen tax brackets, which is the case Section 18.4 has in mind.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a stair-step table to hold every key</strong><span>That is a direct-access table. A staircase stores one upper bound per range, which is why it suits keys that are not whole numbers or not evenly spaced, and why its endpoints need the care the chapter asks for.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can look a key up in a stair-step table and count both searches.</strong><p>For a five-step table and a key, state the value and the comparisons a linear scan and a binary search make, and say which endpoint rule the table uses, by hand.</p></div></div><div class="note"><strong>Note:</strong> The lab counts comparisons, not time, and its binary search always runs until one place is left, counting the place above the last bound; a search that stops on an exact match could take fewer. A key past the last bound is reported as above the table, where the lesson's code returns the top fee instead. Which endpoint rule a business means is not something the lab or the code can know.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Table-driven method</summary><p>A scheme that looks information up in a table instead of working it out with if and case statements. The knowledge the tests held is stored as data, and the code that remains finds the entry.</p></details><details class="recall"><summary>Stair-step access</summary><p>A table whose entries each cover a range of keys. It stores the upper end of each range, and a key belongs to the first step whose upper end it does not pass.</p></details><details class="recall"><summary>The endpoint rule</summary><p>Whether a key equal to a step's upper end belongs to that step or the next: below the bound, or at or below it. Two tables with the same numbers and different rules give different answers at every boundary.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 18 sets out how to replace complicated logic with a table: what to store, and how to look an entry up, by direct, indexed or stair-step access. Look keys up in a stair-step table of late fees, count the comparisons a linear scan and a binary search make, and see the same key get two fees under two endpoint rules.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Table-driven method.</strong> A scheme that looks information up in a table instead of working it out with if and case statements. The knowledge the tests held is stored as data, and the code that remains finds the entry.</li><li><strong>Stair-step access.</strong> A table whose entries each cover a range of keys. It stores the upper end of each range, and a key belongs to the first step whose upper end it does not pass.</li><li><strong>The endpoint rule.</strong> Whether a key equal to a step's upper end belongs to that step or the next: below the bound, or at or below it. Two tables with the same numbers and different rules give different answers at every boundary.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="put the knowledge into the data. direct, indexed or staircase access. each step stores the top of its range. endpoint, below the bound, or at or below. long tables, search by halving" tabindex="0" role="region" aria-label="Mathematical notation">put the knowledge into the data
 direct, indexed or staircase access
 each step stores the top of its range
@@ -2232,11 +2277,42 @@ long tables: search by halving</div><figcaption>The chapter in five lines</figca
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2304,7 +2380,7 @@ long tables: search by halving</div><figcaption>The chapter in five lines</figca
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

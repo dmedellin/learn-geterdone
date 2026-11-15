@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Technical Practices and Architecture</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · Architecture</p>
       <h1>Allow Teams to Choose Their Own Tools</h1>
       <p class="lesson-lede">Why the authors ask for tool choice to rest with the teams, where they would still standardize, and the questions architects should ask instead.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Approved list</li><li>Standardized platform</li><li>Teams that must coordinate</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument, then the count</h2>
-      <article class="prose reading"><p>&ldquo;What tools or technologies you use is irrelevant if the people who must use them hate using them&rdquo;, the authors write in the last section of Chapter 5, going on to say that the tools must also achieve the outcomes wanted. It comes at the end of a short argument about who should choose. In many organizations engineers must use an approved list of tools and frameworks. The authors give the usual reasons fairly: a simpler environment, the skills to manage the technology through its life, more buying power with vendors, and correct licences.</p><p>Their objection is the cost. A fixed list stops teams from choosing what suits their work and from trying new approaches. In their analysis, where teams decide for themselves which tools to use, that contributes to software delivery performance and through it to organizational performance. They find it unsurprising, since the people who build and run systems choose on what serves their work and their users, and they note similar results in other studies of technical professionals, suggesting the upside of delegating the choice may outweigh the downside. This is the second of the two capabilities the 2017 analysis added to the drivers of continuous delivery.</p><p>They do not argue against standards. Some belong, especially in how infrastructure is architected and configured; they cite Humble's discussion of a standardized operational platform and Steve Yegge's account of Amazon's move to service-oriented architecture, which noted that debugging another team's code is nearly impossible without one standard way to run each service in a sandbox you can debug. They add a finding on security: teams that build it into their work do better at continuous delivery, and a key element is that security teams supply libraries, packages, toolchains and processes that are already approved and easy to use.</p><p>The two fit together, the authors say. Tools that make engineers' lives easier get adopted freely, which beats forcing tools chosen for the convenience of other stakeholders, and the freedom to decline keeps the internal tool-builders honest: usability and customer satisfaction matter as much to internal customers as to external ones. The last section turns to architects. Discussions of architecture, they observe, fixate on whether to adopt microservices or serverless, which orchestrator, which CI server or language. Their research says these are the wrong questions; what matters is enabling teams to change their products and services without waiting on other teams or systems, and architects should work closely with the engineers who build and run them.</p><p>Now the count, which is the previous lesson's, with teams. The lab takes components, the team that owns each, and the ties between components that must be released together. The system is invented for this lesson: seven services owned by four teams. Three of the ties are real couplings inside a team's own area (billing and invoices; signup and referrals; reports and export). Three more come from a shared library whose new version must be adopted at the same time by billing, signup, reports and the gateway. In the preset <code>lockstep</code> those six ties make one group of 7: all seven services, no component deployable alone, and 4 teams that must coordinate every release.</p><p>Suppose signup and reports could take the new library version at different times, say through a compatibility shim, and remove that one tie. The group splits in two. The larger has 4 services owned by payments and growth, the other 3 services owned by data and platform. The lab's after tile reads 2: two groups that still need two teams each, so all four teams still coordinate, but in pairs. In the preset <code>pinned</code> the shared library is pinned by version, so each service upgrades when its own team chooses and those three ties vanish. There are 4 groups, the largest has 2, 1 component (the gateway) is deployable alone, and no group spans more than one team, so the lab lists none that must coordinate.</p><p>The lab shows what the chapter argues, that team choice and coupling meet in the release. A tool or library that forces a lock-step upgrade makes a decision that was meant to be local into one across teams. It does not decide the question the chapter leaves open: a standardized platform also removes some choices from a team, and whether a given standard serves its users or only its owners is something to ask the engineers who use it.</p><h3>Exercise</h3><ul><li>Components and owners: <span class="math" data-say="web, shop, api, shop, search, find, index, find, ads, growth">web, shop; api, shop; search, find; index, find; ads, growth</span>.</li><li>Ties: <span class="math" data-say="web, api, api, search, search, index, ads, web">web, api; api, search; search, index; ads, web</span>. A shared library ties <span class="math" data-say="api">api</span> and <span class="math" data-say="search">search</span>.</li></ul><p>Find the release groups and the teams that must coordinate in the largest. Then remove the tie between api and search and do it again. Say what the first count tells you about the shared library, and what a team would give up by pinning it.</p><p>The next course, Security, Lean Management and Product Development, reads Chapters 6 to 8, on security, lean management and product development.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Release independence</h2></div><p>which components can be released on their own</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument, then the count</h2><div class="prose reading"><p>&ldquo;What tools or technologies you use is irrelevant if the people who must use them hate using them&rdquo;, the authors write in the last section of Chapter 5, going on to say that the tools must also achieve the outcomes wanted. It comes at the end of a short argument about who should choose. In many organizations engineers must use an approved list of tools and frameworks. The authors give the usual reasons fairly: a simpler environment, the skills to manage the technology through its life, more buying power with vendors, and correct licences.</p><p>Their objection is the cost. A fixed list stops teams from choosing what suits their work and from trying new approaches. In their analysis, where teams decide for themselves which tools to use, that contributes to software delivery performance and through it to organizational performance. They find it unsurprising, since the people who build and run systems choose on what serves their work and their users, and they note similar results in other studies of technical professionals, suggesting the upside of delegating the choice may outweigh the downside. This is the second of the two capabilities the 2017 analysis added to the drivers of continuous delivery.</p><p>They do not argue against standards. Some belong, especially in how infrastructure is architected and configured; they cite Humble's discussion of a standardized operational platform and Steve Yegge's account of Amazon's move to service-oriented architecture, which noted that debugging another team's code is nearly impossible without one standard way to run each service in a sandbox you can debug. They add a finding on security: teams that build it into their work do better at continuous delivery, and a key element is that security teams supply libraries, packages, toolchains and processes that are already approved and easy to use.</p><p>The two fit together, the authors say. Tools that make engineers' lives easier get adopted freely, which beats forcing tools chosen for the convenience of other stakeholders, and the freedom to decline keeps the internal tool-builders honest: usability and customer satisfaction matter as much to internal customers as to external ones. The last section turns to architects. Discussions of architecture, they observe, fixate on whether to adopt microservices or serverless, which orchestrator, which CI server or language. Their research says these are the wrong questions; what matters is enabling teams to change their products and services without waiting on other teams or systems, and architects should work closely with the engineers who build and run them.</p><p>Now the count, which is the previous lesson's, with teams. The lab takes components, the team that owns each, and the ties between components that must be released together. The system is invented for this lesson: seven services owned by four teams. Three of the ties are real couplings inside a team's own area (billing and invoices; signup and referrals; reports and export). Three more come from a shared library whose new version must be adopted at the same time by billing, signup, reports and the gateway. In the preset <code>lockstep</code> those six ties make one group of 7: all seven services, no component deployable alone, and 4 teams that must coordinate every release.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Release independence</h2></div><p>which components can be released on their own</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Release independence</strong><span>which components can be released on their own</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="arlTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="arlTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A tie a, b says the two components must be released together, in either direction; ties chain, so a release group is every component reachable from another through ties (a connected component). A component in a group of one is deployable alone. When components carry teams, a group holding more than one team's components makes those teams coordinate its release. Groups are listed in the order of their first component in the input, and the largest group is the first of the largest size. With a tie to remove, the after tiles are the same counts without it.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Which teams must coordinate a release</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Which teams must coordinate a release</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="arlPreset">Worked example</label>
           <select id="arlPreset"><option value="lockstep" selected>Seven services, with a shared library forcing a lock-step upgrade</option><option value="pinned">The same services, with the library pinned by version</option></select>
@@ -1439,12 +1482,15 @@
           <div class="kpi"><span>Teams that must coordinate after</span><strong id="arlAfterCoord">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Suppose signup and reports could take the new library version at different times, say through a compatibility shim, and remove that one tie. The group splits in two. The larger has 4 services owned by payments and growth, the other 3 services owned by data and platform. The lab's after tile reads 2: two groups that still need two teams each, so all four teams still coordinate, but in pairs. In the preset <code>pinned</code> the shared library is pinned by version, so each service upgrades when its own team chooses and those three ties vanish. There are 4 groups, the largest has 2, 1 component (the gateway) is deployable alone, and no group spans more than one team, so the lab lists none that must coordinate.</p><p>The lab shows what the chapter argues, that team choice and coupling meet in the release. A tool or library that forces a lock-step upgrade makes a decision that was meant to be local into one across teams. It does not decide the question the chapter leaves open: a standardized platform also removes some choices from a team, and whether a given standard serves its users or only its owners is something to ask the engineers who use it.</p><h3>Exercise</h3><ul><li>Components and owners: <span class="math" data-say="web, shop, api, shop, search, find, index, find, ads, growth">web, shop; api, shop; search, find; index, find; ads, growth</span>.</li><li>Ties: <span class="math" data-say="web, api, api, search, search, index, ads, web">web, api; api, search; search, index; ads, web</span>. A shared library ties <span class="math" data-say="api">api</span> and <span class="math" data-say="search">search</span>.</li></ul><p>Find the release groups and the teams that must coordinate in the largest. Then remove the tie between api and search and do it again. Say what the first count tells you about the shared library, and what a team would give up by pinning it.</p><p>The next course, Security, Lean Management and Product Development, reads Chapters 6 to 8, on security, lean management and product development.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting the teams a release draws in</h2></div><p>Four steps, the last of them on a system you know.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Give every component an owner</h3><p>Write down which team owns each service, as the team that would be called out if it broke.</p></article><article class="card concept-card"><div class="icon">2</div><h3>List the ties, shared things included</h3><p>Add a tie for each pair that must go out together. A shared library, tool or platform that forces a lock-step upgrade ties all its consumers, so tie them in turn.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the largest group and its teams</h3><p>Follow the ties to the biggest set and list the distinct teams that own its components.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own system</h3><p>Take a shared library or tool your teams all use, list the services that must adopt a new version together, and type them in. Write down how many teams must agree before it ships.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting the teams a release draws in</h2>
+      <p class="lead-in">Four steps, the last of them on a system you know.</p>
+      <ol class="key-ideas method"><li><strong>Give every component an owner.</strong> Write down which team owns each service, as the team that would be called out if it broke.</li><li><strong>List the ties, shared things included.</strong> Add a tie for each pair that must go out together. A shared library, tool or platform that forces a lock-step upgrade ties all its consumers, so tie them in turn.</li><li><strong>Find the largest group and its teams.</strong> Follow the ties to the biggest set and list the distinct teams that own its components.</li><li><strong>Do it on your own system.</strong> Take a shared library or tool your teams all use, list the services that must adopt a new version together, and type them in. Write down how many teams must agree before it ships.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1465,17 +1511,16 @@ billing, invoices, signup, referrals: 4 services, 2 teams
 reports, export, gateway: 3 services, 2 teams</div><p>After the split the larger group has 4 services and 2 teams, and the lab's after tile reads 2 because two groups still span two teams each; the teams it names are four. Each group needs fewer people to agree than before.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the chapter as saying there should be no standards</strong><span>The authors keep a place for standards, especially for how infrastructure is architected and configured, and cite a standardized operational platform and Yegge's account of Amazon. Their objection is to standards chosen for other stakeholders' convenience and imposed on the engineers who use them.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking an architect&#x27;s job is to pick the best technology</strong><span>The chapter calls questions such as microservices against serverless or one orchestrator against another the wrong ones. Tools are irrelevant if the people hate using them or if they do not produce the outcomes and behaviors wanted; architects should help teams change their services without depending on others.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Mandating a tool because it is good</strong><span>The chapter's point on security tools is that engineers adopt preapproved libraries and toolchains of their own free will when they make life easier. A tool forced on teams hides whether it is usable, which the freedom to decline keeps in view.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a shared tool couples.</strong><p>Given services, their owning teams and the ties that force them to release together, find the largest group and the teams that must coordinate, and say what the chapter claims about tool choice, standards and the questions architects should ask.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts teams from ties you type. It cannot say whether a tie is a real constraint, whether pinning a version costs more than the coordination it saves, or whether team choice caused anything: the authors report that it contributes to performance in their survey, and argue the rest.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the chapter as saying there should be no standards</strong><span>The authors keep a place for standards, especially for how infrastructure is architected and configured, and cite a standardized operational platform and Yegge's account of Amazon. Their objection is to standards chosen for other stakeholders' convenience and imposed on the engineers who use them.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking an architect&#x27;s job is to pick the best technology</strong><span>The chapter calls questions such as microservices against serverless or one orchestrator against another the wrong ones. Tools are irrelevant if the people hate using them or if they do not produce the outcomes and behaviors wanted; architects should help teams change their services without depending on others.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Mandating a tool because it is good</strong><span>The chapter's point on security tools is that engineers adopt preapproved libraries and toolchains of their own free will when they make life easier. A tool forced on teams hides whether it is usable, which the freedom to decline keeps in view.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a shared tool couples.</strong><p>Given services, their owning teams and the ties that force them to release together, find the largest group and the teams that must coordinate, and say what the chapter claims about tool choice, standards and the questions architects should ask.</p></div></div><div class="note"><strong>Note:</strong> The lab counts teams from ties you type. It cannot say whether a tie is a real constraint, whether pinning a version costs more than the coordination it saves, or whether team choice caused anything: the authors report that it contributes to performance in their survey, and argue the rest.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Approved list</summary><p>A list of tools and frameworks engineers must choose from. The chapter names its purposes: a simpler environment, the skills to support it, buying power with vendors and correct licensing. It weighs them against the teams' loss of fit.</p></details><details class="recall"><summary>Standardized platform</summary><p>A common way to build, run and debug services, such as a universal way to run each in a debuggable sandbox. The authors keep a place for it, around the architecture and configuration of infrastructure.</p></details><details class="recall"><summary>Teams that must coordinate</summary><p>The teams that own the components of a release group spanning more than one team. The lab's tile counts such groups and names each group's teams; a group owned by one team is not listed. Fewer means fewer people who must agree before anything ships.</p></details></div>
+      <h3>Summary</h3>
       <p>The last two sections of Chapter 5: the case for letting teams choose their tools, the room the authors leave for standards, and what they say architects should attend to. Then count how many teams must coordinate a release when a shared library forces its consumers to upgrade together.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Approved list.</strong> A list of tools and frameworks engineers must choose from. The chapter names its purposes: a simpler environment, the skills to support it, buying power with vendors and correct licensing. It weighs them against the teams' loss of fit.</li><li><strong>Standardized platform.</strong> A common way to build, run and debug services, such as a universal way to run each in a debuggable sandbox. The authors keep a place for it, around the architecture and configuration of infrastructure.</li><li><strong>Teams that must coordinate.</strong> The teams that own the components of a release group spanning more than one team. The lab's tile counts such groups and names each group's teams; a group owned by one team is not listed. Fewer means fewer people who must agree before anything ships.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="approved lists have reasons and costs. team tool choice predicts performance. standardize the platform, not every tool. usable tools get adopted by choice. wrong questions, which tool, which stack. enable change without depending on others. architects work with engineers" tabindex="0" role="region" aria-label="Mathematical notation">approved lists have reasons and costs
 team tool choice predicts performance
 standardize the platform, not every tool
@@ -2349,11 +2394,42 @@ architects work with engineers</div><figcaption>Tools and architects in seven li
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2421,7 +2497,7 @@ architects work with engineers</div><figcaption>Tools and architects in seven li
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

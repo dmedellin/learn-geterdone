@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Measuring Systems</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Aggregates that lie</p>
       <h1>Percentiles Do Not Average</h1>
       <p class="lesson-lede">Compute a fleet p99 from the merged sample, and the mean of the per-host p99s on the same data, and say what the second one is.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A percentile is defined on a sample, so the fleet one needs the fleet sample</li><li>The mean of the per-host values weights hosts; the fleet percentile weights requests</li><li>The fleet value is bounded by the per-host values, which is why the mean looks safe</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The fleet percentile, the number that is not one, and the bound they share</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Fleet percentile</span><p>Given the requests served by every host in a fleet over a window, the <strong>fleet q-th percentile</strong> is the q-th percentile of that single merged sample: sort all <span class="math" data-say="n">n</span> latencies and take the one at position <span class="math" data-say="the ceiling of q times n">⌈q·n⌉</span>. It is computed from requests, not from per-host summaries, and every request counts once.</p></div><p>There is no second definition. The bucketed percentile of &ldquo;Histograms and Bucket Error&rdquo; and the corrected percentile of &ldquo;Coordinated Omission&rdquo; are this same rule applied to a coarsened sample and to a repaired one. Where two of this course&rsquo;s numbers disagree, the disagreement is about which requests were in the sample, never about what a percentile is.</p><p>The number a metrics system usually makes easy, by contrast, is one p99 per host per minute, and the obvious thing to do with several of those is to average them. That average has a name in no textbook. It is not the fleet p99, it is not an estimate of the fleet p99, and it does not converge to the fleet p99 as the window grows.</p><div class="mathblock" data-say="host A, 8, 9, 10, 11, 12, 5 requests. host B, 10, 11, 12, 13, 14, 5 requests. host C, 150 times 20, 180 times 20, 220 times 20, 260 times 15, 320 times 10, 400 times 5, 90 requests. per host, nearest the rank of at q equals 99 over 100. A, the ceiling of 0.99 times 5, equals 5, of 5, goes to, 12 milliseconds. B, the ceiling of 0.99 times 5, equals 5, of 5, goes to, 14 milliseconds. C, the ceiling of 0.99 times 90, equals 90, of 90, goes to, 400 milliseconds. mean of the three, equals the quantity 12 plus 14 plus 400, over 3 equals 142 milliseconds. merged sample, n equals 100. fleet p 99, the ceiling of 0.99 times 100, equals 99, of 100, goes to, 400 milliseconds. fleet p 50, the ceiling of 0.50 times 100, equals 50, of 100, goes to, 180 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">host A   8, 9, 10, 11, 12                            5 requests
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The fleet percentile, the number that is not one, and the bound they share</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Fleet percentile</span><p>Given the requests served by every host in a fleet over a window, the <strong>fleet q-th percentile</strong> is the q-th percentile of that single merged sample: sort all <span class="math" data-say="n">n</span> latencies and take the one at position <span class="math" data-say="the ceiling of q times n">⌈q·n⌉</span>. It is computed from requests, not from per-host summaries, and every request counts once.</p></div><p>There is no second definition. The bucketed percentile of &ldquo;Histograms and Bucket Error&rdquo; and the corrected percentile of &ldquo;Coordinated Omission&rdquo; are this same rule applied to a coarsened sample and to a repaired one. Where two of this course&rsquo;s numbers disagree, the disagreement is about which requests were in the sample, never about what a percentile is.</p><p>The number a metrics system usually makes easy, by contrast, is one p99 per host per minute, and the obvious thing to do with several of those is to average them. That average has a name in no textbook. It is not the fleet p99, it is not an estimate of the fleet p99, and it does not converge to the fleet p99 as the window grows.</p><div class="mathblock" data-say="host A, 8, 9, 10, 11, 12, 5 requests. host B, 10, 11, 12, 13, 14, 5 requests. host C, 150 times 20, 180 times 20, 220 times 20, 260 times 15, 320 times 10, 400 times 5, 90 requests. per host, nearest the rank of at q equals 99 over 100. A, the ceiling of 0.99 times 5, equals 5, of 5, goes to, 12 milliseconds. B, the ceiling of 0.99 times 5, equals 5, of 5, goes to, 14 milliseconds. C, the ceiling of 0.99 times 90, equals 90, of 90, goes to, 400 milliseconds. mean of the three, equals the quantity 12 plus 14 plus 400, over 3 equals 142 milliseconds. merged sample, n equals 100. fleet p 99, the ceiling of 0.99 times 100, equals 99, of 100, goes to, 400 milliseconds. fleet p 50, the ceiling of 0.50 times 100, equals 50, of 100, goes to, 180 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">host A   8, 9, 10, 11, 12                            5 requests
 host B   10, 11, 12, 13, 14                          5 requests
 host C   150×20, 180×20, 220×20, 260×15, 320×10, 400×5   90 requests
 
@@ -1404,12 +1448,11 @@ mean of the three                = (12 + 14 + 400)/3 = 142 ms
 
 merged sample, n = 100:
   fleet p99   ⌈0.99×100⌉ = 99  of 100  →  400 ms
-  fleet p50   ⌈0.50×100⌉ = 50  of 100  →  180 ms</div><p>Read the last three lines together. The average of three 99th percentiles is 142 ms; the fleet&rsquo;s median is 180 ms. The number being presented as a statement about the slowest one per cent of requests is smaller than the number that half of all requests beat. It is not a slightly optimistic p99. It is below the middle.</p><div class="thm"><span class="label">Theorem &middot; The fleet percentile lies between the smallest and the largest per-host percentile</span><p>Let host <span class="math" data-say="i">i</span> have <span class="math" data-say="n sub i">nᵢ</span> requests and q-th percentile <span class="math" data-say="p sub i">pᵢ</span>, and let <span class="math" data-say="M equals max p sub i">M = max pᵢ</span>. At least a fraction <span class="math" data-say="q">q</span> of each host&rsquo;s requests are at most <span class="math" data-say="p sub i is at most M">pᵢ ≤ M</span>, so at least a fraction <span class="math" data-say="q">q</span> of all <span class="math" data-say="the sum of n sub i">Σnᵢ</span> requests are at most <span class="math" data-say="M">M</span>, and the merged q-th percentile is therefore at most <span class="math" data-say="M">M</span>. Running the argument with <span class="math" data-say="m equals min p sub i">m = min pᵢ</span> from the other side gives</p><p><span class="math" data-say="min p sub i is at most fleet p is at most max p sub i">min pᵢ ≤ fleet p ≤ max pᵢ</span>.</p><p>One corollary is worth stating because the folklore gets it backwards: if every host reports the <em>same</em> p99, the fleet p99 is that number exactly &mdash; the bound closes. Percentiles fail to average, but they do not fail by leaving the range of the values being averaged.</p></div><p>So the mean of the per-host values is always somewhere plausible, and it is why nobody notices. What the bound does not give you is the value: anywhere inside <span class="math" data-say="min, max">[min, max]</span> is consistent with the per-host figures, and where the fleet value actually falls depends on data the per-host summaries threw away.</p><h3>The per-host percentiles do not determine the fleet percentile</h3><p>That claim deserves a demonstration rather than an assertion, so here are two fleets. Both have two hosts, both hosts serve a hundred requests, and in both fleets the two host p99s are 40 ms and 100 ms. The fleet p99 is not the same number in the two cases.</p><div class="example"><span class="label">Example &middot; Two fleets, the same pair of host p99s, two different answers</span><p><strong>Fleet one.</strong> Host X is 98 requests at 10 ms, one at 40, one at 50; its p99 is position 99 of 100, which is 40 ms. Host Y is 98 at 20 ms, one at 100, one at 200; its p99 is 100 ms. Merged, <span class="math" data-say="n equals 200">n = 200</span> and the fleet p99 is position 198, which is <strong>50 ms</strong>.</p><p><strong>Fleet two.</strong> Host X is 98 at 10 ms and two at 40; its p99 is again 40 ms. Host Y is 96 at 30 ms and four at 100; its p99 is again 100 ms. Merged, position 198 of 200 is <strong>100 ms</strong>.</p><p>Same two host p99s, fleet answers of 50 ms and 100 ms. The average, 70 ms, is a fact about neither fleet, and it is not even between the two right answers in any useful sense: it is above one and below the other. Both fleet values sit inside <span class="math" data-say="40, 100">[40, 100]</span>, exactly as the bound promises, and the bound is the most that can be said without the requests.</p></div><h3>What you can combine, and what to keep instead</h3><p>Counts and sums combine, because they are additive: total requests, total errors, total milliseconds. A ratio of two sums is fine &mdash; the fleet error rate really is the sum of the errors over the sum of the requests &mdash; and so is a mean weighted by its own denominator. It is the order statistics that do not: a percentile, a median, a maximum-of-percentiles all need the sample.</p><p>The practical answer is to keep something mergeable. A histogram of counts per bucket adds bucket by bucket, and the percentile is read off the merged histogram rather than averaged across hosts; that is what almost every metrics system is doing when it gets this right. It costs an interval instead of a point, which is the subject of the next page, and an interval that contains the answer is a better object than a point that does not.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The fleet p99, and the number that is not one</h2></div><p>Two answers from one definition and one set of requests</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  fleet p50   ⌈0.50×100⌉ = 50  of 100  →  180 ms</div><p>Read the last three lines together. The average of three 99th percentiles is 142 ms; the fleet&rsquo;s median is 180 ms. The number being presented as a statement about the slowest one per cent of requests is smaller than the number that half of all requests beat. It is not a slightly optimistic p99. It is below the middle.</p><div class="thm"><span class="label">Theorem &middot; The fleet percentile lies between the smallest and the largest per-host percentile</span><p>Let host <span class="math" data-say="i">i</span> have <span class="math" data-say="n sub i">nᵢ</span> requests and q-th percentile <span class="math" data-say="p sub i">pᵢ</span>, and let <span class="math" data-say="M equals max p sub i">M = max pᵢ</span>. At least a fraction <span class="math" data-say="q">q</span> of each host&rsquo;s requests are at most <span class="math" data-say="p sub i is at most M">pᵢ ≤ M</span>, so at least a fraction <span class="math" data-say="q">q</span> of all <span class="math" data-say="the sum of n sub i">Σnᵢ</span> requests are at most <span class="math" data-say="M">M</span>, and the merged q-th percentile is therefore at most <span class="math" data-say="M">M</span>. Running the argument with <span class="math" data-say="m equals min p sub i">m = min pᵢ</span> from the other side gives</p><p><span class="math" data-say="min p sub i is at most fleet p is at most max p sub i">min pᵢ ≤ fleet p ≤ max pᵢ</span>.</p><p>One corollary is worth stating because the folklore gets it backwards: if every host reports the <em>same</em> p99, the fleet p99 is that number exactly &mdash; the bound closes. Percentiles fail to average, but they do not fail by leaving the range of the values being averaged.</p></div><p>So the mean of the per-host values is always somewhere plausible, and it is why nobody notices. What the bound does not give you is the value: anywhere inside <span class="math" data-say="min, max">[min, max]</span> is consistent with the per-host figures, and where the fleet value actually falls depends on data the per-host summaries threw away.</p><h3>The per-host percentiles do not determine the fleet percentile</h3><p>That claim deserves a demonstration rather than an assertion, so here are two fleets. Both have two hosts, both hosts serve a hundred requests, and in both fleets the two host p99s are 40 ms and 100 ms. The fleet p99 is not the same number in the two cases.</p><div class="example"><span class="label">Example &middot; Two fleets, the same pair of host p99s, two different answers</span><p><strong>Fleet one.</strong> Host X is 98 requests at 10 ms, one at 40, one at 50; its p99 is position 99 of 100, which is 40 ms. Host Y is 98 at 20 ms, one at 100, one at 200; its p99 is 100 ms. Merged, <span class="math" data-say="n equals 200">n = 200</span> and the fleet p99 is position 198, which is <strong>50 ms</strong>.</p><p><strong>Fleet two.</strong> Host X is 98 at 10 ms and two at 40; its p99 is again 40 ms. Host Y is 96 at 30 ms and four at 100; its p99 is again 100 ms. Merged, position 198 of 200 is <strong>100 ms</strong>.</p><p>Same two host p99s, fleet answers of 50 ms and 100 ms. The average, 70 ms, is a fact about neither fleet, and it is not even between the two right answers in any useful sense: it is above one and below the other. Both fleet values sit inside <span class="math" data-say="40, 100">[40, 100]</span>, exactly as the bound promises, and the bound is the most that can be said without the requests.</p></div><h3>What you can combine, and what to keep instead</h3><p>Counts and sums combine, because they are additive: total requests, total errors, total milliseconds. A ratio of two sums is fine &mdash; the fleet error rate really is the sum of the errors over the sum of the requests &mdash; and so is a mean weighted by its own denominator. It is the order statistics that do not: a percentile, a median, a maximum-of-percentiles all need the sample.</p><p>The practical answer is to keep something mergeable. A histogram of counts per bucket adds bucket by bucket, and the percentile is read off the merged histogram rather than averaged across hosts; that is what almost every metrics system is doing when it gets this right. It costs an interval instead of a point, which is the subject of the next page, and an interval that contains the answer is a better object than a point that does not.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The fleet p99, and the number that is not one</h2></div><p>Two answers from one definition and one set of requests</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Percentiles do not average</strong><span>the p99 of the merged sample, against the mean of the per-host p99s</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the merged fleet</span><span class="tone-amber"><i class="legend-swatch"></i>fleet p99</span><span class="tone-red"><i class="legend-swatch"></i>mean of the p99s</span></div>
@@ -1417,10 +1460,10 @@ merged sample, n = 100:
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="agPlot" viewBox="0 0 660 210" role="img" aria-label="Each host's sample as ticks with its own p99, then the merged sample with the fleet p99 and the mean of the p99s marked."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="agTable"></table></div>
       <div class="status-banner" id="agStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Edit the per-host samples</h3>
-          <p>Both numbers are nearest rank, computed by the same function: one on each host&rsquo;s sample, one on the merged sample. Move requests between the hosts without changing any latency and watch the mean of the p99s move while the fleet p99 stays put &mdash; the mean is responding to how the traffic was divided, which is not a property of the service at all.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Edit the per-host samples</h3>
+            <p>Both numbers are nearest rank, computed by the same function: one on each host&rsquo;s sample, one on the merged sample. Move requests between the hosts without changing any latency and watch the mean of the p99s move while the fleet p99 stays put &mdash; the mean is responding to how the traffic was divided, which is not a property of the service at all.</p>
         <div class="field">
           <label for="agA">web-1 (ms; v:count repeats a value)</label>
           <input id="agA" type="text" value="8, 9, 10, 11, 12" inputmode="text" autocomplete="off">
@@ -1446,12 +1489,14 @@ merged sample, n = 100:
           <div class="kpi"><span>Requests in the fleet</span><strong id="agN">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="agHint" style="margin:0;">Both numbers come from the same nearest-rank definition and the same requests. The fleet figure applies it once to every request the fleet served; the other applies it per host and then averages the answers, which is an average of ranks and is not a percentile of anything.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Aggregating a percentile across hosts</h2></div><p>The first step is the one that gets skipped, and skipping it is what makes the rest impossible.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Ask what sample the number is a percentile of</h3><p>If the answer is &ldquo;several samples&rdquo;, it is not a percentile yet. Write down how many requests each contributing host served; the moment those counts are unequal, the mean of the per-host values is weighting hosts rather than requests.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Merge the requests, then take the percentile once</h3><p>Sort the combined latencies and take position <span class="math" data-say="the ceiling of q times n">⌈q·n⌉</span>. This is the answer. Everything else on this page is about what to do when you cannot get the requests.</p></article><article class="card concept-card"><div class="icon">3</div><h3>If you cannot merge requests, merge histograms</h3><p>Bucket counts add across hosts, so the merged histogram is exact even though the percentile read from it is an interval. An interval that certainly contains the fleet p99 beats a point that certainly is not it.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Bound what you have, and report the bound as a bound</h3><p>With only per-host percentiles, <span class="math" data-say="min p sub i is at most fleet p is at most max p sub i">min pᵢ ≤ fleet p ≤ max pᵢ</span> is everything that can honestly be said. Report the range. If the range is too wide to act on, that is a finding about the pipeline, not about the service.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Say which one your dashboard is showing</h3><p>Most panels that plot one line per host and then add an aggregation are averaging percentiles by default. Find the aggregation setting, read it, and write the answer in the panel description so the next person does not have to.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Aggregating a percentile across hosts</h2>
+      <p class="lead-in">The first step is the one that gets skipped, and skipping it is what makes the rest impossible.</p>
+      <ol class="key-ideas method"><li><strong>Ask what sample the number is a percentile of.</strong> If the answer is &ldquo;several samples&rdquo;, it is not a percentile yet. Write down how many requests each contributing host served; the moment those counts are unequal, the mean of the per-host values is weighting hosts rather than requests.</li><li><strong>Merge the requests, then take the percentile once.</strong> Sort the combined latencies and take position <span class="math" data-say="the ceiling of q times n">⌈q·n⌉</span>. This is the answer. Everything else on this page is about what to do when you cannot get the requests.</li><li><strong>If you cannot merge requests, merge histograms.</strong> Bucket counts add across hosts, so the merged histogram is exact even though the percentile read from it is an interval. An interval that certainly contains the fleet p99 beats a point that certainly is not it.</li><li><strong>Bound what you have, and report the bound as a bound.</strong> With only per-host percentiles, <span class="math" data-say="min p sub i is at most fleet p is at most max p sub i">min pᵢ ≤ fleet p ≤ max pᵢ</span> is everything that can honestly be said. Report the range. If the range is too wide to act on, that is a finding about the pipeline, not about the service.</li><li><strong>Say which one your dashboard is showing.</strong> Most panels that plot one line per host and then add an aggregation are averaging percentiles by default. Find the aggregation setting, read it, and write the answer in the panel description so the next person does not have to.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1486,17 +1531,16 @@ merged and sorted:
   142 &lt; 180:  the average of three 99th percentiles is below the median</div><p>The bound holds throughout: <span class="math" data-say="12 is at most 400 is at most 400">12 ≤ 400 ≤ 400</span>, and the average 142 is inside <span class="math" data-say="12, 400">[12, 400]</span> as well. Nothing here is out of range. The average is wrong by being an answer to no question, not by being extreme, and that is why it needs a worked example rather than a warning.</p><p>Notice also what a per-host p99 means on a five-request host: nearest rank at <span class="math" data-say="the ceiling of 0.99 times 5, equals 5">⌈0.99 × 5⌉ = 5</span> is the maximum. Host A&rsquo;s &ldquo;p99&rdquo; of 12 ms is its slowest request out of five, and two of the three numbers being averaged are maxima of tiny samples. The lab makes this visible &mdash; move requests onto A and watch its reported p99 stop being its maximum.</p><p>For faded practice, keep the three samples and change only the division of traffic: give host C thirty requests and hosts A and B thirty-five each, drawn from the same value lists. The supplied first move is that the three per-host p99s barely change. Predict the new fleet p99 and the new average before you compute either, then check both in the lab and say which of the two moved and why.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Averaging the per-host percentiles</strong><span>The headline error, and it is usually made by a dashboard rather than by a person: a panel plots one series per host and an aggregation of &ldquo;avg&rdquo; is applied over them. The fix is to merge before taking the percentile, or to merge histograms and read the percentile off the sum. Check what your panel is configured to do before quoting its number in an incident review.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the maximum of the per-host p99s as the fleet p99</strong><span>It is an upper bound and it is often loose. On the worked sample it happens to be exactly right &mdash; both are 400 ms &mdash; which is how the habit forms; in the two-host example above the maximum is 100 ms and the fleet p99 is 50 ms, wrong by a factor of two in the direction that causes a pointless investigation. Report it as a bound if you use it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting a per-host percentile from a sample too small to have one</strong><span>Nearest rank at <span class="math" data-say="the ceiling of 0.99 times 5">⌈0.99 × 5⌉</span> is rank 5 of 5: the maximum, relabelled. A host serving five requests a minute has no p99, and averaging its &ldquo;p99&rdquo; with anything gives the maximum of five requests a vote equal to a host that served ninety. A percentile needs enough samples to have a rank that is not the last one &mdash; a point &ldquo;How Long to Run a Load Test&rdquo; turns into an exact request count.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “what sample is this a percentile of?” is the first question you ask about any aggregate.</strong><p>You should be able to compute a fleet percentile from merged samples by nearest rank, compute the mean of the per-host values on the same data and say what it is, state and use the bound <span class="math" data-say="min p sub i is at most fleet p is at most max p sub i">min pᵢ ≤ fleet p ≤ max pᵢ</span>, and name what your own pipeline aggregates.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Merging histograms rescues the aggregation and costs resolution: the answer stops being a value and becomes the bucket that contains it. &ldquo;Histograms and Bucket Error&rdquo; computes how wide that bucket is &mdash; on logarithmic boundaries the relative error is <span class="math" data-say="ratio minus 1">ratio − 1</span>, which at the usual ratio of two is one hundred per cent, in every bucket, no matter how much traffic you collect.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Averaging the per-host percentiles</strong><span>The headline error, and it is usually made by a dashboard rather than by a person: a panel plots one series per host and an aggregation of &ldquo;avg&rdquo; is applied over them. The fix is to merge before taking the percentile, or to merge histograms and read the percentile off the sum. Check what your panel is configured to do before quoting its number in an incident review.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the maximum of the per-host p99s as the fleet p99</strong><span>It is an upper bound and it is often loose. On the worked sample it happens to be exactly right &mdash; both are 400 ms &mdash; which is how the habit forms; in the two-host example above the maximum is 100 ms and the fleet p99 is 50 ms, wrong by a factor of two in the direction that causes a pointless investigation. Report it as a bound if you use it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting a per-host percentile from a sample too small to have one</strong><span>Nearest rank at <span class="math" data-say="the ceiling of 0.99 times 5">⌈0.99 × 5⌉</span> is rank 5 of 5: the maximum, relabelled. A host serving five requests a minute has no p99, and averaging its &ldquo;p99&rdquo; with anything gives the maximum of five requests a vote equal to a host that served ninety. A percentile needs enough samples to have a rank that is not the last one &mdash; a point &ldquo;How Long to Run a Load Test&rdquo; turns into an exact request count.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “what sample is this a percentile of?” is the first question you ask about any aggregate.</strong><p>You should be able to compute a fleet percentile from merged samples by nearest rank, compute the mean of the per-host values on the same data and say what it is, state and use the bound <span class="math" data-say="min p sub i is at most fleet p is at most max p sub i">min pᵢ ≤ fleet p ≤ max pᵢ</span>, and name what your own pipeline aggregates.</p></div></div><div class="note"><strong>Note:</strong> Merging histograms rescues the aggregation and costs resolution: the answer stops being a value and becomes the bucket that contains it. &ldquo;Histograms and Bucket Error&rdquo; computes how wide that bucket is &mdash; on logarithmic boundaries the relative error is <span class="math" data-say="ratio minus 1">ratio − 1</span>, which at the usual ratio of two is one hundred per cent, in every bucket, no matter how much traffic you collect.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A percentile is defined on a sample, so the fleet one needs the fleet sample</summary><p>Nearest rank, as &ldquo;Percentiles from a Sample&rdquo; on the Latency and the Tail course defines it: sort the <span class="math" data-say="n">n</span> values, take the one at position <span class="math" data-say="the ceiling of q times n">⌈q·n⌉</span>. Applied to one host&rsquo;s requests it gives that host&rsquo;s p99; applied to every request the fleet served it gives the fleet&rsquo;s. These are two different samples, so they are two different questions, and only the second one is about the fleet.</p></details><details class="recall"><summary>The mean of the per-host values weights hosts; the fleet percentile weights requests</summary><p>That is the entire mechanism. In the lab&rsquo;s sample one host served 90 of the 100 requests and the other two served five each, so averaging the three p99s gives the busy host one vote out of three when it deserves ninety out of a hundred. The result, 142 ms, is dragged down by two hosts that between them handled a tenth of the traffic.</p></details><details class="recall"><summary>The fleet value is bounded by the per-host values, which is why the mean looks safe</summary><p>If every host reports a p99 at or below <span class="math" data-say="v">v</span>, then at least 99% of each host&rsquo;s requests are at or below <span class="math" data-say="v">v</span>, so at least 99% of all of them are, and the fleet p99 is at or below <span class="math" data-say="v">v</span> as well. The same argument downward gives <span class="math" data-say="min p sub i is at most fleet p is at most max p sub i">min pᵢ ≤ fleet p ≤ max pᵢ</span>, and the mean is inside that range too. So the wrong number is never absurd, which is precisely why it survives review. It is simply not the answer to any question.</p></details></div>
+      <h3>Summary</h3>
       <p>A fleet percentile is the percentile of the merged sample: one definition, applied once, to every request. The number most dashboards show instead is the mean of the per-host percentiles, which is not a percentile of anything and is not an estimate of one. On the sample in the lab the three host p99s are 12, 14 and 400 ms, their mean is 142 ms, and the fleet median is 180 ms &mdash; so the average of three 99th percentiles lands below the middle of the distribution it is supposed to sit far above.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A percentile is defined on a sample, so the fleet one needs the fleet sample.</strong> Nearest rank, as &ldquo;Percentiles from a Sample&rdquo; on the Latency and the Tail course defines it: sort the <span class="math" data-say="n">n</span> values, take the one at position <span class="math" data-say="the ceiling of q times n">⌈q·n⌉</span>. Applied to one host&rsquo;s requests it gives that host&rsquo;s p99; applied to every request the fleet served it gives the fleet&rsquo;s. These are two different samples, so they are two different questions, and only the second one is about the fleet.</li><li><strong>The mean of the per-host values weights hosts; the fleet percentile weights requests.</strong> That is the entire mechanism. In the lab&rsquo;s sample one host served 90 of the 100 requests and the other two served five each, so averaging the three p99s gives the busy host one vote out of three when it deserves ninety out of a hundred. The result, 142 ms, is dragged down by two hosts that between them handled a tenth of the traffic.</li><li><strong>The fleet value is bounded by the per-host values, which is why the mean looks safe.</strong> If every host reports a p99 at or below <span class="math" data-say="v">v</span>, then at least 99% of each host&rsquo;s requests are at or below <span class="math" data-say="v">v</span>, so at least 99% of all of them are, and the fleet p99 is at or below <span class="math" data-say="v">v</span> as well. The same argument downward gives <span class="math" data-say="min p sub i is at most fleet p is at most max p sub i">min pᵢ ≤ fleet p ≤ max pᵢ</span>, and the mean is inside that range too. So the wrong number is never absurd, which is precisely why it survives review. It is simply not the answer to any question.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="fleet p 99 equals p 99 of the merged sample, one definition, applied once. mean of per-host p 99 s equals a percentile of nothing. preset, host p 99 s, 12, 14, 400 milliseconds, hosts carry 5, 5 and 90 requests. mean 142, fleet p 99400, fleet median 180. 142 sits BELOW the median it should sit far above. min p sub i is at most fleet p is at most max p sub i, the mean is inside the range too" tabindex="0" role="region" aria-label="Mathematical notation">fleet p99 = p99 of the merged sample     one definition, applied once
 mean of per-host p99s = a percentile of nothing
 preset  host p99s  12, 14, 400 ms        hosts carry 5, 5 and 90 requests
@@ -2906,11 +2950,42 @@ min pᵢ ≤ fleet p ≤ max pᵢ                the mean is inside the range to
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2978,7 +3053,7 @@ min pᵢ ≤ fleet p ≤ max pᵢ                the mean is inside the range to
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,30 +1424,28 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Data Structures</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 13 · Red-Black Trees</p>
       <h1>Red-Black Insertion and Deletion</h1>
       <p class="lesson-lede">An insertion adds a red leaf and repairs the one property it can break by recolouring up the tree and at most two rotations; a deletion that removes a black node pushes an extra black up the tree and settles it with at most three rotations.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Uncle</li><li>The fix-up&#x27;s loop invariant</li><li>Extra black</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p>RB-INSERT, the authors conclude in Section 13.3, &ldquo;never performs more than two rotations, since the while loop terminates if case 2 or case 3 is executed.&rdquo; The recolouring may climb the whole height of the tree, but the structural change is bounded by a constant. This lesson reads sections 13.3 and 13.4: how insertion and deletion keep the five properties, and what each costs.</p><p>RB-INSERT begins as TREE-INSERT does, with <span class="math" data-say="T, nil">T.nil</span> in place of NIL, hangs the new node z as a leaf with two <span class="math" data-say="T, nil">T.nil</span> children, and colours it red. Red is the safe colour. A black z would add a black node to every path through it and break property 5 at every ancestor; a red z leaves the black counts alone, and properties 1, 3 and 5 still hold. Only two things can go wrong: z is the root, which breaks property 2, or z's parent is red, which breaks property 4. RB-INSERT-FIXUP removes whichever it is.</p><p>The fix-up loops while z's parent is red, and the book proves it with a loop invariant in the three parts of Chapter 2. At the start of each pass z is red, z's parent is black if it is the root, and the only violation is one of the two above. Initially z is the new node, so this holds. At termination z's parent is black, so property 4 holds, and the last line colours the root black, which repairs property 2. Maintenance is the case analysis. Since z's parent is red it is not the root, so the grandparent exists, and it is black.</p><div class="defbox"><span class="label">Definition &middot; The three cases, with z&#x27;s parent a left child</span><p>Case 1, the uncle is red: colour the parent and the uncle black and the grandparent red, and make the grandparent the new z, two levels up. Case 2, the uncle is black and z is a right child: left-rotate at the parent, which turns the situation into case 3 with the roles of z and its parent swapped. Case 3, the uncle is black and z is a left child: colour the parent black and the grandparent red, and right-rotate at the grandparent. The loop then ends. When the parent is a right child, the three mirror cases exchange left and right.</p></div><p>Case 1 keeps property 5 because it moves one black from the grandparent down onto both its children, so every path through the grandparent still passes the same number of blacks; the only new risk is the red grandparent's own parent, which the next pass handles. Cases 2 and 3 keep property 5 because rotations change no colours and case 3's recolouring is matched by its rotation. After case 3 the subtree's top is black, so the loop stops.</p><p>The analysis follows. The descent costs <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> because the tree's height is <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> by Lemma 13.1. Only case 1 repeats the loop, and each time it moves z up two levels, so the loop runs <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> times. Cases 2 and 3 end it, which is the sentence quoted above: at most two rotations per insertion, whatever the tree. In recolourings, case 1 changes three colours and case 3 two, and the final colouring of the root changes one more when the root has turned red.</p><p>Section 13.4 is longer, because deletion can break more. RB-TRANSPLANT is Chapter 12's TRANSPLANT with the sentinel, and RB-DELETE follows TREE-DELETE while tracking three things: the node y that is removed or moved (z itself when z has fewer than two children, z's successor otherwise), y's colour before anything changed, and the node x that takes over y's old position, possibly <span class="math" data-say="T, nil">T.nil</span>. If y was red, nothing breaks: no black count changes, no two reds become adjacent, and y was not the root. If y was black, three properties are at risk: 2 if a red child of y becomes the root, 4 if x and its new parent are both red, and 5 on every path that used to pass through y.</p><p>The book repairs property 5 at once by bookkeeping: x carries an extra black, so the counts are right, and the loop in RB-DELETE-FIXUP moves that extra black up the tree. If x is red-and-black it is simply coloured black; if x reaches the root the extra black is dropped. Otherwise x is a doubly black non-root, and the cases look at x's sibling w. Case 1, w is red: recolour w and the parent and rotate at the parent, which gives x a black sibling and leads to one of the other cases. Case 2, w is black with two black children: colour w red and move the extra black up to the parent. Case 3, w is black with a red child on the near side and a black one on the far side: swap colours and rotate at w, giving case 4. Case 4, w is black with a red child on the far side: recolour and rotate at the parent, and the extra black is gone.</p><p>Only case 2 repeats, and it moves x up one level without rotating, so the loop runs <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> times. Case 1 leads into case 2, 3 or 4; a case 2 reached from case 1 leaves x red-and-black, because the parent was red, so the loop stops; and cases 3 and 4 end it at once. Past the climbing case 2 there are a constant number of recolourings, and the worst path, 1 then 3 then 4, rotates three times. RB-DELETE therefore takes <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> with at most three rotations. Here is one deletion by hand, from the tree the worked example below ends with.</p><div class="mathblock" data-say="delete 10 from 20 B of 10 B 40 B of 30 R 50 R. 10 has no children, y equals 10, black, x equals T, nil. x is doubly black, sibling w equals 40, black. w&#x27;s far child 50 is red, case 4. 50 black, rotate left at 20, x equals root. result, 40 B of 20 B of the quantity negative 30 R, 50 B, bh 2" tabindex="0" role="region" aria-label="Mathematical notation">delete 10 from 20B(10B 40B(30R 50R))
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the count</h2><div class="prose reading"><p>RB-INSERT, the authors conclude in Section 13.3, &ldquo;never performs more than two rotations, since the while loop terminates if case 2 or case 3 is executed.&rdquo; The recolouring may climb the whole height of the tree, but the structural change is bounded by a constant. This lesson reads sections 13.3 and 13.4: how insertion and deletion keep the five properties, and what each costs.</p><p>RB-INSERT begins as TREE-INSERT does, with <span class="math" data-say="T, nil">T.nil</span> in place of NIL, hangs the new node z as a leaf with two <span class="math" data-say="T, nil">T.nil</span> children, and colours it red. Red is the safe colour. A black z would add a black node to every path through it and break property 5 at every ancestor; a red z leaves the black counts alone, and properties 1, 3 and 5 still hold. Only two things can go wrong: z is the root, which breaks property 2, or z's parent is red, which breaks property 4. RB-INSERT-FIXUP removes whichever it is.</p><p>The fix-up loops while z's parent is red, and the book proves it with a loop invariant in the three parts of Chapter 2. At the start of each pass z is red, z's parent is black if it is the root, and the only violation is one of the two above. Initially z is the new node, so this holds. At termination z's parent is black, so property 4 holds, and the last line colours the root black, which repairs property 2. Maintenance is the case analysis. Since z's parent is red it is not the root, so the grandparent exists, and it is black.</p><div class="defbox"><span class="label">Definition &middot; The three cases, with z&#x27;s parent a left child</span><p>Case 1, the uncle is red: colour the parent and the uncle black and the grandparent red, and make the grandparent the new z, two levels up. Case 2, the uncle is black and z is a right child: left-rotate at the parent, which turns the situation into case 3 with the roles of z and its parent swapped. Case 3, the uncle is black and z is a left child: colour the parent black and the grandparent red, and right-rotate at the grandparent. The loop then ends. When the parent is a right child, the three mirror cases exchange left and right.</p></div><p>Case 1 keeps property 5 because it moves one black from the grandparent down onto both its children, so every path through the grandparent still passes the same number of blacks; the only new risk is the red grandparent's own parent, which the next pass handles. Cases 2 and 3 keep property 5 because rotations change no colours and case 3's recolouring is matched by its rotation. After case 3 the subtree's top is black, so the loop stops.</p><p>The analysis follows. The descent costs <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> because the tree's height is <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> by Lemma 13.1. Only case 1 repeats the loop, and each time it moves z up two levels, so the loop runs <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> times. Cases 2 and 3 end it, which is the sentence quoted above: at most two rotations per insertion, whatever the tree. In recolourings, case 1 changes three colours and case 3 two, and the final colouring of the root changes one more when the root has turned red.</p><p>Section 13.4 is longer, because deletion can break more. RB-TRANSPLANT is Chapter 12's TRANSPLANT with the sentinel, and RB-DELETE follows TREE-DELETE while tracking three things: the node y that is removed or moved (z itself when z has fewer than two children, z's successor otherwise), y's colour before anything changed, and the node x that takes over y's old position, possibly <span class="math" data-say="T, nil">T.nil</span>. If y was red, nothing breaks: no black count changes, no two reds become adjacent, and y was not the root. If y was black, three properties are at risk: 2 if a red child of y becomes the root, 4 if x and its new parent are both red, and 5 on every path that used to pass through y.</p><p>The book repairs property 5 at once by bookkeeping: x carries an extra black, so the counts are right, and the loop in RB-DELETE-FIXUP moves that extra black up the tree. If x is red-and-black it is simply coloured black; if x reaches the root the extra black is dropped. Otherwise x is a doubly black non-root, and the cases look at x's sibling w. Case 1, w is red: recolour w and the parent and rotate at the parent, which gives x a black sibling and leads to one of the other cases. Case 2, w is black with two black children: colour w red and move the extra black up to the parent. Case 3, w is black with a red child on the near side and a black one on the far side: swap colours and rotate at w, giving case 4. Case 4, w is black with a red child on the far side: recolour and rotate at the parent, and the extra black is gone.</p><p>Only case 2 repeats, and it moves x up one level without rotating, so the loop runs <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> times. Case 1 leads into case 2, 3 or 4; a case 2 reached from case 1 leaves x red-and-black, because the parent was red, so the loop stops; and cases 3 and 4 end it at once. Past the climbing case 2 there are a constant number of recolourings, and the worst path, 1 then 3 then 4, rotates three times. RB-DELETE therefore takes <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> with at most three rotations. Here is one deletion by hand, from the tree the worked example below ends with.</p><div class="mathblock" data-say="delete 10 from 20 B of 10 B 40 B of 30 R 50 R. 10 has no children, y equals 10, black, x equals T, nil. x is doubly black, sibling w equals 40, black. w&#x27;s far child 50 is red, case 4. 50 black, rotate left at 20, x equals root. result, 40 B of 20 B of the quantity negative 30 R, 50 B, bh 2" tabindex="0" role="region" aria-label="Mathematical notation">delete 10 from 20B(10B 40B(30R 50R))
 
 10 has no children: y = 10, black; x = T.nil
 x is doubly black; sibling w = 40, black
 w&#x27;s far child 50 is red: case 4
 50 black, rotate left at 20; x = root
-result: 40B(20B(- 30R) 50B), bh 2</div><p>Now the lab, which runs RB-INSERT and RB-INSERT-FIXUP on the keys you type, one at a time; it does not delete. The tiles are the tally of fix-up cases, a prime marking a mirror case; the recolourings, counting each assignment that changes a colour; the rotations; the most rotations in any one insertion; the final tree, written as key and colour with the subtrees in parentheses and a dash for a missing child; the black-height; the height to the leaves; and Lemma 13.1's bound. The table under them gives each insertion's cases, recolourings and rotations.</p><p>The worked example <code>ascending</code> inserts 10 to 80 in increasing order: case <span data-say="1 prime times 3">1′ ×3</span>, case <span data-say="3 prime times 4">3′ ×4</span>, 19 recolourings, 4 rotations, never more than 1 in an insertion, and a final height of 4 against <span class="math" data-say="2 times log base 2 of 9 is approximately 6.34">2 lg 9 ≈ 6.34</span>. Chapter 12's tree on the same order is a chain of height 7. <code>descending</code> is the mirror image: case <span data-say="1 times 3">1 ×3</span>, case <span data-say="3 times 4">3 ×4</span>, the same 19 and 4. <code>zigzag</code>, 10 30 20 50 40 70 60, makes every other insertion from the third on bend inward: case <span data-say="1 prime times 2">1′ ×2</span>, case <span data-say="2 prime times 3">2′ ×3</span>, case <span data-say="3 prime times 3">3′ ×3</span>, 14 recolourings and 6 rotations, 2 in each bent insertion, the most the analysis allows. <code>spread-order</code>, ten keys in an order that keeps the tree bushy, needs only case <span data-say="1 times 2, 8">1 ×2: 8</span> recolourings and no rotations at all.</p><p>None of those counts reached three rotations in one insertion, and the argument above says none can. That is a claim about every tree and every key, which no number of runs establishes; the runs show what the claim looks like on four sequences.</p><h3>Exercise</h3><p>Insert <span class="math" data-say="15 5 10 25 20">15 5 10 25 20</span> into an empty red-black tree by hand. For each key name the fix-up cases, and count the recolourings and rotations. Write the final tree in the lab's notation, then type the keys into the lab to check your counts insertion by insertion.</p><p>A red-black tree can carry more than a colour in each node. The next lesson, Augmenting Data Structures, adds a subtree size, uses it to find the i-th smallest key in <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>, and asks which extra fields these fix-ups can keep correct.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Red-black trees</h2></div><p>RB-INSERT and RB-INSERT-FIXUP, counted</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+result: 40B(20B(- 30R) 50B), bh 2</div><p>Now the lab, which runs RB-INSERT and RB-INSERT-FIXUP on the keys you type, one at a time; it does not delete. The tiles are the tally of fix-up cases, a prime marking a mirror case; the recolourings, counting each assignment that changes a colour; the rotations; the most rotations in any one insertion; the final tree, written as key and colour with the subtrees in parentheses and a dash for a missing child; the black-height; the height to the leaves; and Lemma 13.1's bound. The table under them gives each insertion's cases, recolourings and rotations.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Red-black trees</h2></div><p>RB-INSERT and RB-INSERT-FIXUP, counted</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Red-black trees</strong><span>RB-INSERT and RB-INSERT-FIXUP, counted</span></div>
       </div>
@@ -1410,10 +1453,10 @@ result: 40B(20B(- 30R) 50B), bh 2</div><p>Now the lab, which runs RB-INSERT and 
       <div class="table-wrap" id="rbiTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="rbiTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each key goes in by RB-INSERT (down the tree, left when smaller, as a red leaf), then RB-INSERT-FIXUP runs while z's parent is red. With z's parent a left child: case 1, the uncle is red; case 2, the uncle is black and z is a right child (z moves up, one left rotation); case 3, the uncle is black and z is a left child (one right rotation). 1′, 2′ and 3′ are the same cases with left and right exchanged. A recoloring is a color assignment that changes a node's color: case 1 makes 3, case 3 makes 2, and the final root := black counts 1 when the root was red. The new node's red is not a recoloring. The final tree is written key and color (R or B), then its two subtrees in parentheses, - for a NIL child. The height counts the edges from the root down to its deepest NIL leaf, so a lone node has height 1; black-height bh(x) counts the black nodes below x on a path down to a NIL leaf, the NIL leaf counted and x not. Lemma 13.1's bound 2 lg(n + 1) is printed to two places, rounded half up by exact integer comparison, with = only when it is exact.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Insert keys and count the fix-up&#x27;s work</h3>
-          <p>A count over the situation the lesson states. Type distinct keys; each is inserted by RB-INSERT and repaired by RB-INSERT-FIXUP. The cases, recolourings and rotations are counted for every insertion and in all, and the final tree is written out with its height beside Lemma 13.1's bound. The counts are about these keys; the two-rotation limit is proved for every insertion.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Insert keys and count the fix-up&#x27;s work</h3>
+            <p>A count over the situation the lesson states. Type distinct keys; each is inserted by RB-INSERT and repaired by RB-INSERT-FIXUP. The cases, recolourings and rotations are counted for every insertion and in all, and the final tree is written out with its height beside Lemma 13.1's bound. The counts are about these keys; the two-rotation limit is proved for every insertion.</p>
         <div class="field">
           <label for="rbiPreset">Worked example</label>
           <select id="rbiPreset"><option value="ascending" selected>Eight keys in increasing order</option><option value="descending">The same keys in decreasing order</option><option value="zigzag">Seven keys that bend inward in turn</option><option value="spread-order">Ten keys in a bushy order</option></select>
@@ -1433,12 +1476,15 @@ result: 40B(20B(- 30R) 50B), bh 2</div><p>Now the lab, which runs RB-INSERT and 
           <div class="kpi"><span>Lemma 13.1 bound</span><strong id="rbiBound">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The worked example <code>ascending</code> inserts 10 to 80 in increasing order: case <span data-say="1 prime times 3">1′ ×3</span>, case <span data-say="3 prime times 4">3′ ×4</span>, 19 recolourings, 4 rotations, never more than 1 in an insertion, and a final height of 4 against <span class="math" data-say="2 times log base 2 of 9 is approximately 6.34">2 lg 9 ≈ 6.34</span>. Chapter 12's tree on the same order is a chain of height 7. <code>descending</code> is the mirror image: case <span data-say="1 times 3">1 ×3</span>, case <span data-say="3 times 4">3 ×4</span>, the same 19 and 4. <code>zigzag</code>, 10 30 20 50 40 70 60, makes every other insertion from the third on bend inward: case <span data-say="1 prime times 2">1′ ×2</span>, case <span data-say="2 prime times 3">2′ ×3</span>, case <span data-say="3 prime times 3">3′ ×3</span>, 14 recolourings and 6 rotations, 2 in each bent insertion, the most the analysis allows. <code>spread-order</code>, ten keys in an order that keeps the tree bushy, needs only case <span data-say="1 times 2, 8">1 ×2: 8</span> recolourings and no rotations at all.</p><p>None of those counts reached three rotations in one insertion, and the argument above says none can. That is a claim about every tree and every key, which no number of runs establishes; the runs show what the claim looks like on four sequences.</p><h3>Exercise</h3><p>Insert <span class="math" data-say="15 5 10 25 20">15 5 10 25 20</span> into an empty red-black tree by hand. For each key name the fix-up cases, and count the recolourings and rotations. Write the final tree in the lab's notation, then type the keys into the lab to check your counts insertion by insertion.</p><p>A red-black tree can carry more than a colour in each node. The next lesson, Augmenting Data Structures, adds a subtree size, uses it to find the i-th smallest key in <span class="math" data-say="big O of log base 2 of n">O(lg n)</span>, and asks which extra fields these fix-ups can keep correct.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running the insertion fix-up by hand</h2></div><p>Four steps for each key, then one in the lab.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Insert red, as in a search tree</h3><p>Walk down from the root, hang the key as a leaf, and colour it red. If its parent is black, or it is the root, skip to the last step.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the uncle</h3><p>Note whether the parent is a left or right child of the grandparent; the uncle is the grandparent's other child, a black NIL if missing.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Apply the case</h3><p>Red uncle: recolour parent, uncle and grandparent and continue from the grandparent. Black uncle, z on the inner side: rotate at the parent, then treat the old parent as z. Black uncle, z on the outer side: recolour parent and grandparent and rotate at the grandparent; stop.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Blacken the root and count</h3><p>Colour the root black. Record the cases, the colours that changed and the rotations; no insertion may rotate more than twice.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Run a sequence of your own</h3><p>Choose eight to twelve keys, predict which insertions will rotate, type them into the lab and compare its table with your predictions row by row.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running the insertion fix-up by hand</h2>
+      <p class="lead-in">Four steps for each key, then one in the lab.</p>
+      <ol class="key-ideas method"><li><strong>Insert red, as in a search tree.</strong> Walk down from the root, hang the key as a leaf, and colour it red. If its parent is black, or it is the root, skip to the last step.</li><li><strong>Find the uncle.</strong> Note whether the parent is a left or right child of the grandparent; the uncle is the grandparent's other child, a black NIL if missing.</li><li><strong>Apply the case.</strong> Red uncle: recolour parent, uncle and grandparent and continue from the grandparent. Black uncle, z on the inner side: rotate at the parent, then treat the old parent as z. Black uncle, z on the outer side: recolour parent and grandparent and rotate at the grandparent; stop.</li><li><strong>Blacken the root and count.</strong> Colour the root black. Record the cases, the colours that changed and the rotations; no insertion may rotate more than twice.</li><li><strong>Run a sequence of your own.</strong> Choose eight to twelve keys, predict which insertions will rotate, type them into the lab and compare its table with your predictions row by row.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1459,17 +1505,16 @@ result: 40B(20B(- 30R) 50B), bh 2</div><p>Now the lab, which runs RB-INSERT and 
   2 and 2: 20B(10B 40B(30R 50R))</div><p>In all, 9 recolourings and 4 rotations, and no insertion rotated more than twice. The case <span data-say="1 prime">1′</span> at 50 recoloured 30 and 10 black and 20 red, then stopped because 20 is the root, and the last line of the fix-up made it black again: four colours changed. The lab's first five rows of <code>zigzag</code> are these five insertions.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting the number of rotations to grow with the tree</strong><span>The recolouring of case 1 can climb <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> levels, but cases 2 and 3 end the loop, so an insertion rotates at most twice; a deletion's fix-up rotates at most three times. In the lab no insertion of the four sequences rotates more than twice, and <code>zigzag</code> reaches two exactly. The bound comes from the case analysis, and the counts only illustrate it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Colouring the new node black</strong><span>A black leaf adds a black node to every path through it, breaking property 5 at every ancestor at once. The book colours z red so that the only possible faults are property 2 at the root or property 4 below a red parent, each next to z, which is what lets three local cases repair them.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling the deletion fix-up whenever a node is removed</strong><span>RB-DELETE calls RB-DELETE-FIXUP only when the node y that left or moved was black. A red y changes no black-height, cannot make two reds adjacent and cannot have been the root. Tracking y's original colour is how the procedure knows which situation it is in.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run both fix-ups by hand and bound their work.</strong><p>Given a red-black tree and a key, insert it naming each case with its recolourings and rotations; given a node to delete, say whether a fix-up is needed and carry out its cases.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab inserts and does not delete; Section 13.4's cases are worked in prose and by hand here. Its recolourings count only assignments that change a colour, and its height counts the edges to the leaves. The counts are four sequences' and yours; the limits of two and three rotations are proved for every insertion and deletion.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting the number of rotations to grow with the tree</strong><span>The recolouring of case 1 can climb <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> levels, but cases 2 and 3 end the loop, so an insertion rotates at most twice; a deletion's fix-up rotates at most three times. In the lab no insertion of the four sequences rotates more than twice, and <code>zigzag</code> reaches two exactly. The bound comes from the case analysis, and the counts only illustrate it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Colouring the new node black</strong><span>A black leaf adds a black node to every path through it, breaking property 5 at every ancestor at once. The book colours z red so that the only possible faults are property 2 at the root or property 4 below a red parent, each next to z, which is what lets three local cases repair them.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling the deletion fix-up whenever a node is removed</strong><span>RB-DELETE calls RB-DELETE-FIXUP only when the node y that left or moved was black. A red y changes no black-height, cannot make two reds adjacent and cannot have been the root. Tracking y's original colour is how the procedure knows which situation it is in.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run both fix-ups by hand and bound their work.</strong><p>Given a red-black tree and a key, insert it naming each case with its recolourings and rotations; given a node to delete, say whether a fix-up is needed and carry out its cases.</p></div></div><div class="note"><strong>Note:</strong> The lab inserts and does not delete; Section 13.4's cases are worked in prose and by hand here. Its recolourings count only assignments that change a colour, and its height counts the edges to the leaves. The counts are four sequences' and yours; the limits of two and three rotations are proved for every insertion and deletion.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Uncle</summary><p>The sibling of the new node's parent. When the parent is red the grandparent is black, and the uncle's colour chooses the case: red means the trouble can be recoloured away and passed upward, black means a rotation can end it here.</p></details><details class="recall"><summary>The fix-up&#x27;s loop invariant</summary><p>At the start of each pass of RB-INSERT-FIXUP: the current node z is red; if z's parent is the root, it is black; and at most one property is violated, either 2 because z is the red root, or 4 because z and its parent are both red.</p></details><details class="recall"><summary>Extra black</summary><p>When RB-DELETE removes or moves a black node, the node x that takes its place is credited with one more black than its colour shows, so property 5 still counts correctly. x is then doubly black or red-and-black, and the fix-up's job is to move that extra black up until it can be discharged.</p></details></div>
+      <h3>Summary</h3>
       <p>Sections 13.3 and 13.4 make insertion and deletion keep the red-black properties. RB-INSERT colours the new node red and RB-INSERT-FIXUP removes the one possible violation by three cases; RB-DELETE tracks the node that leaves or moves and, when it was black, RB-DELETE-FIXUP moves an extra black up the tree by four cases. Both take O(lg n). Insert five keys by hand, then let the lab insert whole sequences and count every case, recolouring and rotation.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Uncle.</strong> The sibling of the new node's parent. When the parent is red the grandparent is black, and the uncle's colour chooses the case: red means the trouble can be recoloured away and passed upward, black means a rotation can end it here.</li><li><strong>The fix-up&#x27;s loop invariant.</strong> At the start of each pass of RB-INSERT-FIXUP: the current node z is red; if z's parent is the root, it is black; and at most one property is violated, either 2 because z is the red root, or 4 because z and its parent are both red.</li><li><strong>Extra black.</strong> When RB-DELETE removes or moves a black node, the node x that takes its place is credited with one more black than its colour shows, so property 5 still counts correctly. x is then doubly black or red-and-black, and the fix-up's job is to move that extra black up until it can be discharged.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="insert as in a search tree, coloured red. only property 2 or 4 can then fail. red uncle, recolour, move up two levels. black uncle, one or two rotations, done. insertion, big O of log base 2 of n, at most 2 rotations. deleting a red node breaks nothing. a black one leaves an extra black to move. deletion, big O of log base 2 of n, at most 3 rotations" tabindex="0" role="region" aria-label="Mathematical notation">insert as in a search tree, coloured red
 only property 2 or 4 can then fail
 red uncle: recolour, move up two levels
@@ -2243,11 +2288,42 @@ deletion: O(lg n), at most 3 rotations</div><figcaption>Sections 13.3 and 13.4 i
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2315,7 +2391,7 @@ deletion: O(lg n), at most 3 rotations</div><figcaption>Sections 13.3 and 13.4 i
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

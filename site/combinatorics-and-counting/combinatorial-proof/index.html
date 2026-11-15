@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Combinatorics and Counting</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Technique</p>
       <h1>Combinatorial Proof</h1>
       <p class="lesson-lede">Count one set two ways, or biject two sets.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Double counting needs one set and two classifications</li><li>A bijection needs an explicit map</li><li>The explanation is the value</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two techniques</h2>
-      <article class="prose reading"><h3>Double counting</h3><div class="thm"><span class="label">Theorem &middot; The method</span><p>To prove <span class="math" data-say="A equals B">A = B</span>, find a set <span class="math" data-say="S">S</span> and show that counting <span class="math" data-say="S">S</span> one way gives <span class="math" data-say="A">A</span> and another way gives <span class="math" data-say="B">B</span>. Since <span class="math" data-say="S">S</span> has one size, <span class="math" data-say="A equals B">A = B</span>.</p></div><div class="example"><span class="label">Example &middot; Handshakes</span><p>In any graph, <span class="math" data-say="the sum over v of the degree of v equals 2 times the size of E">Σ_v deg(v) = 2|E|</span>. Count the incidences &mdash; pairs (vertex, edge at that vertex). By vertex: each contributes its degree. By edge: each has two endpoints. “Degree and the Handshake Theorem” in Graphs and Trees opens with this.</p></div><div class="example"><span class="label">Example &middot; Pascal&#x27;s rule, again</span><p><span class="math" data-say="n choose k equals n minus 1 choose k minus 1 plus n minus 1 choose k">C(n,k) = C(n−1,k−1) + C(n−1,k)</span>: count <span class="math" data-say="k">k</span>-subsets by whether they contain a fixed element. One set, two classifications.</p></div><div class="example"><span class="label">Example &middot; Vandermonde</span><p><span class="math" data-say="m plus n choose r equals the sum over k of m choose kn choose r minus k">C(m+n,r) = Σ_k C(m,k)C(n,r−k)</span>: count <span class="math" data-say="r">r</span>-subsets of a set split into groups of <span class="math" data-say="m">m</span> and <span class="math" data-say="n">n</span>, classified by how many come from the first group.</p></div><p>Vandermonde with <span class="math" data-say="m equals n equals r">m = n = r</span> reads <span class="math" data-say="2 n choose n equals the sum over k of n choose k times n choose n minus k">C(2n, n) = Σ_k C(n,k)·C(n,n−k)</span>, and the symmetry <span class="math" data-say="n choose n minus k equals n choose k">C(n,n−k) = C(n,k)</span> turns it into <span class="math" data-say="the sum over k of n choose k squared equals 2 n choose n">Σ_k C(n,k)² = C(2n,n)</span>: the <span class="math" data-say="n">n</span>-subsets of a <span class="math" data-say="2 n">2n</span>-set, classified by how many come from the first half. The square is two halves of the same size making the same kind of choice. An identity that looks as if it needs algebra is often a known double count in disguise, and recognising which is the skill.</p><h3>Bijective proof</h3><div class="thm"><span class="label">Theorem &middot; The method</span><p>To prove <span class="math" data-say="the size of A, equals the size of B">|A| = |B|</span>, construct an explicit bijection <span class="math" data-say="f, A to B">f : A → B</span>. The criteria of “Injective, Surjective, Bijective”, in Sets, Relations, and Functions, apply: injective and surjective, both argued.</p></div><div class="example"><span class="label">Example &middot; Symmetry of binomial coefficients</span><p><span class="math" data-say="n choose k equals n choose n minus k">C(n,k) = C(n,n−k)</span> via complementation: send each <span class="math" data-say="k">k</span>-subset to its complement. It is its own inverse, hence a bijection.</p></div><div class="example"><span class="label">Example &middot; Subsets and bit strings</span><p><span class="math" data-say="the size of P of S, equals 2 to the power n">|P(S)| = 2ⁿ</span> via the indicator map: send a subset to the string with a 1 in position <span class="math" data-say="i">i</span> exactly when the <span class="math" data-say="i">i</span>th element is in. Injective because a subset is determined by its members; surjective because every string names a subset.</p></div><div class="example"><span class="label">Example &middot; Compositions</span><p>The number of ways to write <span class="math" data-say="n">n</span> as an ordered sum of positive integers is <span class="math" data-say="2 to the power n minus 1">2ⁿ⁻¹</span>. Bijection: write <span class="math" data-say="n">n</span> as <span class="math" data-say="n">n</span> ones separated by <span class="math" data-say="n minus 1">n−1</span> gaps, and choose which gaps to cut. Each subset of gaps gives one composition, and conversely.</p></div><h3>When to use which</h3><ul><li>The identity has a <strong>sum</strong> on one side: double count, classifying by whatever the summation index measures.</li><li>The identity says two <strong>counts are equal</strong> with no sum: look for a bijection.</li><li>The identity has <strong>alternating signs</strong>: neither directly. Look for a sign-reversing involution &mdash; a pairing that cancels most terms &mdash; or use inclusion and exclusion.</li></ul><p>A word on rigour. A combinatorial proof is a proof, not an intuition. The obligations are precise: for double counting, say what the objects are and check both classifications are exhaustive and disjoint; for a bijection, define the map and argue both directions.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Pascal&#x27;s triangle</h2></div><p>Identities highlighted and checked</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two techniques</h2><div class="prose reading"><h3>Double counting</h3><div class="thm"><span class="label">Theorem &middot; The method</span><p>To prove <span class="math" data-say="A equals B">A = B</span>, find a set <span class="math" data-say="S">S</span> and show that counting <span class="math" data-say="S">S</span> one way gives <span class="math" data-say="A">A</span> and another way gives <span class="math" data-say="B">B</span>. Since <span class="math" data-say="S">S</span> has one size, <span class="math" data-say="A equals B">A = B</span>.</p></div><div class="example"><span class="label">Example &middot; Handshakes</span><p>In any graph, <span class="math" data-say="the sum over v of the degree of v equals 2 times the size of E">Σ_v deg(v) = 2|E|</span>. Count the incidences &mdash; pairs (vertex, edge at that vertex). By vertex: each contributes its degree. By edge: each has two endpoints. “Degree and the Handshake Theorem” in Graphs and Trees opens with this.</p></div><div class="example"><span class="label">Example &middot; Pascal&#x27;s rule, again</span><p><span class="math" data-say="n choose k equals n minus 1 choose k minus 1 plus n minus 1 choose k">C(n,k) = C(n−1,k−1) + C(n−1,k)</span>: count <span class="math" data-say="k">k</span>-subsets by whether they contain a fixed element. One set, two classifications.</p></div><div class="example"><span class="label">Example &middot; Vandermonde</span><p><span class="math" data-say="m plus n choose r equals the sum over k of m choose kn choose r minus k">C(m+n,r) = Σ_k C(m,k)C(n,r−k)</span>: count <span class="math" data-say="r">r</span>-subsets of a set split into groups of <span class="math" data-say="m">m</span> and <span class="math" data-say="n">n</span>, classified by how many come from the first group.</p></div><p>Vandermonde with <span class="math" data-say="m equals n equals r">m = n = r</span> reads <span class="math" data-say="2 n choose n equals the sum over k of n choose k times n choose n minus k">C(2n, n) = Σ_k C(n,k)·C(n,n−k)</span>, and the symmetry <span class="math" data-say="n choose n minus k equals n choose k">C(n,n−k) = C(n,k)</span> turns it into <span class="math" data-say="the sum over k of n choose k squared equals 2 n choose n">Σ_k C(n,k)² = C(2n,n)</span>: the <span class="math" data-say="n">n</span>-subsets of a <span class="math" data-say="2 n">2n</span>-set, classified by how many come from the first half. The square is two halves of the same size making the same kind of choice. An identity that looks as if it needs algebra is often a known double count in disguise, and recognising which is the skill.</p><h3>Bijective proof</h3><div class="thm"><span class="label">Theorem &middot; The method</span><p>To prove <span class="math" data-say="the size of A, equals the size of B">|A| = |B|</span>, construct an explicit bijection <span class="math" data-say="f, A to B">f : A → B</span>. The criteria of “Injective, Surjective, Bijective”, in Sets, Relations, and Functions, apply: injective and surjective, both argued.</p></div><div class="example"><span class="label">Example &middot; Symmetry of binomial coefficients</span><p><span class="math" data-say="n choose k equals n choose n minus k">C(n,k) = C(n,n−k)</span> via complementation: send each <span class="math" data-say="k">k</span>-subset to its complement. It is its own inverse, hence a bijection.</p></div><div class="example"><span class="label">Example &middot; Subsets and bit strings</span><p><span class="math" data-say="the size of P of S, equals 2 to the power n">|P(S)| = 2ⁿ</span> via the indicator map: send a subset to the string with a 1 in position <span class="math" data-say="i">i</span> exactly when the <span class="math" data-say="i">i</span>th element is in. Injective because a subset is determined by its members; surjective because every string names a subset.</p></div><div class="example"><span class="label">Example &middot; Compositions</span><p>The number of ways to write <span class="math" data-say="n">n</span> as an ordered sum of positive integers is <span class="math" data-say="2 to the power n minus 1">2ⁿ⁻¹</span>. Bijection: write <span class="math" data-say="n">n</span> as <span class="math" data-say="n">n</span> ones separated by <span class="math" data-say="n minus 1">n−1</span> gaps, and choose which gaps to cut. Each subset of gaps gives one composition, and conversely.</p></div><h3>When to use which</h3><ul><li>The identity has a <strong>sum</strong> on one side: double count, classifying by whatever the summation index measures.</li><li>The identity says two <strong>counts are equal</strong> with no sum: look for a bijection.</li><li>The identity has <strong>alternating signs</strong>: neither directly. Look for a sign-reversing involution &mdash; a pairing that cancels most terms &mdash; or use inclusion and exclusion.</li></ul><p>A word on rigour. A combinatorial proof is a proof, not an intuition. The obligations are precise: for double counting, say what the objects are and check both classifications are exhaustive and disjoint; for a bijection, define the map and argue both directions.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Pascal&#x27;s triangle</h2></div><p>Identities highlighted and checked</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Pascal's triangle</strong><span>Row n, entry k is C(n, k)</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the identity's terms</span><span class="tone-amber"><i class="legend-swatch"></i>the value they equal</span></div>
       </div>
       <div class="lab-stage"><div id="pasOut" style="text-align:center;font-family:var(--mono);font-size:0.8rem;line-height:2;"></div></div>
       <div class="status-banner" id="pasCheck" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>An identity with a counting proof</h3>
-          <p>The hockey stick is proved by classifying <span class="math" data-say="k plus 1">(k+1)</span>-subsets by their largest element. At <span class="math" data-say="n equals 6">n = 6</span>, <span class="math" data-say="k equals 2">k = 2</span> the highlighted column reads <span class="math" data-say="1 plus 3 plus 6 plus 10 plus 15 equals 35 equals 7 choose 3">1 + 3 + 6 + 10 + 15 = 35 = C(7, 3)</span>: the 3-subsets of <span class="math" data-say="the set 1, and so on, 7">{1, …, 7}</span> whose largest element is 3, 4, 5, 6 or 7. The lab checks the arithmetic; the classification is the proof.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>An identity with a counting proof</h3>
+            <p>The hockey stick is proved by classifying <span class="math" data-say="k plus 1">(k+1)</span>-subsets by their largest element. At <span class="math" data-say="n equals 6">n = 6</span>, <span class="math" data-say="k equals 2">k = 2</span> the highlighted column reads <span class="math" data-say="1 plus 3 plus 6 plus 10 plus 15 equals 35 equals 7 choose 3">1 + 3 + 6 + 10 + 15 = 35 = C(7, 3)</span>: the 3-subsets of <span class="math" data-say="the set 1, and so on, 7">{1, …, 7}</span> whose largest element is 3, 4, 5, 6 or 7. The lab checks the arithmetic; the classification is the proof.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="pasRows">Rows shown</label><span class="range-value" id="pasRowsOut">10</span></div>
           <input id="pasRows" type="range" min="4" max="16" value="10" />
@@ -1433,12 +1476,14 @@
           <label>Binomial expansion of (x + y)<sup>n</sup></label>
           <div id="pasExpand" class="mathblock" style="font-size:0.82rem;" tabindex="0" role="region" aria-label="Mathematical notation"></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Constructing a combinatorial proof</h2></div><p>Name the objects before anything else.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide what each side counts</h3><p>Read the expressions as counts. <span class="math" data-say="n times 2 to the power n minus 1">n·2ⁿ⁻¹</span> counts a choice followed by independent decisions; <span class="math" data-say="the sum of k times n choose k">Σ k·C(n,k)</span> counts a set and a distinguished element.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find one set both sides could count</h3><p>Usually the more complicated side names it. Write the objects down explicitly.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Justify each count</h3><p>Say which rule you are applying and check the classification is disjoint and exhaustive.</p></article><article class="card concept-card"><div class="icon">4</div><h3>For a bijection, define the map both ways</h3><p>Give <span class="math" data-say="f">f</span> and give its inverse. Producing the inverse is the cleanest way to establish bijectivity.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Constructing a combinatorial proof</h2>
+      <p class="lead-in">Name the objects before anything else.</p>
+      <ol class="key-ideas method"><li><strong>Decide what each side counts.</strong> Read the expressions as counts. <span class="math" data-say="n times 2 to the power n minus 1">n·2ⁿ⁻¹</span> counts a choice followed by independent decisions; <span class="math" data-say="the sum of k times n choose k">Σ k·C(n,k)</span> counts a set and a distinguished element.</li><li><strong>Find one set both sides could count.</strong> Usually the more complicated side names it. Write the objects down explicitly.</li><li><strong>Justify each count.</strong> Say which rule you are applying and check the classification is disjoint and exhaustive.</li><li><strong>For a bijection, define the map both ways.</strong> Give <span class="math" data-say="f">f</span> and give its inverse. Producing the inverse is the cleanest way to establish bijectivity.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1463,17 +1508,16 @@ COUNT 2 — choose B first:
 One set, two counts  ⟹  the expressions are equal.        ∎</div><p>The algebraic proof expands four factorial expressions and cancels. It is correct and it leaves you knowing nothing. The counting proof says the identity is true because the inner set can be chosen before or after the outer one, which is a fact you can carry to the next problem.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Not saying what the objects are</strong><span>"Both sides count the same thing" is not a proof until the thing is named. The naming is most of the work.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>A classification with a gap or an overlap</strong><span>The same discipline as a proof by cases. Every object in exactly one class, and say why.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Asserting a bijection without defining it</strong><span>"There is an obvious correspondence" is where errors hide. Write the map and its inverse.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you prefer the counting proof.</strong><p>Two proofs, one of each kind. First, “The Binomial Theorem” obtained <span class="math" data-say="the sum over k of 2 to the power k times n choose k equals 3 to the power n">Σ_k 2ᵏ·C(n,k) = 3ⁿ</span> by substitution; prove it by double counting instead, and say what a single object being counted is &mdash; a pair <span class="math" data-say="A is a subset of B is a subset of S">A ⊆ B ⊆ S</span>, or a function from <span class="math" data-say="S">S</span> to a three-element set; either works. Second, prove that the <span class="math" data-say="k">k</span>-subsets of <span class="math" data-say="the set 1, and so on, n">{1, …, n}</span> containing no two consecutive integers number <span class="math" data-say="n minus k plus 1 choose k">C(n − k + 1, k)</span>, by a bijection: subtract <span class="math" data-say="i minus 1">i − 1</span> from the <span class="math" data-say="i">i</span>th smallest element, write down the inverse, and check the map at <span class="math" data-say="n equals 5">n = 5</span>, <span class="math" data-say="k equals 2">k = 2</span>, where both sides are 6.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Some identities have no known combinatorial proof, which is a genuine open kind of question: finding a bijection where only algebra is known is an active research activity, because the bijection carries information the algebra does not.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Not saying what the objects are</strong><span>"Both sides count the same thing" is not a proof until the thing is named. The naming is most of the work.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>A classification with a gap or an overlap</strong><span>The same discipline as a proof by cases. Every object in exactly one class, and say why.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Asserting a bijection without defining it</strong><span>"There is an obvious correspondence" is where errors hide. Write the map and its inverse.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you prefer the counting proof.</strong><p>Two proofs, one of each kind. First, “The Binomial Theorem” obtained <span class="math" data-say="the sum over k of 2 to the power k times n choose k equals 3 to the power n">Σ_k 2ᵏ·C(n,k) = 3ⁿ</span> by substitution; prove it by double counting instead, and say what a single object being counted is &mdash; a pair <span class="math" data-say="A is a subset of B is a subset of S">A ⊆ B ⊆ S</span>, or a function from <span class="math" data-say="S">S</span> to a three-element set; either works. Second, prove that the <span class="math" data-say="k">k</span>-subsets of <span class="math" data-say="the set 1, and so on, n">{1, …, n}</span> containing no two consecutive integers number <span class="math" data-say="n minus k plus 1 choose k">C(n − k + 1, k)</span>, by a bijection: subtract <span class="math" data-say="i minus 1">i − 1</span> from the <span class="math" data-say="i">i</span>th smallest element, write down the inverse, and check the map at <span class="math" data-say="n equals 5">n = 5</span>, <span class="math" data-say="k equals 2">k = 2</span>, where both sides are 6.</p></div></div><div class="note"><strong>Note:</strong> Some identities have no known combinatorial proof, which is a genuine open kind of question: finding a bijection where only algebra is known is an active research activity, because the bijection carries information the algebra does not.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Double counting needs one set and two classifications</summary><p>Both expressions must count the same objects. Naming those objects precisely is where the proof is won.</p></details><details class="recall"><summary>A bijection needs an explicit map</summary><p>Describe the map, show it is injective, show it is surjective. "Clearly there is a correspondence" is not a proof.</p></details><details class="recall"><summary>The explanation is the value</summary><p><span class="math" data-say="the sum of k times n choose k equals n times 2 to the power n minus 1">Σ k·C(n,k) = n·2ⁿ⁻¹</span> proved by counting tells you the <span class="math" data-say="n">n</span> is a chair and the <span class="math" data-say="2 to the power n minus 1">2ⁿ⁻¹</span> is everyone else. The algebra tells you nothing.</p></details></div>
+      <h3>Summary</h3>
       <p>Two techniques that prove identities without algebra: count a single set in two ways, or construct a bijection between two sets. Both explain the identity as well as establishing it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Double counting needs one set and two classifications.</strong> Both expressions must count the same objects. Naming those objects precisely is where the proof is won.</li><li><strong>A bijection needs an explicit map.</strong> Describe the map, show it is injective, show it is surjective. "Clearly there is a correspondence" is not a proof.</li><li><strong>The explanation is the value.</strong> <span class="math" data-say="the sum of k times n choose k equals n times 2 to the power n minus 1">Σ k·C(n,k) = n·2ⁿ⁻¹</span> proved by counting tells you the <span class="math" data-say="n">n</span> is a chair and the <span class="math" data-say="2 to the power n minus 1">2ⁿ⁻¹</span> is everyone else. The algebra tells you nothing.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="DOUBLE COUNTING, one set, two counts, implies, the counts are equal. BIJECTION, a pairing between two sets, implies, equal sizes. Both give WHY, which algebra does not. State the objects first, Everything else follows" tabindex="0" role="region" aria-label="Mathematical notation">DOUBLE COUNTING  one set, two counts  ⟹  the counts are equal
 BIJECTION        a pairing between two sets  ⟹  equal sizes
 Both give WHY, which algebra does not.
@@ -1934,11 +1978,42 @@ State the objects first. Everything else follows.</div><figcaption>Two technique
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2006,7 +2081,7 @@ State the objects first. Everything else follows.</div><figcaption>Two technique
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

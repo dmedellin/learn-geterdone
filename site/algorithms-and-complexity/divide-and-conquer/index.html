@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Algorithms and Complexity</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Analysis</p>
       <h1>Divide and Conquer</h1>
       <p class="lesson-lede">Split, solve the pieces, combine — and the theorem that costs it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The three cases are which level dominates</li><li>Reducing <span class="math" data-say="A">a</span> changes the exponent</li><li>Not every split is even</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Divide and conquer</h2>
-      <article class="prose reading"><p>A divide-and-conquer algorithm splits an input of size <span class="math" data-say="n">n</span> into <span class="math" data-say="A">a</span> subproblems of size <span class="math" data-say="n over b">n/b</span>, solves each recursively, and spends <span class="math" data-say="f of n">f(n)</span> dividing and combining. The running time therefore satisfies <span class="math" data-say="T of n equals aT of the quantity n over b, plus f of n">T(n) = aT(n/b) + f(n)</span>.</p><div class="thm"><span class="label">Theorem &middot; Master theorem</span><p>For <span class="math" data-say="T of n equals aT of the quantity n over b, plus theta of n to the power d">T(n) = aT(n/b) + Θ(nᵈ)</span> with <span class="math" data-say="A is at least 1">a ≥ 1</span>, <span class="math" data-say="b is greater than 1">b &gt; 1</span>, <span class="math" data-say="d is at least 0">d ≥ 0</span>: <span class="math" data-say="T of n equals theta of n to the power d">T(n) = Θ(nᵈ)</span> if <span class="math" data-say="log base b A is less than d">log_b a &lt; d</span>; <span class="math" data-say="theta of n to the power d log n">Θ(nᵈ log n)</span> if <span class="math" data-say="log base b A equals d">log_b a = d</span>; and <span class="math" data-say="theta of n to the power log base b A">Θ(n^{log_b a})</span> if <span class="math" data-say="log base b A is greater than d">log_b a &gt; d</span>.</p></div><p>The three cases are the recursion tree's shape. Level <span class="math" data-say="i">i</span> holds <span class="math" data-say="A to the power i">aⁱ</span> subproblems of size <span class="math" data-say="n over b to the power i">n/bⁱ</span>, doing <span class="math" data-say="n to the power d the quantity A over b to the power d, to the power i">nᵈ(a/bᵈ)ⁱ</span> work in total &mdash; a geometric series whose ratio <span class="math" data-say="A over b to the power d">a/bᵈ</span> is below, equal to, or above 1 exactly as <span class="math" data-say="log base b a">log_b a</span> is below, equal to, or above <span class="math" data-say="d">d</span>.</p><div class="mathblock" data-say="algorithm, a, b, d, log base b a, result. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">algorithm                     a   b   d    log_b a    result
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Divide and conquer</h2><div class="prose reading"><p>A divide-and-conquer algorithm splits an input of size <span class="math" data-say="n">n</span> into <span class="math" data-say="A">a</span> subproblems of size <span class="math" data-say="n over b">n/b</span>, solves each recursively, and spends <span class="math" data-say="f of n">f(n)</span> dividing and combining. The running time therefore satisfies <span class="math" data-say="T of n equals aT of the quantity n over b, plus f of n">T(n) = aT(n/b) + f(n)</span>.</p><div class="thm"><span class="label">Theorem &middot; Master theorem</span><p>For <span class="math" data-say="T of n equals aT of the quantity n over b, plus theta of n to the power d">T(n) = aT(n/b) + Θ(nᵈ)</span> with <span class="math" data-say="A is at least 1">a ≥ 1</span>, <span class="math" data-say="b is greater than 1">b &gt; 1</span>, <span class="math" data-say="d is at least 0">d ≥ 0</span>: <span class="math" data-say="T of n equals theta of n to the power d">T(n) = Θ(nᵈ)</span> if <span class="math" data-say="log base b A is less than d">log_b a &lt; d</span>; <span class="math" data-say="theta of n to the power d log n">Θ(nᵈ log n)</span> if <span class="math" data-say="log base b A equals d">log_b a = d</span>; and <span class="math" data-say="theta of n to the power log base b A">Θ(n^{log_b a})</span> if <span class="math" data-say="log base b A is greater than d">log_b a &gt; d</span>.</p></div><p>The three cases are the recursion tree's shape. Level <span class="math" data-say="i">i</span> holds <span class="math" data-say="A to the power i">aⁱ</span> subproblems of size <span class="math" data-say="n over b to the power i">n/bⁱ</span>, doing <span class="math" data-say="n to the power d the quantity A over b to the power d, to the power i">nᵈ(a/bᵈ)ⁱ</span> work in total &mdash; a geometric series whose ratio <span class="math" data-say="A over b to the power d">a/bᵈ</span> is below, equal to, or above 1 exactly as <span class="math" data-say="log base b a">log_b a</span> is below, equal to, or above <span class="math" data-say="d">d</span>.</p><div class="mathblock" data-say="algorithm, a, b, d, log base b a, result. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">algorithm                     a   b   d    log_b a    result
 binary search                 1   2   0     0.000     Θ(log n)
 merge sort                    2   2   1     1.000     Θ(n log n)
 Karatsuba multiplication      3   2   1     1.585     Θ(n^1.585)
@@ -1402,12 +1446,11 @@ closest pair of points        2   2   1     1.000     Θ(n log n)</div><h3>Where
 
 ad + bc  =  (a + b)(c + d) − ac − bd        ← one product, not two
 
-so three products suffice:  ac,  bd,  (a+b)(c+d)</div><p>Strassen does the same for matrices: seven products of half-size blocks instead of eight, giving <span class="math" data-say="theta of n to the power 2.807">Θ(n^{2.807})</span>. In both cases the gain came from reducing <span class="math" data-say="A">a</span>, and no amount of faster combining could have produced it &mdash; <span class="math" data-say="d">d</span> only matters when it exceeds <span class="math" data-say="log base b a">log_b a</span>.</p><h3>When the split is uneven</h3><p>Quicksort partitions around a pivot, and the split depends on the data. A perfect pivot gives <span class="math" data-say="T of n equals 2 T of the quantity n over 2, plus n equals theta of n times log n">T(n) = 2T(n/2) + n = Θ(n log n)</span>; the worst pivot gives <span class="math" data-say="T of n equals T of the quantity n minus 1, plus n equals theta of n squared">T(n) = T(n−1) + n = Θ(n²)</span>. The master theorem does not apply to the second, which has no fixed <span class="math" data-say="b">b</span> at all.</p><p>Remarkably, even a badly unbalanced but constant split is fine: <span class="math" data-say="T of n equals T of the quantity n over 10, plus T of the quantity 9 n over 10, plus n">T(n) = T(n/10) + T(9n/10) + n</span> is still <span class="math" data-say="theta of n times log n">Θ(n log n)</span>, because the recursion tree still has logarithmic depth. Quicksort survives imperfect pivots for exactly this reason, and fails only on consistently extreme ones.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Algorithms and growth</h2></div><p>Counts from running, not from quoting</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+so three products suffice:  ac,  bd,  (a+b)(c+d)</div><p>Strassen does the same for matrices: seven products of half-size blocks instead of eight, giving <span class="math" data-say="theta of n to the power 2.807">Θ(n^{2.807})</span>. In both cases the gain came from reducing <span class="math" data-say="A">a</span>, and no amount of faster combining could have produced it &mdash; <span class="math" data-say="d">d</span> only matters when it exceeds <span class="math" data-say="log base b a">log_b a</span>.</p><h3>When the split is uneven</h3><p>Quicksort partitions around a pivot, and the split depends on the data. A perfect pivot gives <span class="math" data-say="T of n equals 2 T of the quantity n over 2, plus n equals theta of n times log n">T(n) = 2T(n/2) + n = Θ(n log n)</span>; the worst pivot gives <span class="math" data-say="T of n equals T of the quantity n minus 1, plus n equals theta of n squared">T(n) = T(n−1) + n = Θ(n²)</span>. The master theorem does not apply to the second, which has no fixed <span class="math" data-say="b">b</span> at all.</p><p>Remarkably, even a badly unbalanced but constant split is fine: <span class="math" data-say="T of n equals T of the quantity n over 10, plus T of the quantity 9 n over 10, plus n">T(n) = T(n/10) + T(9n/10) + n</span> is still <span class="math" data-say="theta of n times log n">Θ(n log n)</span>, because the recursion tree still has logarithmic depth. Quicksort survives imperfect pivots for exactly this reason, and fails only on consistently extreme ones.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Algorithms and growth</h2></div><p>Counts from running, not from quoting</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="alTitle">Algorithms and growth</strong><span id="alSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>measured</span><span class="tone-purple"><i class="legend-swatch"></i>predicted</span><span class="tone-amber"><i class="legend-swatch"></i>crossover</span></div>
@@ -1415,10 +1458,10 @@ so three products suffice:  ac,  bd,  (a+b)(c+d)</div><p>Strassen does the same 
       <div class="lab-stage" tabindex="0" role="region" aria-label="Operation counts plot, scroll horizontally for the complete chart"><svg id="alPlot" style="min-width:520px" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alTable"></table></div>
       <div class="status-banner" id="alStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The cases, tabulated — and yours</h3>
-          <p>The top row is the recurrence you enter, and it opens on the worked example's baseline <span class="math" data-say="4 T of the quantity n over 2, plus n">4T(n/2) + n</span>: <span class="math" data-say="log base 2 4 equals 2 is greater than 1">log₂ 4 = 2 &gt; 1</span>, case 3, <span class="math" data-say="theta of n squared">Θ(n²)</span>. Set <span class="math" data-say="d equals 0">d = 0</span> and the answer does not move &mdash; still <span class="math" data-say="theta of n squared">Θ(n²)</span>, the leaves already dominated. Set <span class="math" data-say="A equals 3">a = 3</span> with <span class="math" data-say="d equals 1">d = 1</span> and it becomes <span class="math" data-say="theta of n to the power 1.585">Θ(n^1.585)</span>. The standard's <span class="math" data-say="9 T of the quantity n over 3, plus n squared">9T(n/3) + n²</span> lands in case 2, <span class="math" data-say="theta of n squared log n">Θ(n² log n)</span>. The fixed rows below compute <span class="math" data-say="log base b a">log_b a</span> for the algorithms in the body; Karatsuba and Strassen both improve by lowering <span class="math" data-say="A">a</span>, and both keep the same <span class="math" data-say="d">d</span>. The cases are numbered as “Divide-and-Conquer Recurrences” in Induction and Recursion numbers them: 1 root, 2 balanced, 3 leaves.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The cases, tabulated — and yours</h3>
+            <p>The top row is the recurrence you enter, and it opens on the worked example's baseline <span class="math" data-say="4 T of the quantity n over 2, plus n">4T(n/2) + n</span>: <span class="math" data-say="log base 2 4 equals 2 is greater than 1">log₂ 4 = 2 &gt; 1</span>, case 3, <span class="math" data-say="theta of n squared">Θ(n²)</span>. Set <span class="math" data-say="d equals 0">d = 0</span> and the answer does not move &mdash; still <span class="math" data-say="theta of n squared">Θ(n²)</span>, the leaves already dominated. Set <span class="math" data-say="A equals 3">a = 3</span> with <span class="math" data-say="d equals 1">d = 1</span> and it becomes <span class="math" data-say="theta of n to the power 1.585">Θ(n^1.585)</span>. The standard's <span class="math" data-say="9 T of the quantity n over 3, plus n squared">9T(n/3) + n²</span> lands in case 2, <span class="math" data-say="theta of n squared log n">Θ(n² log n)</span>. The fixed rows below compute <span class="math" data-say="log base b a">log_b a</span> for the algorithms in the body; Karatsuba and Strassen both improve by lowering <span class="math" data-say="A">a</span>, and both keep the same <span class="math" data-say="d">d</span>. The cases are numbered as “Divide-and-Conquer Recurrences” in Induction and Recursion numbers them: 1 root, 2 balanced, 3 leaves.</p>
         <div class="field">
           <label for="alMode">What to examine</label>
           <select id="alMode">
@@ -1479,12 +1522,14 @@ so three products suffice:  ac,  bd,  (a+b)(c+d)</div><p>Strassen does the same 
           <div class="kpi"><span id="alK1L">measured</span><strong id="alK1">&mdash;</strong></div>
           <div class="kpi"><span id="alK2L">predicted</span><strong id="alK2">&mdash;</strong></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Analysing a divide-and-conquer algorithm</h2></div><p>Read off <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span>, <span class="math" data-say="d">d</span>; compare.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the recursive calls: that is <span class="math" data-say="A">a</span></h3><p>How many subproblems, not how much smaller they are.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the shrink factor: that is <span class="math" data-say="b">b</span></h3><p>Halving gives <span class="math" data-say="b equals 2">b = 2</span>. If the factor varies with the data, the theorem does not apply.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the combining cost: that is <span class="math" data-say="n to the power d">nᵈ</span></h3><p>Merging costs <span class="math" data-say="theta of n">Θ(n)</span> so <span class="math" data-say="d equals 1">d = 1</span>; a constant combine gives <span class="math" data-say="d equals 0">d = 0</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare <span class="math" data-say="log base b a">log_b a</span> with <span class="math" data-say="d">d</span></h3><p>Less, equal or greater. That single comparison gives the answer, and the recursion tree explains why.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Analysing a divide-and-conquer algorithm</h2>
+      <p class="lead-in">Read off <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span>, <span class="math" data-say="d">d</span>; compare.</p>
+      <ol class="key-ideas method"><li><strong>Count the recursive calls: that is <span class="math" data-say="A">a</span>.</strong> How many subproblems, not how much smaller they are.</li><li><strong>Find the shrink factor: that is <span class="math" data-say="b">b</span>.</strong> Halving gives <span class="math" data-say="b equals 2">b = 2</span>. If the factor varies with the data, the theorem does not apply.</li><li><strong>Find the combining cost: that is <span class="math" data-say="n to the power d">nᵈ</span>.</strong> Merging costs <span class="math" data-say="theta of n">Θ(n)</span> so <span class="math" data-say="d equals 1">d = 1</span>; a constant combine gives <span class="math" data-say="d equals 0">d = 0</span>.</li><li><strong>Compare <span class="math" data-say="log base b a">log_b a</span> with <span class="math" data-say="d">d</span>.</strong> Less, equal or greater. That single comparison gives the answer, and the recursion tree explains why.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1508,17 +1553,16 @@ Attempt 2: use one fewer subproblem, a = 4 → a = 3
 In case 3 the cost is all at the leaves, and only a affects them.</div><p>This is the structural reason Karatsuba and Strassen both take the form they do. In the leaf-dominated case the combining work is irrelevant, so the only route to a better exponent is fewer subproblems &mdash; and finding an identity that removes one is the hard creative step.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Swapping <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span></strong><span><span class="math" data-say="A">a</span> counts subproblems and <span class="math" data-say="b">b</span> is the shrink factor. <span class="math" data-say="T of n equals 3 T of the quantity n over 2">T(n) = 3T(n/2)</span> has <span class="math" data-say="A equals 3">a = 3</span>, <span class="math" data-say="b equals 2">b = 2</span>, and reversing them gives the wrong case.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Optimising the combining step in case 3</strong><span>When the leaves dominate, <span class="math" data-say="d">d</span> is irrelevant. Effort must go into reducing <span class="math" data-say="A">a</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Applying the theorem to an uneven split</strong><span>It needs a fixed <span class="math" data-say="b">b</span>. Data-dependent splits are analysed by unrolling or by the recursion tree.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which parameter to attack.</strong><p>For <span class="math" data-say="T of n equals 9 T of the quantity n over 3, plus n squared">T(n) = 9T(n/3) + n²</span>, identify the case and say whether faster combining or fewer subproblems would help. <span class="math" data-say="log base 3 9 equals 2 equals d">log₃9 = 2 = d</span>, the balanced case, where both would.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The master theorem as stated covers <span class="math" data-say="f of n equals theta of n to the power d">f(n) = Θ(nᵈ)</span>. The full version handles forcing terms between the cases &mdash; <span class="math" data-say="n times log n">n log n</span>, for instance &mdash; and needs a regularity condition. The polynomial version covers almost every algorithm you will meet.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Swapping <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span></strong><span><span class="math" data-say="A">a</span> counts subproblems and <span class="math" data-say="b">b</span> is the shrink factor. <span class="math" data-say="T of n equals 3 T of the quantity n over 2">T(n) = 3T(n/2)</span> has <span class="math" data-say="A equals 3">a = 3</span>, <span class="math" data-say="b equals 2">b = 2</span>, and reversing them gives the wrong case.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Optimising the combining step in case 3</strong><span>When the leaves dominate, <span class="math" data-say="d">d</span> is irrelevant. Effort must go into reducing <span class="math" data-say="A">a</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Applying the theorem to an uneven split</strong><span>It needs a fixed <span class="math" data-say="b">b</span>. Data-dependent splits are analysed by unrolling or by the recursion tree.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which parameter to attack.</strong><p>For <span class="math" data-say="T of n equals 9 T of the quantity n over 3, plus n squared">T(n) = 9T(n/3) + n²</span>, identify the case and say whether faster combining or fewer subproblems would help. <span class="math" data-say="log base 3 9 equals 2 equals d">log₃9 = 2 = d</span>, the balanced case, where both would.</p></div></div><div class="note"><strong>Note:</strong> The master theorem as stated covers <span class="math" data-say="f of n equals theta of n to the power d">f(n) = Θ(nᵈ)</span>. The full version handles forcing terms between the cases &mdash; <span class="math" data-say="n times log n">n log n</span>, for instance &mdash; and needs a regularity condition. The polynomial version covers almost every algorithm you will meet.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The three cases are which level dominates</summary><p>Work per level either grows, shrinks or stays constant down the recursion tree, and <span class="math" data-say="log base b a">log_b a</span> against <span class="math" data-say="d">d</span> is exactly that comparison.</p></details><details class="recall"><summary>Reducing <span class="math" data-say="A">a</span> changes the exponent</summary><p>Karatsuba's improvement is three multiplications instead of four, and <span class="math" data-say="log base 2 3 is less than log base 2 4">log₂3 &lt; log₂4</span>. Faster combining cannot do that.</p></details><details class="recall"><summary>Not every split is even</summary><p>Quicksort's split depends on the pivot, so it has no fixed <span class="math" data-say="b">b</span> &mdash; and its worst case is quadratic while its average is <span class="math" data-say="n times log n">n log n</span>.</p></details></div>
+      <h3>Summary</h3>
       <p>Divide-and-conquer produces recurrences of one shape, <span class="math" data-say="T of n equals aT of the quantity n over b, plus f of n">T(n) = aT(n/b) + f(n)</span>, solved by the master theorem. The technique's power comes from reducing <span class="math" data-say="A">a</span>, not from combining faster.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The three cases are which level dominates.</strong> Work per level either grows, shrinks or stays constant down the recursion tree, and <span class="math" data-say="log base b a">log_b a</span> against <span class="math" data-say="d">d</span> is exactly that comparison.</li><li><strong>Reducing <span class="math" data-say="A">a</span> changes the exponent.</strong> Karatsuba's improvement is three multiplications instead of four, and <span class="math" data-say="log base 2 3 is less than log base 2 4">log₂3 &lt; log₂4</span>. Faster combining cannot do that.</li><li><strong>Not every split is even.</strong> Quicksort's split depends on the pivot, so it has no fixed <span class="math" data-say="b">b</span> &mdash; and its worst case is quadratic while its average is <span class="math" data-say="n times log n">n log n</span>.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="T of n equals A times T of the quantity n over b, plus n to the power d. log base b A is less than d, implies, theta of n to the power d, the combining dominates. log base b A equals d, implies, theta of n to the power d log n, every level equal. log base b A is greater than d, implies, theta of n to the power log base b A, the leaves dominate" tabindex="0" role="region" aria-label="Mathematical notation">T(n) = a·T(n/b) + nᵈ
 log_b a &lt; d   ⟹  Θ(nᵈ)              the combining dominates
 log_b a = d   ⟹  Θ(nᵈ log n)        every level equal
@@ -2561,11 +2605,42 @@ log_b a &gt; d   ⟹  Θ(n^{log_b a})     the leaves dominate</div><figcaption>O
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2633,7 +2708,7 @@ log_b a &gt; d   ⟹  Θ(n^{log_b a})     the leaves dominate</div><figcaption>O
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

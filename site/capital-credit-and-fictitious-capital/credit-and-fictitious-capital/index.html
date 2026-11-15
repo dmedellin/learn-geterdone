@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Credit and Fictitious Capital</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 25 · Credit and Fictitious Capital</p>
       <h1>Credit and Fictitious Capital</h1>
       <p class="lesson-lede">A bill of exchange is a promise to pay for goods already sold; bills that cancel do the work of money without any money, and a bill with no sale behind it is a claim against nothing.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Commercial credit</li><li>Bank credit</li><li>A bill against nothing</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The bill first, then the bank, then the bills that represent nothing</h2>
-      <article class="prose reading"><p><strong>Volume III, Chapter 25.</strong> &ldquo;Such bills of exchange in their turn circulate as means of payment until the day on which they fall due; and they form commercial money in the strict meaning of the term. To the extent that they ultimately balance one another by the compensation of credits and debts, they serve absolutely as money, since no transformation into actual money takes place.&rdquo;</p><p>If you have ever sent or received an invoice marked <em>payment due in thirty days</em>, you have used the thing Marx starts from. The supplier hands over the goods and becomes a creditor; the buyer takes them and becomes a debtor. In the 1840s the debt was written as a bill of exchange, and the French economist Charles Coquelin, whom Marx quotes, described the chain it made, from the producer of raw material down to the shopkeeper: &ldquo;All borrow with one hand and lend with the other, sometimes money, but more frequently products.&rdquo;</p><p>A word about the kind of chapter this is. Volume III was put together by Engels after Marx's death, and Engels says Part V gave him the most trouble of all: for these chapters there was &ldquo;no finished draft, nor even an outline&rdquo;, but a draft that &ldquo;more than once ended in a disarranged mass of notes, comments and extracts&rdquo;. Chapter 25 is two pages of argument followed by long extracts from bankers' books and from the parliamentary inquiries into the crises of 1847 and 1857, several of them added by Engels from elsewhere in the manuscript. The lessons on Part V read the argument through the extracts and say where the manuscript stops short.</p><p>Go back through the passage. The bills &ldquo;circulate as means of payment&rdquo;: a manufacturer who holds a bill on his customer can endorse it over to his own supplier, who can pass it on again. While they do that they are &ldquo;commercial money in the strict meaning of the term&rdquo;, money made by merchants out of their own promises. And when they &ldquo;balance one another&rdquo;, they &ldquo;serve absolutely as money&rdquo;, because the debt is settled and no coin or note ever appears. Marx adds that bank notes grow out of this, not the other way round: credit money &ldquo;proper&rdquo; does not rest on the circulation of money &ldquo;but upon the circulation of bills of exchange&rdquo;.</p><p>The lab writes the bills down and sets each party's bills against one another. In the bills preset, A owes B £100 for cotton, B owes C £100 for yarn and C owes A £100 for cloth, all due on the same day. Each party pays £100 and receives £100, so every balance is zero: £300 of goods have changed hands and the settlement needs £0 of cash. This is the circle of debts from Volume I's chapter on money, which you met in “Hoards and Means of Payment”. What is new is Marx's claim that the bills are themselves a kind of money, and that a whole credit system stands on them.</p><p>Then the other side, the banks. A bank gathers the reserves every business must keep, the deposits of the rich and the small savings of everyone else, and lends them; its profit &ldquo;is generally made by borrowing at a lower rate of interest than it loans&rdquo;. One of the ways it lends is by discounting bills, &ldquo;that is, by converting them into money before they come due&rdquo;. In the discounted preset B does not wait for A to pay: B sells his bill on A to a bank, takes the money now, less a deduction for the weeks the bill has still to run, and on the due day A pays the bank. The circle no longer closes among the three merchants. Set the bills off again and B owes C £100 with nothing coming in, and the bank is owed £100: the settlement needs £100 of cash. It is the bank's own £100, which B received when the bill was sold, paid on to C, from C to A, and from A back to the bank.</p><p>Was that a loan of money to B? Engels, in a passage he added to the next chapter, says it was not. When a bill is discounted, &ldquo;even the form of an advance disappears. The transaction is then purely one of buying and selling.&rdquo; B sold a claim to money for money, as he might sell cotton; the goods behind the bill had been delivered long before. The bankers of the day saw it the other way. To them every note they paid out was an advance of capital to a customer who lacked it, and the next lesson hears them say so before a committee of Parliament.</p><p>Now the bills that represent nothing. The Yorkshire banker William Leatham, writing in 1840, said it was impossible to tell how many of the bills in circulation were &ldquo;due to actual business&rdquo; and how many were &ldquo;fictitious and consists only of prolonged bills, that is, when a bill of exchange is drawn for the purpose of taking up a current one before it becomes due, and thus of creating fictitious capital by the manufacture of mere means of circulation&rdquo;. In the accommodation preset A, on top of the circle, accepts a second bill for £100 payable to B with no sale behind it, so that B can have it discounted and raise money. The lab counts £100 of bills with no sale behind them, and the settlement now needs £100 of cash where the circle needed none: A owes B twice, once for cotton and once for nothing.</p><p>Engels, in a long bracketed passage, tells what this came to in 1845 to 1847. Goods were shipped to India and China not to be sold but so that bills could be drawn against them and discounted; firms put their capital into railway shares and then borrowed to carry on their own trade. The extracts Marx gathered after the bracket fill in the detail: a Manchester newspaper of 1848 reports that the drafts were commonly renewed when they fell due, and a Liverpool banker told the Lords' committee that he could not tell by looking at a bill &ldquo;whether it represents products or wind&rdquo;. Marx's dry contribution is a line from the banker James Gilbart, who had written in 1834 that &ldquo;The cheapness of capital promotes speculation, just as the cheapness of beer and meat promotes gluttony and drunkenness&rdquo;.</p><p>The distinction the chapter leans on, between bills that represent sales and bills that represent nothing, was the core of the <em>real bills</em> doctrine many bankers held: lend only against genuine trade and credit can never be excessive. Henry Thornton objected to it in 1802, arguing that the rule limits nothing, because when prices rise every genuine sale is a larger bill, and genuine bills can multiply with the boom they finance. Several of Marx's extracts describe firms whose bills were all for real goods bought too dear. The lab can count a bill as backed or unbacked; it cannot say whether a backed bill will be paid.</p><p>The chapter's title names fictitious capital, but Chapter 25 only shows it being made. Marx explains what it is four chapters on. First, “Accumulation of Money Capital and the Rate of Interest” asks what sets the price at which these bills are bought and these loans are made.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Money and its circulation</h2></div><p>prices from values, and the money a day&#x27;s sales need</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The bill first, then the bank, then the bills that represent nothing</h2><div class="prose reading"><p><strong>Volume III, Chapter 25.</strong> &ldquo;Such bills of exchange in their turn circulate as means of payment until the day on which they fall due; and they form commercial money in the strict meaning of the term. To the extent that they ultimately balance one another by the compensation of credits and debts, they serve absolutely as money, since no transformation into actual money takes place.&rdquo;</p><p>If you have ever sent or received an invoice marked <em>payment due in thirty days</em>, you have used the thing Marx starts from. The supplier hands over the goods and becomes a creditor; the buyer takes them and becomes a debtor. In the 1840s the debt was written as a bill of exchange, and the French economist Charles Coquelin, whom Marx quotes, described the chain it made, from the producer of raw material down to the shopkeeper: &ldquo;All borrow with one hand and lend with the other, sometimes money, but more frequently products.&rdquo;</p><p>A word about the kind of chapter this is. Volume III was put together by Engels after Marx's death, and Engels says Part V gave him the most trouble of all: for these chapters there was &ldquo;no finished draft, nor even an outline&rdquo;, but a draft that &ldquo;more than once ended in a disarranged mass of notes, comments and extracts&rdquo;. Chapter 25 is two pages of argument followed by long extracts from bankers' books and from the parliamentary inquiries into the crises of 1847 and 1857, several of them added by Engels from elsewhere in the manuscript. The lessons on Part V read the argument through the extracts and say where the manuscript stops short.</p><p>Go back through the passage. The bills &ldquo;circulate as means of payment&rdquo;: a manufacturer who holds a bill on his customer can endorse it over to his own supplier, who can pass it on again. While they do that they are &ldquo;commercial money in the strict meaning of the term&rdquo;, money made by merchants out of their own promises. And when they &ldquo;balance one another&rdquo;, they &ldquo;serve absolutely as money&rdquo;, because the debt is settled and no coin or note ever appears. Marx adds that bank notes grow out of this, not the other way round: credit money &ldquo;proper&rdquo; does not rest on the circulation of money &ldquo;but upon the circulation of bills of exchange&rdquo;.</p><p>The lab writes the bills down and sets each party's bills against one another. In the bills preset, A owes B £100 for cotton, B owes C £100 for yarn and C owes A £100 for cloth, all due on the same day. Each party pays £100 and receives £100, so every balance is zero: £300 of goods have changed hands and the settlement needs £0 of cash. This is the circle of debts from Volume I's chapter on money, which you met in “Hoards and Means of Payment”. What is new is Marx's claim that the bills are themselves a kind of money, and that a whole credit system stands on them.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Money and its circulation</h2></div><p>prices from values, and the money a day&#x27;s sales need</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Money and its circulation</strong><span>prices from values, and the money a day's sales need</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="moTable"></table></div>
       <div class="status-banner" id="moStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A circle of bills, settled</h3>
-          <p>Each bill runs from the party who pays to the party who is paid, and says whether a sale stands behind it. The goods are valued at 2 hours to the pound, so each lot is £100. The lab sets every party's bills against one another and adds the positive balances for the cash the settlement needs; the money-needed tile is Volume I's formula for the same day. Compare the discounted preset's table with the bills preset's: only the name on one bill has changed.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A circle of bills, settled</h3>
+            <p>Each bill runs from the party who pays to the party who is paid, and says whether a sale stands behind it. The goods are valued at 2 hours to the pound, so each lot is £100. The lab sets every party's bills against one another and adds the positive balances for the cash the settlement needs; the money-needed tile is Volume I's formula for the same day. Compare the discounted preset's table with the bills preset's: only the name on one bill has changed.</p>
         <div class="field">
           <label for="moPreset">Worked example</label>
           <select id="moPreset"><option value="bills" selected>Three bills of £100 in a circle, each for goods sold</option><option value="discounted">B sells his bill on A to a bank before it falls due</option><option value="accommodation">The circle, plus a £100 bill A accepts for B with no sale behind it</option></select>
@@ -1450,12 +1493,15 @@
           <div class="kpi"><span>Bills with no sale behind them</span><strong id="moUnbacked">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Then the other side, the banks. A bank gathers the reserves every business must keep, the deposits of the rich and the small savings of everyone else, and lends them; its profit &ldquo;is generally made by borrowing at a lower rate of interest than it loans&rdquo;. One of the ways it lends is by discounting bills, &ldquo;that is, by converting them into money before they come due&rdquo;. In the discounted preset B does not wait for A to pay: B sells his bill on A to a bank, takes the money now, less a deduction for the weeks the bill has still to run, and on the due day A pays the bank. The circle no longer closes among the three merchants. Set the bills off again and B owes C £100 with nothing coming in, and the bank is owed £100: the settlement needs £100 of cash. It is the bank's own £100, which B received when the bill was sold, paid on to C, from C to A, and from A back to the bank.</p><p>Was that a loan of money to B? Engels, in a passage he added to the next chapter, says it was not. When a bill is discounted, &ldquo;even the form of an advance disappears. The transaction is then purely one of buying and selling.&rdquo; B sold a claim to money for money, as he might sell cotton; the goods behind the bill had been delivered long before. The bankers of the day saw it the other way. To them every note they paid out was an advance of capital to a customer who lacked it, and the next lesson hears them say so before a committee of Parliament.</p><p>Now the bills that represent nothing. The Yorkshire banker William Leatham, writing in 1840, said it was impossible to tell how many of the bills in circulation were &ldquo;due to actual business&rdquo; and how many were &ldquo;fictitious and consists only of prolonged bills, that is, when a bill of exchange is drawn for the purpose of taking up a current one before it becomes due, and thus of creating fictitious capital by the manufacture of mere means of circulation&rdquo;. In the accommodation preset A, on top of the circle, accepts a second bill for £100 payable to B with no sale behind it, so that B can have it discounted and raise money. The lab counts £100 of bills with no sale behind them, and the settlement now needs £100 of cash where the circle needed none: A owes B twice, once for cotton and once for nothing.</p><p>Engels, in a long bracketed passage, tells what this came to in 1845 to 1847. Goods were shipped to India and China not to be sold but so that bills could be drawn against them and discounted; firms put their capital into railway shares and then borrowed to carry on their own trade. The extracts Marx gathered after the bracket fill in the detail: a Manchester newspaper of 1848 reports that the drafts were commonly renewed when they fell due, and a Liverpool banker told the Lords' committee that he could not tell by looking at a bill &ldquo;whether it represents products or wind&rdquo;. Marx's dry contribution is a line from the banker James Gilbart, who had written in 1834 that &ldquo;The cheapness of capital promotes speculation, just as the cheapness of beer and meat promotes gluttony and drunkenness&rdquo;.</p><p>The distinction the chapter leans on, between bills that represent sales and bills that represent nothing, was the core of the <em>real bills</em> doctrine many bankers held: lend only against genuine trade and credit can never be excessive. Henry Thornton objected to it in 1802, arguing that the rule limits nothing, because when prices rise every genuine sale is a larger bill, and genuine bills can multiply with the boom they finance. Several of Marx's extracts describe firms whose bills were all for real goods bought too dear. The lab can count a bill as backed or unbacked; it cannot say whether a backed bill will be paid.</p><p>The chapter's title names fictitious capital, but Chapter 25 only shows it being made. Marx explains what it is four chapters on. First, “Accumulation of Money Capital and the Rate of Interest” asks what sets the price at which these bills are bought and these loans are made.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Settling a set of bills</h2></div><p>Four steps for any set of bills falling due on one day.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the bills</h3><p>Write each bill as payer, payee and amount, and mark whether a sale of goods stands behind it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Net each party</h3><p>For each party add what it receives and subtract what it pays. Bills that run in a circle cancel.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add the positive balances</h3><p>The cash the settlement needs is the sum of the positive balances, which equals the sum of the negative ones.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count the bills against nothing</h3><p>Add the bills with no sale behind them. They need settling like the others, but no goods were delivered for them.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Settling a set of bills</h2>
+      <p class="lead-in">Four steps for any set of bills falling due on one day.</p>
+      <ol class="key-ideas method"><li><strong>List the bills.</strong> Write each bill as payer, payee and amount, and mark whether a sale of goods stands behind it.</li><li><strong>Net each party.</strong> For each party add what it receives and subtract what it pays. Bills that run in a circle cancel.</li><li><strong>Add the positive balances.</strong> The cash the settlement needs is the sum of the positive balances, which equals the sum of the negative ones.</li><li><strong>Count the bills against nothing.</strong> Add the bills with no sale behind them. They need settling like the others, but no goods were delivered for them.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1474,17 +1520,16 @@ accommodation:  A −100,  B +100,  C 0
 cash £100;  bills against nothing £100</div><p>Three hundred pounds of goods changed hands and needed no cash at all while the bills cancelled. A bank's purchase of one bill brings £100 of real money into the settlement, and one bill drawn for nothing brings £100 of debt with no goods behind it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a bill of exchange is a loan of money</strong><span>A bill records goods already delivered and the day they are to be paid for; no money was lent when it was drawn. In the bills preset £300 of goods change hands on three bills and the settlement needs £0, which a set of money loans could not do. Even the discount is, in Engels' words, &ldquo;purely one of buying and selling&rdquo;: B sells his claim to the bank, and the £100 the settlement then needs is the bank's purchase money coming home.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating every bill as backed by goods</strong><span>The accommodation preset adds a bill that looks like the others and has no sale behind it. It adds £100 to the bills against nothing and turns a settlement that needed nothing into one that needs £100. Leatham's prolonged bills, drawn to pay earlier bills, are of this kind.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the title as Marx&#x27;s theory of fictitious capital</strong><span>Chapter 25 shows fictitious capital being made, by bills drawn for nothing; what it is, and how its price is set, is Chapter 29's subject. Much of this chapter is extracts and an editor's narrative, not argument.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can settle a set of bills and count the bills against nothing.</strong><p>Given bills between named parties, each marked as backed by a sale or not, compute each party's net balance, the cash the settlement needs and the sum of bills with no sale behind them, and again when one bill has been sold to a bank.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab sets bills off as if all fell due on one day and were cleared together, which is the most money credit can save; in fact bills fall due on different days and a merchant must hold a reserve against the gap, which Chapter 30 discusses. Whether a bill is backed is entered by hand: the lab cannot tell a sound bill from a bill for goods that will never sell. The bills and their amounts are illustrative.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a bill of exchange is a loan of money</strong><span>A bill records goods already delivered and the day they are to be paid for; no money was lent when it was drawn. In the bills preset £300 of goods change hands on three bills and the settlement needs £0, which a set of money loans could not do. Even the discount is, in Engels' words, &ldquo;purely one of buying and selling&rdquo;: B sells his claim to the bank, and the £100 the settlement then needs is the bank's purchase money coming home.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating every bill as backed by goods</strong><span>The accommodation preset adds a bill that looks like the others and has no sale behind it. It adds £100 to the bills against nothing and turns a settlement that needed nothing into one that needs £100. Leatham's prolonged bills, drawn to pay earlier bills, are of this kind.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the title as Marx&#x27;s theory of fictitious capital</strong><span>Chapter 25 shows fictitious capital being made, by bills drawn for nothing; what it is, and how its price is set, is Chapter 29's subject. Much of this chapter is extracts and an editor's narrative, not argument.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can settle a set of bills and count the bills against nothing.</strong><p>Given bills between named parties, each marked as backed by a sale or not, compute each party's net balance, the cash the settlement needs and the sum of bills with no sale behind them, and again when one bill has been sold to a bank.</p></div></div><div class="note"><strong>Note:</strong> The lab sets bills off as if all fell due on one day and were cleared together, which is the most money credit can save; in fact bills fall due on different days and a merchant must hold a reserve against the gap, which Chapter 30 discusses. Whether a bill is backed is entered by hand: the lab cannot tell a sound bill from a bill for goods that will never sell. The bills and their amounts are illustrative.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Commercial credit</summary><p>The credit producers and merchants give one another: goods now, payment on a stated day. The bill of exchange records it, and passes from hand to hand by endorsement until it falls due.</p></details><details class="recall"><summary>Bank credit</summary><p>The other side of the system. Banks gather the idle money of the whole business world and lend it, and they turn bills into money before they fall due by discounting them.</p></details><details class="recall"><summary>A bill against nothing</summary><p>A bill drawn to raise money rather than to pay for goods, or drawn to pay off an earlier bill. It looks exactly like the others, and a banker cannot tell it from them by looking.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 25 opens Marx's account of credit with the bill of exchange, the written promise to pay on which merchants and manufacturers sell to one another. Compute the cash a circle of bills needs when it is settled, see what changes when a bank buys one of the bills before it falls due, and add a bill drawn with no sale behind it to find the claims that stand against nothing.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Commercial credit.</strong> The credit producers and merchants give one another: goods now, payment on a stated day. The bill of exchange records it, and passes from hand to hand by endorsement until it falls due.</li><li><strong>Bank credit.</strong> The other side of the system. Banks gather the idle money of the whole business world and lend it, and they turn bills into money before they fall due by discounting them.</li><li><strong>A bill against nothing.</strong> A bill drawn to raise money rather than to pay for goods, or drawn to pay off an earlier bill. It looks exactly like the others, and a banker cannot tell it from them by looking.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="bill, a promise to pay on a set day. bills that cancel need no cash. cash equals the positive net balances. discount, a bank buys a bill early. accommodation bill, no sale behind it" tabindex="0" role="region" aria-label="Mathematical notation">bill: a promise to pay on a set day
 bills that cancel need no cash
 cash = the positive net balances
@@ -2271,11 +2316,42 @@ accommodation bill: no sale behind it</div><figcaption>Commercial credit in five
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2343,7 +2419,7 @@ accommodation bill: no sale behind it</div><figcaption>Commercial credit in five
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

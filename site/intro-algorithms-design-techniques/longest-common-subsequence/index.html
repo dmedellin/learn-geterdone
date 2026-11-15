@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Advanced Design and Analysis Techniques</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 15 · Dynamic Programming</p>
       <h1>Longest Common Subsequence</h1>
       <p class="lesson-lede">The longest common subsequence of two strings is found by a table over pairs of prefixes, filled in <span data-say="theta of m n">Θ(mn)</span> time, whose arrows trace one longest subsequence back from the corner.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Subsequence</li><li>Prefixes as subproblems</li><li>The b table of arrows</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The theorem, the recurrence, and one table by hand</h2>
-      <article class="prose reading"><p>&ldquo;A subsequence of a given sequence is just the given sequence with zero or more elements left out.&rdquo; The authors define it in Section 15.4 after a biological motivation: one way to say two strands of DNA are similar is that a long strand appears in both, in the same order but not necessarily contiguously. This lesson reads the section, the chapter's third full example.</p><p>The authors set aside the brute-force approach first. Enumerating every subsequence of X and testing each against Y examines <span class="math" data-say="2 to the power m">2ᵐ</span> candidates, one per subset of X's positions, which is hopeless for long sequences. The way out is to work with prefixes: <span class="math" data-say="X sub i">Xᵢ</span> is the first i elements of X, and the subproblems are pairs of prefixes, one of X and one of Y.</p><div class="thm"><span class="label">Theorem &middot; Theorem 15.1, optimal substructure of an LCS</span><p>Let Z, of length k, be any LCS of X, of length m, and Y, of length n. (1) If <span class="math" data-say="x sub m equals y sub n">xₘ = yₙ</span>, then <span class="math" data-say="z sub k equals x sub m equals y sub n">zₖ = xₘ = yₙ</span> and <span class="math" data-say="Z sub k minus 1">Zₖ₋₁</span> is an LCS of <span class="math" data-say="X sub m minus 1">Xₘ₋₁</span> and <span class="math" data-say="Y sub n minus 1">Yₙ₋₁</span>. (2) If <span class="math" data-say="x sub m is not equal to y sub n">xₘ ≠ yₙ</span> and <span class="math" data-say="z sub k is not equal to x sub m">zₖ ≠ xₘ</span>, then Z is an LCS of <span class="math" data-say="X sub m minus 1">Xₘ₋₁</span> and Y. (3) If <span class="math" data-say="x sub m is not equal to y sub n">xₘ ≠ yₙ</span> and <span class="math" data-say="z sub k is not equal to y sub n">zₖ ≠ yₙ</span>, then Z is an LCS of X and <span class="math" data-say="Y sub n minus 1">Yₙ₋₁</span>.</p></div><p>Each part is a short contradiction. In part 1, if Z did not end with the shared last character, appending it would give a longer common subsequence; and if <span class="math" data-say="Z sub k minus 1">Zₖ₋₁</span> were not longest for the shorter prefixes, a longer one plus the shared character would beat Z. Parts 2 and 3 say that a last character Z does not use can be dropped without losing anything. So an LCS of two sequences contains an LCS of two prefixes, which is optimal substructure.</p><div class="thm"><span class="label">Theorem &middot; The recurrence</span><p><span class="math" data-say="c at i, j equals 0">c[i, j] = 0</span> if i = 0 or j = 0; <span class="math" data-say="c at i, j equals c at i minus 1, j minus 1 plus 1">c[i, j] = c[i − 1, j − 1] + 1</span> if <span class="math" data-say="i, j is greater than 0">i, j > 0</span> and <span class="math" data-say="x sub i equals y sub j">xᵢ = yⱼ</span>; and <span class="math" data-say="c at i, j">c[i, j]</span> is the larger of <span class="math" data-say="c at i, j minus 1">c[i, j − 1]</span> and <span class="math" data-say="c at i minus 1, j">c[i − 1, j]</span> if <span class="math" data-say="i, j is greater than 0">i, j > 0</span> and <span class="math" data-say="x sub i is not equal to y sub j">xᵢ ≠ yⱼ</span>.</p></div><p>The authors point out a feature the earlier examples lacked: a condition in the problem decides which subproblems are considered. When the characters match, only the diagonal subproblem is used; when they differ, only the two others. Rod cutting and the matrix chain tried every choice. The subproblems also overlap at once: both <span class="math" data-say="X sub m minus 1, Y">Xₘ₋₁, Y</span> and <span class="math" data-say="X, Y sub n minus 1">X, Yₙ₋₁</span> contain <span class="math" data-say="X sub m minus 1, Y sub n minus 1">Xₘ₋₁, Yₙ₋₁</span>. There are only <span class="math" data-say="theta of m n">Θ(mn)</span> of them, and LCS-LENGTH fills <span class="math" data-say="c at 0, m, 0, n">c[0..m, 0..n]</span> in row-major order, each cell in constant time, so the whole table costs <span class="math" data-say="theta of m n">Θ(mn)</span>. Each cell reads its upper, left and upper-left neighbours, all earlier in that order.</p><p>LCS-LENGTH also fills <span class="math" data-say="b at 1, m, 1, n">b[1..m, 1..n]</span> with an arrow: up-left for a match, up when the cell above is at least as large as the cell to the left, left otherwise. The tie goes up because the test that chooses up comes first. PRINT-LCS starts at <span class="math" data-say="b at m, n">b[m, n]</span>, follows the arrows, and prints the character at each up-left arrow on the way back out of the recursion, so the LCS comes out in forward order in <span class="math" data-say="big O of the quantity m plus n">O(m + n)</span> time. Here is the table for <span class="math" data-say="TABLE">TABLE</span> against <span class="math" data-say="BLEAT">BLEAT</span>, with the cells PRINT-LCS passes through in brackets.</p><div class="mathblock" data-say="B, L, E, A, T. a table, shown on the page. row T, 0, then 0 up, 0 up, 0 up, 0 up, and 1 diagonal. row A, 0, then 0 up, 0 up, 0 up, 1 diagonal, and 1 up. row B, 0, then 1 diagonal on the path, 1 left, 1 left, 1 up, and 1 up. row L, 0, then 1 up, 2 diagonal on the path, 2 left, 2 left, and 2 left. row E, 0, then 1 up, 2 up, 3 diagonal on the path, 3 left on the path, and 3 left on the path. c at 5, 5 equals 3, the path from the corner prints, B L E" tabindex="0" role="region" aria-label="Mathematical notation">           B     L     E     A     T
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The theorem, the recurrence, and one table by hand</h2><div class="prose reading"><p>&ldquo;A subsequence of a given sequence is just the given sequence with zero or more elements left out.&rdquo; The authors define it in Section 15.4 after a biological motivation: one way to say two strands of DNA are similar is that a long strand appears in both, in the same order but not necessarily contiguously. This lesson reads the section, the chapter's third full example.</p><p>The authors set aside the brute-force approach first. Enumerating every subsequence of X and testing each against Y examines <span class="math" data-say="2 to the power m">2ᵐ</span> candidates, one per subset of X's positions, which is hopeless for long sequences. The way out is to work with prefixes: <span class="math" data-say="X sub i">Xᵢ</span> is the first i elements of X, and the subproblems are pairs of prefixes, one of X and one of Y.</p><div class="thm"><span class="label">Theorem &middot; Theorem 15.1, optimal substructure of an LCS</span><p>Let Z, of length k, be any LCS of X, of length m, and Y, of length n. (1) If <span class="math" data-say="x sub m equals y sub n">xₘ = yₙ</span>, then <span class="math" data-say="z sub k equals x sub m equals y sub n">zₖ = xₘ = yₙ</span> and <span class="math" data-say="Z sub k minus 1">Zₖ₋₁</span> is an LCS of <span class="math" data-say="X sub m minus 1">Xₘ₋₁</span> and <span class="math" data-say="Y sub n minus 1">Yₙ₋₁</span>. (2) If <span class="math" data-say="x sub m is not equal to y sub n">xₘ ≠ yₙ</span> and <span class="math" data-say="z sub k is not equal to x sub m">zₖ ≠ xₘ</span>, then Z is an LCS of <span class="math" data-say="X sub m minus 1">Xₘ₋₁</span> and Y. (3) If <span class="math" data-say="x sub m is not equal to y sub n">xₘ ≠ yₙ</span> and <span class="math" data-say="z sub k is not equal to y sub n">zₖ ≠ yₙ</span>, then Z is an LCS of X and <span class="math" data-say="Y sub n minus 1">Yₙ₋₁</span>.</p></div><p>Each part is a short contradiction. In part 1, if Z did not end with the shared last character, appending it would give a longer common subsequence; and if <span class="math" data-say="Z sub k minus 1">Zₖ₋₁</span> were not longest for the shorter prefixes, a longer one plus the shared character would beat Z. Parts 2 and 3 say that a last character Z does not use can be dropped without losing anything. So an LCS of two sequences contains an LCS of two prefixes, which is optimal substructure.</p><div class="thm"><span class="label">Theorem &middot; The recurrence</span><p><span class="math" data-say="c at i, j equals 0">c[i, j] = 0</span> if i = 0 or j = 0; <span class="math" data-say="c at i, j equals c at i minus 1, j minus 1 plus 1">c[i, j] = c[i − 1, j − 1] + 1</span> if <span class="math" data-say="i, j is greater than 0">i, j > 0</span> and <span class="math" data-say="x sub i equals y sub j">xᵢ = yⱼ</span>; and <span class="math" data-say="c at i, j">c[i, j]</span> is the larger of <span class="math" data-say="c at i, j minus 1">c[i, j − 1]</span> and <span class="math" data-say="c at i minus 1, j">c[i − 1, j]</span> if <span class="math" data-say="i, j is greater than 0">i, j > 0</span> and <span class="math" data-say="x sub i is not equal to y sub j">xᵢ ≠ yⱼ</span>.</p></div><p>The authors point out a feature the earlier examples lacked: a condition in the problem decides which subproblems are considered. When the characters match, only the diagonal subproblem is used; when they differ, only the two others. Rod cutting and the matrix chain tried every choice. The subproblems also overlap at once: both <span class="math" data-say="X sub m minus 1, Y">Xₘ₋₁, Y</span> and <span class="math" data-say="X, Y sub n minus 1">X, Yₙ₋₁</span> contain <span class="math" data-say="X sub m minus 1, Y sub n minus 1">Xₘ₋₁, Yₙ₋₁</span>. There are only <span class="math" data-say="theta of m n">Θ(mn)</span> of them, and LCS-LENGTH fills <span class="math" data-say="c at 0, m, 0, n">c[0..m, 0..n]</span> in row-major order, each cell in constant time, so the whole table costs <span class="math" data-say="theta of m n">Θ(mn)</span>. Each cell reads its upper, left and upper-left neighbours, all earlier in that order.</p><p>LCS-LENGTH also fills <span class="math" data-say="b at 1, m, 1, n">b[1..m, 1..n]</span> with an arrow: up-left for a match, up when the cell above is at least as large as the cell to the left, left otherwise. The tie goes up because the test that chooses up comes first. PRINT-LCS starts at <span class="math" data-say="b at m, n">b[m, n]</span>, follows the arrows, and prints the character at each up-left arrow on the way back out of the recursion, so the LCS comes out in forward order in <span class="math" data-say="big O of the quantity m plus n">O(m + n)</span> time. Here is the table for <span class="math" data-say="TABLE">TABLE</span> against <span class="math" data-say="BLEAT">BLEAT</span>, with the cells PRINT-LCS passes through in brackets.</p><div class="mathblock" data-say="B, L, E, A, T. a table, shown on the page. row T, 0, then 0 up, 0 up, 0 up, 0 up, and 1 diagonal. row A, 0, then 0 up, 0 up, 0 up, 1 diagonal, and 1 up. row B, 0, then 1 diagonal on the path, 1 left, 1 left, 1 up, and 1 up. row L, 0, then 1 up, 2 diagonal on the path, 2 left, 2 left, and 2 left. row E, 0, then 1 up, 2 up, 3 diagonal on the path, 3 left on the path, and 3 left on the path. c at 5, 5 equals 3, the path from the corner prints, B L E" tabindex="0" role="region" aria-label="Mathematical notation">           B     L     E     A     T
       0    0     0     0     0     0
 T     0    0↑    0↑    0↑    0↑    1↖
 A     0    0↑    0↑    0↑    1↖    1↑
@@ -1399,12 +1443,11 @@ B     0   [1↖]   1←    1←    1↑    1↑
 L     0    1↑   [2↖]   2←    2←    2←
 E     0    1↑    2↑   [3↖]  [3←]  [3←]
 
-c[5, 5] = 3;  the path from the corner prints  B L E</div><p>Start at the corner, row E and column T, and go left twice to the match at E, then diagonally to L and to B, then out of the table. The arrows in the first two rows are never visited: they record that T and A could be matched, but only in a common subsequence of length 1. The section ends with improvements. The b table can be dropped, since from <span class="math" data-say="c at i, j">c[i, j]</span> and its three neighbours you can tell in constant time which one it came from, and the c table alone still reconstructs an LCS in <span class="math" data-say="big O of the quantity m plus n">O(m + n)</span>. If only the length is wanted, two rows of c suffice; but then the path back is lost.</p><p>Now the lab. It runs LCS-LENGTH on two strings you type, case sensitive and up to 30 characters each, and prints the length, the LCS PRINT-LCS prints, the cells filled as <span data-say="m times n">m × n</span>, and how many of each arrow the b table holds; when both strings have at most 15 characters it draws the table with PRINT-LCS's cells in brackets. The preset <code>table-bleat</code> is the table above: length 3, BLE, <span class="math" data-say="5 times 5 equals 25">5 × 5 = 25</span> cells, with 5 up-left, 13 up and 7 left arrows.</p><p><code>anagrams</code> compares <span class="math" data-say="ALGORITHM">ALGORITHM</span> with <span class="math" data-say="LOGARITHM">LOGARITHM</span>, the same nine letters rearranged. The LCS has length 7, and the lab prints LGRITHM; LORITHM is just as long, and the tie going up is what picks the first. <code>stone-notes</code> pairs <span class="math" data-say="STONE">STONE</span> with <span class="math" data-say="NOTES">NOTES</span>, another anagram pair, whose LCS has length only 2. <code>nothing-shared</code> compares <span class="math" data-say="ACE">ACE</span> with <span class="math" data-say="BDF">BDF</span>: length 0, the empty sequence, and every arrow up. <code>thirty</code> compares two 30-character strings over A, C, G and T: 900 cells, an LCS of length 18, and no table drawn.</p><p>The 900 cells are the bound and the count at once, because LCS-LENGTH fills every cell whatever the strings are; the arrows are what change. What the lab cannot show is that 18 is the longest, except by the theorem: no table of counts checks optimality, and the recurrence is right because Theorem 15.1 says the cases cover every LCS.</p><h3>Exercise</h3><p>Fill the c and b tables by hand for <span class="math" data-say="STONE">STONE</span> and <span class="math" data-say="NOTES">NOTES</span>, with ties going up. Give the length, list every longest common subsequence you can find, and say which one PRINT-LCS prints. Then type the pair into the lab and compare the arrow counts with yours.</p><p>An LCS table is filled once and read once. The next lesson, Optimal Binary Search Trees, fills a table over ranges of keys whose entries are expected costs, and reads a whole tree out of it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Longest common subsequence</h2></div><p>the c and b tables of LCS-LENGTH</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+c[5, 5] = 3;  the path from the corner prints  B L E</div><p>Start at the corner, row E and column T, and go left twice to the match at E, then diagonally to L and to B, then out of the table. The arrows in the first two rows are never visited: they record that T and A could be matched, but only in a common subsequence of length 1. The section ends with improvements. The b table can be dropped, since from <span class="math" data-say="c at i, j">c[i, j]</span> and its three neighbours you can tell in constant time which one it came from, and the c table alone still reconstructs an LCS in <span class="math" data-say="big O of the quantity m plus n">O(m + n)</span>. If only the length is wanted, two rows of c suffice; but then the path back is lost.</p><p>Now the lab. It runs LCS-LENGTH on two strings you type, case sensitive and up to 30 characters each, and prints the length, the LCS PRINT-LCS prints, the cells filled as <span data-say="m times n">m × n</span>, and how many of each arrow the b table holds; when both strings have at most 15 characters it draws the table with PRINT-LCS's cells in brackets. The preset <code>table-bleat</code> is the table above: length 3, BLE, <span class="math" data-say="5 times 5 equals 25">5 × 5 = 25</span> cells, with 5 up-left, 13 up and 7 left arrows.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Longest common subsequence</h2></div><p>the c and b tables of LCS-LENGTH</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Longest common subsequence</strong><span>the c and b tables of LCS-LENGTH</span></div>
       </div>
@@ -1412,10 +1455,10 @@ c[5, 5] = 3;  the path from the corner prints  B L E</div><p>Start at the corner
       <div class="table-wrap" id="lciTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="lciTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Characters are compared exactly (A and a differ). LCS-LENGTH fills c[i, j] for i = 1 to m, row by row, and j = 1 to n: when x_i = y_j it is c[i − 1, j − 1] + 1 with arrow ↖; otherwise, when c[i − 1, j] ≥ c[i, j − 1], it is c[i − 1, j] with arrow ↑ (a tie goes up), else c[i, j − 1] with arrow ←. Row 0 and column 0 are 0 and are not counted as filled. PRINT-LCS starts at (m, n), prints x_i at every ↖ and follows the arrows to row or column 0.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Fill the table, count the arrows, follow them back</h3>
-          <p>A count over the situation the lesson states. Type two strings of letters or digits. The lab fills the c and b tables in row-major order as LCS-LENGTH does, sends ties up, and follows the arrows back from the corner. The cell count is the bound; the arrows are what your strings decide.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Fill the table, count the arrows, follow them back</h3>
+            <p>A count over the situation the lesson states. Type two strings of letters or digits. The lab fills the c and b tables in row-major order as LCS-LENGTH does, sends ties up, and follows the arrows back from the corner. The cell count is the bound; the arrows are what your strings decide.</p>
         <div class="field">
           <label for="lciPreset">Worked example</label>
           <select id="lciPreset"><option value="table-bleat" selected>TABLE against BLEAT</option><option value="anagrams">ALGORITHM against LOGARITHM</option><option value="stone-notes">STONE against NOTES</option><option value="nothing-shared">ACE against BDF</option><option value="thirty">Two strings of 30 bases</option></select>
@@ -1435,12 +1478,15 @@ c[5, 5] = 3;  the path from the corner prints  B L E</div><p>Start at the corner
           <div class="kpi"><span>Arrows in the b table</span><strong id="lciArrows">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p><code>anagrams</code> compares <span class="math" data-say="ALGORITHM">ALGORITHM</span> with <span class="math" data-say="LOGARITHM">LOGARITHM</span>, the same nine letters rearranged. The LCS has length 7, and the lab prints LGRITHM; LORITHM is just as long, and the tie going up is what picks the first. <code>stone-notes</code> pairs <span class="math" data-say="STONE">STONE</span> with <span class="math" data-say="NOTES">NOTES</span>, another anagram pair, whose LCS has length only 2. <code>nothing-shared</code> compares <span class="math" data-say="ACE">ACE</span> with <span class="math" data-say="BDF">BDF</span>: length 0, the empty sequence, and every arrow up. <code>thirty</code> compares two 30-character strings over A, C, G and T: 900 cells, an LCS of length 18, and no table drawn.</p><p>The 900 cells are the bound and the count at once, because LCS-LENGTH fills every cell whatever the strings are; the arrows are what change. What the lab cannot show is that 18 is the longest, except by the theorem: no table of counts checks optimality, and the recurrence is right because Theorem 15.1 says the cases cover every LCS.</p><h3>Exercise</h3><p>Fill the c and b tables by hand for <span class="math" data-say="STONE">STONE</span> and <span class="math" data-say="NOTES">NOTES</span>, with ties going up. Give the length, list every longest common subsequence you can find, and say which one PRINT-LCS prints. Then type the pair into the lab and compare the arrow counts with yours.</p><p>An LCS table is filled once and read once. The next lesson, Optimal Binary Search Trees, fills a table over ranges of keys whose entries are expected costs, and reads a whole tree out of it.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Filling an LCS table by hand</h2></div><p>Four steps fill and read the table; the fifth uses two words of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Lay out the grid</h3><p>Write Y across the top and X down the side, with an extra row and column of zeros for the empty prefixes.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Fill row by row</h3><p>For each cell, if the row's and column's characters match, write one more than the upper-left cell with an up-left arrow. Otherwise copy the larger of the cell above and the cell to the left, choosing up on a tie, and draw that arrow.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read the length</h3><p>The bottom-right cell is the longest common subsequence length for the whole strings.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Follow the arrows back</h3><p>From the corner, follow each arrow; at every up-left arrow note the character. Read the noted characters in reverse to get the LCS PRINT-LCS prints.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on two words of your own</h3><p>Choose two words of five to seven letters, fill the table by hand, then type them into the lab and compare the length, the LCS and the three arrow counts.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Filling an LCS table by hand</h2>
+      <p class="lead-in">Four steps fill and read the table; the fifth uses two words of your own.</p>
+      <ol class="key-ideas method"><li><strong>Lay out the grid.</strong> Write Y across the top and X down the side, with an extra row and column of zeros for the empty prefixes.</li><li><strong>Fill row by row.</strong> For each cell, if the row's and column's characters match, write one more than the upper-left cell with an up-left arrow. Otherwise copy the larger of the cell above and the cell to the left, choosing up on a tie, and draw that arrow.</li><li><strong>Read the length.</strong> The bottom-right cell is the longest common subsequence length for the whole strings.</li><li><strong>Follow the arrows back.</strong> From the corner, follow each arrow; at every up-left arrow note the character. Read the noted characters in reverse to get the LCS PRINT-LCS prints.</li><li><strong>Do it on two words of your own.</strong> Choose two words of five to seven letters, fill the table by hand, then type them into the lab and compare the length, the LCS and the three arrow counts.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1459,17 +1505,16 @@ E vs T: differ; up 2 &lt; left 3, so 3, left
 row E:  0 1 2 3 3 3</div><p>The match at E adds one to the best common subsequence of <span class="math" data-say="TABL">TABL</span> and <span class="math" data-say="BL">BL</span>, which is BL, length 2. The two cells to its right inherit 3 from the left because no later letter of <span class="math" data-say="BLEAT">BLEAT</span> extends it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Confusing a subsequence with a substring</strong><span>A substring is contiguous; a subsequence need only keep order. <span class="math" data-say="ALGORITHM">ALGORITHM</span> and <span class="math" data-say="LOGARITHM">LOGARITHM</span> share the substring <span class="math" data-say="RITHM">RITHM</span> of length 5 and the subsequence LGRITHM of length 7. Chapter 32 treats substrings; this section, subsequences.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming anagrams have a long common subsequence</strong><span>Two words with the same letters can still order them very differently. <span class="math" data-say="STONE">STONE</span> and <span class="math" data-say="NOTES">NOTES</span> are anagrams, and their longest common subsequence has length 2. The table counts order, not letters.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the arrows to give every LCS</strong><span>PRINT-LCS follows one arrow per cell, so it prints one LCS, chosen by the tie rule. On the lab's anagram preset it prints LGRITHM; LORITHM is equally long and is found by following the other branch at the tie. The length in the corner is the same either way.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can fill and read an LCS table by hand.</strong><p>Given two strings of five to seven characters, fill c and b with ties going up, give the length and the LCS PRINT-LCS prints, and say how many cells were filled.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab prints the single LCS that the book's tie rule selects and counts arrows; listing every LCS is done by hand. Its tables are drawn only up to 15 characters a side. That every printed length is the longest is Theorem 15.1's claim, not something the count checks.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Confusing a subsequence with a substring</strong><span>A substring is contiguous; a subsequence need only keep order. <span class="math" data-say="ALGORITHM">ALGORITHM</span> and <span class="math" data-say="LOGARITHM">LOGARITHM</span> share the substring <span class="math" data-say="RITHM">RITHM</span> of length 5 and the subsequence LGRITHM of length 7. Chapter 32 treats substrings; this section, subsequences.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming anagrams have a long common subsequence</strong><span>Two words with the same letters can still order them very differently. <span class="math" data-say="STONE">STONE</span> and <span class="math" data-say="NOTES">NOTES</span> are anagrams, and their longest common subsequence has length 2. The table counts order, not letters.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the arrows to give every LCS</strong><span>PRINT-LCS follows one arrow per cell, so it prints one LCS, chosen by the tie rule. On the lab's anagram preset it prints LGRITHM; LORITHM is equally long and is found by following the other branch at the tie. The length in the corner is the same either way.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can fill and read an LCS table by hand.</strong><p>Given two strings of five to seven characters, fill c and b with ties going up, give the length and the LCS PRINT-LCS prints, and say how many cells were filled.</p></div></div><div class="note"><strong>Note:</strong> The lab prints the single LCS that the book's tie rule selects and counts arrows; listing every LCS is done by hand. Its tables are drawn only up to 15 characters a side. That every printed length is the longest is Theorem 15.1's claim, not something the count checks.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Subsequence</summary><p>A subsequence of a sequence is the sequence with zero or more elements removed, the rest kept in their order. BLE is a subsequence of TABLE; LBE is not. A common subsequence of X and Y is a subsequence of both, and a longest one is an LCS. There may be several.</p></details><details class="recall"><summary>Prefixes as subproblems</summary><p>The i-th prefix <span class="math" data-say="X sub i">Xᵢ</span> is the first i elements of X, with <span class="math" data-say="X sub 0">X₀</span> empty. <span class="math" data-say="c at i, j">c[i, j]</span> is how long a longest common subsequence of <span class="math" data-say="X sub i">Xᵢ</span> and <span class="math" data-say="Y sub j">Yⱼ</span> is. There are <span class="math" data-say="the quantity m plus 1, times the quantity n plus 1">(m + 1)·(n + 1)</span> such pairs, and every subproblem the recurrence ever asks about is one of them.</p></details><details class="recall"><summary>The b table of arrows</summary><p>Beside each <span class="math" data-say="c at i, j">c[i, j]</span> LCS-LENGTH records which neighbour gave its value: the diagonal when <span class="math" data-say="x sub i equals y sub j">xᵢ = yⱼ</span>, the cell above or the cell to the left otherwise. Following the arrows from <span class="math" data-say="c at m, n">c[m, n]</span> and printing a character at each diagonal step spells an LCS backwards.</p></details></div>
+      <h3>Summary</h3>
       <p>Section 15.4 measures the similarity of two sequences by the longest sequence that appears in both in order, not necessarily contiguously. A theorem about the last characters gives optimal substructure over prefixes, the recurrence has three cases, one of which depends on whether two characters match, and LCS-LENGTH fills an <span data-say="the quantity m plus 1, times the quantity n plus 1">(m + 1) × (n + 1)</span> table row by row with an arrow in each cell. PRINT-LCS follows the arrows back from the corner. Fill a five-by-five table by hand, then let the lab fill larger ones and count the arrows.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Subsequence.</strong> A subsequence of a sequence is the sequence with zero or more elements removed, the rest kept in their order. BLE is a subsequence of TABLE; LBE is not. A common subsequence of X and Y is a subsequence of both, and a longest one is an LCS. There may be several.</li><li><strong>Prefixes as subproblems.</strong> The i-th prefix <span class="math" data-say="X sub i">Xᵢ</span> is the first i elements of X, with <span class="math" data-say="X sub 0">X₀</span> empty. <span class="math" data-say="c at i, j">c[i, j]</span> is how long a longest common subsequence of <span class="math" data-say="X sub i">Xᵢ</span> and <span class="math" data-say="Y sub j">Yⱼ</span> is. There are <span class="math" data-say="the quantity m plus 1, times the quantity n plus 1">(m + 1)·(n + 1)</span> such pairs, and every subproblem the recurrence ever asks about is one of them.</li><li><strong>The b table of arrows.</strong> Beside each <span class="math" data-say="c at i, j">c[i, j]</span> LCS-LENGTH records which neighbour gave its value: the diagonal when <span class="math" data-say="x sub i equals y sub j">xᵢ = yⱼ</span>, the cell above or the cell to the left otherwise. Following the arrows from <span class="math" data-say="c at m, n">c[m, n]</span> and printing a character at each diagonal step spells an LCS backwards.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a subsequence keeps order, not adjacency. subproblems, pairs of prefixes X sub i, Y sub j. last characters equal, extend the diagonal. unequal, the larger of up and left. the table has the quantity m plus 1, times the quantity n plus 1, cells. follow the arrows back from c at m, n" tabindex="0" role="region" aria-label="Mathematical notation">a subsequence keeps order, not adjacency
 subproblems: pairs of prefixes Xᵢ, Yⱼ
 last characters equal: extend the diagonal
@@ -2207,11 +2252,42 @@ follow the arrows back from c[m, n]</div><figcaption>Section 15.4 in six lines</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2279,7 +2355,7 @@ follow the arrows back from c[m, n]</div><figcaption>Section 15.4 in six lines</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

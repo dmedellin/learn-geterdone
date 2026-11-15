@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,40 +1424,38 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Paradoxes and Their Exits</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Probability</p>
       <h1>Sleeping Beauty</h1>
       <p class="lesson-lede">The halfer and the thirder compute the same Bayes&#x27; rule from two different likelihoods for “I am awake”, and the disagreement is about which likelihood is right.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The prior is not in dispute</li><li>The evidence is stated by a likelihood</li><li>The disagreement is about what the evidence is</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>One rule and two likelihoods</h2>
-      <article class="prose reading"><p>On Sunday evening Beauty is told the plan, and she is put to sleep. A fair coin is tossed. If it lands heads she is woken on Monday and the experiment ends. If it lands tails she is woken on Monday, put back to sleep with a drug that erases the memory of the waking, and woken again on Tuesday. Each time she is woken she is asked: how likely is it that the coin landed heads? She cannot tell Monday's waking from Tuesday's, and she knows all this in advance.</p><p>The <strong>halfer</strong> answers one half. She knew on Sunday that she would be woken, and being woken tells her nothing she did not know, so her credence in heads should be what it was. The <strong>thirder</strong> answers one third. Over many repetitions of the experiment a third of her wakings follow heads, and since she cannot tell which waking this is, one third is the credence that matches what her wakings are like.</p><p>Both answers can be written as an update by Bayes' rule, as in “Updating on Evidence”. There are two hypotheses, heads and tails, each with prior one half. What differs is the likelihood of the evidence. The halfer says the evidence is &ldquo;I am awake&rdquo;, which has probability 1 if the coin is heads and probability 1 if it is tails, since she is woken either way.</p><div class="mathblock" data-say="P of awake given H equals 1. P of awake given T equals 1. Bayes factor equals 1 over 1 equals 1. P of H given awake equals 1 over 2" tabindex="0" role="region" aria-label="Mathematical notation">P(awake | H) = 1
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>One rule and two likelihoods</h2><div class="prose reading"><p>On Sunday evening Beauty is told the plan, and she is put to sleep. A fair coin is tossed. If it lands heads she is woken on Monday and the experiment ends. If it lands tails she is woken on Monday, put back to sleep with a drug that erases the memory of the waking, and woken again on Tuesday. Each time she is woken she is asked: how likely is it that the coin landed heads? She cannot tell Monday's waking from Tuesday's, and she knows all this in advance.</p><p>The <strong>halfer</strong> answers one half. She knew on Sunday that she would be woken, and being woken tells her nothing she did not know, so her credence in heads should be what it was. The <strong>thirder</strong> answers one third. Over many repetitions of the experiment a third of her wakings follow heads, and since she cannot tell which waking this is, one third is the credence that matches what her wakings are like.</p><p>Both answers can be written as an update by Bayes' rule, as in “Updating on Evidence”. There are two hypotheses, heads and tails, each with prior one half. What differs is the likelihood of the evidence. The halfer says the evidence is &ldquo;I am awake&rdquo;, which has probability 1 if the coin is heads and probability 1 if it is tails, since she is woken either way.</p><div class="mathblock" data-say="P of awake given H equals 1. P of awake given T equals 1. Bayes factor equals 1 over 1 equals 1. P of H given awake equals 1 over 2" tabindex="0" role="region" aria-label="Mathematical notation">P(awake | H) = 1
 P(awake | T) = 1
 Bayes factor = 1/1 = 1
 P(H | awake) = 1/2</div><p>The thirder says the evidence is the fact that <em>this</em> waking is occurring. Consider a day on which she might be woken. Under heads only one of the two days, Monday, has a waking, so the chance that this day is a waking day is one half. Under tails both days have one, so it is 1. The likelihoods are one half and 1.</p><div class="mathblock" data-say="P of this waking given H equals 1 over 2. P of this waking given T equals 1. Bayes factor equals the quantity 1 over 2, over 1 equals 1 over 2. P of H given this waking equals 1 over 3" tabindex="0" role="region" aria-label="Mathematical notation">P(this waking | H) = 1/2
 P(this waking | T) = 1
 Bayes factor = (1/2)/1 = 1/2
-P(H | this waking) = 1/3</div><p>The lab shows the two computations. In the first preset, the halfer's, the Bayes factor is 1 and the posterior for heads stays at one half. In the second, the thirder's, the Bayes factor is one half, the evidence disconfirms heads, and the posterior is one third. The rule that produced both is the same, and so is the prior. Only the likelihood of the word &ldquo;awake&rdquo; was changed.</p><div class="example"><span class="label">Example &middot; Where the two models part</span><p>Ask what each says when Beauty learns that it is Monday. The thirder starts from one third for heads and the likelihood of Monday is 1 under heads and one half under tails, which brings her to one half. The halfer starts from one half with the same likelihoods and goes to two thirds. The third preset is the thirder's, and editing its prior to one half and one half gives the halfer's. A fair coin that has not yet been tossed, in the version where it is tossed on Monday night, moves to two thirds on the news that it is Monday, and that is what the halfer has to defend.</p></div><p>Each position can be put at its strongest. The halfer has a clean principle behind her: evidence is something you did not already know, and Beauty knew she would be woken. Her cost is the case just given, where a fair coin she has not seen tossed moves to two thirds on the news of a weekday. The thirder has a clean principle too: credences should be right on average over the occasions on which they are held. Her cost is a credence of one third in a coin she knows is fair, reached by evidence that is not about the coin in the ordinary sense.</p><p>So the exit is not the usual one. Set out as this course sets out a paradox, there are two arguments, each valid, each from the Sunday prior and a likelihood, to credences that cannot both be held; the exit is to deny a premise of one of them, and the only premise that differs is the likelihood. Neither side denies a premise of Bayes' rule or faults a step of it. The choice is of a likelihood model, and each model implies the whole of its answer. This is why the question cannot be settled by checking the sum, and why the lesson does not announce a winner. Whether a self-locating fact, &ldquo;this is a waking&rdquo;, counts as evidence about the coin is the premise the two answers divide on.</p><p>The limit of the lab is that it computes from a likelihood and does not decide which to put in. A bet does not settle it either unless it says what is scored. If a stake is paid for each waking, tails pays twice as often as heads and betting on tails is the better bet whichever model is held. If one stake is paid for the experiment, the bet is even. That the best bet depends on the scoring, and not on the model alone, is a further fact about the puzzle and not a way round it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Exact Bayesian updating</h2></div><p>prior times likelihood, normalised; the Bayes factor is the weight of the data</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+P(H | this waking) = 1/3</div><p>The lab shows the two computations. In the first preset, the halfer's, the Bayes factor is 1 and the posterior for heads stays at one half. In the second, the thirder's, the Bayes factor is one half, the evidence disconfirms heads, and the posterior is one third. The rule that produced both is the same, and so is the prior. Only the likelihood of the word &ldquo;awake&rdquo; was changed.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Exact Bayesian updating</h2></div><p>prior times likelihood, normalised; the Bayes factor is the weight of the data</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Hypotheses, data, posterior</strong><span>every figure is an exact fraction</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="upTable"></table></div>
       <div class="status-banner" id="upStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The same rule with two likelihoods</h3>
-          <p>The hypotheses are heads and tails, and the tiles report heads. In the first two presets the prior is the Sunday one, one half each, and only the likelihood of the evidence changes. In the last two Beauty is also told that it is Monday, which has likelihood 1 under heads and one half under tails; the prior is the thirder's one third in the first and the halfer's one half in the second.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The same rule with two likelihoods</h3>
+            <p>The hypotheses are heads and tails, and the tiles report heads. In the first two presets the prior is the Sunday one, one half each, and only the likelihood of the evidence changes. In the last two Beauty is also told that it is Monday, which has likelihood 1 under heads and one half under tails; the prior is the thirder's one third in the first and the halfer's one half in the second.</p>
         <div class="field">
           <label for="upPreset">Worked example</label>
           <select id="upPreset"><option value="halfer" selected>Halfer: being awake is certain on either outcome</option><option value="thirder">Thirder: this waking is half as likely under heads</option><option value="told-monday">Thirder, then told that it is Monday</option><option value="halfer-told-monday">Halfer, then told that it is Monday</option></select>
@@ -1445,12 +1488,15 @@ P(H | this waking) = 1/3</div><p>The lab shows the two computations. In the firs
           <div class="kpi"><span>Best act now</span><strong id="upBest">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="example"><span class="label">Example &middot; Where the two models part</span><p>Ask what each says when Beauty learns that it is Monday. The thirder starts from one third for heads and the likelihood of Monday is 1 under heads and one half under tails, which brings her to one half. The halfer starts from one half with the same likelihoods and goes to two thirds. The third preset is the thirder's, and editing its prior to one half and one half gives the halfer's. A fair coin that has not yet been tossed, in the version where it is tossed on Monday night, moves to two thirds on the news that it is Monday, and that is what the halfer has to defend.</p></div><p>Each position can be put at its strongest. The halfer has a clean principle behind her: evidence is something you did not already know, and Beauty knew she would be woken. Her cost is the case just given, where a fair coin she has not seen tossed moves to two thirds on the news of a weekday. The thirder has a clean principle too: credences should be right on average over the occasions on which they are held. Her cost is a credence of one third in a coin she knows is fair, reached by evidence that is not about the coin in the ordinary sense.</p><p>So the exit is not the usual one. Set out as this course sets out a paradox, there are two arguments, each valid, each from the Sunday prior and a likelihood, to credences that cannot both be held; the exit is to deny a premise of one of them, and the only premise that differs is the likelihood. Neither side denies a premise of Bayes' rule or faults a step of it. The choice is of a likelihood model, and each model implies the whole of its answer. This is why the question cannot be settled by checking the sum, and why the lesson does not announce a winner. Whether a self-locating fact, &ldquo;this is a waking&rdquo;, counts as evidence about the coin is the premise the two answers divide on.</p><p>The limit of the lab is that it computes from a likelihood and does not decide which to put in. A bet does not settle it either unless it says what is scored. If a stake is paid for each waking, tails pays twice as often as heads and betting on tails is the better bet whichever model is held. If one stake is paid for the experiment, the bet is even. That the best bet depends on the scoring, and not on the model alone, is a further fact about the puzzle and not a way round it.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Comparing two answers to a puzzle of evidence</h2></div><p>Four steps, for Sleeping Beauty and for any puzzle where the answers differ and the rule is the same.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix the prior</h3><p>State the hypotheses and the credence in each before the evidence. Here heads and tails at one half each, which both sides accept.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write each side&#x27;s evidence as a likelihood</h3><p>For each hypothesis, give the probability of the evidence as that side describes it. The two sides will differ here, if anywhere.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute both posteriors by the same rule</h3><p>Run the update for each. If both are correct computations, the disagreement is already located in the likelihoods.</p></article><article class="card concept-card"><div class="icon">4</div><h3>State what the disagreement is about</h3><p>Say which likelihood each side defends and what it costs. A test case that separates them, such as being told it is Monday, helps.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Comparing two answers to a puzzle of evidence</h2>
+      <p class="lead-in">Four steps, for Sleeping Beauty and for any puzzle where the answers differ and the rule is the same.</p>
+      <ol class="key-ideas method"><li><strong>Fix the prior.</strong> State the hypotheses and the credence in each before the evidence. Here heads and tails at one half each, which both sides accept.</li><li><strong>Write each side&#x27;s evidence as a likelihood.</strong> For each hypothesis, give the probability of the evidence as that side describes it. The two sides will differ here, if anywhere.</li><li><strong>Compute both posteriors by the same rule.</strong> Run the update for each. If both are correct computations, the disagreement is already located in the likelihoods.</li><li><strong>State what the disagreement is about.</strong> Say which likelihood each side defends and what it costs. A test case that separates them, such as being told it is Monday, helps.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1471,17 +1517,16 @@ thirder: P(this waking | heads) = 1/2, | tails = 1
 same rule, same prior, different likelihood</div><p>The halfer's Bayes factor is 1 and her posterior one half. The thirder's Bayes factor is one half and her posterior one third. Neither made a mistake in the arithmetic.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the coin is fair, so the answer must be one half</strong><span>Fairness fixes the prior, and nobody disputes it. The question is what being woken does to the prior, and that depends on the likelihood of the evidence under each outcome. With a likelihood of 1 for both, the posterior is one half. With one half under heads and 1 under tails, it is one third, for the same fair coin.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the two answers to be an error of arithmetic on one side</strong><span>Each answer is a correct update from its likelihood, and the lab shows both. The dispute is over the likelihood, which is a statement of what the evidence is, and checking the sum cannot settle it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a bet to settle it</strong><span>A bet is scored in some way, per waking or per experiment, and the best bet follows from the scoring. Per waking, tails wins twice as often. Per experiment, the bet is even. Which scoring matches Beauty's credence is part of the question.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute both answers by one rule and say what the disagreement is about.</strong><p>Given the setup, you should be able to write the likelihood each side uses, compute the Bayes factor and posterior for heads under each, run a test case such as being told it is Monday, and state that the dispute is over the likelihood of the evidence.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This lesson makes no claim about which answer is right. Real work on the puzzle weighs the two costs named above, and some reject both models in favour of a third. The next lesson returns to a puzzle where the answer is settled once the model is stated, and the interest is in how a small change in the model moves it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the coin is fair, so the answer must be one half</strong><span>Fairness fixes the prior, and nobody disputes it. The question is what being woken does to the prior, and that depends on the likelihood of the evidence under each outcome. With a likelihood of 1 for both, the posterior is one half. With one half under heads and 1 under tails, it is one third, for the same fair coin.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the two answers to be an error of arithmetic on one side</strong><span>Each answer is a correct update from its likelihood, and the lab shows both. The dispute is over the likelihood, which is a statement of what the evidence is, and checking the sum cannot settle it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a bet to settle it</strong><span>A bet is scored in some way, per waking or per experiment, and the best bet follows from the scoring. Per waking, tails wins twice as often. Per experiment, the bet is even. Which scoring matches Beauty's credence is part of the question.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute both answers by one rule and say what the disagreement is about.</strong><p>Given the setup, you should be able to write the likelihood each side uses, compute the Bayes factor and posterior for heads under each, run a test case such as being told it is Monday, and state that the dispute is over the likelihood of the evidence.</p></div></div><div class="note"><strong>Note:</strong> This lesson makes no claim about which answer is right. Real work on the puzzle weighs the two costs named above, and some reject both models in favour of a third. The next lesson returns to a puzzle where the answer is settled once the model is stated, and the interest is in how a small change in the model moves it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The prior is not in dispute</summary><p>On Sunday the coin is fair, so the credence in heads is one half. Everyone agrees. The question is whether being woken is evidence that should move it.</p></details><details class="recall"><summary>The evidence is stated by a likelihood</summary><p>Bayes' rule needs the probability of the evidence under each hypothesis. &ldquo;I am awake&rdquo; can be modelled as certain on both outcomes of the coin, or as a particular waking whose probability differs between them. Those are the two models, and the rule is the same for both.</p></details><details class="recall"><summary>The disagreement is about what the evidence is</summary><p>The halfer treats being awake as something she knew in advance would happen. The thirder treats it as locating her at one of the possible wakings, which tails produces twice as often. Both are positions about a self-locating fact, and no arithmetic chooses between them.</p></details></div>
+      <h3>Summary</h3>
       <p>Beauty is put to sleep on Sunday and a fair coin is tossed. On heads she is woken once, on tails twice, with memory of the first waking erased. Woken, she is asked how likely heads is. The halfer says one half, the thirder one third. Each is a correct update from a stated likelihood, and what the lab shows is that they differ in the likelihood and nowhere else.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The prior is not in dispute.</strong> On Sunday the coin is fair, so the credence in heads is one half. Everyone agrees. The question is whether being woken is evidence that should move it.</li><li><strong>The evidence is stated by a likelihood.</strong> Bayes' rule needs the probability of the evidence under each hypothesis. &ldquo;I am awake&rdquo; can be modelled as certain on both outcomes of the coin, or as a particular waking whose probability differs between them. Those are the two models, and the rule is the same for both.</li><li><strong>The disagreement is about what the evidence is.</strong> The halfer treats being awake as something she knew in advance would happen. The thirder treats it as locating her at one of the possible wakings, which tails produces twice as often. Both are positions about a self-locating fact, and no arithmetic chooses between them.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="heads, wake Monday, tails, Monday, Tuesday. posterior is proportional to prior times likelihood. halfer, P of awake given H equals P of awake given T equals 1. thirder, P of this waking given H equals 1 over 2. same rule, two likelihoods" tabindex="0" role="region" aria-label="Mathematical notation">heads: wake Monday.  tails: Monday, Tuesday
 posterior ∝ prior × likelihood
 halfer: P(awake | H) = P(awake | T) = 1
@@ -2206,11 +2251,42 @@ same rule, two likelihoods</div><figcaption>Two answers, one rule</figcaption></
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2278,7 +2354,7 @@ same rule, two likelihoods</div><figcaption>Two answers, one rule</figcaption></
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

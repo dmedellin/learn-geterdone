@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Large-Scale Structure and Strategy</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 16 · Large-Scale Structure</p>
       <h1>Pluggable Component Framework and Fitting Structure</h1>
       <p class="lesson-lede">Components that plug into an abstract core through one set of interfaces, the most restrictive structure in the chapter, and how to refactor toward a structure that fits.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Abstract Core</li><li>Pluggable Component Framework</li><li>Translator</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern, the chapter&#x27;s closing sections, then the count</h2>
-      <article class="prose reading"><p>&ldquo;The most important contribution of the large-scale structure is conceptual coherence, and giving insight into the domain.&rdquo; That is from How Restrictive Should a Structure Be?, which follows the last structure of Chapter 16, Pluggable Component Framework. This lesson reads the pattern and the chapter's closing sections. Read them in your own copy first.</p><p>This structure belongs to a mature model. Evans says it usually comes into play only after a few applications have been built in the same domain. The problem it answers is many applications, designed independently on the same abstractions, that must work together: translating between all their Bounded Contexts limits integration, a Shared Kernel is impractical between teams that are not close, and duplication raises the cost of everything.</p><p>The pattern, in the lesson's words: make the Abstract Core's interfaces and their interactions the only contract, so that one component can be swapped for any other that honours it, and an application can work with any component without knowing which one it has. The hub is an Abstract Core inside a Shared Kernel, while behind each component's interface there may be a different context. Components may also share a context, or a kernel of their own, and the plug-in interface may be a Published Language. Technical frameworks that support the idea are secondary; the pattern is a way of organising responsibilities and can be applied inside one Java program.</p><p>Evans is frank about the downsides. The pattern is very hard to apply, needing precise interfaces and a model deep enough to put the necessary behaviour in the core. Applications are limited: one whose idea of the Core Domain differs sharply will find the structure in the way. And the core cannot change without changing the protocol of every component, so refactoring toward deeper insight in the core more or less stops. He points to Fayad and Johnson's survey of such frameworks, calls their success mixed, and says this should be neither the first large-scale structure a project applies nor the second.</p><p>His example is the SEMATECH CIM Framework for semiconductor factories, summarised here only: an industry consortium defined abstract interfaces for the domain's basic concepts and a protocol for using them, so that a vendor's new machine plugs into any application that keeps to the interfaces. The chapter's opening image belongs here too. The AIDS Memorial Quilt gathered tens of thousands of panels made by people working apart, held together by a few rules about each panel's purpose, size and durability.</p><p>How Restrictive Should a Structure Be? sets the four patterns on a line, from the loose metaphor to the restrictive framework, and notes that even one pattern can be tightened, for instance by fixing how layers communicate, such as lower layers announcing events that higher layers listen for, so that no dependency runs upward. A tighter structure is more uniform, easier to interpret and, if it fits, pushes developers toward good designs; it also takes away flexibility they may need, especially across contexts built with different technologies. So Evans advises resisting the urge to build frameworks around a structure, and asks that every structural rule make development easier, which is the point of the quotation.</p><p>Refactoring Toward a Fitting Structure answers the charge that large-scale structure is waterfall design returning: a useful structure can only come from deep understanding, and the practical route to that is iterative development, so the structure must be refactored into the code as it is found. Four sections say how to keep that affordable. Minimalism: deal only with the gravest concerns and settle everything else as it comes up; start loose. Communication and Self-Discipline: the whole team must know the structure through the Ubiquitous Language, because the structure is rarely explicit in the code and no functional test depends on it, so without discipline it decays.</p><p>Restructuring Yields Supple Design reports something Evans says he cannot fully explain: a design that has had a structure is easier to restructure than one that never had one, even into a different kind, and one that has had two is easier still. His image, a leather jacket that loosens with wear, is the chapter's one light moment. Distillation Lightens the Load adds that taking mechanisms and Generic Subdomains out of the core leaves less to restructure, and that a generic subdomain can be placed to fit the structure simply, within one layer or owned by one component.</p><p>Now the count. A museum group runs six applications, collections, exhibitions, outward loans, conservation, ticketing and the shop, that all need the same few concepts: an object, where it is, and its condition. Integrated pairwise, every pair that exchanges data needs a translator; plugged into one framework, each application needs one translator to and from the core's interfaces. On the preset <code>six-pairwise</code>, with each translator working both ways, the lab counts 15 translators to build, one for each of the six applications' fifteen pairs, and 5 to change when one application's model changes. On <code>six-plugged</code>, the scheme the lab calls published, it counts 6 to build and 1 to change. Each preset also prints the other scheme's figures and two ratios, pairwise over framework: <span data-say="5 over 2 is approximately 2.5 times">5/2 ≈ 2.5×</span> to build and <span data-say="5 times">5×</span> to change.</p><p>Pairwise cost grows with the square of the number of applications, the framework's in proportion to it. The presets <code>twelve-pairwise</code> and <code>twelve-plugged</code> give 66 against 12 to build, and 11 against 1 to change, ratios of <span data-say="11 over 2 is approximately 5.5 times">11/2 ≈ 5.5×</span> and <span data-say="11 times">11×</span>. What the lab does not count is Evans's main downside. A change to the core interfaces themselves reaches every component at once, 12 of 12, which is why the core stops evolving; and the count assumes a model deep enough to write the core in the first place, which is the reason he puts this structure late.</p><h3>Exercise</h3><p>A group of nine applications must all exchange data. By hand, find the translators to build pairwise when each works both ways, and when each works in one direction only; the translators to change in each case when one application's model changes; the figures through one framework interface; and the components a change to the framework's interface reaches. Then set the lab to nine to check the figures it counts.</p><p>That ends Chapter 16's four structures. The next lesson, Bringing the Strategy Together, reads Chapter 17, where structure, contexts and distillation meet on one project.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Context map</h2></div><p>translators for point-to-point integration and for one published language</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern, the chapter&#x27;s closing sections, then the count</h2><div class="prose reading"><p>&ldquo;The most important contribution of the large-scale structure is conceptual coherence, and giving insight into the domain.&rdquo; That is from How Restrictive Should a Structure Be?, which follows the last structure of Chapter 16, Pluggable Component Framework. This lesson reads the pattern and the chapter's closing sections. Read them in your own copy first.</p><p>This structure belongs to a mature model. Evans says it usually comes into play only after a few applications have been built in the same domain. The problem it answers is many applications, designed independently on the same abstractions, that must work together: translating between all their Bounded Contexts limits integration, a Shared Kernel is impractical between teams that are not close, and duplication raises the cost of everything.</p><p>The pattern, in the lesson's words: make the Abstract Core's interfaces and their interactions the only contract, so that one component can be swapped for any other that honours it, and an application can work with any component without knowing which one it has. The hub is an Abstract Core inside a Shared Kernel, while behind each component's interface there may be a different context. Components may also share a context, or a kernel of their own, and the plug-in interface may be a Published Language. Technical frameworks that support the idea are secondary; the pattern is a way of organising responsibilities and can be applied inside one Java program.</p><p>Evans is frank about the downsides. The pattern is very hard to apply, needing precise interfaces and a model deep enough to put the necessary behaviour in the core. Applications are limited: one whose idea of the Core Domain differs sharply will find the structure in the way. And the core cannot change without changing the protocol of every component, so refactoring toward deeper insight in the core more or less stops. He points to Fayad and Johnson's survey of such frameworks, calls their success mixed, and says this should be neither the first large-scale structure a project applies nor the second.</p><p>His example is the SEMATECH CIM Framework for semiconductor factories, summarised here only: an industry consortium defined abstract interfaces for the domain's basic concepts and a protocol for using them, so that a vendor's new machine plugs into any application that keeps to the interfaces. The chapter's opening image belongs here too. The AIDS Memorial Quilt gathered tens of thousands of panels made by people working apart, held together by a few rules about each panel's purpose, size and durability.</p><p>How Restrictive Should a Structure Be? sets the four patterns on a line, from the loose metaphor to the restrictive framework, and notes that even one pattern can be tightened, for instance by fixing how layers communicate, such as lower layers announcing events that higher layers listen for, so that no dependency runs upward. A tighter structure is more uniform, easier to interpret and, if it fits, pushes developers toward good designs; it also takes away flexibility they may need, especially across contexts built with different technologies. So Evans advises resisting the urge to build frameworks around a structure, and asks that every structural rule make development easier, which is the point of the quotation.</p><p>Refactoring Toward a Fitting Structure answers the charge that large-scale structure is waterfall design returning: a useful structure can only come from deep understanding, and the practical route to that is iterative development, so the structure must be refactored into the code as it is found. Four sections say how to keep that affordable. Minimalism: deal only with the gravest concerns and settle everything else as it comes up; start loose. Communication and Self-Discipline: the whole team must know the structure through the Ubiquitous Language, because the structure is rarely explicit in the code and no functional test depends on it, so without discipline it decays.</p><p>Restructuring Yields Supple Design reports something Evans says he cannot fully explain: a design that has had a structure is easier to restructure than one that never had one, even into a different kind, and one that has had two is easier still. His image, a leather jacket that loosens with wear, is the chapter's one light moment. Distillation Lightens the Load adds that taking mechanisms and Generic Subdomains out of the core leaves less to restructure, and that a generic subdomain can be placed to fit the structure simply, within one layer or owned by one component.</p><p>Now the count. A museum group runs six applications, collections, exhibitions, outward loans, conservation, ticketing and the shop, that all need the same few concepts: an object, where it is, and its condition. Integrated pairwise, every pair that exchanges data needs a translator; plugged into one framework, each application needs one translator to and from the core's interfaces. On the preset <code>six-pairwise</code>, with each translator working both ways, the lab counts 15 translators to build, one for each of the six applications' fifteen pairs, and 5 to change when one application's model changes. On <code>six-plugged</code>, the scheme the lab calls published, it counts 6 to build and 1 to change. Each preset also prints the other scheme's figures and two ratios, pairwise over framework: <span data-say="5 over 2 is approximately 2.5 times">5/2 ≈ 2.5×</span> to build and <span data-say="5 times">5×</span> to change.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Context map</h2></div><p>translators for point-to-point integration and for one published language</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Context map</strong><span>translators for point-to-point integration and for one published language</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="dcxTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dcxTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Pairwise, every pair of contexts has its own translation: n(n − 1)/2 two-way translators, of which the n − 1 touching a context change when its model does. Published, each context translates to and from one shared language: n translators, of which 1 changes. When the lesson counts one-way translators (directed), each figure doubles: n(n − 1) and 2(n − 1), 2n and 2. The ratios are pairwise over published, exact, and the same either way.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Translators pairwise and through one framework</h3>
-          <p>A count over the small model the lesson states. A count over the small model the lesson states: n applications that all exchange data, integrated pair by pair or each through one shared interface. The applications are the lesson's, not the book's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Translators pairwise and through one framework</h3>
+            <p>A count over the small model the lesson states. A count over the small model the lesson states: n applications that all exchange data, integrated pair by pair or each through one shared interface. The applications are the lesson's, not the book's.</p>
         <div class="field">
           <label for="dcxPreset">Worked example</label>
           <select id="dcxPreset"><option value="six-pairwise" selected>Six museum applications, each pair with a two-way translator</option><option value="six-plugged">The same six plugged into one framework interface</option><option value="twelve-pairwise">Twelve applications, pairwise</option><option value="twelve-plugged">Twelve applications through one framework interface</option></select>
@@ -1429,12 +1472,15 @@
           <div class="kpi"><span>Pairwise ÷ published, to change</span><strong id="dcxChangeRatio">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Pairwise cost grows with the square of the number of applications, the framework's in proportion to it. The presets <code>twelve-pairwise</code> and <code>twelve-plugged</code> give 66 against 12 to build, and 11 against 1 to change, ratios of <span data-say="11 over 2 is approximately 5.5 times">11/2 ≈ 5.5×</span> and <span data-say="11 times">11×</span>. What the lab does not count is Evans's main downside. A change to the core interfaces themselves reaches every component at once, 12 of 12, which is why the core stops evolving; and the count assumes a model deep enough to write the core in the first place, which is the reason he puts this structure late.</p><h3>Exercise</h3><p>A group of nine applications must all exchange data. By hand, find the translators to build pairwise when each works both ways, and when each works in one direction only; the translators to change in each case when one application's model changes; the figures through one framework interface; and the components a change to the framework's interface reaches. Then set the lab to nine to check the figures it counts.</p><p>That ends Chapter 16's four structures. The next lesson, Bringing the Strategy Together, reads Chapter 17, where structure, contexts and distillation meet on one project.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting what integration costs</h2></div><p>Four steps, the last of them on a system of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the parties</h3><p>Write down n, the number of applications or components that must exchange data, and whether each translator works both ways or one.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count pairwise</h3><p>Two-way translators number <span data-say="n times the quantity n minus 1, over 2">n·(n − 1)/2</span> and one-way ones <span data-say="n times the quantity n minus 1">n·(n − 1)</span>. A change to one application reaches n − 1 two-way translators, or <span data-say="2 times the quantity n minus 1">2·(n − 1)</span> one-way ones.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count through a framework</h3><p>One translator a component, n in all, and one to change when a component's own model changes; but a change to the shared interface reaches all n.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own system</h3><p>Count the systems your team's application exchanges data with and the integrations among them, and say which interface a change would have to reach every one of them through.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting what integration costs</h2>
+      <p class="lead-in">Four steps, the last of them on a system of your own.</p>
+      <ol class="key-ideas method"><li><strong>Count the parties.</strong> Write down n, the number of applications or components that must exchange data, and whether each translator works both ways or one.</li><li><strong>Count pairwise.</strong> Two-way translators number <span data-say="n times the quantity n minus 1, over 2">n·(n − 1)/2</span> and one-way ones <span data-say="n times the quantity n minus 1">n·(n − 1)</span>. A change to one application reaches n − 1 two-way translators, or <span data-say="2 times the quantity n minus 1">2·(n − 1)</span> one-way ones.</li><li><strong>Count through a framework.</strong> One translator a component, n in all, and one to change when a component's own model changes; but a change to the shared interface reaches all n.</li><li><strong>Do it on your own system.</strong> Count the systems your team's application exchanges data with and the integrations among them, and say which interface a change would have to reach every one of them through.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1452,17 +1498,16 @@ one app changes: its 1 translator
 the interface changes: all 6</div><p>The framework wins on every count but the last, and the last is the one Evans weighs most: it is why he says the core's refinement stops.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reaching for a pluggable framework at the start of a project</strong><span>Evans puts it last among the structures for a reason: it needs a model deep and distilled enough to write the Abstract Core, it usually follows several applications in the domain, and once in place it freezes the core. He says it should be neither the first structure applied nor the second.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Equating the pattern with a technical plug-in platform</strong><span>Technical frameworks that support it are, he says, a secondary issue, needed only to solve a real technical problem such as distribution. The pattern is a conceptual organisation of responsibilities around an Abstract Core and can be applied within one program.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming a more restrictive structure is always the safer one</strong><span>A tighter structure brings uniformity and, when it fits, good designs; it also removes flexibility developers need, especially across contexts in different technologies. Evans warns against regimenting a structure into a framework and asks that every rule make development easier. On the lesson's illustration, the framework's low counts all assume a core that never has to change.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count what pairwise and framework integration cost.</strong><p>Given n parties, state the translators to build and to change pairwise, one way and two ways, and through one framework interface, and the parties a change to that interface reaches.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts translators for parties that all exchange data. It cannot say whether your model is mature enough to write an Abstract Core, how often the core will need to change, or whether a looser structure would serve; those are the judgements Evans says should come late.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reaching for a pluggable framework at the start of a project</strong><span>Evans puts it last among the structures for a reason: it needs a model deep and distilled enough to write the Abstract Core, it usually follows several applications in the domain, and once in place it freezes the core. He says it should be neither the first structure applied nor the second.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Equating the pattern with a technical plug-in platform</strong><span>Technical frameworks that support it are, he says, a secondary issue, needed only to solve a real technical problem such as distribution. The pattern is a conceptual organisation of responsibilities around an Abstract Core and can be applied within one program.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming a more restrictive structure is always the safer one</strong><span>A tighter structure brings uniformity and, when it fits, good designs; it also removes flexibility developers need, especially across contexts in different technologies. Evans warns against regimenting a structure into a framework and asks that every rule make development easier. On the lesson's illustration, the framework's low counts all assume a core that never has to change.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count what pairwise and framework integration cost.</strong><p>Given n parties, state the translators to build and to change pairwise, one way and two ways, and through one framework interface, and the parties a change to that interface reaches.</p></div></div><div class="note"><strong>Note:</strong> The lab counts translators for parties that all exchange data. It cannot say whether your model is mature enough to write an Abstract Core, how often the core will need to change, or whether a looser structure would serve; those are the judgements Evans says should come late.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Abstract Core</summary><p>Chapter 15's distillation of the Core Domain into abstract interfaces and the interactions between them, with the specialised implementations kept elsewhere.</p></details><details class="recall"><summary>Pluggable Component Framework</summary><p>A structure in which every component is written against the Abstract Core's interfaces and every application reaches components only through them, so that one component can replace another.</p></details><details class="recall"><summary>Translator</summary><p>In the lab, one piece of code that converts between one context's model and another's, or between a context and the shared interface. Pairwise integration needs one for every pair; a framework needs one a component.</p></details></div>
+      <h3>Summary</h3>
       <p>The last structure of Chapter 16 lets independently built components work together through an Abstract Core, at the price of freezing that core. Read the pattern and its downsides, then the chapter's closing sections on how restrictive a structure should be and how to refactor toward one; then count the translators a group of applications needs pairwise and through one framework interface.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Abstract Core.</strong> Chapter 15's distillation of the Core Domain into abstract interfaces and the interactions between them, with the specialised implementations kept elsewhere.</li><li><strong>Pluggable Component Framework.</strong> A structure in which every component is written against the Abstract Core's interfaces and every application reaches components only through them, so that one component can replace another.</li><li><strong>Translator.</strong> In the lab, one piece of code that converts between one context's model and another's, or between a context and the shared interface. Pairwise integration needs one for every pair; a framework needs one a component.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="an abstract core of interfaces. components plug in, apps use the core. one translator each, not one a pair. a change to the core reaches everyone. not the first structure, nor the second. keep any structure minimal" tabindex="0" role="region" aria-label="Mathematical notation">an abstract core of interfaces
 components plug in; apps use the core
 one translator each, not one a pair
@@ -2207,11 +2252,42 @@ keep any structure minimal</div><figcaption>Pluggable components in six lines</f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2279,7 +2355,7 @@ keep any structure minimal</div><figcaption>Pluggable components in six lines</f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Your Training Plan</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The test</p>
       <h1>Plateaus and Transfer</h1>
       <p class="lesson-lede">Read a dense argument, a kind of text you have hardly practised, and set its effective rate beside your baseline range and your recent tests.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Transfer</li><li>A plateau has more than one cause</li><li>One reading, no baseline</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>A new kind of text, read cold</h2>
-      <article class="prose reading"><p>The drill is one reading of In Praise of Maintenance, an argument of 389 words written at the hard band, a kind of prose the practice gave you rarely, if at all (the Daily Drill's eighteen pool passages hold one argument): long sentences, an objection answered, a claim built across paragraphs. Read it at your natural pace with no pacer, then answer the six questions. It is logged as other, not as a test, for the reason this lesson is about: it belongs to no series yet, and as a test it would pull down the median of your tests on standard passages.</p><p>Then set three figures side by side: the effective rate you just measured, your baseline range, and the median of your last three tests. The drill's tiles give all three: when you score the reading, the lab fills the baseline range and the recent test median from your log, the same figures as on the Reading Your Curve page, and sets today's effective rate against each before you decide anything. The recent median fills only once your log holds three tests of standard passages; with fewer, its box is left empty and the last tile says so.</p><p>Suppose your recent test median is 270 effective words a minute against a baseline range of 238 to 251, a change by the Subject's rule, and suppose the tests have stayed near 270 for some weeks. That is a plateau, and the natural reading of it, that this is your limit, is the least informative one. A plateau often means the practice has stopped asking for more: the same target, the same kind of passage, comfortably held. It can also mean that what improved was reading the practice material, and an unpractised kind of text is how you tell those apart.</p><p>The preset transfers is that reader on the argument: 389 words in 97.25 seconds, 240 words a minute, all six questions right, an effective rate of 240. That is inside the old baseline range and 30 below the recent median of 270. It is slower than the practised kind, as harder text often is, and comprehension held. It is consistent with some of the gain carrying over, and also with none: without a reading of this kind from before the practice, one reading cannot say which.</p><p>The preset does-not is the other common result: the same passage in 77.8 seconds, 300 words a minute, the practised pace kept up, with four questions right and an effective rate of 200, 38 below the bottom of the baseline range. The rate carried over; the understanding did not. On effective rate, the figure to compare, this reading is the rate-only log of Reading Your Curve in a single session.</p><p>Two things this comparison cannot separate. The argument is harder than the passages of your baselines, and it is a different kind of text. Both lower a first reading, and one passage cannot tell you how much of the gap is each. What it can tell you is whether the practised pace survived contact with a text that asked more of you.</p><p>The wider evidence points the same way. Practice generally improves the practised task more than tasks that only resemble it; Rayner and colleagues (2016) found the evidence weak that eye exercises carry over to reading, and the brain-training games have met the same difficulty in general. On reading itself, Rayner and colleagues concluded that a large gain in rate with comprehension held is unlikely. Ericsson, Krampe and Tesch-Römer (1993) described deliberate practice as practice at the edge of what you can do, which is the first thing to check when a curve goes flat.</p><p>So the reading tells you where to look. If it went like does-not, practise on that kind of text: paste arguments you have not read into the Daily Drill's own-text box and read them with the pacer below your hold target, raising it once you can state each one's claim and its answer to an objection afterwards. If it went like transfers, the plateau is more likely the practice: check it against the routine. Has the target been raised after three holds, or has it sat where it was comfortable for weeks? If the routine has quietly stopped asking for more, restart it.</p><p>The next lesson, The Full Battery, sets your effective rate beside the other three things the Subject has measured, and asks which of them have moved.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Timed reading drill</h2></div><p>rate, comprehension and the effective rate, measured on your own reading</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>A new kind of text, read cold</h2><div class="prose reading"><p>The drill is one reading of In Praise of Maintenance, an argument of 389 words written at the hard band, a kind of prose the practice gave you rarely, if at all (the Daily Drill's eighteen pool passages hold one argument): long sentences, an objection answered, a claim built across paragraphs. Read it at your natural pace with no pacer, then answer the six questions. It is logged as other, not as a test, for the reason this lesson is about: it belongs to no series yet, and as a test it would pull down the median of your tests on standard passages.</p><p>Then set three figures side by side: the effective rate you just measured, your baseline range, and the median of your last three tests. The drill's tiles give all three: when you score the reading, the lab fills the baseline range and the recent test median from your log, the same figures as on the Reading Your Curve page, and sets today's effective rate against each before you decide anything. The recent median fills only once your log holds three tests of standard passages; with fewer, its box is left empty and the last tile says so.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Timed reading drill</h2></div><p>rate, comprehension and the effective rate, measured on your own reading</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Timed reading drill</strong><span>rate, comprehension and the effective rate, measured on your own reading</span></div>
       </div>
@@ -1414,10 +1457,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="drTable"></table></div>
       <div class="status-banner" id="drStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A first reading of an argument</h3>
-          <p>Your measurement: one timed reading at natural pace, scored by its six questions; one question is about 16.7 points. Scoring it fills your baseline range and recent test median from your log, as on Reading Your Curve. Before you read, the boxes hold a worked example: a range of 238 to 251 and a recent median of 270.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A first reading of an argument</h3>
+            <p>Your measurement: one timed reading at natural pace, scored by its six questions; one question is about 16.7 points. Scoring it fills your baseline range and recent test median from your log, as on Reading Your Curve. Before you read, the boxes hold a worked example: a range of 238 to 251 and a recent median of 270.</p>
         <div class="field">
           <label for="drPreset">Worked example</label>
           <select id="drPreset"><option value="transfers" selected>240 words a minute, 6 of 6</option><option value="does-not">300 words a minute, 4 of 6</option></select>
@@ -1469,12 +1512,15 @@
           <div class="kpi"><span>Effective rate against your recent test median</span><strong id="drVsRecent">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Suppose your recent test median is 270 effective words a minute against a baseline range of 238 to 251, a change by the Subject's rule, and suppose the tests have stayed near 270 for some weeks. That is a plateau, and the natural reading of it, that this is your limit, is the least informative one. A plateau often means the practice has stopped asking for more: the same target, the same kind of passage, comfortably held. It can also mean that what improved was reading the practice material, and an unpractised kind of text is how you tell those apart.</p><p>The preset transfers is that reader on the argument: 389 words in 97.25 seconds, 240 words a minute, all six questions right, an effective rate of 240. That is inside the old baseline range and 30 below the recent median of 270. It is slower than the practised kind, as harder text often is, and comprehension held. It is consistent with some of the gain carrying over, and also with none: without a reading of this kind from before the practice, one reading cannot say which.</p><p>The preset does-not is the other common result: the same passage in 77.8 seconds, 300 words a minute, the practised pace kept up, with four questions right and an effective rate of 200, 38 below the bottom of the baseline range. The rate carried over; the understanding did not. On effective rate, the figure to compare, this reading is the rate-only log of Reading Your Curve in a single session.</p><p>Two things this comparison cannot separate. The argument is harder than the passages of your baselines, and it is a different kind of text. Both lower a first reading, and one passage cannot tell you how much of the gap is each. What it can tell you is whether the practised pace survived contact with a text that asked more of you.</p><p>The wider evidence points the same way. Practice generally improves the practised task more than tasks that only resemble it; Rayner and colleagues (2016) found the evidence weak that eye exercises carry over to reading, and the brain-training games have met the same difficulty in general. On reading itself, Rayner and colleagues concluded that a large gain in rate with comprehension held is unlikely. Ericsson, Krampe and Tesch-Römer (1993) described deliberate practice as practice at the edge of what you can do, which is the first thing to check when a curve goes flat.</p><p>So the reading tells you where to look. If it went like does-not, practise on that kind of text: paste arguments you have not read into the Daily Drill's own-text box and read them with the pacer below your hold target, raising it once you can state each one's claim and its answer to an objection afterwards. If it went like transfers, the plateau is more likely the practice: check it against the routine. Has the target been raised after three holds, or has it sat where it was comfortable for weeks? If the routine has quietly stopped asking for more, restart it.</p><p>The next lesson, The Full Battery, sets your effective rate beside the other three things the Subject has measured, and asks which of them have moved.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing for transfer</h2></div><p>Use this whenever your tests have stayed level for some weeks.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Choose a kind you have not practised</h3><p>An argument, a contract, the discussion section of a paper: a text you have never read, of a kind the practice did not give you.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read it once, at natural pace</h3><p>No pacer, and no going back to it afterwards; a second reading measures memory. Answer the questions, or with your own text write down its three main points and then check them.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Set three figures side by side</h3><p>Today's effective rate, your baseline range and the median of your last three tests; the lab fills the last two from your log.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Decide what to measure next</h3><p>If the rate held and the understanding did not, practise on that kind; if both held, look at the practice itself and find the hold target again. Write which in a note.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Do today's session on The Daily Drill page: the next pool passage with the pacer at your hold target, or a test at natural pace if one is due.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing for transfer</h2>
+      <p class="lead-in">Use this whenever your tests have stayed level for some weeks.</p>
+      <ol class="key-ideas method"><li><strong>Choose a kind you have not practised.</strong> An argument, a contract, the discussion section of a paper: a text you have never read, of a kind the practice did not give you.</li><li><strong>Read it once, at natural pace.</strong> No pacer, and no going back to it afterwards; a second reading measures memory. Answer the questions, or with your own text write down its three main points and then check them.</li><li><strong>Set three figures side by side.</strong> Today's effective rate, your baseline range and the median of your last three tests; the lab fills the last two from your log.</li><li><strong>Decide what to measure next.</strong> If the rate held and the understanding did not, practise on that kind; if both held, look at the practice itself and find the hold target again. Write which in a note.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Do today's session on The Daily Drill page: the next pool passage with the pacer at your hold target, or a test at natural pace if one is due.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1493,17 +1539,16 @@ does-not:  389 × 60 / 77.8 = 300 a minute
 200: 238 − 200 = 38 below the range</div><p>The faster reading is the worse one. Rate carried over in does-not; understanding did not, and effective rate is the figure that shows it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>A plateau means I have reached my limit</strong><span>A plateau often means the practice has stopped asking for more, or that the gains were specific to the practice material. Readings of a new kind of text help tell which: the reader in does-not kept the practised rate of 300 on the argument and lost two questions, which fits a gain tied to the practice material, and the reader in transfers held comprehension at a slower rate, which points more toward the practice. One reading each is a start, not the answer.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating a first reading as a failed test</strong><span>An effective rate of 240 on a hard argument against a recent median of 270 on standard passages is not a fall. It is the first reading of a kind that has no baseline, on a harder text, and it starts a series rather than ending one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Comparing a rate with an effective rate</strong><span>300 words a minute on the argument looks like a gain over a recent median of 270, but 270 is an effective rate. Multiplied by 4/6, the 300 is 200, which is below the range.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say whether practice transferred, and why one reading cannot settle it.</strong><p>Given an effective rate on a new kind of text, a baseline range and a recent test median, say whether the reading is consistent with the practice carrying over, name the two things the comparison cannot separate, the kind of text and its difficulty, and say what further readings would settle it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> One passage, one day, and a passage harder than your baselines: this drill cannot separate the kind of text from its difficulty. The lab's comparison with your log is only as good as the log: with fewer than three baselines it gives no verdict. What the reading starts is a series on a new kind of text.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>A plateau means I have reached my limit</strong><span>A plateau often means the practice has stopped asking for more, or that the gains were specific to the practice material. Readings of a new kind of text help tell which: the reader in does-not kept the practised rate of 300 on the argument and lost two questions, which fits a gain tied to the practice material, and the reader in transfers held comprehension at a slower rate, which points more toward the practice. One reading each is a start, not the answer.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating a first reading as a failed test</strong><span>An effective rate of 240 on a hard argument against a recent median of 270 on standard passages is not a fall. It is the first reading of a kind that has no baseline, on a harder text, and it starts a series rather than ending one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Comparing a rate with an effective rate</strong><span>300 words a minute on the argument looks like a gain over a recent median of 270, but 270 is an effective rate. Multiplied by 4/6, the 300 is 200, which is below the range.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say whether practice transferred, and why one reading cannot settle it.</strong><p>Given an effective rate on a new kind of text, a baseline range and a recent test median, say whether the reading is consistent with the practice carrying over, name the two things the comparison cannot separate, the kind of text and its difficulty, and say what further readings would settle it.</p></div></div><div class="note"><strong>Note:</strong> One passage, one day, and a passage harder than your baselines: this drill cannot separate the kind of text from its difficulty. The lab's comparison with your log is only as good as the log: with fewer than three baselines it gives no verdict. What the reading starts is a series on a new kind of text.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Transfer</summary><p>A gain transfers when it shows on material you did not practise on. Your tests were already on fresh pool passages, which is a short step; this lesson takes a longer one, to a kind of text the pool hardly contained.</p></details><details class="recall"><summary>A plateau has more than one cause</summary><p>Weeks of tests at the same level can mean the practice has stopped asking for more, or that the gains belonged to the practice material. They call for different answers, and a reading on a new kind of text helps tell them apart.</p></details><details class="recall"><summary>One reading, no baseline</summary><p>Your baselines were on standard narrative and expository passages. A hard argument has never been among your baselines, so today's reading is the first of its kind in your series, not a test against a baseline of its kind.</p></details></div>
+      <h3>Summary</h3>
       <p>Gains made on the practice passages may or may not carry to other kinds of text. The drill is one timed reading of a hard argument with six questions; you then set its effective rate beside the baseline range and the median of your recent tests. A first reading of a new kind has no baseline of its own, so the comparison tells you what to measure next, not what you have become.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Transfer.</strong> A gain transfers when it shows on material you did not practise on. Your tests were already on fresh pool passages, which is a short step; this lesson takes a longer one, to a kind of text the pool hardly contained.</li><li><strong>A plateau has more than one cause.</strong> Weeks of tests at the same level can mean the practice has stopped asking for more, or that the gains belonged to the practice material. They call for different answers, and a reading on a new kind of text helps tell them apart.</li><li><strong>One reading, no baseline.</strong> Your baselines were on standard narrative and expository passages. A hard argument has never been among your baselines, so today's reading is the first of its kind in your series, not a test against a baseline of its kind.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="transfer, a gain that shows on new text. a new kind of text has no baseline yet. plateau, the practice stopped asking. compare effective rate, not rate" tabindex="0" role="region" aria-label="Mathematical notation">transfer: a gain that shows on new text
 a new kind of text has no baseline yet
 plateau: the practice stopped asking
@@ -2536,11 +2581,42 @@ compare effective rate, not rate</div><figcaption>Transfer in four lines</figcap
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2608,7 +2684,7 @@ compare effective rate, not rate</div><figcaption>Transfer in four lines</figcap
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

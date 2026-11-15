@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,37 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Data Structures</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Hash tables</p>
       <h1>Hashing with Chaining</h1>
       <p class="lesson-lede">Compute <span class="math" data-say="alpha">α</span> and the expected search cost as exact fractions, then build the key set that degenerates <span class="math" data-say="h of k equals k mod m">h(k) = k mod m</span>.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The load factor is the answer, and it can exceed 1</li><li>The expectation is over an assumption about the keys, not over the table</li><li>The worst case is a linked list, and it cannot be engineered away</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The load factor, the expected chain, and the key set that defeats the table</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Hashing with chaining</span><p>A table of <span class="math" data-say="m">m</span> slots and a hash function <span class="math" data-say="h">h</span> from keys to <span class="math" data-say="the set 0, and so on, m minus 1">{0, …, m−1}</span>. Each slot holds a linked list &mdash; a <strong>chain</strong> &mdash; of every key that hashed to it. Insert prepends to the chain; search computes <span class="math" data-say="h of k">h(k)</span> and walks the chain; delete unlinks. The <strong>load factor</strong> is <span class="math" data-say="alpha equals n over m">α = n/m</span>, the number of keys divided by the number of slots.</p><p>The division hash function is <span class="math" data-say="h of k equals k mod m">h(k) = k mod m</span>. It is the one this lesson uses, because its failure mode is arithmetic rather than mysterious.</p></div><div class="thm"><span class="label">Theorem &middot; Expected search cost under simple uniform hashing</span><p>Assume each key is equally likely to hash to any of the <span class="math" data-say="m">m</span> slots, independently. Then an unsuccessful search examines <span class="math" data-say="alpha">α</span> keys in expectation, and a successful search examines <span class="math" data-say="1 plus alpha over 2 minus alpha over 2 m">1 + α/2 − α/2m</span>. Both are <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> once the constant probe for the slot itself is counted.</p><p>The unsuccessful case is immediate: the search walks the whole chain at <span class="math" data-say="h of k">h(k)</span>, whose expected length is <span class="math" data-say="n over m equals alpha">n/m = α</span> by linearity of expectation over the <span class="math" data-say="n">n</span> keys. The successful case is smaller than <span class="math" data-say="alpha">α</span> because the search stops at the key it wants and, on average, that key is halfway along &mdash; and the correction <span class="math" data-say="negative alpha over 2 m">−α/2m</span> is because the key being searched for is itself one of the <span class="math" data-say="n">n</span>, so it does not collide with itself.</p></div><p>Linearity of expectation is doing all the work in the first half, and it is imported from Discrete Mathematics&rsquo; &ldquo;Linearity of Expectation&rdquo;: the expected number of keys in a given slot is the sum over keys of the probability that key lands there, which is <span class="math" data-say="n times 1 over m">n × 1/m</span>. No independence is needed for that step, only for the assumption to be stated the way it usually is.</p><h3>The fractions, at a table small enough to draw</h3><p>Twenty keys into eight slots. The lab computes every quantity as an exact fraction over big integers, never as a decimal that is nearly one, and then counts the probes an actual search makes:</p><div class="mathblock" data-say="m equals 8, n equals 20, alpha equals 20 over 8 equals 5 over 2 equals 2.5. expected unsuccessful, alpha, equals, 5 over 2, equals, 2.5. expected successful, 1 plus alpha over 2 minus alpha over 2 m. equals 1 plus 5 over 4 minus 5 over 32 equals 67 over 32, equals, 2.09375. measured, twenty keys drawn from the stream. a table, shown on the page. mean probes over the twenty searches, 23 over 10 equals 2.3" tabindex="0" role="region" aria-label="Mathematical notation">m = 8,  n = 20        α = 20/8 = 5/2 = 2.5
-
-expected unsuccessful       α          =  5/2      =  2.5
-expected successful    1 + α/2 − α/2m
-                     = 1 + 5/4 − 5/32 = 67/32     =  2.09375
-
-measured, twenty keys drawn from the stream:
-  chains        4  5  1  2  0  1  4  3        longest 5, one empty
-  mean probes over the twenty searches        23/10 = 2.3</div><p><span class="math" data-say="23 over 10">23/10</span> against an expected <span class="math" data-say="67 over 32">67/32</span>: the measurement came in above the expectation, which is ordinary at twenty keys, and the two numbers are close. The chain lengths <span class="math" data-say="4, 5, 1, 2, 0, 1, 4, 3">4, 5, 1, 2, 0, 1, 4, 3</span> add to twenty and average <span class="math" data-say="2.5">2.5</span>, as they must &mdash; the average chain length is <span class="math" data-say="alpha">α</span> by arithmetic, not by luck. What varies is how unevenly the keys landed, and the longest chain here is <span class="math" data-say="5">5</span>, twice the average.</p><h3>The same load factor, and a table that has become a list</h3><p>Now keep <span class="math" data-say="m equals 8">m = 8</span> and <span class="math" data-say="n equals 20">n = 20</span> and choose the keys to be <span class="math" data-say="8, 16, 24, and so on, 160">8, 16, 24, …, 160</span> &mdash; every one a multiple of <span class="math" data-say="8">8</span>. Each of them hashes to slot <span class="math" data-say="0">0</span>:</p><div class="mathblock" data-say="m equals 8, n equals 20, keys 8 16 24 and so on 160, alpha equals 5 over 2, unchanged. a table, shown on the page. mean probes over the twenty searches, 21 over 2 equals 10.5. same alpha, expected 67 over 32 is approximately 2.09, measured 10.5, a factor of 5" tabindex="0" role="region" aria-label="Mathematical notation">m = 8,  n = 20,  keys 8 16 24 … 160         α = 5/2, unchanged
-
-chains       20  0  0  0  0  0  0  0        longest 20, seven empty
-mean probes over the twenty searches        21/2 = 10.5
-
-same α,  expected 67/32 ≈ 2.09,  measured 10.5      a factor of 5</div><p>The load factor did not move. The expectation did not move. The measured cost went up by a factor of five, and it is not a fluke or a bad seed &mdash; it is the worst case, reached deliberately, by keys that a real application produces all the time: record identifiers spaced by a round number, addresses aligned to a power of two, prices in whole units. The table is now a linked list with an index on the front of it.</p><p>So the quotable statement about a hash lookup has two halves and needs both: <strong><span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> expected under simple uniform hashing, <span class="math" data-say="theta of n">Θ(n)</span> in the worst case, for any fixed hash function</strong>. System Design&rsquo;s &ldquo;Hash vs Tree for Ranges&rdquo; is where those same two facts decide a disk index rather than an in-memory one, and there the second half is joined by a third problem: a hash index cannot answer a range query at all, at any load factor.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Chaining and the load factor</h2></div><p>Expected cost is Θ(1 + α); the worst case is Θ(n), and you can build it</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The load factor, the expected chain, and the key set that defeats the table</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Hashing with chaining</span><p>A table of <span class="math" data-say="m">m</span> slots and a hash function <span class="math" data-say="h">h</span> from keys to <span class="math" data-say="the set 0, and so on, m minus 1">{0, …, m−1}</span>. Each slot holds a linked list &mdash; a <strong>chain</strong> &mdash; of every key that hashed to it. Insert prepends to the chain; search computes <span class="math" data-say="h of k">h(k)</span> and walks the chain; delete unlinks. The <strong>load factor</strong> is <span class="math" data-say="alpha equals n over m">α = n/m</span>, the number of keys divided by the number of slots.</p><p>The division hash function is <span class="math" data-say="h of k equals k mod m">h(k) = k mod m</span>. It is the one this lesson uses, because its failure mode is arithmetic rather than mysterious.</p></div><div class="thm"><span class="label">Theorem &middot; Expected search cost under simple uniform hashing</span><p>Assume each key is equally likely to hash to any of the <span class="math" data-say="m">m</span> slots, independently. Then an unsuccessful search examines <span class="math" data-say="alpha">α</span> keys in expectation, and a successful search examines <span class="math" data-say="1 plus alpha over 2 minus alpha over 2 m">1 + α/2 − α/2m</span>. Both are <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> once the constant probe for the slot itself is counted.</p><p>The unsuccessful case is immediate: the search walks the whole chain at <span class="math" data-say="h of k">h(k)</span>, whose expected length is <span class="math" data-say="n over m equals alpha">n/m = α</span> by linearity of expectation over the <span class="math" data-say="n">n</span> keys. The successful case is smaller than <span class="math" data-say="alpha">α</span> because the search stops at the key it wants and, on average, that key is halfway along &mdash; and the correction <span class="math" data-say="negative alpha over 2 m">−α/2m</span> is because the key being searched for is itself one of the <span class="math" data-say="n">n</span>, so it does not collide with itself.</p></div><p>Linearity of expectation is doing all the work in the first half, and it is imported from Discrete Mathematics&rsquo; &ldquo;Linearity of Expectation&rdquo;: the expected number of keys in a given slot is the sum over keys of the probability that key lands there, which is <span class="math" data-say="n times 1 over m">n × 1/m</span>. No independence is needed for that step, only for the assumption to be stated the way it usually is.</p><h3>The fractions, at a table small enough to draw</h3><p>Twenty keys into eight slots. The lab computes every quantity as an exact fraction over big integers, never as a decimal that is nearly one, and then counts the probes an actual search makes:</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Chaining and the load factor</h2></div><p>Expected cost is Θ(1 + α); the worst case is Θ(n), and you can build it</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Chains, drawn and walked</strong><span>the load factor is exact; the mean beside it was measured</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>a chain</span><span class="tone-amber"><i class="legend-swatch"></i>the longest chain</span><span class="tone-muted"><i class="legend-swatch"></i>an empty slot</span></div>
@@ -1418,10 +1448,10 @@ same α,  expected 67/32 ≈ 2.09,  measured 10.5      a factor of 5</div><p>The
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="hcTable"></table></div>
       <div class="status-banner" id="hcStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Chains drawn, searches run, and the same load factor twice</h3>
-          <p>Set the number of slots, the hash rule and the key set &mdash; drawn from the stream, spaced by <span class="math" data-say="m">m</span>, or typed in yourself. Every chain is drawn, every key is then searched for with a probe counter, and <span class="math" data-say="alpha">α</span> and both expectations are printed as exact fractions. Switch the key set to the stride and watch the load factor stay still while the measured cost multiplies.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Chains drawn, searches run, and the same load factor twice</h3>
+            <p>Set the number of slots, the hash rule and the key set &mdash; drawn from the stream, spaced by <span class="math" data-say="m">m</span>, or typed in yourself. Every chain is drawn, every key is then searched for with a probe counter, and <span class="math" data-say="alpha">α</span> and both expectations are printed as exact fractions. Switch the key set to the stride and watch the load factor stay still while the measured cost multiplies.</p>
         <div class="field" id="hcPresetField">
           <label for="hcPreset">Worked example</label>
           <select id="hcPreset"><option value="eight-slots" selected>twenty keys into eight slots, drawn at random</option><option value="degenerate">every key a multiple of m</option><option value="half-full">a table at half load</option></select>
@@ -1460,12 +1490,28 @@ same α,  expected 67/32 ≈ 2.09,  measured 10.5      a factor of 5</div><p>The
         </div>
         <p class="small-copy" id="hcHint" style="margin:0;">Both expectations are exact fractions of the n and m you chose, not lookups: &alpha; for an unsuccessful search and 1 + &alpha;/2 &minus; &alpha;/2m for a successful one. The mean beside them is counted by running every one of the n searches and adding up the links followed.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="m equals 8, n equals 20, alpha equals 20 over 8 equals 5 over 2 equals 2.5. expected unsuccessful, alpha, equals, 5 over 2, equals, 2.5. expected successful, 1 plus alpha over 2 minus alpha over 2 m. equals 1 plus 5 over 4 minus 5 over 32 equals 67 over 32, equals, 2.09375. measured, twenty keys drawn from the stream. a table, shown on the page. mean probes over the twenty searches, 23 over 10 equals 2.3" tabindex="0" role="region" aria-label="Mathematical notation">m = 8,  n = 20        α = 20/8 = 5/2 = 2.5
+
+expected unsuccessful       α          =  5/2      =  2.5
+expected successful    1 + α/2 − α/2m
+                     = 1 + 5/4 − 5/32 = 67/32     =  2.09375
+
+measured, twenty keys drawn from the stream:
+  chains        4  5  1  2  0  1  4  3        longest 5, one empty
+  mean probes over the twenty searches        23/10 = 2.3</div><p><span class="math" data-say="23 over 10">23/10</span> against an expected <span class="math" data-say="67 over 32">67/32</span>: the measurement came in above the expectation, which is ordinary at twenty keys, and the two numbers are close. The chain lengths <span class="math" data-say="4, 5, 1, 2, 0, 1, 4, 3">4, 5, 1, 2, 0, 1, 4, 3</span> add to twenty and average <span class="math" data-say="2.5">2.5</span>, as they must &mdash; the average chain length is <span class="math" data-say="alpha">α</span> by arithmetic, not by luck. What varies is how unevenly the keys landed, and the longest chain here is <span class="math" data-say="5">5</span>, twice the average.</p><h3>The same load factor, and a table that has become a list</h3><p>Now keep <span class="math" data-say="m equals 8">m = 8</span> and <span class="math" data-say="n equals 20">n = 20</span> and choose the keys to be <span class="math" data-say="8, 16, 24, and so on, 160">8, 16, 24, …, 160</span> &mdash; every one a multiple of <span class="math" data-say="8">8</span>. Each of them hashes to slot <span class="math" data-say="0">0</span>:</p><div class="mathblock" data-say="m equals 8, n equals 20, keys 8 16 24 and so on 160, alpha equals 5 over 2, unchanged. a table, shown on the page. mean probes over the twenty searches, 21 over 2 equals 10.5. same alpha, expected 67 over 32 is approximately 2.09, measured 10.5, a factor of 5" tabindex="0" role="region" aria-label="Mathematical notation">m = 8,  n = 20,  keys 8 16 24 … 160         α = 5/2, unchanged
+
+chains       20  0  0  0  0  0  0  0        longest 20, seven empty
+mean probes over the twenty searches        21/2 = 10.5
+
+same α,  expected 67/32 ≈ 2.09,  measured 10.5      a factor of 5</div><p>The load factor did not move. The expectation did not move. The measured cost went up by a factor of five, and it is not a fluke or a bad seed &mdash; it is the worst case, reached deliberately, by keys that a real application produces all the time: record identifiers spaced by a round number, addresses aligned to a power of two, prices in whole units. The table is now a linked list with an index on the front of it.</p><p>So the quotable statement about a hash lookup has two halves and needs both: <strong><span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> expected under simple uniform hashing, <span class="math" data-say="theta of n">Θ(n)</span> in the worst case, for any fixed hash function</strong>. System Design&rsquo;s &ldquo;Hash vs Tree for Ranges&rdquo; is where those same two facts decide a disk index rather than an in-memory one, and there the second half is joined by a third problem: a hash index cannot answer a range query at all, at any load factor.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Costing a hash table</h2></div><p>Compute the expectation first, measure second, and then try to break it &mdash; in that order, because the third step is meaningless without the first two.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Compute <span data-say="alpha">α</span>, and keep it a fraction</h3><p><span class="math" data-say="n over m">n/m</span>, exactly. <span class="math" data-say="20 over 8">20/8</span> is <span class="math" data-say="5 over 2">5/2</span>, not <span class="math" data-say="2.5">2.5</span> and certainly not <span class="math" data-say="2">2</span>. Every other quantity on the page is built from <span class="math" data-say="alpha">α</span>, and a rounded load factor puts a rounding error into all of them.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write both expectations down before looking at the table</h3><p><span class="math" data-say="alpha">α</span> for an unsuccessful search, <span class="math" data-say="1 plus alpha over 2 minus alpha over 2 m">1 + α/2 − α/2m</span> for a successful one. They differ, they are both <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span>, and knowing which one a measurement should be compared with is half of reading the lab correctly.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Measure, and look at the longest chain as well as the mean</h3><p>The mean is pinned to <span class="math" data-say="alpha">α</span> by arithmetic and tells you nothing about spread. The longest chain is the cost of the unluckiest key, and at <span class="math" data-say="m equals 8, n equals 20">m = 8, n = 20</span> it is <span class="math" data-say="5">5</span> &mdash; twice the mean, on keys that were drawn at random.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Now choose keys to defeat the hash function</h3><p>For <span class="math" data-say="h of k equals k mod m">h(k) = k mod m</span>, use multiples of <span class="math" data-say="m">m</span>. The load factor will not move and the measured cost will. This step is the lesson: a structure whose guarantee is an expectation over the input has to be tested against the input that expectation assumes away.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Costing a hash table</h2>
+      <p class="lead-in">Compute the expectation first, measure second, and then try to break it &mdash; in that order, because the third step is meaningless without the first two.</p>
+      <ol class="key-ideas method"><li><strong>Compute <span data-say="alpha">α</span>, and keep it a fraction.</strong> <span class="math" data-say="n over m">n/m</span>, exactly. <span class="math" data-say="20 over 8">20/8</span> is <span class="math" data-say="5 over 2">5/2</span>, not <span class="math" data-say="2.5">2.5</span> and certainly not <span class="math" data-say="2">2</span>. Every other quantity on the page is built from <span class="math" data-say="alpha">α</span>, and a rounded load factor puts a rounding error into all of them.</li><li><strong>Write both expectations down before looking at the table.</strong> <span class="math" data-say="alpha">α</span> for an unsuccessful search, <span class="math" data-say="1 plus alpha over 2 minus alpha over 2 m">1 + α/2 − α/2m</span> for a successful one. They differ, they are both <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span>, and knowing which one a measurement should be compared with is half of reading the lab correctly.</li><li><strong>Measure, and look at the longest chain as well as the mean.</strong> The mean is pinned to <span class="math" data-say="alpha">α</span> by arithmetic and tells you nothing about spread. The longest chain is the cost of the unluckiest key, and at <span class="math" data-say="m equals 8, n equals 20">m = 8, n = 20</span> it is <span class="math" data-say="5">5</span> &mdash; twice the mean, on keys that were drawn at random.</li><li><strong>Now choose keys to defeat the hash function.</strong> For <span class="math" data-say="h of k equals k mod m">h(k) = k mod m</span>, use multiples of <span class="math" data-say="m">m</span>. The load factor will not move and the measured cost will. This step is the lesson: a structure whose guarantee is an expectation over the input has to be tested against the input that expectation assumes away.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1494,17 +1540,16 @@ same m, same n, keys 16 32 48 64 80 96 112 128:
   mean probes   9/2  =  4.5</div><p><span class="math" data-say="9 over 8">9/8</span> against an expected <span class="math" data-say="79 over 64">79/64</span>: <span class="math" data-say="1.125">1.125</span> measured, <span class="math" data-say="1.234">1.234</span> expected, and the measurement came in slightly under. At eight keys that is nothing but variance, and it is worth noticing that the measurement can land on either side &mdash; a lab that always confirmed the expectation would be reporting the expectation.</p><p>The stride set quadruples the measured cost at the same <span class="math" data-say="alpha equals 1 over 2">α = 1/2</span>. On a half-loaded table. The expected cost of a successful search on eight keys in one chain is <span class="math" data-say="the quantity 1 plus 2, and so on, plus 8, over 8 equals 9 over 2">(1 + 2 + … + 8)/8 = 9/2</span>, which is exactly what was measured, because there is no randomness left: every search walks a known list.</p><p>For a faded rehearsal, set <span class="math" data-say="m equals 8">m = 8</span> and <span class="math" data-say="n equals 8">n = 8</span> so that <span class="math" data-say="alpha equals 1">α = 1</span>. The supplied first step is the expectation: <span class="math" data-say="1 plus 1 over 2 minus 1 over 16 equals 23 over 16 equals 1.4375">1 + 1/2 − 1/16 = 23/16 = 1.4375</span>. Predict the mean probe count for random keys, then measure it; then switch to the stride set and predict <span class="math" data-say="the quantity 1 plus 2, and so on, plus 8, over 8">(1 + 2 + … + 8)/8</span> before measuring that. Say which of your four numbers were computed from a definition and which were counted.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Saying a hash table is <span class="math" data-say="big O of 1">O(1)</span> without the two qualifications</strong><span>It is <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> <em>expected</em>, <em>under an assumption about the keys</em>, and <span class="math" data-say="theta of n">Θ(n)</span> in the worst case. The short version is true of the cases most people meet and is not a bound. The habit worth building is to say the expectation and the worst case in the same breath, because a system whose input an adversary chooses will meet the second one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the load factor as a measurement</strong><span><span class="math" data-say="alpha equals n over m">α = n/m</span> is arithmetic, and so is the mean chain length, which equals <span class="math" data-say="alpha">α</span> on every key set whatsoever. Twenty keys in eight slots average <span class="math" data-say="2.5">2.5</span> per chain whether they are spread evenly or all in one place. The quantity that distinguishes those two tables is the longest chain, and it is <span class="math" data-say="5">5</span> in one and <span class="math" data-say="20">20</span> in the other.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Testing a hash table only on keys that suit it</strong><span>Random keys, sequential keys and keys drawn from a real trace all behave roughly like the expectation for <span class="math" data-say="h of k equals k mod m">h(k) = k mod m</span>. Multiples of <span class="math" data-say="m">m</span> do not, and they are not exotic: they arise from aligned addresses, round-numbered identifiers and strides in a loop. A table that has never been run on a degenerate set has not been tested, and the lab supplies one.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state the cost of a hash lookup in two halves without being prompted for the second.</strong><p>You should be able to compute <span class="math" data-say="alpha">α</span> and both expectations as exact fractions, say which expectation a given measurement should be compared with, produce a key set that sends every key to one slot for <span class="math" data-say="h of k equals k mod m">h(k) = k mod m</span>, and quote <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> expected and <span class="math" data-say="theta of n">Θ(n)</span> worst case as a single two-part statement.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Chaining pays for its collisions in pointers and never runs out of room. The alternative keeps everything inside the table and has a subtler problem: &ldquo;Open Addressing and Linear Probing&rdquo; shows why a deletion must leave a mark rather than a hole &mdash; the lab names the keys that go missing when it does not &mdash; and why clustering makes an unsuccessful search cost far more than <span class="math" data-say="1 plus alpha">1 + α</span>.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Saying a hash table is <span class="math" data-say="big O of 1">O(1)</span> without the two qualifications</strong><span>It is <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> <em>expected</em>, <em>under an assumption about the keys</em>, and <span class="math" data-say="theta of n">Θ(n)</span> in the worst case. The short version is true of the cases most people meet and is not a bound. The habit worth building is to say the expectation and the worst case in the same breath, because a system whose input an adversary chooses will meet the second one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the load factor as a measurement</strong><span><span class="math" data-say="alpha equals n over m">α = n/m</span> is arithmetic, and so is the mean chain length, which equals <span class="math" data-say="alpha">α</span> on every key set whatsoever. Twenty keys in eight slots average <span class="math" data-say="2.5">2.5</span> per chain whether they are spread evenly or all in one place. The quantity that distinguishes those two tables is the longest chain, and it is <span class="math" data-say="5">5</span> in one and <span class="math" data-say="20">20</span> in the other.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Testing a hash table only on keys that suit it</strong><span>Random keys, sequential keys and keys drawn from a real trace all behave roughly like the expectation for <span class="math" data-say="h of k equals k mod m">h(k) = k mod m</span>. Multiples of <span class="math" data-say="m">m</span> do not, and they are not exotic: they arise from aligned addresses, round-numbered identifiers and strides in a loop. A table that has never been run on a degenerate set has not been tested, and the lab supplies one.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state the cost of a hash lookup in two halves without being prompted for the second.</strong><p>You should be able to compute <span class="math" data-say="alpha">α</span> and both expectations as exact fractions, say which expectation a given measurement should be compared with, produce a key set that sends every key to one slot for <span class="math" data-say="h of k equals k mod m">h(k) = k mod m</span>, and quote <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> expected and <span class="math" data-say="theta of n">Θ(n)</span> worst case as a single two-part statement.</p></div></div><div class="note"><strong>Note:</strong> Chaining pays for its collisions in pointers and never runs out of room. The alternative keeps everything inside the table and has a subtler problem: &ldquo;Open Addressing and Linear Probing&rdquo; shows why a deletion must leave a mark rather than a hole &mdash; the lab names the keys that go missing when it does not &mdash; and why clustering makes an unsuccessful search cost far more than <span class="math" data-say="1 plus alpha">1 + α</span>.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The load factor is the answer, and it can exceed 1</summary><p><span class="math" data-say="alpha equals n over m">α = n/m</span> is the average chain length by definition: <span class="math" data-say="n">n</span> keys shared over <span class="math" data-say="m">m</span> slots. With chaining there is no upper limit on <span class="math" data-say="alpha">α</span> &mdash; twenty keys in eight slots is <span class="math" data-say="alpha equals 5 over 2">α = 5/2</span> and the table works fine, just more slowly. A search costs one probe to find the slot plus a walk along the chain, which is <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span>, and the <span class="math" data-say="1">1</span> matters precisely when <span class="math" data-say="alpha">α</span> is small.</p></details><details class="recall"><summary>The expectation is over an assumption about the keys, not over the table</summary><p>Simple uniform hashing says each key is equally likely to hash to each slot, independently of the others. That is an assumption about the input, and the hash function does not enforce it: <span class="math" data-say="h of k equals k mod m">h(k) = k mod m</span> sends every multiple of <span class="math" data-say="m">m</span> to slot <span class="math" data-say="0">0</span> no matter how clever the rest of the table is. When the assumption fails the expectation says nothing.</p></details><details class="recall"><summary>The worst case is a linked list, and it cannot be engineered away</summary><p>For any fixed hash function into <span class="math" data-say="m">m</span> slots there is a set of <span class="math" data-say="n">n</span> keys that all collide, because there are far more keys than slots. So the worst-case search is <span class="math" data-say="theta of n">Θ(n)</span>, permanently. The honest statement is two-part &mdash; <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> expected, <span class="math" data-say="theta of n">Θ(n)</span> worst &mdash; and dropping the second half is how &ldquo;hash tables are <span class="math" data-say="big O of 1">O(1)</span>&rdquo; gets said.</p></details></div>
+      <h3>Summary</h3>
       <p>Under simple uniform hashing the expected length of a chain is the load factor <span class="math" data-say="alpha equals n over m">α = n/m</span>, so a search costs <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> expected. That is an average over an assumption about the keys, and the worst case is <span class="math" data-say="theta of n">Θ(n)</span>: no hash function removes it. At <span class="math" data-say="m equals 8">m = 8</span> and <span class="math" data-say="n equals 20">n = 20</span> the lab measures <span class="math" data-say="2.3">2.3</span> probes on random keys and <span class="math" data-say="10.5">10.5</span> on a key set with the same <span class="math" data-say="alpha">α</span>.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The load factor is the answer, and it can exceed 1.</strong> <span class="math" data-say="alpha equals n over m">α = n/m</span> is the average chain length by definition: <span class="math" data-say="n">n</span> keys shared over <span class="math" data-say="m">m</span> slots. With chaining there is no upper limit on <span class="math" data-say="alpha">α</span> &mdash; twenty keys in eight slots is <span class="math" data-say="alpha equals 5 over 2">α = 5/2</span> and the table works fine, just more slowly. A search costs one probe to find the slot plus a walk along the chain, which is <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span>, and the <span class="math" data-say="1">1</span> matters precisely when <span class="math" data-say="alpha">α</span> is small.</li><li><strong>The expectation is over an assumption about the keys, not over the table.</strong> Simple uniform hashing says each key is equally likely to hash to each slot, independently of the others. That is an assumption about the input, and the hash function does not enforce it: <span class="math" data-say="h of k equals k mod m">h(k) = k mod m</span> sends every multiple of <span class="math" data-say="m">m</span> to slot <span class="math" data-say="0">0</span> no matter how clever the rest of the table is. When the assumption fails the expectation says nothing.</li><li><strong>The worst case is a linked list, and it cannot be engineered away.</strong> For any fixed hash function into <span class="math" data-say="m">m</span> slots there is a set of <span class="math" data-say="n">n</span> keys that all collide, because there are far more keys than slots. So the worst-case search is <span class="math" data-say="theta of n">Θ(n)</span>, permanently. The honest statement is two-part &mdash; <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> expected, <span class="math" data-say="theta of n">Θ(n)</span> worst &mdash; and dropping the second half is how &ldquo;hash tables are <span class="math" data-say="big O of 1">O(1)</span>&rdquo; gets said.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="alpha equals n over m, the load factor, keys per slot. chaining, h of k equals k mod m, collisions live in a list at the slot. expected, unsuccessful, alpha, equals 5 over 2 at m equals 8, n equals 20. expected, successful, 1 plus alpha over 2 minus alpha over 2 m, equals 67 over 32. so a search is, theta of the quantity 1 plus alpha, expected, theta of n worst case. measured at alpha equals 5 over 2, random keys 23 over 10, every key is congruent to 0 mod m, 21 over 2" tabindex="0" role="region" aria-label="Mathematical notation">α = n/m                    the load factor: keys per slot
 chaining      h(k) = k mod m,  collisions live in a list at the slot
 
@@ -2964,11 +3009,42 @@ measured at α = 5/2:   random keys 23/10       every key ≡ 0 (mod m)  21/2</d
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3036,7 +3112,7 @@ measured at α = 5/2:   random keys 23/10       every key ≡ 0 (mod m)  21/2</d
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Surveys, Data and Statistical Methods</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 14 · Why Use a Survey</p>
       <h1>Surveys Allow You to Collect and Analyze Data Quickly</h1>
       <p class="lesson-lede">A team can read its delivery performance from a log or ask the people who do the work; the chapter&#x27;s first two reasons for asking are speed and what a log never sees.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>System data</li><li>Coverage</li><li>A shared definition</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s first two reasons, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Often, the strongest reason to use surveys is speed and ease of data collection.&rdquo; That is Forsgren, Humble and Kim starting the first of five reasons that Chapter 14, Why Use a Survey, gives for asking people. This lesson reads the opening of the chapter and its first two reasons, speed and the full stack. The remaining three, completeness, trust and the things only a survey can measure, are the next lesson's.</p><p>The chapter begins from a fair question. Teams that want to know how well their software delivery performs often start by instrumenting the delivery process and the toolchain, and the authors call what that yields system data. Several tools on the market now report measures such as lead time. So why would anyone also collect survey data? The authors list five reasons: a survey is quick, the full stack is hard to measure from system data, so is completeness, survey data can be trusted, and some things can only be measured by asking.</p><p>The first reason is the speed of a whole research program. The authors say the data in the book was collected four times, each time over four to six weeks, from thousands of respondents around the world representing thousands of organizations; the Preface counts over 23,000 survey responses and over 2,000 organizations across the four years of research, 2014 through 2017. They ask the reader to imagine the legal clearances, the data specifications and the transfers that would be needed to gather system data from so many teams within the same weeks. Then comes the cleaning and analysis, which for the State of DevOps Reports generally took three to four weeks.</p><p>The deeper obstacle, the authors argue, is what the data means. Teams use the same name for different measures. The chapter's example is the pair lead time and cycle time, which it says are often used interchangeably and often confused; if one team calls a measure cycle time, another calls the same thing lead time, and a third calls something different lead time, the analyst does not know which variable is which. A reader can see the difficulty in the book itself: Chapter 2 measures lead time from a commit to code running in production, while this chapter, glossing the term in passing, ends the clock at code in a deployable state. A vetted survey item fixes the words for everyone, so it matters what respondents were asked and not what their organization calls it. Rigorous research adds checks that the survey itself did not bias the answers, among them a comparison of early and late responders, which Appendix C describes and the lesson Tests for Bias works.</p><p>The second reason is that system data is rarely exhaustive, even when it is good. One of the authors tells of an earlier job, tuning the performance of large disk storage machines. Her team measured every layer inside the machine and had figures showing it ran well, yet customers kept saying it was slow, and the first reports were set aside because the logs said otherwise. The reports formed a pattern. The machine was fast. What the team had not measured was the interface, the way customers used the box, which introduced the slowness. People's reports were less precise than the logs, minutes against milliseconds, yet they showed the team where to look. The authors draw the lesson for any team: ask the people who build and run the system, everyone and not a few, so that a couple of very positive or very negative voices do not decide the picture. A footnote adds the condition that the request must be honest, with no instruction to answer well, and that anonymity helps.</p><p>Now the count, on a team of the lesson's own. Fourteen days of a pipeline log hold eight deploys, each with the hour its change was committed and the hour it was deployed. The team also pushes emergency fixes to production by hand, outside the pipeline, and the log knows nothing of them. The lab's delivery view takes the records and computes the four measures of Chapter 2: deployments, with their rate per day and per week, the median lead time from commit to deploy with its answer option on the book's six-option scale, the change fail rate with its band, and the median time to restore. On the preset <code>pipeline-log</code> it counts 8 deployments, 4 a week, a median lead time of 37 hours (the lab prints 1 d 13 h), which is between one day and one week, and a change fail rate of 0 percent, in the book's lowest band, 0 to 15 percent, because the pipeline marks a deploy failed only when the pipeline itself fails. Two incidents, from the on-call tracker, lasted 3 and 2 hours, a median time to restore of 2.5 hours, which the lab prints as 2 h 30 min.</p><p>The preset <code>with-hotfixes</code> adds the two emergency deploys the log missed, made 2 and 1.5 hours after their commits, and records the truth the pipeline did not: the two deploys that caused those incidents had failed. The lab now counts 10 deployments, 5 a week, a median lead time of 26 hours (1 d 2 h), still between one day and one week, and a change fail rate of 20 percent, two failed of ten, which falls in the 16 to 30 percent band. The median time to restore is unchanged at 2.5 hours, since the incidents came from a separate record. The log was exact about what it covered. It missed a fifth of the deploys, gave a median lead time 11 hours too long, and showed no failures where the team had two.</p><p>Read the figures as the authors would, as a reason to look elsewhere too. Neither list is the verdict on the team, and the lab cannot say which of your own sources is the one with the gap. A survey is not the cure for it: the authors add that people will not have perfect knowledge or visibility either, so the claim is that the two views together show more than one. Martin Fowler's foreword makes the matching caution about the book, that its surveys capture subjective perceptions and that he wonders how the sample reflects the wider IT world. The next lesson turns to that doubt.</p><h3>Exercise</h3><ul><li>A team's seven days (168 hours). Logged deploys, as <span class="math" data-say="change, committed, deployed">change, committed, deployed</span>: <span class="math" data-say="e 1, 10, 30, e 2, 40, 70, e 3, 80, 120, e 4, 100, 150">e1, 10, 30; e2, 40, 70; e3, 80, 120; e4, 100, 150</span>. The log marks none of them failed.</li><li>Two deploys made by hand, not logged: <span class="math" data-say="m 1, 31, 34">m1, 31, 34</span> and <span class="math" data-say="m 2, 125, 130">m2, 125, 130</span>. The first repaired <span class="math" data-say="e 1">e1</span>, which had in fact failed; the second shipped an urgent change.</li></ul><p>By hand, compute the deployments, the deployments per week, the median lead time and the change fail rate from the log alone, and again with the two hand deploys and the failure of <code>e1</code>. Then type both versions into the lab to check your count. Find the measure the log gets most wrong, and the answer options that stay the same.</p><p>Surveys are quick and see across the boundary of any one system. The authors also claim that survey data can be trusted, a claim many engineers resist. The next lesson, You Can Trust Survey Data, reads that argument.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Delivery performance</h2></div><p>the four measures from a log of changes and incidents</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s first two reasons, then the count</h2><div class="prose reading"><p>&ldquo;Often, the strongest reason to use surveys is speed and ease of data collection.&rdquo; That is Forsgren, Humble and Kim starting the first of five reasons that Chapter 14, Why Use a Survey, gives for asking people. This lesson reads the opening of the chapter and its first two reasons, speed and the full stack. The remaining three, completeness, trust and the things only a survey can measure, are the next lesson's.</p><p>The chapter begins from a fair question. Teams that want to know how well their software delivery performs often start by instrumenting the delivery process and the toolchain, and the authors call what that yields system data. Several tools on the market now report measures such as lead time. So why would anyone also collect survey data? The authors list five reasons: a survey is quick, the full stack is hard to measure from system data, so is completeness, survey data can be trusted, and some things can only be measured by asking.</p><p>The first reason is the speed of a whole research program. The authors say the data in the book was collected four times, each time over four to six weeks, from thousands of respondents around the world representing thousands of organizations; the Preface counts over 23,000 survey responses and over 2,000 organizations across the four years of research, 2014 through 2017. They ask the reader to imagine the legal clearances, the data specifications and the transfers that would be needed to gather system data from so many teams within the same weeks. Then comes the cleaning and analysis, which for the State of DevOps Reports generally took three to four weeks.</p><p>The deeper obstacle, the authors argue, is what the data means. Teams use the same name for different measures. The chapter's example is the pair lead time and cycle time, which it says are often used interchangeably and often confused; if one team calls a measure cycle time, another calls the same thing lead time, and a third calls something different lead time, the analyst does not know which variable is which. A reader can see the difficulty in the book itself: Chapter 2 measures lead time from a commit to code running in production, while this chapter, glossing the term in passing, ends the clock at code in a deployable state. A vetted survey item fixes the words for everyone, so it matters what respondents were asked and not what their organization calls it. Rigorous research adds checks that the survey itself did not bias the answers, among them a comparison of early and late responders, which Appendix C describes and the lesson Tests for Bias works.</p><p>The second reason is that system data is rarely exhaustive, even when it is good. One of the authors tells of an earlier job, tuning the performance of large disk storage machines. Her team measured every layer inside the machine and had figures showing it ran well, yet customers kept saying it was slow, and the first reports were set aside because the logs said otherwise. The reports formed a pattern. The machine was fast. What the team had not measured was the interface, the way customers used the box, which introduced the slowness. People's reports were less precise than the logs, minutes against milliseconds, yet they showed the team where to look. The authors draw the lesson for any team: ask the people who build and run the system, everyone and not a few, so that a couple of very positive or very negative voices do not decide the picture. A footnote adds the condition that the request must be honest, with no instruction to answer well, and that anonymity helps.</p><p>Now the count, on a team of the lesson's own. Fourteen days of a pipeline log hold eight deploys, each with the hour its change was committed and the hour it was deployed. The team also pushes emergency fixes to production by hand, outside the pipeline, and the log knows nothing of them. The lab's delivery view takes the records and computes the four measures of Chapter 2: deployments, with their rate per day and per week, the median lead time from commit to deploy with its answer option on the book's six-option scale, the change fail rate with its band, and the median time to restore. On the preset <code>pipeline-log</code> it counts 8 deployments, 4 a week, a median lead time of 37 hours (the lab prints 1 d 13 h), which is between one day and one week, and a change fail rate of 0 percent, in the book's lowest band, 0 to 15 percent, because the pipeline marks a deploy failed only when the pipeline itself fails. Two incidents, from the on-call tracker, lasted 3 and 2 hours, a median time to restore of 2.5 hours, which the lab prints as 2 h 30 min.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Delivery performance</h2></div><p>the four measures from a log of changes and incidents</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Delivery performance</strong><span>the four measures from a log of changes and incidents</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="adeTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="adeTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A time is day.hh:mm from the period's start (1.09:30 is day 1 at 09:30; day 1 begins at hour 0) or decimal hours from the start (33.5). Every time falls within the period. A deployment is one deploy time: changes deployed at the same moment are one deployment. Lead time is deployed minus committed, for each change deployed; time to restore is restored minus start. A median is the middle value, or the mean of the two middle values. Change fail rate is the failed changes over the changes deployed. Each measure is placed on the book's six answer options: lead time and time to restore under less than one hour, less than one day, between one day and one week, between one week and one month (30 days), between one month and six months (180 days), more than six months, a value exactly on a boundary going to the longer option (one hour exactly is less than one day); deployment frequency by deployments per day over the period, where the book's first two options overlap, so two or more a day is on demand (multiple deploys per day), at least one but fewer than two is between once per hour and once per day, at least one a week between once per day and once per week, at least one in 30 days between once per week and once per month, at least one in 180 days between once per month and once every six months, a rate exactly on a boundary going to the more frequent option. The fail rate's bands are 0–15%, 16–30%, 31–45%, 46–60% (the book's) and the lab's 61–75%, 76–100%, a rate in the first band whose top it does not pass (15.5% is 16–30%). With period 2 given, each tile reads period 1 → period 2, over the same number of days.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The four measures from a log, with and without a gap</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The four measures from a log, with and without a gap</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="adePreset">Worked example</label>
           <select id="adePreset"><option value="pipeline-log" selected>Fourteen days as the pipeline log records them: eight deploys</option><option value="with-hotfixes">The same fourteen days with the two emergency deploys and their failures</option></select>
@@ -1446,12 +1489,15 @@
           <div class="kpi"><span>Time to restore, as the book's answer option</span><strong id="adeRestoreOpt">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>with-hotfixes</code> adds the two emergency deploys the log missed, made 2 and 1.5 hours after their commits, and records the truth the pipeline did not: the two deploys that caused those incidents had failed. The lab now counts 10 deployments, 5 a week, a median lead time of 26 hours (1 d 2 h), still between one day and one week, and a change fail rate of 20 percent, two failed of ten, which falls in the 16 to 30 percent band. The median time to restore is unchanged at 2.5 hours, since the incidents came from a separate record. The log was exact about what it covered. It missed a fifth of the deploys, gave a median lead time 11 hours too long, and showed no failures where the team had two.</p><p>Read the figures as the authors would, as a reason to look elsewhere too. Neither list is the verdict on the team, and the lab cannot say which of your own sources is the one with the gap. A survey is not the cure for it: the authors add that people will not have perfect knowledge or visibility either, so the claim is that the two views together show more than one. Martin Fowler's foreword makes the matching caution about the book, that its surveys capture subjective perceptions and that he wonders how the sample reflects the wider IT world. The next lesson turns to that doubt.</p><h3>Exercise</h3><ul><li>A team's seven days (168 hours). Logged deploys, as <span class="math" data-say="change, committed, deployed">change, committed, deployed</span>: <span class="math" data-say="e 1, 10, 30, e 2, 40, 70, e 3, 80, 120, e 4, 100, 150">e1, 10, 30; e2, 40, 70; e3, 80, 120; e4, 100, 150</span>. The log marks none of them failed.</li><li>Two deploys made by hand, not logged: <span class="math" data-say="m 1, 31, 34">m1, 31, 34</span> and <span class="math" data-say="m 2, 125, 130">m2, 125, 130</span>. The first repaired <span class="math" data-say="e 1">e1</span>, which had in fact failed; the second shipped an urgent change.</li></ul><p>By hand, compute the deployments, the deployments per week, the median lead time and the change fail rate from the log alone, and again with the two hand deploys and the failure of <code>e1</code>. Then type both versions into the lab to check your count. Find the measure the log gets most wrong, and the answer options that stay the same.</p><p>Surveys are quick and see across the boundary of any one system. The authors also claim that survey data can be trusted, a claim many engineers resist. The next lesson, You Can Trust Survey Data, reads that argument.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Comparing a log with the work</h2></div><p>Four steps, the last of them on a system of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List every path to production</h3><p>Write down each way a change reaches users: the pipeline, a hand deploy, a configuration push, a vendor update. Mark the ones that write to the log you would measure from.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the four measures from the log</h3><p>Count the deploys and the deploys per week, take the median of the lead times, and divide the failed deploys by all deploys, as the log records them.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add the paths the log misses and recompute</h3><p>Type the unlogged deploys and any failures the log did not mark, run the lab again, and write down each measure that moved and by how much.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a service you run</h3><p>Pick one service and one week. Count its deploys from the tool, then ask three people on the team how many they made. Write down whether the counts agree and which path explains the difference.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Comparing a log with the work</h2>
+      <p class="lead-in">Four steps, the last of them on a system of your own.</p>
+      <ol class="key-ideas method"><li><strong>List every path to production.</strong> Write down each way a change reaches users: the pipeline, a hand deploy, a configuration push, a vendor update. Mark the ones that write to the log you would measure from.</li><li><strong>Compute the four measures from the log.</strong> Count the deploys and the deploys per week, take the median of the lead times, and divide the failed deploys by all deploys, as the log records them.</li><li><strong>Add the paths the log misses and recompute.</strong> Type the unlogged deploys and any failures the log did not mark, run the lab again, and write down each measure that moved and by how much.</li><li><strong>Do it on a service you run.</strong> Pick one service and one week. Count its deploys from the tool, then ask three people on the team how many they made. Write down whether the counts agree and which path explains the difference.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1473,17 +1519,16 @@ change fail rate: 0 of 8 logged, 2 of 10 in fact
 2 / 10 = 20 percent</div><p>A median of an even number of values is the mean of the middle two. Adding two fast deploys pulled the middle down from between 26 and 48 to between 26 and 26, which is why the median moved by 11 hours although eight of the ten deploys are the same.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Trusting a measure because it is precise</strong><span>A log's numbers are exact about what the log covers, and the storage team's logs were exact to the millisecond. The lab shows the same on a small scale: 8 deploys, 37 hours and 0 percent failures are exact for the pipeline, and the team made 10 deploys, with 2 failures. Precision answers how closely a number reports what it measured, and says nothing about what it left out.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the chapter as telling teams to drop their logs</strong><span>The authors ask why a team would collect survey data and not just toolchain data, and their reasons are about what a survey adds. They also say that people lack perfect knowledge, and they grant that tools can now report measures such as lead time. The lesson's two presets are one team seen through two sources, not a contest.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a quick survey to be a short one</strong><span>Speed here is the speed of collecting and cleaning data from many teams once vetted items exist. Chapter 13 is wary of quick surveys that rest on a single question: it allows that a carefully developed one, its example being the Net Promoter Score, is useful, and draws only narrow conclusions from it. The authors measure their constructs with several items. A survey is fast to run because a great deal of work went into its wording first.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a log leaves out.</strong><p>Given a log and the paths it does not record, compute the deployments, median lead time and change fail rate with and without them, and name the measure the log alone gets most wrong.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab computes from the records you type, and it takes your word that they are complete. It cannot tell whether a log is missing deploys or whether a respondent's memory of them is better; that is a comparison of two sources, and you make it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Trusting a measure because it is precise</strong><span>A log's numbers are exact about what the log covers, and the storage team's logs were exact to the millisecond. The lab shows the same on a small scale: 8 deploys, 37 hours and 0 percent failures are exact for the pipeline, and the team made 10 deploys, with 2 failures. Precision answers how closely a number reports what it measured, and says nothing about what it left out.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the chapter as telling teams to drop their logs</strong><span>The authors ask why a team would collect survey data and not just toolchain data, and their reasons are about what a survey adds. They also say that people lack perfect knowledge, and they grant that tools can now report measures such as lead time. The lesson's two presets are one team seen through two sources, not a contest.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a quick survey to be a short one</strong><span>Speed here is the speed of collecting and cleaning data from many teams once vetted items exist. Chapter 13 is wary of quick surveys that rest on a single question: it allows that a carefully developed one, its example being the Net Promoter Score, is useful, and draws only narrow conclusions from it. The authors measure their constructs with several items. A survey is fast to run because a great deal of work went into its wording first.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a log leaves out.</strong><p>Given a log and the paths it does not record, compute the deployments, median lead time and change fail rate with and without them, and name the measure the log alone gets most wrong.</p></div></div><div class="note"><strong>Note:</strong> The lab computes from the records you type, and it takes your word that they are complete. It cannot tell whether a log is missing deploys or whether a respondent's memory of them is better; that is a comparison of two sources, and you make it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>System data</summary><p>The authors' name for data gathered by instrumenting the delivery process and the toolchain: commit times, deploy times, incident records. The chapter asks why anyone would collect survey data when system data of this kind is available.</p></details><details class="recall"><summary>Coverage</summary><p>The part of the work a source can see. A pipeline log covers every deploy that goes through the pipeline; a deploy made by hand to production happens in the world and is not in the log. A log with gaps still reports exact numbers, about the part it covers.</p></details><details class="recall"><summary>A shared definition</summary><p>Words and definitions that every respondent reads the same way. The authors' point is that two teams can use one name for two measures, or two names for one, and a survey item removes the doubt by asking everyone the same thing.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 14 asks why the authors used a survey when tools can already report lead time. Read its first two reasons, speed and the full stack, and the story of a storage team whose logs said everything was fine; then compute one team's four delivery measures from a log, and again with the hotfix path the log does not record.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>System data.</strong> The authors' name for data gathered by instrumenting the delivery process and the toolchain: commit times, deploy times, incident records. The chapter asks why anyone would collect survey data when system data of this kind is available.</li><li><strong>Coverage.</strong> The part of the work a source can see. A pipeline log covers every deploy that goes through the pipeline; a deploy made by hand to production happens in the world and is not in the log. A log with gaps still reports exact numbers, about the part it covers.</li><li><strong>A shared definition.</strong> Words and definitions that every respondent reads the same way. The authors' point is that two teams can use one name for two measures, or two names for one, and a survey item removes the doubt by asking everyone the same thing.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="system data is what your tools record. a survey is fast across organizations. the same word can mean two measures. a log sees only what it is wired to. ask people what the log cannot see" tabindex="0" role="region" aria-label="Mathematical notation">system data is what your tools record
 a survey is fast across organizations
 the same word can mean two measures
@@ -2378,11 +2423,42 @@ ask people what the log cannot see</div><figcaption>Surveys and system data in f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2450,7 +2526,7 @@ ask people what the log cannot see</div><figcaption>Surveys and system data in f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

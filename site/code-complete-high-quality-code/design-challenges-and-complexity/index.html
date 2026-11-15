@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Creating High-Quality Code</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · Design in Construction</p>
       <h1>Design Challenges and Complexity</h1>
       <p class="lesson-lede">Design is a wicked, sloppy, heuristic activity whose first job is to keep how much of a program anyone must hold in mind at once small.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A wicked problem</li><li>Essential and accidental difficulty</li><li>Coupling, fan-in and fan-out</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Software’s Primary Technical Imperative is managing complexity. This is greatly aided by a design focus on simplicity.&rdquo; That is the first of Chapter 5's key points (p. 123), and the whole of Creating High-Quality Code is built on it. This lesson reads sections 5.1 and 5.2, pages 73 to 86: why design is hard, and what the chapter means by complexity. Read them in your own copy first.</p><p>The chapter's first question is what design is, and its answer is a list of difficulties. Design, McConnell says, is a wicked problem, in the sense Rittel and Webber gave the word in 1973: one you can define clearly only by solving it, or part of it, so that you solve it once to learn what it was and again to solve it properly. His example is the first Tacoma Narrows bridge, strong enough for its load and shaken apart by the wind in 1940, because nobody had known that aerodynamics mattered that much until the bridge showed them. School exercises, he notes, are rarely wicked; professional work usually is.</p><p>The rest of section 5.1 follows from that. Design is sloppy, full of false steps, even when its result is tidy, and it is hard to know when it is good enough. It is about trade-offs and priorities, and about restrictions, which force simplifications that improve the result. It is nondeterministic: three people sent away to design one program can come back with three acceptable designs. So its techniques are heuristics, rules of thumb that sometimes work, and design is emergent: it evolves through reviews, discussion and the experience of writing and revising the code.</p><p>Section 5.2 asks what all this difficulty is made of, and answers with Fred Brooks's essay <em>No Silver Bullet</em> (1987). Brooks divided software's difficulties, after Aristotle, into the accidental and the essential. Assembly language, batch computers and tools that did not work together were accidental, and were largely dealt with decades ago. What remains is essential: working out an intricate, interlocking set of concepts that must be exactly right and that meet a disorderly world. The root of both kinds, McConnell concludes, is complexity, and when projects fail for technical reasons the reason is often that nobody any longer understands what a change in one place will do elsewhere.</p><p>Hence the imperative. Citing Dijkstra, the chapter says no one's skull is big enough to hold a modern program, so a design should let you focus safely on one part at a time. It proposes two prongs: keep the essential complexity anyone must deal with at one time to a minimum, and keep accidental complexity from spreading. Its list of a design's desirable internal characteristics follows, and three of them are counts: loose coupling, high fan-in (many classes using a given utility class) and low to medium fan-out (a class using only a few others). Stratification, leanness and ease of maintenance are on the same list.</p><p>The section ends with the levels of design, from the whole system through subsystems and classes down to the inside of a routine. At the subsystem level McConnell imagines six subsystems in which every one talks to every other, and offers his own image for what that costs: think of each line between subsystems as a hose with water in it, and of how wet you get pulling one subsystem out to use elsewhere. His advice is to allow communication on a need-to-know basis, restricting it early, and to keep the subsystem diagram free of cycles.</p><p>Now the count. The lab reads a design as records <span class="math" data-say="user, used">user, used</span>, one per dependency, and counts. Its tiles are the number of modules, the distinct uses, the possible pairs of modules, the pairs connected in either direction as a share of the possible ones, and the largest fan-out and fan-in, with a tie going to the alphabetically first name and the banner naming every tied module. The preset <code>everything-talks</code> has five modules, <span class="math" data-say="ui">ui</span>, <span class="math" data-say="orders">orders</span>, <span class="math" data-say="billing">billing</span>, <span class="math" data-say="stock">stock</span> and <span class="math" data-say="db">db</span>, each using every other: 20 uses, 10 possible pairs, and all 10 connected, 1 = 100%. The largest fan-in prints as billing 4, but all five modules tie at 4; this is the hoses picture in miniature.</p><p>The preset <code>layered</code> redraws the same five modules in layers: <span class="math" data-say="ui">ui</span> uses <span class="math" data-say="orders">orders</span> and <span class="math" data-say="billing">billing</span>, each of those uses <span class="math" data-say="stock">stock</span> and <span class="math" data-say="db">db</span>, and <span class="math" data-say="stock">stock</span> uses <span class="math" data-say="db">db</span>. That is 7 uses touching 7 of the 10 pairs, 7/10 = 70%. The largest fan-in is db 3, and the largest fan-out billing 2, tied with <span class="math" data-say="ui">ui</span> and <span class="math" data-say="orders">orders</span>. In <code>strict-layers</code> each module talks only to modules below it, and to fewer of them: <span class="math" data-say="ui">ui</span> to <span class="math" data-say="orders">orders</span> and <span class="math" data-say="billing">billing</span>, <span class="math" data-say="orders">orders</span> to <span class="math" data-say="stock">stock</span>, <span class="math" data-say="stock">stock</span> and <span class="math" data-say="billing">billing</span> to <span class="math" data-say="db">db</span>. Five uses, half the pairs, 1/2 = 50%, and the largest fan-in falls to db 2.</p><p>What do the counts show? Not that one design is good. They show how many pairs of modules a change could pass between directly, and which module everything leans on. In <code>layered</code>, <span class="math" data-say="db">db</span> has the highest fan-in, and that is what the chapter hopes for at the bottom of a design: a utility many modules use. A reader who opens <span class="math" data-say="ui">ui</span> in <code>strict-layers</code> needs to know two modules to understand it, where in <code>everything-talks</code> they need four. A count is a reason to look, and here it tells you where.</p><h3>Exercise</h3><ul><li>Six modules, <span class="math" data-say="ui">ui</span>, <span class="math" data-say="api">api</span>, <span class="math" data-say="orders">orders</span>, <span class="math" data-say="billing">billing</span>, <span class="math" data-say="stock">stock</span> and <span class="math" data-say="db">db</span>, in a design where every module uses every other.</li><li>The same six, layered: <span class="math" data-say="ui, api, api, orders, api, billing, orders, stock, billing, stock, stock, db">ui, api; api, orders; api, billing; orders, stock; billing, stock; stock, db</span>.</li></ul><p>For each design, find by hand the possible pairs, the uses, the pairs connected as a share of the possible ones, and the module with the largest fan-in. Then say in one sentence what the layering changed. You can check your counts afterwards by typing the records into the lab.</p><p>Design, the chapter says, is heuristic. The next lesson, Design Heuristics and Information Hiding, reads the heuristics it offers, and the one it calls particularly valuable.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Counting dependencies</h2></div><p>who uses whom, and how connected the modules are</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the count</h2><div class="prose reading"><p>&ldquo;Software’s Primary Technical Imperative is managing complexity. This is greatly aided by a design focus on simplicity.&rdquo; That is the first of Chapter 5's key points (p. 123), and the whole of Creating High-Quality Code is built on it. This lesson reads sections 5.1 and 5.2, pages 73 to 86: why design is hard, and what the chapter means by complexity. Read them in your own copy first.</p><p>The chapter's first question is what design is, and its answer is a list of difficulties. Design, McConnell says, is a wicked problem, in the sense Rittel and Webber gave the word in 1973: one you can define clearly only by solving it, or part of it, so that you solve it once to learn what it was and again to solve it properly. His example is the first Tacoma Narrows bridge, strong enough for its load and shaken apart by the wind in 1940, because nobody had known that aerodynamics mattered that much until the bridge showed them. School exercises, he notes, are rarely wicked; professional work usually is.</p><p>The rest of section 5.1 follows from that. Design is sloppy, full of false steps, even when its result is tidy, and it is hard to know when it is good enough. It is about trade-offs and priorities, and about restrictions, which force simplifications that improve the result. It is nondeterministic: three people sent away to design one program can come back with three acceptable designs. So its techniques are heuristics, rules of thumb that sometimes work, and design is emergent: it evolves through reviews, discussion and the experience of writing and revising the code.</p><p>Section 5.2 asks what all this difficulty is made of, and answers with Fred Brooks's essay <em>No Silver Bullet</em> (1987). Brooks divided software's difficulties, after Aristotle, into the accidental and the essential. Assembly language, batch computers and tools that did not work together were accidental, and were largely dealt with decades ago. What remains is essential: working out an intricate, interlocking set of concepts that must be exactly right and that meet a disorderly world. The root of both kinds, McConnell concludes, is complexity, and when projects fail for technical reasons the reason is often that nobody any longer understands what a change in one place will do elsewhere.</p><p>Hence the imperative. Citing Dijkstra, the chapter says no one's skull is big enough to hold a modern program, so a design should let you focus safely on one part at a time. It proposes two prongs: keep the essential complexity anyone must deal with at one time to a minimum, and keep accidental complexity from spreading. Its list of a design's desirable internal characteristics follows, and three of them are counts: loose coupling, high fan-in (many classes using a given utility class) and low to medium fan-out (a class using only a few others). Stratification, leanness and ease of maintenance are on the same list.</p><p>The section ends with the levels of design, from the whole system through subsystems and classes down to the inside of a routine. At the subsystem level McConnell imagines six subsystems in which every one talks to every other, and offers his own image for what that costs: think of each line between subsystems as a hose with water in it, and of how wet you get pulling one subsystem out to use elsewhere. His advice is to allow communication on a need-to-know basis, restricting it early, and to keep the subsystem diagram free of cycles.</p><p>Now the count. The lab reads a design as records <span class="math" data-say="user, used">user, used</span>, one per dependency, and counts. Its tiles are the number of modules, the distinct uses, the possible pairs of modules, the pairs connected in either direction as a share of the possible ones, and the largest fan-out and fan-in, with a tie going to the alphabetically first name and the banner naming every tied module. The preset <code>everything-talks</code> has five modules, <span class="math" data-say="ui">ui</span>, <span class="math" data-say="orders">orders</span>, <span class="math" data-say="billing">billing</span>, <span class="math" data-say="stock">stock</span> and <span class="math" data-say="db">db</span>, each using every other: 20 uses, 10 possible pairs, and all 10 connected, 1 = 100%. The largest fan-in prints as billing 4, but all five modules tie at 4; this is the hoses picture in miniature.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Counting dependencies</h2></div><p>who uses whom, and how connected the modules are</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Counting dependencies</strong><span>who uses whom, and how connected the modules are</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgTable"></table></div>
       <div class="status-banner" id="dgStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Count the connections in a design</h3>
-          <p>A count over the structure the lesson states. Each record is one dependency, written user, used. The lab counts the modules, the distinct uses, the possible pairs, the pairs connected in either direction and the largest fan-out and fan-in. The designs are illustrative, and the counts are a reason to look, not a verdict.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Count the connections in a design</h3>
+            <p>A count over the structure the lesson states. Each record is one dependency, written user, used. The lab counts the modules, the distinct uses, the possible pairs, the pairs connected in either direction and the largest fan-out and fan-in. The designs are illustrative, and the counts are a reason to look, not a verdict.</p>
         <div class="field">
           <label for="dgPreset">Worked example</label>
           <select id="dgPreset"><option value="everything-talks" selected>Everything talks: five modules, each using every other (illustrative)</option><option value="layered">Layered: ui over orders and billing, over stock and db</option><option value="strict-layers">Strict layers: each module uses fewer modules, all below it</option></select>
@@ -1424,12 +1467,15 @@
           <div class="kpi"><span>Largest fan-in</span><strong id="dgFanIn">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>layered</code> redraws the same five modules in layers: <span class="math" data-say="ui">ui</span> uses <span class="math" data-say="orders">orders</span> and <span class="math" data-say="billing">billing</span>, each of those uses <span class="math" data-say="stock">stock</span> and <span class="math" data-say="db">db</span>, and <span class="math" data-say="stock">stock</span> uses <span class="math" data-say="db">db</span>. That is 7 uses touching 7 of the 10 pairs, 7/10 = 70%. The largest fan-in is db 3, and the largest fan-out billing 2, tied with <span class="math" data-say="ui">ui</span> and <span class="math" data-say="orders">orders</span>. In <code>strict-layers</code> each module talks only to modules below it, and to fewer of them: <span class="math" data-say="ui">ui</span> to <span class="math" data-say="orders">orders</span> and <span class="math" data-say="billing">billing</span>, <span class="math" data-say="orders">orders</span> to <span class="math" data-say="stock">stock</span>, <span class="math" data-say="stock">stock</span> and <span class="math" data-say="billing">billing</span> to <span class="math" data-say="db">db</span>. Five uses, half the pairs, 1/2 = 50%, and the largest fan-in falls to db 2.</p><p>What do the counts show? Not that one design is good. They show how many pairs of modules a change could pass between directly, and which module everything leans on. In <code>layered</code>, <span class="math" data-say="db">db</span> has the highest fan-in, and that is what the chapter hopes for at the bottom of a design: a utility many modules use. A reader who opens <span class="math" data-say="ui">ui</span> in <code>strict-layers</code> needs to know two modules to understand it, where in <code>everything-talks</code> they need four. A count is a reason to look, and here it tells you where.</p><h3>Exercise</h3><ul><li>Six modules, <span class="math" data-say="ui">ui</span>, <span class="math" data-say="api">api</span>, <span class="math" data-say="orders">orders</span>, <span class="math" data-say="billing">billing</span>, <span class="math" data-say="stock">stock</span> and <span class="math" data-say="db">db</span>, in a design where every module uses every other.</li><li>The same six, layered: <span class="math" data-say="ui, api, api, orders, api, billing, orders, stock, billing, stock, stock, db">ui, api; api, orders; api, billing; orders, stock; billing, stock; stock, db</span>.</li></ul><p>For each design, find by hand the possible pairs, the uses, the pairs connected as a share of the possible ones, and the module with the largest fan-in. Then say in one sentence what the layering changed. You can check your counts afterwards by typing the records into the lab.</p><p>Design, the chapter says, is heuristic. The next lesson, Design Heuristics and Information Hiding, reads the heuristics it offers, and the one it calls particularly valuable.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting a design&#x27;s connections</h2></div><p>Five steps, the last of them on a design of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the modules</h3><p>Write down every module the dependencies name, once each. Their number is n.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the possible pairs</h3><p>Each module can be paired with each of the n − 1 others, and each pair is counted twice that way, so there are <span data-say="n times the quantity n minus 1, over 2">n·(n − 1)/2</span> possible pairs.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the connected pairs</h3><p>Mark each pair that has a dependency in either direction, counting a pair once even when each module uses the other. Divide by the possible pairs for the share.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Find the largest fan-in and fan-out</h3><p>For each module, count the modules that use it (fan-in) and the modules it uses (fan-out), and note the largest of each and every module tied for it.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on your own code</h3><p>Take one package of your own, list who imports whom as <span class="math" data-say="A, b">a, b</span> records, and paste them into the lab. Note the share of pairs connected and the module with the largest fan-in, and write one sentence on a dependency you would remove.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting a design&#x27;s connections</h2>
+      <p class="lead-in">Five steps, the last of them on a design of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the modules.</strong> Write down every module the dependencies name, once each. Their number is n.</li><li><strong>Count the possible pairs.</strong> Each module can be paired with each of the n − 1 others, and each pair is counted twice that way, so there are <span data-say="n times the quantity n minus 1, over 2">n·(n − 1)/2</span> possible pairs.</li><li><strong>Count the connected pairs.</strong> Mark each pair that has a dependency in either direction, counting a pair once even when each module uses the other. Divide by the possible pairs for the share.</li><li><strong>Find the largest fan-in and fan-out.</strong> For each module, count the modules that use it (fan-in) and the modules it uses (fan-out), and note the largest of each and every module tied for it.</li><li><strong>Do it on your own code.</strong> Take one package of your own, list who imports whom as <span class="math" data-say="A, b">a, b</span> records, and paste them into the lab. Note the share of pairs connected and the module with the largest fan-in, and write one sentence on a dependency you would remove.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1448,17 +1494,16 @@ db is used by orders, billing and stock: 3
 strict layers: 5 uses, 5 of 10 pairs</div><p>Layering removed thirteen of the twenty uses and three of the ten pairs, and made <span class="math" data-say="db">db</span> the module most others lean on. Whether the remaining dependencies are the right ones is a design question the count does not answer; it tells you which ones to ask it about.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking design is a phase that ends when coding begins</strong><span>On this view the design is finished, then built. Section 5.1 says otherwise: design is a wicked problem, understood only by partly solving it, and it is sloppy, heuristic and emergent, evolving through reviews, discussion and the experience of writing and revising the code. Much of it is done during construction, at the level of classes and routines. The lab's three presets illustrate the point on the lesson's own example: one set of five modules, its layering redrawn three times, each a design decision.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking fewer connections for a better design</strong><span>The share of connected pairs falls from 100% to 50% across the presets, and it is tempting to read the lowest as the best. The chapter does not ask for the fewest connections; it asks for loose coupling and for high fan-in at the bottom of a design, where many modules use one utility. In <code>layered</code>, <span class="math" data-say="db">db</span> with fan-in 3 is that utility. The count shows where the connections are; whether each is needed is a design question.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting good design to remove complexity</strong><span>Brooks's distinction says some difficulty belongs to the problem: the details that must be exactly right, and the world they meet. Design cannot remove that. What the chapter asks of it is narrower: keep the essential complexity anyone must face at one time to a minimum, and stop accidental complexity from spreading.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a design&#x27;s connections by hand.</strong><p>For five or six modules and their dependencies, compute the possible pairs, the pairs connected as a share, and the largest fan-in, and say what a layering changes in those figures.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts the dependencies you state; it cannot find them in code, and it counts a pair joined by one call the same as a pair joined by forty. It does not say whether a design is good. Chapter 5 says complexity is the thing to manage, and these counts are one view of it: how many places a change could reach directly, and which module carries the most weight.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking design is a phase that ends when coding begins</strong><span>On this view the design is finished, then built. Section 5.1 says otherwise: design is a wicked problem, understood only by partly solving it, and it is sloppy, heuristic and emergent, evolving through reviews, discussion and the experience of writing and revising the code. Much of it is done during construction, at the level of classes and routines. The lab's three presets illustrate the point on the lesson's own example: one set of five modules, its layering redrawn three times, each a design decision.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking fewer connections for a better design</strong><span>The share of connected pairs falls from 100% to 50% across the presets, and it is tempting to read the lowest as the best. The chapter does not ask for the fewest connections; it asks for loose coupling and for high fan-in at the bottom of a design, where many modules use one utility. In <code>layered</code>, <span class="math" data-say="db">db</span> with fan-in 3 is that utility. The count shows where the connections are; whether each is needed is a design question.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting good design to remove complexity</strong><span>Brooks's distinction says some difficulty belongs to the problem: the details that must be exactly right, and the world they meet. Design cannot remove that. What the chapter asks of it is narrower: keep the essential complexity anyone must face at one time to a minimum, and stop accidental complexity from spreading.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a design&#x27;s connections by hand.</strong><p>For five or six modules and their dependencies, compute the possible pairs, the pairs connected as a share, and the largest fan-in, and say what a layering changes in those figures.</p></div></div><div class="note"><strong>Note:</strong> The lab counts the dependencies you state; it cannot find them in code, and it counts a pair joined by one call the same as a pair joined by forty. It does not say whether a design is good. Chapter 5 says complexity is the thing to manage, and these counts are one view of it: how many places a change could reach directly, and which module carries the most weight.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A wicked problem</summary><p>A problem that can be clearly defined only by solving it, or part of it. The book takes the term from Rittel and Webber (1973) and applies it to design: you often learn what the problem was by building something that fails to solve it.</p></details><details class="recall"><summary>Essential and accidental difficulty</summary><p>Brooks's distinction (1987), which the chapter follows. Accidental difficulties come from the tools, such as clumsy syntax or batch computers, and have largely been removed. Essential difficulties come from the problem itself, an intricate set of interlocking details that must be exactly right.</p></details><details class="recall"><summary>Coupling, fan-in and fan-out</summary><p>Coupling is how tightly two parts of a program are connected. A module's fan-in is the number of modules that use it; its fan-out is the number it uses. The chapter asks for loose coupling, high fan-in at the utility level and low to medium fan-out.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 5 opens by saying why design is hard and what it is for: design is a wicked problem, sloppy and heuristic, and its primary technical imperative is managing complexity. Count the modules of a small design, the pairs that could interact and the pairs that do, and the largest fan-in, and see what one layering decision changes.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A wicked problem.</strong> A problem that can be clearly defined only by solving it, or part of it. The book takes the term from Rittel and Webber (1973) and applies it to design: you often learn what the problem was by building something that fails to solve it.</li><li><strong>Essential and accidental difficulty.</strong> Brooks's distinction (1987), which the chapter follows. Accidental difficulties come from the tools, such as clumsy syntax or batch computers, and have largely been removed. Essential difficulties come from the problem itself, an intricate set of interlocking details that must be exactly right.</li><li><strong>Coupling, fan-in and fan-out.</strong> Coupling is how tightly two parts of a program are connected. A module's fan-in is the number of modules that use it; its fan-out is the number it uses. The chapter asks for loose coupling, high fan-in at the utility level and low to medium fan-out.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="design is sloppy, heuristic, emergent. first imperative, manage complexity. pairs of n modules, n times, open bracket, n minus 1, close bracket, divided by 2. connected pairs, used either way, once. fan in, how many modules use this one. fan out, how many this one uses" tabindex="0" role="region" aria-label="Mathematical notation">design is sloppy, heuristic, emergent
 first imperative: manage complexity
 pairs of n modules: n * (n - 1) / 2
@@ -2182,11 +2227,42 @@ fan out: how many this one uses</div><figcaption>Sections 5.1 and 5.2 in six lin
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2254,7 +2330,7 @@ fan out: how many this one uses</div><figcaption>Sections 5.1 and 5.2 in six lin
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

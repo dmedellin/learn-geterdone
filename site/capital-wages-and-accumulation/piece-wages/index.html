@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Wages and Accumulation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 21 · Piece-Wages</p>
       <h1>Piece-Wages</h1>
       <p class="lesson-lede">A piece-rate is the time-wage divided by the pieces a normal day yields, so when the normal output rises the rate falls and the day pays the same.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A converted form of time-wages</li><li>The measure of intensity</li><li>The rate follows productivity</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>One sentence of definition, then 24 pieces and 48</h2>
-      <article class="prose reading"><p><strong>Volume I, Chapter 21.</strong> &ldquo;Wages by the piece are nothing else than a converted form of wages by time, just as wages by time are a converted form of the value or price of labour-power.&rdquo;</p><p>If you have been paid per delivery, per item packed or per article written, you know the feeling this form gives: that you are being paid for what you made, and that working harder pays more. Marx grants that the appearance is strong. It looks as if what is bought is labour already realised in a product, priced by the capacity of the producer, and not labour-power priced by its daily value.</p><p>His first shock to that confidence is simple. Both forms exist side by side in the same trade. London compositors worked by the piece and country ones by the day; in the same London saddlery shops the French were paid by the piece and the English by time, often for the same work. A difference in the form of payment that can be switched from one worker to the next does not change what is being paid for.</p><p>Then his figures. The ordinary day is 12 hours, 6 of them paid; it creates 6s of new value, so 6d an hour. A worker of average intensity and skill turns out 24 pieces in the day. After the value of the means of production is taken out, the 24 pieces are worth 6s, so a piece is worth 3d. The worker is paid 1½d a piece and earns 3s in 12 hours. Each piece is half paid and half unpaid, exactly as each hour was in the time-wage. The marx preset prints the 1½d and the 3s.</p><p>So the piece-rate is the daily value of labour-power divided by the pieces of a normal day: <span class="math" data-say="36 pence over 24 equals 1 and a half pence">36d/24 = 1½d</span>. Marx says the form is as irrational as the time-wage. Two pieces are the product of an hour and worth 6d, and the worker receives 3d for them. The piece-rate does not measure the value of a piece by the time in it. It measures the time the worker spent by the pieces he turned out.</p><p>What piece-wages do is put the measure inside the wage. A piece below average quality is not paid in full. In the large London tailoring shops a waistcoat was called an hour or half an hour, at 6d the hour, and master and worker argued over whether a new fashion was an hour's work until experience settled it. A worker who could not reach the minimum was dismissed. Supervision becomes largely unnecessary, and the form lends itself to middlemen, in what England called the &ldquo;Sweating system&rdquo;, where a sub-contractor lives on the difference between the rate the capitalist pays and the part he lets reach the worker.</p><p>It is also the worker's own interest, now, to work harder and longer, because his day's wage rises with his output. Individual earnings spread out with skill, strength and stamina. Marx does not think this changes the relation between wages and surplus value, because the surplus labour each worker supplies rises with his wage. But the competition it sets up among the workers tends, he says, to raise individual wages above the average while lowering the average itself. The speed-up preset shows how the rate can follow: a worker pushes his output from 24 pieces to 30, the rate is cut from 1½d to 1 1/5d, and the day pays 3s as before.</p><p><strong>Volume I, Chapter 21.</strong> &ldquo;If the same working day now supplies, in consequence of the doubled productiveness of labour, 48 pieces instead of 24, and all other circumstances remain unchanged, then the piece-wage falls from 1½d. to ¾d., as every piece now only represents ¼, instead of ½ of a working hour.&rdquo;</p><p>This is where the appearance and the reality part. The lab's faster preset is the worker's reading: 48 pieces at the old 1½d make 6s, and he expects to be paid for his product. The cut preset is the capitalist's: the normal day now yields 48, so the rate is 3s over 48, ¾d, and the day pays 3s again. <span class="math" data-say="24 times 1 and a half pence equals 48 times three farthings equals 3 shillings">24 · 1½d = 48 · ¾d = 3s</span>. Marx calls the change &ldquo;so far purely nominal&rdquo;, and notes that it is where the fights start, since employers use it as a pretext for real cuts, or the higher productivity comes with more intensity.</p><p>Some workers did take the appearance seriously. Marx quotes operatives who &ldquo;carefully watch the price of the raw material and the price of manufactured goods&rdquo; and so could estimate their master's profits. He adds, drily, that the capitalist rightly knocks such pretensions on the head as gross errors about the nature of wage-labour, and declares that the productivity of labour is none of the labourer's concern.</p><p>Modern labour economics reads piece-rates more kindly. Edward Lazear's study of a firm that installed car windscreens, published in 2000, found that moving from hourly pay to piece-rates raised output per worker substantially, partly through effort and partly by attracting faster workers, and that pay rose with it. The same literature knows Marx's problem under another name, the ratchet effect: workers hold back output when they expect the rate to be cut once they show what they can do. Whether rates are cut after output rises is a question about particular firms that this chapter's arithmetic cannot answer.</p><p>The last two lessons compared wages inside one country. The next, “National Differences of Wages”, asks what the same reasoning says when the wages of two countries are set side by side.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Wages</h2></div><p>the value of labour-power in the form of a price of labour</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>One sentence of definition, then 24 pieces and 48</h2><div class="prose reading"><p><strong>Volume I, Chapter 21.</strong> &ldquo;Wages by the piece are nothing else than a converted form of wages by time, just as wages by time are a converted form of the value or price of labour-power.&rdquo;</p><p>If you have been paid per delivery, per item packed or per article written, you know the feeling this form gives: that you are being paid for what you made, and that working harder pays more. Marx grants that the appearance is strong. It looks as if what is bought is labour already realised in a product, priced by the capacity of the producer, and not labour-power priced by its daily value.</p><p>His first shock to that confidence is simple. Both forms exist side by side in the same trade. London compositors worked by the piece and country ones by the day; in the same London saddlery shops the French were paid by the piece and the English by time, often for the same work. A difference in the form of payment that can be switched from one worker to the next does not change what is being paid for.</p><p>Then his figures. The ordinary day is 12 hours, 6 of them paid; it creates 6s of new value, so 6d an hour. A worker of average intensity and skill turns out 24 pieces in the day. After the value of the means of production is taken out, the 24 pieces are worth 6s, so a piece is worth 3d. The worker is paid 1½d a piece and earns 3s in 12 hours. Each piece is half paid and half unpaid, exactly as each hour was in the time-wage. The marx preset prints the 1½d and the 3s.</p><p>So the piece-rate is the daily value of labour-power divided by the pieces of a normal day: <span class="math" data-say="36 pence over 24 equals 1 and a half pence">36d/24 = 1½d</span>. Marx says the form is as irrational as the time-wage. Two pieces are the product of an hour and worth 6d, and the worker receives 3d for them. The piece-rate does not measure the value of a piece by the time in it. It measures the time the worker spent by the pieces he turned out.</p><p>What piece-wages do is put the measure inside the wage. A piece below average quality is not paid in full. In the large London tailoring shops a waistcoat was called an hour or half an hour, at 6d the hour, and master and worker argued over whether a new fashion was an hour's work until experience settled it. A worker who could not reach the minimum was dismissed. Supervision becomes largely unnecessary, and the form lends itself to middlemen, in what England called the &ldquo;Sweating system&rdquo;, where a sub-contractor lives on the difference between the rate the capitalist pays and the part he lets reach the worker.</p><p>It is also the worker's own interest, now, to work harder and longer, because his day's wage rises with his output. Individual earnings spread out with skill, strength and stamina. Marx does not think this changes the relation between wages and surplus value, because the surplus labour each worker supplies rises with his wage. But the competition it sets up among the workers tends, he says, to raise individual wages above the average while lowering the average itself. The speed-up preset shows how the rate can follow: a worker pushes his output from 24 pieces to 30, the rate is cut from 1½d to 1 1/5d, and the day pays 3s as before.</p><p><strong>Volume I, Chapter 21.</strong> &ldquo;If the same working day now supplies, in consequence of the doubled productiveness of labour, 48 pieces instead of 24, and all other circumstances remain unchanged, then the piece-wage falls from 1½d. to ¾d., as every piece now only represents ¼, instead of ½ of a working hour.&rdquo;</p><p>This is where the appearance and the reality part. The lab's faster preset is the worker's reading: 48 pieces at the old 1½d make 6s, and he expects to be paid for his product. The cut preset is the capitalist's: the normal day now yields 48, so the rate is 3s over 48, ¾d, and the day pays 3s again. <span class="math" data-say="24 times 1 and a half pence equals 48 times three farthings equals 3 shillings">24 · 1½d = 48 · ¾d = 3s</span>. Marx calls the change &ldquo;so far purely nominal&rdquo;, and notes that it is where the fights start, since employers use it as a pretext for real cuts, or the higher productivity comes with more intensity.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Wages</h2></div><p>the value of labour-power in the form of a price of labour</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Wages</strong><span>the value of labour-power in the form of a price of labour</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="waTable"></table></div>
       <div class="status-banner" id="waStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The piece-rate and the day&#x27;s wage</h3>
-          <p>Money is in shillings, so a rate cut to 1 1/5d is entered as 1/10 of a shilling; leave the cut empty for none. The lab divides the daily value of labour-power by the pieces of a normal day and pays the pieces actually made at that rate, or at the cut rate. Compare faster with cut: the same 48 pieces, two readings of what they should earn.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The piece-rate and the day&#x27;s wage</h3>
+            <p>Money is in shillings, so a rate cut to 1 1/5d is entered as 1/10 of a shilling; leave the cut empty for none. The lab divides the daily value of labour-power by the pieces of a normal day and pays the pieces actually made at that rate, or at the cut rate. Compare faster with cut: the same 48 pieces, two readings of what they should earn.</p>
         <div class="field">
           <label for="waPreset">Worked example</label>
           <select id="waPreset"><option value="marx" selected>Marx's figures: 3s a day, 24 pieces in a normal day of 12 hours</option><option value="faster">Marx's figures: 48 pieces made, the old rate still paid</option><option value="cut">Marx's figures: 48 pieces is the new normal day</option><option value="speed-up">Speed-up: 30 pieces made, the rate cut to 1 1/5d</option></select>
@@ -1436,12 +1479,15 @@
           <div class="kpi"><span>The day's wage</span><strong id="waDaily">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Some workers did take the appearance seriously. Marx quotes operatives who &ldquo;carefully watch the price of the raw material and the price of manufactured goods&rdquo; and so could estimate their master's profits. He adds, drily, that the capitalist rightly knocks such pretensions on the head as gross errors about the nature of wage-labour, and declares that the productivity of labour is none of the labourer's concern.</p><p>Modern labour economics reads piece-rates more kindly. Edward Lazear's study of a firm that installed car windscreens, published in 2000, found that moving from hourly pay to piece-rates raised output per worker substantially, partly through effort and partly by attracting faster workers, and that pay rose with it. The same literature knows Marx's problem under another name, the ratchet effect: workers hold back output when they expect the rate to be cut once they show what they can do. Whether rates are cut after output rises is a question about particular firms that this chapter's arithmetic cannot answer.</p><p>The last two lessons compared wages inside one country. The next, “National Differences of Wages”, asks what the same reasoning says when the wages of two countries are set side by side.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing a piece-rate</h2></div><p>Four steps, starting from the time-wage the piece-rate converts.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix the daily value of labour-power</h3><p>It is the same numerator as in the time-wage: 3s, or 36d.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the normal output</h3><p>The pieces a worker of average skill and intensity turns out in the normal day, fixed beforehand by experience: 24 in Marx's example.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Divide for the rate</h3><p>The piece-rate is the daily value over the normal output: 36d over 24 is 1½d.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Pay the pieces made</h3><p>The day's wage is the rate times the pieces actually made, at the rate in force. If the normal output changes, recompute the rate first.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing a piece-rate</h2>
+      <p class="lead-in">Four steps, starting from the time-wage the piece-rate converts.</p>
+      <ol class="key-ideas method"><li><strong>Fix the daily value of labour-power.</strong> It is the same numerator as in the time-wage: 3s, or 36d.</li><li><strong>Find the normal output.</strong> The pieces a worker of average skill and intensity turns out in the normal day, fixed beforehand by experience: 24 in Marx's example.</li><li><strong>Divide for the rate.</strong> The piece-rate is the daily value over the normal output: 36d over 24 is 1½d.</li><li><strong>Pay the pieces made.</strong> The day's wage is the rate times the pieces actually made, at the rate in force. If the normal output changes, recompute the rate first.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1459,17 +1505,16 @@ doubled:  36d / 48 = ¾d a piece
 day&#x27;s wage:  48 · ¾d = 36d = 3s</div><p>Paid at the old rate, the 48 pieces would bring 6s, which is what the worker expects. The rate falls in the same proportion as the output rises, because a piece now holds a quarter of an hour of labour instead of half.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing piece-wages pay for the worker&#x27;s actual effort</strong><span>The cut preset answers it: the worker makes twice as many pieces and the day pays 3s, exactly as before, because the rate fell from 1½d to ¾d. The rate was set from the daily value of labour-power and the normal output, and it follows them, not the effort. In the speed-up preset 30 pieces at a rate cut to 1 1/5d also pay 3s: more effort, the same day's wage.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the piece-rate as the value of a piece</strong><span>A piece is worth 3d of new value and is paid 1½d. Piece-wages, Marx says, do not express any relation of value directly; they measure the worker's time by his output.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking a fast worker&#x27;s higher pay changes the rate of exploitation</strong><span>A worker above the average earns more, and supplies proportionally more surplus labour, since each of his pieces is half paid like anyone's. The proportion between wages and surplus value is unchanged; what changes is the competition between workers.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute a piece-rate and the day&#x27;s wage it pays.</strong><p>Given the daily value of labour-power, the normal output and the pieces made, compute the piece-rate and the day's wage, and recompute both when the normal output changes or the rate is cut.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The marx, faster and cut presets use Marx's figures; the speed-up is illustrative. The lab takes the daily value of labour-power as fixed when output rises. Marx's own example assumes that too, and he notes that higher productivity in practice often came with higher intensity, which would raise the wear on labour-power and, on his definitions, its value.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing piece-wages pay for the worker&#x27;s actual effort</strong><span>The cut preset answers it: the worker makes twice as many pieces and the day pays 3s, exactly as before, because the rate fell from 1½d to ¾d. The rate was set from the daily value of labour-power and the normal output, and it follows them, not the effort. In the speed-up preset 30 pieces at a rate cut to 1 1/5d also pay 3s: more effort, the same day's wage.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the piece-rate as the value of a piece</strong><span>A piece is worth 3d of new value and is paid 1½d. Piece-wages, Marx says, do not express any relation of value directly; they measure the worker's time by his output.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking a fast worker&#x27;s higher pay changes the rate of exploitation</strong><span>A worker above the average earns more, and supplies proportionally more surplus labour, since each of his pieces is half paid like anyone's. The proportion between wages and surplus value is unchanged; what changes is the competition between workers.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute a piece-rate and the day&#x27;s wage it pays.</strong><p>Given the daily value of labour-power, the normal output and the pieces made, compute the piece-rate and the day's wage, and recompute both when the normal output changes or the rate is cut.</p></div></div><div class="note"><strong>Note:</strong> The marx, faster and cut presets use Marx's figures; the speed-up is illustrative. The lab takes the daily value of labour-power as fixed when output rises. Marx's own example assumes that too, and he notes that higher productivity in practice often came with higher intensity, which would raise the wear on labour-power and, on his definitions, its value.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A converted form of time-wages</summary><p>The piece-rate is fixed so that a worker of average skill and intensity earns the daily value of labour-power in a normal day. It is the time-wage divided by the normal output.</p></details><details class="recall"><summary>The measure of intensity</summary><p>Only the time embodied in a quantity fixed beforehand by experience counts as socially necessary and is paid. The form of the wage controls quality and intensity, so much supervision becomes superfluous.</p></details><details class="recall"><summary>The rate follows productivity</summary><p>A piece-rate is the money form of a definite working time. When productivity doubles, a piece holds half the time and the rate halves, so the day's wage is unchanged.</p></details></div>
+      <h3>Summary</h3>
       <p>Piece-wages look like payment for what the worker produced, but the rate is set from the daily value of labour-power and the normal output of a day. Compute Marx's piece-rate of 1½d from 24 pieces and 3s, see what doubled output does to the day's wage at the old rate and at the new one, and find the speed-up hidden in a cut rate.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A converted form of time-wages.</strong> The piece-rate is fixed so that a worker of average skill and intensity earns the daily value of labour-power in a normal day. It is the time-wage divided by the normal output.</li><li><strong>The measure of intensity.</strong> Only the time embodied in a quantity fixed beforehand by experience counts as socially necessary and is paid. The form of the wage controls quality and intensity, so much supervision becomes superfluous.</li><li><strong>The rate follows productivity.</strong> A piece-rate is the money form of a definite working time. When productivity doubles, a piece holds half the time and the rate halves, so the day's wage is unchanged.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="piece-rate equals day&#x27;s value over normal pieces. 3 shillings over 24 pieces equals 1 and a half pence a piece. a piece creates 3 pence and is paid 1 and a half pence. 48 pieces, the rate falls to three farthings. 48 times three farthings equals 24 times 1 and a half pence equals 3 shillings" tabindex="0" role="region" aria-label="Mathematical notation">piece-rate = day&#x27;s value / normal pieces
 3s / 24 pieces = 1½d a piece
 a piece creates 3d and is paid 1½d
@@ -2224,11 +2269,42 @@ a piece creates 3d and is paid 1½d
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2296,7 +2372,7 @@ a piece creates 3d and is paid 1½d
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Life Cycle of a Domain Object</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 7 · Using the Language: An Extended Example</p>
       <h1>Using the Language: An Extended Example</h1>
       <p class="lesson-lede">Part II&#x27;s patterns applied one after another to one model: layers, entities and values, associations, aggregates, repositories, scenarios and creation.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Application class</li><li>Scenario</li><li>Prototype</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The book&#x27;s example in order, then the same decisions on our own</h2>
-      <article class="prose reading"><p>&ldquo;In the earlier examples, the patterns were mostly applied one at a time, but on a real project you have to combine them.&rdquo; So Evans opens Chapter 7, Using the Language: An Extended Example. It follows an imagined team through one model, a cargo shipper's, with three requirements: track the handling of each customer's cargo, book cargo in advance, and invoice automatically when the cargo reaches a certain point. He starts from a fairly mature model and changes it only to connect it to an implementation, leaving discovery to Part III.</p><p>The decisions come in a fixed order, and the order is the lesson. First the domain is isolated: three application classes, a tracking query, a booking application and an incident-logging application, act as coordinators and leave the answers to the domain layer. Then each object is sorted. Customers, cargoes, handling events, carrier movements and locations are entities, each with its own identity scheme, two of them (the customer's and the handling event's) settled by asking a domain expert; the delivery history is an entity whose identity is borrowed from its cargo; the delivery specification and the customer's role are values.</p><p>Next, associations get directions. The customer does not hold every cargo it has shipped, since a query can find them; handling events point to carrier movements and not back, because the business tracks cargo, not ships' inventories; and one cycle, cargo to history to events and back, is kept with its cost noted. Then boundaries. Customer, location and carrier movement are shared and become roots of their own; the cargo's aggregate takes in the history and the specification; and the handling event becomes a root too, because finding the events for a carrier movement gives it meaning apart from the cargo. Repositories are then chosen among the roots by the requirements: four, and none yet for handling events.</p><p>Scenarios check the result. Changing a cargo's destination means replacing one value with another. Repeat business, a new cargo copied from an old one by Prototype, means deciding part by part: a fresh empty history, a copy of the map of customer roles that still points at the same customers, and a new tracking number, so that nothing outside the boundary is touched. Object Creation then writes constructors that leave identity intact and factory methods for each kind of handling event, and runs into the cycle: adding an event means adding it to the cargo's history in the same transaction. The next lesson reads Evans's way out.</p><p>Now the same order on a model of our own, a theatre box office. Three requirements: sell seats for a performance, change or cancel a booking, and admit ticket holders at the door. Three application classes coordinate them: the box office, the door scanner and the sales report. Customers, bookings, performances and venues are entities, the customer known by the box office's customer number and a booking by the number printed on it. A seat is an entity known by row and number only within its venue, and a ticket is known only within its booking. A price and a reference to a seat by row and number are values.</p><p>Associations get directions as Evans's do. A booking knows its customer; the customer does not hold its bookings, which a repository query can find. A ticket knows its performance, and a performance its venue. The <span class="math" data-say="booking">Booking</span> root below holds its customer and its tickets, and its <em>book again</em> method is the Prototype scenario on this model: a new number, the same customer root, and new tickets for the next performance at the same seats, priced afresh.</p><pre class="codeblock" data-say="line 1, public class booking. line 2, private final booking number number. line 3, private final customer customer, comment, another aggregate&#x27;s root. line 4, private final list of ticket tickets is set to new array list. line 6, booking of booking number number, customer customer. line 7, this dot number is set to number. line 8, this dot customer is set to customer. line 11, comment, Book again same customer, same seats, a new performance and number.. line 12, public booking repeat for of performance next, booking number new number. line 13, booking copy is set to new booking of new number, customer. line 14, for ticket t in tickets. line 15, copy dot tickets dot add of new ticket of copy dot tickets dot size plus 1, next. line 16, t dot seat, next dot price for of t dot seat. line 18, return copy" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">public class Booking {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The book&#x27;s example in order, then the same decisions on our own</h2><div class="prose reading"><p>&ldquo;In the earlier examples, the patterns were mostly applied one at a time, but on a real project you have to combine them.&rdquo; So Evans opens Chapter 7, Using the Language: An Extended Example. It follows an imagined team through one model, a cargo shipper's, with three requirements: track the handling of each customer's cargo, book cargo in advance, and invoice automatically when the cargo reaches a certain point. He starts from a fairly mature model and changes it only to connect it to an implementation, leaving discovery to Part III.</p><p>The decisions come in a fixed order, and the order is the lesson. First the domain is isolated: three application classes, a tracking query, a booking application and an incident-logging application, act as coordinators and leave the answers to the domain layer. Then each object is sorted. Customers, cargoes, handling events, carrier movements and locations are entities, each with its own identity scheme, two of them (the customer's and the handling event's) settled by asking a domain expert; the delivery history is an entity whose identity is borrowed from its cargo; the delivery specification and the customer's role are values.</p><p>Next, associations get directions. The customer does not hold every cargo it has shipped, since a query can find them; handling events point to carrier movements and not back, because the business tracks cargo, not ships' inventories; and one cycle, cargo to history to events and back, is kept with its cost noted. Then boundaries. Customer, location and carrier movement are shared and become roots of their own; the cargo's aggregate takes in the history and the specification; and the handling event becomes a root too, because finding the events for a carrier movement gives it meaning apart from the cargo. Repositories are then chosen among the roots by the requirements: four, and none yet for handling events.</p><p>Scenarios check the result. Changing a cargo's destination means replacing one value with another. Repeat business, a new cargo copied from an old one by Prototype, means deciding part by part: a fresh empty history, a copy of the map of customer roles that still points at the same customers, and a new tracking number, so that nothing outside the boundary is touched. Object Creation then writes constructors that leave identity intact and factory methods for each kind of handling event, and runs into the cycle: adding an event means adding it to the cargo's history in the same transaction. The next lesson reads Evans's way out.</p><p>Now the same order on a model of our own, a theatre box office. Three requirements: sell seats for a performance, change or cancel a booking, and admit ticket holders at the door. Three application classes coordinate them: the box office, the door scanner and the sales report. Customers, bookings, performances and venues are entities, the customer known by the box office's customer number and a booking by the number printed on it. A seat is an entity known by row and number only within its venue, and a ticket is known only within its booking. A price and a reference to a seat by row and number are values.</p><p>Associations get directions as Evans's do. A booking knows its customer; the customer does not hold its bookings, which a repository query can find. A ticket knows its performance, and a performance its venue. The <span class="math" data-say="booking">Booking</span> root below holds its customer and its tickets, and its <em>book again</em> method is the Prototype scenario on this model: a new number, the same customer root, and new tickets for the next performance at the same seats, priced afresh.</p><pre class="codeblock" data-say="line 1, public class booking. line 2, private final booking number number. line 3, private final customer customer, comment, another aggregate&#x27;s root. line 4, private final list of ticket tickets is set to new array list. line 6, booking of booking number number, customer customer. line 7, this dot number is set to number. line 8, this dot customer is set to customer. line 11, comment, Book again same customer, same seats, a new performance and number.. line 12, public booking repeat for of performance next, booking number new number. line 13, booking copy is set to new booking of new number, customer. line 14, for ticket t in tickets. line 15, copy dot tickets dot add of new ticket of copy dot tickets dot size plus 1, next. line 16, t dot seat, next dot price for of t dot seat. line 18, return copy" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">public class Booking {</span>
 <span class="cl">    private final BookingNumber number;</span>
 <span class="cl">    private final Customer customer;         // another aggregate&#x27;s root</span>
 <span class="cl">    private final List&lt;Ticket&gt; tickets = new ArrayList&lt;&gt;();</span>
@@ -1464,12 +1508,11 @@
 <span class="cl">        }</span>
 <span class="cl">        return copy;</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The lab checks the boundaries. The preset <code>first-draft</code> is the model before anyone drew them: the ticket holds a reference to the seat object in the venue, and the door scanner keeps the tickets it has scanned. Over 4 aggregates and 6 objects the lab counts 5 references that cross a boundary, and lists 2 that reach a non-root: ticket to seat, and scanner to ticket.</p><p>The preset <code>boundaries-drawn</code> fixes both. The ticket holds the seat as a value, row and number, and reaches the venue through its performance; the scanner holds the booking and asks it for its tickets during one scan. Now 4 references cross a boundary, every one onto a root, and 0 are violations. Repositories follow from the requirements: the box office must find customers, performances and bookings, so three; the venue is reached from its performance and needs none.</p><p>On <code>cancel-booking</code> the lab deletes the booking: 2 objects go, the booking and its ticket, and 1 reference is left dangling, the scanner's. The scanner must therefore drop a cancelled booking, which is a rule across aggregates that the model has to state. The book-again copy, by contrast, touches nothing outside the booking's boundary, just as Evans's repeat-business copy did.</p><h3>Exercise</h3><ul><li>Objects (object, aggregate, root): Customer, customer, yes; Order, order, yes; OrderLine, order, no; Product, product, yes; Oven, oven, yes; Tray, oven, no.</li><li>References (from, to): Order, Customer; Order, OrderLine; OrderLine, Product; OrderLine, Tray; Oven, Tray; Dispatch, Order.</li></ul><p>A bakery's orders, with the dispatch board as an outside holder. Count the references that cross a boundary and those that reach a non-root, say what deleting an order removes and leaves dangling, and name the one change that would leave no violation. Check it in the lab.</p><p>The design works, but it already has one awkward transaction. The next lesson, Refactoring the Example, Modules and a New Feature, reads how Evans removes it and what happens when a second system has to be joined to the first.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Aggregates</h2></div><p>who may hold a reference into an aggregate</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The lab checks the boundaries. The preset <code>first-draft</code> is the model before anyone drew them: the ticket holds a reference to the seat object in the venue, and the door scanner keeps the tickets it has scanned. Over 4 aggregates and 6 objects the lab counts 5 references that cross a boundary, and lists 2 that reach a non-root: ticket to seat, and scanner to ticket.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Aggregates</h2></div><p>who may hold a reference into an aggregate</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Aggregates</strong><span>who may hold a reference into an aggregate</span></div>
       </div>
@@ -1477,10 +1520,10 @@
       <div class="table-wrap" id="dgrTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgrTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each object belongs to one aggregate, and each aggregate has exactly one root. A reference crosses a boundary when it comes from outside the aggregate it points into: from another aggregate's object, or from a name that is not an object (an outside holder). A crossing reference may hold only the root; one to any other object is a violation. Deleting a root removes its whole aggregate; deleting a non-root is refused, naming the root to go through. A reference left dangling runs from a surviving object or outside holder to a removed object. Lists follow the order of the records.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A box office&#x27;s aggregates, before and after</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A box office&#x27;s aggregates, before and after</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
         <div class="field">
           <label for="dgrPreset">Worked example</label>
           <select id="dgrPreset"><option value="first-draft" selected>A box office before the boundaries are drawn</option><option value="boundaries-drawn">The same model with every crossing on a root</option><option value="cancel-booking">Cancel a booking</option></select>
@@ -1506,12 +1549,15 @@
           <div class="kpi"><span>References left dangling</span><strong id="dgrDangling">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>boundaries-drawn</code> fixes both. The ticket holds the seat as a value, row and number, and reaches the venue through its performance; the scanner holds the booking and asks it for its tickets during one scan. Now 4 references cross a boundary, every one onto a root, and 0 are violations. Repositories follow from the requirements: the box office must find customers, performances and bookings, so three; the venue is reached from its performance and needs none.</p><p>On <code>cancel-booking</code> the lab deletes the booking: 2 objects go, the booking and its ticket, and 1 reference is left dangling, the scanner's. The scanner must therefore drop a cancelled booking, which is a rule across aggregates that the model has to state. The book-again copy, by contrast, touches nothing outside the booking's boundary, just as Evans's repeat-business copy did.</p><h3>Exercise</h3><ul><li>Objects (object, aggregate, root): Customer, customer, yes; Order, order, yes; OrderLine, order, no; Product, product, yes; Oven, oven, yes; Tray, oven, no.</li><li>References (from, to): Order, Customer; Order, OrderLine; OrderLine, Product; OrderLine, Tray; Oven, Tray; Dispatch, Order.</li></ul><p>A bakery's orders, with the dispatch board as an outside holder. Count the references that cross a boundary and those that reach a non-root, say what deleting an order removes and leaves dangling, and name the one change that would leave no violation. Check it in the lab.</p><p>The design works, but it already has one awkward transaction. The next lesson, Refactoring the Example, Modules and a New Feature, reads how Evans removes it and what happens when a second system has to be joined to the first.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Taking the decisions in Evans&#x27;s order</h2></div><p>Five steps, the last of them on a model of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Isolate the domain</h3><p>Name the application functions and give each a coordinating class that asks the domain layer and works nothing out itself.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Sort entities from values</h3><p>For each object, ask whether the users care which one it is. If they do, find out from the experts how it is told apart.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Direct the associations</h3><p>Make each association one-way unless the business needs both, and replace a large collection by a repository query where you can.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Draw boundaries and choose repositories</h3><p>Make shared objects roots, gather what exists only for a root inside its boundary, and give a repository only to the roots a requirement must find.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Walk a scenario on your own model</h3><p>Pick a feature of a system you know and walk it through your aggregates. Count the objects outside the boundary it touches; if the count is not zero, write down which boundary you would move.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Taking the decisions in Evans&#x27;s order</h2>
+      <p class="lead-in">Five steps, the last of them on a model of your own.</p>
+      <ol class="key-ideas method"><li><strong>Isolate the domain.</strong> Name the application functions and give each a coordinating class that asks the domain layer and works nothing out itself.</li><li><strong>Sort entities from values.</strong> For each object, ask whether the users care which one it is. If they do, find out from the experts how it is told apart.</li><li><strong>Direct the associations.</strong> Make each association one-way unless the business needs both, and replace a large collection by a repository query where you can.</li><li><strong>Draw boundaries and choose repositories.</strong> Make shared objects roots, gather what exists only for a root inside its boundary, and give a repository only to the roots a requirement must find.</li><li><strong>Walk a scenario on your own model.</strong> Pick a feature of a system you know and walk it through your aggregates. Count the objects outside the boundary it touches; if the count is not zero, write down which boundary you would move.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1532,17 +1578,16 @@ scanner to ticket: not a root
 5 crossings, 2 of them violations</div><p>Holding the seat as a value removes one crossing altogether, and pointing the scanner at the booking turns the other into a crossing onto a root: 4 crossings and 0 violations in <code>boundaries-drawn</code>.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting the extended example to show how the model was discovered</strong><span>Evans says at the start that he begins from a fairly mature model and changes it only to connect it with an implementation; discovery is Part III's subject. The chapter shows the building blocks combined, not knowledge crunching.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Giving every aggregate root a repository because it is a root</strong><span>Being a root makes an object eligible for a repository, not entitled to one. In the example the handling event, a root, has none until a requirement needs it; on the lesson's illustration the venue is reached from its performance and gets none.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Copying an aggregate by copying everything it refers to</strong><span>A Prototype copy of an aggregate copies what is inside the boundary, with a decision for each part, and keeps references to the roots outside it. The lesson's book-again method makes new tickets and keeps the same customer.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can take Chapter 7&#x27;s decisions on a model of your own.</strong><p>Given a small model, sort its objects, direct its associations, draw aggregate boundaries, count the references that reach past a root, and say which roots need repositories and why.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts references against the boundaries you draw; it cannot say whether an object should be an entity or a value, or which requirement needs a repository. Those are the decisions the chapter makes by asking the experts and walking scenarios, and the lab can only check that the result is consistent.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting the extended example to show how the model was discovered</strong><span>Evans says at the start that he begins from a fairly mature model and changes it only to connect it with an implementation; discovery is Part III's subject. The chapter shows the building blocks combined, not knowledge crunching.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Giving every aggregate root a repository because it is a root</strong><span>Being a root makes an object eligible for a repository, not entitled to one. In the example the handling event, a root, has none until a requirement needs it; on the lesson's illustration the venue is reached from its performance and gets none.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Copying an aggregate by copying everything it refers to</strong><span>A Prototype copy of an aggregate copies what is inside the boundary, with a decision for each part, and keeps references to the roots outside it. The lesson's book-again method makes new tickets and keeps the same customer.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can take Chapter 7&#x27;s decisions on a model of your own.</strong><p>Given a small model, sort its objects, direct its associations, draw aggregate boundaries, count the references that reach past a root, and say which roots need repositories and why.</p></div></div><div class="note"><strong>Note:</strong> The lab counts references against the boundaries you draw; it cannot say whether an object should be an entity or a value, or which requirement needs a repository. Those are the decisions the chapter makes by asking the experts and walking scenarios, and the lab can only check that the result is consistent.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Application class</summary><p>A class in the application layer that coordinates one function a user asks for, such as taking a booking. It asks the domain layer the questions and does not work out the answers itself.</p></details><details class="recall"><summary>Scenario</summary><p>A sample feature walked through the design to check the decisions made so far: which objects take part, which rules apply, and whether anything outside an aggregate is touched.</p></details><details class="recall"><summary>Prototype</summary><p>A design pattern from Gamma and colleagues: a new object is made by copying an existing one. On an aggregate, every part inside the boundary needs its own decision about what is copied.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 7 takes one model through every building block in turn. Read the order in which Evans makes the decisions on his shipping example, then take the same decisions on a theatre box office written for the lesson, and count what drawing its aggregate boundaries changes.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Application class.</strong> A class in the application layer that coordinates one function a user asks for, such as taking a booking. It asks the domain layer the questions and does not work out the answers itself.</li><li><strong>Scenario.</strong> A sample feature walked through the design to check the decisions made so far: which objects take part, which rules apply, and whether anything outside an aggregate is touched.</li><li><strong>Prototype.</strong> A design pattern from Gamma and colleagues: a new object is made by copying an existing one. On an aggregate, every part inside the boundary needs its own decision about what is copied.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="isolate the domain first. sort entities from values. give associations a direction. draw boundaries round roots. repositories from requirements. walk scenarios to test it all" tabindex="0" role="region" aria-label="Mathematical notation">isolate the domain first
 sort entities from values
 give associations a direction
@@ -2321,11 +2366,42 @@ walk scenarios to test it all</div><figcaption>The extended example in six lines
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2393,7 +2469,7 @@ walk scenarios to test it all</div><figcaption>The extended example in six lines
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

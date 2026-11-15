@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Scaling Laws and Cost</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Paying for the peak</p>
       <h1>Utilisation and Waste</h1>
       <p class="lesson-lede">Compute the fraction of purchased capacity a load profile leaves unused, and show what cutting to the mean would do.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>You buy for the peak hour, divided by the utilisation you will run it at</li><li>You use the mean, and the ratio of the two is the shape</li><li>The waste fraction contains no units and no volume</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>What is bought, what is used, and the fraction between them</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Waste from a load profile</span><p>For a load profile with maximum <span class="math" data-say="peak">peak</span> and average <span class="math" data-say="mean">mean</span>, bought at a target utilisation <span class="math" data-say="rho sub target">ρ_target</span> for the busiest hour, the <strong>purchased capacity</strong> is <span class="math" data-say="peak over rho sub target">peak/ρ_target</span>, the <strong>used capacity</strong> is <span class="math" data-say="mean">mean</span>, and the <strong>waste</strong> is</p><p><span class="math" data-say="1 minus mean times rho sub target over peak">1 − mean·ρ_target/peak</span>,</p><p>the share of what was bought that was not used, averaged over the period the profile covers.</p></div><p><span class="math" data-say="rho">ρ</span> here is the <span class="math" data-say="lambda over mu">λ/μ</span> of &ldquo;<span data-say="lambda, mu">λ, μ</span> and <span data-say="rho">ρ</span>&rdquo; and nothing else: demand over the capacity actually in service. This course does not define a second utilisation, and every page that prints a <span class="math" data-say="rho">ρ</span> means that one.</p><div class="mathblock" data-say="peak equals 12000 rps at 21, 00, mean equals 5250 rps, rho sub target equals 7 over 10. paid, equals peak over rho equals 12000 divided by 7 over 10 equals 120000 over 7 equals 17142.86 rps. used, equals mean, equals 5250 rps. waste, equals 1 minus used over paid. equals 1 minus 5250 times 7 over 120000. equals 1 minus 36750 over 120000, equals, 1 minus 49 over 160, equals, 111 over 160. equals 69.375 percent. peak over mean equals 12000 over 5250 equals 16 over 7 equals 2.286" tabindex="0" role="region" aria-label="Mathematical notation">peak = 12 000 rps at 21:00      mean = 5 250 rps      ρ_target = 7/10
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>What is bought, what is used, and the fraction between them</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Waste from a load profile</span><p>For a load profile with maximum <span class="math" data-say="peak">peak</span> and average <span class="math" data-say="mean">mean</span>, bought at a target utilisation <span class="math" data-say="rho sub target">ρ_target</span> for the busiest hour, the <strong>purchased capacity</strong> is <span class="math" data-say="peak over rho sub target">peak/ρ_target</span>, the <strong>used capacity</strong> is <span class="math" data-say="mean">mean</span>, and the <strong>waste</strong> is</p><p><span class="math" data-say="1 minus mean times rho sub target over peak">1 − mean·ρ_target/peak</span>,</p><p>the share of what was bought that was not used, averaged over the period the profile covers.</p></div><p><span class="math" data-say="rho">ρ</span> here is the <span class="math" data-say="lambda over mu">λ/μ</span> of &ldquo;<span data-say="lambda, mu">λ, μ</span> and <span data-say="rho">ρ</span>&rdquo; and nothing else: demand over the capacity actually in service. This course does not define a second utilisation, and every page that prints a <span class="math" data-say="rho">ρ</span> means that one.</p><div class="mathblock" data-say="peak equals 12000 rps at 21, 00, mean equals 5250 rps, rho sub target equals 7 over 10. paid, equals peak over rho equals 12000 divided by 7 over 10 equals 120000 over 7 equals 17142.86 rps. used, equals mean, equals 5250 rps. waste, equals 1 minus used over paid. equals 1 minus 5250 times 7 over 120000. equals 1 minus 36750 over 120000, equals, 1 minus 49 over 160, equals, 111 over 160. equals 69.375 percent. peak over mean equals 12000 over 5250 equals 16 over 7 equals 2.286" tabindex="0" role="region" aria-label="Mathematical notation">peak = 12 000 rps at 21:00      mean = 5 250 rps      ρ_target = 7/10
 
 paid   = peak/ρ = 12 000 ÷ 7/10 = 120 000/7 = 17 142.86 rps
 used   = mean    = 5 250 rps
@@ -1401,22 +1445,21 @@ waste  = 1 − used/paid
        = 1 − 36 750/120 000  =  1 − 49/160  =  111/160
        = 69.375%
 
-peak/mean = 12 000/5 250 = 16/7 = 2.286</div><p>Note the middle line. <span class="math" data-say="used over paid">used/paid</span> is <span class="math" data-say="mean times rho over peak">mean·ρ/peak</span>, which is <span class="math" data-say="the quantity mean over peak, times rho">(mean/peak)·ρ</span> &mdash; the reciprocal of the peak-to-mean ratio, multiplied by the target utilisation. Both factors are pure numbers, which is why nothing about the size of the service survives into the answer.</p><div class="example"><span class="label">Example &middot; The same shape, ten times the traffic</span><p>Multiply every hour of the profile by ten. The peak becomes <span class="math" data-say="120000 rps">120 000 rps</span>, the mean <span class="math" data-say="52500">52 500</span>, the purchase <span class="math" data-say="171429">171 429</span> &mdash; and the waste is <span class="math" data-say="1 minus 52500 times 0.7 over 120000">1 − 52 500 × 0.7/120 000</span>, which is <span class="math" data-say="111 over 160">111/160</span> again. Growth does not improve this number. Flattening the profile does, and so does daring to run the peak hour hotter.</p></div><h3>“Sixty-nine per cent idle, so cut it”</h3><p>This is the misconception the lesson exists for, and it is easy to fall into because the number really is <span class="math" data-say="69.4 percent">69.4%</span>. But that figure is an average over the day, and the day has a shape: cut the fleet to the <span class="math" data-say="5250 rps">5 250 rps</span> you use on average and nine of the twenty-four hours are over capacity, the worst of them by <span class="math" data-say="6750 rps">6 750 rps</span>.</p><p>At the peak hour the utilisation of that cut fleet would be <span class="math" data-say="12000 over 5250 equals 16 over 7">12 000/5 250 = 16/7</span>, which is not a busy queue &mdash; it is <span class="math" data-say="rho is greater than 1">ρ > 1</span>, where there is no steady state at all and the backlog grows at <span class="math" data-say="lambda minus mu">λ − μ</span> for as long as the hour lasts. &ldquo;<span data-say="lambda, mu">λ, μ</span> and <span data-say="rho">ρ</span>&rdquo; is where that threshold is established; the point here is that the waste figure gives no warning of it, because it is a mean and the failure is at the maximum.</p><div class="example"><span class="label">Example &middot; What can actually be cut</span><p>The honest reading of <span class="math" data-say="69.4 percent">69.4%</span> is that the profile is expensive, not that the fleet is oversized. Three moves change the number and none of them is a straight cut: raise <span class="math" data-say="rho sub target">ρ_target</span> from <span class="math" data-say="70 percent">70%</span> to <span class="math" data-say="80 percent">80%</span> and the waste falls to <span class="math" data-say="1 minus 5250 times 0.8 over 12000 equals 65 percent">1 − 5 250 × 0.8/12 000 = 65%</span>; move work out of the peak hour so the peak-to-mean ratio falls; or put work on the trough that does not care when it runs, which raises the mean without touching the peak.</p></div><h3>The only profile with no waste</h3><p>Set the shape to flat and <span class="math" data-say="peak equals mean">peak = mean</span>, so the waste is <span class="math" data-say="1 minus rho sub target">1 − ρ_target</span> &mdash; <span class="math" data-say="30 percent">30%</span> at a seventy per cent target, and that residue is the headroom, which is not waste at all. A perfectly flat profile is the best case and it is rare, which is why batch work, index rebuilds and backfills are scheduled into troughs: they are the cheapest capacity in the building because they are already paid for.</p><p>The profile this lesson uses is the consumer shape of &ldquo;Peak to Average&rdquo;, on &ldquo;Capacity Estimation&rdquo; &mdash; one evening peak, a quiet early morning. That course turned a population into a peak rate; this one prices the gap that peak leaves behind for the other twenty-three hours.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Utilisation and waste</h2></div><p>The gap between what you buy and what you use</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+peak/mean = 12 000/5 250 = 16/7 = 2.286</div><p>Note the middle line. <span class="math" data-say="used over paid">used/paid</span> is <span class="math" data-say="mean times rho over peak">mean·ρ/peak</span>, which is <span class="math" data-say="the quantity mean over peak, times rho">(mean/peak)·ρ</span> &mdash; the reciprocal of the peak-to-mean ratio, multiplied by the target utilisation. Both factors are pure numbers, which is why nothing about the size of the service survives into the answer.</p><div class="example"><span class="label">Example &middot; The same shape, ten times the traffic</span><p>Multiply every hour of the profile by ten. The peak becomes <span class="math" data-say="120000 rps">120 000 rps</span>, the mean <span class="math" data-say="52500">52 500</span>, the purchase <span class="math" data-say="171429">171 429</span> &mdash; and the waste is <span class="math" data-say="1 minus 52500 times 0.7 over 120000">1 − 52 500 × 0.7/120 000</span>, which is <span class="math" data-say="111 over 160">111/160</span> again. Growth does not improve this number. Flattening the profile does, and so does daring to run the peak hour hotter.</p></div><h3>“Sixty-nine per cent idle, so cut it”</h3><p>This is the misconception the lesson exists for, and it is easy to fall into because the number really is <span class="math" data-say="69.4 percent">69.4%</span>. But that figure is an average over the day, and the day has a shape: cut the fleet to the <span class="math" data-say="5250 rps">5 250 rps</span> you use on average and nine of the twenty-four hours are over capacity, the worst of them by <span class="math" data-say="6750 rps">6 750 rps</span>.</p><p>At the peak hour the utilisation of that cut fleet would be <span class="math" data-say="12000 over 5250 equals 16 over 7">12 000/5 250 = 16/7</span>, which is not a busy queue &mdash; it is <span class="math" data-say="rho is greater than 1">ρ > 1</span>, where there is no steady state at all and the backlog grows at <span class="math" data-say="lambda minus mu">λ − μ</span> for as long as the hour lasts. &ldquo;<span data-say="lambda, mu">λ, μ</span> and <span data-say="rho">ρ</span>&rdquo; is where that threshold is established; the point here is that the waste figure gives no warning of it, because it is a mean and the failure is at the maximum.</p><div class="example"><span class="label">Example &middot; What can actually be cut</span><p>The honest reading of <span class="math" data-say="69.4 percent">69.4%</span> is that the profile is expensive, not that the fleet is oversized. Three moves change the number and none of them is a straight cut: raise <span class="math" data-say="rho sub target">ρ_target</span> from <span class="math" data-say="70 percent">70%</span> to <span class="math" data-say="80 percent">80%</span> and the waste falls to <span class="math" data-say="1 minus 5250 times 0.8 over 12000 equals 65 percent">1 − 5 250 × 0.8/12 000 = 65%</span>; move work out of the peak hour so the peak-to-mean ratio falls; or put work on the trough that does not care when it runs, which raises the mean without touching the peak.</p></div><h3>The only profile with no waste</h3><p>Set the shape to flat and <span class="math" data-say="peak equals mean">peak = mean</span>, so the waste is <span class="math" data-say="1 minus rho sub target">1 − ρ_target</span> &mdash; <span class="math" data-say="30 percent">30%</span> at a seventy per cent target, and that residue is the headroom, which is not waste at all. A perfectly flat profile is the best case and it is rare, which is why batch work, index rebuilds and backfills are scheduled into troughs: they are the cheapest capacity in the building because they are already paid for.</p><p>The profile this lesson uses is the consumer shape of &ldquo;Peak to Average&rdquo;, on &ldquo;Capacity Estimation&rdquo; &mdash; one evening peak, a quiet early morning. That course turned a population into a peak rate; this one prices the gap that peak leaves behind for the other twenty-three hours.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Utilisation and waste</h2></div><p>The gap between what you buy and what you use</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Utilisation and waste</strong><span>you pay for peak/&rho; and you use the mean</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>load in the hour</span><span class="tone-amber"><i class="legend-swatch"></i>the peak hour</span><span class="tone-purple"><i class="legend-swatch"></i>the hour you are editing</span><span class="tone-red"><i class="legend-swatch"></i>capacity paid for and not used</span><span class="tone-green"><i class="legend-swatch"></i>the mean</span></div>
       </div>
       <div class="lab-stage" id="waStage" tabindex="0" role="region" aria-label="Hourly load against the capacity bought for the peak, with the unused band shaded."><svg id="waBars" style="min-width:520px" viewBox="0 0 520 192" role="img" aria-label="Twenty-four hourly bars inside a taller block of paid-for capacity, with the mean marked."></svg></div>
       <div class="status-banner" id="waStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Reshape the day and set the target utilisation</h3>
-          <p>Each bucket is an exact multiple of the profile’s base, so the mean, the peak and <span class="math" data-say="1 minus mean times rho over peak">1 − mean·ρ/peak</span> are exact fractions. The size of the day cancels out of the waste entirely: only the shape and <span class="math" data-say="rho">ρ</span> move it. Lift one hour at a time and watch the waste fall as the profile flattens, then set the shape to zero and see the only case in which nothing is wasted.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Reshape the day and set the target utilisation</h3>
+            <p>Each bucket is an exact multiple of the profile’s base, so the mean, the peak and <span class="math" data-say="1 minus mean times rho over peak">1 − mean·ρ/peak</span> are exact fractions. The size of the day cancels out of the waste entirely: only the shape and <span class="math" data-say="rho">ρ</span> move it. Lift one hour at a time and watch the waste fall as the profile flattens, then set the shape to zero and see the only case in which nothing is wasted.</p>
         <div class="field" id="waPresetField">
           <label for="waPreset">Worked example</label>
           <select id="waPreset"><option value="consumer-evening" selected>the consumer profile of “Peak to Average”: one evening peak at 21:00, 250 rps a point</option><option value="office-hours">a business app: two humps either side of lunch</option><option value="flat-internal">an internal service with no daily shape — the only profile that is not wasteful</option><option value="nightly-batch">a nightly batch window: two hours carry the day</option></select>
@@ -1450,12 +1493,14 @@ peak/mean = 12 000/5 250 = 16/7 = 2.286</div><p>Note the middle line. <span clas
           <div class="kpi"><span>Peak / mean</span><strong id="waRatio">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Putting a number on a profile’s waste</h2></div><p>Two capacities and one subtraction — and then the check that stops the number being acted on wrongly.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the peak bucket and the mean across all of them</h3><p>The peak is a maximum over the period, not the busiest bucket you happened to look at. Both come from the same profile, so state the period: a waste figure over a day and one over a week are different numbers about different shapes.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Divide the peak by the utilisation you will run it at</h3><p><span class="math" data-say="peak over rho sub target">peak/ρ_target</span> is what you buy. Choosing <span class="math" data-say="rho sub target">ρ_target</span> is a latency decision rather than a cost one &mdash; the response-time multiplier is <span class="math" data-say="1 over the quantity 1 minus rho">1/(1 − ρ)</span> &mdash; and it should be decided before this arithmetic rather than tuned to make the waste look better.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute <span class="math" data-say="1 minus mean times rho sub target over peak">1 − mean·ρ_target/peak</span> and keep it as a fraction</h3><p><span class="math" data-say="111 over 160">111/160</span> here. Keeping it exact makes it obvious that the answer contains only a ratio and a fraction, and therefore that nothing about the volume of traffic is in it.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Test the cut before recommending it</h3><p>Take the capacity you propose and count the hours of the profile above it, and the worst overshoot. Cutting to the mean here leaves nine hours over and a worst case of <span class="math" data-say="6750 rps">6 750 rps</span>, with <span class="math" data-say="rho equals 16 over 7">ρ = 16/7</span> at the peak. That test is one pass over the buckets and it is what separates a saving from an outage.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Say which of the three levers you are proposing</h3><p>A higher <span class="math" data-say="rho sub target">ρ_target</span>, a flatter profile, or more work in the trough. &ldquo;Reduce waste&rdquo; without one of those named is not a proposal, because the only other way to move the number is to serve less traffic.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Putting a number on a profile’s waste</h2>
+      <p class="lead-in">Two capacities and one subtraction — and then the check that stops the number being acted on wrongly.</p>
+      <ol class="key-ideas method"><li><strong>Find the peak bucket and the mean across all of them.</strong> The peak is a maximum over the period, not the busiest bucket you happened to look at. Both come from the same profile, so state the period: a waste figure over a day and one over a week are different numbers about different shapes.</li><li><strong>Divide the peak by the utilisation you will run it at.</strong> <span class="math" data-say="peak over rho sub target">peak/ρ_target</span> is what you buy. Choosing <span class="math" data-say="rho sub target">ρ_target</span> is a latency decision rather than a cost one &mdash; the response-time multiplier is <span class="math" data-say="1 over the quantity 1 minus rho">1/(1 − ρ)</span> &mdash; and it should be decided before this arithmetic rather than tuned to make the waste look better.</li><li><strong>Compute <span class="math" data-say="1 minus mean times rho sub target over peak">1 − mean·ρ_target/peak</span> and keep it as a fraction.</strong> <span class="math" data-say="111 over 160">111/160</span> here. Keeping it exact makes it obvious that the answer contains only a ratio and a fraction, and therefore that nothing about the volume of traffic is in it.</li><li><strong>Test the cut before recommending it.</strong> Take the capacity you propose and count the hours of the profile above it, and the worst overshoot. Cutting to the mean here leaves nine hours over and a worst case of <span class="math" data-say="6750 rps">6 750 rps</span>, with <span class="math" data-say="rho equals 16 over 7">ρ = 16/7</span> at the peak. That test is one pass over the buckets and it is what separates a saving from an outage.</li><li><strong>Say which of the three levers you are proposing.</strong> A higher <span class="math" data-say="rho sub target">ρ_target</span>, a flatter profile, or more work in the trough. &ldquo;Reduce waste&rdquo; without one of those named is not a proposal, because the only other way to move the number is to serve less traffic.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1488,17 +1533,16 @@ and at ρ_target = 8/10 instead:
   waste = 1 − 5 250·(8/10)/12 000 = 1 − 4 200/12 000 = 65%</div><p>The two blocks at the bottom are the lesson. The first shows that the <span class="math" data-say="69.4 percent">69.4%</span> cannot be taken as slack: acting on it directly puts nine hours of the day above capacity and the busiest one far above it. The second shows the lever that does work &mdash; ten points of target utilisation moved the waste by more than four points, and it cost latency rather than reliability.</p><p>Notice that the volume never appeared. <span class="math" data-say="16 over 7">16/7</span> and <span class="math" data-say="7 over 10">7/10</span> are the only inputs to the waste, and both are pure numbers: the same fraction comes out for a service a hundred times the size with the same daily shape.</p><p>For a faded attempt, take the business profile &mdash; two humps either side of lunch, which is flatter. Predict before computing whether its waste is above or below <span class="math" data-say="69.4 percent">69.4%</span> at the same <span class="math" data-say="rho sub target">ρ_target</span>, then read the peak, the mean and the waste off the lab and say which of the two factors did the work.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the waste as slack that can be cut</strong><span><span class="math" data-say="69.4 percent">69.4%</span> is an average over a shaped day. The fleet is not <span class="math" data-say="69.4 percent">69.4%</span> too large at any hour &mdash; it is enormously too large at 04:00 and exactly right at 21:00. Cutting to the mean leaves nine hours over capacity and the peak hour at <span class="math" data-say="rho equals 16 over 7">ρ = 16/7</span>, which is not a slow service but an unbounded backlog.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting the headroom in <span class="math" data-say="peak over rho sub target">peak/ρ_target</span> as waste</strong><span>The gap between <span class="math" data-say="12000">12 000</span> and <span class="math" data-say="17143">17 143</span> was bought on purpose, because the response-time multiplier at <span class="math" data-say="rho equals 1">ρ = 1</span> is unbounded. It shows up inside the waste fraction, which is why a flat profile still reports <span class="math" data-say="1 minus rho sub target equals 30 percent">1 − ρ_target = 30%</span>. That residue is the price of a latency target rather than an inefficiency.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting growth to improve the number</strong><span>Traffic cancels out of <span class="math" data-say="1 minus mean times rho over peak">1 − mean·ρ/peak</span> completely, so a service that grows tenfold with the same daily shape wastes the same fraction and ten times the money. The two things that move it are the shape and the target utilisation, and neither of them arrives on its own.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a waste figure always arrives with the shape it came from and a test of the cut it suggests.</strong><p>You should be able to compute <span class="math" data-say="peak over rho sub target">peak/ρ_target</span>, the mean, and <span class="math" data-say="1 minus mean times rho sub target over peak">1 − mean·ρ_target/peak</span> as an exact fraction, show that the answer does not change when the whole profile is scaled, and count the hours a proposed cut would put over capacity before you propose it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That fraction assumed every instance-hour costs the same. It does not: the same hour can be bought up front at a discount or on demand at a premium, and the profile decides which is cheaper for each layer of the fleet. &ldquo;Reserved vs On-demand&rdquo; turns the price ratio into a utilisation threshold and then reads the optimal reserved level straight off the profile you just measured.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the waste as slack that can be cut</strong><span><span class="math" data-say="69.4 percent">69.4%</span> is an average over a shaped day. The fleet is not <span class="math" data-say="69.4 percent">69.4%</span> too large at any hour &mdash; it is enormously too large at 04:00 and exactly right at 21:00. Cutting to the mean leaves nine hours over capacity and the peak hour at <span class="math" data-say="rho equals 16 over 7">ρ = 16/7</span>, which is not a slow service but an unbounded backlog.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting the headroom in <span class="math" data-say="peak over rho sub target">peak/ρ_target</span> as waste</strong><span>The gap between <span class="math" data-say="12000">12 000</span> and <span class="math" data-say="17143">17 143</span> was bought on purpose, because the response-time multiplier at <span class="math" data-say="rho equals 1">ρ = 1</span> is unbounded. It shows up inside the waste fraction, which is why a flat profile still reports <span class="math" data-say="1 minus rho sub target equals 30 percent">1 − ρ_target = 30%</span>. That residue is the price of a latency target rather than an inefficiency.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting growth to improve the number</strong><span>Traffic cancels out of <span class="math" data-say="1 minus mean times rho over peak">1 − mean·ρ/peak</span> completely, so a service that grows tenfold with the same daily shape wastes the same fraction and ten times the money. The two things that move it are the shape and the target utilisation, and neither of them arrives on its own.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a waste figure always arrives with the shape it came from and a test of the cut it suggests.</strong><p>You should be able to compute <span class="math" data-say="peak over rho sub target">peak/ρ_target</span>, the mean, and <span class="math" data-say="1 minus mean times rho sub target over peak">1 − mean·ρ_target/peak</span> as an exact fraction, show that the answer does not change when the whole profile is scaled, and count the hours a proposed cut would put over capacity before you propose it.</p></div></div><div class="note"><strong>Note:</strong> That fraction assumed every instance-hour costs the same. It does not: the same hour can be bought up front at a discount or on demand at a premium, and the profile decides which is cheaper for each layer of the fleet. &ldquo;Reserved vs On-demand&rdquo; turns the price ratio into a utilisation threshold and then reads the optimal reserved level straight off the profile you just measured.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>You buy for the peak hour, divided by the utilisation you will run it at</summary><p>Nobody runs the busy hour at a hundred per cent: waiting explodes as <span class="math" data-say="rho">ρ</span> approaches one, which is the subject of &ldquo;The Knee: Response Time vs Utilisation&rdquo;. So the purchase is <span class="math" data-say="peak over rho sub target">peak/ρ_target</span> &mdash; <span class="math" data-say="12000 over 0.7 equals 17143 rps">12 000/0.7 = 17 143 rps</span> here &mdash; and the headroom in that division is bought deliberately rather than wasted.</p></details><details class="recall"><summary>You use the mean, and the ratio of the two is the shape</summary><p>Every hour below the peak contributes its own gap, and averaged over the day the capacity actually consumed is the mean: <span class="math" data-say="5250 rps">5 250 rps</span> against <span class="math" data-say="17143">17 143</span> purchased. The <span class="math" data-say="16 over 7">16/7</span> peak-to-mean ratio is the whole of what the profile contributes &mdash; the same shape at ten times the traffic gives exactly the same waste.</p></details><details class="recall"><summary>The waste fraction contains no units and no volume</summary><p><span class="math" data-say="1 minus mean times rho over peak">1 − mean·ρ/peak</span> is built from a ratio and a fraction, so doubling every bucket changes nothing and switching from requests to watts changes nothing. Only two things move it: flattening the profile, and raising the utilisation you are prepared to run the peak at. That is the entire list.</p></details></div>
+      <h3>Summary</h3>
       <p>Capacity is bought for the busiest hour and used at the average one. Buy <span class="math" data-say="peak over rho sub target">peak/ρ_target</span> and use the mean, and the share you paid for and did not use is <span class="math" data-say="1 minus mean times rho sub target over peak">1 − mean·ρ_target/peak</span>. The size of the day cancels out of that fraction entirely: only the shape of the profile and the target utilisation move it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>You buy for the peak hour, divided by the utilisation you will run it at.</strong> Nobody runs the busy hour at a hundred per cent: waiting explodes as <span class="math" data-say="rho">ρ</span> approaches one, which is the subject of &ldquo;The Knee: Response Time vs Utilisation&rdquo;. So the purchase is <span class="math" data-say="peak over rho sub target">peak/ρ_target</span> &mdash; <span class="math" data-say="12000 over 0.7 equals 17143 rps">12 000/0.7 = 17 143 rps</span> here &mdash; and the headroom in that division is bought deliberately rather than wasted.</li><li><strong>You use the mean, and the ratio of the two is the shape.</strong> Every hour below the peak contributes its own gap, and averaged over the day the capacity actually consumed is the mean: <span class="math" data-say="5250 rps">5 250 rps</span> against <span class="math" data-say="17143">17 143</span> purchased. The <span class="math" data-say="16 over 7">16/7</span> peak-to-mean ratio is the whole of what the profile contributes &mdash; the same shape at ten times the traffic gives exactly the same waste.</li><li><strong>The waste fraction contains no units and no volume.</strong> <span class="math" data-say="1 minus mean times rho over peak">1 − mean·ρ/peak</span> is built from a ratio and a fraction, so doubling every bucket changes nothing and switching from requests to watts changes nothing. Only two things move it: flattening the profile, and raising the utilisation you are prepared to run the peak at. That is the entire list.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="paid equals peak over rho sub target, used equals mean. waste equals 1 minus mean times rho sub target over peak, the size of the day cancels. peak 12000 rps at 21, 00, mean 5250 rps, peak over mean equals 16 over 7. rho sub target equals 70 percent, goes to, paid 17143 rps, used 5250 rps. waste equals 1 minus the quantity 5250 times 0.7, over 12000 equals 111 over 160 equals 69.4 percent" tabindex="0" role="region" aria-label="Mathematical notation">paid = peak/ρ_target          used = mean
 waste = 1 − mean·ρ_target/peak     the size of the day cancels
 peak 12 000 rps at 21:00,  mean 5 250 rps,  peak/mean = 16/7
@@ -2926,11 +2970,42 @@ waste = 1 − (5 250 × 0.7)/12 000 = 111/160 = 69.4%</div><figcaption>What you 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2998,7 +3073,7 @@ waste = 1 − (5 250 × 0.7)/12 000 = 111/160 = 69.4%</div><figcaption>What you 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

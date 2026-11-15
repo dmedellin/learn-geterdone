@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,39 +1478,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Statements</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 16 · Loops</p>
       <h1>Controlling Loops</h1>
       <p class="lesson-lede">A loop&#x27;s header decides how many times it runs, the last value its index takes and the value the index is left holding, and Chapter 16 asks you to work all three out before the loop runs.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Where the loop tests</li><li>The off-by-one error</li><li>The index&#x27;s final value</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the header</h2>
-      <article class="prose reading"><p><strong>Chapter 16, p. 389.</strong> &ldquo;Think through the loop carefully to verify that it operates normally under each case and terminates under all possible conditions.&rdquo; It is the last of the chapter's key points. Read Chapter 16, pp. 367&ndash;389, in your own copy first.</p><p>You have probably written a loop that ran once too often: the array had ten entries, the loop asked for eleven, and the program stopped with an exception on a line that looked right. Chapter 16 opens by calling loops one of the most complex parts of programming, and spends its pages on keeping them simple enough that such mistakes show.</p><p>Section 16.1 (p. 367) sorts loops into counted loops, continuously evaluated loops, endless loops and iterator loops, and then by two properties: how flexible the loop is, and whether it tests for completion at the beginning, the middle or the end, which decides whether the body runs at least once. Use a <span class="math" data-say="while">while</span> loop when you do not know in advance how many times it will run, and a <span class="math" data-say="for">for</span> loop when you do. Prefer <span class="math" data-say="for">for</span> when it fits, because all of its control sits in the header; but keep the header for statements that control the loop, and do not cram a <span class="math" data-say="while">while</span> loop's housekeeping into it.</p><p>Section 16.2 (p. 373) begins with a list of what goes wrong with loops, from missing initialization to a wrong termination, and two practices against it: minimize the number of things that affect the loop, and treat its inside like a routine, a black box whose controlling conditions can be read without looking in. Enter the loop from one place, with its initialization directly before it; write an infinite loop as <span class="math" data-say="while true">while (true)</span>; brace the body, keep it non-empty, keep its housekeeping together and give it one job. On the way out, make sure the loop ends, make the ending obvious, and do not alter a <span class="math" data-say="for">for</span> loop's index to stop it early: use a <span class="math" data-say="while">while</span> loop instead.</p><p>Two of the section's guidelines are the lesson's subject. Check the endpoints: run through the first pass, a pass in the middle and the last pass in your head, and with a calculator if the body computes something (p. 381). And avoid code that depends on the index's value after the loop (p. 377): it varies from language to language and between a normal ending and an early one, and the next reader will have to stop and work it out, so save what you need in a variable inside the loop. In Java an index declared in the <span class="math" data-say="for">for</span> header does not exist after the loop at all; the book reports three C++ compilers giving three different answers on the same point (p. 384), which is a reason not to rely on the language to settle it.</p><p>The section ends with length and nesting. Make a loop short enough to see all at once; the book reports an expert limit of one page, and adds that a programmer who values simple code will rarely write a loop longer than 15 or 20 lines. Limit nesting to three levels, after a finding Yourdon reports, that the ability to understand a loop falls sharply beyond three (p. 385). These are guidelines from other people's experience, collected before 2004; your own code reviews can test them. Section 16.3 (p. 385) then shows how to build a hard loop from the inside out: write one case with literals, put a loop round it, replace the literals, and repeat. Section 16.4 (p. 387) notes that loops and arrays usually correspond, though some languages, APL and later Fortran among them, operate on whole arrays with no loop at all; in Java the loop is required.</p><p>Now the header. The lab's <em>loop</em> view reads the loop <span class="math" data-say="for int i is set to start, i cmp bound, i is increased by step">for (int i = start; i cmp bound; i += step)</span>, where <span class="math" data-say="cmp">cmp</span> is typed as one of <span class="math" data-say="lt">lt</span>, <span class="math" data-say="le">le</span>, <span class="math" data-say="ne">ne</span>, <span class="math" data-say="gt">gt</span> or <span class="math" data-say="ge">ge</span> for <span class="math" data-say="is less than">&lt;</span>, <span class="math" data-say="is at most">&lt;=</span>, <span class="math" data-say="is not equal to">!=</span>, <span class="math" data-say="is greater than">&gt;</span> and <span class="math" data-say="is at least">&gt;=</span>, and computes from those four values alone, in closed form, without running anything. It prints the <strong>iterations</strong>, the <strong>last value of i in the body</strong>, and <strong>i after the loop, if declared before it</strong>: the value an index declared outside the loop would be left holding, which is the value p. 377 advises against using. Here is a loop with the classic mistake:</p><pre class="codeblock" data-say="line 1, array of int hourly is set to new int array of length 10. line 2, for int i is set to 0, i is at most 10, i is incremented. line 3, hourly at index i is set to count visits of i" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">int[] hourly = new int[10];</span>
-<span class="cl">for (int i = 0; i &lt;= 10; i++) {</span>
-<span class="cl">    hourly[i] = countVisits(i);</span>
-<span class="cl">}</span></code></pre><p>The <code>fencepost</code> preset is its header: start 0, <span class="math" data-say="le">le</span>, bound 10, step 1. The lab prints 11 iterations, a last value of 10 and 11 after the loop. The array has ten entries, numbered 0 to 9, so the eleventh pass asks for <span class="math" data-say="hourly at index 10">hourly[10]</span> and Java throws an <span class="math" data-say="array index out of bounds exception">ArrayIndexOutOfBoundsException</span>. The <code>half-open</code> preset is the fix, <span class="math" data-say="is less than">&lt;</span> in place of <span class="math" data-say="is at most">&lt;=</span>: 10 iterations, last value 9, and 10 after. Changing one character changed all three figures, not only the last pass.</p><p>The <code>counting-down</code> preset runs from 10 down to and including 0, <span class="math" data-say="ge">ge</span> with a step of −1: 11 iterations, a last value of 0, and −1 after the loop, one step past in the direction of travel. The <code>skips-the-bound</code> preset is start 0, <span class="math" data-say="ne">ne</span>, bound 9, step 2, and the lab prints &ldquo;never ends&rdquo;: <span class="math" data-say="i">i</span> takes only even values, 9 is odd, and even when <span class="math" data-say="i">i</span> passes the top of Java's <span class="math" data-say="int">int</span> and wraps round to the bottom it stays even, so <span class="math" data-say="i is not equal to 9">i != 9</span> never becomes false. This is the case the opening quotation asks you to think through, a loop that terminates under some conditions and not others; with <span class="math" data-say="is less than">&lt;</span> in the test it would have stopped after 5 passes.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, for int i is set to 10, i is greater than 0, i is decreased by 3. line 2, print line i" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">for (int i = 10; i &gt; 0; i -= 3) {</span>
-<span class="cl">    System.out.println(i);</span>
-<span class="cl">}</span></code></pre><p>From the header alone, state how many times the body runs, the last value it prints, and the value an <span class="math" data-say="i">i</span> declared before the loop would hold after it. Then type the header into the lab as start 10, <span class="math" data-say="gt">gt</span>, bound 0, step −3 to check.</p><p>Loops and conditionals are the ordinary structures. The next lesson, Unusual Control Structures, takes the ones Chapter 17 calls unusual: early returns, recursion and the <span class="math" data-say="goto">goto</span>.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Counting what runs</h2></div><p>how many times a for loop runs</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the header</h2><div class="prose reading"><p><strong>Chapter 16, p. 389.</strong> &ldquo;Think through the loop carefully to verify that it operates normally under each case and terminates under all possible conditions.&rdquo; It is the last of the chapter's key points. Read Chapter 16, pp. 367&ndash;389, in your own copy first.</p><p>You have probably written a loop that ran once too often: the array had ten entries, the loop asked for eleven, and the program stopped with an exception on a line that looked right. Chapter 16 opens by calling loops one of the most complex parts of programming, and spends its pages on keeping them simple enough that such mistakes show.</p><p>Section 16.1 (p. 367) sorts loops into counted loops, continuously evaluated loops, endless loops and iterator loops, and then by two properties: how flexible the loop is, and whether it tests for completion at the beginning, the middle or the end, which decides whether the body runs at least once. Use a <span class="math" data-say="while">while</span> loop when you do not know in advance how many times it will run, and a <span class="math" data-say="for">for</span> loop when you do. Prefer <span class="math" data-say="for">for</span> when it fits, because all of its control sits in the header; but keep the header for statements that control the loop, and do not cram a <span class="math" data-say="while">while</span> loop's housekeeping into it.</p><p>Section 16.2 (p. 373) begins with a list of what goes wrong with loops, from missing initialization to a wrong termination, and two practices against it: minimize the number of things that affect the loop, and treat its inside like a routine, a black box whose controlling conditions can be read without looking in. Enter the loop from one place, with its initialization directly before it; write an infinite loop as <span class="math" data-say="while true">while (true)</span>; brace the body, keep it non-empty, keep its housekeeping together and give it one job. On the way out, make sure the loop ends, make the ending obvious, and do not alter a <span class="math" data-say="for">for</span> loop's index to stop it early: use a <span class="math" data-say="while">while</span> loop instead.</p><p>Two of the section's guidelines are the lesson's subject. Check the endpoints: run through the first pass, a pass in the middle and the last pass in your head, and with a calculator if the body computes something (p. 381). And avoid code that depends on the index's value after the loop (p. 377): it varies from language to language and between a normal ending and an early one, and the next reader will have to stop and work it out, so save what you need in a variable inside the loop. In Java an index declared in the <span class="math" data-say="for">for</span> header does not exist after the loop at all; the book reports three C++ compilers giving three different answers on the same point (p. 384), which is a reason not to rely on the language to settle it.</p><p>The section ends with length and nesting. Make a loop short enough to see all at once; the book reports an expert limit of one page, and adds that a programmer who values simple code will rarely write a loop longer than 15 or 20 lines. Limit nesting to three levels, after a finding Yourdon reports, that the ability to understand a loop falls sharply beyond three (p. 385). These are guidelines from other people's experience, collected before 2004; your own code reviews can test them. Section 16.3 (p. 385) then shows how to build a hard loop from the inside out: write one case with literals, put a loop round it, replace the literals, and repeat. Section 16.4 (p. 387) notes that loops and arrays usually correspond, though some languages, APL and later Fortran among them, operate on whole arrays with no loop at all; in Java the loop is required.</p><p>Now the header. The lab's <em>loop</em> view reads the loop <span class="math" data-say="for int i is set to start, i cmp bound, i is increased by step">for (int i = start; i cmp bound; i += step)</span>, where <span class="math" data-say="cmp">cmp</span> is typed as one of <span class="math" data-say="lt">lt</span>, <span class="math" data-say="le">le</span>, <span class="math" data-say="ne">ne</span>, <span class="math" data-say="gt">gt</span> or <span class="math" data-say="ge">ge</span> for <span class="math" data-say="is less than">&lt;</span>, <span class="math" data-say="is at most">&lt;=</span>, <span class="math" data-say="is not equal to">!=</span>, <span class="math" data-say="is greater than">&gt;</span> and <span class="math" data-say="is at least">&gt;=</span>, and computes from those four values alone, in closed form, without running anything. It prints the <strong>iterations</strong>, the <strong>last value of i in the body</strong>, and <strong>i after the loop, if declared before it</strong>: the value an index declared outside the loop would be left holding, which is the value p. 377 advises against using. Here is a loop with the classic mistake:</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Counting what runs</h2></div><p>how many times a for loop runs</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Counting what runs</strong><span>how many times a for loop runs</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="lpTable"></table></div>
       <div class="status-banner" id="lpStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What a loop header decides</h3>
-          <p>A count over the structure the lesson states. The lab reads one header, for (int i = start; i cmp bound; i += step), over Java's int, and computes the run in closed form. The body is not read: a body that changes i or breaks out early is outside the count.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What a loop header decides</h3>
+            <p>A count over the structure the lesson states. The lab reads one header, for (int i = start; i cmp bound; i += step), over Java's int, and computes the run in closed form. The body is not read: a body that changes i or breaks out early is outside the count.</p>
         <div class="field">
           <label for="lpPreset">Worked example</label>
           <select id="lpPreset"><option value="fencepost" selected>0 to 10, at most 10 (the lesson's hourly loop)</option><option value="half-open">0 to 10, below 10</option><option value="counting-down">10 down to 0, at least 0</option><option value="skips-the-bound">0 by twos, while not 9</option></select>
@@ -1492,12 +1530,20 @@
           <div class="kpi"><span>i after the loop, if declared before it</span><strong id="lpAfter">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, array of int hourly is set to new int array of length 10. line 2, for int i is set to 0, i is at most 10, i is incremented. line 3, hourly at index i is set to count visits of i" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">int[] hourly = new int[10];</span>
+<span class="cl">for (int i = 0; i &lt;= 10; i++) {</span>
+<span class="cl">    hourly[i] = countVisits(i);</span>
+<span class="cl">}</span></code></pre><p>The <code>fencepost</code> preset is its header: start 0, <span class="math" data-say="le">le</span>, bound 10, step 1. The lab prints 11 iterations, a last value of 10 and 11 after the loop. The array has ten entries, numbered 0 to 9, so the eleventh pass asks for <span class="math" data-say="hourly at index 10">hourly[10]</span> and Java throws an <span class="math" data-say="array index out of bounds exception">ArrayIndexOutOfBoundsException</span>. The <code>half-open</code> preset is the fix, <span class="math" data-say="is less than">&lt;</span> in place of <span class="math" data-say="is at most">&lt;=</span>: 10 iterations, last value 9, and 10 after. Changing one character changed all three figures, not only the last pass.</p><p>The <code>counting-down</code> preset runs from 10 down to and including 0, <span class="math" data-say="ge">ge</span> with a step of −1: 11 iterations, a last value of 0, and −1 after the loop, one step past in the direction of travel. The <code>skips-the-bound</code> preset is start 0, <span class="math" data-say="ne">ne</span>, bound 9, step 2, and the lab prints &ldquo;never ends&rdquo;: <span class="math" data-say="i">i</span> takes only even values, 9 is odd, and even when <span class="math" data-say="i">i</span> passes the top of Java's <span class="math" data-say="int">int</span> and wraps round to the bottom it stays even, so <span class="math" data-say="i is not equal to 9">i != 9</span> never becomes false. This is the case the opening quotation asks you to think through, a loop that terminates under some conditions and not others; with <span class="math" data-say="is less than">&lt;</span> in the test it would have stopped after 5 passes.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, for int i is set to 10, i is greater than 0, i is decreased by 3. line 2, print line i" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">for (int i = 10; i &gt; 0; i -= 3) {</span>
+<span class="cl">    System.out.println(i);</span>
+<span class="cl">}</span></code></pre><p>From the header alone, state how many times the body runs, the last value it prints, and the value an <span class="math" data-say="i">i</span> declared before the loop would hold after it. Then type the header into the lab as start 10, <span class="math" data-say="gt">gt</span>, bound 0, step −3 to check.</p><p>Loops and conditionals are the ordinary structures. The next lesson, Unusual Control Structures, takes the ones Chapter 17 calls unusual: early returns, recursion and the <span class="math" data-say="goto">goto</span>.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a loop from its header</h2></div><p>Five steps, the last of which is yours.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the first values</h3><p>Start at the header's first value and apply the step two or three times, so you see the direction and the spacing.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the last value the test accepts</h3><p>Walk to the bound: the last value of i for which the test is still true is the last value in the body. If no value ever makes the test false, the loop never ends.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the values</h3><p>The number of values from the first to the last, in steps of the step, is the number of iterations.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Take one more step</h3><p>One step past the last value is where the test first fails, and that is what an index declared before the loop is left holding.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on your own code</h3><p>Type four loop headers from your own code into the lab, note the iterations, the last value and the value after for each, and mark any header whose figures differ from what you would have said.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a loop from its header</h2>
+      <p class="lead-in">Five steps, the last of which is yours.</p>
+      <ol class="key-ideas method"><li><strong>Write the first values.</strong> Start at the header's first value and apply the step two or three times, so you see the direction and the spacing.</li><li><strong>Find the last value the test accepts.</strong> Walk to the bound: the last value of i for which the test is still true is the last value in the body. If no value ever makes the test false, the loop never ends.</li><li><strong>Count the values.</strong> The number of values from the first to the last, in steps of the step, is the number of iterations.</li><li><strong>Take one more step.</strong> One step past the last value is where the test first fails, and that is what an index declared before the loop is left holding.</li><li><strong>Do it on your own code.</strong> Type four loop headers from your own code into the lab, note the iterations, the last value and the value after for each, and mark any header whose figures differ from what you would have said.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1515,17 +1561,16 @@ the test first fails at i == 11
 so an i declared before the loop holds 11</div><p>The loop runs 11 times, one more than the 10 its bound suggests, and the index ends one step past its last value in the body. Written with < it runs 10 times and ends at 10.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking <span data-say="is at most">&lt;=</span> and <span data-say="is less than">&lt;</span> differ by one only at the end</strong><span>They differ in the count, the last value and the value after. On the lesson's header, <span class="math" data-say="is at most 10">&lt;= 10</span> gives 11 iterations, a last value of 10 and 11 after; <span class="math" data-say="is less than 10">&lt; 10</span> gives 10, 9 and 10. And with <span class="math" data-say="is not equal to">!=</span> the difference can be between a loop that stops and one that never does: counting up by twos from 0, <span class="math" data-say="i is not equal to 9">i != 9</span> never becomes false. That is why the chapter asks you to check the first, a middle and the last pass.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking the index after the loop is the last value it had in the body</strong><span>The index is left one step past it, because the loop ends at the first value the test rejects. The fencepost loop's last value in the body is 10 and an index declared outside it holds 11; the counting-down loop's last value is 0 and the index holds −1. Section 16.2 advises not relying on either.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Stopping a for loop by setting its index</strong><span>Setting <span class="math" data-say="i">i</span> to the bound inside the body to end the loop early is what the book calls monkeying with the loop index (p. 377). The header no longer says when the loop ends, and a reader has to look inside. A <span class="math" data-say="while">while</span> loop, whose condition holds the whole exit, is the chapter's alternative.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can read a loop&#x27;s run from its header.</strong><p>For four loop headers, state the iterations, the last value of the index in the body and the value it would hold after the loop, and say which header never ends, without the lab.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab computes from the header alone. A body that changes the index, breaks out or throws is outside its count, and so is any loop that is not a for loop over an int. The length and nesting limits come from the book's reading of other people's experience and are guidelines, not properties of a loop the lab could check.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking <span data-say="is at most">&lt;=</span> and <span data-say="is less than">&lt;</span> differ by one only at the end</strong><span>They differ in the count, the last value and the value after. On the lesson's header, <span class="math" data-say="is at most 10">&lt;= 10</span> gives 11 iterations, a last value of 10 and 11 after; <span class="math" data-say="is less than 10">&lt; 10</span> gives 10, 9 and 10. And with <span class="math" data-say="is not equal to">!=</span> the difference can be between a loop that stops and one that never does: counting up by twos from 0, <span class="math" data-say="i is not equal to 9">i != 9</span> never becomes false. That is why the chapter asks you to check the first, a middle and the last pass.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking the index after the loop is the last value it had in the body</strong><span>The index is left one step past it, because the loop ends at the first value the test rejects. The fencepost loop's last value in the body is 10 and an index declared outside it holds 11; the counting-down loop's last value is 0 and the index holds −1. Section 16.2 advises not relying on either.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Stopping a for loop by setting its index</strong><span>Setting <span class="math" data-say="i">i</span> to the bound inside the body to end the loop early is what the book calls monkeying with the loop index (p. 377). The header no longer says when the loop ends, and a reader has to look inside. A <span class="math" data-say="while">while</span> loop, whose condition holds the whole exit, is the chapter's alternative.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can read a loop&#x27;s run from its header.</strong><p>For four loop headers, state the iterations, the last value of the index in the body and the value it would hold after the loop, and say which header never ends, without the lab.</p></div></div><div class="note"><strong>Note:</strong> The lab computes from the header alone. A body that changes the index, breaks out or throws is outside its count, and so is any loop that is not a for loop over an int. The length and nesting limits come from the book's reading of other people's experience and are guidelines, not properties of a loop the lab could check.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Where the loop tests</summary><p>A loop can test whether it has finished at the beginning, in the middle or at the end. That decides whether its body runs at least once, and with the loop's flexibility it decides which kind of loop to use.</p></details><details class="recall"><summary>The off-by-one error</summary><p>A loop that runs once too often or once too few times, usually because <span class="math" data-say="is at most">&lt;=</span> was written where <span class="math" data-say="is less than">&lt;</span> was meant or the other way round. It is also called a fencepost error: ten sections of fence need eleven posts.</p></details><details class="recall"><summary>The index&#x27;s final value</summary><p>The value a loop index holds once the loop is over. It is one step past the last value used in the body, it differs between languages and between a normal and an early exit, and the chapter says not to write code that depends on it.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 16 chooses the kind of loop, controls its entry, body and exit, and limits its length and nesting. Compute from a header alone how many times a loop runs, the last value of its index in the body and the value it would hold afterwards, and find the header that never ends.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Where the loop tests.</strong> A loop can test whether it has finished at the beginning, in the middle or at the end. That decides whether its body runs at least once, and with the loop's flexibility it decides which kind of loop to use.</li><li><strong>The off-by-one error.</strong> A loop that runs once too often or once too few times, usually because <span class="math" data-say="is at most">&lt;=</span> was written where <span class="math" data-say="is less than">&lt;</span> was meant or the other way round. It is also called a fencepost error: ten sections of fence need eleven posts.</li><li><strong>The index&#x27;s final value.</strong> The value a loop index holds once the loop is over. It is one step past the last value used in the body, it differs between languages and between a normal and an early exit, and the chapter says not to write code that depends on it.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="choose the loop by its test and its count. treat loop bodies as black boxes. check the first, middle and last passes. do not rely on the index after the loop. keep loops short, nest three levels at most" tabindex="0" role="region" aria-label="Mathematical notation">choose the loop by its test and its count
 treat loop bodies as black boxes
 check the first, middle and last passes
@@ -2241,11 +2286,42 @@ keep loops short; nest three levels at most</div><figcaption>The chapter in five
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2313,7 +2389,7 @@ keep loops short; nest three levels at most</div><figcaption>The chapter in five
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

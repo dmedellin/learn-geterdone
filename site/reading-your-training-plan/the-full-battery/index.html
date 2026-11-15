@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Your Training Plan</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The test</p>
       <h1>The Full Battery</h1>
       <p class="lesson-lede">Take the battery fresh, and set four measures, effective rate, skim gist, scan time and recall, beside your first ones.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A profile, not a score</li><li>Only one measure has a range</li><li>Fresh, in one sitting</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Four measures, then and now</h2>
-      <article class="prose reading"><p>Do the battery fresh, at a time you would otherwise do the Daily Drill, and not after another drill. Start with the warm-up above the lab: a test reading of a passage about how the Dutch kept low land dry, at natural pace with no pacer, then six questions. That is your newest test.</p><p>Then press Fill from my log. The effective rate then is the median of all your baselines, with their range; the effective rate now is the latest test the log holds, today's warm-up included, and the fill lists your recent tests so that the verdict is on the median of the last three, by the Subject's rule. The gist, scan and recall rows take the first and the latest of the skims, scans and free recalls your log holds as baseline or test readings, from Skimming, Scanning and Previewing and from Remembering What You Read. Skimming for Gist, Scanning for a Target and Free Recall log their drills as tests, so those rows fill from your log; where it holds only one reading of a kind, then and now are that same reading. A row your log cannot fill keeps the example: type your own figures there if you have them, and otherwise read that row as an example.</p><ul><li>Effective rate: tests at natural pace with questions, here and in the Daily Drill.</li><li>Skim gist: the gist questions answered after a timed skim, as in Skimming for Gist.</li><li>Scan time: seconds per target found, as in Scanning for a Target.</li><li>Recall: idea units recalled out of the passage's units, as in Free Recall.</li></ul><p>The preset after-practice is a reader some weeks on. The effective rate then is 245, the median of baselines of 238, 245 and 251. The last three tests are 262, 270 and 266, and the latest, 266, is the rate now. The profile's verdict tile judges the latest test alone, so it prints above the baseline range once, with its warning about one time in four. The Subject's rule asks for the median of the last three, and that is also 266, 15 above the top of the range: by the rule, a change.</p><p>The same reader's other rows: gist after a skim from 2 of 3 to all 3, scan time from 12 seconds a target to 8, and free recall from 5 of 12 idea units to 7. What can be said of these? Each is one reading before and one after, on a different text each time. The gist score moved by one question, the smallest step the measure can take. Scan time fell by a third, and recall rose by two idea units of twelve. Each is promising and none has a range, so by the Subject's rule each has too few readings to say.</p><p>The preset rate-flat is the reader the one-number view forgets. Effective rate then 245 and now 244, inside the range; gist 2 of 3 both times; recall 5 of 12 both times; and scan time from 12 seconds a target to 7. On the one-number view nothing happened. On the profile, this reader finds a fact in a document in a little over half the time, one reading each, so not yet a result, but the row that says where to measure next.</p><p>The rows are there because time spent reading is saved in four places, not one: understanding more per minute, knowing when a skim is enough, finding a fact without reading for it, and keeping what was read so that it need not be read again. Skimming, Scanning and Previewing argued that the large savings are in the second and third, not the first; Words, Knowledge and Difficulty, that what you know and how much you read move a rate more than any technique.</p><p>To make a row say something, measure it the way the effective rate was measured: three readings to give a range, then tests. A row that matters to you can become a row of your plan: a skim or a scan on a fresh text every week or two, logged, as in A Practice Week. Take the battery again in a month or so; the profile will then have more than one reading behind some of its rows.</p><p>This is the last lesson of the Subject. What it leaves you with is not a speed but a method: a log, a rule for reading it, a routine that keeps it filling, and four measures for what reading faster can mean. Tomorrow, go back to The Daily Drill.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Your profile, then and now</h2></div><p>your own numbers, compared with themselves</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Four measures, then and now</h2><div class="prose reading"><p>Do the battery fresh, at a time you would otherwise do the Daily Drill, and not after another drill. Start with the warm-up above the lab: a test reading of a passage about how the Dutch kept low land dry, at natural pace with no pacer, then six questions. That is your newest test.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Your profile, then and now</h2></div><p>your own numbers, compared with themselves</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Your profile, then and now</strong><span>your own numbers, compared with themselves</span></div>
       </div>
@@ -1417,10 +1460,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="lgTable"></table></div>
       <div class="status-banner" id="lgStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Your profile, then and now</h3>
-          <p>Your measurement, from your log: baseline and test readings only. The effective rate is judged against your baseline range; the other three rows are a first reading and a latest, with no range. Until you fill it, the profile holds a worked example.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Your profile, then and now</h3>
+            <p>Your measurement, from your log: baseline and test readings only. The effective rate is judged against your baseline range; the other three rows are a first reading and a latest, with no range. Until you fill it, the profile holds a worked example.</p>
         <div class="field">
           <label for="lgPreset">Worked example</label>
           <select id="lgPreset"><option value="after-practice" selected>Some weeks on</option><option value="rate-flat">Rate flat, scan faster</option></select>
@@ -1482,12 +1525,15 @@
           <div class="kpi"><span>Free recall</span><strong id="lgRecall">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Then press Fill from my log. The effective rate then is the median of all your baselines, with their range; the effective rate now is the latest test the log holds, today's warm-up included, and the fill lists your recent tests so that the verdict is on the median of the last three, by the Subject's rule. The gist, scan and recall rows take the first and the latest of the skims, scans and free recalls your log holds as baseline or test readings, from Skimming, Scanning and Previewing and from Remembering What You Read. Skimming for Gist, Scanning for a Target and Free Recall log their drills as tests, so those rows fill from your log; where it holds only one reading of a kind, then and now are that same reading. A row your log cannot fill keeps the example: type your own figures there if you have them, and otherwise read that row as an example.</p><ul><li>Effective rate: tests at natural pace with questions, here and in the Daily Drill.</li><li>Skim gist: the gist questions answered after a timed skim, as in Skimming for Gist.</li><li>Scan time: seconds per target found, as in Scanning for a Target.</li><li>Recall: idea units recalled out of the passage's units, as in Free Recall.</li></ul><p>The preset after-practice is a reader some weeks on. The effective rate then is 245, the median of baselines of 238, 245 and 251. The last three tests are 262, 270 and 266, and the latest, 266, is the rate now. The profile's verdict tile judges the latest test alone, so it prints above the baseline range once, with its warning about one time in four. The Subject's rule asks for the median of the last three, and that is also 266, 15 above the top of the range: by the rule, a change.</p><p>The same reader's other rows: gist after a skim from 2 of 3 to all 3, scan time from 12 seconds a target to 8, and free recall from 5 of 12 idea units to 7. What can be said of these? Each is one reading before and one after, on a different text each time. The gist score moved by one question, the smallest step the measure can take. Scan time fell by a third, and recall rose by two idea units of twelve. Each is promising and none has a range, so by the Subject's rule each has too few readings to say.</p><p>The preset rate-flat is the reader the one-number view forgets. Effective rate then 245 and now 244, inside the range; gist 2 of 3 both times; recall 5 of 12 both times; and scan time from 12 seconds a target to 7. On the one-number view nothing happened. On the profile, this reader finds a fact in a document in a little over half the time, one reading each, so not yet a result, but the row that says where to measure next.</p><p>The rows are there because time spent reading is saved in four places, not one: understanding more per minute, knowing when a skim is enough, finding a fact without reading for it, and keeping what was read so that it need not be read again. Skimming, Scanning and Previewing argued that the large savings are in the second and third, not the first; Words, Knowledge and Difficulty, that what you know and how much you read move a rate more than any technique.</p><p>To make a row say something, measure it the way the effective rate was measured: three readings to give a range, then tests. A row that matters to you can become a row of your plan: a skim or a scan on a fresh text every week or two, logged, as in A Practice Week. Take the battery again in a month or so; the profile will then have more than one reading behind some of its rows.</p><p>This is the last lesson of the Subject. What it leaves you with is not a speed but a method: a log, a rule for reading it, a routine that keeps it filling, and four measures for what reading faster can mean. Tomorrow, go back to The Daily Drill.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Taking the battery</h2></div><p>About once a month, in one sitting of fifteen minutes.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Sit down fresh</h3><p>At the time you would do the Daily Drill, with no other drill before it and nothing to interrupt you.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Take the test reading</h3><p>The warm-up here the first time; after that, a test at natural pace from the Daily Drill's test box.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Fill the profile</h3><p>Press Fill from my log: today's test is the latest it reads, and your tests are listed so that the verdict is on the median of the last three. Type any figures your log cannot supply from the latest skim, scan and recall you have done.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Judge each row by its readings</h3><p>Effective rate by the median of the last three tests against the range; the other rows as one reading against one, too few to say. Write down which row to give readings to next.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Do today's session on The Daily Drill page: the next pool passage with the pacer at your hold target, or a test at natural pace if one is due.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Taking the battery</h2>
+      <p class="lead-in">About once a month, in one sitting of fifteen minutes.</p>
+      <ol class="key-ideas method"><li><strong>Sit down fresh.</strong> At the time you would do the Daily Drill, with no other drill before it and nothing to interrupt you.</li><li><strong>Take the test reading.</strong> The warm-up here the first time; after that, a test at natural pace from the Daily Drill's test box.</li><li><strong>Fill the profile.</strong> Press Fill from my log: today's test is the latest it reads, and your tests are listed so that the verdict is on the median of the last three. Type any figures your log cannot supply from the latest skim, scan and recall you have done.</li><li><strong>Judge each row by its readings.</strong> Effective rate by the median of the last three tests against the range; the other rows as one reading against one, too few to say. Write down which row to give readings to next.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Do today's session on The Daily Drill page: the next pool passage with the pacer at your hold target, or a test at natural pace if one is due.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1506,17 +1552,16 @@ scan 12 s to 8 s: one reading each
 recall 5/12 to 7/12: one reading each</div><p>One row has a range and three tests behind it; three rows have one reading each side. Only the first can be called a change.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>One number sums up a reader</strong><span>A reader is a profile: rate on a kind of text, comprehension, the choice of when not to read everything, and what is kept. In rate-flat the effective rate went from 245 to 244 and scan time from 12 seconds a target to 7; on the one-number view nothing happened, and the profile shows where to measure next.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a before and an after as a change</strong><span>Gist 2 of 3 to 3 of 3 and recall 5 of 12 to 7 of 12 are each two readings on two different texts. Without a range there is no telling them from the variation of an ordinary week, and the effective rate's range of 13 with nothing changed is a reminder of how large that is.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the preset&#x27;s verdict tile as the Subject&#x27;s rule</strong><span>With no tests listed, as in the presets, the tile sets the one rate now against the range, which is the one-in-four comparison. The rule is the median of the last three tests: the fill lists yours, so your own tile follows the rule, and for the presets work the median from the body as Reading Your Curve does.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which measures of a profile have changed.</strong><p>Given two profiles, say which measures changed by the Subject's rule, which only a measure with a baseline range and three tests can do, and which have too few readings to say, giving the figures that show each.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The battery's effective rate is the only row with a range; the other three are one reading against one, each on a different text, so the profile shows where to look rather than what has changed. The page's warm-up asks no free recall, so the recall row comes from Remembering What You Read. The fill lists your tests, today's warm-up included, and the verdict follows the median rule on them; the presets list none, so their tile judges one effective rate alone.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>One number sums up a reader</strong><span>A reader is a profile: rate on a kind of text, comprehension, the choice of when not to read everything, and what is kept. In rate-flat the effective rate went from 245 to 244 and scan time from 12 seconds a target to 7; on the one-number view nothing happened, and the profile shows where to measure next.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a before and an after as a change</strong><span>Gist 2 of 3 to 3 of 3 and recall 5 of 12 to 7 of 12 are each two readings on two different texts. Without a range there is no telling them from the variation of an ordinary week, and the effective rate's range of 13 with nothing changed is a reminder of how large that is.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the preset&#x27;s verdict tile as the Subject&#x27;s rule</strong><span>With no tests listed, as in the presets, the tile sets the one rate now against the range, which is the one-in-four comparison. The rule is the median of the last three tests: the fill lists yours, so your own tile follows the rule, and for the presets work the median from the body as Reading Your Curve does.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which measures of a profile have changed.</strong><p>Given two profiles, say which measures changed by the Subject's rule, which only a measure with a baseline range and three tests can do, and which have too few readings to say, giving the figures that show each.</p></div></div><div class="note"><strong>Note:</strong> The battery's effective rate is the only row with a range; the other three are one reading against one, each on a different text, so the profile shows where to look rather than what has changed. The page's warm-up asks no free recall, so the recall row comes from Remembering What You Read. The fill lists your tests, today's warm-up included, and the verdict follows the median rule on them; the presets list none, so their tile judges one effective rate alone.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A profile, not a score</summary><p>Four measures answer four questions: how much you understand per minute of ordinary text, how much a skim tells you, how fast you find a fact, and how much stays. They move separately, and a reader can improve on one and not the others.</p></details><details class="recall"><summary>Only one measure has a range</summary><p>Effective rate has three baselines and a run of tests, so the Subject's rule applies to it. Gist, scan and recall each have a first reading and a latest, and a change between two readings is one measurement against one.</p></details><details class="recall"><summary>Fresh, in one sitting</summary><p>Fifteen minutes, before rather than after another drill. A tired battery measures the tiredness, and a battery spread over several days measures the days.</p></details></div>
+      <h3>Summary</h3>
       <p>A reader is more than a rate. The battery takes one test reading here and reads your log for your first and latest skim, scan and free recall, then sets each beside your first measurement of it. Only the effective rate has a baseline range and a series of tests; for the other three the profile shows a before and an after, and says less than it seems to.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A profile, not a score.</strong> Four measures answer four questions: how much you understand per minute of ordinary text, how much a skim tells you, how fast you find a fact, and how much stays. They move separately, and a reader can improve on one and not the others.</li><li><strong>Only one measure has a range.</strong> Effective rate has three baselines and a run of tests, so the Subject's rule applies to it. Gist, scan and recall each have a first reading and a latest, and a change between two readings is one measurement against one.</li><li><strong>Fresh, in one sitting.</strong> Fifteen minutes, before rather than after another drill. A tired battery measures the tiredness, and a battery spread over several days measures the days.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="effective rate, median of last 3 tests. gist, gist questions right on a skim. scan, seconds per target found. recall, idea units recalled over units. one before, one after, too few to say" tabindex="0" role="region" aria-label="Mathematical notation">effective rate: median of last 3 tests
 gist: gist questions right on a skim
 scan: seconds per target found
@@ -2662,11 +2707,42 @@ one before, one after: too few to say</div><figcaption>Four measures in five lin
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2734,7 +2810,7 @@ one before, one after: too few to say</div><figcaption>Four measures in five lin
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

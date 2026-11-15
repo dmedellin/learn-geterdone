@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Separable Equations, Growth and Decay</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Shifted and bounded growth</p>
       <h1>Harvesting and the Threshold</h1>
       <p class="lesson-lede">Subtracting a constant harvest H from the logistic equation moves its equilibria together until, at <span data-say="H equals r times K over 4">H = r·K/4</span>, they meet and vanish, and above that rate every start collapses.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A harvest lowers the whole rate by H</li><li>The equilibria solve a quadratic</li><li>The threshold is the most the growth ever gives</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two equilibria, one, and none</h2>
-      <article class="prose reading"><p>Take the logistic population of the previous lesson, with <span class="math" data-say="r equals 1">r = 1</span> and <span class="math" data-say="K equals 4">K = 4</span>, and remove a fixed amount <span class="math" data-say="H">H</span> of it in every unit of time. Fishing and logging are the usual pictures. Left alone the population grows to 4. The question is how large <span class="math" data-say="H">H</span> can be before it no longer does.</p><div class="defbox"><span class="label">Definition &middot; The harvested logistic equation</span><p>With a constant harvest rate <span class="math" data-say="H is at least 0">H ≥ 0</span>, the equation is <span class="math" data-say="y prime equals r times y times the quantity 1 minus y over K, minus H">y′ = r·y·(1 − y/K) − H</span>.</p><p>The harvest is taken at the same rate whatever the population is. This is an assumption about the fishery, and the lab computes what follows from it.</p></div><div class="mathblock" data-say="r equals 1, K equals 4. y prime equals y times the quantity 1 minus y over 4, minus H. equals negative y squared over 4 plus y minus H. equilibria, y squared minus 4 y plus 4 H equals 0. discriminant, 16 minus 16 times H equals 16 times the quantity 1 minus H" tabindex="0" role="region" aria-label="Mathematical notation">r = 1, K = 4:
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two equilibria, one, and none</h2><div class="prose reading"><p>Take the logistic population of the previous lesson, with <span class="math" data-say="r equals 1">r = 1</span> and <span class="math" data-say="K equals 4">K = 4</span>, and remove a fixed amount <span class="math" data-say="H">H</span> of it in every unit of time. Fishing and logging are the usual pictures. Left alone the population grows to 4. The question is how large <span class="math" data-say="H">H</span> can be before it no longer does.</p><div class="defbox"><span class="label">Definition &middot; The harvested logistic equation</span><p>With a constant harvest rate <span class="math" data-say="H is at least 0">H ≥ 0</span>, the equation is <span class="math" data-say="y prime equals r times y times the quantity 1 minus y over K, minus H">y′ = r·y·(1 − y/K) − H</span>.</p><p>The harvest is taken at the same rate whatever the population is. This is an assumption about the fishery, and the lab computes what follows from it.</p></div><div class="mathblock" data-say="r equals 1, K equals 4. y prime equals y times the quantity 1 minus y over 4, minus H. equals negative y squared over 4 plus y minus H. equilibria, y squared minus 4 y plus 4 H equals 0. discriminant, 16 minus 16 times H equals 16 times the quantity 1 minus H" tabindex="0" role="region" aria-label="Mathematical notation">r = 1, K = 4:
 
   y′ = y·(1 − y/4) − H
      = −y²/4 + y − H
@@ -1399,12 +1443,11 @@
   equilibria:   y² − 4y + 4H = 0
   discriminant: 16 − 16·H = 16·(1 − H)</div><p>The discriminant decides the count. For <span class="math" data-say="H is less than 1">H < 1</span> it is positive and there are two real roots, for <span class="math" data-say="H equals 1">H = 1</span> it is zero and there is one, and for <span class="math" data-say="H is greater than 1">H > 1</span> it is negative and there are none. The three presets are one of each.</p><div class="mathblock" data-say="H equals 3 over 4, y squared minus 4 y plus 3 equals the quantity y minus 1, times the quantity y minus 3, y equals 1, 3. H equals 1, y squared minus 4 y plus 4 equals the quantity y minus 2, squared, y equals 2. H equals 5 over 4, y squared minus 4 y plus 5, 16 minus 20 is less than 0, none" tabindex="0" role="region" aria-label="Mathematical notation">  H = 3/4:   y² − 4y + 3 = (y − 1)(y − 3)    y = 1, 3
   H = 1:     y² − 4y + 4 = (y − 2)²          y = 2
-  H = 5/4:   y² − 4y + 5,  16 − 20 &lt; 0       none</div><h3>A harvest of three quarters</h3><p>The right side is <span class="math" data-say="negative the quantity y minus 1, times the quantity y minus 3, over 4">−(y − 1)·(y − 3)/4</span>, which is negative below 1, positive between 1 and 3, and negative above 3. So a population between 1 and 3 grows to 3, a population above 3 falls to 3, and a population below 1 falls further. The lab prints <span class="math" data-say="1 unstable, 3 stable">1 unstable; 3 stable</span>. The harvest has not removed the attracting equilibrium; it has moved it from 4 down to 3, and it has created a repelling one at 1. The slope tile agrees: <span class="math" data-say="f prime of 1 equals 1 over 2">f′(1) = 1/2</span> is positive, so nearby populations move away from 1, and <span class="math" data-say="f prime of 3 equals negative 1 over 2">f′(3) = −1/2</span> is negative, so they move towards 3.</p><p>The repelling equilibrium is the dangerous one. At <span class="math" data-say="y equals 1">y = 1</span> the natural growth is exactly <span class="math" data-say="3 over 4">3/4</span>, the harvest, so nothing changes. At <span class="math" data-say="y equals 9 over 10">y = 9/10</span> the natural growth is <span class="math" data-say="279 over 400">279/400</span>, which is less than <span class="math" data-say="300 over 400">300/400</span>, so the population shrinks, and the less there is the less growth to pay for the harvest. A harvest that the population can replace today may not be one it can replace after a bad year.</p><h3>At the threshold, and beyond</h3><p>At <span class="math" data-say="H equals 1">H = 1</span> the right side is <span class="math" data-say="negative the quantity y minus 2, squared over 4">−(y − 2)²/4</span>, which is never positive. A population above 2 falls back to 2 and settles. A population below 2 falls away, and so does one that dips just under it. The equilibrium is attracting from one side only, and the lab calls it semistable. At <span class="math" data-say="H equals 5 over 4">H = 5/4</span> the right side is negative for every <span class="math" data-say="y">y</span> and every start falls.</p><p>The threshold has a general form. The natural growth <span class="math" data-say="r times y times the quantity 1 minus y over K">r·y·(1 − y/K)</span> has its peak at <span class="math" data-say="y equals K over 2">y = K/2</span>, where it equals <span class="math" data-say="r times K over 4">r·K/4</span>. For a harvest above that peak the right side is negative at every <span class="math" data-say="y">y</span>; for one below it the line <span class="math" data-say="H">H</span> crosses the growth curve twice. So <span class="math" data-say="H star equals r times K over 4">H* = r·K/4</span>, which is <span class="math" data-say="1 times 4 over 4 equals 1">1·4/4 = 1</span> here.</p><div class="example"><span class="label">Example &middot; A population that falls below zero</span><p>In the third preset the limit tile reads <span class="math" data-say="goes to negative infinity">→ −∞</span>: every start falls without bound, and passes zero on the way, since the equation does not know a population cannot be negative. Read a negative value as the population having already gone: the model says the stock is exhausted, and stops describing anything.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Autonomous equations</h2></div><p>Equilibria, the phase line, and where solutions go</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  H = 5/4:   y² − 4y + 5,  16 − 20 &lt; 0       none</div><h3>A harvest of three quarters</h3><p>The right side is <span class="math" data-say="negative the quantity y minus 1, times the quantity y minus 3, over 4">−(y − 1)·(y − 3)/4</span>, which is negative below 1, positive between 1 and 3, and negative above 3. So a population between 1 and 3 grows to 3, a population above 3 falls to 3, and a population below 1 falls further. The lab prints <span class="math" data-say="1 unstable, 3 stable">1 unstable; 3 stable</span>. The harvest has not removed the attracting equilibrium; it has moved it from 4 down to 3, and it has created a repelling one at 1. The slope tile agrees: <span class="math" data-say="f prime of 1 equals 1 over 2">f′(1) = 1/2</span> is positive, so nearby populations move away from 1, and <span class="math" data-say="f prime of 3 equals negative 1 over 2">f′(3) = −1/2</span> is negative, so they move towards 3.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Autonomous equations</h2></div><p>Equilibria, the phase line, and where solutions go</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Autonomous equations</strong><span>y′ = f(y): the sign of f decides the direction</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>exact Euler steps</span><span class="tone-purple"><i class="legend-swatch"></i>curves drawn by stepping in floating point</span><span class="tone-cyan"><i class="legend-swatch"></i>phase line</span></div>
@@ -1413,10 +1456,10 @@
       <div class="table-wrap" style="margin-top:12px;" id="auTable" tabindex="0" role="region" aria-label="Data table"></div>
       <div class="status-banner" id="auStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>How many equilibria a harvest leaves</h3>
-          <p>The phase line shows each equilibrium as a dot and each gap between them as an arrow. The first tile lists the equilibria, the second says which attract and which repel, and the limit tile says where the first start ends up. Edit the box to try another harvest: the threshold is where the number of equilibria changes.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>How many equilibria a harvest leaves</h3>
+            <p>The phase line shows each equilibrium as a dot and each gap between them as an arrow. The first tile lists the equilibria, the second says which attract and which repel, and the limit tile says where the first start ends up. Edit the box to try another harvest: the threshold is where the number of equilibria changes.</p>
         <div class="field">
           <label for="auPreset">Equation</label>
           <select id="auPreset"><option value="light" selected>H = 3/4: y′ = y·(1 − y/4) − 3/4</option><option value="critical">H = 1: y′ = y·(1 − y/4) − 1</option><option value="heavy">H = 5/4: y′ = y·(1 − y/4) − 5/4</option></select>
@@ -1451,12 +1494,15 @@
         </div>
         <p class="small-copy" style="margin:0;">f is a polynomial in y of degree 4 at most: y^2 - 1, y(1 - y/4), y^3 - 4y^2 + 3y.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The repelling equilibrium is the dangerous one. At <span class="math" data-say="y equals 1">y = 1</span> the natural growth is exactly <span class="math" data-say="3 over 4">3/4</span>, the harvest, so nothing changes. At <span class="math" data-say="y equals 9 over 10">y = 9/10</span> the natural growth is <span class="math" data-say="279 over 400">279/400</span>, which is less than <span class="math" data-say="300 over 400">300/400</span>, so the population shrinks, and the less there is the less growth to pay for the harvest. A harvest that the population can replace today may not be one it can replace after a bad year.</p><h3>At the threshold, and beyond</h3><p>At <span class="math" data-say="H equals 1">H = 1</span> the right side is <span class="math" data-say="negative the quantity y minus 2, squared over 4">−(y − 2)²/4</span>, which is never positive. A population above 2 falls back to 2 and settles. A population below 2 falls away, and so does one that dips just under it. The equilibrium is attracting from one side only, and the lab calls it semistable. At <span class="math" data-say="H equals 5 over 4">H = 5/4</span> the right side is negative for every <span class="math" data-say="y">y</span> and every start falls.</p><p>The threshold has a general form. The natural growth <span class="math" data-say="r times y times the quantity 1 minus y over K">r·y·(1 − y/K)</span> has its peak at <span class="math" data-say="y equals K over 2">y = K/2</span>, where it equals <span class="math" data-say="r times K over 4">r·K/4</span>. For a harvest above that peak the right side is negative at every <span class="math" data-say="y">y</span>; for one below it the line <span class="math" data-say="H">H</span> crosses the growth curve twice. So <span class="math" data-say="H star equals r times K over 4">H* = r·K/4</span>, which is <span class="math" data-say="1 times 4 over 4 equals 1">1·4/4 = 1</span> here.</p><div class="example"><span class="label">Example &middot; A population that falls below zero</span><p>In the third preset the limit tile reads <span class="math" data-say="goes to negative infinity">→ −∞</span>: every start falls without bound, and passes zero on the way, since the equation does not know a population cannot be negative. Read a negative value as the population having already gone: the model says the stock is exhausted, and stops describing anything.</p></div></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding what a harvest does</h2></div><p>Five moves, and the threshold is the fourth.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the natural growth and the harvest</h3><p><span class="math" data-say="f of y equals r times y times the quantity 1 minus y over K">f(y) = r·y·(1 − y/K)</span> and the constant <span class="math" data-say="H">H</span>. The equation is <span class="math" data-say="y prime equals f of y minus H">y′ = f(y) − H</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the equilibria</h3><p>Solve <span class="math" data-say="f of y equals H">f(y) = H</span>. For <span class="math" data-say="r equals 1">r = 1</span>, <span class="math" data-say="K equals 4">K = 4</span> that is <span class="math" data-say="y squared minus 4 y plus 4 H equals 0">y² − 4y + 4H = 0</span>; use its discriminant first to count the roots.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read the direction in each region</h3><p>Evaluate <span class="math" data-say="f of y minus H">f(y) − H</span> at a point in each region between roots. The lower one repels and the upper one attracts.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Find the threshold</h3><p>The peak of <span class="math" data-say="f">f</span> is <span class="math" data-say="r times K over 4">r·K/4</span>, at <span class="math" data-say="y equals K over 2">y = K/2</span>. A harvest at or above it leaves no attracting equilibrium.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Test with a dip</h3><p>Take a start a little below the lower equilibrium and compute <span class="math" data-say="f of y minus H">f(y) − H</span> there. If it is negative, a small loss becomes a collapse.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding what a harvest does</h2>
+      <p class="lead-in">Five moves, and the threshold is the fourth.</p>
+      <ol class="key-ideas method"><li><strong>Write the natural growth and the harvest.</strong> <span class="math" data-say="f of y equals r times y times the quantity 1 minus y over K">f(y) = r·y·(1 − y/K)</span> and the constant <span class="math" data-say="H">H</span>. The equation is <span class="math" data-say="y prime equals f of y minus H">y′ = f(y) − H</span>.</li><li><strong>Find the equilibria.</strong> Solve <span class="math" data-say="f of y equals H">f(y) = H</span>. For <span class="math" data-say="r equals 1">r = 1</span>, <span class="math" data-say="K equals 4">K = 4</span> that is <span class="math" data-say="y squared minus 4 y plus 4 H equals 0">y² − 4y + 4H = 0</span>; use its discriminant first to count the roots.</li><li><strong>Read the direction in each region.</strong> Evaluate <span class="math" data-say="f of y minus H">f(y) − H</span> at a point in each region between roots. The lower one repels and the upper one attracts.</li><li><strong>Find the threshold.</strong> The peak of <span class="math" data-say="f">f</span> is <span class="math" data-say="r times K over 4">r·K/4</span>, at <span class="math" data-say="y equals K over 2">y = K/2</span>. A harvest at or above it leaves no attracting equilibrium.</li><li><strong>Test with a dip.</strong> Take a start a little below the lower equilibrium and compute <span class="math" data-say="f of y minus H">f(y) − H</span> there. If it is negative, a small loss becomes a collapse.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1478,17 +1524,16 @@ threshold  H* = r·K/4 = 1·4/4 = 1
 f(9/10) − 3/4 = 279/400 − 300/400 = −21/400</div><p>The last line is the check on the lower equilibrium: just below 1 the right side is negative, so the population keeps falling. As <span class="math" data-say="H">H</span> rises from 3/4 to 1 the two equilibria, 1 and 3, move together and meet at 2; at any larger harvest nothing is left to hold the population.</p><p>The upper equilibrium is 3 at the first harvest, 2 at the second, and absent at the third. It does not fade away smoothly: it goes from 2 to nothing the moment <span class="math" data-say="H">H</span> passes <span class="math" data-say="H star equals 1">H* = 1</span>.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that any harvest below the natural growth rate is sustainable</strong><span>The mistaken model is that if the population is growing faster than it is harvested, the harvest is safe. At <span class="math" data-say="y equals 1">y = 1</span> with <span class="math" data-say="H equals 3 over 4">H = 3/4</span> the growth exactly matches the harvest, and the equilibrium there repels: at <span class="math" data-say="y equals 9 over 10">y = 9/10</span> the growth <span class="math" data-say="279 over 400">279/400</span> is under the harvest <span class="math" data-say="300 over 400">300/400</span>, and the population falls and keeps falling. A harvest below the peak of the growth is sustainable only for starts above the lower equilibrium.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the population to shrink gradually as the harvest grows</strong><span>The stable level does come down with <span class="math" data-say="H">H</span>: 4 for no harvest, 3 for <span class="math" data-say="H equals 3 over 4">H = 3/4</span>, 2 for <span class="math" data-say="H equals 1">H = 1</span>. But at <span class="math" data-say="H equals 1">H = 1</span> it meets the repelling equilibrium, past that both are gone, and for <span class="math" data-say="H equals 5 over 4">H = 5/4</span> there is nothing left to settle on. There is no small stable population at a slightly larger harvest, so a small increase in <span class="math" data-say="H">H</span> past <span class="math" data-say="H star">H*</span> turns a stable stock into a collapse.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the negative values as a population</strong><span>In the heavy preset the limit is <span class="math" data-say="goes to negative infinity">→ −∞</span>, so the solution passes below zero. A negative number of fish is not a quantity, and the equation, which knows nothing of the physical problem, carries on past it. The honest reading is that the stock is gone when <span class="math" data-say="y">y</span> reaches 0, and everything after that point is outside the model.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find the equilibria of a harvested logistic equation, classify them, and compute the threshold harvest.</strong><p>You should be able to write <span class="math" data-say="y prime equals f of y minus H">y′ = f(y) − H</span>, reduce it to a quadratic, count its roots from the discriminant, read which repel and which attract, derive <span class="math" data-say="H star equals r times K over 4">H* = r·K/4</span> from the peak of the growth, and test a start just below the lower equilibrium.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That finishes the course. Every model in it was one first-order equation with its equilibria read from its right side; the next course takes that reading as its subject and draws the phase line for any equation of the form <span class="math" data-say="y prime equals f of y">y′ = f(y)</span>.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that any harvest below the natural growth rate is sustainable</strong><span>The mistaken model is that if the population is growing faster than it is harvested, the harvest is safe. At <span class="math" data-say="y equals 1">y = 1</span> with <span class="math" data-say="H equals 3 over 4">H = 3/4</span> the growth exactly matches the harvest, and the equilibrium there repels: at <span class="math" data-say="y equals 9 over 10">y = 9/10</span> the growth <span class="math" data-say="279 over 400">279/400</span> is under the harvest <span class="math" data-say="300 over 400">300/400</span>, and the population falls and keeps falling. A harvest below the peak of the growth is sustainable only for starts above the lower equilibrium.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the population to shrink gradually as the harvest grows</strong><span>The stable level does come down with <span class="math" data-say="H">H</span>: 4 for no harvest, 3 for <span class="math" data-say="H equals 3 over 4">H = 3/4</span>, 2 for <span class="math" data-say="H equals 1">H = 1</span>. But at <span class="math" data-say="H equals 1">H = 1</span> it meets the repelling equilibrium, past that both are gone, and for <span class="math" data-say="H equals 5 over 4">H = 5/4</span> there is nothing left to settle on. There is no small stable population at a slightly larger harvest, so a small increase in <span class="math" data-say="H">H</span> past <span class="math" data-say="H star">H*</span> turns a stable stock into a collapse.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the negative values as a population</strong><span>In the heavy preset the limit is <span class="math" data-say="goes to negative infinity">→ −∞</span>, so the solution passes below zero. A negative number of fish is not a quantity, and the equation, which knows nothing of the physical problem, carries on past it. The honest reading is that the stock is gone when <span class="math" data-say="y">y</span> reaches 0, and everything after that point is outside the model.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find the equilibria of a harvested logistic equation, classify them, and compute the threshold harvest.</strong><p>You should be able to write <span class="math" data-say="y prime equals f of y minus H">y′ = f(y) − H</span>, reduce it to a quadratic, count its roots from the discriminant, read which repel and which attract, derive <span class="math" data-say="H star equals r times K over 4">H* = r·K/4</span> from the peak of the growth, and test a start just below the lower equilibrium.</p></div></div><div class="note"><strong>Note:</strong> That finishes the course. Every model in it was one first-order equation with its equilibria read from its right side; the next course takes that reading as its subject and draws the phase line for any equation of the form <span class="math" data-say="y prime equals f of y">y′ = f(y)</span>.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A harvest lowers the whole rate by H</summary><p>Taking <span class="math" data-say="H">H</span> per unit time makes the rate of change <span class="math" data-say="f of y minus H">f(y) − H</span>, where <span class="math" data-say="f of y equals r times y times the quantity 1 minus y over K">f(y) = r·y·(1 − y/K)</span> is the natural growth. The population grows where the natural growth exceeds the harvest and shrinks where it does not.</p></details><details class="recall"><summary>The equilibria solve a quadratic</summary><p>Setting <span class="math" data-say="f of y minus H equals 0">f(y) − H = 0</span> gives, for <span class="math" data-say="r equals 1">r = 1</span> and <span class="math" data-say="K equals 4">K = 4</span>, <span class="math" data-say="y squared minus 4 y plus 4 H equals 0">y² − 4y + 4H = 0</span>. Its discriminant is <span class="math" data-say="16 minus 16 times H">16 − 16·H</span>, so two roots exist for <span class="math" data-say="H is less than 1">H < 1</span>, one for <span class="math" data-say="H equals 1">H = 1</span>, none for <span class="math" data-say="H is greater than 1">H > 1</span>.</p></details><details class="recall"><summary>The threshold is the most the growth ever gives</summary><p>The natural growth <span class="math" data-say="f">f</span> is largest at <span class="math" data-say="y equals K over 2">y = K/2</span>, where it is <span class="math" data-say="r times K over 4">r·K/4</span>. A harvest above that is more than the population can replace at any size, and a harvest at exactly that leaves a single, fragile equilibrium.</p></details></div>
+      <h3>Summary</h3>
       <p>A population harvested at a constant rate <span class="math" data-say="H">H</span> obeys <span class="math" data-say="y prime equals r times y times the quantity 1 minus y over K, minus H">y′ = r·y·(1 − y/K) − H</span>. The equilibria are the roots of a quadratic. Below the threshold <span class="math" data-say="H star equals r times K over 4">H* = r·K/4</span> there are two, a lower one that repels and an upper one that attracts; at the threshold they merge into one; above it there are none and every start falls. A population that looks sustainable at a given harvest can therefore collapse from a small dip.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A harvest lowers the whole rate by H.</strong> Taking <span class="math" data-say="H">H</span> per unit time makes the rate of change <span class="math" data-say="f of y minus H">f(y) − H</span>, where <span class="math" data-say="f of y equals r times y times the quantity 1 minus y over K">f(y) = r·y·(1 − y/K)</span> is the natural growth. The population grows where the natural growth exceeds the harvest and shrinks where it does not.</li><li><strong>The equilibria solve a quadratic.</strong> Setting <span class="math" data-say="f of y minus H equals 0">f(y) − H = 0</span> gives, for <span class="math" data-say="r equals 1">r = 1</span> and <span class="math" data-say="K equals 4">K = 4</span>, <span class="math" data-say="y squared minus 4 y plus 4 H equals 0">y² − 4y + 4H = 0</span>. Its discriminant is <span class="math" data-say="16 minus 16 times H">16 − 16·H</span>, so two roots exist for <span class="math" data-say="H is less than 1">H < 1</span>, one for <span class="math" data-say="H equals 1">H = 1</span>, none for <span class="math" data-say="H is greater than 1">H > 1</span>.</li><li><strong>The threshold is the most the growth ever gives.</strong> The natural growth <span class="math" data-say="f">f</span> is largest at <span class="math" data-say="y equals K over 2">y = K/2</span>, where it is <span class="math" data-say="r times K over 4">r·K/4</span>. A harvest above that is more than the population can replace at any size, and a harvest at exactly that leaves a single, fragile equilibrium.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="y prime equals r times y times the quantity 1 minus y over K, minus H. r equals 1, K equals 4, y squared minus 4 y plus 4 H equals 0. H below 1, two, H equals 1, one, H above 1, none. H star equals r times K over 4, the peak of the growth rate. below the lower equilibrium, collapse" tabindex="0" role="region" aria-label="Mathematical notation">y′ = r·y·(1 − y/K) − H
 r = 1, K = 4:  y² − 4y + 4H = 0
 H below 1: two;  H = 1: one;  H above 1: none
@@ -3487,11 +3532,42 @@ below the lower equilibrium: collapse</div><figcaption>How much a population can
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3559,7 +3635,7 @@ below the lower equilibrium: collapse</div><figcaption>How much a population can
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Rates of Change and the Derivative</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The derivative as a function</p>
       <h1>The Chain Rule</h1>
       <p class="lesson-lede">The derivative of f(g(t)) is <span data-say="f prime of g of t times g prime of t">f′(g(t))·g′(t)</span>: the outer rate at the inner value, times the inner rate.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A function of a function</li><li>Rates multiply along the chain</li><li>The outer derivative is read at g(t), not at t</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Outer at the inner value, times the inner rate</h2>
-      <article class="prose reading"><p>Take <span class="math" data-say="f of t equals t squared">f(t) = t²</span> and the inner function <span class="math" data-say="g of t equals 3 t plus 1">g(t) = 3t + 1</span>, so that <span class="math" data-say="f of g of t equals the quantity 3 t plus 1, squared">f(g(t)) = (3t + 1)²</span>. Multiplied out this is <span class="math" data-say="9 t squared plus 6 t plus 1">9t² + 6t + 1</span>, and the power rule gives the derivative at once: <span class="math" data-say="18 t plus 6">18t + 6</span>.</p><p>Now suppose the expansion is not wanted. The derivative of the outer function <span class="math" data-say="t squared">t²</span> is <span class="math" data-say="2 t">2t</span>, and read at the inner value <span class="math" data-say="3 t plus 1">3t + 1</span> it is <span class="math" data-say="2 times the quantity 3 t plus 1, equals 6 t plus 2">2(3t + 1) = 6t + 2</span>. That is not <span class="math" data-say="18 t plus 6">18t + 6</span>; it is off by a factor of 3, and 3 is the derivative of the inner function <span class="math" data-say="3 t plus 1">3t + 1</span>. Multiplying the two, <span class="math" data-say="the quantity 6 t plus 2, times 3">(6t + 2)·3</span>, gives <span class="math" data-say="18 t plus 6">18t + 6</span>.</p><div class="thm"><span class="label">Theorem &middot; The chain rule for polynomials</span><p>For polynomials <span class="math" data-say="f">f</span> and <span class="math" data-say="g">g</span>, <span class="math" data-say="the derivative of f of g of t, equals f prime of g of t, times g prime of t">(f(g(t)))′ = f′(g(t))·g′(t)</span>.</p></div><div class="proof"><p>Write <span class="math" data-say="u">u</span> for <span class="math" data-say="g of t">g(t)</span>. For <span class="math" data-say="f of t equals t to the power n">f(t) = tⁿ</span> the claim is <span class="math" data-say="the derivative of u to the power n, equals n times u to the power n minus 1, times u prime">(uⁿ)′ = n·uⁿ⁻¹·u′</span>. It is true for <span class="math" data-say="n equals 1">n = 1</span>, where it says <span class="math" data-say="u prime equals u prime">u′ = u′</span>.</p><p>If it holds for <span class="math" data-say="n">n</span>, the product rule gives <span class="math" data-say="the derivative of u to the power n plus 1, equals the derivative of u to the power n times u, equals n times u to the power n minus 1, times u prime, times u, plus u to the power n times u prime, equals the quantity n plus 1, times u to the power n, times u prime">(uⁿ⁺¹)′ = (uⁿ·u)′ = n·uⁿ⁻¹·u′·u + uⁿ·u′ = (n + 1)·uⁿ·u′</span>, which is the claim for <span class="math" data-say="n plus 1">n + 1</span>.</p><p>So the claim passes from each power to the next: from <span class="math" data-say="n equals 1">n = 1</span> to 2, from 2 to 3, and on to every power. A polynomial <span class="math" data-say="f">f</span> is a sum of constants times powers, and differentiating is done term by term, so the claim holds for every polynomial <span class="math" data-say="f">f</span>.</p><p><span class="qed">&#9633;</span></p></div><p>The proof is the product rule applied again and again, which is why this lesson follows &ldquo;The Product Rule&rdquo;. It covers the cases the Subject uses. In words: the rate of the whole is the outer function's rate, taken where the outer function is standing, times the rate at which the inner function is carrying it.</p><div class="example"><span class="label">Example &middot; A power of a function</span><p>Let <span class="math" data-say="f of t equals t cubed">f(t) = t³</span> and <span class="math" data-say="g of t equals t squared plus 1">g(t) = t² + 1</span>. The outer derivative is <span class="math" data-say="3 t squared">3t²</span>, read at the inner value it is <span class="math" data-say="3 times the quantity t squared plus 1, squared">3(t² + 1)²</span>, and the inner derivative is <span class="math" data-say="2 t">2t</span>. The product is <span class="math" data-say="6 t times the quantity t squared plus 1, squared">6t·(t² + 1)²</span>, which expands to <span class="math" data-say="6 t to the power 5 plus 12 t cubed plus 6 t">6t⁵ + 12t³ + 6t</span>.</p><p>Expanding first confirms it: <span class="math" data-say="the quantity t squared plus 1, cubed equals t to the power 6 plus 3 t to the power 4 plus 3 t squared plus 1">(t² + 1)³ = t⁶ + 3t⁴ + 3t² + 1</span>, and its derivative is <span class="math" data-say="6 t to the power 5 plus 12 t cubed plus 6 t">6t⁵ + 12t³ + 6t</span>. The lab's equality tile reads equal.</p></div><h3>A shift leaves the multiplier alone</h3><p>With <span class="math" data-say="f of t equals t squared">f(t) = t²</span> and <span class="math" data-say="g of t equals t minus 4">g(t) = t − 4</span> the composition is <span class="math" data-say="the quantity t minus 4, squared">(t − 4)²</span>, and the rule gives <span class="math" data-say="2 times the quantity t minus 4, times 1 equals 2 t minus 8">2(t − 4)·1 = 2t − 8</span>. The inner derivative is 1, so the chain factor is invisible. That is why a shift of the input is easy to differentiate and a stretch is not: a shift moves the graph without changing how steep it is, and a stretch by 3 makes every slope 3 times as large.</p><p>The pattern for a stretch and shift together, <span class="math" data-say="f of the quantity k times t plus c">f(k·t + c)</span>, is <span class="math" data-say="k times f prime of k times t plus c">k·f′(k·t + c)</span>: the constant <span class="math" data-say="c">c</span> never appears in the multiplier, and <span class="math" data-say="k">k</span> always does.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The quotient in h</h2></div><p>Difference quotients of polynomials, by algebra</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Outer at the inner value, times the inner rate</h2><div class="prose reading"><p>Take <span class="math" data-say="f of t equals t squared">f(t) = t²</span> and the inner function <span class="math" data-say="g of t equals 3 t plus 1">g(t) = 3t + 1</span>, so that <span class="math" data-say="f of g of t equals the quantity 3 t plus 1, squared">f(g(t)) = (3t + 1)²</span>. Multiplied out this is <span class="math" data-say="9 t squared plus 6 t plus 1">9t² + 6t + 1</span>, and the power rule gives the derivative at once: <span class="math" data-say="18 t plus 6">18t + 6</span>.</p><p>Now suppose the expansion is not wanted. The derivative of the outer function <span class="math" data-say="t squared">t²</span> is <span class="math" data-say="2 t">2t</span>, and read at the inner value <span class="math" data-say="3 t plus 1">3t + 1</span> it is <span class="math" data-say="2 times the quantity 3 t plus 1, equals 6 t plus 2">2(3t + 1) = 6t + 2</span>. That is not <span class="math" data-say="18 t plus 6">18t + 6</span>; it is off by a factor of 3, and 3 is the derivative of the inner function <span class="math" data-say="3 t plus 1">3t + 1</span>. Multiplying the two, <span class="math" data-say="the quantity 6 t plus 2, times 3">(6t + 2)·3</span>, gives <span class="math" data-say="18 t plus 6">18t + 6</span>.</p><div class="thm"><span class="label">Theorem &middot; The chain rule for polynomials</span><p>For polynomials <span class="math" data-say="f">f</span> and <span class="math" data-say="g">g</span>, <span class="math" data-say="the derivative of f of g of t, equals f prime of g of t, times g prime of t">(f(g(t)))′ = f′(g(t))·g′(t)</span>.</p></div><div class="proof"><p>Write <span class="math" data-say="u">u</span> for <span class="math" data-say="g of t">g(t)</span>. For <span class="math" data-say="f of t equals t to the power n">f(t) = tⁿ</span> the claim is <span class="math" data-say="the derivative of u to the power n, equals n times u to the power n minus 1, times u prime">(uⁿ)′ = n·uⁿ⁻¹·u′</span>. It is true for <span class="math" data-say="n equals 1">n = 1</span>, where it says <span class="math" data-say="u prime equals u prime">u′ = u′</span>.</p><p>If it holds for <span class="math" data-say="n">n</span>, the product rule gives <span class="math" data-say="the derivative of u to the power n plus 1, equals the derivative of u to the power n times u, equals n times u to the power n minus 1, times u prime, times u, plus u to the power n times u prime, equals the quantity n plus 1, times u to the power n, times u prime">(uⁿ⁺¹)′ = (uⁿ·u)′ = n·uⁿ⁻¹·u′·u + uⁿ·u′ = (n + 1)·uⁿ·u′</span>, which is the claim for <span class="math" data-say="n plus 1">n + 1</span>.</p><p>So the claim passes from each power to the next: from <span class="math" data-say="n equals 1">n = 1</span> to 2, from 2 to 3, and on to every power. A polynomial <span class="math" data-say="f">f</span> is a sum of constants times powers, and differentiating is done term by term, so the claim holds for every polynomial <span class="math" data-say="f">f</span>.</p><p><span class="qed">&#9633;</span></p></div><p>The proof is the product rule applied again and again, which is why this lesson follows &ldquo;The Product Rule&rdquo;. It covers the cases the Subject uses. In words: the rate of the whole is the outer function's rate, taken where the outer function is standing, times the rate at which the inner function is carrying it.</p><div class="example"><span class="label">Example &middot; A power of a function</span><p>Let <span class="math" data-say="f of t equals t cubed">f(t) = t³</span> and <span class="math" data-say="g of t equals t squared plus 1">g(t) = t² + 1</span>. The outer derivative is <span class="math" data-say="3 t squared">3t²</span>, read at the inner value it is <span class="math" data-say="3 times the quantity t squared plus 1, squared">3(t² + 1)²</span>, and the inner derivative is <span class="math" data-say="2 t">2t</span>. The product is <span class="math" data-say="6 t times the quantity t squared plus 1, squared">6t·(t² + 1)²</span>, which expands to <span class="math" data-say="6 t to the power 5 plus 12 t cubed plus 6 t">6t⁵ + 12t³ + 6t</span>.</p><p>Expanding first confirms it: <span class="math" data-say="the quantity t squared plus 1, cubed equals t to the power 6 plus 3 t to the power 4 plus 3 t squared plus 1">(t² + 1)³ = t⁶ + 3t⁴ + 3t² + 1</span>, and its derivative is <span class="math" data-say="6 t to the power 5 plus 12 t cubed plus 6 t">6t⁵ + 12t³ + 6t</span>. The lab's equality tile reads equal.</p></div><h3>A shift leaves the multiplier alone</h3><p>With <span class="math" data-say="f of t equals t squared">f(t) = t²</span> and <span class="math" data-say="g of t equals t minus 4">g(t) = t − 4</span> the composition is <span class="math" data-say="the quantity t minus 4, squared">(t − 4)²</span>, and the rule gives <span class="math" data-say="2 times the quantity t minus 4, times 1 equals 2 t minus 8">2(t − 4)·1 = 2t − 8</span>. The inner derivative is 1, so the chain factor is invisible. That is why a shift of the input is easy to differentiate and a stretch is not: a shift moves the graph without changing how steep it is, and a stretch by 3 makes every slope 3 times as large.</p><p>The pattern for a stretch and shift together, <span class="math" data-say="f of the quantity k times t plus c">f(k·t + c)</span>, is <span class="math" data-say="k times f prime of k times t plus c">k·f′(k·t + c)</span>: the constant <span class="math" data-say="c">c</span> never appears in the multiplier, and <span class="math" data-say="k">k</span> always does.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The quotient in h</h2></div><p>Difference quotients of polynomials, by algebra</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The quotient as a polynomial in h</strong><span>expand, cancel the h, then read off the rest</span></div>
         <div class="inline-legend"></div>
@@ -1404,10 +1447,10 @@
       <div class="lab-stage"><div class="table-wrap" id="hpTable" tabindex="0" role="region" aria-label="Data table"></div></div>
       <div class="status-banner" id="hpStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The chain rule against the expansion</h3>
-          <p>Type an outer polynomial f and an inner polynomial g. The lab forms f(g(t)), expands it, and reads off the part of its quotient free of h. The rule tile prints <span data-say="f prime of g of t times g prime of t">f′(g(t))·g′(t)</span>, and the equality tile says whether the two polynomials are the same.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The chain rule against the expansion</h3>
+            <p>Type an outer polynomial f and an inner polynomial g. The lab forms f(g(t)), expands it, and reads off the part of its quotient free of h. The rule tile prints <span data-say="f prime of g of t times g prime of t">f′(g(t))·g′(t)</span>, and the equality tile says whether the two polynomials are the same.</p>
         <div class="field">
           <label for="hpPreset">Polynomial</label>
           <select id="hpPreset"><option value="stretch" selected>t² of 3t + 1, a stretch</option><option value="power">t³ of t² + 1, a power of a function</option><option value="shift">t² of t − 4, a shift</option></select>
@@ -1433,12 +1476,14 @@
         </div>
         <p class="small-copy" style="margin:0;">Polynomials in t only: t^3 - t, 3t + 1, (t^2 + 1)^2.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Using the chain rule</h2></div><p>Four moves. Leaving the inner function in place is the second, and forgetting the last is the common slip.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the outer and the inner function</h3><p>In <span class="math" data-say="the quantity t squared plus 1, cubed">(t² + 1)³</span> the inner function is <span class="math" data-say="t squared plus 1">t² + 1</span> and the outer is the cube. The inner one is what you compute first.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Differentiate the outer, and leave the inner in place</h3><p>Take the derivative of the outer function and put the inner function where its variable was: <span class="math" data-say="3 times the quantity t squared plus 1, squared">3·(t² + 1)²</span>, not <span class="math" data-say="3 t squared">3t²</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Differentiate the inner function</h3><p>The inner derivative of <span class="math" data-say="t squared plus 1">t² + 1</span> is <span class="math" data-say="2 t">2t</span>. It is a derivative, not the inner function repeated.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Multiply, then check</h3><p>Multiply the two results. Expand <span class="math" data-say="f of g of t">f(g(t))</span> and differentiate it as a polynomial; the two answers must be the same polynomial.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Using the chain rule</h2>
+      <p class="lead-in">Four moves. Leaving the inner function in place is the second, and forgetting the last is the common slip.</p>
+      <ol class="key-ideas method"><li><strong>Name the outer and the inner function.</strong> In <span class="math" data-say="the quantity t squared plus 1, cubed">(t² + 1)³</span> the inner function is <span class="math" data-say="t squared plus 1">t² + 1</span> and the outer is the cube. The inner one is what you compute first.</li><li><strong>Differentiate the outer, and leave the inner in place.</strong> Take the derivative of the outer function and put the inner function where its variable was: <span class="math" data-say="3 times the quantity t squared plus 1, squared">3·(t² + 1)²</span>, not <span class="math" data-say="3 t squared">3t²</span>.</li><li><strong>Differentiate the inner function.</strong> The inner derivative of <span class="math" data-say="t squared plus 1">t² + 1</span> is <span class="math" data-say="2 t">2t</span>. It is a derivative, not the inner function repeated.</li><li><strong>Multiply, then check.</strong> Multiply the two results. Expand <span class="math" data-say="f of g of t">f(g(t))</span> and differentiate it as a polynomial; the two answers must be the same polynomial.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1459,17 +1504,16 @@ expand first:  (t² + 1)³ = t⁶ + 3t⁴ + 3t² + 1
 differentiate: 6t⁵ + 12t³ + 6t     the same</div><p>Both routes give the same polynomial, and the lab's rule tile prints it for this pair. At <span class="math" data-say="t equals 1">t = 1</span> the slope is <span class="math" data-say="6 plus 12 plus 6 equals 24">6 + 12 + 6 = 24</span>.</p><p>For a rehearsal, differentiate <span class="math" data-say="the quantity 2 t plus 5, cubed">(2t + 5)³</span> by the rule: the outer derivative read at the inner value is <span class="math" data-say="3 times the quantity 2 t plus 5, squared">3(2t + 5)²</span>, and the inner derivative is 2.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Differentiating the outside and forgetting the inner derivative</strong><span>For <span class="math" data-say="the quantity 3 t plus 1, squared">(3t + 1)²</span> the outer derivative read at the inner value is <span class="math" data-say="2 times the quantity 3 t plus 1, equals 6 t plus 2">2(3t + 1) = 6t + 2</span>. The derivative of the expanded <span class="math" data-say="9 t squared plus 6 t plus 1">9t² + 6t + 1</span> is <span class="math" data-say="18 t plus 6">18t + 6</span>, three times as large. The missing 3 is the slope of the inner <span class="math" data-say="3 t plus 1">3t + 1</span>, and a stretch makes every slope as many times larger as the stretch.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Replacing the inner function by t in the outer derivative</strong><span>For <span class="math" data-say="the quantity t squared plus 1, cubed">(t² + 1)³</span> the outer derivative read at the inner value is <span class="math" data-say="3 times the quantity t squared plus 1, squared">3(t² + 1)²</span>. Writing <span class="math" data-say="3 t squared">3t²</span> instead drops the inside. At <span class="math" data-say="t equals 1">t = 1</span> the true slope is <span class="math" data-say="6 times 1 times the quantity 1 plus 1, squared equals 24">6·1·(1 + 1)² = 24</span>, the lab's rule tile gives the same, and <span class="math" data-say="3 t squared times 2 t">3t²·2t</span> at <span class="math" data-say="t equals 1">t = 1</span> is only 6.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Multiplying by the inner function instead of its derivative</strong><span>The factor to multiply by is <span class="math" data-say="g prime">g′</span>, not <span class="math" data-say="g">g</span>. For <span class="math" data-say="the quantity 3 t plus 1, squared">(3t + 1)²</span>, writing <span class="math" data-say="2 times the quantity 3 t plus 1, times the quantity 3 t plus 1">2(3t + 1)·(3t + 1)</span> gives a quadratic, <span class="math" data-say="18 t squared plus 12 t plus 2">18t² + 12t + 2</span>, when the true derivative <span class="math" data-say="18 t plus 6">18t + 6</span> is a line.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can differentiate a function of a function by <span data-say="f prime of g of t times g prime of t">f′(g(t))·g′(t)</span> and confirm it by expanding.</strong><p>You should be able to name the outer and inner functions, differentiate the outer one and read it at the inner value, multiply by the inner derivative, expand to verify, and say what goes wrong when the last factor is omitted.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That completes the rules the course needs: the power, product and chain rules. The last two lessons use them to read how a graph bends, in &ldquo;The Second Derivative&rdquo;, and then to meet a function whose rate is a multiple of itself.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Differentiating the outside and forgetting the inner derivative</strong><span>For <span class="math" data-say="the quantity 3 t plus 1, squared">(3t + 1)²</span> the outer derivative read at the inner value is <span class="math" data-say="2 times the quantity 3 t plus 1, equals 6 t plus 2">2(3t + 1) = 6t + 2</span>. The derivative of the expanded <span class="math" data-say="9 t squared plus 6 t plus 1">9t² + 6t + 1</span> is <span class="math" data-say="18 t plus 6">18t + 6</span>, three times as large. The missing 3 is the slope of the inner <span class="math" data-say="3 t plus 1">3t + 1</span>, and a stretch makes every slope as many times larger as the stretch.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Replacing the inner function by t in the outer derivative</strong><span>For <span class="math" data-say="the quantity t squared plus 1, cubed">(t² + 1)³</span> the outer derivative read at the inner value is <span class="math" data-say="3 times the quantity t squared plus 1, squared">3(t² + 1)²</span>. Writing <span class="math" data-say="3 t squared">3t²</span> instead drops the inside. At <span class="math" data-say="t equals 1">t = 1</span> the true slope is <span class="math" data-say="6 times 1 times the quantity 1 plus 1, squared equals 24">6·1·(1 + 1)² = 24</span>, the lab's rule tile gives the same, and <span class="math" data-say="3 t squared times 2 t">3t²·2t</span> at <span class="math" data-say="t equals 1">t = 1</span> is only 6.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Multiplying by the inner function instead of its derivative</strong><span>The factor to multiply by is <span class="math" data-say="g prime">g′</span>, not <span class="math" data-say="g">g</span>. For <span class="math" data-say="the quantity 3 t plus 1, squared">(3t + 1)²</span>, writing <span class="math" data-say="2 times the quantity 3 t plus 1, times the quantity 3 t plus 1">2(3t + 1)·(3t + 1)</span> gives a quadratic, <span class="math" data-say="18 t squared plus 12 t plus 2">18t² + 12t + 2</span>, when the true derivative <span class="math" data-say="18 t plus 6">18t + 6</span> is a line.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can differentiate a function of a function by <span data-say="f prime of g of t times g prime of t">f′(g(t))·g′(t)</span> and confirm it by expanding.</strong><p>You should be able to name the outer and inner functions, differentiate the outer one and read it at the inner value, multiply by the inner derivative, expand to verify, and say what goes wrong when the last factor is omitted.</p></div></div><div class="note"><strong>Note:</strong> That completes the rules the course needs: the power, product and chain rules. The last two lessons use them to read how a graph bends, in &ldquo;The Second Derivative&rdquo;, and then to meet a function whose rate is a multiple of itself.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A function of a function</summary><p>In <span class="math" data-say="f of g of t">f(g(t))</span> the number <span class="math" data-say="g of t">g(t)</span> is computed first and fed to <span class="math" data-say="f">f</span>. With <span class="math" data-say="f of t equals t squared">f(t) = t²</span> and <span class="math" data-say="g of t equals 3 t plus 1">g(t) = 3t + 1</span>, the composition is <span class="math" data-say="the quantity 3 t plus 1, squared">(3t + 1)²</span>. Which one is inside matters: <span class="math" data-say="g of f of t">g(f(t))</span> would be <span class="math" data-say="3 t squared plus 1">3t² + 1</span>, a different function.</p></details><details class="recall"><summary>Rates multiply along the chain</summary><p>If <span class="math" data-say="t">t</span> moves by a small step, the inner function moves by <span class="math" data-say="g prime">g′</span> times that step. The outer function then moves by <span class="math" data-say="f prime">f′</span> times what its input moved. The rate of the whole is the product of the two rates: the inner rate <span class="math" data-say="g prime of t">g′(t)</span>, and the outer rate <span class="math" data-say="f prime">f′</span> taken at the place the outer function is actually standing.</p></details><details class="recall"><summary>The outer derivative is read at g(t), not at t</summary><p><span class="math" data-say="f prime of g of t">f′(g(t))</span> means: differentiate <span class="math" data-say="f">f</span>, then put <span class="math" data-say="g of t">g(t)</span> into the result. For <span class="math" data-say="f of t equals t squared">f(t) = t²</span> the derivative is <span class="math" data-say="2 t">2t</span>, and at the inner value <span class="math" data-say="3 t plus 1">3t + 1</span> it is <span class="math" data-say="2 times the quantity 3 t plus 1">2(3t + 1)</span>. Replacing <span class="math" data-say="g of t">g(t)</span> by <span class="math" data-say="t">t</span> throws away the inside of the composition.</p></details></div>
+      <h3>Summary</h3>
       <p>When one function is fed into another, the rate of the whole is a chain of two rates. The outer function's derivative is evaluated at the inner function's value, and multiplied by the inner function's derivative. Without the second factor the answer is wrong by exactly that factor. For polynomials the rule is proved from the product rule and checked by expanding.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A function of a function.</strong> In <span class="math" data-say="f of g of t">f(g(t))</span> the number <span class="math" data-say="g of t">g(t)</span> is computed first and fed to <span class="math" data-say="f">f</span>. With <span class="math" data-say="f of t equals t squared">f(t) = t²</span> and <span class="math" data-say="g of t equals 3 t plus 1">g(t) = 3t + 1</span>, the composition is <span class="math" data-say="the quantity 3 t plus 1, squared">(3t + 1)²</span>. Which one is inside matters: <span class="math" data-say="g of f of t">g(f(t))</span> would be <span class="math" data-say="3 t squared plus 1">3t² + 1</span>, a different function.</li><li><strong>Rates multiply along the chain.</strong> If <span class="math" data-say="t">t</span> moves by a small step, the inner function moves by <span class="math" data-say="g prime">g′</span> times that step. The outer function then moves by <span class="math" data-say="f prime">f′</span> times what its input moved. The rate of the whole is the product of the two rates: the inner rate <span class="math" data-say="g prime of t">g′(t)</span>, and the outer rate <span class="math" data-say="f prime">f′</span> taken at the place the outer function is actually standing.</li><li><strong>The outer derivative is read at g(t), not at t.</strong> <span class="math" data-say="f prime of g of t">f′(g(t))</span> means: differentiate <span class="math" data-say="f">f</span>, then put <span class="math" data-say="g of t">g(t)</span> into the result. For <span class="math" data-say="f of t equals t squared">f(t) = t²</span> the derivative is <span class="math" data-say="2 t">2t</span>, and at the inner value <span class="math" data-say="3 t plus 1">3t + 1</span> it is <span class="math" data-say="2 times the quantity 3 t plus 1">2(3t + 1)</span>. Replacing <span class="math" data-say="g of t">g(t)</span> by <span class="math" data-say="t">t</span> throws away the inside of the composition.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the derivative of f of g of t, equals f prime of g of t, times g prime of t. outer rate, at the inner value. times the inner rate. the quantity 3 t plus 1, squared, 2 times the quantity 3 t plus 1, times 3 equals 18 t plus 6. the 3 is the derivative of 3 t plus 1. the derivative of u to the power n, equals n times u to the power n minus 1, times u prime" tabindex="0" role="region" aria-label="Mathematical notation">(f(g(t)))′ = f′(g(t))·g′(t)
 outer rate, at the inner value
 times the inner rate
@@ -3090,11 +3134,42 @@ the 3 is the derivative of 3t + 1
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3162,7 +3237,7 @@ the 3 is the derivative of 3t + 1
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Replication and Consistency</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Clocks and order</p>
       <h1>Vector Clocks and Concurrency</h1>
       <p class="lesson-lede">Stamp a diagram with vectors and count the pairs of events that are concurrent.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>One counter per process, merged by elementwise maximum</li><li>Comparison is componentwise, and it can fail both ways</li><li>Concurrent is a statement about information, not about time</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Vectors, comparison, and the pairs that refuse to order</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Vector clock, and concurrency</span><p>A <strong>vector clock</strong> on <span class="math" data-say="n">n</span> processes assigns each event a vector <span class="math" data-say="V">V</span> of <span class="math" data-say="n">n</span> counters. Process <span class="math" data-say="i">i</span> increments <span class="math" data-say="V at i">V[i]</span> at each of its events; a receive first takes the elementwise maximum with the vector carried by the message. Then <span class="math" data-say="e goes to f">e → f</span> if and only if <span class="math" data-say="V of e is at most V of f">V(e) ≤ V(f)</span> componentwise with <span class="math" data-say="V of e is not equal to V of f">V(e) ≠ V(f)</span>, and <span class="math" data-say="e">e</span> and <span class="math" data-say="f">f</span> are <strong>concurrent</strong> if neither comparison holds.</p></div><p>The “if and only if” is what a Lamport stamp could not offer. A single integer can be compared with any other integer, so it always produces an answer even when there is no answer to produce; a vector produces three possible outcomes — before, after, or neither — and the third is as informative as the others.</p><div class="mathblock" data-say="components in the order A, B, C. messages, A 2 goes to B 2, B 3 goes to C 2, C 1 goes to A 4. A, A 1 1, 0, 0, A 2 2, 0, 0, A 3 3, 0, 0, A 4 4, 0, 1. B, B 1 0, 1, 0, B 2 2, 2, 0, B 3 2, 3, 0, B 4 2, 4, 0. C, C 1 0, 0, 1, C 2 2, 3, 2, C 3 2, 3, 3. the three receives, worked. B 2 equals the max of 0, 1, 0 and 2, 0, 0 then plus 1 in B equals 2, 2, 0. C 2 equals the max of 0, 0, 1 and 2, 3, 0 then plus 1 in C equals 2, 3, 2. A 4 equals the max of 3, 0, 0 and 0, 0, 1 then plus 1 in A equals 4, 0, 1" tabindex="0" role="region" aria-label="Mathematical notation">components in the order (A, B, C)
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Vectors, comparison, and the pairs that refuse to order</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Vector clock, and concurrency</span><p>A <strong>vector clock</strong> on <span class="math" data-say="n">n</span> processes assigns each event a vector <span class="math" data-say="V">V</span> of <span class="math" data-say="n">n</span> counters. Process <span class="math" data-say="i">i</span> increments <span class="math" data-say="V at i">V[i]</span> at each of its events; a receive first takes the elementwise maximum with the vector carried by the message. Then <span class="math" data-say="e goes to f">e → f</span> if and only if <span class="math" data-say="V of e is at most V of f">V(e) ≤ V(f)</span> componentwise with <span class="math" data-say="V of e is not equal to V of f">V(e) ≠ V(f)</span>, and <span class="math" data-say="e">e</span> and <span class="math" data-say="f">f</span> are <strong>concurrent</strong> if neither comparison holds.</p></div><p>The “if and only if” is what a Lamport stamp could not offer. A single integer can be compared with any other integer, so it always produces an answer even when there is no answer to produce; a vector produces three possible outcomes — before, after, or neither — and the third is as informative as the others.</p><div class="mathblock" data-say="components in the order A, B, C. messages, A 2 goes to B 2, B 3 goes to C 2, C 1 goes to A 4. A, A 1 1, 0, 0, A 2 2, 0, 0, A 3 3, 0, 0, A 4 4, 0, 1. B, B 1 0, 1, 0, B 2 2, 2, 0, B 3 2, 3, 0, B 4 2, 4, 0. C, C 1 0, 0, 1, C 2 2, 3, 2, C 3 2, 3, 3. the three receives, worked. B 2 equals the max of 0, 1, 0 and 2, 0, 0 then plus 1 in B equals 2, 2, 0. C 2 equals the max of 0, 0, 1 and 2, 3, 0 then plus 1 in C equals 2, 3, 2. A 4 equals the max of 3, 0, 0 and 0, 0, 1 then plus 1 in A equals 4, 0, 1" tabindex="0" role="region" aria-label="Mathematical notation">components in the order (A, B, C)
 messages   A2 → B2      B3 → C2      C1 → A4
 
   A    A1 (1,0,0)   A2 (2,0,0)   A3 (3,0,0)   A4 (4,0,1)
@@ -1414,12 +1458,11 @@ a worked comparison
 and one that does order
   A1 (1,0,0)   vs   C3 (2,3,3)
     1 ≤ 2,  0 ≤ 3,  0 ≤ 3,  and the vectors differ
-    so A1 → C3, along A1 → A2 → B2 → B3 → C2 → C3</div><p>Twenty-three of fifty-five is not an anomaly of this diagram, it is what a system with few messages looks like. Concurrency is the default and ordering is what communication buys, so a system that gossips rarely has a great many concurrent pairs and a system that synchronises constantly has few — and pays for the difference in messages.</p><div class="example"><span class="label">Example &middot; Concurrent is not simultaneous</span><p><span class="math" data-say="A 3 equals 3, 0, 0">A3 = (3,0,0)</span> and <span class="math" data-say="C 3 equals 2, 3, 3">C3 = (2,3,3)</span>. Compare: <span class="math" data-say="3 is at most 2">3 ≤ 2</span> fails, so <span class="math" data-say="A 3">A3</span> does not precede <span class="math" data-say="C 3">C3</span>; and <span class="math" data-say="3 is at most 0">3 ≤ 0</span> fails in the middle component, so <span class="math" data-say="C 3">C3</span> does not precede <span class="math" data-say="A 3">A3</span>. They are concurrent — and <span class="math" data-say="C 3">C3</span> is the last event on its process while <span class="math" data-say="A 3">A3</span> is in the middle of another, so on a wall clock they could be seconds or minutes apart. The vectors are not claiming they happened at the same moment. They are claiming that neither process could possibly have known about the other's event, which is the condition under which two updates to the same key are a conflict rather than an overwrite.</p></div><p>That is what the count is for. Every concurrent pair touching the same data is a decision somebody has to make — keep one, keep both, merge them — and “Conflict Resolution, Counted” is where those decisions get priced. The vector clock's job ends at identifying them, and it does that exactly, which is more than any single number can do.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Vector clocks and concurrency</h2></div><p>Happens-before as a partial order, with every incomparable pair listed</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    so A1 → C3, along A1 → A2 → B2 → B3 → C2 → C3</div><p>Twenty-three of fifty-five is not an anomaly of this diagram, it is what a system with few messages looks like. Concurrency is the default and ordering is what communication buys, so a system that gossips rarely has a great many concurrent pairs and a system that synchronises constantly has few — and pays for the difference in messages.</p><div class="example"><span class="label">Example &middot; Concurrent is not simultaneous</span><p><span class="math" data-say="A 3 equals 3, 0, 0">A3 = (3,0,0)</span> and <span class="math" data-say="C 3 equals 2, 3, 3">C3 = (2,3,3)</span>. Compare: <span class="math" data-say="3 is at most 2">3 ≤ 2</span> fails, so <span class="math" data-say="A 3">A3</span> does not precede <span class="math" data-say="C 3">C3</span>; and <span class="math" data-say="3 is at most 0">3 ≤ 0</span> fails in the middle component, so <span class="math" data-say="C 3">C3</span> does not precede <span class="math" data-say="A 3">A3</span>. They are concurrent — and <span class="math" data-say="C 3">C3</span> is the last event on its process while <span class="math" data-say="A 3">A3</span> is in the middle of another, so on a wall clock they could be seconds or minutes apart. The vectors are not claiming they happened at the same moment. They are claiming that neither process could possibly have known about the other's event, which is the condition under which two updates to the same key are a conflict rather than an overwrite.</p></div><p>That is what the count is for. Every concurrent pair touching the same data is a decision somebody has to make — keep one, keep both, merge them — and “Conflict Resolution, Counted” is where those decisions get priced. The vector clock's job ends at identifying them, and it does that exactly, which is more than any single number can do.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Vector clocks and concurrency</h2></div><p>Happens-before as a partial order, with every incomparable pair listed</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Vector clocks and concurrency</strong><span>incomparable means concurrent, and the concurrent pairs are the conflicts</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>an event, with its vector</span><span class="tone-amber"><i class="legend-swatch"></i>a message</span><span class="tone-purple"><i class="legend-swatch"></i>a concurrent pair</span></div>
@@ -1428,10 +1471,10 @@ and one that does order
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="vcTable"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="vcPairs"></table></div>
       <div class="status-banner" id="vcStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Edit the same message diagram</h3>
-          <p>The vectors propagate along the diagram you type and every pair is compared elementwise, with each incomparable pair listed by name. Compare the listing against the stamps the previous lesson produced on this same diagram.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Edit the same message diagram</h3>
+            <p>The vectors propagate along the diagram you type and every pair is compared elementwise, with each incomparable pair listed by name. Compare the listing against the stamps the previous lesson produced on this same diagram.</p>
         <div class="field">
           <label for="vcSpec">The diagram: processes, then messages</label>
           <input id="vcSpec" type="text" value="A:4 B:4 C:3; A2 to B2; B3 to C2; C1 to A4" inputmode="text" autocomplete="off">
@@ -1445,12 +1488,14 @@ and one that does order
           <div class="kpi"><span>Widest concurrent pair</span><strong id="vcWidest">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="vcHint" style="margin:0;">A vector is one counter per process. Comparing two of them elementwise gives three answers and a fourth: a &le; b, b &le; a, equal &mdash; or neither, which is what concurrent means. Concurrent is not simultaneous: two events a minute apart on the clock can be concurrent, and two at the same instant can be ordered.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Stamping with vectors and reading off the conflicts</h2></div><p>The propagation is mechanical. The part worth slowing down for is the comparison, which has three outcomes and not two.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix the component order and keep it</h3><p>Decide once that the vector is <span class="math" data-say="A, B, C">(A, B, C)</span> and write every vector that way. Most arithmetic errors here are a component written in the wrong slot, and they are invisible until a comparison comes out strangely.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Increment your own component at every event, including sends and receives</h3><p>A send is an event on the sender and a receive is an event on the receiver, so both increment. Forgetting the increment on a send makes the send and the message's previous event compare as equal.</p></article><article class="card concept-card"><div class="icon">3</div><h3>On a receive, take the elementwise maximum first, then increment</h3><p>Maximum with the message's vector, then <span class="math" data-say="plus 1">+1</span> in your own slot. The order matters: incrementing first and then taking the maximum can lose your own increment if the message was ahead in your component, which it should never be but will be if an earlier step was wrong.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare in both directions before concluding anything</h3><p>Ask whether <span class="math" data-say="V of e is at most V of f">V(e) ≤ V(f)</span>, then whether <span class="math" data-say="V of f is at most V of e">V(f) ≤ V(e)</span>. Two failures mean concurrent; one success means ordered; two successes mean the vectors are equal and you have compared an event with itself.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Stamping with vectors and reading off the conflicts</h2>
+      <p class="lead-in">The propagation is mechanical. The part worth slowing down for is the comparison, which has three outcomes and not two.</p>
+      <ol class="key-ideas method"><li><strong>Fix the component order and keep it.</strong> Decide once that the vector is <span class="math" data-say="A, B, C">(A, B, C)</span> and write every vector that way. Most arithmetic errors here are a component written in the wrong slot, and they are invisible until a comparison comes out strangely.</li><li><strong>Increment your own component at every event, including sends and receives.</strong> A send is an event on the sender and a receive is an event on the receiver, so both increment. Forgetting the increment on a send makes the send and the message's previous event compare as equal.</li><li><strong>On a receive, take the elementwise maximum first, then increment.</strong> Maximum with the message's vector, then <span class="math" data-say="plus 1">+1</span> in your own slot. The order matters: incrementing first and then taking the maximum can lose your own increment if the message was ahead in your component, which it should never be but will be if an earlier step was wrong.</li><li><strong>Compare in both directions before concluding anything.</strong> Ask whether <span class="math" data-say="V of e is at most V of f">V(e) ≤ V(f)</span>, then whether <span class="math" data-say="V of f is at most V of e">V(f) ≤ V(e)</span>. Two failures mean concurrent; one success means ordered; two successes mean the vectors are equal and you have compared an event with itself.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1483,17 +1528,16 @@ and the comparison with the previous lesson&#x27;s stamps
   pairs the vectors call concurrent</div><p>The second and third comparisons are the ones to sit with. <span class="math" data-say="A 1">A1</span> and <span class="math" data-say="A 3">A3</span> are two events on the same process, one before the other, and the vectors say that the earlier one precedes <span class="math" data-say="C 3">C3</span> while the later one does not. That is not a contradiction: <span class="math" data-say="A 1">A1</span>'s information reached <span class="math" data-say="C">C</span> through the chain of messages and <span class="math" data-say="A 3">A3</span>'s did not, because <span class="math" data-say="A 3">A3</span> happened after <span class="math" data-say="A">A</span> had already sent everything it was going to send.</p><p>Twenty-three concurrent pairs on eleven events is the real output. If those events were updates to one key, twenty-three of the pairs would need a merge rule and thirty-two would not — and no amount of clock accuracy changes that split, because it is a fact about which messages were sent.</p><p>For a faded rehearsal, delete the message <span class="math" data-say="C 1 goes to A 4">C1 → A4</span> from the diagram. The supplied first move is that <span class="math" data-say="A 4">A4</span> becomes a local event, so its vector is <span class="math" data-say="4, 0, 0">(4,0,0)</span> rather than <span class="math" data-say="4, 0, 1">(4,0,1)</span>. Restamp what changes, predict whether the concurrent count rises or falls, then compute it and check against the lab.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading concurrent as simultaneous</strong><span>The word is borrowed and it misleads. Two concurrent events can be minutes apart in real time; what they cannot be is causally connected. Conversely two events at the same instant on synchronised clocks may be perfectly ordered if a message ran between them. The vectors know nothing about clocks and everything about messages.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Comparing vectors by their sum, or by one component</strong><span><span class="math" data-say="A 3 equals 3, 0, 0">A3 = (3,0,0)</span> sums to <span class="math" data-say="3">3</span> and <span class="math" data-say="C 3 equals 2, 3, 3">C3 = (2,3,3)</span> sums to <span class="math" data-say="8">8</span>, which would order them — and they are concurrent. Any collapse of the vector to a single number reintroduces exactly the defect of a Lamport stamp, because a single number is always comparable. The comparison must be componentwise and it must be tried in both directions.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the vector to say which concurrent update is right</strong><span>It says they conflict and nothing more, which is its job done correctly. Choosing between them, or merging them, is a decision about the data rather than about the ordering — and a merge that always picks the larger vector, or the later arrival, is making that decision by accident rather than by design.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when an incomparable pair of vectors reads as “a merge decision”, not as an error.</strong><p>You should be able to propagate vectors along a diagram including sends and receives, compare two vectors in both directions and report one of three outcomes, count the concurrent pairs, and say what a concurrent pair implies about two updates to one key.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both clocks so far count events rather than seconds, which is what makes them exact. The temptation is always to use the machine's own wall clock instead, since it needs no messages at all. “Physical Clocks and Drift” computes how wrong that is: a drift rate and a sync interval give an uncertainty window, and any two events closer together than the window cannot be ordered by a timestamp at all.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading concurrent as simultaneous</strong><span>The word is borrowed and it misleads. Two concurrent events can be minutes apart in real time; what they cannot be is causally connected. Conversely two events at the same instant on synchronised clocks may be perfectly ordered if a message ran between them. The vectors know nothing about clocks and everything about messages.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Comparing vectors by their sum, or by one component</strong><span><span class="math" data-say="A 3 equals 3, 0, 0">A3 = (3,0,0)</span> sums to <span class="math" data-say="3">3</span> and <span class="math" data-say="C 3 equals 2, 3, 3">C3 = (2,3,3)</span> sums to <span class="math" data-say="8">8</span>, which would order them — and they are concurrent. Any collapse of the vector to a single number reintroduces exactly the defect of a Lamport stamp, because a single number is always comparable. The comparison must be componentwise and it must be tried in both directions.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the vector to say which concurrent update is right</strong><span>It says they conflict and nothing more, which is its job done correctly. Choosing between them, or merging them, is a decision about the data rather than about the ordering — and a merge that always picks the larger vector, or the later arrival, is making that decision by accident rather than by design.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when an incomparable pair of vectors reads as “a merge decision”, not as an error.</strong><p>You should be able to propagate vectors along a diagram including sends and receives, compare two vectors in both directions and report one of three outcomes, count the concurrent pairs, and say what a concurrent pair implies about two updates to one key.</p></div></div><div class="note"><strong>Note:</strong> Both clocks so far count events rather than seconds, which is what makes them exact. The temptation is always to use the machine's own wall clock instead, since it needs no messages at all. “Physical Clocks and Drift” computes how wrong that is: a drift rate and a sync interval give an uncertainty window, and any two events closer together than the window cannot be ordered by a timestamp at all.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>One counter per process, merged by elementwise maximum</summary><p>Process <span class="math" data-say="i">i</span> keeps a vector <span class="math" data-say="V">V</span> and increments <span class="math" data-say="V at i">V[i]</span> at each of its own events. A message carries the sender's whole vector; on receipt the receiver takes the elementwise maximum with its own and then increments its own component. The vector is therefore a record of how much of each process's history this event knows about.</p></details><details class="recall"><summary>Comparison is componentwise, and it can fail both ways</summary><p><span class="math" data-say="V of e is at most V of f">V(e) ≤ V(f)</span> means every component of <span class="math" data-say="V of e">V(e)</span> is at most the matching component of <span class="math" data-say="V of f">V(f)</span>. If that holds and the vectors differ, <span class="math" data-say="e goes to f">e → f</span>. If neither <span class="math" data-say="V of e is at most V of f">V(e) ≤ V(f)</span> nor <span class="math" data-say="V of f is at most V of e">V(f) ≤ V(e)</span>, there is no chain either way and the events are <strong>concurrent</strong>. Unlike a single integer, a vector can simply refuse to compare, and that refusal is the answer.</p></details><details class="recall"><summary>Concurrent is a statement about information, not about time</summary><p><span class="math" data-say="A 3">A3</span> and <span class="math" data-say="C 3">C3</span> on this diagram are concurrent, and they may have occurred a minute apart on any wall clock. What makes them concurrent is that neither process had heard anything of the other's event when its own occurred. Concurrency here means “unordered by any chain of messages”, and it is exactly the condition under which two updates conflict.</p></details></div>
+      <h3>Summary</h3>
       <p>A vector clock carries one counter per process, merged by elementwise maximum, and it makes happens-before decidable in both directions: <span class="math" data-say="e goes to f">e → f</span> exactly when <span class="math" data-say="V of e is at most V of f">V(e) ≤ V(f)</span> componentwise and the vectors differ. When neither vector dominates the other the events are <em>concurrent</em> — unordered by any chain of messages. On the same eleven-event diagram, <span class="math" data-say="23">23</span> of the <span class="math" data-say="55">55</span> pairs are concurrent, and those are precisely the pairs a merge will have to decide.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>One counter per process, merged by elementwise maximum.</strong> Process <span class="math" data-say="i">i</span> keeps a vector <span class="math" data-say="V">V</span> and increments <span class="math" data-say="V at i">V[i]</span> at each of its own events. A message carries the sender's whole vector; on receipt the receiver takes the elementwise maximum with its own and then increments its own component. The vector is therefore a record of how much of each process's history this event knows about.</li><li><strong>Comparison is componentwise, and it can fail both ways.</strong> <span class="math" data-say="V of e is at most V of f">V(e) ≤ V(f)</span> means every component of <span class="math" data-say="V of e">V(e)</span> is at most the matching component of <span class="math" data-say="V of f">V(f)</span>. If that holds and the vectors differ, <span class="math" data-say="e goes to f">e → f</span>. If neither <span class="math" data-say="V of e is at most V of f">V(e) ≤ V(f)</span> nor <span class="math" data-say="V of f is at most V of e">V(f) ≤ V(e)</span>, there is no chain either way and the events are <strong>concurrent</strong>. Unlike a single integer, a vector can simply refuse to compare, and that refusal is the answer.</li><li><strong>Concurrent is a statement about information, not about time.</strong> <span class="math" data-say="A 3">A3</span> and <span class="math" data-say="C 3">C3</span> on this diagram are concurrent, and they may have occurred a minute apart on any wall clock. What makes them concurrent is that neither process had heard anything of the other's event when its own occurred. Concurrency here means “unordered by any chain of messages”, and it is exactly the condition under which two updates conflict.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="V of e is at most V of f componentwise and V of e is not equal to V of f, if and only if, e goes to f. neither vector dominates the other, if and only if, concurrent. on a receive, elementwise max, then increment your own component. same 11 events, 55 pairs, 32 ordered, 23 concurrent. concurrent means unordered by information, not simultaneous in time" tabindex="0" role="region" aria-label="Mathematical notation">V(e) ≤ V(f) componentwise and V(e) ≠ V(f)    ⟺    e → f
 neither vector dominates the other           ⟺    concurrent
 on a receive: elementwise max, then increment your own component
@@ -3007,11 +3051,42 @@ concurrent means unordered by information, not simultaneous in time</div><figcap
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3079,7 +3154,7 @@ concurrent means unordered by information, not simultaneous in time</div><figcap
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

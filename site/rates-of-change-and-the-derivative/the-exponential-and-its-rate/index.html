@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,25 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Rates of Change and the Derivative</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Second derivatives and the exponential</p>
       <h1>The Exponential and Its Rate</h1>
       <p class="lesson-lede">The quotient of bᵗ is bᵗ times a factor that does not depend on t, so the rate of an exponential is a constant multiple of itself.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The quotient factors exactly</li><li>One column serves every place</li><li>The variable is in the exponent</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>A column of rounded quotients and the constant it heads for</h2>
-      <article class="prose reading"><p>Apart from <span class="math" data-say="1 over t">1/t</span>, everything before this lesson was a polynomial, whose quotient is a polynomial in the step and comes out exact. An exponential is not a polynomial, and for most bases and steps its quotient is no longer a fraction, so for the first time in the course some figures are rounded.</p><div class="mathblock" data-say="b to the power the quantity A plus h, minus b to the power A equals b to the power A times b to the power h minus b to the power A. equals b to the power A times the quantity b to the power h minus 1. the quantity b to the power the quantity A plus h, minus b to the power A, over h equals b to the power A times the quantity b to the power h minus 1, over h" tabindex="0" role="region" aria-label="Mathematical notation">b^(a + h) − b^a = b^a·b^h − b^a
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>A column of rounded quotients and the constant it heads for</h2><div class="prose reading"><p>Apart from <span class="math" data-say="1 over t">1/t</span>, everything before this lesson was a polynomial, whose quotient is a polynomial in the step and comes out exact. An exponential is not a polynomial, and for most bases and steps its quotient is no longer a fraction, so for the first time in the course some figures are rounded.</p><div class="mathblock" data-say="b to the power the quantity A plus h, minus b to the power A equals b to the power A times b to the power h minus b to the power A. equals b to the power A times the quantity b to the power h minus 1. the quantity b to the power the quantity A plus h, minus b to the power A, over h equals b to the power A times the quantity b to the power h minus 1, over h" tabindex="0" role="region" aria-label="Mathematical notation">b^(a + h) − b^a = b^a·b^h − b^a
                 = b^a·(b^h − 1)
 
-(b^(a + h) − b^a)/h = b^a·(b^h − 1)/h</div><p>That is exact algebra and nothing is dropped. Every quotient of <span class="math" data-say="b to the power t">bᵗ</span> at every place is the base raised to the place, times the quotient at the place 0. Everything depends on the second factor, so look at it for <span class="math" data-say="b equals 2">b = 2</span>.</p><p>At <span class="math" data-say="h equals 1">h = 1</span> it is <span class="math" data-say="the quantity 2 minus 1, over 1 equals 1">(2 − 1)/1 = 1</span>, exactly, because the base is a whole number and the step is 1. At <span class="math" data-say="h equals 1 over 2">h = 1/2</span> it is <span class="math" data-say="the quantity the square root of 2 minus 1, over the quantity 1 over 2, equals 2 times the quantity the square root of 2 minus 1">(√2 − 1)/(1/2) = 2(√2 − 1)</span>, which has no finite decimal, and the lab prints <span class="math" data-say="is approximately 0.828427">≈ 0.828427</span>. From the second row on, every figure in the table is rounded to six significant figures and carries the sign <span class="math" data-say="is approximately">≈</span>.</p><div class="mathblock" data-say="b equals 2, A equals 0, the quantity 2 to the power h minus 1, over h. h, quotient. a table, shown on the page. 1 over 2, is approximately 0.828427, rounded. 1 over 4, is approximately 0.756828, rounded. 1 over 8, is approximately 0.724062, rounded. 1 over 16, is approximately 0.708381, rounded. 1 over 32, is approximately 0.700709, rounded. 1 over 64, is approximately 0.696914, rounded" tabindex="0" role="region" aria-label="Mathematical notation">b = 2,  a = 0,   (2^h − 1)/h
-
-   h        quotient
-   1          1          exact
-   1/2     ≈ 0.828427    rounded
-   1/4     ≈ 0.756828    rounded
-   1/8     ≈ 0.724062    rounded
-   1/16    ≈ 0.708381    rounded
-   1/32    ≈ 0.700709    rounded
-   1/64    ≈ 0.696914    rounded</div><div class="thm"><span class="label">Theorem &middot; The exponential&#x27;s rate</span><p>For each base <span class="math" data-say="b is greater than 0">b > 0</span> the quotients <span class="math" data-say="the quantity b to the power h minus 1, over h">(b^h − 1)/h</span> for halving <span class="math" data-say="h">h</span> head for a number written <span class="math" data-say="the natural log of b">ln b</span>. Then the rate of <span class="math" data-say="b to the power t">bᵗ</span> at every <span class="math" data-say="t">t</span> is <span class="math" data-say="the natural log of b">ln b</span> times <span class="math" data-say="b to the power t">bᵗ</span>. The base <span class="math" data-say="e is approximately 2.71828">e ≈ 2.71828</span> is the one with <span class="math" data-say="the natural log of e equals 1">ln e = 1</span>, so <span class="math" data-say="the derivative of e to the power t equals e to the power t">(eᵗ)′ = eᵗ</span>.</p></div><p>This is stated and not proved. The factoring above is proved; that the rounded column settles on one number is what the table suggests and the lab shows for each base, and no table of seven rows establishes it for every step. For <span class="math" data-say="b equals 2">b = 2</span> the column heads for <span class="math" data-say="the natural log of 2 is approximately 0.693147">ln 2 ≈ 0.693147</span>, the way the quotients of <span class="math" data-say="t squared">t²</span> headed for 2.</p><h3>Other bases, and the one where the constant is 1</h3><p>For <span class="math" data-say="b equals 3">b = 3</span> the first quotient is <span class="math" data-say="the quantity 3 minus 1, over 1 equals 2">(3 − 1)/1 = 2</span>, exact, and the column heads for <span class="math" data-say="the natural log of 3 is approximately 1.09861">ln 3 ≈ 1.09861</span>. For <span class="math" data-say="b equals e">b = e</span>, entered in the lab as <span class="math" data-say="e">e</span>, every quotient is rounded, since <span class="math" data-say="e">e</span> itself is not a fraction: the first is <span class="math" data-say="e minus 1 is approximately 1.71828">e − 1 ≈ 1.71828</span>, and the column heads for 1. That is the definition of the number: of all the bases, <span class="math" data-say="e">e</span> is the one for which the exponential's rate is the exponential itself.</p><h3>The same column at another place</h3><p>At <span class="math" data-say="A equals 3">a = 3</span>, with <span class="math" data-say="b equals 2">b = 2</span>, the quotient at <span class="math" data-say="h equals 1">h = 1</span> is <span class="math" data-say="the quantity 16 minus 8, over 1 equals 8">(16 − 8)/1 = 8</span>, exactly <span class="math" data-say="2 cubed">2³</span> times the first entry of the column above. Every later row is <span class="math" data-say="8">8</span> times the matching row of that column, so the rate of <span class="math" data-say="2 to the power t">2ᵗ</span> at 3 is <span class="math" data-say="8 times the natural log of 2 is approximately 5.54518">8·ln 2 ≈ 5.54518</span>, rounded. The lab's ratio tile divides the last quotient by <span class="math" data-say="2 cubed">2³</span> and gets back the column at 0.</p><h3>Why the power rule is not allowed here</h3><p>Applying the power rule to <span class="math" data-say="2 to the power t">2ᵗ</span> would give <span class="math" data-say="t times 2 to the power the quantity t minus 1">t·2^(t − 1)</span>. At <span class="math" data-say="t equals 0">t = 0</span> that is 0, but the quotients of <span class="math" data-say="2 to the power t">2ᵗ</span> at 0 head for <span class="math" data-say="is approximately 0.693147">≈ 0.693147</span>. The power rule belongs to a variable base and a fixed exponent. When the variable is in the exponent, the rate is proportional to the function.</p><p>A quantity whose rate is a constant multiple of itself is exactly what the equation <span class="math" data-say="y prime equals k times y">y′ = k·y</span> says, and this lesson has shown that exponentials have the property. That equation opens the second half of this Subject, in Separable Equations, Growth and Decay.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Rates of bᵗ, sin and cos</h2></div><p>Rounded quotients, labelled, and what they approach</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+(b^(a + h) − b^a)/h = b^a·(b^h − 1)/h</div><p>That is exact algebra and nothing is dropped. Every quotient of <span class="math" data-say="b to the power t">bᵗ</span> at every place is the base raised to the place, times the quotient at the place 0. Everything depends on the second factor, so look at it for <span class="math" data-say="b equals 2">b = 2</span>.</p><p>At <span class="math" data-say="h equals 1">h = 1</span> it is <span class="math" data-say="the quantity 2 minus 1, over 1 equals 1">(2 − 1)/1 = 1</span>, exactly, because the base is a whole number and the step is 1. At <span class="math" data-say="h equals 1 over 2">h = 1/2</span> it is <span class="math" data-say="the quantity the square root of 2 minus 1, over the quantity 1 over 2, equals 2 times the quantity the square root of 2 minus 1">(√2 − 1)/(1/2) = 2(√2 − 1)</span>, which has no finite decimal, and the lab prints <span class="math" data-say="is approximately 0.828427">≈ 0.828427</span>. From the second row on, every figure in the table is rounded to six significant figures and carries the sign <span class="math" data-say="is approximately">≈</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Rates of bᵗ, sin and cos</h2></div><p>Rounded quotients, labelled, and what they approach</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Quotients that are not fractions</strong><span>rounded to six significant figures and labelled</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>f</span><span class="tone-red"><i class="legend-swatch"></i>secant at the smallest h</span><span class="tone-green"><i class="legend-swatch"></i>tangent</span></div>
@@ -1417,10 +1451,10 @@
       <div class="table-wrap" style="margin-top:12px;" id="tqTable" tabindex="0" role="region" aria-label="Data table"></div>
       <div class="status-banner" id="tqStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The quotients of an exponential, rounded and labelled</h3>
-          <p>Choose a base, a place and a first step. Each row halves the step. The first row is exact when the base is a fraction such as 2 or 3/2, the place is a whole number and the step is 1; every other figure is rounded to six significant figures and carries the sign <span data-say="is approximately">≈</span>. The ratio tile divides the last quotient by the function's value at the place.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The quotients of an exponential, rounded and labelled</h3>
+            <p>Choose a base, a place and a first step. Each row halves the step. The first row is exact when the base is a fraction such as 2 or 3/2, the place is a whole number and the step is 1; every other figure is rounded to six significant figures and carries the sign <span data-say="is approximately">≈</span>. The ratio tile divides the last quotient by the function's value at the place.</p>
         <div class="field">
           <label for="tqPreset">Function and point</label>
           <select id="tqPreset"><option value="two" selected>2ᵗ at 0, six halvings</option><option value="three">3ᵗ at 0, six halvings</option><option value="e">eᵗ at 0, the base whose constant is 1</option><option value="two-at-3">2ᵗ at 3, eight times the column at 0</option></select>
@@ -1452,12 +1486,24 @@
           <div class="kpi"><span>Last quotient ÷ f(a)</span><strong id="tqRatio">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="b equals 2, A equals 0, the quantity 2 to the power h minus 1, over h. h, quotient. a table, shown on the page. 1 over 2, is approximately 0.828427, rounded. 1 over 4, is approximately 0.756828, rounded. 1 over 8, is approximately 0.724062, rounded. 1 over 16, is approximately 0.708381, rounded. 1 over 32, is approximately 0.700709, rounded. 1 over 64, is approximately 0.696914, rounded" tabindex="0" role="region" aria-label="Mathematical notation">b = 2,  a = 0,   (2^h − 1)/h
+
+   h        quotient
+   1          1          exact
+   1/2     ≈ 0.828427    rounded
+   1/4     ≈ 0.756828    rounded
+   1/8     ≈ 0.724062    rounded
+   1/16    ≈ 0.708381    rounded
+   1/32    ≈ 0.700709    rounded
+   1/64    ≈ 0.696914    rounded</div><div class="thm"><span class="label">Theorem &middot; The exponential&#x27;s rate</span><p>For each base <span class="math" data-say="b is greater than 0">b > 0</span> the quotients <span class="math" data-say="the quantity b to the power h minus 1, over h">(b^h − 1)/h</span> for halving <span class="math" data-say="h">h</span> head for a number written <span class="math" data-say="the natural log of b">ln b</span>. Then the rate of <span class="math" data-say="b to the power t">bᵗ</span> at every <span class="math" data-say="t">t</span> is <span class="math" data-say="the natural log of b">ln b</span> times <span class="math" data-say="b to the power t">bᵗ</span>. The base <span class="math" data-say="e is approximately 2.71828">e ≈ 2.71828</span> is the one with <span class="math" data-say="the natural log of e equals 1">ln e = 1</span>, so <span class="math" data-say="the derivative of e to the power t equals e to the power t">(eᵗ)′ = eᵗ</span>.</p></div><p>This is stated and not proved. The factoring above is proved; that the rounded column settles on one number is what the table suggests and the lab shows for each base, and no table of seven rows establishes it for every step. For <span class="math" data-say="b equals 2">b = 2</span> the column heads for <span class="math" data-say="the natural log of 2 is approximately 0.693147">ln 2 ≈ 0.693147</span>, the way the quotients of <span class="math" data-say="t squared">t²</span> headed for 2.</p><h3>Other bases, and the one where the constant is 1</h3><p>For <span class="math" data-say="b equals 3">b = 3</span> the first quotient is <span class="math" data-say="the quantity 3 minus 1, over 1 equals 2">(3 − 1)/1 = 2</span>, exact, and the column heads for <span class="math" data-say="the natural log of 3 is approximately 1.09861">ln 3 ≈ 1.09861</span>. For <span class="math" data-say="b equals e">b = e</span>, entered in the lab as <span class="math" data-say="e">e</span>, every quotient is rounded, since <span class="math" data-say="e">e</span> itself is not a fraction: the first is <span class="math" data-say="e minus 1 is approximately 1.71828">e − 1 ≈ 1.71828</span>, and the column heads for 1. That is the definition of the number: of all the bases, <span class="math" data-say="e">e</span> is the one for which the exponential's rate is the exponential itself.</p><h3>The same column at another place</h3><p>At <span class="math" data-say="A equals 3">a = 3</span>, with <span class="math" data-say="b equals 2">b = 2</span>, the quotient at <span class="math" data-say="h equals 1">h = 1</span> is <span class="math" data-say="the quantity 16 minus 8, over 1 equals 8">(16 − 8)/1 = 8</span>, exactly <span class="math" data-say="2 cubed">2³</span> times the first entry of the column above. Every later row is <span class="math" data-say="8">8</span> times the matching row of that column, so the rate of <span class="math" data-say="2 to the power t">2ᵗ</span> at 3 is <span class="math" data-say="8 times the natural log of 2 is approximately 5.54518">8·ln 2 ≈ 5.54518</span>, rounded. The lab's ratio tile divides the last quotient by <span class="math" data-say="2 cubed">2³</span> and gets back the column at 0.</p><h3>Why the power rule is not allowed here</h3><p>Applying the power rule to <span class="math" data-say="2 to the power t">2ᵗ</span> would give <span class="math" data-say="t times 2 to the power the quantity t minus 1">t·2^(t − 1)</span>. At <span class="math" data-say="t equals 0">t = 0</span> that is 0, but the quotients of <span class="math" data-say="2 to the power t">2ᵗ</span> at 0 head for <span class="math" data-say="is approximately 0.693147">≈ 0.693147</span>. The power rule belongs to a variable base and a fixed exponent. When the variable is in the exponent, the rate is proportional to the function.</p><p>A quantity whose rate is a constant multiple of itself is exactly what the equation <span class="math" data-say="y prime equals k times y">y′ = k·y</span> says, and this lesson has shown that exponentials have the property. That equation opens the second half of this Subject, in Separable Equations, Growth and Decay.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading the rate of an exponential</h2></div><p>Five moves. The first is exact algebra and the rest read a rounded table, so keep the two apart.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Factor the quotient</h3><p>Write <span class="math" data-say="b to the power the quantity A plus h">b^(a + h)</span> as <span class="math" data-say="b to the power A times b to the power h">b^a·b^h</span>, take out <span class="math" data-say="b to the power A">b^a</span>, and the quotient is <span class="math" data-say="b to the power A times the quantity b to the power h minus 1, over h">b^a·(b^h − 1)/h</span>. This step is exact.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Build the column at a = 0</h3><p>At <span class="math" data-say="A equals 0">a = 0</span> the factor <span class="math" data-say="b to the power A">b^a</span> is 1, so the quotient is <span class="math" data-say="the quantity b to the power h minus 1, over h">(b^h − 1)/h</span>. Halve the step row by row. For the bases 2 and 3 only the first entry is a fraction, and the lab prints every later one rounded.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read each figure with its sign</h3><p>Every figure with <span class="math" data-say="is approximately">≈</span> is a rounded decimal of a number with no finite decimal. Never quote one as exact, and never read the last row as the constant itself.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Multiply by <span data-say="b to the power A">b^a</span> for another place</h3><p>The quotient at <span class="math" data-say="A">a</span> is <span class="math" data-say="b to the power A">b^a</span> times the column at 0, so the constant the column heads for is the same at every place.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Name the constant</h3><p>For <span class="math" data-say="b equals 2">b = 2</span> it is <span class="math" data-say="the natural log of 2 is approximately 0.693147">ln 2 ≈ 0.693147</span>, for <span class="math" data-say="b equals 3">b = 3</span> it is <span class="math" data-say="the natural log of 3 is approximately 1.09861">ln 3 ≈ 1.09861</span>, and for <span class="math" data-say="b equals e">b = e</span> it is exactly 1.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading the rate of an exponential</h2>
+      <p class="lead-in">Five moves. The first is exact algebra and the rest read a rounded table, so keep the two apart.</p>
+      <ol class="key-ideas method"><li><strong>Factor the quotient.</strong> Write <span class="math" data-say="b to the power the quantity A plus h">b^(a + h)</span> as <span class="math" data-say="b to the power A times b to the power h">b^a·b^h</span>, take out <span class="math" data-say="b to the power A">b^a</span>, and the quotient is <span class="math" data-say="b to the power A times the quantity b to the power h minus 1, over h">b^a·(b^h − 1)/h</span>. This step is exact.</li><li><strong>Build the column at a = 0.</strong> At <span class="math" data-say="A equals 0">a = 0</span> the factor <span class="math" data-say="b to the power A">b^a</span> is 1, so the quotient is <span class="math" data-say="the quantity b to the power h minus 1, over h">(b^h − 1)/h</span>. Halve the step row by row. For the bases 2 and 3 only the first entry is a fraction, and the lab prints every later one rounded.</li><li><strong>Read each figure with its sign.</strong> Every figure with <span class="math" data-say="is approximately">≈</span> is a rounded decimal of a number with no finite decimal. Never quote one as exact, and never read the last row as the constant itself.</li><li><strong>Multiply by <span data-say="b to the power A">b^a</span> for another place.</strong> The quotient at <span class="math" data-say="A">a</span> is <span class="math" data-say="b to the power A">b^a</span> times the column at 0, so the constant the column heads for is the same at every place.</li><li><strong>Name the constant.</strong> For <span class="math" data-say="b equals 2">b = 2</span> it is <span class="math" data-say="the natural log of 2 is approximately 0.693147">ln 2 ≈ 0.693147</span>, for <span class="math" data-say="b equals 3">b = 3</span> it is <span class="math" data-say="the natural log of 3 is approximately 1.09861">ln 3 ≈ 1.09861</span>, and for <span class="math" data-say="b equals e">b = e</span> it is exactly 1.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1480,17 +1526,16 @@ h = 1/64: 8·(the column at 0)   ≈ 5.57531   rounded
 heads for  8·ln 2 ≈ 5.54518</div><p>The factoring is exact, so the second block is the first multiplied by 8 row for row. The constant is claimed, and the lab shows the column sinking toward it.</p><p>For a rehearsal, take <span class="math" data-say="b equals 3">b = 3</span> at <span class="math" data-say="A equals 0">a = 0</span>: the first entry is 2, and the column should head for <span class="math" data-say="is approximately 1.09861">≈ 1.09861</span>, which is <span class="math" data-say="the natural log of 3">ln 3</span>.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Applying the power rule to an exponential</strong><span>The derivative of <span class="math" data-say="2 to the power t">2ᵗ</span> is not <span class="math" data-say="t times 2 to the power the quantity t minus 1">t·2^(t − 1)</span>. At <span class="math" data-say="t equals 0">t = 0</span> that gives 0, but the quotients of <span class="math" data-say="2 to the power t">2ᵗ</span> at 0 are <span class="math" data-say="1, is approximately 0.828427, is approximately 0.756828, and so on">1, ≈ 0.828427, ≈ 0.756828, …</span>, heading for <span class="math" data-say="is approximately 0.693147">≈ 0.693147</span>. In <span class="math" data-say="2 to the power t">2ᵗ</span> the variable is in the exponent, and the rate is a constant times <span class="math" data-say="2 to the power t">2ᵗ</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting a rounded figure as if it were exact</strong><span><span class="math" data-say="is approximately 0.828427">≈ 0.828427</span> is a decimal approximation of <span class="math" data-say="2 times the quantity the square root of 2 minus 1">2(√2 − 1)</span>, and <span class="math" data-say="the natural log of 2 is approximately 0.693147">ln 2 ≈ 0.693147</span> has no finite decimal either. Write <span class="math" data-say="is approximately">≈</span> whenever a figure was rounded, and read the last row of the column as a step on the way to the constant and not the constant.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the constant to change with the place</strong><span>The quotients at <span class="math" data-say="A equals 3">a = 3</span> are eight times those at <span class="math" data-say="A equals 0">a = 0</span>, but the factor <span class="math" data-say="the quantity 2 to the power h minus 1, over h">(2^h − 1)/h</span> is the same. The ratio tile divides the place's value out and gets the same column back. The rate depends on where you are only through the factor <span class="math" data-say="b to the power A">b^a</span>.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can factor the quotient of an exponential, read the remaining factor from a rounded column, and state the rate of bᵗ as a constant times bᵗ.</strong><p>You should be able to write the quotient of <span class="math" data-say="b to the power t">bᵗ</span> as <span class="math" data-say="b to the power A times the quantity b to the power h minus 1, over h">b^a·(b^h − 1)/h</span>, say which entries of the column are exact and which are rounded, name the constant for a given base, and say why the power rule does not apply.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That ends the course. A rate has been computed as a fraction, read as a derivative, found by rule, and applied to the shape of a graph. The next course, Accumulation and the Integral, runs the other way: given the rate, recover the quantity.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Applying the power rule to an exponential</strong><span>The derivative of <span class="math" data-say="2 to the power t">2ᵗ</span> is not <span class="math" data-say="t times 2 to the power the quantity t minus 1">t·2^(t − 1)</span>. At <span class="math" data-say="t equals 0">t = 0</span> that gives 0, but the quotients of <span class="math" data-say="2 to the power t">2ᵗ</span> at 0 are <span class="math" data-say="1, is approximately 0.828427, is approximately 0.756828, and so on">1, ≈ 0.828427, ≈ 0.756828, …</span>, heading for <span class="math" data-say="is approximately 0.693147">≈ 0.693147</span>. In <span class="math" data-say="2 to the power t">2ᵗ</span> the variable is in the exponent, and the rate is a constant times <span class="math" data-say="2 to the power t">2ᵗ</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting a rounded figure as if it were exact</strong><span><span class="math" data-say="is approximately 0.828427">≈ 0.828427</span> is a decimal approximation of <span class="math" data-say="2 times the quantity the square root of 2 minus 1">2(√2 − 1)</span>, and <span class="math" data-say="the natural log of 2 is approximately 0.693147">ln 2 ≈ 0.693147</span> has no finite decimal either. Write <span class="math" data-say="is approximately">≈</span> whenever a figure was rounded, and read the last row of the column as a step on the way to the constant and not the constant.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the constant to change with the place</strong><span>The quotients at <span class="math" data-say="A equals 3">a = 3</span> are eight times those at <span class="math" data-say="A equals 0">a = 0</span>, but the factor <span class="math" data-say="the quantity 2 to the power h minus 1, over h">(2^h − 1)/h</span> is the same. The ratio tile divides the place's value out and gets the same column back. The rate depends on where you are only through the factor <span class="math" data-say="b to the power A">b^a</span>.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can factor the quotient of an exponential, read the remaining factor from a rounded column, and state the rate of bᵗ as a constant times bᵗ.</strong><p>You should be able to write the quotient of <span class="math" data-say="b to the power t">bᵗ</span> as <span class="math" data-say="b to the power A times the quantity b to the power h minus 1, over h">b^a·(b^h − 1)/h</span>, say which entries of the column are exact and which are rounded, name the constant for a given base, and say why the power rule does not apply.</p></div></div><div class="note"><strong>Note:</strong> That ends the course. A rate has been computed as a fraction, read as a derivative, found by rule, and applied to the shape of a graph. The next course, Accumulation and the Integral, runs the other way: given the rate, recover the quantity.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The quotient factors exactly</summary><p>The law of exponents from Algebra's Exponential and Logarithmic Functions says <span class="math" data-say="b to the power the quantity A plus h, equals b to the power A times b to the power h">b^(a + h) = b^a·b^h</span>. So <span class="math" data-say="b to the power the quantity A plus h, minus b to the power A equals b to the power A times the quantity b to the power h minus 1">b^(a + h) − b^a = b^a·(b^h − 1)</span>, and dividing by <span class="math" data-say="h">h</span> gives <span class="math" data-say="b to the power A times the quantity b to the power h minus 1, over h">b^a·(b^h − 1)/h</span>. The second factor contains the step <span class="math" data-say="h">h</span> and the base <span class="math" data-say="b">b</span>, and nothing about the place <span class="math" data-say="A">a</span>.</p></details><details class="recall"><summary>One column serves every place</summary><p>At <span class="math" data-say="A equals 0">a = 0</span>, <span class="math" data-say="b to the power A equals 1">b^a = 1</span>, so the quotient there is the second factor alone. That one column, for halving <span class="math" data-say="h">h</span>, is the same at every place after multiplying by <span class="math" data-say="b to the power A">b^a</span>. The lesson states that the column settles on one constant. A table of rounded rows illustrates this and does not prove it.</p></details><details class="recall"><summary>The variable is in the exponent</summary><p>The power rule differentiates <span class="math" data-say="t to the power n">tⁿ</span>, with the variable in the base and the exponent fixed. In <span class="math" data-say="2 to the power t">2ᵗ</span> it is the other way round, and the rule does not apply. The rate of <span class="math" data-say="2 to the power t">2ᵗ</span> is proportional to <span class="math" data-say="2 to the power t">2ᵗ</span> itself, with a constant of proportion, and <span class="math" data-say="e">e</span> is the base for which that constant is 1.</p></details></div>
+      <h3>Summary</h3>
       <p>An exponential has its variable in the exponent, and its difference quotient factors exactly: <span class="math" data-say="b to the power t">bᵗ</span> times a quotient that does not contain <span class="math" data-say="t">t</span>. That second factor is a column of rounded numbers, and the lesson states, without proving it, that the column settles on a constant. The rate of <span class="math" data-say="b to the power t">bᵗ</span> is that constant times <span class="math" data-say="b to the power t">bᵗ</span>, and <span class="math" data-say="e">e</span> is the base whose constant is 1.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The quotient factors exactly.</strong> The law of exponents from Algebra's Exponential and Logarithmic Functions says <span class="math" data-say="b to the power the quantity A plus h, equals b to the power A times b to the power h">b^(a + h) = b^a·b^h</span>. So <span class="math" data-say="b to the power the quantity A plus h, minus b to the power A equals b to the power A times the quantity b to the power h minus 1">b^(a + h) − b^a = b^a·(b^h − 1)</span>, and dividing by <span class="math" data-say="h">h</span> gives <span class="math" data-say="b to the power A times the quantity b to the power h minus 1, over h">b^a·(b^h − 1)/h</span>. The second factor contains the step <span class="math" data-say="h">h</span> and the base <span class="math" data-say="b">b</span>, and nothing about the place <span class="math" data-say="A">a</span>.</li><li><strong>One column serves every place.</strong> At <span class="math" data-say="A equals 0">a = 0</span>, <span class="math" data-say="b to the power A equals 1">b^a = 1</span>, so the quotient there is the second factor alone. That one column, for halving <span class="math" data-say="h">h</span>, is the same at every place after multiplying by <span class="math" data-say="b to the power A">b^a</span>. The lesson states that the column settles on one constant. A table of rounded rows illustrates this and does not prove it.</li><li><strong>The variable is in the exponent.</strong> The power rule differentiates <span class="math" data-say="t to the power n">tⁿ</span>, with the variable in the base and the exponent fixed. In <span class="math" data-say="2 to the power t">2ᵗ</span> it is the other way round, and the rule does not apply. The rate of <span class="math" data-say="2 to the power t">2ᵗ</span> is proportional to <span class="math" data-say="2 to the power t">2ᵗ</span> itself, with a constant of proportion, and <span class="math" data-say="e">e</span> is the base for which that constant is 1.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="b to the power the quantity A plus h, minus b to the power A equals b to the power A times the quantity b to the power h minus 1. the quotient is b to the power A times the quantity b to the power h minus 1, over h. the second factor does not contain a. the derivative of b to the power t equals a constant times b to the power t. the constant for 2 is the natural log of 2 is approximately 0.693147. e is the base whose constant is 1" tabindex="0" role="region" aria-label="Mathematical notation">b^(a + h) − b^a = b^a·(b^h − 1)
 the quotient is b^a·(b^h − 1)/h
 the second factor does not contain a
@@ -2836,11 +2881,42 @@ e is the base whose constant is 1</div><figcaption>The quotient of an exponentia
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2908,7 +2984,7 @@ e is the base whose constant is 1</div><figcaption>The quotient of an exponentia
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

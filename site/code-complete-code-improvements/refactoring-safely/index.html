@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Code Improvements</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 24 · Refactoring</p>
       <h1>Refactoring Safely</h1>
       <p class="lesson-lede">Before you pull a block out into its own routine, count what it reads from before it and what it leaves for after it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Refactoring</li><li>The Cardinal Rule of Software Evolution</li><li>A block&#x27;s In and Out</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument, then a block measured before it moves</h2>
-      <article class="prose reading"><p><strong>Code Complete, Chapter 24, p. 585.</strong> &ldquo;Software can either improve or degrade as it’s changed. The Cardinal Rule of Software Evolution is that internal quality should improve with code evolution.&rdquo; Read Chapter 24, pages 563 to 585, in your own copy first.</p><p>You have a routine that totals an account's transactions, charges a fee for each overdraft and prints the result, and you would like to pull the loop out into a routine of its own. Chapter 24 starts further back (p. 563), with a myth: that a well-run project writes its code once, tests it and forgets it until maintenance. The reality, McConnell says, is that code changes a great deal while it is first being written, because requirements change during development and every requirement change reaches the code. Section 24.1 (p. 564) draws the distinction that matters: whether a program's quality improves or degrades as it changes. Hence the Cardinal Rule.</p><p>Section 24.2 (p. 565) names the tool. Refactoring, in Martin Fowler's definition (1999), is a change to a program's internal structure that makes it easier to understand and cheaper to modify without changing its observable behaviour. The word grew, the chapter notes, out of Larry Constantine's &ldquo;factoring&rdquo; in structured programming, the decomposition of a program into its parts. The section then lists warning signs, which Fowler calls smells: duplicated code, a routine that is too long, a parameter list that is too long, and many more, which the chapter gathers into a checklist worth reading in the book. It ends on reasons not to refactor, and on the word's dilution: a change that fixes a defect or adds a feature is not a refactoring, however loosely people use the term.</p><p>Section 24.3 (p. 571) is a catalogue, summarised largely from Fowler, at five levels: data (replace a magic number with a named constant, rename a variable), statements (return as soon as you know the answer), routines (extract a routine, move a routine's code inline, add or remove a parameter), classes and their interfaces, and whole systems. Extract Routine, the one this lesson measures, is the routine-level refactoring that removes inline code from one routine and turns it into its own.</p><p>Section 24.4 (p. 579) is the precautions: save the code you start with, keep each refactoring small, do them one at a time, keep a list of the steps and a &ldquo;parking lot&rdquo; for changes that can wait, make checkpoints, use the compiler's warnings, retest, add tests, and review. The evidence the chapter gives for reviewing even small changes is other people's. Programmers' first attempt at a change is wrong more than half the time (Yourdon 1986). The chance of a bad change rises from one line changed to five and then falls (Weinberg 1983); McConnell's explanation is that programmers treat small changes casually. And one organisation that began reviewing one-line changes saw their error rate fall from 55 percent to 2 (Freedman and Weinberg 1982). Some refactorings are riskier than others: a named constant is nearly risk-free, while a change to a routine's interface or to a boolean test is not.</p><p>The chapter warns against two abuses (p. 582): calling it refactoring while tweaking broken code until it works, which McConnell calls hacking, and refactoring code that needs rewriting. Section 24.5 (p. 582) suggests when: when you add a routine or a class, when you fix a defect, in the modules everyone is afraid of and the ones with the highest complexity, and in a maintenance setting, in the parts you touch, leaving each better than you found it.</p><div class="defbox"><span class="label">Definition &middot; In and Out of a block</span><p>In: the variables the block reads whose values were set before it. They become the extracted routine's parameters. Out: the variables the block sets that are read after it. A Java method returns one value, so a block with one Out extracts directly, and one with two needs another step first.</p></div><pre class="codeblock" data-say="line 1, void print statement of account account. line 2, double balance is set to account dot opening balance. line 3, double fees is set to 0.0. line 4, for transaction t in account dot transactions. line 5, balance is set to balance plus t dot amount. line 6, if t dot amount is less than 0 and balance is less than 0. line 7, fees is set to fees plus 25.0. line 10, balance is set to balance minus fees. line 11, print line Fees plus fees. line 12, print line Closing balance plus balance" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void printStatement(Account account) {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument, then a block measured before it moves</h2><div class="prose reading"><p><strong>Code Complete, Chapter 24, p. 585.</strong> &ldquo;Software can either improve or degrade as it’s changed. The Cardinal Rule of Software Evolution is that internal quality should improve with code evolution.&rdquo; Read Chapter 24, pages 563 to 585, in your own copy first.</p><p>You have a routine that totals an account's transactions, charges a fee for each overdraft and prints the result, and you would like to pull the loop out into a routine of its own. Chapter 24 starts further back (p. 563), with a myth: that a well-run project writes its code once, tests it and forgets it until maintenance. The reality, McConnell says, is that code changes a great deal while it is first being written, because requirements change during development and every requirement change reaches the code. Section 24.1 (p. 564) draws the distinction that matters: whether a program's quality improves or degrades as it changes. Hence the Cardinal Rule.</p><p>Section 24.2 (p. 565) names the tool. Refactoring, in Martin Fowler's definition (1999), is a change to a program's internal structure that makes it easier to understand and cheaper to modify without changing its observable behaviour. The word grew, the chapter notes, out of Larry Constantine's &ldquo;factoring&rdquo; in structured programming, the decomposition of a program into its parts. The section then lists warning signs, which Fowler calls smells: duplicated code, a routine that is too long, a parameter list that is too long, and many more, which the chapter gathers into a checklist worth reading in the book. It ends on reasons not to refactor, and on the word's dilution: a change that fixes a defect or adds a feature is not a refactoring, however loosely people use the term.</p><p>Section 24.3 (p. 571) is a catalogue, summarised largely from Fowler, at five levels: data (replace a magic number with a named constant, rename a variable), statements (return as soon as you know the answer), routines (extract a routine, move a routine's code inline, add or remove a parameter), classes and their interfaces, and whole systems. Extract Routine, the one this lesson measures, is the routine-level refactoring that removes inline code from one routine and turns it into its own.</p><p>Section 24.4 (p. 579) is the precautions: save the code you start with, keep each refactoring small, do them one at a time, keep a list of the steps and a &ldquo;parking lot&rdquo; for changes that can wait, make checkpoints, use the compiler's warnings, retest, add tests, and review. The evidence the chapter gives for reviewing even small changes is other people's. Programmers' first attempt at a change is wrong more than half the time (Yourdon 1986). The chance of a bad change rises from one line changed to five and then falls (Weinberg 1983); McConnell's explanation is that programmers treat small changes casually. And one organisation that began reviewing one-line changes saw their error rate fall from 55 percent to 2 (Freedman and Weinberg 1982). Some refactorings are riskier than others: a named constant is nearly risk-free, while a change to a routine's interface or to a boolean test is not.</p><p>The chapter warns against two abuses (p. 582): calling it refactoring while tweaking broken code until it works, which McConnell calls hacking, and refactoring code that needs rewriting. Section 24.5 (p. 582) suggests when: when you add a routine or a class, when you fix a defect, in the modules everyone is afraid of and the ones with the highest complexity, and in a maintenance setting, in the parts you touch, leaving each better than you found it.</p><div class="defbox"><span class="label">Definition &middot; In and Out of a block</span><p>In: the variables the block reads whose values were set before it. They become the extracted routine's parameters. Out: the variables the block sets that are read after it. A Java method returns one value, so a block with one Out extracts directly, and one with two needs another step first.</p></div><pre class="codeblock" data-say="line 1, void print statement of account account. line 2, double balance is set to account dot opening balance. line 3, double fees is set to 0.0. line 4, for transaction t in account dot transactions. line 5, balance is set to balance plus t dot amount. line 6, if t dot amount is less than 0 and balance is less than 0. line 7, fees is set to fees plus 25.0. line 10, balance is set to balance minus fees. line 11, print line Fees plus fees. line 12, print line Closing balance plus balance" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void printStatement(Account account) {</span>
 <span class="cl">    double balance = account.openingBalance();</span>
 <span class="cl">    double fees = 0.0;</span>
 <span class="cl">    for (Transaction t : account.transactions()) {</span>
@@ -1457,21 +1501,11 @@
 <span class="cl">    balance = balance - fees;</span>
 <span class="cl">    System.out.println(&quot;Fees: &quot; + fees);</span>
 <span class="cl">    System.out.println(&quot;Closing balance: &quot; + balance);</span>
-<span class="cl">}</span></code></pre><p>The lab reads <code>printStatement</code> and a range of its lines. The <code>print-lines</code> preset takes lines 11 and 12, the two print statements: In is fees and balance, Out is none, and Parameters the routine needs is 2. They extract as <code>printTotals(fees, balance)</code>, with nothing to return. The <code>fee-loop</code> preset takes lines 4 to 9, the loop: In is account, balance and fees, 3 parameters, and Out is balance and fees, both read on lines 10 to 12. Two results.</p><p>The <code>from-the-top</code> preset takes lines 2 to 10, everything before the printing: In is only account, 1 parameter, because the block sets balance and fees itself, but Out is still balance and fees. The lab's last tile, Read but set nowhere, lists any name the block reads that the listing never sets, such as a field or a constant the new routine would have to reach some other way; here it is none. On the lesson's illustration the count says what the refactoring will cost before you start: one clean extraction, and two that need a small class holding both totals, or two routines, one per result.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, void print invoice of invoice inv. line 2, double subtotal is set to 0.0. line 3, for line line in inv dot lines. line 4, subtotal is set to subtotal plus line dot amount. line 6, double tax is set to subtotal times inv dot tax rate. line 7, print line Subtotal plus subtotal. line 8, print line Tax plus tax. line 9, print line Total plus, open bracket, subtotal plus tax, close bracket" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void printInvoice(Invoice inv) {</span>
-<span class="cl">    double subtotal = 0.0;</span>
-<span class="cl">    for (Line line : inv.lines()) {</span>
-<span class="cl">        subtotal = subtotal + line.amount();</span>
-<span class="cl">    }</span>
-<span class="cl">    double tax = subtotal * inv.taxRate();</span>
-<span class="cl">    System.out.println(&quot;Subtotal: &quot; + subtotal);</span>
-<span class="cl">    System.out.println(&quot;Tax: &quot; + tax);</span>
-<span class="cl">    System.out.println(&quot;Total: &quot; + (subtotal + tax));</span>
-<span class="cl">}</span></code></pre><p>Two extractions are proposed for <code>printInvoice</code>: lines 2 to 5 as a routine that totals the lines, and lines 7 to 9 as a routine that prints. For each, give its In, its Out and the call that would replace it. Then say whether lines 2 to 6, the total and the tax together, would extract as cleanly, and why. To check, paste the routine into the lab and set the From and To lines.</p><p>Refactoring improves structure and leaves behaviour alone. The next lesson, “Code-Tuning Strategies”, is about the opposite trade: changing code to run faster, and why that should come last.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>what a block would take in and hand out</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The lab reads <code>printStatement</code> and a range of its lines. The <code>print-lines</code> preset takes lines 11 and 12, the two print statements: In is fees and balance, Out is none, and Parameters the routine needs is 2. They extract as <code>printTotals(fees, balance)</code>, with nothing to return. The <code>fee-loop</code> preset takes lines 4 to 9, the loop: In is account, balance and fees, 3 parameters, and Out is balance and fees, both read on lines 10 to 12. Two results.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>what a block would take in and hand out</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Reading the code</strong><span>what a block would take in and hand out</span></div>
       </div>
@@ -1491,10 +1525,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
       <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What a block reads and leaves</h3>
-          <p>A count over code, by the rules stated below the listing. Choose a range of lines. In lists what the block reads that was set before it; Out lists what it sets that is read after it. Paste a routine of your own and choose a block to see its interface before you extract it.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What a block reads and leaves</h3>
+            <p>A count over code, by the rules stated below the listing. Choose a range of lines. In lists what the block reads that was set before it; Out lists what it sets that is read after it. Paste a routine of your own and choose a block to see its interface before you extract it.</p>
         <div class="field">
           <label for="coPreset">Worked example</label>
           <select id="coPreset"><option value="print-lines" selected>Lines 11 to 12: the two print statements</option><option value="fee-loop">Lines 4 to 9: the loop over the transactions</option><option value="from-the-top">Lines 2 to 10: everything before the printing</option></select>
@@ -1514,12 +1548,24 @@
           <div class="kpi"><span>Read but set nowhere</span><strong id="coOutside">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The <code>from-the-top</code> preset takes lines 2 to 10, everything before the printing: In is only account, 1 parameter, because the block sets balance and fees itself, but Out is still balance and fees. The lab's last tile, Read but set nowhere, lists any name the block reads that the listing never sets, such as a field or a constant the new routine would have to reach some other way; here it is none. On the lesson's illustration the count says what the refactoring will cost before you start: one clean extraction, and two that need a small class holding both totals, or two routines, one per result.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, void print invoice of invoice inv. line 2, double subtotal is set to 0.0. line 3, for line line in inv dot lines. line 4, subtotal is set to subtotal plus line dot amount. line 6, double tax is set to subtotal times inv dot tax rate. line 7, print line Subtotal plus subtotal. line 8, print line Tax plus tax. line 9, print line Total plus, open bracket, subtotal plus tax, close bracket" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void printInvoice(Invoice inv) {</span>
+<span class="cl">    double subtotal = 0.0;</span>
+<span class="cl">    for (Line line : inv.lines()) {</span>
+<span class="cl">        subtotal = subtotal + line.amount();</span>
+<span class="cl">    }</span>
+<span class="cl">    double tax = subtotal * inv.taxRate();</span>
+<span class="cl">    System.out.println(&quot;Subtotal: &quot; + subtotal);</span>
+<span class="cl">    System.out.println(&quot;Tax: &quot; + tax);</span>
+<span class="cl">    System.out.println(&quot;Total: &quot; + (subtotal + tax));</span>
+<span class="cl">}</span></code></pre><p>Two extractions are proposed for <code>printInvoice</code>: lines 2 to 5 as a routine that totals the lines, and lines 7 to 9 as a routine that prints. For each, give its In, its Out and the call that would replace it. Then say whether lines 2 to 6, the total and the tax together, would extract as cleanly, and why. To check, paste the routine into the lab and set the From and To lines.</p><p>Refactoring improves structure and leaves behaviour alone. The next lesson, “Code-Tuning Strategies”, is about the opposite trade: changing code to run faster, and why that should come last.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Measuring a block before extracting it</h2></div><p>Four steps before the refactoring, and one on your own code.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Mark the block</h3><p>Choose the lines to extract, and save the code as it is, so that you can get back to it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>List what it reads from before</h3><p>For each variable the block reads, find where it was last set. Those set before the block are its In, the new routine's parameters.</p></article><article class="card concept-card"><div class="icon">3</div><h3>List what it leaves for after</h3><p>For each variable the block sets, look for a read after the block. Those read later are its Out, the routine's results.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Decide on the shape</h3><p>No Out or one Out: extract the routine, with the Out as its return value. Two or more: first make a small class that holds them, or split the block into one routine per result.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Measure a block of your own</h3><p>Paste a routine you would like to break up into the lab with the block you would extract, note its In and Out before you change anything, and write the new routine's signature from them.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Measuring a block before extracting it</h2>
+      <p class="lead-in">Four steps before the refactoring, and one on your own code.</p>
+      <ol class="key-ideas method"><li><strong>Mark the block.</strong> Choose the lines to extract, and save the code as it is, so that you can get back to it.</li><li><strong>List what it reads from before.</strong> For each variable the block reads, find where it was last set. Those set before the block are its In, the new routine's parameters.</li><li><strong>List what it leaves for after.</strong> For each variable the block sets, look for a read after the block. Those read later are its Out, the routine's results.</li><li><strong>Decide on the shape.</strong> No Out or one Out: extract the routine, with the Out as its return value. Two or more: first make a small class that holds them, or split the block into one routine per result.</li><li><strong>Measure a block of your own.</strong> Paste a routine you would like to break up into the lab with the block you would extract, note its In and Out before you change anything, and write the new routine's signature from them.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1538,17 +1584,16 @@ out:  none
 call:  printTotals(fees, balance)</div><p>Lines 11 and 12 read <code>fees</code> and <code>balance</code> and set nothing used later, so they become <code>printTotals(fees, balance)</code> with no return value.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Extract Routine is always safe</strong><span>Extract Routine is a refactoring many programmers reach for first, and its mechanics look trivial: cut the lines, paste them into a new routine, call it. It is clean when the block leaves at most one result. On the lesson's illustration the loop of <code>printStatement</code> leaves two, balance and fees, and a Java method returns one value, so the refactoring needs a small class or two routines first. The chapter counts a change to a routine's interface among the riskier refactorings.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Calling any change a refactoring</strong><span>The chapter objects to the word's loose use. A refactoring leaves behaviour unchanged; fixing a defect, adding a feature or tweaking broken code until it works is not one, and the last, McConnell says, is hacking.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Skipping review for small changes</strong><span>A one-line change feels too small to go wrong. The book reports the opposite: the chance of a bad change rises from one line to five, after Weinberg, and one organisation's error rate on one-line changes fell from 55 percent to 2 when it began reviewing them, after Freedman and Weinberg.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can give a block&#x27;s In and Out and say whether it extracts cleanly.</strong><p>For a block in a routine, list the variables it reads that were set before it (its parameters) and those it sets that are read after it (its results), and say what to do when there are two results.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab reads the listing and computes In and Out from where each name is set and read, in line order; it does not follow calls, so a method that changes an object it is passed is invisible to it, and a field read in the block shows only in Read but set nowhere. It never runs the code. Whether the extracted routine has a good name and one clear purpose is the chapter's question, not the count's.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Extract Routine is always safe</strong><span>Extract Routine is a refactoring many programmers reach for first, and its mechanics look trivial: cut the lines, paste them into a new routine, call it. It is clean when the block leaves at most one result. On the lesson's illustration the loop of <code>printStatement</code> leaves two, balance and fees, and a Java method returns one value, so the refactoring needs a small class or two routines first. The chapter counts a change to a routine's interface among the riskier refactorings.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Calling any change a refactoring</strong><span>The chapter objects to the word's loose use. A refactoring leaves behaviour unchanged; fixing a defect, adding a feature or tweaking broken code until it works is not one, and the last, McConnell says, is hacking.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Skipping review for small changes</strong><span>A one-line change feels too small to go wrong. The book reports the opposite: the chance of a bad change rises from one line to five, after Weinberg, and one organisation's error rate on one-line changes fell from 55 percent to 2 when it began reviewing them, after Freedman and Weinberg.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can give a block&#x27;s In and Out and say whether it extracts cleanly.</strong><p>For a block in a routine, list the variables it reads that were set before it (its parameters) and those it sets that are read after it (its results), and say what to do when there are two results.</p></div></div><div class="note"><strong>Note:</strong> The lab reads the listing and computes In and Out from where each name is set and read, in line order; it does not follow calls, so a method that changes an object it is passed is invisible to it, and a field read in the block shows only in Read but set nowhere. It never runs the code. Whether the extracted routine has a good name and one clear purpose is the chapter's question, not the count's.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Refactoring</summary><p>In Martin Fowler's definition, which the chapter adopts, a change to a program's internal structure that makes it easier to understand and cheaper to modify without changing what it observably does.</p></details><details class="recall"><summary>The Cardinal Rule of Software Evolution</summary><p>McConnell's name for the rule that a program's internal quality should improve as it is changed. A fix made with duct tape and superstition makes it worse.</p></details><details class="recall"><summary>A block&#x27;s In and Out</summary><p>Before extracting a block into a routine, the variables it reads that were set before it become the routine's parameters, and the variables it sets that are read after it become its results.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 24 argues that code changes throughout its life and that each change should improve it, and lists the warning signs, the refactorings and the precautions that make that safe. Compute the inputs and outputs of a block before extracting it into a routine, and decide whether it extracts cleanly.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Refactoring.</strong> In Martin Fowler's definition, which the chapter adopts, a change to a program's internal structure that makes it easier to understand and cheaper to modify without changing what it observably does.</li><li><strong>The Cardinal Rule of Software Evolution.</strong> McConnell's name for the rule that a program's internal quality should improve as it is changed. A fix made with duct tape and superstition makes it worse.</li><li><strong>A block&#x27;s In and Out.</strong> Before extracting a block into a routine, the variables it reads that were set before it become the routine's parameters, and the variables it sets that are read after it become its results.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="change should improve internal quality. refactor, same behaviour, better structure. in, read in the block, set before it. out, set in the block, read after it. two outs, A class or two routines first. small changes, review them too" tabindex="0" role="region" aria-label="Mathematical notation">change should improve internal quality
 refactor: same behaviour, better structure
 in: read in the block, set before it
@@ -2552,11 +2597,42 @@ small changes: review them too</div><figcaption>Extracting a routine</figcaption
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2624,7 +2700,7 @@ small changes: review them too</div><figcaption>Extracting a routine</figcaption
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

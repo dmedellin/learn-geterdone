@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Code Improvements</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 20 · The Software-Quality Landscape</p>
       <h1>The Software-Quality Landscape</h1>
       <p class="lesson-lede">No single way of finding defects finds most of them, so the share a project removes depends on which unlike techniques it combines.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Defect-detection rate</li><li>Combined removal</li><li>The General Principle of Software Quality</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s survey, section by section, then the arithmetic</h2>
-      <article class="prose reading"><p><strong>Code Complete, Chapter 20, p. 477.</strong> &ldquo;No single defect-detection technique is completely effective by itself. Testing by itself is not optimally effective at removing errors.&rdquo; That is the chapter's own summary, from its Key Points. Read Chapter 20, pages 463 to 477, in your own copy first; it is short, and this lesson goes back through it a section at a time.</p><p>The chapter asks what quality is before it asks how to get it. Section 20.1 (p. 463) separates the characteristics a user meets, such as correctness, usability, efficiency, reliability and robustness, from the ones only a programmer meets: maintainability, readability, testability and the rest. Users care only about the first kind, McConnell says, but the second kind reaches them in the end, because code you cannot understand is code whose defects you cannot fix. And the characteristics pull against each other: his Figure 20-1 shows, for instance, that working on correctness, doing exactly what the specification says, works against robustness, carrying on when the input is not what was specified.</p><p>Section 20.2 (p. 466) lists the techniques: explicit quality objectives, an explicit assurance activity, a testing strategy, guidelines, informal and formal reviews, external audits, and in the development process change control, measurement and prototyping. The case for setting objectives is a story. In 1974 Gerald Weinberg and Edward Schulman gave several teams the same program and told each to optimise something different: memory, readable output, readable code, the least code, the least programming time. Nearly every team came first on the objective it had been given, and none did well on all of them. Programmers do what they are asked, the chapter concludes, and the objectives conflict, so someone has to choose.</p><p>Section 20.3 (p. 469) is the heart of the chapter. Its Table 20-2, which the book adapts from Capers Jones (1986 and 1996) and from Shull and others (2002), gives each defect-detection technique a lowest, a modal and a highest rate. A few of the modal rates: unit testing 30 percent, integration testing 35, system testing 40, formal design inspections 55, formal code inspections 60. McConnell's reading of the table is that no technique's modal rate is above 75 percent and that they average about 40; that the typical test-heavy organisation removes about 85 percent of its defects; and that leading organisations, using a wider variety of techniques, reach 95 percent or more (Jones 2000). These are averages over many organisations' projects, mostly before 2004, gathered by other people. Your own defect records are what would test them, and nothing in this lesson can.</p><p>So the chapter argues for combining techniques, and for combining unlike ones. It cites a study by Glenford Myers (1978) in which experienced programmers looked for the known errors in one program by different methods: no method had a significant advantage on its own, but any two together, even two independent groups using the same method, found far more than one, because different people find different defects. Jones reports that unit, functional and system testing together often remove less than 60 percent, which the book calls usually inadequate for production software. The section then turns to what finding and fixing a defect costs, which the next lesson takes up.</p><p>Section 20.4 (p. 473) says when: early, and throughout, because a defect made in requirements or architecture spreads into design, code and tests before anyone finds it. Section 20.5 (p. 474) closes with what McConnell calls the General Principle of Software Quality: improving quality reduces development costs. His reason is that the largest single activity on most projects is debugging and reworking code that does not work, so preventing a defect is cheaper than finding it later. Quality, the Key Points put it, is free in the end, but only once resources are moved to preventing defects cheaply rather than fixing them expensively.</p><div class="defbox"><span class="label">Definition &middot; A sequence of removal stages</span><p>Defects pass through stages in order: an inspection, then unit test, then system test. Each stage finds its rate of the defects that reach it, and the rest go on. After the last stage, the defects left are the starting number times each stage's miss rate, one minus its rate.</p></div><p>That is the lab's arithmetic, and it is the arithmetic the book itself does in Table 20-3 (p. 472), where it multiplies the rates of Extreme Programming's practices to estimate what they remove. The <code>testing-only</code> preset sends 1,000 defects through unit, integration and system testing at the table's modal rates, 30, 35 and 40 percent. Unit testing finds 300 and passes on 700; integration testing finds 35 percent of those and passes on 455; system testing finds 40 percent of those and passes on 273. The lab prints Found 727, Remaining 273 and Combined removal 727/1000 = 72.7%: the share of the original defects found by some stage. The <code>one-stage</code> preset, unit testing alone, finds 300, leaves 700 and removes 30%.</p><p>The <code>inspections-too</code> preset puts a formal design inspection at 55 percent and a formal code inspection at 60 percent in front of the same three tests. Remaining falls to 2457/50 = 49.14 and Combined removal rises to 47543/50000, about 95.1%, the level the chapter reports for leading organisations. A fraction of a defect is the model's expected value, not a defect anyone could point to. On the lesson's illustration, three test stages at their modal rates still leave more than a quarter of the defects behind, and only stages of another kind bring the remainder below fifty.</p><p>Read the product for what it assumes. It treats each stage's misses as independent of the stages before it, as if every defect that survived unit testing were as easy for integration testing to find as any other. Two stages that miss the same kinds of defect break that assumption, and the product cannot tell them from two that miss different kinds: three test stages multiply exactly as three unlike stages would. That unlike techniques find different defects is the chapter's claim from Jones's and Myers's data, not something the multiplication shows. And since Jones reports that testing combinations like this one often remove less than 60 percent, the 72.7 is optimistic, as that figure suggests, and not a forecast.</p><h3>Exercise</h3><div class="mathblock" data-say="defects at the start, 1000. pipeline A, two stages, 40 percent then 50 percent. pipeline B, three stages, 30 percent each" tabindex="0" role="region" aria-label="Mathematical notation">defects at the start:  1000
-pipeline A:  two stages, 40 percent then 50 percent
-pipeline B:  three stages, 30 percent each</div><p>For each pipeline, compute by hand the defects left and the combined removal, and say which of the two removes more. Then type each pipeline into the lab's stages box, with any stage names and the rates as fractions or decimals (40/100 or 0.4), to check your figures.</p><p>The rates in Table 20-2 are what a technique finds. What it costs to find them, and why reviews find different defects from tests, is the subject of the next lesson, “Collaborative Construction”.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Defect arithmetic</h2></div><p>stages that each find a share of what is left</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s survey, section by section, then the arithmetic</h2><div class="prose reading"><p><strong>Code Complete, Chapter 20, p. 477.</strong> &ldquo;No single defect-detection technique is completely effective by itself. Testing by itself is not optimally effective at removing errors.&rdquo; That is the chapter's own summary, from its Key Points. Read Chapter 20, pages 463 to 477, in your own copy first; it is short, and this lesson goes back through it a section at a time.</p><p>The chapter asks what quality is before it asks how to get it. Section 20.1 (p. 463) separates the characteristics a user meets, such as correctness, usability, efficiency, reliability and robustness, from the ones only a programmer meets: maintainability, readability, testability and the rest. Users care only about the first kind, McConnell says, but the second kind reaches them in the end, because code you cannot understand is code whose defects you cannot fix. And the characteristics pull against each other: his Figure 20-1 shows, for instance, that working on correctness, doing exactly what the specification says, works against robustness, carrying on when the input is not what was specified.</p><p>Section 20.2 (p. 466) lists the techniques: explicit quality objectives, an explicit assurance activity, a testing strategy, guidelines, informal and formal reviews, external audits, and in the development process change control, measurement and prototyping. The case for setting objectives is a story. In 1974 Gerald Weinberg and Edward Schulman gave several teams the same program and told each to optimise something different: memory, readable output, readable code, the least code, the least programming time. Nearly every team came first on the objective it had been given, and none did well on all of them. Programmers do what they are asked, the chapter concludes, and the objectives conflict, so someone has to choose.</p><p>Section 20.3 (p. 469) is the heart of the chapter. Its Table 20-2, which the book adapts from Capers Jones (1986 and 1996) and from Shull and others (2002), gives each defect-detection technique a lowest, a modal and a highest rate. A few of the modal rates: unit testing 30 percent, integration testing 35, system testing 40, formal design inspections 55, formal code inspections 60. McConnell's reading of the table is that no technique's modal rate is above 75 percent and that they average about 40; that the typical test-heavy organisation removes about 85 percent of its defects; and that leading organisations, using a wider variety of techniques, reach 95 percent or more (Jones 2000). These are averages over many organisations' projects, mostly before 2004, gathered by other people. Your own defect records are what would test them, and nothing in this lesson can.</p><p>So the chapter argues for combining techniques, and for combining unlike ones. It cites a study by Glenford Myers (1978) in which experienced programmers looked for the known errors in one program by different methods: no method had a significant advantage on its own, but any two together, even two independent groups using the same method, found far more than one, because different people find different defects. Jones reports that unit, functional and system testing together often remove less than 60 percent, which the book calls usually inadequate for production software. The section then turns to what finding and fixing a defect costs, which the next lesson takes up.</p><p>Section 20.4 (p. 473) says when: early, and throughout, because a defect made in requirements or architecture spreads into design, code and tests before anyone finds it. Section 20.5 (p. 474) closes with what McConnell calls the General Principle of Software Quality: improving quality reduces development costs. His reason is that the largest single activity on most projects is debugging and reworking code that does not work, so preventing a defect is cheaper than finding it later. Quality, the Key Points put it, is free in the end, but only once resources are moved to preventing defects cheaply rather than fixing them expensively.</p><div class="defbox"><span class="label">Definition &middot; A sequence of removal stages</span><p>Defects pass through stages in order: an inspection, then unit test, then system test. Each stage finds its rate of the defects that reach it, and the rest go on. After the last stage, the defects left are the starting number times each stage's miss rate, one minus its rate.</p></div><p>That is the lab's arithmetic, and it is the arithmetic the book itself does in Table 20-3 (p. 472), where it multiplies the rates of Extreme Programming's practices to estimate what they remove. The <code>testing-only</code> preset sends 1,000 defects through unit, integration and system testing at the table's modal rates, 30, 35 and 40 percent. Unit testing finds 300 and passes on 700; integration testing finds 35 percent of those and passes on 455; system testing finds 40 percent of those and passes on 273. The lab prints Found 727, Remaining 273 and Combined removal 727/1000 = 72.7%: the share of the original defects found by some stage. The <code>one-stage</code> preset, unit testing alone, finds 300, leaves 700 and removes 30%.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Defect arithmetic</h2></div><p>stages that each find a share of what is left</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Defect arithmetic</strong><span>stages that each find a share of what is left</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dfTable"></table></div>
       <div class="status-banner" id="dfStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What a sequence of stages leaves behind</h3>
-          <p>The arithmetic of figures the lesson quotes (marked with their source). Each stage finds its rate of the defects that reach it, and the rest go on to the next. Rates are typed as fractions or decimals. The product assumes each stage's misses are independent of the stages before it. Figures: modal rates from the book's Table 20-2, after Jones and Shull et al.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What a sequence of stages leaves behind</h3>
+            <p>The arithmetic of figures the lesson quotes (marked with their source). Each stage finds its rate of the defects that reach it, and the rest go on to the next. Rates are typed as fractions or decimals. The product assumes each stage's misses are independent of the stages before it. Figures: modal rates from the book's Table 20-2, after Jones and Shull et al.</p>
         <div class="field">
           <label for="dfPreset">Worked example</label>
           <select id="dfPreset"><option value="testing-only" selected>Testing only: unit 30, integration 35, system 40 percent</option><option value="inspections-too">Design and code inspections, then the three tests</option><option value="one-stage">Unit testing alone</option></select>
@@ -1427,12 +1468,17 @@ pipeline B:  three stages, 30 percent each</div><p>For each pipeline, compute by
           <div class="kpi"><span>Combined removal</span><strong id="dfCombined">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The <code>inspections-too</code> preset puts a formal design inspection at 55 percent and a formal code inspection at 60 percent in front of the same three tests. Remaining falls to 2457/50 = 49.14 and Combined removal rises to 47543/50000, about 95.1%, the level the chapter reports for leading organisations. A fraction of a defect is the model's expected value, not a defect anyone could point to. On the lesson's illustration, three test stages at their modal rates still leave more than a quarter of the defects behind, and only stages of another kind bring the remainder below fifty.</p><p>Read the product for what it assumes. It treats each stage's misses as independent of the stages before it, as if every defect that survived unit testing were as easy for integration testing to find as any other. Two stages that miss the same kinds of defect break that assumption, and the product cannot tell them from two that miss different kinds: three test stages multiply exactly as three unlike stages would. That unlike techniques find different defects is the chapter's claim from Jones's and Myers's data, not something the multiplication shows. And since Jones reports that testing combinations like this one often remove less than 60 percent, the 72.7 is optimistic, as that figure suggests, and not a forecast.</p><h3>Exercise</h3><div class="mathblock" data-say="defects at the start, 1000. pipeline A, two stages, 40 percent then 50 percent. pipeline B, three stages, 30 percent each" tabindex="0" role="region" aria-label="Mathematical notation">defects at the start:  1000
+pipeline A:  two stages, 40 percent then 50 percent
+pipeline B:  three stages, 30 percent each</div><p>For each pipeline, compute by hand the defects left and the combined removal, and say which of the two removes more. Then type each pipeline into the lab's stages box, with any stage names and the rates as fractions or decimals (40/100 or 0.4), to check your figures.</p><p>The rates in Table 20-2 are what a technique finds. What it costs to find them, and why reviews find different defects from tests, is the subject of the next lesson, “Collaborative Construction”.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Combining removal stages</h2></div><p>Four steps of arithmetic and one of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write each stage&#x27;s miss rate</h3><p>A stage that finds 30 percent of what reaches it misses 70 percent. Write the miss rate, one minus the rate, for every stage in order.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Multiply the misses</h3><p>The defects left after the last stage are the starting number times every miss rate. The order of the stages does not change the product.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Subtract for what was found</h3><p>Found is the starting number minus what is left, and the combined removal is found over the starting number.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Say what the product assumes</h3><p>Write one sentence saying the stages are taken to miss independently, so the figure is an upper bound when two stages find the same kinds of defect.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Put your own team&#x27;s stages in</h3><p>List the stages your team actually runs, give each the book's modal rate from Table 20-2, type them into the lab and note the combined removal. Then name the record of your own that would test those rates.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Combining removal stages</h2>
+      <p class="lead-in">Four steps of arithmetic and one of your own.</p>
+      <ol class="key-ideas method"><li><strong>Write each stage&#x27;s miss rate.</strong> A stage that finds 30 percent of what reaches it misses 70 percent. Write the miss rate, one minus the rate, for every stage in order.</li><li><strong>Multiply the misses.</strong> The defects left after the last stage are the starting number times every miss rate. The order of the stages does not change the product.</li><li><strong>Subtract for what was found.</strong> Found is the starting number minus what is left, and the combined removal is found over the starting number.</li><li><strong>Say what the product assumes.</strong> Write one sentence saying the stages are taken to miss independently, so the figure is an upper bound when two stages find the same kinds of defect.</li><li><strong>Put your own team&#x27;s stages in.</strong> List the stages your team actually runs, give each the book's modal rate from Table 20-2, type them into the lab and note the combined removal. Then name the record of your own that would test those rates.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1450,17 +1496,16 @@ found:  1000 - 273 gives 727
 combined removal:  727 of 1000, 72.7 percent</div><p>More than a quarter of the defects are still there after three rounds of testing, and that is on the assumption that each stage misses independently. Adding a design and a code inspection in front, the <code>inspections-too</code> preset, leaves about 49.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking testing is how you get quality</strong><span>Many teams rely on testing as both the measure and the source of quality, and the chapter argues it cannot carry that weight. No single technique's modal rate in the book's table is above 75 percent, they average about 40, and Jones reports that unit, functional and system testing together often remove less than 60 percent. On the lesson's illustration, even three test stages at their modal rates leave 273 of 1,000 defects, more than a quarter; the level the chapter reports for leading organisations comes only from combining unlike techniques, such as inspections, with the tests.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding the rates</strong><span>Unit testing at 30 percent, integration at 35 and system at 40 do not remove 105 percent of the defects, nor 100. Each stage works on what the stages before it left, so the misses multiply: <span data-say="0.70 times 0.65 times 0.60">0.70 × 0.65 × 0.60</span> leaves 273 of 1,000.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the book&#x27;s rates as your project&#x27;s</strong><span>The rates in Table 20-2 have wide ranges either side of the modal figure. They say where to look, not what your stages remove. Your own records of defects found at each stage, and found later, are what would test them.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute what a sequence of stages leaves and say what the product assumes.</strong><p>For three stages with stated rates and 1,000 defects, compute the defects found, the defects remaining and the combined removal by hand, and state in one sentence the independence assumption the product makes.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab multiplies the misses, so it assumes each stage misses independently of the stages before it. It therefore gives the same answer for two like stages as for two unlike ones; that unlike techniques find different defects is the chapter's claim from Jones's and Myers's data, which a product cannot test. The book also reports, after Jones, that real combinations of testing alone often remove less than 60 percent, so the lab's 72.7 percent for three tests is optimistic, as that figure suggests, and not a forecast.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking testing is how you get quality</strong><span>Many teams rely on testing as both the measure and the source of quality, and the chapter argues it cannot carry that weight. No single technique's modal rate in the book's table is above 75 percent, they average about 40, and Jones reports that unit, functional and system testing together often remove less than 60 percent. On the lesson's illustration, even three test stages at their modal rates leave 273 of 1,000 defects, more than a quarter; the level the chapter reports for leading organisations comes only from combining unlike techniques, such as inspections, with the tests.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding the rates</strong><span>Unit testing at 30 percent, integration at 35 and system at 40 do not remove 105 percent of the defects, nor 100. Each stage works on what the stages before it left, so the misses multiply: <span data-say="0.70 times 0.65 times 0.60">0.70 × 0.65 × 0.60</span> leaves 273 of 1,000.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the book&#x27;s rates as your project&#x27;s</strong><span>The rates in Table 20-2 have wide ranges either side of the modal figure. They say where to look, not what your stages remove. Your own records of defects found at each stage, and found later, are what would test them.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute what a sequence of stages leaves and say what the product assumes.</strong><p>For three stages with stated rates and 1,000 defects, compute the defects found, the defects remaining and the combined removal by hand, and state in one sentence the independence assumption the product makes.</p></div></div><div class="note"><strong>Note:</strong> The lab multiplies the misses, so it assumes each stage misses independently of the stages before it. It therefore gives the same answer for two like stages as for two unlike ones; that unlike techniques find different defects is the chapter's claim from Jones's and Myers's data, which a product cannot test. The book also reports, after Jones, that real combinations of testing alone often remove less than 60 percent, so the lab's 72.7 percent for three tests is optimistic, as that figure suggests, and not a forecast.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Defect-detection rate</summary><p>The share of the defects present at a stage that the stage finds. The book's Table 20-2, after Jones and others, gives each technique a lowest, a modal and a highest rate; the modal rate is the one seen most often.</p></details><details class="recall"><summary>Combined removal</summary><p>The share of the original defects that a sequence of stages finds between them. If each stage finds its rate of whatever reaches it, the defects left are the starting number times each stage's miss rate.</p></details><details class="recall"><summary>The General Principle of Software Quality</summary><p>McConnell's name for the claim that improving quality reduces development cost, because the largest single activity on most projects is finding and reworking what went wrong.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 20 surveys what software quality is, the techniques that improve it, and how effective each is at finding defects. Its table of detection rates, after Capers Jones, puts no single technique's typical rate above 75 percent. Compute what a sequence of stages leaves behind from each stage's rate, and say what the product assumes.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Defect-detection rate.</strong> The share of the defects present at a stage that the stage finds. The book's Table 20-2, after Jones and others, gives each technique a lowest, a modal and a highest rate; the modal rate is the one seen most often.</li><li><strong>Combined removal.</strong> The share of the original defects that a sequence of stages finds between them. If each stage finds its rate of whatever reaches it, the defects left are the starting number times each stage's miss rate.</li><li><strong>The General Principle of Software Quality.</strong> McConnell's name for the claim that improving quality reduces development cost, because the largest single activity on most projects is finding and reworking what went wrong.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="no single technique is enough. a stage finds its rate of what reaches it. left, start times every miss rate. unit test 30, code inspection 60. the product assumes independent misses. improving quality reduces cost" tabindex="0" role="region" aria-label="Mathematical notation">no single technique is enough
 a stage finds its rate of what reaches it
 left: start × every miss rate
@@ -2155,11 +2200,42 @@ improving quality reduces cost</div><figcaption>The chapter in six lines</figcap
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2227,7 +2303,7 @@ improving quality reduces cost</div><figcaption>The chapter in six lines</figcap
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Expenses of the Sovereign</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Book V, Chapter 1, Part 3, Article 3 · Part 4 · Conclusion</p>
       <h1>The Instruction of People of All Ages</h1>
       <p class="lesson-lede">Smith asks what the clergy cost and how they should be paid, answers that many small sects and modest livings serve best, and closes the chapter by saying who should pay for what.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Two ways of paying a clergy</li><li>Many sects, and the sovereign</li><li>Who pays for what</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The passage first, then the Article, Part IV and the Conclusion</h2>
-      <article class="prose reading"><p><strong>Book V, Chapter 1, Part 3, Article 3.</strong> The institutions for instructing people of all ages are &ldquo;chiefly those for religious instruction&rdquo;, of which the object is &ldquo;not so much to render the people good citizens in this world, as to prepare them for another and a better world in the life to come&rdquo;. Smith treats the teachers as he treated the others, as men who may &ldquo;depend altogether for their subsistence upon the voluntary contributions of their hearers&rdquo;, or live on a fund the law gives them.</p><p>His first claim is that the zeal of the first kind is greater, and he has examples. The clergy of an established church &ldquo;are apt gradually to lose the qualities, both good and bad, which gave them authority and influence with the inferior ranks of people&rdquo;, while new sects have all the arts of gaining proselytes. In the church of Rome the parish clergy draw part of their living from voluntary offerings, like teachers who have both a salary and fees, and the mendicant orders draw all of it: &ldquo;It is with them as with the hussars and light infantry of some armies; no plunder, no pay.&rdquo;</p><p>Then he quotes a passage he introduces as the work of &ldquo;by far the most illustrious philosopher and historian of the present age&rdquo;, which he does not name and scholars take to be David Hume, in his <em>History of England</em>. Hume's point is that clergy living by their hearers' favour will flatter the passions, so that &ldquo;the most decent and advantageous composition, which he can make with the spiritual guides, is to bribe their indolence, by assigning stated salaries to their profession, and rendering it superfluous for them to be farther active, than merely to prevent their flock from straying in quest of new pastors&rdquo;.</p><p>Smith's answer is the heart of Article III, and it turns on the number of sects. The zeal of religious teachers &ldquo;can be dangerous and troublesome only where there is either but one sect tolerated in the society, or where the whole of a large society is divided into two or three great sects&rdquo;. If it is divided into hundreds or thousands, each teacher &ldquo;would be obliged to learn that candour and moderation&rdquo;, because he would find himself among more adversaries than friends. It needs a government that is &ldquo;perfectly decided, both to let them all alone, and to oblige them all to let alone one another&rdquo;. He gives Pennsylvania as a place where it was tried. He then offers two remedies for the gloomy rigour of the little sects, in his words &ldquo;the study of science and philosophy&rdquo; for people of middling rank and fortune, enforced by an examination, and public amusements, since &ldquo;Science is the great antidote to the poison of enthusiasm and superstition&rdquo;.</p><p>Smith and Hume disagree here, and a reader can take either side with reason. Hume's view is a claim about incentives, that interested diligence in a clergy is dangerous, and Smith's is a claim about numbers, that interested diligence is harmless when no one sect can win. Sociologists who reviewed the evidence on religious competition, such as Mark Chaves and Philip Gorski in 2001, found no consistent evidence that more sects meant more religious participation, though that is a later question than Smith's, which is about peace and moderation. Smith's argument is better read as a proposal about government than as a measurement.</p><div class="defbox"><span class="label">Definition &middot; Established church</span><p>A church whose clergy are maintained by a fund the law provides: tithes, lands or stipends. Smith says the sovereign cannot be secure with such a clergy, which &ldquo;constitute a great incorporation&rdquo;, unless he can influence it, and the only way is through the preferment he has to bestow.</p></div><p>The long middle of the Article, several hundred lines, is the history of how the church of Rome became &ldquo;the most formidable combination that ever was formed against the authority and security of civil government&rdquo; and how the growth of arts and commerce weakened it, as it weakened the great barons: the clergy found things to spend their revenues on, and the hospitality that had bound the people to them ended. The lesson leaves the narrative to the book, and takes only its use in the next step.</p><p>That step is the cost, and Smith gives a figure. Smith observes that the revenue of every established church, apart from its own lands, is &ldquo;a branch, it ought to be observed, of the general revenue of the state&rdquo;, and that &ldquo;all other things being supposed equal, the richer the church, the poorer must necessarily be, either the sovereign on the one hand, or the people on the other&rdquo;. As his example of how little an established church needs, he gives the church of Scotland, whose whole revenue in 1755, with its glebes and the rent of the manses, &ldquo;amounted only to £68,514:1:5 1/12d&rdquo;, which supported nine hundred and forty-four ministers. Divide it: £68,514 over 944 ministers is <span class="math" data-say="34257 over 472">34257/472</span> of a pound each, about £72 11s, the first row of the lab's scotland preset. And &ldquo;The most opulent church in Christendom does not maintain better the uniformity of faith, the fervour of devotion, the spirit of order, regularity, and austere morals, in the great body of the people, than this very poorly endowed church of Scotland.&rdquo;</p><p>The same preset sets that average beside the other two of Smith's three cases, with figures written for the lesson: a parish priest on £40 with 200 hearers giving two shillings each, so that £20 of his £60 is offerings, and a friar on nothing with 300 hearers giving the same, so that all his £30 depends on them. The Scottish minister's £72.58 is the largest living of the three and none of it depends on his hearers, while one more hearer is worth two shillings to each of the others. The tiles give each man's share from gifts and what one more hearer is worth to him. Smith's own rule for the pay is a general one: &ldquo;If any service is very much underpaid, it is very apt to suffer by the meanness and incapacity of the greater part of those who are employed in it. If it is very much overpaid, it is apt to suffer, perhaps still more, by their negligence and idleness.&rdquo;</p><p>Part IV is short. Besides the expenses of the sovereign's duties, &ldquo;a certain expense is requisite for the support of his dignity&rdquo;, and as the whole society grows more expensive, &ldquo;it cannot well be expected that the sovereign should alone hold out against the fashion&rdquo;. A monarch, being raised higher above his subjects than a doge or a burgomaster, needs more splendour.</p><p>The Conclusion gathers the chapter. Defence and the dignity of the chief magistrate, Smith says, &ldquo;are both laid out for the general benefit of the whole society. It is reasonable, therefore, that they should be defrayed by the general contribution of the whole society; all the different members contributing, as nearly as possible, in proportion to their respective abilities.&rdquo; Justice, he says, may be paid by the fees of those who give occasion to it or those it restores, and the general revenue is needed only for criminals without means. Local works go to local revenue: &ldquo;It is unjust that the whole society should contribute towards an expense, of which the benefit is confined to a part of the society.&rdquo; Roads are paid by the tolls, and the education and religious instruction of the people may be paid by the whole society, though it &ldquo;might, perhaps, with equal propriety, and even with some advantage&rdquo; be paid by those who receive it.</p><p>Smith's list is a view of the state's job that people read in many ways. Some find in it a small government with a few duties, others a case for public schools and public works, and the same chapter has supported both. The lesson reads it as an inventory with an argument about who should pay for each item, and the argument does not settle how large the state should be.</p><p>The chapter ends by promising its sequel: &ldquo;The sources of this general or public revenue, I shall endeavour to explain in the following chapter.&rdquo; The next course, <em>Taxes and Public Debts</em>, begins with its first lesson, <em>The Funds of the Sovereign</em>, on the sovereign's own lands and stock.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The expenses of the sovereign</h2></div><p>a teacher&#x27;s or a judge&#x27;s income by fees and by salary</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The passage first, then the Article, Part IV and the Conclusion</h2><div class="prose reading"><p><strong>Book V, Chapter 1, Part 3, Article 3.</strong> The institutions for instructing people of all ages are &ldquo;chiefly those for religious instruction&rdquo;, of which the object is &ldquo;not so much to render the people good citizens in this world, as to prepare them for another and a better world in the life to come&rdquo;. Smith treats the teachers as he treated the others, as men who may &ldquo;depend altogether for their subsistence upon the voluntary contributions of their hearers&rdquo;, or live on a fund the law gives them.</p><p>His first claim is that the zeal of the first kind is greater, and he has examples. The clergy of an established church &ldquo;are apt gradually to lose the qualities, both good and bad, which gave them authority and influence with the inferior ranks of people&rdquo;, while new sects have all the arts of gaining proselytes. In the church of Rome the parish clergy draw part of their living from voluntary offerings, like teachers who have both a salary and fees, and the mendicant orders draw all of it: &ldquo;It is with them as with the hussars and light infantry of some armies; no plunder, no pay.&rdquo;</p><p>Then he quotes a passage he introduces as the work of &ldquo;by far the most illustrious philosopher and historian of the present age&rdquo;, which he does not name and scholars take to be David Hume, in his <em>History of England</em>. Hume's point is that clergy living by their hearers' favour will flatter the passions, so that &ldquo;the most decent and advantageous composition, which he can make with the spiritual guides, is to bribe their indolence, by assigning stated salaries to their profession, and rendering it superfluous for them to be farther active, than merely to prevent their flock from straying in quest of new pastors&rdquo;.</p><p>Smith's answer is the heart of Article III, and it turns on the number of sects. The zeal of religious teachers &ldquo;can be dangerous and troublesome only where there is either but one sect tolerated in the society, or where the whole of a large society is divided into two or three great sects&rdquo;. If it is divided into hundreds or thousands, each teacher &ldquo;would be obliged to learn that candour and moderation&rdquo;, because he would find himself among more adversaries than friends. It needs a government that is &ldquo;perfectly decided, both to let them all alone, and to oblige them all to let alone one another&rdquo;. He gives Pennsylvania as a place where it was tried. He then offers two remedies for the gloomy rigour of the little sects, in his words &ldquo;the study of science and philosophy&rdquo; for people of middling rank and fortune, enforced by an examination, and public amusements, since &ldquo;Science is the great antidote to the poison of enthusiasm and superstition&rdquo;.</p><p>Smith and Hume disagree here, and a reader can take either side with reason. Hume's view is a claim about incentives, that interested diligence in a clergy is dangerous, and Smith's is a claim about numbers, that interested diligence is harmless when no one sect can win. Sociologists who reviewed the evidence on religious competition, such as Mark Chaves and Philip Gorski in 2001, found no consistent evidence that more sects meant more religious participation, though that is a later question than Smith's, which is about peace and moderation. Smith's argument is better read as a proposal about government than as a measurement.</p><div class="defbox"><span class="label">Definition &middot; Established church</span><p>A church whose clergy are maintained by a fund the law provides: tithes, lands or stipends. Smith says the sovereign cannot be secure with such a clergy, which &ldquo;constitute a great incorporation&rdquo;, unless he can influence it, and the only way is through the preferment he has to bestow.</p></div><p>The long middle of the Article, several hundred lines, is the history of how the church of Rome became &ldquo;the most formidable combination that ever was formed against the authority and security of civil government&rdquo; and how the growth of arts and commerce weakened it, as it weakened the great barons: the clergy found things to spend their revenues on, and the hospitality that had bound the people to them ended. The lesson leaves the narrative to the book, and takes only its use in the next step.</p><p>That step is the cost, and Smith gives a figure. Smith observes that the revenue of every established church, apart from its own lands, is &ldquo;a branch, it ought to be observed, of the general revenue of the state&rdquo;, and that &ldquo;all other things being supposed equal, the richer the church, the poorer must necessarily be, either the sovereign on the one hand, or the people on the other&rdquo;. As his example of how little an established church needs, he gives the church of Scotland, whose whole revenue in 1755, with its glebes and the rent of the manses, &ldquo;amounted only to £68,514:1:5 1/12d&rdquo;, which supported nine hundred and forty-four ministers. Divide it: £68,514 over 944 ministers is <span class="math" data-say="34257 over 472">34257/472</span> of a pound each, about £72 11s, the first row of the lab's scotland preset. And &ldquo;The most opulent church in Christendom does not maintain better the uniformity of faith, the fervour of devotion, the spirit of order, regularity, and austere morals, in the great body of the people, than this very poorly endowed church of Scotland.&rdquo;</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The expenses of the sovereign</h2></div><p>a teacher&#x27;s or a judge&#x27;s income by fees and by salary</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The expenses of the sovereign</strong><span>a teacher's or a judge's income by fees and by salary</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="wpbTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="wpbTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Fees = the number who pay × the fee from each; income = salary + fees; the share from fees = fees ÷ income ("no income" when it is 0). One more who pays adds the fee. The person who depends most on diligence is the one with the largest share from fees, all of them when several are equal: that a share from fees measures the spur to diligence is Smith's argument (Book V, chapter 1, parts II and III), not a measurement. Amounts are in the lesson's money unit, typed as decimals (at most 6 places) or fractions such as 5/2, and computed exactly; one without a finite decimal is printed as its fraction and its value to 2 places after ≈. A percentage is exact when it has at most 2 decimal places and is otherwise rounded to 2 places on the exact value and marked ≈. </p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What a clergyman&#x27;s living depends on</h3>
-          <p>A figure computed from the quantities the lesson states. Each row is a clergyman: a salary or stipend, a number of hearers and what each gives. The lab shows the income, the share that depends on the hearers and what one more hearer is worth. The first row is Smith's figure divided by his count; the other two are written for the lesson.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What a clergyman&#x27;s living depends on</h3>
+            <p>A figure computed from the quantities the lesson states. Each row is a clergyman: a salary or stipend, a number of hearers and what each gives. The lab shows the income, the share that depends on the hearers and what one more hearer is worth. The first row is Smith's figure divided by his count; the other two are written for the lesson.</p>
         <div class="field">
           <label for="wpbPreset">Worked example</label>
           <select id="wpbPreset"><option value="scotland" selected>Smith's average minister of the church of Scotland in 1755 (£68,514 over his 944 ministers), beside a parish priest and a friar written for this lesson</option></select>
@@ -1424,12 +1467,15 @@
           <div class="kpi"><span>Depends most on diligence</span><strong id="wpbMost">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The same preset sets that average beside the other two of Smith's three cases, with figures written for the lesson: a parish priest on £40 with 200 hearers giving two shillings each, so that £20 of his £60 is offerings, and a friar on nothing with 300 hearers giving the same, so that all his £30 depends on them. The Scottish minister's £72.58 is the largest living of the three and none of it depends on his hearers, while one more hearer is worth two shillings to each of the others. The tiles give each man's share from gifts and what one more hearer is worth to him. Smith's own rule for the pay is a general one: &ldquo;If any service is very much underpaid, it is very apt to suffer by the meanness and incapacity of the greater part of those who are employed in it. If it is very much overpaid, it is apt to suffer, perhaps still more, by their negligence and idleness.&rdquo;</p><p>Part IV is short. Besides the expenses of the sovereign's duties, &ldquo;a certain expense is requisite for the support of his dignity&rdquo;, and as the whole society grows more expensive, &ldquo;it cannot well be expected that the sovereign should alone hold out against the fashion&rdquo;. A monarch, being raised higher above his subjects than a doge or a burgomaster, needs more splendour.</p><p>The Conclusion gathers the chapter. Defence and the dignity of the chief magistrate, Smith says, &ldquo;are both laid out for the general benefit of the whole society. It is reasonable, therefore, that they should be defrayed by the general contribution of the whole society; all the different members contributing, as nearly as possible, in proportion to their respective abilities.&rdquo; Justice, he says, may be paid by the fees of those who give occasion to it or those it restores, and the general revenue is needed only for criminals without means. Local works go to local revenue: &ldquo;It is unjust that the whole society should contribute towards an expense, of which the benefit is confined to a part of the society.&rdquo; Roads are paid by the tolls, and the education and religious instruction of the people may be paid by the whole society, though it &ldquo;might, perhaps, with equal propriety, and even with some advantage&rdquo; be paid by those who receive it.</p><p>Smith's list is a view of the state's job that people read in many ways. Some find in it a small government with a few duties, others a case for public schools and public works, and the same chapter has supported both. The lesson reads it as an inventory with an argument about who should pay for each item, and the argument does not settle how large the state should be.</p><p>The chapter ends by promising its sequel: &ldquo;The sources of this general or public revenue, I shall endeavour to explain in the following chapter.&rdquo; The next course, <em>Taxes and Public Debts</em>, begins with its first lesson, <em>The Funds of the Sovereign</em>, on the sovereign's own lands and stock.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Pricing a church</h2></div><p>Four steps, from a church's revenue to a clergyman's living.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Take the revenue</h3><p>The whole revenue of the church, glebes and manses included, as Smith states it for Scotland in 1755: £68,514.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Divide by the ministers</h3><p>The average living is the revenue divided by the number, 944 here, which gives <span class="math" data-say="34257 over 472">34257/472</span> of a pound.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Split any living by its source</h3><p>A living from a stipend does not change with the hearers; offerings do. The share from offerings is the measure of what Smith means by &ldquo;no plunder, no pay&rdquo;.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare the cost with what it buys</h3><p>Smith's comparison is between the expense and the &ldquo;uniformity of faith, the fervour of devotion&rdquo; it maintains. The lab computes the cost only.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Pricing a church</h2>
+      <p class="lead-in">Four steps, from a church's revenue to a clergyman's living.</p>
+      <ol class="key-ideas method"><li><strong>Take the revenue.</strong> The whole revenue of the church, glebes and manses included, as Smith states it for Scotland in 1755: £68,514.</li><li><strong>Divide by the ministers.</strong> The average living is the revenue divided by the number, 944 here, which gives <span class="math" data-say="34257 over 472">34257/472</span> of a pound.</li><li><strong>Split any living by its source.</strong> A living from a stipend does not change with the hearers; offerings do. The share from offerings is the measure of what Smith means by &ldquo;no plunder, no pay&rdquo;.</li><li><strong>Compare the cost with what it buys.</strong> Smith's comparison is between the expense and the &ldquo;uniformity of faith, the fervour of devotion&rdquo; it maintains. The lab computes the cost only.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1445,17 +1491,16 @@ in pounds:  72 and 273/472, about £72.58
 in shillings:  273/472 × 20 = about 11.57s, or 11s 7d</div><p>About £72 11s a year, which Smith calls a decent subsistence. The figure includes lands and houses estimated at a fair valuation, and he puts the whole cost to the state, with the building and repair of churches and manses, at no more than eighty or eighty-five thousand pounds a year.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking the Hume passage for Smith&#x27;s own view</strong><span>Smith quotes it at length and then replies to it. He is stating the case for paying clergy by salary at its strongest, and his own argument, from the number of sects, is a different one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading Smith as praising the Scottish church for its poverty alone</strong><span>His praise is conditional: a church of modest, nearly equal livings, whose clergy win respect by learning and regular lives, keeps order as well as the richest, and costs the state much less. He adds that the mediocrity of benefice &ldquo;may be, no doubt, carried too far&rdquo;.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the Conclusion says the state should pay for nothing but defence</strong><span>It says some expenses fall on the whole society, some on those who give occasion or benefit, and some on a locality, and that when the users do not pay enough &ldquo;the deficiency must, in most cases, be made up by the general contribution of the whole society&rdquo;.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can sort the chapter&#x27;s expenses by who should pay, and compute a living.</strong><p>Given a revenue and a count of ministers, compute the average living, split a clergyman's income by source, and state who Smith says should pay for defence, justice, roads, local works and instruction.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab divides a revenue by a count and splits a living by its source. It cannot tell you whether many sects bring peace, whether the Scottish church kept order better or worse than richer ones, or whether Smith's ranking of who should pay for what is the right one. The Scottish figure is his, divided by his own count, and the priest and the friar are written for the lesson.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking the Hume passage for Smith&#x27;s own view</strong><span>Smith quotes it at length and then replies to it. He is stating the case for paying clergy by salary at its strongest, and his own argument, from the number of sects, is a different one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading Smith as praising the Scottish church for its poverty alone</strong><span>His praise is conditional: a church of modest, nearly equal livings, whose clergy win respect by learning and regular lives, keeps order as well as the richest, and costs the state much less. He adds that the mediocrity of benefice &ldquo;may be, no doubt, carried too far&rdquo;.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the Conclusion says the state should pay for nothing but defence</strong><span>It says some expenses fall on the whole society, some on those who give occasion or benefit, and some on a locality, and that when the users do not pay enough &ldquo;the deficiency must, in most cases, be made up by the general contribution of the whole society&rdquo;.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can sort the chapter&#x27;s expenses by who should pay, and compute a living.</strong><p>Given a revenue and a count of ministers, compute the average living, split a clergyman's income by source, and state who Smith says should pay for defence, justice, roads, local works and instruction.</p></div></div><div class="note"><strong>Note:</strong> The lab divides a revenue by a count and splits a living by its source. It cannot tell you whether many sects bring peace, whether the Scottish church kept order better or worse than richer ones, or whether Smith's ranking of who should pay for what is the right one. The Scottish figure is his, divided by his own count, and the priest and the friar are written for the lesson.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Two ways of paying a clergy</summary><p>A clergy can live on the voluntary gifts of those who hear them, or on tithes, lands and a stipend. Smith says zeal is greatest in the first case, as the new sects and the mendicant friars show. A friar's rule is &ldquo;no plunder, no pay&rdquo;, and an established clergy, comfortable and learned, lose the arts that win a hearing among common people.</p></details><details class="recall"><summary>Many sects, and the sovereign</summary><p>Smith quotes a famous argument, which scholars attribute to Hume, that the magistrate does best to bribe the clergy's indolence with salaries. He replies that with a great many small sects none can disturb the peace, and that science and public amusements are the remedies for gloom and enthusiasm. Where there is an established church, he says, the sovereign must manage it through the preferments he can give.</p></details><details class="recall"><summary>Who pays for what</summary><p>In the Conclusion Smith sorts the expenses. Defence and the dignity of the chief magistrate are for the whole society in proportion to ability; justice may be paid by those who give occasion for it or are restored by it; local works by a local revenue; roads by the tolls; schools and churches by the whole society or, with equal propriety, by those who use them. The deficiency is made up by the general contribution.</p></details></div>
+      <h3>Summary</h3>
       <p>Article III is about religion as the instruction of people of all ages. Smith quotes a famous argument that the magistrate should buy off the clergy with salaries, replies that many small sects would do better, and shows what an established clergy costs the state, with a figure from Scotland. Part IV adds the dignity of the sovereign and the Conclusion sorts every expense of the chapter by who ought to pay it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Two ways of paying a clergy.</strong> A clergy can live on the voluntary gifts of those who hear them, or on tithes, lands and a stipend. Smith says zeal is greatest in the first case, as the new sects and the mendicant friars show. A friar's rule is &ldquo;no plunder, no pay&rdquo;, and an established clergy, comfortable and learned, lose the arts that win a hearing among common people.</li><li><strong>Many sects, and the sovereign.</strong> Smith quotes a famous argument, which scholars attribute to Hume, that the magistrate does best to bribe the clergy's indolence with salaries. He replies that with a great many small sects none can disturb the peace, and that science and public amusements are the remedies for gloom and enthusiasm. Where there is an established church, he says, the sovereign must manage it through the preferments he can give.</li><li><strong>Who pays for what.</strong> In the Conclusion Smith sorts the expenses. Defence and the dignity of the chief magistrate are for the whole society in proportion to ability; justice may be paid by those who give occasion for it or are restored by it; local works by a local revenue; roads by the tolls; schools and churches by the whole society or, with equal propriety, by those who use them. The deficiency is made up by the general contribution.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="teachers on voluntary pay work hardest. a salary can bribe a clergy&#x27;s indolence. many small sects, none strong enough to harm. the richer the church, the poorer the rest. who benefits, pays, the rest, everyone" tabindex="0" role="region" aria-label="Mathematical notation">teachers on voluntary pay work hardest
 a salary can bribe a clergy&#x27;s indolence
 many small sects, none strong enough to harm
@@ -2334,11 +2379,42 @@ who benefits, pays; the rest, everyone</div><figcaption>The end of the chapter i
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2406,7 +2482,7 @@ who benefits, pays; the rest, everyone</div><figcaption>The end of the chapter i
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

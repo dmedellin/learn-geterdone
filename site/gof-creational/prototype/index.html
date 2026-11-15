@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Creational Patterns</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 3 · Creational Patterns</p>
       <h1>Prototype</h1>
       <p class="lesson-lede">New objects made by copying a sample instance, which forces the question of what a copy shares with the sample it was made from.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Prototype</li><li>Prototype manager</li><li>Shallow and deep copy</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Specify the kinds of objects to create using a prototypical instance, and create new objects by copying this prototype.&rdquo; That is the intent of Prototype, the fourth pattern of Chapter 3 and an object creational pattern. Read it in your own copy first. The lesson reads it as a tool, then turns to what the authors call the pattern's hardest part, implementing the clone operation correctly, and to the question inside it of what a clone shares with its prototype, and counts who sees a change made through one clone.</p><p>The book's example is a music score editor built by customising a general framework for graphical editors. The framework supplies a tool class that creates a graphic and adds it to the document, but it cannot know the application's note and staff classes, and a subclass of the tool for every kind of note would multiply classes that differ only in what they make. So each palette tool is an instance of the one tool class, given a different prototype graphic to clone. The authors then go further: whole notes and half notes need not be classes at all, but instances of one note class with different images and durations, each installed as a prototype.</p><p>Prototype applies when a system should not care how its products are made and, besides, when the classes to create are known only at run time, loaded dynamically for instance; when you want no factory classes shadowing the product classes one for one; or when a class's instances come in only a few combinations of state, so that keeping one prototype per combination is simpler than setting the state by hand each time. The participants are the Prototype, which declares the operation that copies it; the ConcretePrototypes, which implement it; and the Client, which asks a prototype for a copy of itself whenever it needs a new object.</p><pre class="codeblock" data-say="line 1, comment, A playlist template and its two ways of being copied.. line 2, final class playlist. line 3, private final string name. line 4, private final list of track tracks, comment, a part that can change. line 6, playlist of string name, list of track tracks. line 7, this dot name is set to name. line 8, this dot tracks is set to tracks. line 11, playlist shallow copy of string new name. line 12, return new playlist of new name, tracks, comment, shares it. line 15, playlist deep copy of string new name. line 16, return new playlist of new name, new array list of tracks, comment, owns one. line 19, void add of track track tracks dot add of track" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A playlist template and its two ways of being copied.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the count</h2><div class="prose reading"><p>&ldquo;Specify the kinds of objects to create using a prototypical instance, and create new objects by copying this prototype.&rdquo; That is the intent of Prototype, the fourth pattern of Chapter 3 and an object creational pattern. Read it in your own copy first. The lesson reads it as a tool, then turns to what the authors call the pattern's hardest part, implementing the clone operation correctly, and to the question inside it of what a clone shares with its prototype, and counts who sees a change made through one clone.</p><p>The book's example is a music score editor built by customising a general framework for graphical editors. The framework supplies a tool class that creates a graphic and adds it to the document, but it cannot know the application's note and staff classes, and a subclass of the tool for every kind of note would multiply classes that differ only in what they make. So each palette tool is an instance of the one tool class, given a different prototype graphic to clone. The authors then go further: whole notes and half notes need not be classes at all, but instances of one note class with different images and durations, each installed as a prototype.</p><p>Prototype applies when a system should not care how its products are made and, besides, when the classes to create are known only at run time, loaded dynamically for instance; when you want no factory classes shadowing the product classes one for one; or when a class's instances come in only a few combinations of state, so that keeping one prototype per combination is simpler than setting the state by hand each time. The participants are the Prototype, which declares the operation that copies it; the ConcretePrototypes, which implement it; and the Client, which asks a prototype for a copy of itself whenever it needs a new object.</p><pre class="codeblock" data-say="line 1, comment, A playlist template and its two ways of being copied.. line 2, final class playlist. line 3, private final string name. line 4, private final list of track tracks, comment, a part that can change. line 6, playlist of string name, list of track tracks. line 7, this dot name is set to name. line 8, this dot tracks is set to tracks. line 11, playlist shallow copy of string new name. line 12, return new playlist of new name, tracks, comment, shares it. line 15, playlist deep copy of string new name. line 16, return new playlist of new name, new array list of tracks, comment, owns one. line 19, void add of track track tracks dot add of track" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A playlist template and its two ways of being copied.</span>
 <span class="cl">final class Playlist {</span>
 <span class="cl">    private final String name;</span>
 <span class="cl">    private final List&lt;Track&gt; tracks;      // a part that can change</span>
@@ -1479,12 +1523,11 @@
 <span class="cl">        }</span>
 <span class="cl">        return prototype.deepCopy(newName);</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The Sample Code makes a maze factory that is given a prototype maze, room, wall and door and clones them, so a new kind of maze is a new set of prototypes rather than a new factory subclass; a cloned door is then given its rooms by an initialise operation, and a Smalltalk version keeps a dictionary of prototypes. Read it in the book. The known uses reach back to Ivan Sutherland's Sketchpad and to ThingLab; Goldberg and Robson name prototypes as a pattern and Coplien describes C++ idioms for them; the etgdb debugger front end clones the debugger adaptor an environment variable names; Mode Composer keeps interaction techniques as prototypes; and the music editor is based on Unidraw. The related patterns: Prototype competes with Abstract Factory in some designs, the subject of the chapter's discussion, and can serve it, a factory holding prototypes to clone; and designs heavy with Composite and Decorator often gain from it.</p><p>Now the lab, on a music playlist app rather than a score editor. A template playlist, a workout mix, is the prototype, and three runners clone it. The lab's sharing view asks who holds which track list and what a change made through one holder reaches; its panel speaks of a model, a value and holders, which here are the design, the track list and the template with its clones. On the preset <code>shallow-clones</code> the copies are shallow, so the template and all three clones hold the one list <code>tracks-w</code>. Ben adds a track through his copy: the lab counts 4 holders, 4 that see the change, 3 surprised, the template, Ana and Cy, who saw a change they did not make, and 0 new values. The template is among the surprised, so every clone made from it later starts with Ben's track.</p><p>On <code>deep-clones</code> each copy has its own list, and Ben's change to <code>tracks-b</code> reaches 1 holder, himself, with none surprised: the clones are independent, at the price of a list copied for every clone, which this view does not count. The preset <code>shallow-immutable</code> shares one list again, but an immutable one: a change made through Ben gives him a new list, <code><span data-say="tracks minus w prime">tracks-w′</span></code> in the lab, so 1 holder sees it, none are surprised, and 1 new value is made. A shallow copy is safe for any part that cannot change, which is why the decision the authors describe is made part by part.</p><h3>Exercise</h3><ul><li>A quiz app keeps a multiple-choice template, <span class="math" data-say="mc minus template">mc-template</span>, and clones it for four questions. Three clones, <span class="math" data-say="q 1">q1</span>, <span class="math" data-say="q 2">q2</span> and <span class="math" data-say="q 4">q4</span>, are shallow and share the template's options list <span class="math" data-say="opts">opts</span>; <span class="math" data-say="q 3">q3</span> was deep-copied and holds <span class="math" data-say="opts minus 3">opts-3</span>.</li><li>Through <span class="math" data-say="q 2">q2</span>, an option in <span class="math" data-say="opts">opts</span> is reworded.</li></ul><p>Count, for a mutable and then an immutable options list, the holders of <code>opts</code>, the holders that see the change, the holders surprised and the new values made. Then type the holders into the lab and check.</p><p>A prototype manager is one object that every client must reach. The next lesson, Singleton, reads the pattern for a class that has exactly one instance.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Identity and value</h2></div><p>a change through one holder of a shared value</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The Sample Code makes a maze factory that is given a prototype maze, room, wall and door and clones them, so a new kind of maze is a new set of prototypes rather than a new factory subclass; a cloned door is then given its rooms by an initialise operation, and a Smalltalk version keeps a dictionary of prototypes. Read it in the book. The known uses reach back to Ivan Sutherland's Sketchpad and to ThingLab; Goldberg and Robson name prototypes as a pattern and Coplien describes C++ idioms for them; the etgdb debugger front end clones the debugger adaptor an environment variable names; Mode Composer keeps interaction techniques as prototypes; and the music editor is based on Unidraw. The related patterns: Prototype competes with Abstract Factory in some designs, the subject of the chapter's discussion, and can serve it, a factory holding prototypes to clone; and designs heavy with Composite and Decorator often gain from it.</p><p>Now the lab, on a music playlist app rather than a score editor. A template playlist, a workout mix, is the prototype, and three runners clone it. The lab's sharing view asks who holds which track list and what a change made through one holder reaches; its panel speaks of a model, a value and holders, which here are the design, the track list and the template with its clones. On the preset <code>shallow-clones</code> the copies are shallow, so the template and all three clones hold the one list <code>tracks-w</code>. Ben adds a track through his copy: the lab counts 4 holders, 4 that see the change, 3 surprised, the template, Ana and Cy, who saw a change they did not make, and 0 new values. The template is among the surprised, so every clone made from it later starts with Ben's track.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Identity and value</h2></div><p>a change through one holder of a shared value</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Identity and value</strong><span>a change through one holder of a shared value</span></div>
       </div>
@@ -1492,10 +1535,10 @@
       <div class="table-wrap" id="didTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="didTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record says which value a holder refers to; several holders may share one. A change is made through one holder. If the value is mutable it changes in place, so every holder of it sees the change; if it is immutable the changing holder gets a new value (named with ′) and every other holder keeps the old one. A holder is surprised when it sees a change it did not make. Lists follow the record order.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Who sees a change made through one clone</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of how a prototype is copied; how to copy each part is weighed in the book, against what in the design is expected to change.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Who sees a change made through one clone</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of how a prototype is copied; how to copy each part is weighed in the book, against what in the design is expected to change.</p>
         <div class="field">
           <label for="didPreset">Worked example</label>
           <select id="didPreset"><option value="shallow-clones" selected>Three shallow clones of a playlist template</option><option value="deep-clones">Three deep clones of the same template</option><option value="shallow-immutable">Shallow clones sharing an immutable track list</option></select>
@@ -1523,12 +1566,15 @@
           <div class="kpi"><span>New values created</span><strong id="didNew">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>On <code>deep-clones</code> each copy has its own list, and Ben's change to <code>tracks-b</code> reaches 1 holder, himself, with none surprised: the clones are independent, at the price of a list copied for every clone, which this view does not count. The preset <code>shallow-immutable</code> shares one list again, but an immutable one: a change made through Ben gives him a new list, <code><span data-say="tracks minus w prime">tracks-w′</span></code> in the lab, so 1 holder sees it, none are surprised, and 1 new value is made. A shallow copy is safe for any part that cannot change, which is why the decision the authors describe is made part by part.</p><h3>Exercise</h3><ul><li>A quiz app keeps a multiple-choice template, <span class="math" data-say="mc minus template">mc-template</span>, and clones it for four questions. Three clones, <span class="math" data-say="q 1">q1</span>, <span class="math" data-say="q 2">q2</span> and <span class="math" data-say="q 4">q4</span>, are shallow and share the template's options list <span class="math" data-say="opts">opts</span>; <span class="math" data-say="q 3">q3</span> was deep-copied and holds <span class="math" data-say="opts minus 3">opts-3</span>.</li><li>Through <span class="math" data-say="q 2">q2</span>, an option in <span class="math" data-say="opts">opts</span> is reworded.</li></ul><p>Count, for a mutable and then an immutable options list, the holders of <code>opts</code>, the holders that see the change, the holders surprised and the new values made. Then type the holders into the lab and check.</p><p>A prototype manager is one object that every client must reach. The next lesson, Singleton, reads the pattern for a class that has exactly one instance.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Making new objects by copying</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the classes that differ only in values</h3><p>Look for subclasses, or factory subclasses, whose only job is to set different values. Each could be one class with a prototype per variant.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Decide part by part what a clone shares</h3><p>For each field of the prototype, ask whether it can change after cloning. Share what cannot; copy what can.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Register the prototypes</h3><p>Keep the prototypes in a manager keyed by name, so that a new variant is registered while the program runs instead of written as a class.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own code</h3><p>Find an object in a system you know that is copied to make new ones: a template, a default configuration, a test fixture. List who holds its changeable parts after copying, type them into the lab, and count the holders one change surprises.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Making new objects by copying</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>Find the classes that differ only in values.</strong> Look for subclasses, or factory subclasses, whose only job is to set different values. Each could be one class with a prototype per variant.</li><li><strong>Decide part by part what a clone shares.</strong> For each field of the prototype, ask whether it can change after cloning. Share what cannot; copy what can.</li><li><strong>Register the prototypes.</strong> Keep the prototypes in a manager keyed by name, so that a new variant is registered while the program runs instead of written as a class.</li><li><strong>Do it on your own code.</strong> Find an object in a system you know that is copied to make new ones: a template, a default configuration, a test fixture. List who holds its changeable parts after copying, type them into the lab, and count the holders one change surprises.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1546,17 +1592,16 @@ deep: Ben&#x27;s list is his alone
 Ben&#x27;s change: 1 sees it, none surprised</div><p>The template counted among the surprised is the costly one: every runner who clones it next starts with Ben's track.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming a copy is independent of its prototype</strong><span>A shallow copy shares every part the prototype refers to. On the playlist the lab counts 3 holders surprised by one runner's change, the template among them, so every later clone inherits it. The authors put it plainly: cloning makes you decide what is shared.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Deep-copying everything to be safe</strong><span>A deep copy costs an object per part for every clone, and is wrong for parts meant to be shared, such as a connection to a service. A part that cannot change can be shared by a shallow copy, as the immutable preset shows.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Passing initial values through the clone operation</strong><span>Prototypes of different classes need different values, so a clone operation with parameters cannot be uniform. The authors reset state after cloning, through setters or an initialise operation.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a clone shares and count who sees a change.</strong><p>Given a prototype, its clones and the parts each holds, state who sees a change made through one clone under shallow and deep copying, and the consequences and the liability the authors list.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts who holds a shared part and who sees a change to it. It cannot tell which parts of your prototype will change after cloning, what a deep copy costs, or whether a part is meant to be shared; those decide, part by part, how a clone should be made.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming a copy is independent of its prototype</strong><span>A shallow copy shares every part the prototype refers to. On the playlist the lab counts 3 holders surprised by one runner's change, the template among them, so every later clone inherits it. The authors put it plainly: cloning makes you decide what is shared.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Deep-copying everything to be safe</strong><span>A deep copy costs an object per part for every clone, and is wrong for parts meant to be shared, such as a connection to a service. A part that cannot change can be shared by a shallow copy, as the immutable preset shows.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Passing initial values through the clone operation</strong><span>Prototypes of different classes need different values, so a clone operation with parameters cannot be uniform. The authors reset state after cloning, through setters or an initialise operation.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a clone shares and count who sees a change.</strong><p>Given a prototype, its clones and the parts each holds, state who sees a change made through one clone under shallow and deep copying, and the consequences and the liability the authors list.</p></div></div><div class="note"><strong>Note:</strong> The lab counts who holds a shared part and who sees a change to it. It cannot tell which parts of your prototype will change after cloning, what a deep copy costs, or whether a part is meant to be shared; those decide, part by part, how a clone should be made.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Prototype</summary><p>An instance kept as a sample of what to create. A client makes new objects by asking it to copy itself, so the client needs neither the product's class nor a factory class for it.</p></details><details class="recall"><summary>Prototype manager</summary><p>A registry that stores prototypes under keys, so that clients can register, look up, replace and remove them while the program runs, and clone by name.</p></details><details class="recall"><summary>Shallow and deep copy</summary><p>A shallow copy duplicates the object and shares everything it refers to with the original; a deep copy duplicates those parts as well, so original and clone are independent. Cloning makes you choose, part by part, what is shared.</p></details></div>
+      <h3>Summary</h3>
       <p>Prototype makes new objects by asking a sample instance to copy itself, which removes the factory classes and brings what the authors call its hardest part, implementing the copy correctly, and with it the question of what a clone shares. Read the pattern, then count who sees a change made through one clone of a playlist, under shallow and deep copies.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Prototype.</strong> An instance kept as a sample of what to create. A client makes new objects by asking it to copy itself, so the client needs neither the product's class nor a factory class for it.</li><li><strong>Prototype manager.</strong> A registry that stores prototypes under keys, so that clients can register, look up, replace and remove them while the program runs, and clone by name.</li><li><strong>Shallow and deep copy.</strong> A shallow copy duplicates the object and shares everything it refers to with the original; a deep copy duplicates those parts as well, so original and clone are independent. Cloning makes you choose, part by part, what is shared.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="copy a sample instead of naming A class. register prototypes while running. variants by value, not by subclass. a shallow copy shares every part. a deep copy owns its parts. share only what cannot change" tabindex="0" role="region" aria-label="Mathematical notation">copy a sample instead of naming a class
 register prototypes while running
 variants by value, not by subclass
@@ -2302,11 +2347,42 @@ share only what cannot change</div><figcaption>Prototype in six lines</figcaptio
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2374,7 +2450,7 @@ share only what cannot change</div><figcaption>Prototype in six lines</figcaptio
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

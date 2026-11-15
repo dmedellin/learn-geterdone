@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Creational Patterns</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 3 · Creational Patterns</p>
       <h1>Factory Method</h1>
       <p class="lesson-lede">An overridable operation that creates an object, so a class can say when one is needed and leave which class it is to its subclasses.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Factory method</li><li>Creator and product hierarchies</li><li>Parameterized factory method</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Define an interface for creating an object, but let subclasses decide which class to instantiate.&rdquo; So begins the intent of Factory Method, also known as Virtual Constructor, the third pattern of Chapter 3 and its only class creational one: it works by inheritance, where the others hand creation to an object. Read the pattern in your own copy first. The lesson reads it as a tool, then counts the classes a creator hierarchy and its products need, and what a new product costs.</p><p>The motivating example is a framework for applications that manage several documents. Its two central classes, Application and Document, are both abstract, and a drawing program subclasses both. The framework knows when a new document is needed, when the user chooses Open or New, but not which document class to make, and it cannot instantiate an abstract class. So Application declares an abstract operation that creates a document, each application subclass overrides it to return its own document class, and the framework calls it. That operation is the factory method: it carries one piece of knowledge, which class, out of the framework and into the subclass.</p><p>The pattern applies when a class cannot know in advance which class its objects must be, when a class would rather its subclasses chose, and when a class passes work to a helper whose subclass varies, and the choice of subclass should be made in one place. The participants are the Product interface, the ConcreteProducts, the Creator, which declares the factory method, may give it a default and calls it, and the ConcreteCreators, which override it. The one collaboration is that the Creator relies on its subclasses for the right product.</p><pre class="codeblock" data-say="line 1, comment, The controller knows when a zone needs a schedule, not which one.. line 2, abstract class zone. line 3, protected abstract schedule create schedule, comment, the factory method. line 5, abstract list of valve valves. line 7, final void run cycle of weather today. line 8, schedule schedule is set to create schedule. line 9, for valve valve in valves. line 10, valve dot open of schedule dot minutes for of today. line 15, final class lawn zone extends zone. line 16, private final list of valve sprinklers is set to new array list. line 18, at override protected schedule create schedule return new lawn schedule. line 19, at override list of valve valves return sprinklers" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The controller knows when a zone needs a schedule, not which one.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the count</h2><div class="prose reading"><p>&ldquo;Define an interface for creating an object, but let subclasses decide which class to instantiate.&rdquo; So begins the intent of Factory Method, also known as Virtual Constructor, the third pattern of Chapter 3 and its only class creational one: it works by inheritance, where the others hand creation to an object. Read the pattern in your own copy first. The lesson reads it as a tool, then counts the classes a creator hierarchy and its products need, and what a new product costs.</p><p>The motivating example is a framework for applications that manage several documents. Its two central classes, Application and Document, are both abstract, and a drawing program subclasses both. The framework knows when a new document is needed, when the user chooses Open or New, but not which document class to make, and it cannot instantiate an abstract class. So Application declares an abstract operation that creates a document, each application subclass overrides it to return its own document class, and the framework calls it. That operation is the factory method: it carries one piece of knowledge, which class, out of the framework and into the subclass.</p><p>The pattern applies when a class cannot know in advance which class its objects must be, when a class would rather its subclasses chose, and when a class passes work to a helper whose subclass varies, and the choice of subclass should be made in one place. The participants are the Product interface, the ConcreteProducts, the Creator, which declares the factory method, may give it a default and calls it, and the ConcreteCreators, which override it. The one collaboration is that the Creator relies on its subclasses for the right product.</p><pre class="codeblock" data-say="line 1, comment, The controller knows when a zone needs a schedule, not which one.. line 2, abstract class zone. line 3, protected abstract schedule create schedule, comment, the factory method. line 5, abstract list of valve valves. line 7, final void run cycle of weather today. line 8, schedule schedule is set to create schedule. line 9, for valve valve in valves. line 10, valve dot open of schedule dot minutes for of today. line 15, final class lawn zone extends zone. line 16, private final list of valve sprinklers is set to new array list. line 18, at override protected schedule create schedule return new lawn schedule. line 19, at override list of valve valves return sprinklers" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The controller knows when a zone needs a schedule, not which one.</span>
 <span class="cl">abstract class Zone {</span>
 <span class="cl">    protected abstract Schedule createSchedule();   // the factory method</span>
 <span class="cl"></span>
@@ -1479,12 +1523,11 @@
 <span class="cl">    @Override List&lt;Valve&gt; valves() { return valves; }</span>
 <span class="cl">}</span>
 <span class="cl"></span>
-<span class="cl">// new PlainZone(DripSchedule::new, potLines) needs no PotZone class.</span></code></pre><p>The Sample Code gives the maze game a factory method for the maze and each kind of part, rewrites the maze routine to call them, and overrides a few of them in bombed and enchanted game subclasses; read it in the book. The known uses are many, since factory methods are everywhere in toolkits and frameworks: the document example in MacApp and ET++, Unidraw's manipulators, the Smalltalk-80 view whose default controller's class is the real factory method, a class choosing the parser for its own source code, and the Orbix broker choosing a proxy for a remote object. The related patterns: Abstract Factory is often built from factory methods; factory methods are usually called inside Template Methods; and Prototype needs no Creator subclass, though it often needs an initialising operation on the product, which Factory Method does not.</p><p>Now the lab, on a garden irrigation controller rather than a document framework. The controller's abstract Zone runs a watering cycle and asks its factory method for a schedule; three concrete zones, lawn, bed and greenhouse, each make their own schedule class. In the lab's terms that is 3 families and 1 kind of product. On the preset <code>zones</code> there are <span data-say="3 times 1 equals 3">3 × 1 = 3</span> concrete products, and the classes add up as 1 abstract creator, 3 concrete creators, 1 abstract product and 3 concrete products, 1 + 3 + 1 + 3 = 8, of which 1 + 3 = 4 create. The prototype configuration tile reads none: only Prototype configures instances.</p><p>On <code>zones-new-zone</code> a fourth zone type, a row of pots on drip lines, adds 2 classes, 1 concrete creator and 1 concrete product, taking the design from 8 to 10, and edits none. Nothing written changes, and since a pot zone also supplies its own valves, its creator subclass is the harmless case the authors name, one the client needed anyway; had zones differed only in schedules, it would exist just to make one product. The preset <code>zones-new-kind</code> asks for a second kind of product, a moisture sensor per zone. The lab counts the book's own shape, the one its maze game has: the abstract Zone declares a second factory method and every zone overrides it. That adds 4 classes, 1 abstract sensor and 3 concrete ones, 8 to 12, and edits 4, the abstract creator and its 3 concrete creators. Those are exactly the Abstract Factory lesson's counts, because the two patterns have the same shape here: an abstract factory is often a set of factory methods. What differs is where the choice is made, in a subclass of the class that uses the products or in a separate object handed to it.</p><h3>Exercise</h3><ul><li>A vending machine framework has an abstract <span class="math" data-say="slot">Slot</span> whose factory method creates the slot's dispenser.</li><li>Four slot types, <span class="math" data-say="can">can</span>, <span class="math" data-say="bottle">bottle</span>, <span class="math" data-say="snack">snack</span> and <span class="math" data-say="hot minus drink">hot-drink</span>, each override it to make their own dispenser class.</li></ul><p>By hand, count the concrete products, the classes in the design, the classes that create, and what a fifth slot type adds and edits. Then type it into the lab as four families and one kind under the factory-method scheme, and check.</p><p>A creator subclass for every product is the cost this lesson counted. The next lesson, Prototype, reads the pattern that does without the creator hierarchy by copying an instance instead.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Classes</h2></div><p>families and kinds of product, and who makes them</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">// new PlainZone(DripSchedule::new, potLines) needs no PotZone class.</span></code></pre><p>The Sample Code gives the maze game a factory method for the maze and each kind of part, rewrites the maze routine to call them, and overrides a few of them in bombed and enchanted game subclasses; read it in the book. The known uses are many, since factory methods are everywhere in toolkits and frameworks: the document example in MacApp and ET++, Unidraw's manipulators, the Smalltalk-80 view whose default controller's class is the real factory method, a class choosing the parser for its own source code, and the Orbix broker choosing a proxy for a remote object. The related patterns: Abstract Factory is often built from factory methods; factory methods are usually called inside Template Methods; and Prototype needs no Creator subclass, though it often needs an initialising operation on the product, which Factory Method does not.</p><p>Now the lab, on a garden irrigation controller rather than a document framework. The controller's abstract Zone runs a watering cycle and asks its factory method for a schedule; three concrete zones, lawn, bed and greenhouse, each make their own schedule class. In the lab's terms that is 3 families and 1 kind of product. On the preset <code>zones</code> there are <span data-say="3 times 1 equals 3">3 × 1 = 3</span> concrete products, and the classes add up as 1 abstract creator, 3 concrete creators, 1 abstract product and 3 concrete products, 1 + 3 + 1 + 3 = 8, of which 1 + 3 = 4 create. The prototype configuration tile reads none: only Prototype configures instances.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Classes</h2></div><p>families and kinds of product, and who makes them</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Classes</strong><span>families and kinds of product, and who makes them</span></div>
       </div>
@@ -1492,10 +1535,10 @@
       <div class="table-wrap" id="gclTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gclTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> F families × K kinds of product. Every scheme has K abstract products and F × K concrete product classes, counted as if each concrete product differs in behaviour. Abstract Factory adds 1 abstract factory and 1 concrete factory per family: 1 + F + K + F × K. Factory Method has 1 abstract creator declaring one factory method per kind and 1 concrete creator subclass per family overriding them: 1 + F + K + F × K, the same count, the difference being that the client subclasses the creator instead of composing with a factory object. Prototype adds 1 prototype manager, a registry keyed by kind, and no factory subclasses: 1 + K + F × K; a family is a configuration of K prototype instances. A new family adds its K products and, under Abstract Factory, 1 concrete factory, under Factory Method 1 concrete creator, under Prototype 1 configuration; it edits no existing class. A new kind adds 1 abstract product and F concrete products; under Abstract Factory it edits the abstract factory and every concrete factory (1 + F classes), each gaining an operation, and under Factory Method the abstract creator and every concrete creator (1 + F), each gaining a factory method; under Prototype it edits no class, and each of the F configurations registers one more prototype. The client is not counted.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Creators, products and what a new product costs</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Creators, products and what a new product costs</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gclPreset">Worked example</label>
           <select id="gclPreset"><option value="zones" selected>An irrigation controller: three zone types, one schedule each</option><option value="zones-new-zone">The same controller gaining a fourth zone type</option><option value="zones-new-kind">The same controller gaining a second kind of product</option></select>
@@ -1526,12 +1569,15 @@
           <div class="kpi"><span>Configurations the change touches</span><strong id="gclConfigChange">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>On <code>zones-new-zone</code> a fourth zone type, a row of pots on drip lines, adds 2 classes, 1 concrete creator and 1 concrete product, taking the design from 8 to 10, and edits none. Nothing written changes, and since a pot zone also supplies its own valves, its creator subclass is the harmless case the authors name, one the client needed anyway; had zones differed only in schedules, it would exist just to make one product. The preset <code>zones-new-kind</code> asks for a second kind of product, a moisture sensor per zone. The lab counts the book's own shape, the one its maze game has: the abstract Zone declares a second factory method and every zone overrides it. That adds 4 classes, 1 abstract sensor and 3 concrete ones, 8 to 12, and edits 4, the abstract creator and its 3 concrete creators. Those are exactly the Abstract Factory lesson's counts, because the two patterns have the same shape here: an abstract factory is often a set of factory methods. What differs is where the choice is made, in a subclass of the class that uses the products or in a separate object handed to it.</p><h3>Exercise</h3><ul><li>A vending machine framework has an abstract <span class="math" data-say="slot">Slot</span> whose factory method creates the slot's dispenser.</li><li>Four slot types, <span class="math" data-say="can">can</span>, <span class="math" data-say="bottle">bottle</span>, <span class="math" data-say="snack">snack</span> and <span class="math" data-say="hot minus drink">hot-drink</span>, each override it to make their own dispenser class.</li></ul><p>By hand, count the concrete products, the classes in the design, the classes that create, and what a fifth slot type adds and edits. Then type it into the lab as four families and one kind under the factory-method scheme, and check.</p><p>A creator subclass for every product is the cost this lesson counted. The next lesson, Prototype, reads the pattern that does without the creator hierarchy by copying an instance instead.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Introducing a factory method</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the line that names a class</h3><p>Look for the place where a general class constructs a specific one. The general class knows when the object is needed; the specific class is what varies.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Move the construction into an operation</h3><p>Replace the constructor call with a call to a protected factory method that returns the product interface, abstract or with a default.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the creators</h3><p>Each concrete product needs a creator subclass that overrides the factory method, unless a default or a passed-in constructor serves. Count creators against products.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own code</h3><p>Find a hook in a system you know that subclasses override to supply an object, such as a test base class or a plug-in point. Count its creator subclasses and products in the lab, and note how many creators exist only to make one product.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Introducing a factory method</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>Find the line that names a class.</strong> Look for the place where a general class constructs a specific one. The general class knows when the object is needed; the specific class is what varies.</li><li><strong>Move the construction into an operation.</strong> Replace the constructor call with a call to a protected factory method that returns the product interface, abstract or with a default.</li><li><strong>Count the creators.</strong> Each concrete product needs a creator subclass that overrides the factory method, unless a default or a passed-in constructor serves. Count creators against products.</li><li><strong>Do it on your own code.</strong> Find a hook in a system you know that subclasses override to supply an object, such as a test base class or a plug-in point. Count its creator subclasses and products in the lab, and note how many creators exist only to make one product.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1550,17 +1596,16 @@ a sensor kind adds 1 + 3 = 4, edits 4
 edits none; the design goes 8 → 10</div><p>Each zone subclass also supplies its valves, the harmless case; one that existed only to pick a schedule would be the disadvantage, and a template or a prototype the way round it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Factory Method needs no extra classes</strong><span>The factory method is one operation, but each concrete product usually needs a creator subclass to return it, 4 creating classes for 3 products on the irrigation controller. Where the subclass exists anyway, as each zone does for its valves, that costs nothing; where it exists only to pick a product, the authors call it the pattern's potential disadvantage, and offer a template, and later Prototype, as ways round it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting a factory method behind every constructor call</strong><span>The Discussion of Creational Patterns says factory methods are not needed when the class instantiated never changes, or when the making already happens in an operation subclasses can override. A factory method is a hook for what varies.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling the factory method from the creator&#x27;s constructor</strong><span>In C++ the subclass's override is not yet in effect there; in Java it runs before the subclass's fields are set. The authors' remedy is an accessor that creates the product on first use.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a creator hierarchy and the product hierarchy it parallels.</strong><p>Given the products of a design under Factory Method, state its classes and creators, what a new product adds and edits, the pattern's disadvantage, and the two further consequences the authors list.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts one concrete creator per family, from the zones and kinds you state. A creator with a sensible default, a parameterized factory method or a passed-in constructor needs fewer, and whether the subclasses would exist anyway, which decides whether the cost is real, is for you to judge.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Factory Method needs no extra classes</strong><span>The factory method is one operation, but each concrete product usually needs a creator subclass to return it, 4 creating classes for 3 products on the irrigation controller. Where the subclass exists anyway, as each zone does for its valves, that costs nothing; where it exists only to pick a product, the authors call it the pattern's potential disadvantage, and offer a template, and later Prototype, as ways round it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting a factory method behind every constructor call</strong><span>The Discussion of Creational Patterns says factory methods are not needed when the class instantiated never changes, or when the making already happens in an operation subclasses can override. A factory method is a hook for what varies.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling the factory method from the creator&#x27;s constructor</strong><span>In C++ the subclass's override is not yet in effect there; in Java it runs before the subclass's fields are set. The authors' remedy is an accessor that creates the product on first use.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a creator hierarchy and the product hierarchy it parallels.</strong><p>Given the products of a design under Factory Method, state its classes and creators, what a new product adds and edits, the pattern's disadvantage, and the two further consequences the authors list.</p></div></div><div class="note"><strong>Note:</strong> The lab counts one concrete creator per family, from the zones and kinds you state. A creator with a sensible default, a parameterized factory method or a passed-in constructor needs fewer, and whether the subclasses would exist anyway, which decides whether the cost is real, is for you to judge.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Factory method</summary><p>An operation, declared in a class, whose job is to create and return an object of some product type. Subclasses override it to choose the concrete product; the class that declares it calls it without knowing which class it gets.</p></details><details class="recall"><summary>Creator and product hierarchies</summary><p>The Creator declares the factory method and usually calls it; each ConcreteCreator overrides it. When each creator subclass makes its own product subclass the two hierarchies run in parallel, and the factory method records which classes go together.</p></details><details class="recall"><summary>Parameterized factory method</summary><p>A factory method that takes an identifier of the kind to create, so one operation can make several products. A subclass can override it for a few identifiers and pass the rest back to its parent.</p></details></div>
+      <h3>Summary</h3>
       <p>Factory Method is the chapter's one class creational pattern: a class declares an operation that makes an object, and its subclasses decide what it makes. Read the pattern, then count the creator and product classes an irrigation controller needs, and what a new zone type adds.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Factory method.</strong> An operation, declared in a class, whose job is to create and return an object of some product type. Subclasses override it to choose the concrete product; the class that declares it calls it without knowing which class it gets.</li><li><strong>Creator and product hierarchies.</strong> The Creator declares the factory method and usually calls it; each ConcreteCreator overrides it. When each creator subclass makes its own product subclass the two hierarchies run in parallel, and the factory method records which classes go together.</li><li><strong>Parameterized factory method.</strong> A factory method that takes an identifier of the kind to create, so one operation can make several products. A subclass can override it for a few identifiers and pass the rest back to its parent.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="subclasses decide what to instantiate. the creator knows when, not which class. a factory method is a hook. creators run parallel to products. A new product, a creator and a product. pass an identifier for many products" tabindex="0" role="region" aria-label="Mathematical notation">subclasses decide what to instantiate
 the creator knows when, not which class
 a factory method is a hook
@@ -2357,11 +2402,42 @@ pass an identifier for many products</div><figcaption>Factory Method in six line
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2429,7 +2505,7 @@ pass an identifier for many products</div><figcaption>Factory Method in six line
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

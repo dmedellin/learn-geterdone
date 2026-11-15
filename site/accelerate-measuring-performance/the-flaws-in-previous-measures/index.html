@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Accelerate and Measuring Performance</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 2 · Measuring Performance</p>
       <h1>The Flaws in Previous Attempts to Measure Performance</h1>
       <p class="lesson-lede">Lines of code, velocity and utilization each measure an output or a local quantity, and the third has a rule that shows why: a wait grows without limit as slack runs out.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Output and outcome</li><li>Utilization</li><li>Lead time and service time</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Three measures, and why each fails</h2>
-      <article class="prose reading"><p>Chapter 2 opens with a difficulty. Measuring performance in software is hard, the authors say, because the inventory is invisible, because the way work is broken down is relatively arbitrary, and because design and delivery happen at the same time. Their first section, The Flaws in Previous Attempts to Measure Performance, names two drawbacks of the usual measures of productivity. They focus on outputs rather than outcomes, and on what one person or one function does, rather than on what a team or the whole delivers. Three examples follow: lines of code, velocity and utilization.</p><p>Lines of code come first, and the argument is short. A company that rewards developers for lines written gets more lines, and the authors say it gets bloated software with higher maintenance and change costs. They would rather have ten lines than a thousand for the same problem, and a business process change that removes the need for code is better still. They do not conclude that fewer is always better: a task done in one line that nobody else can read is worse than a few lines everybody can. A count of lines is a count of output, and no direction of it is the goal.</p><p>Velocity is the Agile way to measure the same thing. Teams estimate stories in points, and the points signed off at the end of an iteration are the team's velocity, which was designed to plan capacity, to extrapolate how long the planned work will take. The authors object when managers use it to compare teams or to measure productivity. It is relative and team-dependent, since teams' contexts differ, so one team's points cannot be set against another's. And when it is a target, teams game it, inflating estimates and pushing stories through while collaboration suffers, which spoils its use as a planning tool and discourages teams from helping one another.</p><p>Utilization is the third. Many organizations treat how busy people are as a stand-in for productivity. The authors say that &ldquo;high utilization is only good up to a point&rdquo;: past it, nothing is left over for the unplanned, for a change of plan or for improving the work, and lead times lengthen. They cite queue theory, in which lead times approach infinity as utilization approaches 100 percent, and say that getting anything done then takes teams far longer, in their word exponentially. Lead time is the productivity measure that avoids the faults of the other two, and the authors conclude that utilization has to be managed against it.</p><p>The rule behind that sentence is a few lines of arithmetic, and the lab does it. In the simplest queueing model, one worker taking tasks one at a time, with tasks arriving at random, a task waits on average <span class="math" data-say="u over the quantity 1 minus u">u/(1 − u)</span> times its service time for its turn, where <span class="math" data-say="u">u</span> is the utilization as a fraction. Its lead time is the wait plus the service, which is the service time divided by <span class="math" data-say="1 minus u">1 − u</span>. Two cautions. The model is a simplification of any real team, which has several people, tasks of mixed sizes and arrivals that are not random. And in this model the growth is a hyperbola, steeper and steeper near 100 percent, which is not strictly the exponential of the book's wording; the book's point, that the wait has no limit, holds. The System Design path teaches the model in its lesson The Knee: Response Time vs Utilisation, in Queues and Utilisation, and this lesson does not repeat it.</p><p>The preset <code>ladder</code> takes a review that needs two hours of hands-on work, at 50, 80, 90, 95 and 99 percent utilization. The waits are 1, 4, 9, 19 and 99 times the service time, so the lead times are 4, 10, 20, 40 and 200 hours. Going from 50 to 80 percent busy multiplies the lead time by two and a half; going from 90 to 99 multiplies it by ten. The same person, doing the same review, is the same speed at every row; all that changes is how often a review arrives while another is being done.</p><p>The preset <code>headroom</code> asks the manager's question. A task takes 3 hours of hands-on work, and the team is at 90 percent. The lead time is 30 hours. Take ten points of utilization off, to 80 percent, and it is 15 hours: half. Nothing was sped up, and the people are no less capable; some of the time was set aside so that work does not queue. That is the trade the authors ask managers to make, weighing utilization against lead time, and the lab leaves the economics, what the idle time costs, to you.</p><p>Read the figures as a reason to look, not as a forecast. Lead time is where this model sends you, but the model sees one queue and a team has many. The lab refuses 100 percent, since the formula divides by zero there; that refusal is the book's claim as arithmetic, and no team's true utilization is known to the point where the model matters. What the lesson can say is the direction: the nearer a team runs to full, the more a small rise in demand costs.</p><h3>Exercise</h3><ul><li>A task takes 6 hours of hands-on work.</li><li>The team's utilization is 75 percent.</li></ul><p>Find the wait in service times, then the lead time in hours. Then find the utilization at which the lead time is ten times the service time, and check both in the lab. Try 100 percent and read what the lab says.</p><p>The next lesson, Measuring Software Delivery Performance, turns to what the authors measure instead: four measures of delivery, each of which is a team-level outcome.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Flow</h2></div><p>how lead time grows as utilization nears 100 percent</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Three measures, and why each fails</h2><div class="prose reading"><p>Chapter 2 opens with a difficulty. Measuring performance in software is hard, the authors say, because the inventory is invisible, because the way work is broken down is relatively arbitrary, and because design and delivery happen at the same time. Their first section, The Flaws in Previous Attempts to Measure Performance, names two drawbacks of the usual measures of productivity. They focus on outputs rather than outcomes, and on what one person or one function does, rather than on what a team or the whole delivers. Three examples follow: lines of code, velocity and utilization.</p><p>Lines of code come first, and the argument is short. A company that rewards developers for lines written gets more lines, and the authors say it gets bloated software with higher maintenance and change costs. They would rather have ten lines than a thousand for the same problem, and a business process change that removes the need for code is better still. They do not conclude that fewer is always better: a task done in one line that nobody else can read is worse than a few lines everybody can. A count of lines is a count of output, and no direction of it is the goal.</p><p>Velocity is the Agile way to measure the same thing. Teams estimate stories in points, and the points signed off at the end of an iteration are the team's velocity, which was designed to plan capacity, to extrapolate how long the planned work will take. The authors object when managers use it to compare teams or to measure productivity. It is relative and team-dependent, since teams' contexts differ, so one team's points cannot be set against another's. And when it is a target, teams game it, inflating estimates and pushing stories through while collaboration suffers, which spoils its use as a planning tool and discourages teams from helping one another.</p><p>Utilization is the third. Many organizations treat how busy people are as a stand-in for productivity. The authors say that &ldquo;high utilization is only good up to a point&rdquo;: past it, nothing is left over for the unplanned, for a change of plan or for improving the work, and lead times lengthen. They cite queue theory, in which lead times approach infinity as utilization approaches 100 percent, and say that getting anything done then takes teams far longer, in their word exponentially. Lead time is the productivity measure that avoids the faults of the other two, and the authors conclude that utilization has to be managed against it.</p><p>The rule behind that sentence is a few lines of arithmetic, and the lab does it. In the simplest queueing model, one worker taking tasks one at a time, with tasks arriving at random, a task waits on average <span class="math" data-say="u over the quantity 1 minus u">u/(1 − u)</span> times its service time for its turn, where <span class="math" data-say="u">u</span> is the utilization as a fraction. Its lead time is the wait plus the service, which is the service time divided by <span class="math" data-say="1 minus u">1 − u</span>. Two cautions. The model is a simplification of any real team, which has several people, tasks of mixed sizes and arrivals that are not random. And in this model the growth is a hyperbola, steeper and steeper near 100 percent, which is not strictly the exponential of the book's wording; the book's point, that the wait has no limit, holds. The System Design path teaches the model in its lesson The Knee: Response Time vs Utilisation, in Queues and Utilisation, and this lesson does not repeat it.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Flow</h2></div><p>how lead time grows as utilization nears 100 percent</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Flow</strong><span>how lead time grows as utilization nears 100 percent</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="aflTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="aflTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> The model is the simplest queue, a single server with random arrivals and random service times (M/M/1), a simplification of any real team: at utilization u (the share of time busy) a job waits u/(1 − u) service times in the queue on average, so its lead time is service × (1 + u/(1 − u)) = service/(1 − u). Every figure is exact. At 100% the multiple divides by zero and the lab refuses. Levels are shown in the order given; the highest and lowest are by value.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>How the wait grows as slack runs out</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>How the wait grows as slack runs out</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="aflPreset">Worked example</label>
           <select id="aflPreset"><option value="ladder" selected>A two-hour review at five levels of utilization</option><option value="headroom">A three-hour task at 90 and at 80 percent</option></select>
@@ -1432,12 +1475,15 @@
           <div class="kpi"><span>Highest level's lead time over the lowest's</span><strong id="aflRatio">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>ladder</code> takes a review that needs two hours of hands-on work, at 50, 80, 90, 95 and 99 percent utilization. The waits are 1, 4, 9, 19 and 99 times the service time, so the lead times are 4, 10, 20, 40 and 200 hours. Going from 50 to 80 percent busy multiplies the lead time by two and a half; going from 90 to 99 multiplies it by ten. The same person, doing the same review, is the same speed at every row; all that changes is how often a review arrives while another is being done.</p><p>The preset <code>headroom</code> asks the manager's question. A task takes 3 hours of hands-on work, and the team is at 90 percent. The lead time is 30 hours. Take ten points of utilization off, to 80 percent, and it is 15 hours: half. Nothing was sped up, and the people are no less capable; some of the time was set aside so that work does not queue. That is the trade the authors ask managers to make, weighing utilization against lead time, and the lab leaves the economics, what the idle time costs, to you.</p><p>Read the figures as a reason to look, not as a forecast. Lead time is where this model sends you, but the model sees one queue and a team has many. The lab refuses 100 percent, since the formula divides by zero there; that refusal is the book's claim as arithmetic, and no team's true utilization is known to the point where the model matters. What the lesson can say is the direction: the nearer a team runs to full, the more a small rise in demand costs.</p><h3>Exercise</h3><ul><li>A task takes 6 hours of hands-on work.</li><li>The team's utilization is 75 percent.</li></ul><p>Find the wait in service times, then the lead time in hours. Then find the utilization at which the lead time is ten times the service time, and check both in the lab. Try 100 percent and read what the lab says.</p><p>The next lesson, Measuring Software Delivery Performance, turns to what the authors measure instead: four measures of delivery, each of which is a team-level outcome.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing a measure</h2></div><p>Four steps, the last of them on a measure in use near you.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Ask what it counts</h3><p>Say whether the measure counts something produced (an output) or something achieved (an outcome).</p></article><article class="card concept-card"><div class="icon">2</div><h3>Ask who it can be compared across</h3><p>Say whether the figure means the same thing across teams, and whether improving it for one team can make another's worse.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Ask what happens when it is a target</h3><p>Imagine rewarding it. Write down one cheap way to raise it that helps nobody.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a measure of your own</h3><p>Take a measure your organization reports about teams. Answer the three questions and, if it is a utilization, type its value into the lab with a typical task's service time.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing a measure</h2>
+      <p class="lead-in">Four steps, the last of them on a measure in use near you.</p>
+      <ol class="key-ideas method"><li><strong>Ask what it counts.</strong> Say whether the measure counts something produced (an output) or something achieved (an outcome).</li><li><strong>Ask who it can be compared across.</strong> Say whether the figure means the same thing across teams, and whether improving it for one team can make another's worse.</li><li><strong>Ask what happens when it is a target.</strong> Imagine rewarding it. Write down one cheap way to raise it that helps nobody.</li><li><strong>Do it on a measure of your own.</strong> Take a measure your organization reports about teams. Answer the three questions and, if it is a utilization, type its value into the lab with a typical task's service time.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1455,17 +1501,16 @@ lead time = 2 hours × (1 + 4) = 10 hours
 check: 2 hours ÷ (1/5) = 10 hours</div><p>The two ways of getting the lead time are the same line of algebra. At 99 percent the wait is 99 service times and the lead time 200 hours.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a busier team is a more productive one</strong><span>The authors' point is that high utilization is good only up to a point. On the lesson's sample, the same two-hour review takes 4 hours of lead time at 50 percent and 20 at 90. The people are no slower; the work waits.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using velocity to compare teams</strong><span>Velocity was built to plan one team's capacity, and the authors say teams' points are not commensurable and, used as a target, get inflated. A change in the points a team signs off tells you little about the value delivered.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding that less code is always better</strong><span>The authors say the same of minimising lines as of rewarding them: the aim is to solve the business problem with the least code that people can read and keep up, and the best saving is code that never has to be written. Neither more nor fewer lines is the measure.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute what a rise in utilization costs.</strong><p>Given a task's service time and a utilization, work out the wait in service times and the lead time, and say why the model has no answer at 100 percent.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab uses the simplest queueing model, one server and random arrivals. A real team has several people, tasks of mixed sizes and demand that is not random, and the lab cannot say how close any team is to the model; it shows the direction and the steepness, not your lead time.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a busier team is a more productive one</strong><span>The authors' point is that high utilization is good only up to a point. On the lesson's sample, the same two-hour review takes 4 hours of lead time at 50 percent and 20 at 90. The people are no slower; the work waits.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using velocity to compare teams</strong><span>Velocity was built to plan one team's capacity, and the authors say teams' points are not commensurable and, used as a target, get inflated. A change in the points a team signs off tells you little about the value delivered.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding that less code is always better</strong><span>The authors say the same of minimising lines as of rewarding them: the aim is to solve the business problem with the least code that people can read and keep up, and the best saving is code that never has to be written. Neither more nor fewer lines is the measure.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute what a rise in utilization costs.</strong><p>Given a task's service time and a utilization, work out the wait in service times and the lead time, and say why the model has no answer at 100 percent.</p></div></div><div class="note"><strong>Note:</strong> The lab uses the simplest queueing model, one server and random arrivals. A real team has several people, tasks of mixed sizes and demand that is not random, and the lab cannot say how close any team is to the model; it shows the direction and the steepness, not your lead time.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Output and outcome</summary><p>An output is what a team produces, lines of code or stories finished; an outcome is what the output achieves for the organization. The authors' first complaint is that earlier measures count the first and miss the second.</p></details><details class="recall"><summary>Utilization</summary><p>The share of its time that a person or team is busy. The lab gives it as a percentage from 0 to 99, and it is the one lever on this page that a manager can pull in the wrong direction.</p></details><details class="recall"><summary>Lead time and service time</summary><p>Lead time is how long a task takes from request to completion; service time is the hands-on part of it. The difference is the wait, and the lab computes it from utilization in the simplest queueing model.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 2 begins by clearing the ground. The authors name two flaws in earlier measures of software productivity, outputs rather than outcomes and local rather than global measures, and test three examples against them. Read the case against lines of code and velocity, then compute the one that has arithmetic behind it: what a task's lead time does as the people doing it are kept busier.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Output and outcome.</strong> An output is what a team produces, lines of code or stories finished; an outcome is what the output achieves for the organization. The authors' first complaint is that earlier measures count the first and miss the second.</li><li><strong>Utilization.</strong> The share of its time that a person or team is busy. The lab gives it as a percentage from 0 to 99, and it is the one lever on this page that a manager can pull in the wrong direction.</li><li><strong>Lead time and service time.</strong> Lead time is how long a task takes from request to completion; service time is the hands-on part of it. The difference is the wait, and the lab computes it from utilization in the simplest queueing model.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="output is not outcome. a local measure can hurt the whole. lines of code reward bloat. velocity is relative and gameable. lead time is the service time divided by the quantity 1 minus utilization. at 100 percent, no finite wait" tabindex="0" role="region" aria-label="Mathematical notation">output is not outcome
 a local measure can hurt the whole
 lines of code reward bloat
@@ -2305,11 +2350,42 @@ at 100 percent, no finite wait</div><figcaption>The flaws in six lines</figcapti
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2377,7 +2453,7 @@ at 100 percent, no finite wait</div><figcaption>The flaws in six lines</figcapti
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

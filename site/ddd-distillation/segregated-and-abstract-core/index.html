@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,43 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Distillation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 15 · Distillation</p>
       <h1>Segregated Core, Abstract Core and Refactoring Targets</h1>
       <p class="lesson-lede">The core&#x27;s classes pulled into a module of their own, then its fundamental concepts made abstract so the other modules depend on it and not on each other.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Segregated Core</li><li>Abstract Core</li><li>Dependencies across the core&#x27;s boundary</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two patterns and a strategy, then the count</h2>
-      <article class="prose reading"><p>&ldquo;What is done with the undifferentiated mass left behind is important, but not as important.&rdquo; Evans says it of the code left over when the core is pulled out of a model, and it sets the priority of Segregated Core. This lesson reads the end of Chapter 15: Distilling to a Declarative Style, Segregated Core with its costs and the team decision it needs, Abstract Core, Deep Models Distill and Choosing Refactoring Targets. Read them in your own copy first.</p><p>Distilling to a Declarative Style links this chapter to Chapter 10. The value of distillation is seeing what you are doing, and parts of the core can be written declaratively when the supporting design gives them a small language for stating the core's concepts and rules while hiding how they are computed or enforced. Mechanisms with intention-revealing interfaces, assertions and side-effect-free functions let the core make meaningful statements; the larger payoff comes when the core itself becomes such a language. Even then, Evans says, not everything outside the core will find a good home, which is where the next pattern begins.</p><p>Segregated Core starts from entanglement: elements that serve the core partly and support it partly, core elements tightly coupled to generic ones, a core whose cohesion is weak or invisible. Factoring out generic subdomains clears some of this, but it is hard work and leaves the core tangled in the residue. So work from the other direction: pull the core's concepts away from everything that only helps them, vague helpers included, so that the core hangs together more tightly and leans less on the rest, and push what is generic or supporting into other classes and packages, even when that pulls apart classes that were closely tied. The residue can stay roughly where it was, or go into packages named for its prominent classes, and be sorted out later.</p><p>Evans gives the steps as roughly these. Identify a core subdomain, perhaps from the distillation document; collect its classes in a new module whose name says what unites them; cut out the data and behaviour that do not express that concept and put them in other packages, without agonising over where, while making the references from the core outward explicit; simplify the new module's relationships with the others, an objective that never quite ends; and repeat with the next core subdomain.</p><p>He is plain about the costs. Segregation can leave the links with closely coupled non-core classes murkier, and it can break up a module that was nicely cohesive in another way; he counts both as worth paying for a clearer core. It is also a lot of work that can pull developers into changes all over the system, so the time for it is when a large, critical Bounded Context has its essential model hidden under supporting capability. And the whole team must move together, under one definition of the core that is not frozen, with insights shared and acted on jointly rather than by one pair alone. The book's worked example segregates the core of a cargo-shipping model and shows the small model changes that segregation tends to surface.</p><p>Abstract Core addresses what segregation can leave. Breaking a model into modules by subdomain is the usual way to make it manageable, but where the subdomains interact heavily, either many references cross the modules or the interaction is made indirect and obscure. &ldquo;Consider slicing horizontally rather than vertically.&rdquo; If most of the interaction can be expressed through polymorphic interfaces, and those interfaces are fundamental concepts of the domain rather than a technical trick, factor them into a core module of their own; the specialised modules then reference that core and not each other. Evans warns that this is not mechanical: moving every frequently referenced class into one module makes a meaningless mess, and the real thing needs deep understanding and usually considerable redesign. Deep Models Distill adds that distillation also means refining the core itself toward a deep model and supple design, where a breakthrough can change a whole project.</p><p>Choosing Refactoring Targets closes the chapter. Evans rejects the two answers the XP community tends to give to where a tangled system's refactoring should start: anywhere, since it all needs doing, which works only for teams of top programmers; and wherever it hurts, which treats symptoms and avoids the worst tangles. His alternative: when pain drives the work, check whether its root is in the core or in the core's relationship to a supporting element, and if it is, fix that first; when you are free to choose, improve the factoring of the core and its segregation, and purify supporting subdomains until they are generic.</p><p>Now the count, on the bike-share model's twelve classes and eighteen dependencies. The preset <code>mixed-and-segregated</code> packages them twice. As history left them, in <span class="math" data-say="stations">stations</span>, <span class="math" data-say="fleet">fleet</span>, <span class="math" data-say="ops">ops</span> and <span class="math" data-say="riders">riders</span>, 9 dependencies fall inside a module and 9 across, and <span class="math" data-say="stations">stations</span>, <span class="math" data-say="fleet">fleet</span> and <span class="math" data-say="riders">riders</span> lie on one cycle of module dependencies. Segregated, with <span class="math" data-say="demand forecast">DemandForecast</span>, <span class="math" data-say="rebalancing plan">RebalancingPlan</span> and <span class="math" data-say="move">Move</span> in a <span class="math" data-say="rebalancing">rebalancing</span> module, 8 fall inside and 10 across. Seven of the 18 cross the core's boundary, and the cycles now pass through the core: <span class="math" data-say="station">Station</span> still depends on <span class="math" data-say="demand forecast">DemandForecast</span>, which depends on <span class="math" data-say="station">Station</span>. The share inside went down, from a half to four ninths, which is the cost Evans names: the forecast had been comfortable in <span class="math" data-say="stations">stations</span>. The lab's most coupled pair says the same: before, <span class="math" data-say="fleet">fleet</span> and <span class="math" data-say="ops">ops</span> with 3 dependencies between them; after, <span class="math" data-say="fleet">fleet</span> and <span class="math" data-say="rebalancing">rebalancing</span> tie with <span class="math" data-say="rebalancing">rebalancing</span> and <span class="math" data-say="stations">stations</span> at 3, both pairs now through the core.</p><p>What segregation did is put the core's own relationships in one place, so that the seven references crossing its boundary are explicit and can be worked on, which is his fourth step. The preset <code>abstract-core</code> is that work done, and it is a redesign, not a repackaging: two interfaces, <span class="math" data-say="place">Place</span> and <span class="math" data-say="demand source">DemandSource</span>, shown below, carry the core's interactions; <span class="math" data-say="station">Station</span> implements one and <span class="math" data-say="trip">Trip</span> the other; the plan no longer reads repair tickets, and a move carries a number of bikes between places. The preset packages the new model twice, to show what Evans means by slicing horizontally. Sliced vertically, each interface sits with the class that implements it, <span class="math" data-say="place">Place</span> in <span class="math" data-say="stations">stations</span> and <span class="math" data-say="demand source">DemandSource</span> in <span class="math" data-say="riders">riders</span>: of 17 dependencies, 10 fall inside a module and 7 across, and <span class="math" data-say="fleet">fleet</span>, <span class="math" data-say="rebalancing">rebalancing</span> and <span class="math" data-say="riders">riders</span> lie on a cycle.</p><p>Sliced horizontally, with both interfaces in the <span class="math" data-say="rebalancing">rebalancing</span> module, 11 fall inside and 6 across, and there is no cycle between modules. Five dependencies cross the core's boundary, and every one of them points into it: the stations, the fleet and the riders depend on the core and the core on none of them. That is the shape the pattern describes, specialised modules referring to the abstract core rather than to each other, though <span class="math" data-say="trip">Trip</span> still refers to <span class="math" data-say="bike">Bike</span> in another specialised module. The interfaces earned their place because places and demand are what rebalancing is about; the lab would have counted the same for any two interfaces.</p><pre class="codeblock" data-say="line 1, comment, In the rebalancing module the abstract core.. line 2, interface place. line 3, string name. line 4, int bikes available. line 5, int docks free. line 8, interface demand source. line 9, int departures of place place, int hour. line 10, int arrivals of place place, int hour. line 13, final class move. line 14, final place from. line 15, final place to. line 16, final int bikes. line 17, move of place from, place to, int bikes. line 18, this dot from is set to from, this dot to is set to to, this dot bikes is set to bikes" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// In the rebalancing module: the abstract core.</span>
-<span class="cl">interface Place {</span>
-<span class="cl">    String name();</span>
-<span class="cl">    int bikesAvailable();</span>
-<span class="cl">    int docksFree();</span>
-<span class="cl">}</span>
-<span class="cl"></span>
-<span class="cl">interface DemandSource {</span>
-<span class="cl">    int departures(Place place, int hour);</span>
-<span class="cl">    int arrivals(Place place, int hour);</span>
-<span class="cl">}</span>
-<span class="cl"></span>
-<span class="cl">final class Move {</span>
-<span class="cl">    final Place from;</span>
-<span class="cl">    final Place to;</span>
-<span class="cl">    final int bikes;</span>
-<span class="cl">    Move(Place from, Place to, int bikes) {</span>
-<span class="cl">        this.from = from; this.to = to; this.bikes = bikes;</span>
-<span class="cl">    }</span>
-<span class="cl">}</span></code></pre><h3>Exercise</h3><ul><li>A seed bank's model, whose core is deciding when stored seed must be grown again. Classes: <span class="math" data-say="accession">Accession</span>, <span class="math" data-say="germination test">GerminationTest</span>, <span class="math" data-say="viability forecast">ViabilityForecast</span>, <span class="math" data-say="regeneration plan">RegenerationPlan</span>, <span class="math" data-say="donor">Donor</span>, <span class="math" data-say="shipment">Shipment</span>.</li><li>Dependencies (from, to): GerminationTest, Accession; ViabilityForecast, GerminationTest; RegenerationPlan, ViabilityForecast; RegenerationPlan, Accession; Accession, Donor; Shipment, Accession; Accession, ViabilityForecast.</li><li>Packaging A: <span class="math" data-say="stock">stock</span> holds Accession, GerminationTest and ViabilityForecast; <span class="math" data-say="ops">ops</span> holds RegenerationPlan, Shipment and Donor. Packaging B: <span class="math" data-say="viability">viability</span> holds GerminationTest, ViabilityForecast and RegenerationPlan; <span class="math" data-say="stock">stock</span> holds Accession and Donor; <span class="math" data-say="dispatch">dispatch</span> holds Shipment. <span class="math" data-say="viability">viability</span> is the core's module.</li></ul><p>By hand, find the dependencies inside and across modules in each packaging, the dependencies across the core's boundary in packaging B, and any cycle between B's modules. Then type both packagings into the lab.</p><p>Distillation sorts a model by what matters most. The next course, Large-Scale Structure and Strategy, reads Evans's third strategic principle, after context and distillation: an order that lets a whole system be understood in terms of its role in the parts.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Modules and dependencies</h2></div><p>dependencies inside and across modules</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two patterns and a strategy, then the count</h2><div class="prose reading"><p>&ldquo;What is done with the undifferentiated mass left behind is important, but not as important.&rdquo; Evans says it of the code left over when the core is pulled out of a model, and it sets the priority of Segregated Core. This lesson reads the end of Chapter 15: Distilling to a Declarative Style, Segregated Core with its costs and the team decision it needs, Abstract Core, Deep Models Distill and Choosing Refactoring Targets. Read them in your own copy first.</p><p>Distilling to a Declarative Style links this chapter to Chapter 10. The value of distillation is seeing what you are doing, and parts of the core can be written declaratively when the supporting design gives them a small language for stating the core's concepts and rules while hiding how they are computed or enforced. Mechanisms with intention-revealing interfaces, assertions and side-effect-free functions let the core make meaningful statements; the larger payoff comes when the core itself becomes such a language. Even then, Evans says, not everything outside the core will find a good home, which is where the next pattern begins.</p><p>Segregated Core starts from entanglement: elements that serve the core partly and support it partly, core elements tightly coupled to generic ones, a core whose cohesion is weak or invisible. Factoring out generic subdomains clears some of this, but it is hard work and leaves the core tangled in the residue. So work from the other direction: pull the core's concepts away from everything that only helps them, vague helpers included, so that the core hangs together more tightly and leans less on the rest, and push what is generic or supporting into other classes and packages, even when that pulls apart classes that were closely tied. The residue can stay roughly where it was, or go into packages named for its prominent classes, and be sorted out later.</p><p>Evans gives the steps as roughly these. Identify a core subdomain, perhaps from the distillation document; collect its classes in a new module whose name says what unites them; cut out the data and behaviour that do not express that concept and put them in other packages, without agonising over where, while making the references from the core outward explicit; simplify the new module's relationships with the others, an objective that never quite ends; and repeat with the next core subdomain.</p><p>He is plain about the costs. Segregation can leave the links with closely coupled non-core classes murkier, and it can break up a module that was nicely cohesive in another way; he counts both as worth paying for a clearer core. It is also a lot of work that can pull developers into changes all over the system, so the time for it is when a large, critical Bounded Context has its essential model hidden under supporting capability. And the whole team must move together, under one definition of the core that is not frozen, with insights shared and acted on jointly rather than by one pair alone. The book's worked example segregates the core of a cargo-shipping model and shows the small model changes that segregation tends to surface.</p><p>Abstract Core addresses what segregation can leave. Breaking a model into modules by subdomain is the usual way to make it manageable, but where the subdomains interact heavily, either many references cross the modules or the interaction is made indirect and obscure. &ldquo;Consider slicing horizontally rather than vertically.&rdquo; If most of the interaction can be expressed through polymorphic interfaces, and those interfaces are fundamental concepts of the domain rather than a technical trick, factor them into a core module of their own; the specialised modules then reference that core and not each other. Evans warns that this is not mechanical: moving every frequently referenced class into one module makes a meaningless mess, and the real thing needs deep understanding and usually considerable redesign. Deep Models Distill adds that distillation also means refining the core itself toward a deep model and supple design, where a breakthrough can change a whole project.</p><p>Choosing Refactoring Targets closes the chapter. Evans rejects the two answers the XP community tends to give to where a tangled system's refactoring should start: anywhere, since it all needs doing, which works only for teams of top programmers; and wherever it hurts, which treats symptoms and avoids the worst tangles. His alternative: when pain drives the work, check whether its root is in the core or in the core's relationship to a supporting element, and if it is, fix that first; when you are free to choose, improve the factoring of the core and its segregation, and purify supporting subdomains until they are generic.</p><p>Now the count, on the bike-share model's twelve classes and eighteen dependencies. The preset <code>mixed-and-segregated</code> packages them twice. As history left them, in <span class="math" data-say="stations">stations</span>, <span class="math" data-say="fleet">fleet</span>, <span class="math" data-say="ops">ops</span> and <span class="math" data-say="riders">riders</span>, 9 dependencies fall inside a module and 9 across, and <span class="math" data-say="stations">stations</span>, <span class="math" data-say="fleet">fleet</span> and <span class="math" data-say="riders">riders</span> lie on one cycle of module dependencies. Segregated, with <span class="math" data-say="demand forecast">DemandForecast</span>, <span class="math" data-say="rebalancing plan">RebalancingPlan</span> and <span class="math" data-say="move">Move</span> in a <span class="math" data-say="rebalancing">rebalancing</span> module, 8 fall inside and 10 across. Seven of the 18 cross the core's boundary, and the cycles now pass through the core: <span class="math" data-say="station">Station</span> still depends on <span class="math" data-say="demand forecast">DemandForecast</span>, which depends on <span class="math" data-say="station">Station</span>. The share inside went down, from a half to four ninths, which is the cost Evans names: the forecast had been comfortable in <span class="math" data-say="stations">stations</span>. The lab's most coupled pair says the same: before, <span class="math" data-say="fleet">fleet</span> and <span class="math" data-say="ops">ops</span> with 3 dependencies between them; after, <span class="math" data-say="fleet">fleet</span> and <span class="math" data-say="rebalancing">rebalancing</span> tie with <span class="math" data-say="rebalancing">rebalancing</span> and <span class="math" data-say="stations">stations</span> at 3, both pairs now through the core.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Modules and dependencies</h2></div><p>dependencies inside and across modules</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Modules and dependencies</strong><span>dependencies inside and across modules</span></div>
       </div>
@@ -1477,10 +1501,10 @@
       <div class="table-wrap" id="dmoTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dmoTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each element sits in one module of each packaging; with a third column (module2) the view counts a second packaging of the same elements and prints its tiles second. A dependency is inside when both of its elements sit in the same module and across otherwise; the share inside is the inside dependencies over all of them, exact. A module cycle is a group of two or more modules each of which reaches every other along across-module dependencies (a strongly connected component); each group lists its modules alphabetically, and groups go in the order of their first module. The most coupled pair is the pair of modules with the most dependencies between them in either direction; a tie goes to the alphabetically first pair and the status line names the others. An element may depend on another once; a dependency on itself is refused.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Dependencies inside, across, and across the core</h3>
-          <p>A count over the small model the lesson states. Each dependency runs from one class to another; the lab places both ends in their modules and counts those inside a module, those across, and the cycles between modules. Whether a module means something in the domain is the book's question, and the lab cannot ask it.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Dependencies inside, across, and across the core</h3>
+            <p>A count over the small model the lesson states. Each dependency runs from one class to another; the lab places both ends in their modules and counts those inside a module, those across, and the cycles between modules. Whether a module means something in the domain is the book's question, and the lab cannot ask it.</p>
         <div class="field">
           <label for="dmoPreset">Worked example</label>
           <select id="dmoPreset"><option value="mixed-and-segregated" selected>The bike-share model as history packaged it, and with the core segregated</option><option value="abstract-core">The model redesigned around an abstract core, sliced vertically and horizontally</option></select>
@@ -1508,12 +1532,34 @@
           <div class="kpi"><span>Most coupled pair, second packaging</span><strong id="dmoPair2">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>What segregation did is put the core's own relationships in one place, so that the seven references crossing its boundary are explicit and can be worked on, which is his fourth step. The preset <code>abstract-core</code> is that work done, and it is a redesign, not a repackaging: two interfaces, <span class="math" data-say="place">Place</span> and <span class="math" data-say="demand source">DemandSource</span>, shown below, carry the core's interactions; <span class="math" data-say="station">Station</span> implements one and <span class="math" data-say="trip">Trip</span> the other; the plan no longer reads repair tickets, and a move carries a number of bikes between places. The preset packages the new model twice, to show what Evans means by slicing horizontally. Sliced vertically, each interface sits with the class that implements it, <span class="math" data-say="place">Place</span> in <span class="math" data-say="stations">stations</span> and <span class="math" data-say="demand source">DemandSource</span> in <span class="math" data-say="riders">riders</span>: of 17 dependencies, 10 fall inside a module and 7 across, and <span class="math" data-say="fleet">fleet</span>, <span class="math" data-say="rebalancing">rebalancing</span> and <span class="math" data-say="riders">riders</span> lie on a cycle.</p><p>Sliced horizontally, with both interfaces in the <span class="math" data-say="rebalancing">rebalancing</span> module, 11 fall inside and 6 across, and there is no cycle between modules. Five dependencies cross the core's boundary, and every one of them points into it: the stations, the fleet and the riders depend on the core and the core on none of them. That is the shape the pattern describes, specialised modules referring to the abstract core rather than to each other, though <span class="math" data-say="trip">Trip</span> still refers to <span class="math" data-say="bike">Bike</span> in another specialised module. The interfaces earned their place because places and demand are what rebalancing is about; the lab would have counted the same for any two interfaces.</p><pre class="codeblock" data-say="line 1, comment, In the rebalancing module the abstract core.. line 2, interface place. line 3, string name. line 4, int bikes available. line 5, int docks free. line 8, interface demand source. line 9, int departures of place place, int hour. line 10, int arrivals of place place, int hour. line 13, final class move. line 14, final place from. line 15, final place to. line 16, final int bikes. line 17, move of place from, place to, int bikes. line 18, this dot from is set to from, this dot to is set to to, this dot bikes is set to bikes" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// In the rebalancing module: the abstract core.</span>
+<span class="cl">interface Place {</span>
+<span class="cl">    String name();</span>
+<span class="cl">    int bikesAvailable();</span>
+<span class="cl">    int docksFree();</span>
+<span class="cl">}</span>
+<span class="cl"></span>
+<span class="cl">interface DemandSource {</span>
+<span class="cl">    int departures(Place place, int hour);</span>
+<span class="cl">    int arrivals(Place place, int hour);</span>
+<span class="cl">}</span>
+<span class="cl"></span>
+<span class="cl">final class Move {</span>
+<span class="cl">    final Place from;</span>
+<span class="cl">    final Place to;</span>
+<span class="cl">    final int bikes;</span>
+<span class="cl">    Move(Place from, Place to, int bikes) {</span>
+<span class="cl">        this.from = from; this.to = to; this.bikes = bikes;</span>
+<span class="cl">    }</span>
+<span class="cl">}</span></code></pre><h3>Exercise</h3><ul><li>A seed bank's model, whose core is deciding when stored seed must be grown again. Classes: <span class="math" data-say="accession">Accession</span>, <span class="math" data-say="germination test">GerminationTest</span>, <span class="math" data-say="viability forecast">ViabilityForecast</span>, <span class="math" data-say="regeneration plan">RegenerationPlan</span>, <span class="math" data-say="donor">Donor</span>, <span class="math" data-say="shipment">Shipment</span>.</li><li>Dependencies (from, to): GerminationTest, Accession; ViabilityForecast, GerminationTest; RegenerationPlan, ViabilityForecast; RegenerationPlan, Accession; Accession, Donor; Shipment, Accession; Accession, ViabilityForecast.</li><li>Packaging A: <span class="math" data-say="stock">stock</span> holds Accession, GerminationTest and ViabilityForecast; <span class="math" data-say="ops">ops</span> holds RegenerationPlan, Shipment and Donor. Packaging B: <span class="math" data-say="viability">viability</span> holds GerminationTest, ViabilityForecast and RegenerationPlan; <span class="math" data-say="stock">stock</span> holds Accession and Donor; <span class="math" data-say="dispatch">dispatch</span> holds Shipment. <span class="math" data-say="viability">viability</span> is the core's module.</li></ul><p>By hand, find the dependencies inside and across modules in each packaging, the dependencies across the core's boundary in packaging B, and any cycle between B's modules. Then type both packagings into the lab.</p><p>Distillation sorts a model by what matters most. The next course, Large-Scale Structure and Strategy, reads Evans's third strategic principle, after context and distillation: an order that lets a whole system be understood in terms of its role in the parts.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Segregating a core</h2></div><p>Five steps, Evans's own in outline, the last on a model of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Pick one core subdomain</h3><p>Take the core's elements from the distillation document or the flags, and choose the most closely related few.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Move them into a named module</h3><p>Create a module whose name says what unites them, and move the classes as they are.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Cut out what is not the concept</h3><p>From each moved class, take out the data and behaviour that do not express the core concept, and put them in classes outside the module.</p></article><article class="card concept-card"><div class="icon">4</div><h3>List the boundary</h3><p>Write down every dependency that crosses the new module's boundary, in both directions, and look for an abstraction that would make the outward ones point inward.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on your own model</h3><p>Type a system's classes and dependencies into the lab with two packagings, before and after segregating its core, and write down the dependencies inside, across and across the core's boundary.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Segregating a core</h2>
+      <p class="lead-in">Five steps, Evans's own in outline, the last on a model of your own.</p>
+      <ol class="key-ideas method"><li><strong>Pick one core subdomain.</strong> Take the core's elements from the distillation document or the flags, and choose the most closely related few.</li><li><strong>Move them into a named module.</strong> Create a module whose name says what unites them, and move the classes as they are.</li><li><strong>Cut out what is not the concept.</strong> From each moved class, take out the data and behaviour that do not express the core concept, and put them in classes outside the module.</li><li><strong>List the boundary.</strong> Write down every dependency that crosses the new module's boundary, in both directions, and look for an abstraction that would make the outward ones point inward.</li><li><strong>Do it on your own model.</strong> Type a system's classes and dependencies into the lab with two packagings, before and after segregating its core, and write down the dependencies inside, across and across the core's boundary.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1532,17 +1578,16 @@ into the core: VanRun, Station: 2
 across the core boundary: 5 + 2, so 7</div><p>Out of the core run the forecast to <span class="math" data-say="trip">Trip</span> and to <span class="math" data-say="station">Station</span>, the move to <span class="math" data-say="station">Station</span> and to <span class="math" data-say="bike">Bike</span>, and the plan to <span class="math" data-say="repair ticket">RepairTicket</span>; into it run <span class="math" data-say="van run">VanRun</span> to <span class="math" data-say="move">Move</span> and <span class="math" data-say="station">Station</span> to <span class="math" data-say="demand forecast">DemandForecast</span>. The last of these closes the cycle between <span class="math" data-say="stations">stations</span> and <span class="math" data-say="rebalancing">rebalancing</span>.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting a Segregated Core to make every module more cohesive</strong><span>Evans says the opposite can happen: segregation may break up a module that was cohesive in another way, and may leave the links to closely coupled non-core classes murkier, and he judges the cost worth paying for the core's sake. It is also a lot of work across the whole system. On the lesson's illustration the share of dependencies inside a module fell from 9 of 18 to 8 of 18 when the core was segregated.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Building an Abstract Core by moving the most-referenced classes</strong><span>Evans warns that doing it mechanically, by moving whatever is often referenced across modules, gives a meaningless mess. The abstractions must be fundamental concepts of the domain whose polymorphic interfaces carry most of the interaction; finding them is refactoring toward deeper insight and usually needs considerable redesign.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Refactoring everywhere at once, or only where it hurts</strong><span>Choosing Refactoring Targets rejects both: the first is impractical except for teams of top programmers, and the second picks at the edges and avoids the worst tangles. Evans's rule is to look for the core in the root of the pain, and when free, to work on the core's factoring and segregation and on purifying supporting subdomains until they are generic.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can segregate a core and count what it does to the boundary.</strong><p>Given a model's classes and dependencies in two packagings, count the dependencies inside and across modules and across the core's boundary, name any cycle, and give two costs Evans names for a Segregated Core.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts where dependencies fall. It cannot tell a module named for a domain concept from one named for a technical layer, which is what Evans asks of a Segregated Core, and it cannot tell a fundamental abstraction from a merely popular class, which is the whole difficulty of an Abstract Core.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting a Segregated Core to make every module more cohesive</strong><span>Evans says the opposite can happen: segregation may break up a module that was cohesive in another way, and may leave the links to closely coupled non-core classes murkier, and he judges the cost worth paying for the core's sake. It is also a lot of work across the whole system. On the lesson's illustration the share of dependencies inside a module fell from 9 of 18 to 8 of 18 when the core was segregated.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Building an Abstract Core by moving the most-referenced classes</strong><span>Evans warns that doing it mechanically, by moving whatever is often referenced across modules, gives a meaningless mess. The abstractions must be fundamental concepts of the domain whose polymorphic interfaces carry most of the interaction; finding them is refactoring toward deeper insight and usually needs considerable redesign.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Refactoring everywhere at once, or only where it hurts</strong><span>Choosing Refactoring Targets rejects both: the first is impractical except for teams of top programmers, and the second picks at the edges and avoids the worst tangles. Evans's rule is to look for the core in the root of the pain, and when free, to work on the core's factoring and segregation and on purifying supporting subdomains until they are generic.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can segregate a core and count what it does to the boundary.</strong><p>Given a model's classes and dependencies in two packagings, count the dependencies inside and across modules and across the core's boundary, name any cycle, and give two costs Evans names for a Segregated Core.</p></div></div><div class="note"><strong>Note:</strong> The lab counts where dependencies fall. It cannot tell a module named for a domain concept from one named for a technical layer, which is what Evans asks of a Segregated Core, and it cannot tell a fundamental abstraction from a merely popular class, which is the whole difficulty of an Abstract Core.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Segregated Core</summary><p>The model refactored so that the core's concepts sit in a module of their own, with the cohesion inside it strengthened and its coupling to other code reduced, even where that means separating elements that were tightly coupled.</p></details><details class="recall"><summary>Abstract Core</summary><p>The model's deepest concepts made into abstract types through which most of the traffic between the main parts flows, kept in a module of their own, with the detailed classes left in modules by subdomain, depending on it rather than on each other.</p></details><details class="recall"><summary>Dependencies across the core&#x27;s boundary</summary><p>In the lab, read from its list of dependencies: those with one end in the core's module and the other outside it, in either direction: in the lab's table, the core module's row, out to others plus in from others. The lab itself counts dependencies inside and across all modules, and the cycles between modules.</p></details></div>
+      <h3>Summary</h3>
       <p>The last and heaviest distillations: refactor the core's classes out of the mass of supporting code into their own module, and, further, factor the core's fundamental concepts into abstract types that carry most of the interaction between modules. Read Evans's steps, the costs he names, and where he would start refactoring a tangled system; then count the dependencies across the core's boundary in a model packaged three ways.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Segregated Core.</strong> The model refactored so that the core's concepts sit in a module of their own, with the cohesion inside it strengthened and its coupling to other code reduced, even where that means separating elements that were tightly coupled.</li><li><strong>Abstract Core.</strong> The model's deepest concepts made into abstract types through which most of the traffic between the main parts flows, kept in a module of their own, with the detailed classes left in modules by subdomain, depending on it rather than on each other.</li><li><strong>Dependencies across the core&#x27;s boundary.</strong> In the lab, read from its list of dependencies: those with one end in the core's module and the other outside it, in either direction: in the lab's table, the core module's row, out to others plus in from others. The lab itself counts dependencies inside and across all modules, and the cycles between modules.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="pull the core into its own module. leave the rest where it is, for now. it can break a module that was cohesive. the whole team moves to it together. abstract types carry the interactions. refactor the core first" tabindex="0" role="region" aria-label="Mathematical notation">pull the core into its own module
 leave the rest where it is, for now
 it can break a module that was cohesive
@@ -2350,11 +2395,42 @@ refactor the core first</div><figcaption>The two cores in six lines</figcaption>
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2422,7 +2498,7 @@ refactor the core first</div><figcaption>The two cores in six lines</figcaption>
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

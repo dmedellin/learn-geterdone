@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Caching and Hit Rates</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Where caches fail</p>
       <h1>Cache Stampedes</h1>
       <p class="lesson-lede">Compute how many requests reach the backend in the window after a hot key expires, with and without coalescing.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>At expiry, there is no cache</li><li>The burst is <span class="math" data-say="lambda times d">λ·d</span>, and that is Little’s Law</li><li>Coalescing, not caching, is what stops it</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The window with no cache in it, and the two ways to survive it</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Miss window and stampede</span><p>The <strong>miss window</strong> <span class="math" data-say="d">d</span> of a key is the time from a miss being detected to the refilled value being available to serve &mdash; the backend call plus the write back. A <strong>stampede</strong> is the set of requests for that key which arrive during the miss window and are therefore all forwarded to the backend. Its size is <span class="math" data-say="lambda sub key times d">λ_key·d</span>.</p><p><span class="math" data-say="lambda sub key">λ_key</span> is the read rate of the one key, not of the service. A service at <span class="math" data-say="50000">50 000</span> rps whose hottest key takes ten per cent of the traffic has <span class="math" data-say="lambda sub key equals 5000">λ_key = 5 000</span>.</p></div><p>The formula is a rate times a time and nothing else. It does not depend on the hit rate, the cache size, the policy or the catalogue &mdash; those all describe steady state, and this is a transient. That independence is the uncomfortable part: a cache with a <span class="math" data-say="99.9 percent">99.9%</span> hit rate has exactly the same stampede as a cache with a <span class="math" data-say="50 percent">50%</span> one, for the same key at the same read rate.</p><div class="example"><span class="label">Example &middot; A hot key at five thousand reads a second</span><p><span class="math" data-say="lambda sub key equals 5000">λ_key = 5 000</span> reads a second, <span class="math" data-say="d equals 100 milliseconds">d = 100 ms</span>. The stampede is <span class="math" data-say="5000 times 0.1 equals 500">5 000 × 0.1 = 500</span> requests. Against a backend that can hold <span class="math" data-say="200">200</span> concurrent fills that is <span class="math" data-say="5 over 2 equals 2.50">5/2 = 2.50</span> times its capacity: the backend does not absorb this, and the requests it cannot take either queue or fail.</p></div><p>Scale either input and it scales linearly. The same key at a <span class="math" data-say="1 milliseconds">1 ms</span> fill sends <span class="math" data-say="5">5</span> requests through; at <span class="math" data-say="500 milliseconds">500 ms</span> it sends <span class="math" data-say="2500">2 500</span>; at <span class="math" data-say="2 seconds">2 s</span>, <span class="math" data-say="10000">10 000</span>. And the fill time is the one thing you least control, because a slow fill is exactly what happens when the backend is already under pressure &mdash; which is a feedback loop, not a coincidence.</p><h3>Why the obvious fixes are not fixes</h3><p>A bigger cache does not help: the key was in the cache and the problem is the moment it left. A longer TTL does not help either; it makes the expiry rarer, not smaller, and TTL and Staleness has already priced what a longer TTL costs in wrongness. Nor does a higher hit rate: the hit rate is an average over a window that contains this one, and the average is fine.</p><p>Two things do help. <strong>Coalescing</strong> &mdash; also called single-flight or request collapsing &mdash; makes one request per key per window reach the backend and parks the rest on the result. And <strong>early refresh</strong>, where a request arriving near the end of a TTL refreshes the entry while continuing to serve the old value, removes the window altogether at the cost of a little more staleness.</p><div class="thm"><span class="label">Theorem &middot; What coalescing is worth</span><p>Without coalescing, <span class="math" data-say="lambda sub key times d">λ_key·d</span> requests reach the backend per expiry. With it, exactly one does, per key. The reduction factor is <span class="math" data-say="lambda sub key times d">λ_key·d</span> itself.</p><p>So coalescing is worth the most precisely where the stampede is worst: the hotter the key and the slower the fill, the larger the factor. At <span class="math" data-say="5000">5 000</span> reads a second and a <span class="math" data-say="100 milliseconds">100 ms</span> fill it is a factor of <span class="math" data-say="500">500</span>.</p></div><h3>Many keys at once, which is the version that takes systems down</h3><p>A fleet that sets the same TTL on everything at deploy time expires everything together. Then <span class="math" data-say="k">k</span> hot keys each send <span class="math" data-say="lambda sub key times d">λ_key·d</span> requests in the same window, and the burst is <span class="math" data-say="k">k</span> times as large while coalescing still reduces it to <span class="math" data-say="k">k</span> &mdash; one per key. Jittering the TTLs spreads the expiries out, and it is the cheapest of the three fixes on this page.</p><p>One limit on the model: <span class="math" data-say="lambda times d">λ·d</span> counts arrivals in the window and assumes the backend keeps accepting them. A backend that starts queueing will make <span class="math" data-say="d">d</span> longer, which lets more requests into the window, which makes <span class="math" data-say="d">d</span> longer still. The formula gives the first step of that loop and not the rest of it, and the first step is already enough to size the problem.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Cache stampedes</h2></div><p>What arrives at the backend in the window after a hot key expires</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The window with no cache in it, and the two ways to survive it</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Miss window and stampede</span><p>The <strong>miss window</strong> <span class="math" data-say="d">d</span> of a key is the time from a miss being detected to the refilled value being available to serve &mdash; the backend call plus the write back. A <strong>stampede</strong> is the set of requests for that key which arrive during the miss window and are therefore all forwarded to the backend. Its size is <span class="math" data-say="lambda sub key times d">λ_key·d</span>.</p><p><span class="math" data-say="lambda sub key">λ_key</span> is the read rate of the one key, not of the service. A service at <span class="math" data-say="50000">50 000</span> rps whose hottest key takes ten per cent of the traffic has <span class="math" data-say="lambda sub key equals 5000">λ_key = 5 000</span>.</p></div><p>The formula is a rate times a time and nothing else. It does not depend on the hit rate, the cache size, the policy or the catalogue &mdash; those all describe steady state, and this is a transient. That independence is the uncomfortable part: a cache with a <span class="math" data-say="99.9 percent">99.9%</span> hit rate has exactly the same stampede as a cache with a <span class="math" data-say="50 percent">50%</span> one, for the same key at the same read rate.</p><div class="example"><span class="label">Example &middot; A hot key at five thousand reads a second</span><p><span class="math" data-say="lambda sub key equals 5000">λ_key = 5 000</span> reads a second, <span class="math" data-say="d equals 100 milliseconds">d = 100 ms</span>. The stampede is <span class="math" data-say="5000 times 0.1 equals 500">5 000 × 0.1 = 500</span> requests. Against a backend that can hold <span class="math" data-say="200">200</span> concurrent fills that is <span class="math" data-say="5 over 2 equals 2.50">5/2 = 2.50</span> times its capacity: the backend does not absorb this, and the requests it cannot take either queue or fail.</p></div><p>Scale either input and it scales linearly. The same key at a <span class="math" data-say="1 milliseconds">1 ms</span> fill sends <span class="math" data-say="5">5</span> requests through; at <span class="math" data-say="500 milliseconds">500 ms</span> it sends <span class="math" data-say="2500">2 500</span>; at <span class="math" data-say="2 seconds">2 s</span>, <span class="math" data-say="10000">10 000</span>. And the fill time is the one thing you least control, because a slow fill is exactly what happens when the backend is already under pressure &mdash; which is a feedback loop, not a coincidence.</p><h3>Why the obvious fixes are not fixes</h3><p>A bigger cache does not help: the key was in the cache and the problem is the moment it left. A longer TTL does not help either; it makes the expiry rarer, not smaller, and TTL and Staleness has already priced what a longer TTL costs in wrongness. Nor does a higher hit rate: the hit rate is an average over a window that contains this one, and the average is fine.</p><p>Two things do help. <strong>Coalescing</strong> &mdash; also called single-flight or request collapsing &mdash; makes one request per key per window reach the backend and parks the rest on the result. And <strong>early refresh</strong>, where a request arriving near the end of a TTL refreshes the entry while continuing to serve the old value, removes the window altogether at the cost of a little more staleness.</p><div class="thm"><span class="label">Theorem &middot; What coalescing is worth</span><p>Without coalescing, <span class="math" data-say="lambda sub key times d">λ_key·d</span> requests reach the backend per expiry. With it, exactly one does, per key. The reduction factor is <span class="math" data-say="lambda sub key times d">λ_key·d</span> itself.</p><p>So coalescing is worth the most precisely where the stampede is worst: the hotter the key and the slower the fill, the larger the factor. At <span class="math" data-say="5000">5 000</span> reads a second and a <span class="math" data-say="100 milliseconds">100 ms</span> fill it is a factor of <span class="math" data-say="500">500</span>.</p></div><h3>Many keys at once, which is the version that takes systems down</h3><p>A fleet that sets the same TTL on everything at deploy time expires everything together. Then <span class="math" data-say="k">k</span> hot keys each send <span class="math" data-say="lambda sub key times d">λ_key·d</span> requests in the same window, and the burst is <span class="math" data-say="k">k</span> times as large while coalescing still reduces it to <span class="math" data-say="k">k</span> &mdash; one per key. Jittering the TTLs spreads the expiries out, and it is the cheapest of the three fixes on this page.</p><p>One limit on the model: <span class="math" data-say="lambda times d">λ·d</span> counts arrivals in the window and assumes the backend keeps accepting them. A backend that starts queueing will make <span class="math" data-say="d">d</span> longer, which lets more requests into the window, which makes <span class="math" data-say="d">d</span> longer still. The formula gives the first step of that loop and not the rest of it, and the first step is already enough to size the problem.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Cache stampedes</h2></div><p>What arrives at the backend in the window after a hot key expires</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The stampede at expiry</strong><span>&lambda;&middot;d requests through the miss window, or one with coalescing</span></div>
         <div class="inline-legend"><span class="tone-red"><i class="legend-swatch"></i>the burst</span><span class="tone-green"><i class="legend-swatch"></i>with coalescing</span><span class="tone-amber"><i class="legend-swatch"></i>backend capacity</span><span class="tone-cyan"><i class="legend-swatch"></i>steady state</span></div>
@@ -1404,10 +1447,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="stPlot" viewBox="0 0 520 200" role="img" aria-label="The backend request rate over time, with the expiry burst drawn against the backend's capacity."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="stTable"></table></div>
       <div class="status-banner" id="stStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the key&#x27;s rate and the miss window</h3>
-          <p>The burst is &lambda;&middot;d, computed from the rate and the window you set, and drawn against the backend capacity Queues and Utilisation sized.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the key&#x27;s rate and the miss window</h3>
+            <p>The burst is &lambda;&middot;d, computed from the rate and the window you set, and drawn against the backend capacity Queues and Utilisation sized.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="stLam">Reads of the hot key per second</label><span class="range-value" id="stLamOut">5000</span></div>
           <input id="stLam" type="range" min="10" max="20000" step="10" value="5000" />
@@ -1431,12 +1474,14 @@
           <div class="kpi"><span>Against capacity</span><strong id="stRatio">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="stHint" style="margin:0;">The burst is a rate times a time, which is Little's Law and nothing more. A cache does not protect a backend during the miss window; single-flight coalescing does, by making the number in that window one per key instead of &lambda;&middot;d.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sizing the burst at expiry</h2></div><p>Two inputs, one multiplication, and then the comparison that decides whether it matters.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the read rate of the single hottest key</h3><p>Not the service&rsquo;s rate: one key&rsquo;s. If you know the total rate and the skew, Popularity Is Skewed: Zipf gives you the top key&rsquo;s share &mdash; at <span class="math" data-say="N equals 50">N = 50</span> and <span class="math" data-say="s equals 2">s = 2</span> it is <span class="math" data-say="61.53 percent">61.53%</span> of all requests, which makes <span class="math" data-say="lambda sub key">λ_key</span> most of <span class="math" data-say="lambda">λ</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Measure the miss window <span class="math" data-say="d">d</span></h3><p>From miss detected to value available, including the write back. Use a high percentile of the fill time rather than the mean: the stampede you care about is the one that happens when the backend is slow.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply, and compare against what the backend can hold</h3><p><span class="math" data-say="lambda sub key times d">λ_key·d</span> requests arrive in the window. Divide by the backend&rsquo;s concurrent capacity. Above <span class="math" data-say="1">1</span> the backend does not absorb the burst, and the cache&rsquo;s excellent hit rate will not appear anywhere in the incident review.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Decide between coalescing, early refresh and jitter</h3><p>Coalescing takes the burst to one per key. Early refresh removes the window and costs a little staleness. Jitter stops many keys expiring together. They address different parts of the same failure and a busy system usually wants all three.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sizing the burst at expiry</h2>
+      <p class="lead-in">Two inputs, one multiplication, and then the comparison that decides whether it matters.</p>
+      <ol class="key-ideas method"><li><strong>Find the read rate of the single hottest key.</strong> Not the service&rsquo;s rate: one key&rsquo;s. If you know the total rate and the skew, Popularity Is Skewed: Zipf gives you the top key&rsquo;s share &mdash; at <span class="math" data-say="N equals 50">N = 50</span> and <span class="math" data-say="s equals 2">s = 2</span> it is <span class="math" data-say="61.53 percent">61.53%</span> of all requests, which makes <span class="math" data-say="lambda sub key">λ_key</span> most of <span class="math" data-say="lambda">λ</span>.</li><li><strong>Measure the miss window <span class="math" data-say="d">d</span>.</strong> From miss detected to value available, including the write back. Use a high percentile of the fill time rather than the mean: the stampede you care about is the one that happens when the backend is slow.</li><li><strong>Multiply, and compare against what the backend can hold.</strong> <span class="math" data-say="lambda sub key times d">λ_key·d</span> requests arrive in the window. Divide by the backend&rsquo;s concurrent capacity. Above <span class="math" data-say="1">1</span> the backend does not absorb the burst, and the cache&rsquo;s excellent hit rate will not appear anywhere in the incident review.</li><li><strong>Decide between coalescing, early refresh and jitter.</strong> Coalescing takes the burst to one per key. Early refresh removes the window and costs a little staleness. Jitter stops many keys expiring together. They address different parts of the same failure and a busy system usually wants all three.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1464,17 +1509,16 @@ the same key at other fill times:
 with single-flight coalescing:   1 request       a factor of 500</div><p>Read the table as a warning about <span class="math" data-say="d">d</span> rather than about <span class="math" data-say="lambda">λ</span>. The read rate of a hot key is a fact about your users; the fill time is a property of your backend, and it grows exactly when you can least afford it to.</p><p>For a faded rehearsal, take a service at <span class="math" data-say="20000">20 000</span> rps whose hottest key is <span class="math" data-say="10 percent">10%</span> of traffic, with a <span class="math" data-say="50 milliseconds">50 ms</span> fill and a backend that holds <span class="math" data-say="200">200</span> concurrent requests. The supplied first move is that <span class="math" data-say="lambda sub key equals 2000">λ_key = 2 000</span>; compute the burst and the ratio to capacity, then say what the ratio becomes if <span class="math" data-say="12">12</span> hot keys expire together because they share a deploy-time TTL. State which of the three fixes you would reach for first and why.</p><p>In the lab the burst is drawn as a rectangle against the backend&rsquo;s capacity line from Queues and Utilisation, with the coalesced version beside it. Raise the number of keys expiring together and watch the red rectangle grow while the green one does not.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a cache always protects the backend</strong><span>It protects it in steady state and not during the miss window, where for <span class="math" data-say="d">d</span> milliseconds there is no cache at all. <span class="math" data-say="5000">5 000</span> reads a second through a <span class="math" data-say="100 milliseconds">100 ms</span> fill is <span class="math" data-say="500">500</span> simultaneous requests at a backend sized for <span class="math" data-say="200">200</span>, and the hit rate that made the capacity plan work says nothing about it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using the service’s rate instead of the key’s</strong><span>The stampede is <span class="math" data-say="lambda sub key times d">λ_key·d</span>, and <span class="math" data-say="lambda sub key">λ_key</span> is one key&rsquo;s read rate. Using the whole service&rsquo;s rate overstates it by the reciprocal of the top key&rsquo;s share; using an average key&rsquo;s rate understates it by far more, because the key that stampedes is the hot one and popularity is skewed.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reaching for a longer TTL</strong><span>A longer TTL makes the expiry happen less often; it does not make the burst any smaller when it does happen, and TTL and Staleness has already priced the wrongness it buys. The fixes that change the burst size are coalescing, early refresh, and jittering the TTLs so that many keys do not expire at once.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we have a cache” stops sounding like an answer to a burst question.</strong><p>You should be able to compute <span class="math" data-say="lambda sub key times d">λ_key·d</span> for a hot key, express it as a multiple of the backend&rsquo;s concurrent capacity, state what coalescing reduces it to and by what factor, and say why a larger cache and a higher hit rate change neither number.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Everything so far has been about reads. Writes have their own arithmetic and their own trade: “Write Policies” counts what a write-back cache actually sends to the backend on a trace, and what is lost if the process dies before the next flush.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a cache always protects the backend</strong><span>It protects it in steady state and not during the miss window, where for <span class="math" data-say="d">d</span> milliseconds there is no cache at all. <span class="math" data-say="5000">5 000</span> reads a second through a <span class="math" data-say="100 milliseconds">100 ms</span> fill is <span class="math" data-say="500">500</span> simultaneous requests at a backend sized for <span class="math" data-say="200">200</span>, and the hit rate that made the capacity plan work says nothing about it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using the service’s rate instead of the key’s</strong><span>The stampede is <span class="math" data-say="lambda sub key times d">λ_key·d</span>, and <span class="math" data-say="lambda sub key">λ_key</span> is one key&rsquo;s read rate. Using the whole service&rsquo;s rate overstates it by the reciprocal of the top key&rsquo;s share; using an average key&rsquo;s rate understates it by far more, because the key that stampedes is the hot one and popularity is skewed.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reaching for a longer TTL</strong><span>A longer TTL makes the expiry happen less often; it does not make the burst any smaller when it does happen, and TTL and Staleness has already priced the wrongness it buys. The fixes that change the burst size are coalescing, early refresh, and jittering the TTLs so that many keys do not expire at once.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we have a cache” stops sounding like an answer to a burst question.</strong><p>You should be able to compute <span class="math" data-say="lambda sub key times d">λ_key·d</span> for a hot key, express it as a multiple of the backend&rsquo;s concurrent capacity, state what coalescing reduces it to and by what factor, and say why a larger cache and a higher hit rate change neither number.</p></div></div><div class="note"><strong>Note:</strong> Everything so far has been about reads. Writes have their own arithmetic and their own trade: “Write Policies” counts what a write-back cache actually sends to the backend on a trace, and what is lost if the process dies before the next flush.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>At expiry, there is no cache</summary><p>A cache entry expires. The next request misses and starts a fill that takes <span class="math" data-say="d">d</span> milliseconds. Every request for that key arriving before the fill lands also finds nothing, also misses, and is also forwarded. For <span class="math" data-say="d">d</span> milliseconds the hit rate for that key is zero, and <span class="math" data-say="1 minus h lambda">(1 − h)λ</span> describes none of it.</p></details><details class="recall"><summary>The burst is <span class="math" data-say="lambda times d">λ·d</span>, and that is Little’s Law</summary><p>The number of requests in flight is the arrival rate times the time each spends in flight &mdash; the identity of &ldquo;Little&rsquo;s Law from a Trace&rdquo;, applied to one key over one window. At <span class="math" data-say="5000">5 000</span> reads a second and a <span class="math" data-say="100 milliseconds">100 ms</span> fill that is <span class="math" data-say="500">500</span> requests, all asking the backend for the same value at the same moment.</p></details><details class="recall"><summary>Coalescing, not caching, is what stops it</summary><p>Single-flight coalescing lets the first miss start the fill and makes every subsequent request for that key wait on the same in-flight fill. The backend sees exactly one request per key instead of <span class="math" data-say="lambda times d">λ·d</span>. Nothing about the cache changed; what changed is what happens to the requests that miss together.</p></details></div>
+      <h3>Summary</h3>
       <p>For the few milliseconds between a hot key expiring and the first refill landing, there is no cache. Every request that arrives in that window misses and is forwarded, and by Little&rsquo;s Law the number of them is <span class="math" data-say="lambda times d">λ·d</span> &mdash; a rate times a time. Single-flight coalescing reduces it to one, which is the difference between a cache that protects a backend and a cache that merely usually does.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>At expiry, there is no cache.</strong> A cache entry expires. The next request misses and starts a fill that takes <span class="math" data-say="d">d</span> milliseconds. Every request for that key arriving before the fill lands also finds nothing, also misses, and is also forwarded. For <span class="math" data-say="d">d</span> milliseconds the hit rate for that key is zero, and <span class="math" data-say="1 minus h lambda">(1 − h)λ</span> describes none of it.</li><li><strong>The burst is <span class="math" data-say="lambda times d">λ·d</span>, and that is Little’s Law.</strong> The number of requests in flight is the arrival rate times the time each spends in flight &mdash; the identity of &ldquo;Little&rsquo;s Law from a Trace&rdquo;, applied to one key over one window. At <span class="math" data-say="5000">5 000</span> reads a second and a <span class="math" data-say="100 milliseconds">100 ms</span> fill that is <span class="math" data-say="500">500</span> requests, all asking the backend for the same value at the same moment.</li><li><strong>Coalescing, not caching, is what stops it.</strong> Single-flight coalescing lets the first miss start the fill and makes every subsequent request for that key wait on the same in-flight fill. The backend sees exactly one request per key instead of <span class="math" data-say="lambda times d">λ·d</span>. Nothing about the cache changed; what changed is what happens to the requests that miss together.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="stampede size equals lambda sub key times d, a rate times a time, by Little&#x27;s Law. lambda sub key equals 5000 reads over s, d equals 100 milliseconds fill. lambda times d equals 5000 times 0.1 equals 500 requests through the window. backend capacity 200 concurrent, goes to, the burst is 5 over 2 equals 2.50 times capacity. with single-flight coalescing, 1 request, a factor of 500" tabindex="0" role="region" aria-label="Mathematical notation">stampede size = λ_key · d          a rate times a time, by Little&#x27;s Law
 
 λ_key = 5 000 reads/s,  d = 100 ms fill
@@ -2668,11 +2712,42 @@ with single-flight coalescing:  1 request, a factor of 500</div><figcaption>The 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2740,7 +2815,7 @@ with single-flight coalescing:  1 request, a factor of 500</div><figcaption>The 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

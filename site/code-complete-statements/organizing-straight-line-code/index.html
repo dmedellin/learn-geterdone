@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,41 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Statements</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 14 · Straight-Line Code</p>
       <h1>Organizing Straight-Line Code</h1>
       <p class="lesson-lede">When statements must run in a certain order, Chapter 14 asks you to make the order visible in the code itself: in names, in parameters, and only as a last resort in comments.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Order dependency</li><li>Hidden dependency</li><li>The Principle of Proximity</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the parcel quote</h2>
-      <article class="prose reading"><p><strong>Chapter 14, p. 353.</strong> &ldquo;The strongest principle for organizing straight-line code is ordering dependencies.&rdquo; The sentence is the first of the chapter's key points. Read Chapter 14, pp. 347&ndash;353, in your own copy before going on; it is seven pages, and the lesson follows it in order.</p><p>You have probably met a routine that worked until someone tidied it: two calls that looked independent were swapped, and a total came out wrong, or zero. Chapter 14 is about that kind of code, statements with no branches and no loops, run one after another, and its argument is that the order of such statements is a fact about the program that should be visible in the code, not something a reader has to know.</p><p>Section 14.1 (p. 347) begins with statements whose order counts, and McConnell's word for what makes it count is dependency: the second statement needs what the first produced. Sometimes the routine names make that plain, sometimes only knowledge of the domain does, and sometimes it is hidden altogether, as in a run of calls that take no parameters and work on data their class shares. His first guideline is to organize the code so that dependencies are obvious: if one routine quietly initializes data the others use, move the initialization into a routine of its own whose name says it comes first. His second is to name routines so that dependencies are obvious, even at the cost of a long name. A name that lists everything a routine does is not the trouble, he remarks; the routine that does all of it is.</p><p>The third guideline is the one the lab can see. Pass the data between the routines as parameters, and better still have each return what the next one takes, and the order is written into the calls themselves (pp. 349&ndash;350). Data can show the opposite too: routines that share nothing announce that their order does not matter. Only when the code itself cannot be improved does McConnell turn to comments that document the dependency, and for critical code to status variables or assertions that check it, a technique he weighs against the new variables and new error checks it brings.</p><p>Section 14.2 (p. 351) takes statements whose order does not matter. There the guiding rule is the Principle of Proximity: keep related actions together, so that the code reads from top to bottom and a reader following one variable does not have to search the whole routine. McConnell's test is to draw a box round each group of related statements on a printed listing. Boxes that nest are fine; boxes that overlap mean the code should be reorganized, and a group with no ties to its neighbours may be a routine waiting to be extracted. The measure behind it, how long a variable stays live, is the one Scope, Span and Live Time counted.</p><p>Now the code. The lab's <em>dataflow</em> view reads a Java listing top to bottom and records, for every variable, the lines that set it and the lines that read it; a parameter is set on the routine's first line. From those it prints the <strong>dependencies (line <span data-say="goes to">→</span> line)</strong>: a pair <span data-say="i goes to j">i → j</span> whenever line j reads a variable whose latest earlier set is on line i. It also counts <strong>anomalies</strong>, the names of which come from the data-flow testing of Section 22.3: a variable <strong>used before set</strong>, one <strong>set twice</strong> with no read between, and one <strong>set, never used</strong>. Here is the lesson's parcel quote in the order a hurried writer might put it, the <code>total-first</code> preset:</p><pre class="codeblock" data-say="line 1, double shipping quote of parcel parcel. line 2, flagged, double total is set to base plus surcharge plus insurance. line 3, double base is set to parcel dot base rate. line 4, double surcharge is set to parcel dot fuel surcharge. line 5, double insurance is set to parcel dot insurance fee. line 6, return total" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">double shippingQuote(Parcel parcel) {</span>
-<span class="cl flag">    double total = base + surcharge + insurance;</span>
-<span class="cl">    double base = parcel.baseRate();</span>
-<span class="cl">    double surcharge = parcel.fuelSurcharge();</span>
-<span class="cl">    double insurance = parcel.insuranceFee();</span>
-<span class="cl">    return total;</span>
-<span class="cl">}</span></code></pre><p>The lab finds 6 anomalies. Line 2 reads <span class="math" data-say="base">base</span>, <span class="math" data-say="surcharge">surcharge</span> and <span class="math" data-say="insurance">insurance</span> before anything has set them, so all three are used before set at line 2, and each is then set on lines 3, 4 and 5 and never read again, which is three more. Its dependencies are <span data-say="1 goes to 3, 1 goes to 4, 1 goes to 5, 2 goes to 6">1→3, 1→4, 1→5, 2→6</span>: lines 3 to 5 read the parameter <span class="math" data-say="parcel">parcel</span>, and line 6 returns the <span class="math" data-say="total">total</span> that line 2 wrote. Nothing links line 2 to the three lines it needs, because in this order they come after it. Here <span class="math" data-say="javac">javac</span> agrees with the lab and refuses to compile the routine, with &ldquo;cannot find symbol&rdquo; at line 2, and it can refuse because the names make the dependency visible. Now the same statements in the order their dependencies set, the <code>in-order</code> preset:</p><pre class="codeblock" data-say="line 1, double shipping quote of parcel parcel. line 2, double base is set to parcel dot base rate. line 3, double surcharge is set to parcel dot fuel surcharge. line 4, double insurance is set to parcel dot insurance fee. line 5, double total is set to base plus surcharge plus insurance. line 6, return total" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">double shippingQuote(Parcel parcel) {</span>
-<span class="cl">    double base = parcel.baseRate();</span>
-<span class="cl">    double surcharge = parcel.fuelSurcharge();</span>
-<span class="cl">    double insurance = parcel.insuranceFee();</span>
-<span class="cl">    double total = base + surcharge + insurance;</span>
-<span class="cl">    return total;</span>
-<span class="cl">}</span></code></pre><p>Here the lab finds 0 anomalies, nothing set twice and nothing set but never used, and the dependencies <span data-say="1 goes to 2, 1 goes to 3, 1 goes to 4, 2 goes to 5, 3 goes to 5, 4 goes to 5, 5 goes to 6">1→2, 1→3, 1→4, 2→5, 3→5, 4→5, 5→6</span>. Every arrow points down the page, and that is what ordering dependencies means in the count: no line reads anything a later line writes. The third preset, <code>hidden</code>, is the listing in the exercise below: four calls on one <span class="math" data-say="quote">Quote</span> object, each taking nothing and returning nothing. The lab prints <span data-say="1 goes to 2, 1 goes to 3, 1 goes to 4, 1 goes to 5">1→2, 1→3, 1→4, 1→5</span>, which says only that every call reads the parameter <span class="math" data-say="quote">quote</span>, and 0 anomalies. The routine compiles with its four calls in any order. Whatever <span class="math" data-say="load rates">loadRates</span> leaves inside the object for <span class="math" data-say="add surcharges">addSurcharges</span> to use, the lab cannot see it, and from this code you cannot either.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, void print quote of quote quote. line 2, quote dot load rates. line 3, quote dot add surcharges. line 4, quote dot add insurance. line 5, quote dot print" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void printQuote(Quote quote) {</span>
-<span class="cl">    quote.loadRates();</span>
-<span class="cl">    quote.addSurcharges();</span>
-<span class="cl">    quote.addInsurance();</span>
-<span class="cl">    quote.print();</span>
-<span class="cl">}</span></code></pre><p>Rewrite <span class="math" data-say="print quote">printQuote</span> so that the order is in the parameters, as Section 14.1 recommends: <span class="math" data-say="load rates">loadRates</span> returns a <span class="math" data-say="rates">Rates</span>, which you keep in a new local variable; <span class="math" data-say="add surcharges">addSurcharges</span> and <span class="math" data-say="add insurance">addInsurance</span> each take the <span class="math" data-say="rates">Rates</span> the call before returned and return a new one, kept in its own variable; and <span class="math" data-say="print">print</span> takes the last of them. Keep each of the four statements on its own line, so that they are still lines 2 to 5 and the line numbers in your list match the listing's. Then list, by the lab's rule, every dependency <span data-say="i goes to j">i → j</span> in your version, and name the chain of arrows that now carries the order. You can paste your version into the lab afterwards to check the list.</p><p>Statements in sequence are the simplest kind of control. The next lesson, Using Conditionals, adds the first decision, and asks what the order of a chain of tests costs.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>each name&#x27;s sets and reads, line by line</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the parcel quote</h2><div class="prose reading"><p><strong>Chapter 14, p. 353.</strong> &ldquo;The strongest principle for organizing straight-line code is ordering dependencies.&rdquo; The sentence is the first of the chapter's key points. Read Chapter 14, pp. 347&ndash;353, in your own copy before going on; it is seven pages, and the lesson follows it in order.</p><p>You have probably met a routine that worked until someone tidied it: two calls that looked independent were swapped, and a total came out wrong, or zero. Chapter 14 is about that kind of code, statements with no branches and no loops, run one after another, and its argument is that the order of such statements is a fact about the program that should be visible in the code, not something a reader has to know.</p><p>Section 14.1 (p. 347) begins with statements whose order counts, and McConnell's word for what makes it count is dependency: the second statement needs what the first produced. Sometimes the routine names make that plain, sometimes only knowledge of the domain does, and sometimes it is hidden altogether, as in a run of calls that take no parameters and work on data their class shares. His first guideline is to organize the code so that dependencies are obvious: if one routine quietly initializes data the others use, move the initialization into a routine of its own whose name says it comes first. His second is to name routines so that dependencies are obvious, even at the cost of a long name. A name that lists everything a routine does is not the trouble, he remarks; the routine that does all of it is.</p><p>The third guideline is the one the lab can see. Pass the data between the routines as parameters, and better still have each return what the next one takes, and the order is written into the calls themselves (pp. 349&ndash;350). Data can show the opposite too: routines that share nothing announce that their order does not matter. Only when the code itself cannot be improved does McConnell turn to comments that document the dependency, and for critical code to status variables or assertions that check it, a technique he weighs against the new variables and new error checks it brings.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>each name&#x27;s sets and reads, line by line</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Reading the code</strong><span>each name's sets and reads, line by line</span></div>
       </div>
@@ -1487,10 +1513,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
       <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Which line reads what another wrote</h3>
-          <p>A count over code, by the rules stated below the listing. The lab records every set and read of every variable, line by line, and prints each dependency <span data-say="i goes to j">i → j</span> where line j reads what line i last wrote. It reads variables only: what a call leaves inside an object is invisible to it, as it is to a reader of the code.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Which line reads what another wrote</h3>
+            <p>A count over code, by the rules stated below the listing. The lab records every set and read of every variable, line by line, and prints each dependency <span data-say="i goes to j">i → j</span> where line j reads what line i last wrote. It reads variables only: what a call leaves inside an object is invisible to it, as it is to a reader of the code.</p>
         <div class="field">
           <label for="coPreset">Worked example</label>
           <select id="coPreset"><option value="total-first" selected>Total summed first (the lesson's parcel quote, out of order)</option><option value="in-order">The same statements in dependency order</option><option value="hidden">Four calls that pass nothing (the exercise's listing)</option></select>
@@ -1503,12 +1529,32 @@
           <div class="kpi"><span>Dependencies (line → line)</span><strong id="coDeps">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Section 14.2 (p. 351) takes statements whose order does not matter. There the guiding rule is the Principle of Proximity: keep related actions together, so that the code reads from top to bottom and a reader following one variable does not have to search the whole routine. McConnell's test is to draw a box round each group of related statements on a printed listing. Boxes that nest are fine; boxes that overlap mean the code should be reorganized, and a group with no ties to its neighbours may be a routine waiting to be extracted. The measure behind it, how long a variable stays live, is the one Scope, Span and Live Time counted.</p><p>Now the code. The lab's <em>dataflow</em> view reads a Java listing top to bottom and records, for every variable, the lines that set it and the lines that read it; a parameter is set on the routine's first line. From those it prints the <strong>dependencies (line <span data-say="goes to">→</span> line)</strong>: a pair <span data-say="i goes to j">i → j</span> whenever line j reads a variable whose latest earlier set is on line i. It also counts <strong>anomalies</strong>, the names of which come from the data-flow testing of Section 22.3: a variable <strong>used before set</strong>, one <strong>set twice</strong> with no read between, and one <strong>set, never used</strong>. Here is the lesson's parcel quote in the order a hurried writer might put it, the <code>total-first</code> preset:</p><pre class="codeblock" data-say="line 1, double shipping quote of parcel parcel. line 2, flagged, double total is set to base plus surcharge plus insurance. line 3, double base is set to parcel dot base rate. line 4, double surcharge is set to parcel dot fuel surcharge. line 5, double insurance is set to parcel dot insurance fee. line 6, return total" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">double shippingQuote(Parcel parcel) {</span>
+<span class="cl flag">    double total = base + surcharge + insurance;</span>
+<span class="cl">    double base = parcel.baseRate();</span>
+<span class="cl">    double surcharge = parcel.fuelSurcharge();</span>
+<span class="cl">    double insurance = parcel.insuranceFee();</span>
+<span class="cl">    return total;</span>
+<span class="cl">}</span></code></pre><p>The lab finds 6 anomalies. Line 2 reads <span class="math" data-say="base">base</span>, <span class="math" data-say="surcharge">surcharge</span> and <span class="math" data-say="insurance">insurance</span> before anything has set them, so all three are used before set at line 2, and each is then set on lines 3, 4 and 5 and never read again, which is three more. Its dependencies are <span data-say="1 goes to 3, 1 goes to 4, 1 goes to 5, 2 goes to 6">1→3, 1→4, 1→5, 2→6</span>: lines 3 to 5 read the parameter <span class="math" data-say="parcel">parcel</span>, and line 6 returns the <span class="math" data-say="total">total</span> that line 2 wrote. Nothing links line 2 to the three lines it needs, because in this order they come after it. Here <span class="math" data-say="javac">javac</span> agrees with the lab and refuses to compile the routine, with &ldquo;cannot find symbol&rdquo; at line 2, and it can refuse because the names make the dependency visible. Now the same statements in the order their dependencies set, the <code>in-order</code> preset:</p><pre class="codeblock" data-say="line 1, double shipping quote of parcel parcel. line 2, double base is set to parcel dot base rate. line 3, double surcharge is set to parcel dot fuel surcharge. line 4, double insurance is set to parcel dot insurance fee. line 5, double total is set to base plus surcharge plus insurance. line 6, return total" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">double shippingQuote(Parcel parcel) {</span>
+<span class="cl">    double base = parcel.baseRate();</span>
+<span class="cl">    double surcharge = parcel.fuelSurcharge();</span>
+<span class="cl">    double insurance = parcel.insuranceFee();</span>
+<span class="cl">    double total = base + surcharge + insurance;</span>
+<span class="cl">    return total;</span>
+<span class="cl">}</span></code></pre><p>Here the lab finds 0 anomalies, nothing set twice and nothing set but never used, and the dependencies <span data-say="1 goes to 2, 1 goes to 3, 1 goes to 4, 2 goes to 5, 3 goes to 5, 4 goes to 5, 5 goes to 6">1→2, 1→3, 1→4, 2→5, 3→5, 4→5, 5→6</span>. Every arrow points down the page, and that is what ordering dependencies means in the count: no line reads anything a later line writes. The third preset, <code>hidden</code>, is the listing in the exercise below: four calls on one <span class="math" data-say="quote">Quote</span> object, each taking nothing and returning nothing. The lab prints <span data-say="1 goes to 2, 1 goes to 3, 1 goes to 4, 1 goes to 5">1→2, 1→3, 1→4, 1→5</span>, which says only that every call reads the parameter <span class="math" data-say="quote">quote</span>, and 0 anomalies. The routine compiles with its four calls in any order. Whatever <span class="math" data-say="load rates">loadRates</span> leaves inside the object for <span class="math" data-say="add surcharges">addSurcharges</span> to use, the lab cannot see it, and from this code you cannot either.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, void print quote of quote quote. line 2, quote dot load rates. line 3, quote dot add surcharges. line 4, quote dot add insurance. line 5, quote dot print" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void printQuote(Quote quote) {</span>
+<span class="cl">    quote.loadRates();</span>
+<span class="cl">    quote.addSurcharges();</span>
+<span class="cl">    quote.addInsurance();</span>
+<span class="cl">    quote.print();</span>
+<span class="cl">}</span></code></pre><p>Rewrite <span class="math" data-say="print quote">printQuote</span> so that the order is in the parameters, as Section 14.1 recommends: <span class="math" data-say="load rates">loadRates</span> returns a <span class="math" data-say="rates">Rates</span>, which you keep in a new local variable; <span class="math" data-say="add surcharges">addSurcharges</span> and <span class="math" data-say="add insurance">addInsurance</span> each take the <span class="math" data-say="rates">Rates</span> the call before returned and return a new one, kept in its own variable; and <span class="math" data-say="print">print</span> takes the last of them. Keep each of the four statements on its own line, so that they are still lines 2 to 5 and the line numbers in your list match the listing's. Then list, by the lab's rule, every dependency <span data-say="i goes to j">i → j</span> in your version, and name the chain of arrows that now carries the order. You can paste your version into the lab afterwards to check the list.</p><p>Statements in sequence are the simplest kind of control. The next lesson, Using Conditionals, adds the first decision, and asks what the order of a chain of tests costs.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding the order a routine depends on</h2></div><p>Five steps, the last of which is yours.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Mark what each line writes</h3><p>For every line, note the variable it sets, if any. A parameter is set on the routine's first line.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Mark what each line reads</h3><p>Note every variable each line uses on its right-hand side, in a condition or as an argument.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Draw the arrows</h3><p>For each variable a line reads, draw an arrow from the line that last set it. A read with no earlier set is a value used before it exists.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Look for an arrow that points up</h3><p>An arrow from a later line to an earlier one is an order the code gets wrong. A pair of calls with no arrow between them is either free to move or a dependency the code hides; decide which, and make it visible.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on your own code</h3><p>Paste a routine of your own whose calls must run in a certain order into the lab, note the arrows it prints, and write one sentence naming the dependency that the arrows do not show and how you know it is there.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding the order a routine depends on</h2>
+      <p class="lead-in">Five steps, the last of which is yours.</p>
+      <ol class="key-ideas method"><li><strong>Mark what each line writes.</strong> For every line, note the variable it sets, if any. A parameter is set on the routine's first line.</li><li><strong>Mark what each line reads.</strong> Note every variable each line uses on its right-hand side, in a condition or as an argument.</li><li><strong>Draw the arrows.</strong> For each variable a line reads, draw an arrow from the line that last set it. A read with no earlier set is a value used before it exists.</li><li><strong>Look for an arrow that points up.</strong> An arrow from a later line to an earlier one is an order the code gets wrong. A pair of calls with no arrow between them is either free to move or a dependency the code hides; decide which, and make it visible.</li><li><strong>Do it on your own code.</strong> Paste a routine of your own whose calls must run in a certain order into the lab, note the arrows it prints, and write one sentence naming the dependency that the arrows do not show and how you know it is there.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1526,17 +1572,16 @@ line 5 sets total; line 6 returns it: 5→6
 every arrow points down the page</div><p>Line 5 depends on lines 2, 3 and 4, and on nothing else: it never reads <span class="math" data-say="parcel">parcel</span> itself. That is the order Section 14.1 asks to see, and here the names alone show it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking that if the code compiles, its order is right</strong><span>The compiler sees the dependencies the names show and no others. It rejects <code>total-first</code>, because line 2 names three variables that do not yet exist, but it accepts the four calls of <code>hidden</code> in every one of their 24 orders, because they pass nothing. On the lesson's illustration the lab is in the same position: <span data-say="1 goes to 2, 1 goes to 3, 1 goes to 4, 1 goes to 5">1→2, 1→3, 1→4, 1→5</span> and no arrow between the calls. Section 14.1's argument is that the order should be put where both can see it, in names and in parameters.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reaching for a comment first</strong><span>A comment saying which call must come first is McConnell's fallback, not his remedy. He asks you first to write code without order dependencies, second to write code that makes them obvious, and only then, if the code itself cannot be improved, to document them (p. 350).</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a status flag as a free safety net</strong><span>A variable such as a flag set by the initializing routine and checked by the others can enforce a critical order, and the book offers it for code critical enough to need it. It also says what it costs: new variables, new initialization code and new error checks, each a new place for a mistake, to be weighed against the benefit.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can list a routine&#x27;s order dependencies and reorder it so none points backwards.</strong><p>For a routine of about six statements of your own, list each dependency as <span data-say="i goes to j">i → j</span>, where line j reads what line i last wrote, and reorder the statements so that no dependency points backwards, by hand.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab reads variables and nothing else. A dependency carried by the fields of an object, a file or a database is invisible to it, which is the point of the <code>hidden</code> preset and the limit of the count. It reads the lines top to bottom and does not follow branches or loops, so for code that has them its arrows are an approximation. Whether a given order is the one the program needs is a question about the program, which the arrows only help you ask.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking that if the code compiles, its order is right</strong><span>The compiler sees the dependencies the names show and no others. It rejects <code>total-first</code>, because line 2 names three variables that do not yet exist, but it accepts the four calls of <code>hidden</code> in every one of their 24 orders, because they pass nothing. On the lesson's illustration the lab is in the same position: <span data-say="1 goes to 2, 1 goes to 3, 1 goes to 4, 1 goes to 5">1→2, 1→3, 1→4, 1→5</span> and no arrow between the calls. Section 14.1's argument is that the order should be put where both can see it, in names and in parameters.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reaching for a comment first</strong><span>A comment saying which call must come first is McConnell's fallback, not his remedy. He asks you first to write code without order dependencies, second to write code that makes them obvious, and only then, if the code itself cannot be improved, to document them (p. 350).</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a status flag as a free safety net</strong><span>A variable such as a flag set by the initializing routine and checked by the others can enforce a critical order, and the book offers it for code critical enough to need it. It also says what it costs: new variables, new initialization code and new error checks, each a new place for a mistake, to be weighed against the benefit.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can list a routine&#x27;s order dependencies and reorder it so none points backwards.</strong><p>For a routine of about six statements of your own, list each dependency as <span data-say="i goes to j">i → j</span>, where line j reads what line i last wrote, and reorder the statements so that no dependency points backwards, by hand.</p></div></div><div class="note"><strong>Note:</strong> The lab reads variables and nothing else. A dependency carried by the fields of an object, a file or a database is invisible to it, which is the point of the <code>hidden</code> preset and the limit of the count. It reads the lines top to bottom and does not follow branches or loops, so for code that has them its arrows are an approximation. Whether a given order is the one the program needs is a question about the program, which the arrows only help you ask.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Order dependency</summary><p>One statement depends on another when it reads a value the other wrote, so it has to run after it. Straight-line code is correct only if every dependency points forward, from an earlier line to a later one.</p></details><details class="recall"><summary>Hidden dependency</summary><p>A dependency the code does not show. Calls that pass nothing and return nothing can still depend on each other through the data of the object they share, and neither the reader nor the compiler can see it.</p></details><details class="recall"><summary>The Principle of Proximity</summary><p>Keep related actions together. When the order of some statements does not matter, McConnell's rule for choosing one is to put the statements that work on the same data next to each other, so the code reads from top to bottom.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 14 is about code with no branches at all, and its one hard idea is the dependency: a statement that must come after another because it reads what the other wrote. Count the dependencies in a parcel quote with the lab, find the three values summed before they exist, and see why four calls that pass nothing show the lab no order at all.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Order dependency.</strong> One statement depends on another when it reads a value the other wrote, so it has to run after it. Straight-line code is correct only if every dependency points forward, from an earlier line to a later one.</li><li><strong>Hidden dependency.</strong> A dependency the code does not show. Calls that pass nothing and return nothing can still depend on each other through the data of the object they share, and neither the reader nor the compiler can see it.</li><li><strong>The Principle of Proximity.</strong> Keep related actions together. When the order of some statements does not matter, McConnell's rule for choosing one is to put the statements that work on the same data next to each other, so the code reads from top to bottom.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="order statements by their dependencies. i goes to j, line j reads what line i wrote. make the order visible in names and data. pass the data, and the order shows. no dependency, keep related lines together" tabindex="0" role="region" aria-label="Mathematical notation">order statements by their dependencies
 i → j: line j reads what line i wrote
 make the order visible in names and data
@@ -2554,11 +2599,42 @@ no dependency: keep related lines together</div><figcaption>The chapter in five 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2626,7 +2702,7 @@ no dependency: keep related lines together</div><figcaption>The chapter in five 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

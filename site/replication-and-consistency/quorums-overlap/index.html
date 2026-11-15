@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Replication and Consistency</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Quorums</p>
       <h1>Quorums Overlap</h1>
       <p class="lesson-lede">Decide whether a configuration overlaps, and compute the minimum overlap it actually guarantees.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Pigeonhole, applied to node names</li><li>The minimum is attained, so it is the guarantee</li><li>Overlap says a node saw it, not that the reader can tell</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The overlap bound, and the line it does not cross</h2>
-      <article class="prose reading"><div class="thm"><span class="label">Theorem &middot; The quorum overlap bound</span><p>Let a write be applied to a set of <span class="math" data-say="W">W</span> nodes and a read consult a set of <span class="math" data-say="R">R</span> nodes, both subsets of the same <span class="math" data-say="N">N</span>. If <span class="math" data-say="R plus W is greater than N">R + W > N</span> then the two sets intersect, and the intersection contains at least <span class="math" data-say="R plus W minus N">R + W − N</span> nodes. If <span class="math" data-say="R plus W is at most N">R + W ≤ N</span> there exist a read set and a write set that are disjoint.</p></div><div class="proof"><p>The read set and the write set together name <span class="math" data-say="R plus W">R + W</span> nodes, counted with repetition, from a pool of <span class="math" data-say="N">N</span> distinct nodes. Each node can be named at most twice — once by each set — so the number of nodes named by both is at least <span class="math" data-say="R plus W minus N">R + W − N</span>. When <span class="math" data-say="R plus W is greater than N">R + W > N</span> that quantity is positive, so the sets intersect.</p><p>For the converse, if <span class="math" data-say="R plus W is at most N">R + W ≤ N</span> then the <span class="math" data-say="W">W</span> nodes of the write and <span class="math" data-say="R">R</span> further nodes can be chosen from the <span class="math" data-say="N">N</span> without reusing any, and those <span class="math" data-say="R">R</span> form a read set disjoint from the write set. Such a read returns no copy of the write at all.</p><p><span class="qed">&#9633;</span></p></div><p>The theorem is about set membership and it is proved in two lines, which is why it is the load-bearing fact in every quorum system. What takes care is the second half of the statement: the bound is a <em>minimum</em>, and a minimum is only useful if something attains it.</p><div class="mathblock" data-say="N equals 3 nodes the set 1, 2, 3, R equals 2, W equals 2. read sets, the set 1, 2, the set 1, 3, the set 2, 3. write sets, the set 1, 2, the set 1, 3, the set 2, 3. size of the intersection, over all 9 pairs. the set 1, 2, the set 1, 3, the set 2, 3. a table, shown on the page. smallest entry equals 1 equals R plus W minus N, and it occurs in 6 of the 9 pairs" tabindex="0" role="region" aria-label="Mathematical notation">N = 3 nodes {1, 2, 3},   R = 2,   W = 2
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The overlap bound, and the line it does not cross</h2><div class="prose reading"><div class="thm"><span class="label">Theorem &middot; The quorum overlap bound</span><p>Let a write be applied to a set of <span class="math" data-say="W">W</span> nodes and a read consult a set of <span class="math" data-say="R">R</span> nodes, both subsets of the same <span class="math" data-say="N">N</span>. If <span class="math" data-say="R plus W is greater than N">R + W > N</span> then the two sets intersect, and the intersection contains at least <span class="math" data-say="R plus W minus N">R + W − N</span> nodes. If <span class="math" data-say="R plus W is at most N">R + W ≤ N</span> there exist a read set and a write set that are disjoint.</p></div><div class="proof"><p>The read set and the write set together name <span class="math" data-say="R plus W">R + W</span> nodes, counted with repetition, from a pool of <span class="math" data-say="N">N</span> distinct nodes. Each node can be named at most twice — once by each set — so the number of nodes named by both is at least <span class="math" data-say="R plus W minus N">R + W − N</span>. When <span class="math" data-say="R plus W is greater than N">R + W > N</span> that quantity is positive, so the sets intersect.</p><p>For the converse, if <span class="math" data-say="R plus W is at most N">R + W ≤ N</span> then the <span class="math" data-say="W">W</span> nodes of the write and <span class="math" data-say="R">R</span> further nodes can be chosen from the <span class="math" data-say="N">N</span> without reusing any, and those <span class="math" data-say="R">R</span> form a read set disjoint from the write set. Such a read returns no copy of the write at all.</p><p><span class="qed">&#9633;</span></p></div><p>The theorem is about set membership and it is proved in two lines, which is why it is the load-bearing fact in every quorum system. What takes care is the second half of the statement: the bound is a <em>minimum</em>, and a minimum is only useful if something attains it.</p><div class="mathblock" data-say="N equals 3 nodes the set 1, 2, 3, R equals 2, W equals 2. read sets, the set 1, 2, the set 1, 3, the set 2, 3. write sets, the set 1, 2, the set 1, 3, the set 2, 3. size of the intersection, over all 9 pairs. the set 1, 2, the set 1, 3, the set 2, 3. a table, shown on the page. smallest entry equals 1 equals R plus W minus N, and it occurs in 6 of the 9 pairs" tabindex="0" role="region" aria-label="Mathematical notation">N = 3 nodes {1, 2, 3},   R = 2,   W = 2
 
 read sets    {1,2}   {1,3}   {2,3}
 write sets   {1,2}   {1,3}   {2,3}
@@ -1403,12 +1447,11 @@ size of the intersection, over all 9 pairs
        {1,3}      1       2       1
        {2,3}      1       1       2
 
-smallest entry = 1 = R + W − N, and it occurs in 6 of the 9 pairs</div><p>Two thirds of the pairs sit exactly on the bound, so a design that assumed a comfortable margin of agreement between the read set and the write set has assumed something that is false most of the time. The guarantee is one node, and one node is enough — provided the reader knows what to do with a set of answers that disagree.</p><h3>What the overlap does not buy</h3><p>The read set contains a node holding the latest acknowledged write. It also contains, in general, nodes holding older values, and the reader receives all of them without a label saying which is which. Version numbers or timestamps are what turn the overlap into an answer, and they bring their own difficulties — “Lamport Clocks” and “Physical Clocks and Drift” are both about how badly a naive version of that can go.</p><div class="example"><span class="label">Example &middot; Two concurrent writes, and an overlap that decides nothing</span><p><span class="math" data-say="N equals 3, R equals 2, W equals 2">N = 3, R = 2, W = 2</span>. Client one writes <span class="math" data-say="x equals 1">x = 1</span> to <span class="math" data-say="the set 1, 2">{1,2}</span>; at the same moment client two writes <span class="math" data-say="x equals 2">x = 2</span> to <span class="math" data-say="the set 2, 3">{2,3}</span>. Both writes satisfy the configuration and both are acknowledged. A reader consulting <span class="math" data-say="the set 1, 3">{1,3}</span> sees <span class="math" data-say="1">1</span> and <span class="math" data-say="2">2</span> and overlaps with both write sets, exactly as the theorem promises. The theorem has done its job and the reader still does not know which value is current, because neither write happened before the other. That is a conflict rather than a staleness problem, and it is what “Vector Clocks and Concurrency” makes countable and “Conflict Resolution, Counted” decides.</p></div><p>So the right claim for a <span class="math" data-say="N, R, W">(N, R, W)</span> configuration with <span class="math" data-say="R plus W is greater than N">R + W > N</span> is: no acknowledged write can be missed entirely by a subsequent read. That is a real and useful guarantee. It is not “the read returns the current value”, and the gap between the two is where most of the remaining lessons on this course live.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Quorums overlap</h2></div><p>R + W &gt; N, the minimum R + W − N, and the pair that misses when it does not</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+smallest entry = 1 = R + W − N, and it occurs in 6 of the 9 pairs</div><p>Two thirds of the pairs sit exactly on the bound, so a design that assumed a comfortable margin of agreement between the read set and the write set has assumed something that is false most of the time. The guarantee is one node, and one node is enough — provided the reader knows what to do with a set of answers that disagree.</p><h3>What the overlap does not buy</h3><p>The read set contains a node holding the latest acknowledged write. It also contains, in general, nodes holding older values, and the reader receives all of them without a label saying which is which. Version numbers or timestamps are what turn the overlap into an answer, and they bring their own difficulties — “Lamport Clocks” and “Physical Clocks and Drift” are both about how badly a naive version of that can go.</p><div class="example"><span class="label">Example &middot; Two concurrent writes, and an overlap that decides nothing</span><p><span class="math" data-say="N equals 3, R equals 2, W equals 2">N = 3, R = 2, W = 2</span>. Client one writes <span class="math" data-say="x equals 1">x = 1</span> to <span class="math" data-say="the set 1, 2">{1,2}</span>; at the same moment client two writes <span class="math" data-say="x equals 2">x = 2</span> to <span class="math" data-say="the set 2, 3">{2,3}</span>. Both writes satisfy the configuration and both are acknowledged. A reader consulting <span class="math" data-say="the set 1, 3">{1,3}</span> sees <span class="math" data-say="1">1</span> and <span class="math" data-say="2">2</span> and overlaps with both write sets, exactly as the theorem promises. The theorem has done its job and the reader still does not know which value is current, because neither write happened before the other. That is a conflict rather than a staleness problem, and it is what “Vector Clocks and Concurrency” makes countable and “Conflict Resolution, Counted” decides.</p></div><p>So the right claim for a <span class="math" data-say="N, R, W">(N, R, W)</span> configuration with <span class="math" data-say="R plus W is greater than N">R + W > N</span> is: no acknowledged write can be missed entirely by a subsequent read. That is a real and useful guarantee. It is not “the read returns the current value”, and the gap between the two is where most of the remaining lessons on this course live.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Quorums overlap</h2></div><p>R + W &gt; N, the minimum R + W − N, and the pair that misses when it does not</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Quorums overlap when R + W &gt; N</strong><span>and the minimum overlap is R + W &minus; N, by the pigeonhole principle</span></div>
         <div class="inline-legend"><span class="tone-amber"><i class="legend-swatch"></i>the write set</span><span class="tone-cyan"><i class="legend-swatch"></i>the read set</span><span class="tone-green"><i class="legend-swatch"></i>nodes in both</span><span class="tone-red"><i class="legend-swatch"></i>a disjoint pair</span></div>
@@ -1416,10 +1459,10 @@ smallest entry = 1 = R + W − N, and it occurs in 6 of the 9 pairs</div><p>Two 
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="qmGrid" viewBox="0 0 520 210" role="img" aria-label="The N nodes with a write set and a read set marked, and their intersection."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="qmTable"></table></div>
       <div class="status-banner" id="qmStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the quorum configuration</h3>
-          <p>Both families of sets are enumerated and every pair compared, so the minimum overlap shown is measured rather than asserted from the formula. Drop <span class="math" data-say="R">R</span> to <span class="math" data-say="1">1</span> and the lab exhibits an actual disjoint pair instead of a minimum.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the quorum configuration</h3>
+            <p>Both families of sets are enumerated and every pair compared, so the minimum overlap shown is measured rather than asserted from the formula. Drop <span class="math" data-say="R">R</span> to <span class="math" data-say="1">1</span> and the lab exhibits an actual disjoint pair instead of a minimum.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="qmN">Replicas N</label><span class="range-value" id="qmNOut">3</span></div>
           <input id="qmN" type="range" min="1" max="9" step="1" value="3" />
@@ -1441,12 +1484,14 @@ smallest entry = 1 = R + W − N, and it occurs in 6 of the 9 pairs</div><p>Two 
           <div class="kpi"><span>C(N&minus;W, R) &times; C(N, W)</span><strong id="qmFormula">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="qmHint" style="margin:0;">Every C(N, R) read set is checked against every C(N, W) write set, so the minimum below is measured rather than argued. Overlap makes a read <em>able</em> to see the latest acknowledged write. It does not make the system linearizable &mdash; that needs an order on the operations, and it is the business of &ldquo;Linearizability by Enumeration&rdquo;.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding a quorum configuration</h2></div><p>Two integers decide it and the third step is where a real design usually goes wrong — not in the arithmetic, but in what it is asked to mean.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Add <span class="math" data-say="R">R</span> and <span class="math" data-say="W">W</span> and compare with <span class="math" data-say="N">N</span></h3><p>Strictly greater. <span class="math" data-say="R plus W equals N">R + W = N</span> is not the boundary case of a guarantee, it is the absence of one, and “Sloppy Quorums and the Miss Probability” prices exactly how absent.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute <span class="math" data-say="R plus W minus N">R + W − N</span> and treat it as the worst case</h3><p>That is the number of nodes the read and write sets are guaranteed to share, and it is attained. If your design needs two shared nodes — because you intend to survive one of them being wrong — then <span class="math" data-say="R plus W minus N is at least 2">R + W − N ≥ 2</span> is the condition, not <span class="math" data-say="R plus W is greater than N">R + W > N</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Decide where to spend the sum, since only the sum is constrained</h3><p><span class="math" data-say="N, R, W equals 3, 3, 1">(N, R, W) = (3, 3, 1)</span> gives fast writes and slow reads; <span class="math" data-say="3, 1, 3">(3, 1, 3)</span> the reverse; <span class="math" data-say="3, 2, 2">(3, 2, 2)</span> balances them. All three overlap. Choose by which of the two paths is hot, using the latency arithmetic of “Quorum Latency: the W-th Fastest”.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Say out loud what the overlap does not give you</h3><p>It gives you a node with the latest acknowledged write in every read set. It does not give you a way to recognise that node's answer, a resolution for concurrent writes, or linearizability. Writing that sentence into the design document is what stops a quorum from being quoted as consistency later.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Deciding a quorum configuration</h2>
+      <p class="lead-in">Two integers decide it and the third step is where a real design usually goes wrong — not in the arithmetic, but in what it is asked to mean.</p>
+      <ol class="key-ideas method"><li><strong>Add <span class="math" data-say="R">R</span> and <span class="math" data-say="W">W</span> and compare with <span class="math" data-say="N">N</span>.</strong> Strictly greater. <span class="math" data-say="R plus W equals N">R + W = N</span> is not the boundary case of a guarantee, it is the absence of one, and “Sloppy Quorums and the Miss Probability” prices exactly how absent.</li><li><strong>Compute <span class="math" data-say="R plus W minus N">R + W − N</span> and treat it as the worst case.</strong> That is the number of nodes the read and write sets are guaranteed to share, and it is attained. If your design needs two shared nodes — because you intend to survive one of them being wrong — then <span class="math" data-say="R plus W minus N is at least 2">R + W − N ≥ 2</span> is the condition, not <span class="math" data-say="R plus W is greater than N">R + W > N</span>.</li><li><strong>Decide where to spend the sum, since only the sum is constrained.</strong> <span class="math" data-say="N, R, W equals 3, 3, 1">(N, R, W) = (3, 3, 1)</span> gives fast writes and slow reads; <span class="math" data-say="3, 1, 3">(3, 1, 3)</span> the reverse; <span class="math" data-say="3, 2, 2">(3, 2, 2)</span> balances them. All three overlap. Choose by which of the two paths is hot, using the latency arithmetic of “Quorum Latency: the W-th Fastest”.</li><li><strong>Say out loud what the overlap does not give you.</strong> It gives you a node with the latest acknowledged write in every read set. It does not give you a way to recognise that node's answer, a resolution for concurrent writes, or linearizability. Writing that sentence into the design document is what stops a quorum from being quoted as consistency later.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1473,17 +1518,16 @@ and a configuration with a margin
                   {1,2,3,4} ∩ {2,3,4,5} = {2,3,4}</div><p>The first three configurations are equally safe and wildly different to operate. <span class="math" data-say="R equals 1, W equals 5">R = 1, W = 5</span> cannot tolerate a single node being down for writes; <span class="math" data-say="R equals 5, W equals 1">R = 5, W = 1</span> cannot tolerate one being down for reads; <span class="math" data-say="R equals 3, W equals 3">R = 3, W = 3</span> tolerates one being down on either path. The overlap arithmetic is blind to all of that, which is why it is a necessary condition and never the whole design.</p><p>The fourth line is the trap, and it is a popular one because <span class="math" data-say="R plus W equals N">R + W = N</span> looks like a boundary you are standing on rather than one you are outside of. The exhibited pair settles it: a write to <span class="math" data-say="the set 1, 2, 3">{1,2,3}</span> and a read of <span class="math" data-say="the set 4, 5">{4,5}</span> are both legal under that configuration and share nothing.</p><p>For a faded rehearsal, take <span class="math" data-say="N equals 7">N = 7</span> with <span class="math" data-say="R equals 3">R = 3</span> and <span class="math" data-say="W equals 5">W = 5</span>. The supplied first move is <span class="math" data-say="R plus W equals 8 is greater than 7">R + W = 8 > 7</span>, so it overlaps. Compute the minimum overlap, then find the smallest <span class="math" data-say="R">R</span> that keeps the configuration overlapping if <span class="math" data-say="W">W</span> is cut to <span class="math" data-say="4">4</span>, and say what that change does to the read path before you check it in the lab.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading <span class="math" data-say="R plus W is greater than N">R + W &gt; N</span> as <span class="math" data-say="R plus W is at least N">R + W ≥ N</span></strong><span>The strictness is the whole condition. At <span class="math" data-say="N equals 3">N = 3</span>, <span class="math" data-say="R plus W equals 3">R + W = 3</span> leaves a read missing the write one time in three, which is not a boundary case of a guarantee but a coin flip with bad odds. Any configuration you cannot immediately place on the correct side of that inequality should be written out and checked.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating <span class="math" data-say="R plus W minus N">R + W − N</span> as a lower bound with slack in it</strong><span>It is attained. At <span class="math" data-say="N equals 3, R equals W equals 2">N = 3, R = W = 2</span> six of the nine set pairs share exactly one node, so the worst case is the common case. A design that quietly relies on two of the read's nodes agreeing needs <span class="math" data-say="R plus W minus N is at least 2">R + W − N ≥ 2</span>, and must say so.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling a quorum configuration “consistent”</strong><span>The overlap guarantees that no acknowledged write is missed entirely. It does not order concurrent writes, does not tell the reader which returned value is current without version information, and does not make the history linearizable. Every one of those has cost somebody an outage that the quorum arithmetic said was impossible, because the arithmetic was answering a narrower question than the one being asked.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can prove the bound in two lines and state, in one more, what it does not give you.</strong><p>You should be able to decide any <span class="math" data-say="N, R, W">(N, R, W)</span> at sight, compute the minimum overlap and know it is attained, exhibit a disjoint pair when the condition fails, and separate “no acknowledged write is missed” from “the read returns the current value”.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The overlap condition constrains <span class="math" data-say="R plus W">R + W</span> and leaves you free to choose where to spend it, and that choice is a latency choice. “Quorum Latency: the W-th Fastest” computes it — and produces the one result on this course that most readers refuse to believe until they have worked the binomial tail themselves.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading <span class="math" data-say="R plus W is greater than N">R + W &gt; N</span> as <span class="math" data-say="R plus W is at least N">R + W ≥ N</span></strong><span>The strictness is the whole condition. At <span class="math" data-say="N equals 3">N = 3</span>, <span class="math" data-say="R plus W equals 3">R + W = 3</span> leaves a read missing the write one time in three, which is not a boundary case of a guarantee but a coin flip with bad odds. Any configuration you cannot immediately place on the correct side of that inequality should be written out and checked.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating <span class="math" data-say="R plus W minus N">R + W − N</span> as a lower bound with slack in it</strong><span>It is attained. At <span class="math" data-say="N equals 3, R equals W equals 2">N = 3, R = W = 2</span> six of the nine set pairs share exactly one node, so the worst case is the common case. A design that quietly relies on two of the read's nodes agreeing needs <span class="math" data-say="R plus W minus N is at least 2">R + W − N ≥ 2</span>, and must say so.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling a quorum configuration “consistent”</strong><span>The overlap guarantees that no acknowledged write is missed entirely. It does not order concurrent writes, does not tell the reader which returned value is current without version information, and does not make the history linearizable. Every one of those has cost somebody an outage that the quorum arithmetic said was impossible, because the arithmetic was answering a narrower question than the one being asked.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can prove the bound in two lines and state, in one more, what it does not give you.</strong><p>You should be able to decide any <span class="math" data-say="N, R, W">(N, R, W)</span> at sight, compute the minimum overlap and know it is attained, exhibit a disjoint pair when the condition fails, and separate “no acknowledged write is missed” from “the read returns the current value”.</p></div></div><div class="note"><strong>Note:</strong> The overlap condition constrains <span class="math" data-say="R plus W">R + W</span> and leaves you free to choose where to spend it, and that choice is a latency choice. “Quorum Latency: the W-th Fastest” computes it — and produces the one result on this course that most readers refuse to believe until they have worked the binomial tail themselves.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Pigeonhole, applied to node names</summary><p>A read set of <span class="math" data-say="R">R</span> nodes and a write set of <span class="math" data-say="W">W</span> nodes name <span class="math" data-say="R plus W">R + W</span> nodes between them, all drawn from the same <span class="math" data-say="N">N</span>. If <span class="math" data-say="R plus W is greater than N">R + W > N</span> they cannot all be distinct, so at least <span class="math" data-say="R plus W minus N">R + W − N</span> names appear in both sets. Nothing about time, ordering or protocol enters the argument — it is Discrete Mathematics' pigeonhole principle with nodes as pigeonholes.</p></details><details class="recall"><summary>The minimum is attained, so it is the guarantee</summary><p>A bound that is never reached would be the wrong number to design on. Here it is reached: at <span class="math" data-say="N equals 3, R equals 2, W equals 2">N = 3, R = 2, W = 2</span> the lab compares all <span class="math" data-say="9">9</span> read-set and write-set pairs and finds the smallest intersection is exactly <span class="math" data-say="1">1</span>, which is <span class="math" data-say="R plus W minus N">R + W − N</span>. So <span class="math" data-say="R plus W minus N">R + W − N</span> is what you get in the worst case, and sizing a design as though you got more is sizing it wrong.</p></details><details class="recall"><summary>Overlap says a node saw it, not that the reader can tell</summary><p>The guarantee is that at least one node in the read set holds the latest acknowledged write. It does not say the reader can identify which of the returned values that is, what happens when two writes are concurrent, or that the whole history looks like it happened at single instants. Those are separate questions, and “Linearizability by Enumeration” is where the last of them gets answered.</p></details></div>
+      <h3>Summary</h3>
       <p>If a read consults <span class="math" data-say="R">R</span> nodes and a write reaches <span class="math" data-say="W">W</span> of <span class="math" data-say="N">N</span>, then <span class="math" data-say="R plus W">R + W</span> node names are drawn from a pool of <span class="math" data-say="N">N</span>, and <span class="math" data-say="R plus W is greater than N">R + W > N</span> forces at least <span class="math" data-say="R plus W minus N">R + W − N</span> of them to coincide. That is the pigeonhole principle applied to machine names, and the bound is attained, which is what makes it the guarantee rather than merely a limit. It is also strictly less than consistency, and this lesson says exactly how much less.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Pigeonhole, applied to node names.</strong> A read set of <span class="math" data-say="R">R</span> nodes and a write set of <span class="math" data-say="W">W</span> nodes name <span class="math" data-say="R plus W">R + W</span> nodes between them, all drawn from the same <span class="math" data-say="N">N</span>. If <span class="math" data-say="R plus W is greater than N">R + W > N</span> they cannot all be distinct, so at least <span class="math" data-say="R plus W minus N">R + W − N</span> names appear in both sets. Nothing about time, ordering or protocol enters the argument — it is Discrete Mathematics' pigeonhole principle with nodes as pigeonholes.</li><li><strong>The minimum is attained, so it is the guarantee.</strong> A bound that is never reached would be the wrong number to design on. Here it is reached: at <span class="math" data-say="N equals 3, R equals 2, W equals 2">N = 3, R = 2, W = 2</span> the lab compares all <span class="math" data-say="9">9</span> read-set and write-set pairs and finds the smallest intersection is exactly <span class="math" data-say="1">1</span>, which is <span class="math" data-say="R plus W minus N">R + W − N</span>. So <span class="math" data-say="R plus W minus N">R + W − N</span> is what you get in the worst case, and sizing a design as though you got more is sizing it wrong.</li><li><strong>Overlap says a node saw it, not that the reader can tell.</strong> The guarantee is that at least one node in the read set holds the latest acknowledged write. It does not say the reader can identify which of the returned values that is, what happens when two writes are concurrent, or that the whole history looks like it happened at single instants. Those are separate questions, and “Linearizability by Enumeration” is where the last of them gets answered.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="R plus W is greater than N, implies, every read set meets every write set. minimum overlap equals R plus W minus N, and it is attained. N equals 3, R equals 2, W equals 2, R plus W equals 4 is greater than 3, minimum overlap 1. 3 read sets times 3 write sets equals 9 pairs, none of them disjoint. overlap is a statement about nodes, not about what the reader can tell" tabindex="0" role="region" aria-label="Mathematical notation">R + W &gt; N   ⟹   every read set meets every write set
 minimum overlap = R + W − N, and it is attained
 N = 3, R = 2, W = 2:   R + W = 4 &gt; 3,  minimum overlap 1
@@ -2964,11 +3008,42 @@ overlap is a statement about nodes, not about what the reader can tell</div><fig
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3036,7 +3111,7 @@ overlap is a statement about nodes, not about what the reader can tell</div><fig
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

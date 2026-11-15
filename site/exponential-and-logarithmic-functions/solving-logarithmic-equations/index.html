@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Exponential and Logarithmic Functions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Solving</p>
       <h1>Solving Logarithmic Equations</h1>
       <p class="lesson-lede">State the original domain, solve a logarithmic equation, and reject extraneous candidates.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Solving means undoing, not cancelling</li><li>Condensing widens the domain</li><li>The test is on the arguments, not on the sign of x</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Condensing, exponentiating, and the domain check</h2>
-      <article class="prose reading"><p>In “Solving Exponential Equations” the unknown sat in an exponent and a logarithm brought it down. Here the unknown sits inside a logarithm, and an exponential takes it out. The two lessons are the same manoeuvre in opposite directions, with one asymmetry: an exponential accepts every real number, and a logarithm does not.</p><div class="defbox"><span class="label">Definition &middot; Logarithmic equation</span><p>An equation in which the unknown appears in the argument or the base of a logarithm. Its <strong>domain</strong> is the set of values making every argument positive (and every base positive and not <span class="math" data-say="1">1</span>). The domain is fixed by the equation as given, and no later step may enlarge it.</p></div><div class="thm"><span class="label">Theorem &middot; The two conversions</span><p>For <span class="math" data-say="b is greater than 0">b &gt; 0</span>, <span class="math" data-say="b is not equal to 1">b ≠ 1</span>: <span class="math" data-say="log base b of u equals c">log_b(u) = c</span> if and only if <span class="math" data-say="u equals b to the power c">u = b^c</span>, for <span class="math" data-say="u is greater than 0">u &gt; 0</span> and any real <span class="math" data-say="c">c</span>.</p><p>And <span class="math" data-say="log base b of M equals log base b of N">log_b(M) = log_b(N)</span> if and only if <span class="math" data-say="M equals N">M = N</span>, for <span class="math" data-say="M, N is greater than 0">M, N &gt; 0</span>. The second is the first applied twice, and it is the statement that lets two matching logarithms be dropped from an equation.</p></div><p>The method follows from the two conversions. Condense until each side is a single logarithm or a constant. If both sides are logarithms in the same base, drop them. If one side is a constant, convert. Then solve whatever is left, which is usually linear or quadratic.</p><div class="mathblock" data-say="log base 2 of the quantity x minus 1, plus log base 2 of the quantity x plus 2, equals 2. log base 2 of the quantity the quantity x minus 1, times the quantity x plus 2, equals 2, product law, used right to left. the quantity x minus 1, times the quantity x plus 2, equals 2 squared equals 4, definition of a logarithm. x squared plus x minus 2 equals 4. x squared plus x minus 6 equals 0. the quantity x plus 3, times the quantity x minus 2, equals 0, candidates x equals negative 3 and x equals 2. domain, x minus 1 is greater than 0, and, x plus 2 is greater than 0, implies, x is greater than 1. x equals 2, survives, log base 2 of 1 plus log base 2 of 4 equals 0 plus 2 equals 2, check. x equals negative 3 does not, log base 2 of the quantity negative 4, is not defined, fails" tabindex="0" role="region" aria-label="Mathematical notation">log_2(x − 1) + log_2(x + 2) = 2
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Condensing, exponentiating, and the domain check</h2><div class="prose reading"><p>In “Solving Exponential Equations” the unknown sat in an exponent and a logarithm brought it down. Here the unknown sits inside a logarithm, and an exponential takes it out. The two lessons are the same manoeuvre in opposite directions, with one asymmetry: an exponential accepts every real number, and a logarithm does not.</p><div class="defbox"><span class="label">Definition &middot; Logarithmic equation</span><p>An equation in which the unknown appears in the argument or the base of a logarithm. Its <strong>domain</strong> is the set of values making every argument positive (and every base positive and not <span class="math" data-say="1">1</span>). The domain is fixed by the equation as given, and no later step may enlarge it.</p></div><div class="thm"><span class="label">Theorem &middot; The two conversions</span><p>For <span class="math" data-say="b is greater than 0">b &gt; 0</span>, <span class="math" data-say="b is not equal to 1">b ≠ 1</span>: <span class="math" data-say="log base b of u equals c">log_b(u) = c</span> if and only if <span class="math" data-say="u equals b to the power c">u = b^c</span>, for <span class="math" data-say="u is greater than 0">u &gt; 0</span> and any real <span class="math" data-say="c">c</span>.</p><p>And <span class="math" data-say="log base b of M equals log base b of N">log_b(M) = log_b(N)</span> if and only if <span class="math" data-say="M equals N">M = N</span>, for <span class="math" data-say="M, N is greater than 0">M, N &gt; 0</span>. The second is the first applied twice, and it is the statement that lets two matching logarithms be dropped from an equation.</p></div><p>The method follows from the two conversions. Condense until each side is a single logarithm or a constant. If both sides are logarithms in the same base, drop them. If one side is a constant, convert. Then solve whatever is left, which is usually linear or quadratic.</p><div class="mathblock" data-say="log base 2 of the quantity x minus 1, plus log base 2 of the quantity x plus 2, equals 2. log base 2 of the quantity the quantity x minus 1, times the quantity x plus 2, equals 2, product law, used right to left. the quantity x minus 1, times the quantity x plus 2, equals 2 squared equals 4, definition of a logarithm. x squared plus x minus 2 equals 4. x squared plus x minus 6 equals 0. the quantity x plus 3, times the quantity x minus 2, equals 0, candidates x equals negative 3 and x equals 2. domain, x minus 1 is greater than 0, and, x plus 2 is greater than 0, implies, x is greater than 1. x equals 2, survives, log base 2 of 1 plus log base 2 of 4 equals 0 plus 2 equals 2, check. x equals negative 3 does not, log base 2 of the quantity negative 4, is not defined, fails" tabindex="0" role="region" aria-label="Mathematical notation">log_2(x − 1) + log_2(x + 2) = 2
 log_2((x − 1)(x + 2)) = 2         product law, used right to left
 (x − 1)(x + 2) = 2^2 = 4          definition of a logarithm
 x² + x − 2 = 4
@@ -1400,12 +1444,11 @@ x² + x − 6 = 0
 
 domain:  x − 1 &gt; 0  and  x + 2 &gt; 0    ⟹    x &gt; 1
 x = 2  survives      log_2(1) + log_2(4) = 0 + 2 = 2      ✓
-x = −3 does not      log_2(−4) is not defined             ✗</div><p>Look at why <span class="math" data-say="x equals negative 3">x = −3</span> appeared at all. The condensed equation asks only that <span class="math" data-say="the quantity x minus 1, times the quantity x plus 2">(x − 1)(x + 2)</span> equal <span class="math" data-say="4">4</span>, and at <span class="math" data-say="x equals negative 3">x = −3</span> those factors are <span class="math" data-say="negative 4">−4</span> and <span class="math" data-say="negative 1">−1</span>, whose product is <span class="math" data-say="4">4</span>. Two negatives passed a test that was written for their product. The original equation asks for the logarithm of each factor separately, and neither exists.</p><div class="example"><span class="label">Example &middot; A negative solution that is not extraneous</span><p><span class="math" data-say="log base 3 of the quantity x plus 6, minus log base 3 of the quantity x plus 2, equals 2">log_3(x + 6) − log_3(x + 2) = 2</span> condenses to <span class="math" data-say="log base 3 of the quantity the quantity x plus 6, over the quantity x plus 2, equals 2">log_3((x + 6)/(x + 2)) = 2</span>, so <span class="math" data-say="the quantity x plus 6, over the quantity x plus 2, equals 9">(x + 6)/(x + 2) = 9</span>, giving <span class="math" data-say="x plus 6 equals 9 x plus 18">x + 6 = 9x + 18</span> and <span class="math" data-say="x equals negative 3 over 2">x = −3/2</span>. The arguments there are <span class="math" data-say="9 over 2">9/2</span> and <span class="math" data-say="1 over 2">1/2</span>, both positive, so the candidate stands. Check: <span class="math" data-say="log base 3 of the quantity 9 over 2, minus log base 3 of the quantity 1 over 2, equals log base 3 of 9 equals 2">log_3(9/2) − log_3(1/2) = log_3(9) = 2</span>.</p></div><div class="example"><span class="label">Example &middot; Every candidate rejected</span><p><span class="math" data-say="log base 2 of x minus log base 2 of the quantity x plus 1, equals 3">log_2(x) − log_2(x + 1) = 3</span> condenses to <span class="math" data-say="x over the quantity x plus 1, equals 2 cubed equals 8">x/(x + 1) = 2^3 = 8</span>, so <span class="math" data-say="x equals 8 x plus 8">x = 8x + 8</span> and <span class="math" data-say="x equals negative 8 over 7">x = −8/7</span>. That value makes both arguments negative, so it is rejected and nothing else is available. The solution set is empty, and no step along the way was wrong.</p></div><p>A third ending is possible: the condensed equation can be a contradiction. <span class="math" data-say="log of the quantity 3 x plus 1, equals log x plus log 3">log(3x + 1) = log x + log 3</span> becomes <span class="math" data-say="log of the quantity 3 x plus 1, equals log of 3 x">log(3x + 1) = log(3x)</span>, hence <span class="math" data-say="3 x plus 1 equals 3 x">3x + 1 = 3x</span>, hence <span class="math" data-say="1 equals 0">1 = 0</span>. No candidate is ever produced, and the solution set is empty for a reason that has nothing to do with domains.</p><h3>What a check can and cannot do</h3><p>Substitute into the equation you were given, never into the condensed form. The condensed form is precisely the form that accepts extraneous values, so it will confirm them cheerfully. Checking there proves nothing at all.</p><p>An equation may also carry the unknown in the base. <span class="math" data-say="log base x of 16 equals 2">log_x(16) = 2</span> converts to <span class="math" data-say="x squared equals 16">x² = 16</span>, so <span class="math" data-say="x equals 4">x = 4</span> or <span class="math" data-say="x equals negative 4">x = −4</span>. A base must be positive and not <span class="math" data-say="1">1</span>, so <span class="math" data-say="negative 4">−4</span> is rejected and <span class="math" data-say="x equals 4">x = 4</span> is the answer. The same discipline applies: convert by the definition, then test each candidate against the conditions the definition imposes.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Solving a logarithmic equation</h2></div><p>The domain check is a step, not a formality</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+x = −3 does not      log_2(−4) is not defined             ✗</div><p>Look at why <span class="math" data-say="x equals negative 3">x = −3</span> appeared at all. The condensed equation asks only that <span class="math" data-say="the quantity x minus 1, times the quantity x plus 2">(x − 1)(x + 2)</span> equal <span class="math" data-say="4">4</span>, and at <span class="math" data-say="x equals negative 3">x = −3</span> those factors are <span class="math" data-say="negative 4">−4</span> and <span class="math" data-say="negative 1">−1</span>, whose product is <span class="math" data-say="4">4</span>. Two negatives passed a test that was written for their product. The original equation asks for the logarithm of each factor separately, and neither exists.</p><div class="example"><span class="label">Example &middot; A negative solution that is not extraneous</span><p><span class="math" data-say="log base 3 of the quantity x plus 6, minus log base 3 of the quantity x plus 2, equals 2">log_3(x + 6) − log_3(x + 2) = 2</span> condenses to <span class="math" data-say="log base 3 of the quantity the quantity x plus 6, over the quantity x plus 2, equals 2">log_3((x + 6)/(x + 2)) = 2</span>, so <span class="math" data-say="the quantity x plus 6, over the quantity x plus 2, equals 9">(x + 6)/(x + 2) = 9</span>, giving <span class="math" data-say="x plus 6 equals 9 x plus 18">x + 6 = 9x + 18</span> and <span class="math" data-say="x equals negative 3 over 2">x = −3/2</span>. The arguments there are <span class="math" data-say="9 over 2">9/2</span> and <span class="math" data-say="1 over 2">1/2</span>, both positive, so the candidate stands. Check: <span class="math" data-say="log base 3 of the quantity 9 over 2, minus log base 3 of the quantity 1 over 2, equals log base 3 of 9 equals 2">log_3(9/2) − log_3(1/2) = log_3(9) = 2</span>.</p></div><div class="example"><span class="label">Example &middot; Every candidate rejected</span><p><span class="math" data-say="log base 2 of x minus log base 2 of the quantity x plus 1, equals 3">log_2(x) − log_2(x + 1) = 3</span> condenses to <span class="math" data-say="x over the quantity x plus 1, equals 2 cubed equals 8">x/(x + 1) = 2^3 = 8</span>, so <span class="math" data-say="x equals 8 x plus 8">x = 8x + 8</span> and <span class="math" data-say="x equals negative 8 over 7">x = −8/7</span>. That value makes both arguments negative, so it is rejected and nothing else is available. The solution set is empty, and no step along the way was wrong.</p></div><p>A third ending is possible: the condensed equation can be a contradiction. <span class="math" data-say="log of the quantity 3 x plus 1, equals log x plus log 3">log(3x + 1) = log x + log 3</span> becomes <span class="math" data-say="log of the quantity 3 x plus 1, equals log of 3 x">log(3x + 1) = log(3x)</span>, hence <span class="math" data-say="3 x plus 1 equals 3 x">3x + 1 = 3x</span>, hence <span class="math" data-say="1 equals 0">1 = 0</span>. No candidate is ever produced, and the solution set is empty for a reason that has nothing to do with domains.</p><h3>What a check can and cannot do</h3><p>Substitute into the equation you were given, never into the condensed form. The condensed form is precisely the form that accepts extraneous values, so it will confirm them cheerfully. Checking there proves nothing at all.</p><p>An equation may also carry the unknown in the base. <span class="math" data-say="log base x of 16 equals 2">log_x(16) = 2</span> converts to <span class="math" data-say="x squared equals 16">x² = 16</span>, so <span class="math" data-say="x equals 4">x = 4</span> or <span class="math" data-say="x equals negative 4">x = −4</span>. A base must be positive and not <span class="math" data-say="1">1</span>, so <span class="math" data-say="negative 4">−4</span> is rejected and <span class="math" data-say="x equals 4">x = 4</span> is the answer. The same discipline applies: convert by the definition, then test each candidate against the conditions the definition imposes.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Solving a logarithmic equation</h2></div><p>The domain check is a step, not a formality</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="lgTitle">Logarithm</strong><span id="lgSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the left side, on its domain</span><span class="tone-red"><i class="legend-swatch"></i>y = k</span><span class="tone-green"><i class="legend-swatch"></i>accepted</span><span class="tone-muted"><i class="legend-swatch"></i>rejected</span></div>
@@ -1413,10 +1456,10 @@ x = −3 does not      log_2(−4) is not defined             ✗</div><p>Look a
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="lgPlot"></svg></div>
       <div id="lgWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="lgStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Candidates, and which survive</h3>
-          <p>The domain is computed from the equation as typed, before any condensing happens, and every candidate is then reported as kept or rejected with the argument that decided it. An empty solution set is a normal outcome here.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Candidates, and which survive</h3>
+            <p>The domain is computed from the equation as typed, before any condensing happens, and every candidate is then reported as kept or rejected with the argument that decided it. An empty solution set is a normal outcome here.</p>
         <div class="field">
           <label for="lgPreset">Example</label>
           <select id="lgPreset"><option value="sum|2|0|2|3">log_2(x) + log_2(x - 2) = 3</option><option value="sum|10|0|-3|1">log_10(x) + log_10(x + 3) = 1</option><option value="diff|2|0|-3|1">log_2(x) - log_2(x + 3) = 1 &mdash; no solution</option><option value="diff|5|1|4|0">log_5(x - 1) - log_5(x - 4) = 0 &mdash; no solution</option><option value="square|3|7|0|2">log_3(x^2 - 7) = 2 &mdash; both answers survive</option><option value="square|2|-20|0|2">log_2(x^2 + 20) = 2 &mdash; no real solution</option></select>
@@ -1444,12 +1487,14 @@ x = −3 does not      log_2(−4) is not defined             ✗</div><p>Look a
         <div class="kpi-grid"><div class="kpi"><span>Candidates</span><strong id="lgKpi1">&mdash;</strong></div><div class="kpi"><span>Accepted</span><strong id="lgKpi2">&mdash;</strong></div><div class="kpi"><span>Rejected</span><strong id="lgKpi3">&mdash;</strong></div></div>
         <p class="small-copy" id="lgHint" style="margin:0;">k has to be a whole number so that b^k is exact. The shape picker changes the equation; p and q are the numbers subtracted inside the logarithms.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Solving a logarithmic equation</h2></div><p>Four steps. The first one is written before any algebra and used after all of it.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the domain from the original equation</h3><p>Every argument must be positive; intersect those conditions. Do it now, because the condensed equation has forgotten what the conditions were and cannot be asked.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Condense each side to a single logarithm</h3><p>Use the three laws of “The Laws of Logarithms” from right to left. A coefficient goes back up as a power first: <span class="math" data-say="2 times log x">2 log x</span> becomes <span class="math" data-say="log of x squared">log(x²)</span>, and only then can it join a sum.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Convert, and solve what remains</h3><p>Two logarithms in the same base: drop both and equate the arguments. A logarithm equal to a constant: apply the definition, <span class="math" data-say="u equals b to the power c">u = b^c</span>. What is left is an ordinary equation with no logarithms in it.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Test every candidate against the domain, then the original</h3><p>Keep the candidates inside the domain and discard the rest, naming the argument that went non-positive. If nothing survives, the solution set is empty and that is the answer.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Solving a logarithmic equation</h2>
+      <p class="lead-in">Four steps. The first one is written before any algebra and used after all of it.</p>
+      <ol class="key-ideas method"><li><strong>Write the domain from the original equation.</strong> Every argument must be positive; intersect those conditions. Do it now, because the condensed equation has forgotten what the conditions were and cannot be asked.</li><li><strong>Condense each side to a single logarithm.</strong> Use the three laws of “The Laws of Logarithms” from right to left. A coefficient goes back up as a power first: <span class="math" data-say="2 times log x">2 log x</span> becomes <span class="math" data-say="log of x squared">log(x²)</span>, and only then can it join a sum.</li><li><strong>Convert, and solve what remains.</strong> Two logarithms in the same base: drop both and equate the arguments. A logarithm equal to a constant: apply the definition, <span class="math" data-say="u equals b to the power c">u = b^c</span>. What is left is an ordinary equation with no logarithms in it.</li><li><strong>Test every candidate against the domain, then the original.</strong> Keep the candidates inside the domain and discard the rest, naming the argument that went non-positive. If nothing survives, the solution set is empty and that is the answer.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1475,17 +1520,16 @@ x = −2    −2 &gt; 2 ✗    log_2(−2) is not defined               rejected
 solution set:  { 4 }</div><p>The rejected candidate is not a mistake in the algebra. At <span class="math" data-say="x equals negative 2">x = −2</span> the two factors are <span class="math" data-say="negative 2">−2</span> and <span class="math" data-say="negative 4">−4</span>, and their product is <span class="math" data-say="8">8</span> exactly as the condensed equation demands. It satisfies every line below the condensing step and none of the equation above it.</p><p>Note what the check is testing. Not "is <span class="math" data-say="negative 2">−2</span> negative" but "are the arguments <span class="math" data-say="x">x</span> and <span class="math" data-say="x minus 2">x − 2</span> positive at <span class="math" data-say="x equals negative 2">x = −2</span>". Those are different questions, and only the second one is the domain condition: the reading's <span class="math" data-say="x equals negative 3 over 2">x = −3/2</span> is a negative candidate that passes it and is a genuine solution.</p><p>For a faded domain-and-solve pass, use <span class="math" data-say="log base 2 of the quantity x minus 1, plus log base 2 of the quantity x minus 3, equals 3">log_2(x − 1) + log_2(x − 3) = 3</span>. The supplied first line is the original domain <span class="math" data-say="x is greater than 3">x &gt; 3</span>. Condense, convert, factor, and test both candidates in the original two arguments. Your final line must name which argument rejects any discarded candidate, not merely call the candidate negative.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Checking in the condensed equation</strong><span>The condensed form is the one that accepts extraneous values by construction: <span class="math" data-say="x equals negative 2">x = −2</span> satisfies <span class="math" data-say="x times the quantity x minus 2, equals 8">x(x − 2) = 8</span> perfectly. A check has to be run in the equation as it was given, or it confirms the wrong answer with complete confidence.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Rejecting every negative candidate</strong><span>The condition is on arguments. <span class="math" data-say="log base 3 of the quantity x plus 6">log_3(x + 6)</span> is defined for every <span class="math" data-say="x is greater than negative 6">x &gt; −6</span>, and most of those numbers are negative. A rule of thumb that says "logarithms hate negatives, so discard negative answers" discards correct ones.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Condensing a sum of logarithms into the logarithm of a sum</strong><span><span class="math" data-say="log M plus log N">log M + log N</span> is <span class="math" data-say="log of MN">log(MN)</span>, never <span class="math" data-say="log of the quantity M plus N">log(M + N)</span>. Test it once on numbers and it stops being tempting: <span class="math" data-say="log 10 plus log 100 equals 1 plus 2 equals 3">log 10 + log 100 = 1 + 2 = 3</span>, while <span class="math" data-say="log 110 is approximately 2.0414">log 110 ≈ 2.0414</span>. The entire method depends on getting this one right.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the domain line is written before the first algebraic step, every time.</strong><p>Given <span class="math" data-say="log of the quantity x minus 3, plus log x equals 1">log(x − 3) + log x = 1</span>, you should write <span class="math" data-say="x is greater than 3">x &gt; 3</span> before condensing anything, and then be able to say in advance that one of the two candidates from <span class="math" data-say="x squared minus 3 x minus 10 equals 0">x² − 3x − 10 = 0</span> will fail it. It does: <span class="math" data-say="x equals 5">x = 5</span> is the solution and <span class="math" data-say="x equals negative 2">x = −2</span> is rejected.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both halves of the course now solve. “Solving Exponential Equations” applied a logarithm to both sides to bring a variable down; this lesson made both sides exponents to lift a variable out. The last two lessons stop solving and start applying &mdash; compound interest, and the scales that are logarithms in ordinary clothes.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Checking in the condensed equation</strong><span>The condensed form is the one that accepts extraneous values by construction: <span class="math" data-say="x equals negative 2">x = −2</span> satisfies <span class="math" data-say="x times the quantity x minus 2, equals 8">x(x − 2) = 8</span> perfectly. A check has to be run in the equation as it was given, or it confirms the wrong answer with complete confidence.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Rejecting every negative candidate</strong><span>The condition is on arguments. <span class="math" data-say="log base 3 of the quantity x plus 6">log_3(x + 6)</span> is defined for every <span class="math" data-say="x is greater than negative 6">x &gt; −6</span>, and most of those numbers are negative. A rule of thumb that says "logarithms hate negatives, so discard negative answers" discards correct ones.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Condensing a sum of logarithms into the logarithm of a sum</strong><span><span class="math" data-say="log M plus log N">log M + log N</span> is <span class="math" data-say="log of MN">log(MN)</span>, never <span class="math" data-say="log of the quantity M plus N">log(M + N)</span>. Test it once on numbers and it stops being tempting: <span class="math" data-say="log 10 plus log 100 equals 1 plus 2 equals 3">log 10 + log 100 = 1 + 2 = 3</span>, while <span class="math" data-say="log 110 is approximately 2.0414">log 110 ≈ 2.0414</span>. The entire method depends on getting this one right.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the domain line is written before the first algebraic step, every time.</strong><p>Given <span class="math" data-say="log of the quantity x minus 3, plus log x equals 1">log(x − 3) + log x = 1</span>, you should write <span class="math" data-say="x is greater than 3">x &gt; 3</span> before condensing anything, and then be able to say in advance that one of the two candidates from <span class="math" data-say="x squared minus 3 x minus 10 equals 0">x² − 3x − 10 = 0</span> will fail it. It does: <span class="math" data-say="x equals 5">x = 5</span> is the solution and <span class="math" data-say="x equals negative 2">x = −2</span> is rejected.</p></div></div><div class="note"><strong>Note:</strong> Both halves of the course now solve. “Solving Exponential Equations” applied a logarithm to both sides to bring a variable down; this lesson made both sides exponents to lift a variable out. The last two lessons stop solving and start applying &mdash; compound interest, and the scales that are logarithms in ordinary clothes.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Solving means undoing, not cancelling</summary><p>There are two moves. Condense several logarithms into one with the laws of “The Laws of Logarithms”, then convert <span class="math" data-say="log base b of u equals c">log_b(u) = c</span> into <span class="math" data-say="u equals b to the power c">u = b^c</span> by the definition in “What a Logarithm Is”. Nothing is cancelled and nothing is divided by; the definition is quoted, in the direction that removes the logarithm.</p></details><details class="recall"><summary>Condensing widens the domain</summary><p><span class="math" data-say="log M plus log N">log M + log N</span> requires <span class="math" data-say="M is greater than 0">M &gt; 0</span> and <span class="math" data-say="N is greater than 0">N &gt; 0</span>. <span class="math" data-say="log of MN">log(MN)</span> requires only <span class="math" data-say="MN is greater than 0">MN &gt; 0</span>, which two negatives also satisfy. The two agree wherever both are defined, and the second is defined in more places. Every extraneous solution in this lesson enters through exactly that gap.</p></details><details class="recall"><summary>The test is on the arguments, not on the sign of x</summary><p>A candidate is rejected when it makes some argument of some logarithm zero or negative. <span class="math" data-say="x equals negative 3 over 2">x = −3/2</span> solves <span class="math" data-say="log base 3 of the quantity x plus 6, minus log base 3 of the quantity x plus 2, equals 2">log_3(x + 6) − log_3(x + 2) = 2</span> perfectly well, because at that value the arguments are <span class="math" data-say="9 over 2">9/2</span> and <span class="math" data-say="1 over 2">1/2</span>. Rejecting negative candidates on sight throws away correct answers.</p></details></div>
+      <h3>Summary</h3>
       <p>Condense to a single logarithm, convert to exponential form, solve, and then test every candidate in the original equation. That last step is not diligence, it is arithmetic: condensing enlarges the set of values the expression accepts, so it can manufacture solutions the original never had.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Solving means undoing, not cancelling.</strong> There are two moves. Condense several logarithms into one with the laws of “The Laws of Logarithms”, then convert <span class="math" data-say="log base b of u equals c">log_b(u) = c</span> into <span class="math" data-say="u equals b to the power c">u = b^c</span> by the definition in “What a Logarithm Is”. Nothing is cancelled and nothing is divided by; the definition is quoted, in the direction that removes the logarithm.</li><li><strong>Condensing widens the domain.</strong> <span class="math" data-say="log M plus log N">log M + log N</span> requires <span class="math" data-say="M is greater than 0">M &gt; 0</span> and <span class="math" data-say="N is greater than 0">N &gt; 0</span>. <span class="math" data-say="log of MN">log(MN)</span> requires only <span class="math" data-say="MN is greater than 0">MN &gt; 0</span>, which two negatives also satisfy. The two agree wherever both are defined, and the second is defined in more places. Every extraneous solution in this lesson enters through exactly that gap.</li><li><strong>The test is on the arguments, not on the sign of x.</strong> A candidate is rejected when it makes some argument of some logarithm zero or negative. <span class="math" data-say="x equals negative 3 over 2">x = −3/2</span> solves <span class="math" data-say="log base 3 of the quantity x plus 6, minus log base 3 of the quantity x plus 2, equals 2">log_3(x + 6) − log_3(x + 2) = 2</span> perfectly well, because at that value the arguments are <span class="math" data-say="9 over 2">9/2</span> and <span class="math" data-say="1 over 2">1/2</span>. Rejecting negative candidates on sight throws away correct answers.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="log base b of u equals c, implies, u equals b to the power c, then check u is greater than 0. log base b of M equals log base b of N, implies, M equals N, both must be positive. log base 2 of x plus log base 2 of the quantity x minus 2, equals 3, goes to, x equals 4, x equals negative 2 rejected. log M plus log N equals log of MN, holds on a SMALLER set than the right side" tabindex="0" role="region" aria-label="Mathematical notation">log_b(u) = c         ⟹   u = b^c        then check u &gt; 0
 log_b(M) = log_b(N)  ⟹   M = N          both must be positive
 log_2(x) + log_2(x − 2) = 3   →   x = 4      (x = −2 rejected)
@@ -3931,11 +3975,42 @@ log M + log N = log(MN)   holds on a SMALLER set than the right side</div><figca
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -4003,7 +4078,7 @@ log M + log N = log(MN)   holds on a SMALLER set than the right side</div><figca
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,37 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Vocabulary and Reading</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Word and family</p>
       <h1>Word or Word Family</h1>
       <p class="lesson-lede">A word with its endings and a word with every word made from it are two different things to count, and the lab shows the difference.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A flemma is a word with its endings</li><li>A family is a flemma and the words made from it</li><li>The step the lab adds is a spelling test</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The twelve family words in the passage</h2>
-      <article class="prose reading"><p>The last two lessons counted words. This one asks what a word is. When someone says a reader needs to know 98% of the words of a page, they have counted in a certain way, and the lab counts in another. The two ways have names, and the difference is about one point.</p><h3>A word, a flemma, a family</h3><p>A <dfn>flemma</dfn> is a word and the forms made from it by the endings you met in the first courses: <em>-s</em>, <em>-ed</em>, <em>-ing</em>, <em>-er</em>, <em>-est</em>, and the forms that do not follow the rules. <em>Walk</em> and <em>walked</em> are one flemma. A <dfn>family</dfn> is a flemma and the words made from it with a beginning or a different kind of ending: <em>happy</em>, <em>unhappy</em> and <em>happiness</em> are one family. The word list counts flemmas. Nation counts families.</p><h3>Three steps of the lab&#x27;s count</h3><p>The lab reads a page in this order. First it asks if a word is on the list, by the rules, and counts it as covered if so. Second, if not, it asks if the word is a name. Third, if not, it takes off one beginning or one ending and asks again. A word that passes the third step is counted as a family word. A word that passes none is not covered.</p><p>So the three numbers are in order, each including the one before. On the passage they read 91.0% for the list, 94.3% with names, and 95.6% with families. The second step adds 3.3 points and the third adds 1.3. The passage has 12 family words, each appearing once, and 1.3 points is 12 in 936.</p><h3>The words a family adds</h3><p>Set the second menu to the words a family adds. On the passage the rows include <em>delightful</em>, <em>unwelcome</em>, <em>unwilling</em>, <em>recollect</em> and <em>overtaken</em>. On the modern documents the first row is <em>disability</em>, made from <em>dis-</em> and <em>ability</em>, and it appears ten times. The step adds 1.0 point to that text, from 92.7% to 93.7%. On the play it adds 0.8, from 94.6% to 95.4%.</p><h3>What the step cannot see</h3><p>The step cuts a spelling and looks at what is left. <em>Notable</em> could be cut to <em>not</em> and <em>-able</em>, since both are on the list; the lab tries <em>note</em> first, so its cut is the right one. In the play, <em>resides</em> becomes <em>re-</em> and <em>sides</em>, and <em>endure</em> becomes <em>end</em> and <em>-ure</em>: there the row is wrong too, and the share counts both. The cut is right for <em>delightful</em>, and the lab cannot tell which is which.</p><h3>Why the gap is small here</h3><p>The design notes behind this Subject put the gap between counting flemmas and counting families on general text at three to six points; that is an estimate, not a count you can see. The gap the lab shows on these three texts is between 0.8 and 1.3 points. The lab uses a short list of beginnings and endings, and a full family count uses many more. So a full count would add more than the lab does, though some of the lab's rows are only spellings.</p><p>Either way you count, the answer for these texts is the same: below 98%. The words that stand between you and an easy read are the ones in the table of words not covered, and the family step has already taken out the ones it can.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>How much of a page the 2,800 words cover</h2></div><p>Every word of the text checked against the list, by the rules of the nine courses before</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The twelve family words in the passage</h2><div class="prose reading"><p>The last two lessons counted words. This one asks what a word is. When someone says a reader needs to know 98% of the words of a page, they have counted in a certain way, and the lab counts in another. The two ways have names, and the difference is about one point.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>How much of a page the 2,800 words cover</h2></div><p>Every word of the text checked against the list, by the rules of the nine courses before</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
 <div class="kpi-grid"><div class="kpi"><span>words read</span><strong id="cvN">&mdash;</strong></div><div class="kpi"><span>first band, 1,050 headwords</span><strong id="cvB1">&mdash;</strong></div><div class="kpi"><span>first two bands, 2,050</span><strong id="cvB2">&mdash;</strong></div><div class="kpi"><span>all three, 2,859</span><strong id="cvB3">&mdash;</strong></div><div class="kpi"><span>and names</span><strong id="cvNames">&mdash;</strong></div><div class="kpi"><span>and families</span><strong id="cvFam">&mdash;</strong></div><div class="kpi"><span>words not covered</span><strong id="cvOff">&mdash;</strong></div><div class="kpi"><span>different words</span><strong id="cvDistinct">&mdash;</strong></div></div><div class="kpi-grid"><div class="kpi"><span>the commonest ten</span><strong id="cvTop10">&mdash;</strong></div><div class="kpi"><span>fifty</span><strong id="cvTop50">&mdash;</strong></div><div class="kpi"><span>a hundred</span><strong id="cvTop100">&mdash;</strong></div></div><p class="small-copy" id="cvLimit"></p><div class="table-wrap" style="max-height:20rem;overflow-y:auto;" tabindex="0" role="region" aria-label="Data table"><table id="cvTable"><thead><tr id="cvCols"></tr></thead><tbody id="cvBody"></tbody></table></div><details><summary>The text, printed in full</summary><div class="mathblock" id="cvText" style="font-size:0.84rem;line-height:1.9;" tabindex="0" role="region" aria-label="Mathematical notation"></div></details>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What a family adds</h3>
-          <p>The table lists the words that are not on the list as they stand, but are on the list when one beginning or one ending is taken off. Each row shows the word, what it was made from, and how many times it appears. The two tiles to compare are &ldquo;and names&rdquo; and &ldquo;and families&rdquo;. Switch the text to see the others.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What a family adds</h3>
+            <p>The table lists the words that are not on the list as they stand, but are on the list when one beginning or one ending is taken off. Each row shows the word, what it was made from, and how many times it appears. The two tiles to compare are &ldquo;and names&rdquo; and &ldquo;and families&rdquo;. Switch the text to see the others.</p>
 <label for="cvPreset">Text</label> <select id="cvPreset"><option value="passage" selected="selected">the 936-word passage from the novel (1813)</option><option value="wilde">1,975 words of the play (1895)</option><option value="modern">the two modern documents</option><option value="own">a text of your own</option></select> <label for="cvShow">List</label> <select id="cvShow"><option value="bands">the words not covered</option><option value="top">the commonest words, ranked</option><option value="family" selected="selected">the words a family adds</option></select><div id="cvOwnBox"><label for="cvOwn">Paste a text of fifty words or more</label><textarea id="cvOwn" rows="6" style="width:100%;"></textarea></div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>A word, a flemma, a family</h3><p>A <dfn>flemma</dfn> is a word and the forms made from it by the endings you met in the first courses: <em>-s</em>, <em>-ed</em>, <em>-ing</em>, <em>-er</em>, <em>-est</em>, and the forms that do not follow the rules. <em>Walk</em> and <em>walked</em> are one flemma. A <dfn>family</dfn> is a flemma and the words made from it with a beginning or a different kind of ending: <em>happy</em>, <em>unhappy</em> and <em>happiness</em> are one family. The word list counts flemmas. Nation counts families.</p><h3>Three steps of the lab&#x27;s count</h3><p>The lab reads a page in this order. First it asks if a word is on the list, by the rules, and counts it as covered if so. Second, if not, it asks if the word is a name. Third, if not, it takes off one beginning or one ending and asks again. A word that passes the third step is counted as a family word. A word that passes none is not covered.</p><p>So the three numbers are in order, each including the one before. On the passage they read 91.0% for the list, 94.3% with names, and 95.6% with families. The second step adds 3.3 points and the third adds 1.3. The passage has 12 family words, each appearing once, and 1.3 points is 12 in 936.</p><h3>The words a family adds</h3><p>Set the second menu to the words a family adds. On the passage the rows include <em>delightful</em>, <em>unwelcome</em>, <em>unwilling</em>, <em>recollect</em> and <em>overtaken</em>. On the modern documents the first row is <em>disability</em>, made from <em>dis-</em> and <em>ability</em>, and it appears ten times. The step adds 1.0 point to that text, from 92.7% to 93.7%. On the play it adds 0.8, from 94.6% to 95.4%.</p><h3>What the step cannot see</h3><p>The step cuts a spelling and looks at what is left. <em>Notable</em> could be cut to <em>not</em> and <em>-able</em>, since both are on the list; the lab tries <em>note</em> first, so its cut is the right one. In the play, <em>resides</em> becomes <em>re-</em> and <em>sides</em>, and <em>endure</em> becomes <em>end</em> and <em>-ure</em>: there the row is wrong too, and the share counts both. The cut is right for <em>delightful</em>, and the lab cannot tell which is which.</p><h3>Why the gap is small here</h3><p>The design notes behind this Subject put the gap between counting flemmas and counting families on general text at three to six points; that is an estimate, not a count you can see. The gap the lab shows on these three texts is between 0.8 and 1.3 points. The lab uses a short list of beginnings and endings, and a full family count uses many more. So a full count would add more than the lab does, though some of the lab's rows are only spellings.</p><p>Either way you count, the answer for these texts is the same: below 98%. The words that stand between you and an easy read are the ones in the table of words not covered, and the family step has already taken out the ones it can.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting a word that is not on the list</h2></div><p>Four questions, asked of each word the list lacks.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Is it a form of a word on the list?</h3><p>If the rules of the earlier courses take it back to a word on the list, it is a flemma of that word and the list covers it. Stop.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Is it a name?</h3><p>A capital letter in the middle of a sentence, or capitals all through, and the lab sets it apart. Stop.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Take off one beginning or one ending</h3><p><em>Unwelcome</em> loses <em>un-</em> and leaves <em>welcome</em>. <em>Careless</em> loses <em>-less</em> and leaves <em>care</em>. If what is left is on the list, the word joins that word's family.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Ask whether the meaning followed the spelling</h3><p>The lab cannot. You can. <em>Notable</em> loses <em>-able</em> and leaves <em>not</em>, which is on the list, but the word does not mean <em>not able</em>: it is made from <em>note</em>, and the lab stopped at the first cut that found a listed word.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting a word that is not on the list</h2>
+      <p class="lead-in">Four questions, asked of each word the list lacks.</p>
+      <ol class="key-ideas method"><li><strong>Is it a form of a word on the list?.</strong> If the rules of the earlier courses take it back to a word on the list, it is a flemma of that word and the list covers it. Stop.</li><li><strong>Is it a name?.</strong> A capital letter in the middle of a sentence, or capitals all through, and the lab sets it apart. Stop.</li><li><strong>Take off one beginning or one ending.</strong> <em>Unwelcome</em> loses <em>un-</em> and leaves <em>welcome</em>. <em>Careless</em> loses <em>-less</em> and leaves <em>care</em>. If what is left is on the list, the word joins that word's family.</li><li><strong>Ask whether the meaning followed the spelling.</strong> The lab cannot. You can. <em>Notable</em> loses <em>-able</em> and leaves <em>not</em>, which is on the list, but the word does not mean <em>not able</em>: it is made from <em>note</em>, and the lab stopped at the first cut that found a listed word.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1427,17 +1473,16 @@ resides (re- + sides)            a spelling only
 endure (end + -ure)              a spelling only</div><p>The first four are what a family means. A reader who knows <em>delight</em>, <em>willing</em>, <em>collect</em> and <em>note</em> has most of what the longer word says. <em>Notable</em> also contains <em>not</em>, which is on the list, but the lab tries the stem with an <em>e</em> first, so it finds <em>note</em>. The last two are wrong. To reside has nothing to do with sides, and to endure nothing to do with an end. The lab passes both, because it reads spellings, and its count includes them. The passage's twelve rows also include <em>carriage</em> from <em>carry</em>, which is a judgement of the same kind.</p><p>Two things follow. The lab's family step cannot take a wrong row away, so you have to read the rows. And it uses a short list of beginnings and endings, so a full family count, with every beginning and ending a full list gives, would add more.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Holding the lab&#x27;s share against 98% without asking what each one counts</strong><span>Nation's 98% is counted by family. The list, and so the lab, counts flemmas. The two are not the same thing, and the difference is real: on the passage the lab's share goes from 94.3% to 95.6% when the family step is added, on the play from 94.6% to 95.4%, and on the modern documents from 92.7% to 93.7%. To compare like with like, use the figure with families. It is still below 98%, on every text.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a family is any word that contains another</strong><span><em>Resides</em> contains <em>re-</em> and <em>sides</em>, and <em>endure</em> contains <em>end</em>. Neither is their family. The lab's step cuts a beginning or an ending and looks at what is left, and it passes any cut that leaves a listed word. You must read the rows and decide.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the family step finds the words you need to learn</strong><span>It finds the words you may not need to. A reader who knows <em>delight</em> can probably read <em>delightful</em>. The words you need to learn are the ones still in the table of words not covered after the family step, and on the passage there are 41 of them.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a flemma counts and what a family counts, and how far apart the two figures are.</strong><p>You should be able to say what a flemma and a family each include, switch the lab to the words a family adds, read how many points the family step adds to the share, and say which of the lab's rows are real families and which are only spellings that look like them.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The whole novel was counted once, which no page can carry, and the quoted result is 93.0% with names and 94.6% with families, a gain of 1.6 points. The design notes behind this Subject put the cost of counting flemmas instead of families on general text at three to six points. That is an estimate with no count behind it that you can see, and nothing on this page measures it. The lab's gain is smaller, and one reason is that its family step uses only a short list of beginnings and endings.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Holding the lab&#x27;s share against 98% without asking what each one counts</strong><span>Nation's 98% is counted by family. The list, and so the lab, counts flemmas. The two are not the same thing, and the difference is real: on the passage the lab's share goes from 94.3% to 95.6% when the family step is added, on the play from 94.6% to 95.4%, and on the modern documents from 92.7% to 93.7%. To compare like with like, use the figure with families. It is still below 98%, on every text.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a family is any word that contains another</strong><span><em>Resides</em> contains <em>re-</em> and <em>sides</em>, and <em>endure</em> contains <em>end</em>. Neither is their family. The lab's step cuts a beginning or an ending and looks at what is left, and it passes any cut that leaves a listed word. You must read the rows and decide.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the family step finds the words you need to learn</strong><span>It finds the words you may not need to. A reader who knows <em>delight</em> can probably read <em>delightful</em>. The words you need to learn are the ones still in the table of words not covered after the family step, and on the passage there are 41 of them.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a flemma counts and what a family counts, and how far apart the two figures are.</strong><p>You should be able to say what a flemma and a family each include, switch the lab to the words a family adds, read how many points the family step adds to the share, and say which of the lab's rows are real families and which are only spellings that look like them.</p></div></div><div class="note"><strong>Note:</strong> The whole novel was counted once, which no page can carry, and the quoted result is 93.0% with names and 94.6% with families, a gain of 1.6 points. The design notes behind this Subject put the cost of counting flemmas instead of families on general text at three to six points. That is an estimate with no count behind it that you can see, and nothing on this page measures it. The lab's gain is smaller, and one reason is that its family step uses only a short list of beginnings and endings.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A flemma is a word with its endings</summary><p><em>Walk</em>, <em>walks</em>, <em>walked</em> and <em>walking</em> are one flemma. So are <em>child</em> and <em>children</em>, and <em>good</em>, <em>better</em> and <em>best</em>. A flemma only adds the endings the first courses taught. The 2,800 words of the list are counted this way, and so is the lab's share up to the names.</p></details><details class="recall"><summary>A family is a flemma and the words made from it</summary><p><em>Delight</em> with <em>delightful</em>, and <em>care</em> with <em>careless</em>, are two families, each of two flemmas. A family keeps the same root and adds a beginning such as <em>un-</em> or <em>re-</em>, which turns the meaning, or an ending such as <em>-ful</em>, <em>-less</em>, <em>-ness</em> or <em>-ly</em>, which changes the kind of word. Nation's 98% is counted by family, which means a reader who knows the root is counted as knowing the longer word.</p></details><details class="recall"><summary>The step the lab adds is a spelling test</summary><p>The family step takes one beginning or one ending off a word the list does not cover. If what is left is on the list, the word is counted as a family member. It tests spellings, not meanings, so it also passes some words whose meaning has moved away from their root.</p></details></div>
+      <h3>Summary</h3>
       <p>The list counts <dfn>flemmas</dfn>: a word with its endings. Nation's 98% counts <dfn>families</dfn>: a word with the words made from it. On the passage the lab's share with names is 94.3%, and 95.6% when the family step is added. Those 1.3 points are 12 words, and reading them shows what a family step can do and what it cannot.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A flemma is a word with its endings.</strong> <em>Walk</em>, <em>walks</em>, <em>walked</em> and <em>walking</em> are one flemma. So are <em>child</em> and <em>children</em>, and <em>good</em>, <em>better</em> and <em>best</em>. A flemma only adds the endings the first courses taught. The 2,800 words of the list are counted this way, and so is the lab's share up to the names.</li><li><strong>A family is a flemma and the words made from it.</strong> <em>Delight</em> with <em>delightful</em>, and <em>care</em> with <em>careless</em>, are two families, each of two flemmas. A family keeps the same root and adds a beginning such as <em>un-</em> or <em>re-</em>, which turns the meaning, or an ending such as <em>-ful</em>, <em>-less</em>, <em>-ness</em> or <em>-ly</em>, which changes the kind of word. Nation's 98% is counted by family, which means a reader who knows the root is counted as knowing the longer word.</li><li><strong>The step the lab adds is a spelling test.</strong> The family step takes one beginning or one ending off a word the list does not cover. If what is left is on the list, the word is counted as a family member. It tests spellings, not meanings, so it also passes some words whose meaning has moved away from their root.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the passage, 94.3 percent to 95.6 percent. the play excerpt, 94.6 percent to 95.4 percent. the modern papers, 92.7 percent to 93.7 percent. a flemma, walk, walks, walked, walking. a family, delight, delightful" tabindex="0" role="region" aria-label="Mathematical notation">the passage          94.3% to 95.6%
 the play excerpt     94.6% to 95.4%
 the modern papers    92.7% to 93.7%
@@ -2117,11 +2162,42 @@ var cvFamily = function (t) {
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2189,7 +2265,7 @@ var cvFamily = function (t) {
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

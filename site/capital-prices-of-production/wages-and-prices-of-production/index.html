@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Average Profit and Its Fall</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 11 · Effects of General Fluctuations of Wages on Prices of Production</p>
       <h1>Wage Changes and Prices of Production</h1>
       <p class="lesson-lede">A general rise in wages lowers the general rate of profit; it leaves the price of the average sphere where it was, raises prices where wages are a large share of capital and lowers them where they are small.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A wage rise is a fall in <span data-say="s prime">s′</span></li><li>The new general rate</li><li>Three directions</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The passage first, then the three spheres</h2>
-      <article class="prose reading"><p><strong>Volume III, Chapter 11.</strong> &ldquo;Let wages rise by 25%. Then the same quantity of labor, which was formerly set in motion with 20, costs 25. Instead of 80 c + 20 v + 20 p, we have then for the value of one turn-over 80 c + 25 v + 15 p. The labor set in motion by the variable capital still produces a value of 40, the same as before. If v rises from 20 to 25, then the surplus p, or s, amounts only to 15. The profit of 15 on a capital of 105 is 14 2/7%, and this would be the new average rate of profit.&rdquo;</p><p>When wages rise across an economy, a common first thought is that every price must rise with them. It has a distinguished source. Adam Smith wrote in 1776 that wages, profit and rent are the three component parts of price, so that raising one raises the whole, and on that view higher wages are passed on as higher prices everywhere. David Ricardo disagreed in his <em>Principles</em> of 1817: a rise in wages lowers profits, and it changes relative prices, lowering those of goods made with much fixed capital. Chapter 11 is Marx's version of Ricardo's point, with prices of production in place of Ricardo's values.</p><p>Read the passage line by line. The labour bought is the same, so it still adds 40 of new value. Wages take 25 of it instead of 20, and 15 is left. The average sphere's price is still 80 + 25 + 15 = 120, its value: Marx says the rise &ldquo;would have brought about a reduction of profits, but no change in the value and price of the commodities&rdquo;. The new rate is reckoned on the capital as it now stands, 105, so it is <span class="math" data-say="15 over 105 equals 1 over 7">15/105 = 1/7</span>, or 14 2/7%.</p><p>Now a sphere below the average, 50c + 50v, which sold at 120 before. Its wages rise to 62½, its cost price to 112½, and it must now earn 14 2/7% on 112½. Exactly, that is 16 1/14, and the price is 128 4/7. The Kerr text prints &ldquo;16 1/12&rdquo; and &ldquo;128 7/12&rdquo;; Marx called it &ldquo;a round profit&rdquo;, and the lab prints the exact figure, 900/7. A sphere above the average, 92c + 8v, has wages rise from 8 to 10 and a cost price of 102, and at the new rate sells at 116 4/7, or 816/7.</p><p>The <strong>marx</strong> preset computes all three: a new general rate of 1/7 and prices of £120, £900/7 and £816/7, with the table marking them unchanged, rising and falling. The text's own summary is that the low composition's price &ldquo;rises, but not in the same proportion in which the profit falls&rdquo;, and the high composition's &ldquo;falls, but not as much as the profit&rdquo;.</p><div class="defbox"><span class="label">Definition &middot; General rate after a wage rise</span><p>The average capital's profit after the extra wages are paid, divided by that capital as enlarged by them: <span data-say="the quantity p prime times the quantity c plus v, minus w times v, over the quantity c plus v plus w times v">(p′ · (c + v) − w · v) / (c + v + w · v)</span>, where w is the rise in money wages.</p></div><p>Why do the prices move at all? Because the rate must be equal everywhere. If the low-composition sphere kept its price of 120, its profit would be 7½ on 112½, 6 2/3%, far below the new average; if the high-composition sphere kept its price, it would earn more than the average. Prices move until each earns 14 2/7% again. No sphere is compensated for the wage rise: the price rise in one and the fall in the other leave both at the same reduced average profit.</p><p>And the totals still hold. Since the average sphere's price is unchanged and equal to its value, Marx says, the sum of all prices of production stays equal to the sum of values. The <strong>two-spheres</strong> preset shows it with two illustrative capitals that together have the average composition, 70c + 30v and 90c + 10v, with all of the economy as the average capital. After a 25% rise the rate is again 1/7, and the prices, £860/7 and £820/7, rise and fall by exactly the same amount: they still sum to £240.</p><p>Marx then reverses the case, which he notes Ricardo did not analyse. Let wages fall by a quarter. The average capital becomes 80c + 15v + 25 of profit, still 120, and the rate rises to 25 on 95, 26 6/19%. The <strong>fall</strong> preset runs it: prices of £120 for the average sphere, £2,100/19 for 50c + 50v (now 50c + 37½v), and £2,352/19, or 123 15/19, for 92c + 8v, a rise. The first of those is 87½ + 23 1/38 = 110 10/19; the Kerr text adds the same two figures and prints 100 10/19, a slip the lab does not repeat. Every direction is reversed.</p><p>The chapter's lesson for a reader of the news is narrow but sharp: on this accounting, a general wage rise is paid out of profits, and it shifts relative prices without raising the price level. The lab knows nothing of money or of monetary policy, which is where most modern arguments about wages and prices live, and it assumes the working day and the labour performed stay fixed.</p><p>Chapters 8 to 11 have shown how the general rate is formed and how it moves. The next lesson, “Supplementary Remarks on Prices of Production”, asks what the capitalist's own reasons for a higher price, risk and slow turnover, amount to inside a fixed total.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Prices of production</h2></div><p>values transformed sphere by sphere, inputs at value, as Volume III, Chapter 9 does it</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The passage first, then the three spheres</h2><div class="prose reading"><p><strong>Volume III, Chapter 11.</strong> &ldquo;Let wages rise by 25%. Then the same quantity of labor, which was formerly set in motion with 20, costs 25. Instead of 80 c + 20 v + 20 p, we have then for the value of one turn-over 80 c + 25 v + 15 p. The labor set in motion by the variable capital still produces a value of 40, the same as before. If v rises from 20 to 25, then the surplus p, or s, amounts only to 15. The profit of 15 on a capital of 105 is 14 2/7%, and this would be the new average rate of profit.&rdquo;</p><p>When wages rise across an economy, a common first thought is that every price must rise with them. It has a distinguished source. Adam Smith wrote in 1776 that wages, profit and rent are the three component parts of price, so that raising one raises the whole, and on that view higher wages are passed on as higher prices everywhere. David Ricardo disagreed in his <em>Principles</em> of 1817: a rise in wages lowers profits, and it changes relative prices, lowering those of goods made with much fixed capital. Chapter 11 is Marx's version of Ricardo's point, with prices of production in place of Ricardo's values.</p><p>Read the passage line by line. The labour bought is the same, so it still adds 40 of new value. Wages take 25 of it instead of 20, and 15 is left. The average sphere's price is still 80 + 25 + 15 = 120, its value: Marx says the rise &ldquo;would have brought about a reduction of profits, but no change in the value and price of the commodities&rdquo;. The new rate is reckoned on the capital as it now stands, 105, so it is <span class="math" data-say="15 over 105 equals 1 over 7">15/105 = 1/7</span>, or 14 2/7%.</p><p>Now a sphere below the average, 50c + 50v, which sold at 120 before. Its wages rise to 62½, its cost price to 112½, and it must now earn 14 2/7% on 112½. Exactly, that is 16 1/14, and the price is 128 4/7. The Kerr text prints &ldquo;16 1/12&rdquo; and &ldquo;128 7/12&rdquo;; Marx called it &ldquo;a round profit&rdquo;, and the lab prints the exact figure, 900/7. A sphere above the average, 92c + 8v, has wages rise from 8 to 10 and a cost price of 102, and at the new rate sells at 116 4/7, or 816/7.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Prices of production</h2></div><p>values transformed sphere by sphere, inputs at value, as Volume III, Chapter 9 does it</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Prices of production</strong><span>values transformed sphere by sphere, inputs at value, as Volume III, Chapter 9 does it</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ppTable"></table></div>
       <div class="status-banner" id="ppStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Prices of production after a change in wages</h3>
-          <p>Each sphere is typed as name, c, v, all of c used up and one turnover a year. The extra wages come out of surplus value; the new general rate is the average capital's remaining profit over that capital as enlarged. Every price is then cost price plus the new rate on the new capital. A fall in wages is a negative rise.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Prices of production after a change in wages</h3>
+            <p>Each sphere is typed as name, c, v, all of c used up and one turnover a year. The extra wages come out of surplus value; the new general rate is the average capital's remaining profit over that capital as enlarged. Every price is then cost price plus the new rate on the new capital. A fall in wages is a negative rise.</p>
         <div class="field">
           <label for="ppPreset">Worked example</label>
           <select id="ppPreset"><option value="marx" selected>Marx's figures: 80c + 20v, 50c + 50v and 92c + 8v at 20%; wages rise 25%</option><option value="two-spheres">70c + 30v and 90c + 10v at 20%, the whole as the average; wages rise 25%</option><option value="fall">Marx's figures: the same three spheres; wages fall by a quarter</option></select>
@@ -1432,12 +1475,15 @@
           <div class="kpi"><span>New prices of production</span><strong id="ppPrices">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The <strong>marx</strong> preset computes all three: a new general rate of 1/7 and prices of £120, £900/7 and £816/7, with the table marking them unchanged, rising and falling. The text's own summary is that the low composition's price &ldquo;rises, but not in the same proportion in which the profit falls&rdquo;, and the high composition's &ldquo;falls, but not as much as the profit&rdquo;.</p><div class="defbox"><span class="label">Definition &middot; General rate after a wage rise</span><p>The average capital's profit after the extra wages are paid, divided by that capital as enlarged by them: <span data-say="the quantity p prime times the quantity c plus v, minus w times v, over the quantity c plus v plus w times v">(p′ · (c + v) − w · v) / (c + v + w · v)</span>, where w is the rise in money wages.</p></div><p>Why do the prices move at all? Because the rate must be equal everywhere. If the low-composition sphere kept its price of 120, its profit would be 7½ on 112½, 6 2/3%, far below the new average; if the high-composition sphere kept its price, it would earn more than the average. Prices move until each earns 14 2/7% again. No sphere is compensated for the wage rise: the price rise in one and the fall in the other leave both at the same reduced average profit.</p><p>And the totals still hold. Since the average sphere's price is unchanged and equal to its value, Marx says, the sum of all prices of production stays equal to the sum of values. The <strong>two-spheres</strong> preset shows it with two illustrative capitals that together have the average composition, 70c + 30v and 90c + 10v, with all of the economy as the average capital. After a 25% rise the rate is again 1/7, and the prices, £860/7 and £820/7, rise and fall by exactly the same amount: they still sum to £240.</p><p>Marx then reverses the case, which he notes Ricardo did not analyse. Let wages fall by a quarter. The average capital becomes 80c + 15v + 25 of profit, still 120, and the rate rises to 25 on 95, 26 6/19%. The <strong>fall</strong> preset runs it: prices of £120 for the average sphere, £2,100/19 for 50c + 50v (now 50c + 37½v), and £2,352/19, or 123 15/19, for 92c + 8v, a rise. The first of those is 87½ + 23 1/38 = 110 10/19; the Kerr text adds the same two figures and prints 100 10/19, a slip the lab does not repeat. Every direction is reversed.</p><p>The chapter's lesson for a reader of the news is narrow but sharp: on this accounting, a general wage rise is paid out of profits, and it shifts relative prices without raising the price level. The lab knows nothing of money or of monetary policy, which is where most modern arguments about wages and prices live, and it assumes the working day and the labour performed stay fixed.</p><p>Chapters 8 to 11 have shown how the general rate is formed and how it moves. The next lesson, “Supplementary Remarks on Prices of Production”, asks what the capitalist's own reasons for a higher price, risk and slow turnover, amount to inside a fixed total.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Repricing after a general wage rise</h2></div><p>Four steps, in Marx's order.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Take the average capital</h3><p>Raise its v by the wage rise. Its new value added is unchanged, so its profit falls by exactly the extra wages.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the new general rate</h3><p>Divide the average capital's remaining profit by its capital after the rise, c plus the new v.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Reprice each sphere</h3><p>Raise each sphere's v by the same share; its new price is its new cost price plus the new rate on its new capital.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Classify the change</h3><p>Compare each new price with the old: unchanged at average composition, higher below it, lower above it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Repricing after a general wage rise</h2>
+      <p class="lead-in">Four steps, in Marx's order.</p>
+      <ol class="key-ideas method"><li><strong>Take the average capital.</strong> Raise its v by the wage rise. Its new value added is unchanged, so its profit falls by exactly the extra wages.</li><li><strong>Compute the new general rate.</strong> Divide the average capital's remaining profit by its capital after the rise, c plus the new v.</li><li><strong>Reprice each sphere.</strong> Raise each sphere's v by the same share; its new price is its new cost price plus the new rate on its new capital.</li><li><strong>Classify the change.</strong> Compare each new price with the old: unchanged at average composition, higher below it, lower above it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1455,17 +1501,16 @@ higher:  (92 + 10) · 8/7 = 816/7
 816/7 = 116 4/7, down from 120</div><p>Adding the rate of 1/7 to a cost price is multiplying it by 8/7. The average sphere stays at <span class="math" data-say="105 times 8 over 7 equals 120">105 · 8/7 = 120</span>, its value.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a general wage rise raises all prices</strong><span>That is the reading of Smith's component parts of price. In the marx preset the prices tile reads £120, £900/7, £816/7: the average sphere unchanged, the low composition up to 128 4/7 and the high composition down to 116 4/7. A general rise comes out of profit and only rearranges relative prices; in the two-spheres preset the two prices still sum to £240.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reckoning the new rate on the old capital</strong><span>Marx divides the remaining profit by the capital after the rise: 15 on 105, not 15 on 100. The difference is between 1/7 and 3/20, and the lab's general rate tile reads 1/7.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the printed 128 7/12 as exact</strong><span>The text's &ldquo;16 1/12&rdquo; and &ldquo;128 7/12&rdquo; are rounded: 14 2/7% of 112½ is 16 1/14, and the price is 128 4/7. The lab prints £900/7. Nothing in the argument depends on the difference, but a quotation is not a calculation.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can reprice spheres after a general change in wages.</strong><p>Given the average capital, the old general rate, the spheres' c and v and a change in money wages, compute the new general rate over the capital after the change, each sphere's new price of production, and classify each as rising, falling or unchanged.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab, like the chapter, holds the working day, the labour performed and the value of the inputs fixed, and assumes one turnover a year with all of c used up. A wage change that came from a change in the value of the workers' necessities would also change some inputs, which Marx sets aside. The marx and fall figures are Marx's; two-spheres is illustrative.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a general wage rise raises all prices</strong><span>That is the reading of Smith's component parts of price. In the marx preset the prices tile reads £120, £900/7, £816/7: the average sphere unchanged, the low composition up to 128 4/7 and the high composition down to 116 4/7. A general rise comes out of profit and only rearranges relative prices; in the two-spheres preset the two prices still sum to £240.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reckoning the new rate on the old capital</strong><span>Marx divides the remaining profit by the capital after the rise: 15 on 105, not 15 on 100. The difference is between 1/7 and 3/20, and the lab's general rate tile reads 1/7.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the printed 128 7/12 as exact</strong><span>The text's &ldquo;16 1/12&rdquo; and &ldquo;128 7/12&rdquo; are rounded: 14 2/7% of 112½ is 16 1/14, and the price is 128 4/7. The lab prints £900/7. Nothing in the argument depends on the difference, but a quotation is not a calculation.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can reprice spheres after a general change in wages.</strong><p>Given the average capital, the old general rate, the spheres' c and v and a change in money wages, compute the new general rate over the capital after the change, each sphere's new price of production, and classify each as rising, falling or unchanged.</p></div></div><div class="note"><strong>Note:</strong> The lab, like the chapter, holds the working day, the labour performed and the value of the inputs fixed, and assumes one turnover a year with all of c used up. A wage change that came from a change in the value of the workers' necessities would also change some inputs, which Marx sets aside. The marx and fall figures are Marx's; two-spheres is illustrative.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A wage rise is a fall in <span data-say="s prime">s′</span></summary><p>With the working day and the labour performed unchanged, the same workers still add the same new value. If more of it goes to wages, less is left as surplus value, so a general wage rise lowers the rate of surplus value and the general rate of profit.</p></details><details class="recall"><summary>The new general rate</summary><p>Marx reckons it on the average capital after the rise: 80c + 20v becomes 80c + 25v, whose 40 of new value now leaves 15 of profit on 105 of capital, 14 2/7%.</p></details><details class="recall"><summary>Three directions</summary><p>The average sphere's price stays at its value. A sphere of lower composition, more wages per hundred, sees its cost rise more than its profit falls; one of higher composition sees the reverse.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 11 is short and is mostly arithmetic. Marx raises all wages by a quarter and recomputes the general rate of profit and three prices of production: the average sphere's, a low composition's and a high composition's. Compute the new rate over the enlarged capital, the new prices, and the direction each one moves.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A wage rise is a fall in <span data-say="s prime">s′</span>.</strong> With the working day and the labour performed unchanged, the same workers still add the same new value. If more of it goes to wages, less is left as surplus value, so a general wage rise lowers the rate of surplus value and the general rate of profit.</li><li><strong>The new general rate.</strong> Marx reckons it on the average capital after the rise: 80c + 20v becomes 80c + 25v, whose 40 of new value now leaves 15 of profit on 105 of capital, 14 2/7%.</li><li><strong>Three directions.</strong> The average sphere's price stays at its value. A sphere of lower composition, more wages per hundred, sees its cost rise more than its profit falls; one of higher composition sees the reverse.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a wage rise comes out of surplus value. after a rise, p prime equals profit left over new capital. Marx, 15 on 105 equals 14 and 2 sevenths percent. average sphere, price unchanged. lower c over v, price rises, higher, falls" tabindex="0" role="region" aria-label="Mathematical notation">a wage rise comes out of surplus value
 after a rise: p′ = profit left / new capital
 Marx: 15 on 105 = 14 2/7%
@@ -2363,11 +2408,42 @@ lower c/v: price rises; higher: falls</div><figcaption>A wage rise in five lines
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2435,7 +2511,7 @@ lower c/v: price rises; higher: falls</div><figcaption>A wage rise in five lines
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

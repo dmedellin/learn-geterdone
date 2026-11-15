@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Measuring Systems</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Sizing samples and alerts</p>
       <h1>Threshold Alerts and False Alarms</h1>
       <p class="lesson-lede">Compute the exact probability that a fixed threshold fires on a healthy service, and the pages a week that produces.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A threshold is a statement about the sample, not about the system</li><li>Small per-window probabilities multiply into large weekly counts</li><li>The fix is more requests per window, not a higher threshold</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The binomial tail, the pages it produces, and what to change</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Threshold alert, and its false-alarm rate</span><p>A <strong>threshold alert</strong> fires when a statistic measured over a window crosses a fixed value. For an error ratio with threshold <span class="math" data-say="tau">τ</span> over <span class="math" data-say="n">n</span> requests, it fires at the smallest integer error count strictly above <span class="math" data-say="tau times n">τ·n</span>. Its <strong>false-alarm probability</strong> is the chance of reaching that count when the true rate is the healthy one, and it is the upper tail of a binomial distribution.</p></div><div class="mathblock" data-say="true rate p equals 1 over 100, window n equals 200 requests, threshold tau equals 2 percent. tau times n equals 0.02 times 200 equals 4, so the alert fires at k equals 5 or more. X is approximately Binomial of 200 and 1 over 100, E of X equals 2 errors a window. P of X is at least 5 equals the sum from j equals 5 to 200 of 200 choose j the quantity 1 over 100, to the power j the quantity 99 over 100, to the power 200 minus j. equals 0.051746263 and so on. equals 5.1746 and so on percent, is approximately 5.175 percent" tabindex="0" role="region" aria-label="Mathematical notation">true rate p = 1/100,  window n = 200 requests,  threshold τ = 2%
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The binomial tail, the pages it produces, and what to change</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Threshold alert, and its false-alarm rate</span><p>A <strong>threshold alert</strong> fires when a statistic measured over a window crosses a fixed value. For an error ratio with threshold <span class="math" data-say="tau">τ</span> over <span class="math" data-say="n">n</span> requests, it fires at the smallest integer error count strictly above <span class="math" data-say="tau times n">τ·n</span>. Its <strong>false-alarm probability</strong> is the chance of reaching that count when the true rate is the healthy one, and it is the upper tail of a binomial distribution.</p></div><div class="mathblock" data-say="true rate p equals 1 over 100, window n equals 200 requests, threshold tau equals 2 percent. tau times n equals 0.02 times 200 equals 4, so the alert fires at k equals 5 or more. X is approximately Binomial of 200 and 1 over 100, E of X equals 2 errors a window. P of X is at least 5 equals the sum from j equals 5 to 200 of 200 choose j the quantity 1 over 100, to the power j the quantity 99 over 100, to the power 200 minus j. equals 0.051746263 and so on. equals 5.1746 and so on percent, is approximately 5.175 percent" tabindex="0" role="region" aria-label="Mathematical notation">true rate p = 1/100,  window n = 200 requests,  threshold τ = 2%
 
 τ·n = 0.02 × 200 = 4,  so the alert fires at k = 5 or more
 
@@ -1407,12 +1451,11 @@ expected false pages 0.051746… × 2 016 = 104.32 a week
 
 windows in an hour  60 ÷ 5 = 12
 P(at least one page in the next hour)
-     = 1 − (1 − 0.051746…)¹²  = 47.14%</div><p>The second block is <span class="math" data-say="1 minus the quantity 1 minus p, to the power k">1 − (1 − p)ᵏ</span> for the third time on this course &mdash; the capture probability of a sampling rate, the chance a load test meets its tail, and now the chance of at least one false page in the next hour. Three lessons, one function, and the lab calls the same one in all three places so the claim can be checked rather than taken on trust.</p><p>A 47% chance of being paged in any given hour by a service in which nothing is wrong is the number that matters operationally. It is not merely wasteful: after a week of it the page has no information content left, and the response to the hundred and fifth one is indistinguishable from the response to a real outage, because there is nothing to distinguish it by.</p><h3>The two levers, and what each costs</h3><div class="example"><span class="label">Example &middot; The same alert, three configurations</span><p><strong>200 requests, 2%.</strong> Fires at 5 errors, 5.175% of windows, 104.32 pages a week. This is the configuration almost everyone starts with.</p><p><strong>600 requests, 2%.</strong> A fifteen-minute window instead of five, so the threshold now means 13 errors. 0.849% of windows and 672 windows a week: 5.71 pages. The threshold did not move; the sample got bigger and its ratio got less variable.</p><p><strong>200 requests, 4%.</strong> Fires at 9 errors, 0.021% of windows, 0.43 pages a week. Quieter still &mdash; and it no longer fires on a true rate of 2%, which is double the healthy rate and is exactly the kind of change the alert existed to catch.</p></div><p>The two levers are not equivalent. Widening the window buys quiet with detection <em>latency</em>: the same regression is caught, ten minutes later. Raising the threshold buys quiet with detection <em>sensitivity</em>: some regressions are now never caught at all, at any latency. Latency is usually the cheaper currency, which is why the first move on a noisy alert should be the window.</p><p>There is a floor. A low-traffic service has few requests per window however long the window is, and at twenty requests a window no threshold on a ratio is stable: one error is 5% and two is 10%. For those services the honest answer is to alert on something else &mdash; an absolute count of errors, a budget consumed over a long window, or a synthetic probe &mdash; rather than to choose a threshold and live with the noise.</p><h3>What this calculation is and is not</h3><p>It is a false-alarm rate for a stated rule on a stated healthy rate. It is not a detector design: it says nothing about how quickly a real change is caught, and it does not compare this rule against any other. Those questions need the distribution under the alternative as well, which is the beginning of hypothesis testing and is outside this course.</p><p>What it does give you is the arithmetic to reject a rule before shipping it. If a proposed alert would fire a hundred times a week on a healthy service, that fact is available from four numbers &mdash; the true rate, the requests per window, the threshold and the window length &mdash; and it is available before anybody is woken up. The previous page&rsquo;s burn-rate rule is the better-behaved alternative for exactly this reason: it thresholds a quantity that accumulates rather than a ratio that fluctuates.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A threshold fires on the sample, not on the system</h2></div><p>The exact chance a healthy service trips a fixed threshold, and the pages it costs</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+     = 1 − (1 − 0.051746…)¹²  = 47.14%</div><p>The second block is <span class="math" data-say="1 minus the quantity 1 minus p, to the power k">1 − (1 − p)ᵏ</span> for the third time on this course &mdash; the capture probability of a sampling rate, the chance a load test meets its tail, and now the chance of at least one false page in the next hour. Three lessons, one function, and the lab calls the same one in all three places so the claim can be checked rather than taken on trust.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A threshold fires on the sample, not on the system</h2></div><p>The exact chance a healthy service trips a fixed threshold, and the pages it costs</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>What a threshold fires at when nothing is wrong</strong><span>the exact binomial tail of a window, and the pages a week it comes to</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>errors per window</span><span class="tone-red"><i class="legend-swatch"></i>the threshold and above</span><span class="tone-amber"><i class="legend-swatch"></i>the true rate</span></div>
@@ -1420,10 +1463,10 @@ P(at least one page in the next hour)
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="thPlot" viewBox="0 0 660 200" role="img" aria-label="The distribution of errors in one window, with every outcome at or above the threshold shaded."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="thTable"></table></div>
       <div class="status-banner" id="thStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the rate, the window and the threshold</h3>
-          <p>The firing probability is the exact binomial upper tail, computed two ways &mdash; directly, and as a suffix sum of the whole distribution &mdash; so the page can show the two agree. Raise the requests per window without touching the threshold and watch the pages a week collapse; then raise the threshold instead, and notice what the alert has stopped being able to see.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the rate, the window and the threshold</h3>
+            <p>The firing probability is the exact binomial upper tail, computed two ways &mdash; directly, and as a suffix sum of the whole distribution &mdash; so the page can show the two agree. Raise the requests per window without touching the threshold and watch the pages a week collapse; then raise the threshold instead, and notice what the alert has stopped being able to see.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="thRate">True error rate (per mille)</label><span class="range-value" id="thRateOut">10</span></div>
           <input id="thRate" type="range" min="1" max="50" step="1" value="10" />
@@ -1449,12 +1492,15 @@ P(at least one page in the next hour)
           <div class="kpi"><span>False pages in 30 days</span><strong id="thMonth">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="thHint" style="margin:0;">The tail is exact: availKofN from the availability course, which is the same binomial upper tail as &ldquo;at least k of n replicas up&rdquo; and is reused rather than rewritten. No square root and no normal approximation appear on this page.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>A 47% chance of being paged in any given hour by a service in which nothing is wrong is the number that matters operationally. It is not merely wasteful: after a week of it the page has no information content left, and the response to the hundred and fifth one is indistinguishable from the response to a real outage, because there is nothing to distinguish it by.</p><h3>The two levers, and what each costs</h3><div class="example"><span class="label">Example &middot; The same alert, three configurations</span><p><strong>200 requests, 2%.</strong> Fires at 5 errors, 5.175% of windows, 104.32 pages a week. This is the configuration almost everyone starts with.</p><p><strong>600 requests, 2%.</strong> A fifteen-minute window instead of five, so the threshold now means 13 errors. 0.849% of windows and 672 windows a week: 5.71 pages. The threshold did not move; the sample got bigger and its ratio got less variable.</p><p><strong>200 requests, 4%.</strong> Fires at 9 errors, 0.021% of windows, 0.43 pages a week. Quieter still &mdash; and it no longer fires on a true rate of 2%, which is double the healthy rate and is exactly the kind of change the alert existed to catch.</p></div><p>The two levers are not equivalent. Widening the window buys quiet with detection <em>latency</em>: the same regression is caught, ten minutes later. Raising the threshold buys quiet with detection <em>sensitivity</em>: some regressions are now never caught at all, at any latency. Latency is usually the cheaper currency, which is why the first move on a noisy alert should be the window.</p><p>There is a floor. A low-traffic service has few requests per window however long the window is, and at twenty requests a window no threshold on a ratio is stable: one error is 5% and two is 10%. For those services the honest answer is to alert on something else &mdash; an absolute count of errors, a budget consumed over a long window, or a synthetic probe &mdash; rather than to choose a threshold and live with the noise.</p><h3>What this calculation is and is not</h3><p>It is a false-alarm rate for a stated rule on a stated healthy rate. It is not a detector design: it says nothing about how quickly a real change is caught, and it does not compare this rule against any other. Those questions need the distribution under the alternative as well, which is the beginning of hypothesis testing and is outside this course.</p><p>What it does give you is the arithmetic to reject a rule before shipping it. If a proposed alert would fire a hundred times a week on a healthy service, that fact is available from four numbers &mdash; the true rate, the requests per window, the threshold and the window length &mdash; and it is available before anybody is woken up. The previous page&rsquo;s burn-rate rule is the better-behaved alternative for exactly this reason: it thresholds a quantity that accumulates rather than a ratio that fluctuates.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Checking an alert before it checks you</h2></div><p>Four numbers in, two numbers out, and the second one is the one to put in the review.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down the healthy rate and the requests per window</h3><p>Not the threshold &mdash; the rate the service actually runs at, and how many requests fall in one evaluation window at its typical traffic. If traffic varies by time of day, do this twice: the quiet hours are where the false alarms live.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the count the threshold fires at</h3><p>The smallest integer strictly above <span class="math" data-say="tau times n">τ·n</span>. At <span class="math" data-say="tau equals 2 percent">τ = 2%</span> and <span class="math" data-say="n equals 200">n = 200</span> that is 5, not 4 &mdash; the off-by-one matters, because the tail at 4 is several times the tail at 5.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the exact binomial upper tail at that count</h3><p><span class="math" data-say="P of X is at least k">P(X ≥ k)</span> for <span class="math" data-say="X is approximately Binomial of n and p">X ~ Binomial(n, p)</span>. This is the probability of a page per window when nothing is wrong, and it is the number people expect to be small and are surprised by.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Multiply by the windows, and read the weekly figure out loud</h3><p><span class="math" data-say="7 times 24 times 60 divided by w">7 × 24 × 60 ÷ w</span> windows a week. A hundred pages a week is not a tuning detail; it is a rule that should not ship. Then try the window lever first and the threshold lever second, and say what each one gave up.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Checking an alert before it checks you</h2>
+      <p class="lead-in">Four numbers in, two numbers out, and the second one is the one to put in the review.</p>
+      <ol class="key-ideas method"><li><strong>Write down the healthy rate and the requests per window.</strong> Not the threshold &mdash; the rate the service actually runs at, and how many requests fall in one evaluation window at its typical traffic. If traffic varies by time of day, do this twice: the quiet hours are where the false alarms live.</li><li><strong>Find the count the threshold fires at.</strong> The smallest integer strictly above <span class="math" data-say="tau times n">τ·n</span>. At <span class="math" data-say="tau equals 2 percent">τ = 2%</span> and <span class="math" data-say="n equals 200">n = 200</span> that is 5, not 4 &mdash; the off-by-one matters, because the tail at 4 is several times the tail at 5.</li><li><strong>Compute the exact binomial upper tail at that count.</strong> <span class="math" data-say="P of X is at least k">P(X ≥ k)</span> for <span class="math" data-say="X is approximately Binomial of n and p">X ~ Binomial(n, p)</span>. This is the probability of a page per window when nothing is wrong, and it is the number people expect to be small and are surprised by.</li><li><strong>Multiply by the windows, and read the weekly figure out loud.</strong> <span class="math" data-say="7 times 24 times 60 divided by w">7 × 24 × 60 ÷ w</span> windows a week. A hundred pages a week is not a tuning detail; it is a rule that should not ship. Then try the window lever first and the threshold lever second, and say what each one gave up.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1493,17 +1539,16 @@ TWO FIXES
   n = 200, τ = 4%   fires at  9   P = 0.021%  2 016 windows → 0.43/week</div><p>The comparison line in the middle is worth keeping. Moving the firing count by one, from 5 to 4, changes the false-alarm rate by a factor of nearly three; from 5 to 6, by a factor of three the other way. A threshold on a small count is extremely sensitive to exactly where the boundary falls, which is another way of saying that a round-numbered threshold like 2% has no particular claim to being right.</p><p>The two fixes are not interchangeable even though both make the pager quiet. The wider window still detects a doubling of the error rate, ten minutes later than before. The higher threshold does not detect a doubling at all: at a true rate of 2% the mean is 4 errors in 200 and the alert wants 9. Quiet is easy; quiet while still detecting the thing you built the alert for is the actual problem.</p><p>For faded practice, take a service with a true rate of 0.5% and 100-request windows of one minute, with a 2% threshold. The supplied first move is that the mean is 0.5 errors and the alert fires at 3. Compute the tail, the windows a week and the pages, then say which lever you would pull &mdash; and whether a ratio threshold is the right instrument for a service this small at all.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating a threshold crossing as a fact about the system</strong><span>It is a fact about one sample of a random quantity. Before investigating a single crossing, compute what fraction of windows cross by chance at the healthy rate; if the answer is five per cent, a crossing is evidence of almost nothing and the correct response to a single page is to look at the next window rather than at the service.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Judging an alert by its per-window probability</strong><span>5% per window reads as rare and is a hundred and four pages a week. The number to put in a design review is always the weekly count, because that is the number a human experiences, and the conversion factor &mdash; 2 016 windows for five-minute evaluation &mdash; is larger than anybody&rsquo;s intuition allows for.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reaching for the threshold when the window is the problem</strong><span>Raising the threshold is the quickest way to silence a noisy alert and the one that silently removes its reason for existing. Widening the window reduces the variance of the ratio instead, costs detection latency rather than detection sensitivity, and leaves the alert firing on the regressions it was built for.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a proposed alert is priced in pages a week on a healthy service before it ships.</strong><p>You should be able to find the count a threshold fires at, compute the exact binomial upper tail at it, convert that into pages a week and into the chance of a page in the next hour, and say which of the window and the threshold you would change and what each one gives up.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That is the whole course: a ratio with an error bar, two aggregates that lie in different ways, two biases a measurement introduces, and four sizing calculations for a sample, a metric, a test and an alert. Every one of them is the same discipline &mdash; write down what the number is a measurement of, and then compute how far it can be from the thing you wanted to know.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating a threshold crossing as a fact about the system</strong><span>It is a fact about one sample of a random quantity. Before investigating a single crossing, compute what fraction of windows cross by chance at the healthy rate; if the answer is five per cent, a crossing is evidence of almost nothing and the correct response to a single page is to look at the next window rather than at the service.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Judging an alert by its per-window probability</strong><span>5% per window reads as rare and is a hundred and four pages a week. The number to put in a design review is always the weekly count, because that is the number a human experiences, and the conversion factor &mdash; 2 016 windows for five-minute evaluation &mdash; is larger than anybody&rsquo;s intuition allows for.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reaching for the threshold when the window is the problem</strong><span>Raising the threshold is the quickest way to silence a noisy alert and the one that silently removes its reason for existing. Widening the window reduces the variance of the ratio instead, costs detection latency rather than detection sensitivity, and leaves the alert firing on the regressions it was built for.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a proposed alert is priced in pages a week on a healthy service before it ships.</strong><p>You should be able to find the count a threshold fires at, compute the exact binomial upper tail at it, convert that into pages a week and into the chance of a page in the next hour, and say which of the window and the threshold you would change and what each one gives up.</p></div></div><div class="note"><strong>Note:</strong> That is the whole course: a ratio with an error bar, two aggregates that lie in different ways, two biases a measurement introduces, and four sizing calculations for a sample, a metric, a test and an alert. Every one of them is the same discipline &mdash; write down what the number is a measurement of, and then compute how far it can be from the thing you wanted to know.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A threshold is a statement about the sample, not about the system</summary><p>&ldquo;More than 2% errors&rdquo; is evaluated against the ratio observed in one window, and that ratio is a random quantity even when the underlying rate is constant. With 200 requests at a true 1%, the observed count is <span class="math" data-say="Binomial of 200 and 0.01">Binomial(200, 0.01)</span> with a mean of 2, and it exceeds 4 in one window in twenty. The alert is firing correctly; it is answering a question about arithmetic.</p></details><details class="recall"><summary>Small per-window probabilities multiply into large weekly counts</summary><p>5.175% sounds like a tolerable rate until it is multiplied by the number of windows. Five-minute windows give <span class="math" data-say="7 times 24 times 60 divided by 5 equals 2016">7 × 24 × 60 ÷ 5 = 2 016</span> of them a week, so the expected false pages are <span class="math" data-say="0.05175 times 2016 equals 104.32">0.05175 × 2 016 = 104.32</span>. Fifteen a day. The per-window figure and the weekly figure are the same fact and only one of them is ever quoted.</p></details><details class="recall"><summary>The fix is more requests per window, not a higher threshold</summary><p>Both work arithmetically and they differ in what they cost. Widening the window to 600 requests keeps the 2% threshold and drops the false rate to 0.849%, or 5.71 pages a week, because the ratio of a larger sample varies less &mdash; the <span class="math" data-say="1 over the square root of n">1/√n</span> of the first page of this course, arriving as an alerting decision. Raising the threshold to 4% on the same 200 requests gives 0.021% and 0.43 pages a week, and buys it by refusing to detect a genuine doubling of the error rate.</p></details></div>
+      <h3>Summary</h3>
       <p>A threshold on a measured ratio is a statement about a sample. With 200 requests a window at a true error rate of 1%, a 2% threshold fires at five errors, and the exact binomial tail says that happens in 5.175% of windows &mdash; 104.32 pages a week, all of them false, from a service in which nothing at all has changed. Widening the window to 600 requests at the same threshold takes it to 5.71.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A threshold is a statement about the sample, not about the system.</strong> &ldquo;More than 2% errors&rdquo; is evaluated against the ratio observed in one window, and that ratio is a random quantity even when the underlying rate is constant. With 200 requests at a true 1%, the observed count is <span class="math" data-say="Binomial of 200 and 0.01">Binomial(200, 0.01)</span> with a mean of 2, and it exceeds 4 in one window in twenty. The alert is firing correctly; it is answering a question about arithmetic.</li><li><strong>Small per-window probabilities multiply into large weekly counts.</strong> 5.175% sounds like a tolerable rate until it is multiplied by the number of windows. Five-minute windows give <span class="math" data-say="7 times 24 times 60 divided by 5 equals 2016">7 × 24 × 60 ÷ 5 = 2 016</span> of them a week, so the expected false pages are <span class="math" data-say="0.05175 times 2016 equals 104.32">0.05175 × 2 016 = 104.32</span>. Fifteen a day. The per-window figure and the weekly figure are the same fact and only one of them is ever quoted.</li><li><strong>The fix is more requests per window, not a higher threshold.</strong> Both work arithmetically and they differ in what they cost. Widening the window to 600 requests keeps the 2% threshold and drops the false rate to 0.849%, or 5.71 pages a week, because the ratio of a larger sample varies less &mdash; the <span class="math" data-say="1 over the square root of n">1/√n</span> of the first page of this course, arriving as an alerting decision. Raising the threshold to 4% on the same 200 requests gives 0.021% and 0.43 pages a week, and buys it by refusing to detect a genuine doubling of the error rate.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="errors in a window is approximately Binomial of n and p, n equals 200, p equals 1 percent goes to mean 2. threshold 2 percent of 200 equals 4, so it fires at 5 or more. P of X is at least 5 equals 5.1746 and so on percent is approximately 5.175 percent, exact binomial tail. windows a week equals 7 times 24 times 60 divided by 5 equals 2016, goes to 104.32 false pages a week. P of at least one in the next hour equals 1 minus the quantity 1 minus 0.05175, to the power 12 equals 47.14 percent. same threshold on 600-request windows, fires at 13, 5.71 pages a week" tabindex="0" role="region" aria-label="Mathematical notation">errors in a window ~ Binomial(n, p)     n = 200, p = 1% → mean 2
 threshold 2% of 200 = 4, so it fires at 5 or more
 P(X ≥ 5) = 5.1746…% ≈ 5.175%           exact binomial tail
@@ -2889,11 +2934,42 @@ same threshold on 600-request windows: fires at 13, 5.71 pages a week</div><figc
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2961,7 +3037,7 @@ same threshold on 600-request windows: fires at 13, 5.71 pages a week</div><figc
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

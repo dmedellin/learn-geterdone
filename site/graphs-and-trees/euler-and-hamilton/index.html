@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,28 +1424,26 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Graphs and Trees</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Traversal</p>
       <h1>Euler and Hamilton Paths</h1>
       <p class="lesson-lede">Every edge once, or every vertex once — and the two are nothing alike.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Euler is decided by the degrees</li><li>The degree condition has an obvious reason</li><li>Hamilton has no such criterion</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Euler and Hamilton</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Euler path and circuit</span><p>An <strong>Euler path</strong> uses every edge of the graph exactly once. An <strong>Euler circuit</strong> is an Euler path that returns to its starting vertex.</p></div><div class="thm"><span class="label">Theorem &middot; Euler&#x27;s theorem</span><p>A connected graph has an Euler circuit if and only if every vertex has even degree. It has an Euler path but no circuit if and only if exactly two vertices have odd degree, and any such path starts at one and ends at the other.</p></div><div class="proof"><p><strong>Necessity.</strong> Every time the circuit enters a vertex it leaves again, using two edges at that vertex; the start and end are the same vertex, so its first and last edges pair up too. Every edge is used exactly once, so every degree is even.</p><p><strong>Sufficiency.</strong> Suppose the graph is connected with all degrees even. Start anywhere and walk, never repeating an edge. Even degrees mean that whenever you enter a vertex other than the start there is an unused edge to leave by, so the walk can only get stuck at the start &mdash; producing a circuit.</p><p>If that circuit misses some edges, connectivity gives a vertex <span class="math" data-say="v">v</span> on it with unused edges. The unused edges still form a graph of even degrees, so the same argument gives a second circuit through <span class="math" data-say="v">v</span>, which can be spliced into the first. Repeating exhausts the edges.</p><p><span class="qed">&#9633;</span></p></div><p>That is a complete criterion and an algorithm: check the degrees, and the splicing argument (Hierholzer's algorithm) constructs the circuit in linear time.</p><div class="example"><span class="label">Example &middot; The bridges of Königsberg</span><p>Four land masses joined by seven bridges. The question &mdash; can one walk crossing every bridge exactly once? &mdash; is whether an Euler path exists. The four vertices have degrees 5, 3, 3 and 3: four vertices of odd degree, and a path allows at most two. No such walk exists, and Euler proved it in 1736.</p></div><p>Notice how little the argument needs. The geometry, the distances and the layout were all discarded; only the degrees mattered. That abstraction is the founding move of graph theory.</p><h3>Hamilton</h3><div class="defbox"><span class="label">Definition &middot; Hamilton path and circuit</span><p>A <strong>Hamilton path</strong> visits every vertex exactly once. A <strong>Hamilton circuit</strong> is a Hamilton path returning to its start.</p></div><p>There is no known criterion. Some sufficient conditions exist:</p><div class="thm"><span class="label">Theorem &middot; Dirac&#x27;s theorem</span><p>If <span class="math" data-say="n is at least 3">n ≥ 3</span> and every vertex has degree at least <span class="math" data-say="n over 2">n/2</span>, the graph has a Hamilton circuit.</p></div><div class="thm"><span class="label">Theorem &middot; Ore&#x27;s theorem</span><p>If <span class="math" data-say="n is at least 3">n ≥ 3</span> and <span class="math" data-say="the degree of u plus the degree of v is at least n">deg(u) + deg(v) ≥ n</span> for every pair of non-adjacent <span class="math" data-say="u, v">u, v</span>, the graph has a Hamilton circuit.</p></div><p>Both are sufficient and neither is necessary: <span class="math" data-say="C sub n">Cₙ</span> has a Hamilton circuit and every degree 2, far below <span class="math" data-say="n over 2">n/2</span>. There is no known condition that is both.</p><div class="thm"><span class="label">Theorem &middot; Hamiltonicity is NP-complete</span><p>Deciding whether a graph has a Hamilton circuit is NP-complete. No polynomial-time algorithm is known, and one would imply P = NP.</p></div><div class="mathblock" data-say="Euler, Hamilton. covers, every EDGE once, every VERTEX once. criterion, degrees all even, none known. deciding it, linear time, NP-complete. constructing it, Hierholzer, linear, exponential in general" tabindex="0" role="region" aria-label="Mathematical notation">                    Euler                  Hamilton
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Euler and Hamilton</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Euler path and circuit</span><p>An <strong>Euler path</strong> uses every edge of the graph exactly once. An <strong>Euler circuit</strong> is an Euler path that returns to its starting vertex.</p></div><div class="thm"><span class="label">Theorem &middot; Euler&#x27;s theorem</span><p>A connected graph has an Euler circuit if and only if every vertex has even degree. It has an Euler path but no circuit if and only if exactly two vertices have odd degree, and any such path starts at one and ends at the other.</p></div><div class="proof"><p><strong>Necessity.</strong> Every time the circuit enters a vertex it leaves again, using two edges at that vertex; the start and end are the same vertex, so its first and last edges pair up too. Every edge is used exactly once, so every degree is even.</p><p><strong>Sufficiency.</strong> Suppose the graph is connected with all degrees even. Start anywhere and walk, never repeating an edge. Even degrees mean that whenever you enter a vertex other than the start there is an unused edge to leave by, so the walk can only get stuck at the start &mdash; producing a circuit.</p><p>If that circuit misses some edges, connectivity gives a vertex <span class="math" data-say="v">v</span> on it with unused edges. The unused edges still form a graph of even degrees, so the same argument gives a second circuit through <span class="math" data-say="v">v</span>, which can be spliced into the first. Repeating exhausts the edges.</p><p><span class="qed">&#9633;</span></p></div><p>That is a complete criterion and an algorithm: check the degrees, and the splicing argument (Hierholzer's algorithm) constructs the circuit in linear time.</p><div class="example"><span class="label">Example &middot; The bridges of Königsberg</span><p>Four land masses joined by seven bridges. The question &mdash; can one walk crossing every bridge exactly once? &mdash; is whether an Euler path exists. The four vertices have degrees 5, 3, 3 and 3: four vertices of odd degree, and a path allows at most two. No such walk exists, and Euler proved it in 1736.</p></div><p>Notice how little the argument needs. The geometry, the distances and the layout were all discarded; only the degrees mattered. That abstraction is the founding move of graph theory.</p><h3>Hamilton</h3><div class="defbox"><span class="label">Definition &middot; Hamilton path and circuit</span><p>A <strong>Hamilton path</strong> visits every vertex exactly once. A <strong>Hamilton circuit</strong> is a Hamilton path returning to its start.</p></div><p>There is no known criterion. Some sufficient conditions exist:</p><div class="thm"><span class="label">Theorem &middot; Dirac&#x27;s theorem</span><p>If <span class="math" data-say="n is at least 3">n ≥ 3</span> and every vertex has degree at least <span class="math" data-say="n over 2">n/2</span>, the graph has a Hamilton circuit.</p></div><div class="thm"><span class="label">Theorem &middot; Ore&#x27;s theorem</span><p>If <span class="math" data-say="n is at least 3">n ≥ 3</span> and <span class="math" data-say="the degree of u plus the degree of v is at least n">deg(u) + deg(v) ≥ n</span> for every pair of non-adjacent <span class="math" data-say="u, v">u, v</span>, the graph has a Hamilton circuit.</p></div><p>Both are sufficient and neither is necessary: <span class="math" data-say="C sub n">Cₙ</span> has a Hamilton circuit and every degree 2, far below <span class="math" data-say="n over 2">n/2</span>. There is no known condition that is both.</p><div class="thm"><span class="label">Theorem &middot; Hamiltonicity is NP-complete</span><p>Deciding whether a graph has a Hamilton circuit is NP-complete. No polynomial-time algorithm is known, and one would imply P = NP.</p></div><div class="mathblock" data-say="Euler, Hamilton. covers, every EDGE once, every VERTEX once. criterion, degrees all even, none known. deciding it, linear time, NP-complete. constructing it, Hierholzer, linear, exponential in general" tabindex="0" role="region" aria-label="Mathematical notation">                    Euler                  Hamilton
 covers              every EDGE once        every VERTEX once
 criterion           degrees all even       none known
 deciding it         linear time            NP-complete
-constructing it     Hierholzer, linear     exponential in general</div><p>This table is the lesson. Two questions that a reader would expect to be of similar difficulty are on opposite sides of the sharpest boundary in computer science, and nothing in the statements reveals which is which.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Graph workbench</h2></div><p>Your graph, the course&#x27;s algorithms</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+constructing it     Hierholzer, linear     exponential in general</div><p>This table is the lesson. Two questions that a reader would expect to be of similar difficulty are on opposite sides of the sharpest boundary in computer science, and nothing in the statements reveals which is which.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Graph workbench</h2></div><p>Your graph, the course&#x27;s algorithms</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Build a graph, run the algorithms</strong><span id="gCaption">Click a cell in the adjacency matrix to toggle an edge</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>in the result</span><span class="tone-amber"><i class="legend-swatch"></i>visited / root</span><span class="tone-muted"><i class="legend-swatch"></i>not used</span></div>
@@ -1413,10 +1456,10 @@ constructing it     Hierholzer, linear     exponential in general</div><p>This t
         <div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gFacts"></table></div>
       </div>
       <div class="status-banner" id="gStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Both questions, on your graph</h3>
-          <p><span class="math" data-say="C sub 6">C₆</span> is loaded: no odd vertex, so an Euler circuit exists, and switching to Hamilton finds <span class="math" data-say="1 goes to 2 goes to 3 goes to 4 goes to 5 goes to 6 goes to 1">1 → 2 → 3 → 4 → 5 → 6 → 1</span> too. Remove the edge <span class="math" data-say="1 to 2">1–2</span>: vertices 1 and 2 are now the two odd vertices, an Euler path exists from one to the other and no circuit, and the Hamilton search finds a path (<span class="math" data-say="1 goes to 6 goes to 5 goes to 4 goes to 3 goes to 2">1 → 6 → 5 → 4 → 3 → 2</span>) but no circuit. Königsberg itself cannot be built here &mdash; two pairs of its land masses are joined by two bridges each, and the lab draws simple graphs &mdash; but Euler's proof never used simplicity, and the same degree count settles it. The Hamilton search tries orderings exhaustively, which is why the vertex count stops at 8.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Both questions, on your graph</h3>
+            <p><span class="math" data-say="C sub 6">C₆</span> is loaded: no odd vertex, so an Euler circuit exists, and switching to Hamilton finds <span class="math" data-say="1 goes to 2 goes to 3 goes to 4 goes to 5 goes to 6 goes to 1">1 → 2 → 3 → 4 → 5 → 6 → 1</span> too. Remove the edge <span class="math" data-say="1 to 2">1–2</span>: vertices 1 and 2 are now the two odd vertices, an Euler path exists from one to the other and no circuit, and the Hamilton search finds a path (<span class="math" data-say="1 goes to 6 goes to 5 goes to 4 goes to 3 goes to 2">1 → 6 → 5 → 4 → 3 → 2</span>) but no circuit. Königsberg itself cannot be built here &mdash; two pairs of its land masses are joined by two bridges each, and the lab draws simple graphs &mdash; but Euler's proof never used simplicity, and the same degree count settles it. The Hamilton search tries orderings exhaustively, which is why the vertex count stops at 8.</p>
         <div class="field">
           <label for="gAlgo">Algorithm</label>
           <select id="gAlgo">
@@ -1461,12 +1504,14 @@ constructing it     Hierholzer, linear     exponential in general</div><p>This t
           <div class="kpi"><span>|E|</span><strong id="gE">&mdash;</strong></div>
           <div class="kpi"><span>Σ deg</span><strong id="gSum">&mdash;</strong></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding both questions</h2></div><p>Euler is a degree count. Hamilton is a search.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>For Euler, check connectivity and count odd degrees</h3><p>Zero odd degrees gives a circuit; exactly two give a path; anything else gives neither.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Construct the Euler circuit by splicing</h3><p>Walk until stuck, then find a vertex with unused edges and splice in a second circuit. That is Hierholzer's algorithm.</p></article><article class="card concept-card"><div class="icon">3</div><h3>For Hamilton, check the sufficient conditions</h3><p>Dirac and Ore. If either holds, a circuit exists. If neither holds, nothing follows.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Otherwise search, and expect it to be slow</h3><p>Backtracking over orderings. For <span class="math" data-say="n">n</span> beyond about 20 this is impractical, and no better general method is known.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Deciding both questions</h2>
+      <p class="lead-in">Euler is a degree count. Hamilton is a search.</p>
+      <ol class="key-ideas method"><li><strong>For Euler, check connectivity and count odd degrees.</strong> Zero odd degrees gives a circuit; exactly two give a path; anything else gives neither.</li><li><strong>Construct the Euler circuit by splicing.</strong> Walk until stuck, then find a vertex with unused edges and splice in a second circuit. That is Hierholzer's algorithm.</li><li><strong>For Hamilton, check the sufficient conditions.</strong> Dirac and Ore. If either holds, a circuit exists. If neither holds, nothing follows.</li><li><strong>Otherwise search, and expect it to be slow.</strong> Backtracking over orderings. For <span class="math" data-say="n">n</span> beyond about 20 this is impractical, and no better general method is known.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1493,17 +1538,16 @@ ADD A SECOND, between A and D:
    all even  ⟹  an Euler CIRCUIT exists, from anywhere.</div><p>The bridges added were chosen to fix parity, and any bridge joining two odd-degree vertices would have done. That is the practical form of the theorem: the obstruction is parity, and parity is what you repair.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Confusing the two problems</strong><span>Euler covers edges; Hamilton covers vertices. The difficulty is completely different and nothing in the wording signals it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Applying Dirac&#x27;s condition in reverse</strong><span>It is sufficient, not necessary. <span class="math" data-say="C sub n">Cₙ</span> has degree 2 everywhere and a Hamilton circuit.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting connectivity in Euler&#x27;s criterion</strong><span>Two disjoint even-degree cycles have all degrees even and no Euler circuit. The edges must lie in one component.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can settle Euler in one pass and say why Hamilton is different.</strong><p>For a graph of your own, decide the Euler question by counting degrees, then attempt Hamilton by hand and notice what changes: one is a check, the other is a search.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The travelling salesman problem is Hamilton with weights: find the cheapest Hamilton circuit. It is the canonical hard optimisation problem, and “P, NP and NP-Completeness” in Algorithms and Complexity places it precisely.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Confusing the two problems</strong><span>Euler covers edges; Hamilton covers vertices. The difficulty is completely different and nothing in the wording signals it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Applying Dirac&#x27;s condition in reverse</strong><span>It is sufficient, not necessary. <span class="math" data-say="C sub n">Cₙ</span> has degree 2 everywhere and a Hamilton circuit.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting connectivity in Euler&#x27;s criterion</strong><span>Two disjoint even-degree cycles have all degrees even and no Euler circuit. The edges must lie in one component.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can settle Euler in one pass and say why Hamilton is different.</strong><p>For a graph of your own, decide the Euler question by counting degrees, then attempt Hamilton by hand and notice what changes: one is a check, the other is a search.</p></div></div><div class="note"><strong>Note:</strong> The travelling salesman problem is Hamilton with weights: find the cheapest Hamilton circuit. It is the canonical hard optimisation problem, and “P, NP and NP-Completeness” in Algorithms and Complexity places it precisely.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Euler is decided by the degrees</summary><p>One pass over the vertices. Even degrees and connectivity are necessary and sufficient, which is unusually clean.</p></details><details class="recall"><summary>The degree condition has an obvious reason</summary><p>Every visit to a vertex uses two edge-ends, one in and one out. So a circuit requires every degree even.</p></details><details class="recall"><summary>Hamilton has no such criterion</summary><p>Only sufficient conditions (Dirac, Ore) and no characterisation. Deciding it is NP-complete, which Algorithms and Complexity defines.</p></details></div>
+      <h3>Summary</h3>
       <p>An Euler circuit uses every edge once and exists exactly when the graph is connected with all degrees even. A Hamilton circuit visits every vertex once and has no such criterion &mdash; deciding it is NP-complete.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Euler is decided by the degrees.</strong> One pass over the vertices. Even degrees and connectivity are necessary and sufficient, which is unusually clean.</li><li><strong>The degree condition has an obvious reason.</strong> Every visit to a vertex uses two edge-ends, one in and one out. So a circuit requires every degree even.</li><li><strong>Hamilton has no such criterion.</strong> Only sufficient conditions (Dirac, Ore) and no characterisation. Deciding it is NP-complete, which Algorithms and Complexity defines.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="EULER, every EDGE once, criterion, connected, all degrees even. Euler PATH, exactly two odd-degree vertices. HAMILTON every VERTEX once, NO simple criterion, NP-complete. The problems look alike, They are not" tabindex="0" role="region" aria-label="Mathematical notation">EULER    every EDGE once      criterion: connected, all degrees even
          Euler PATH: exactly two odd-degree vertices
 HAMILTON every VERTEX once    NO simple criterion — NP-complete
@@ -2652,11 +2696,42 @@ The problems look alike. They are not.</div><figcaption>One easy, one hard</figc
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2724,7 +2799,7 @@ The problems look alike. They are not.</div><figcaption>One easy, one hard</figc
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

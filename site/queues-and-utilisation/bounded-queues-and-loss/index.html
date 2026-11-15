@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Queues and Utilisation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Shedding and overload</p>
       <h1>Bounded Queues and Loss</h1>
       <p class="lesson-lede">Compute a buffer&#x27;s loss, the K a loss target needs, its latency cap and its admitted rate.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A bound converts waiting into dropping</li><li>The cap on the queue is a cap on the latency</li><li><span class="math" data-say="L equals lambda W">L = λW</span> needs the rate that crosses the boundary</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Truncating the queue</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; M/M/1/K</span><p>The M/M/1 model with room for at most <span class="math" data-say="K">K</span> in the system, the one in service included. An arrival that finds <span class="math" data-say="K">K</span> present is <strong>blocked</strong> and lost. The states <span class="math" data-say="0">0</span> to <span class="math" data-say="K">K</span> carry the same geometric ratios as before, normalised over a finite sum, so <span class="math" data-say="pi sub n equals 1 minus rho rho to the power n over the quantity 1 minus rho to the power the quantity K plus 1">πₙ = (1 − ρ)ρⁿ/(1 − ρ^(K+1))</span> and in particular <span class="math" data-say="pi sub K equals 1 minus rho rho to the power K over the quantity 1 minus rho to the power the quantity K plus 1">π_K = (1 − ρ)ρ^K/(1 − ρ^(K+1))</span>.</p></div><p>One step in that definition deserves naming rather than sliding past. <span class="math" data-say="pi sub K">π_K</span> is the fraction of <em>time</em> the system is full; the loss is the fraction of <em>arrivals</em> that find it full. Those are two different quantities, and they are equal here because the arrivals are Poisson: a Poisson arrival sees the system exactly as an outside observer sampling at a random instant would. That property is called <strong>PASTA</strong> &mdash; Poisson arrivals see time averages &mdash; and it is an assumption of this model rather than a general truth about queues.</p><p>The discrete-time chain of &ldquo;Why Queues Form at <span class="math" data-say="rho is less than 1">ρ &lt; 1</span>&rdquo; does <em>not</em> have it. Under the late-arrival convention a departure resolves before the arrival in the same slot, so an arrival that meets a full system is still admitted whenever a completion happened first, and its blocking probability is strictly smaller than that chain's <span class="math" data-say="pi sub K">π_K</span>. The two statements look alike and are not the same statement; the discrete one is Operations Research, <span class="math" data-say="markov-chains-decisions-and-queues over queues-in-discrete-time">markov-chains-decisions-and-queues/queues-in-discrete-time</span>, and the one on this page is the continuous-time one.</p><p>One consequence is worth stating on its own: this chain settles at every <span class="math" data-say="rho">ρ</span>, including <span class="math" data-say="rho is at least 1">ρ ≥ 1</span>. There are finitely many states and the queue cannot grow past <span class="math" data-say="K">K</span>, so there is always a stationary distribution &mdash; at <span class="math" data-say="rho equals 1">ρ = 1</span> every state is equally likely, and with <span class="math" data-say="K equals 4">K = 4</span> that makes the blocking probability exactly <span class="math" data-say="1 over 5">1/5</span>. Overload in a bounded system is not unbounded growth; it is loss.</p><div class="mathblock" data-say="lambda equals 4 over 5 per second, mu equals 1 per second, rho equals 4 over 5, K equals 4. pi sub K, equals the quantity 1 over 5, times the quantity 256 over 625, divided by the quantity 1 minus 1024 over 3125, equals 256 over 2101, is approximately 12.2 percent. lambda sub eff equals lambda times the quantity 1 minus pi sub K, equals the quantity 4 over 5, times the quantity 1845 over 2101, equals 1476 over 2101, is approximately 0.703 per second. L, equals the sum of n pi sub n, equals 3284 over 2101 is approximately 1.563. W equals L over lambda sub eff equals 3284 over 1476, equals 821 over 369, is approximately 2.22 seconds, correct. W equals L over lambda, equals 3284 over 2101 divided by the quantity 4 over 5, is approximately 1.95 seconds, wrong. the ratio between them is exactly 1 over the quantity 1 minus pi sub K, equals 2101 over 1845" tabindex="0" role="region" aria-label="Mathematical notation">λ = 4/5 / s     μ = 1 / s     ρ = 4/5     K = 4
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Truncating the queue</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; M/M/1/K</span><p>The M/M/1 model with room for at most <span class="math" data-say="K">K</span> in the system, the one in service included. An arrival that finds <span class="math" data-say="K">K</span> present is <strong>blocked</strong> and lost. The states <span class="math" data-say="0">0</span> to <span class="math" data-say="K">K</span> carry the same geometric ratios as before, normalised over a finite sum, so <span class="math" data-say="pi sub n equals 1 minus rho rho to the power n over the quantity 1 minus rho to the power the quantity K plus 1">πₙ = (1 − ρ)ρⁿ/(1 − ρ^(K+1))</span> and in particular <span class="math" data-say="pi sub K equals 1 minus rho rho to the power K over the quantity 1 minus rho to the power the quantity K plus 1">π_K = (1 − ρ)ρ^K/(1 − ρ^(K+1))</span>.</p></div><p>One step in that definition deserves naming rather than sliding past. <span class="math" data-say="pi sub K">π_K</span> is the fraction of <em>time</em> the system is full; the loss is the fraction of <em>arrivals</em> that find it full. Those are two different quantities, and they are equal here because the arrivals are Poisson: a Poisson arrival sees the system exactly as an outside observer sampling at a random instant would. That property is called <strong>PASTA</strong> &mdash; Poisson arrivals see time averages &mdash; and it is an assumption of this model rather than a general truth about queues.</p><p>The discrete-time chain of &ldquo;Why Queues Form at <span class="math" data-say="rho is less than 1">ρ &lt; 1</span>&rdquo; does <em>not</em> have it. Under the late-arrival convention a departure resolves before the arrival in the same slot, so an arrival that meets a full system is still admitted whenever a completion happened first, and its blocking probability is strictly smaller than that chain's <span class="math" data-say="pi sub K">π_K</span>. The two statements look alike and are not the same statement; the discrete one is Operations Research, <span class="math" data-say="markov-chains-decisions-and-queues over queues-in-discrete-time">markov-chains-decisions-and-queues/queues-in-discrete-time</span>, and the one on this page is the continuous-time one.</p><p>One consequence is worth stating on its own: this chain settles at every <span class="math" data-say="rho">ρ</span>, including <span class="math" data-say="rho is at least 1">ρ ≥ 1</span>. There are finitely many states and the queue cannot grow past <span class="math" data-say="K">K</span>, so there is always a stationary distribution &mdash; at <span class="math" data-say="rho equals 1">ρ = 1</span> every state is equally likely, and with <span class="math" data-say="K equals 4">K = 4</span> that makes the blocking probability exactly <span class="math" data-say="1 over 5">1/5</span>. Overload in a bounded system is not unbounded growth; it is loss.</p><div class="mathblock" data-say="lambda equals 4 over 5 per second, mu equals 1 per second, rho equals 4 over 5, K equals 4. pi sub K, equals the quantity 1 over 5, times the quantity 256 over 625, divided by the quantity 1 minus 1024 over 3125, equals 256 over 2101, is approximately 12.2 percent. lambda sub eff equals lambda times the quantity 1 minus pi sub K, equals the quantity 4 over 5, times the quantity 1845 over 2101, equals 1476 over 2101, is approximately 0.703 per second. L, equals the sum of n pi sub n, equals 3284 over 2101 is approximately 1.563. W equals L over lambda sub eff equals 3284 over 1476, equals 821 over 369, is approximately 2.22 seconds, correct. W equals L over lambda, equals 3284 over 2101 divided by the quantity 4 over 5, is approximately 1.95 seconds, wrong. the ratio between them is exactly 1 over the quantity 1 minus pi sub K, equals 2101 over 1845" tabindex="0" role="region" aria-label="Mathematical notation">λ = 4/5 / s     μ = 1 / s     ρ = 4/5     K = 4
 
 π_K   = (1/5)(256/625) ÷ (1 − 1024/3125)  = 256/2101  ≈ 12.2%
 λ_eff = λ(1 − π_K) = (4/5)(1845/2101)     = 1476/2101 ≈ 0.703 / s
@@ -1400,19 +1444,11 @@ L     = Σ n πₙ                            = 3284/2101 ≈ 1.563
 W = L/λ_eff = 3284/1476  = 821/369  ≈ 2.22 s      correct
 W = L/λ     = 3284/2101 ÷ (4/5)     ≈ 1.95 s      wrong
 
-the ratio between them is exactly 1/(1 − π_K) = 2101/1845</div><p>The wrong line is not a rounding difference; it is 12% low, and it is low in the flattering direction. A team that computes it is reporting a response time that no admitted request experiences, on a system that is also dropping one arrival in eight. The lab prints both values side by side and labels them, because the only reliable defence against this mistake is seeing the two numbers together.</p><p>The boundary form of the rule &mdash; that the rate in <span class="math" data-say="L equals lambda W">L = λW</span> is whatever crosses <em>into</em> the boundary you drew &mdash; is Operations Research, <span class="math" data-say="markov-chains-decisions-and-queues over littles-l A w">markov-chains-decisions-and-queues/littles-law</span>, which cites this path's proof. A dropped arrival never crossed the boundary, so it belongs in neither <span class="math" data-say="lambda">λ</span> nor <span class="math" data-say="W">W</span>.</p><h3>Sizing the buffer</h3><p>Loss falls quickly with <span class="math" data-say="K">K</span>, and the latency cap rises with it just as quickly, so the two constraints pull in opposite directions and the buffer size is where they meet.</p><div class="mathblock" data-say="lambda equals 4 over 5, mu equals 1, so S equals 1 seconds. K equals 4, pi sub K is approximately 12.2 percent, latency cap is approximately, 4 seconds. K equals 14, pi sub K is at most 1 percent, latency cap is approximately 14 seconds. K equals 24, pi sub K is at most 0.1 percent, latency cap is approximately 24 seconds. for comparison, the unbounded queue at the same rho. no loss at all, mean W equals S over the quantity 1 minus rho, equals 5 seconds, unbounded tail" tabindex="0" role="region" aria-label="Mathematical notation">λ = 4/5, μ = 1, so S = 1 s
-
-K = 4      π_K ≈ 12.2%        latency cap ≈  4 s
-K = 14     π_K ≤ 1%           latency cap ≈ 14 s
-K = 24     π_K ≤ 0.1%         latency cap ≈ 24 s
-
-for comparison, the unbounded queue at the same ρ:
-           no loss at all     mean W = S/(1 − ρ) = 5 s, unbounded tail</div><p>That table is bufferbloat in four lines. Pushing the loss from 12% to 0.1% costs a latency cap of twenty-four service times, and a queue that deep delivers work whose answer stopped being wanted twenty seconds ago. The interesting question is never &ldquo;how do we stop dropping&rdquo; but &ldquo;which of dropping and delaying is the cheaper failure for this request&rdquo;.</p><p>For an interactive request with a client timeout, delay beyond the timeout is loss with extra steps: the work is done, the resources are spent, and nobody is listening. A short buffer refuses the request early enough for the client to do something about it. For a batch pipeline with no reader waiting, the trade runs the other way and a deep buffer is exactly right.</p><p>Note also what a finite buffer does to the numbers of the previous lessons. <span class="math" data-say="L">L</span> and <span class="math" data-say="W">W</span> both fall, because the worst states have been removed from the distribution; throughput falls too, by the blocked fraction; and the response-time curve no longer has an asymptote at <span class="math" data-say="rho equals 1">ρ = 1</span>, because there is nothing left for it to blow up into.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Bounded queues and loss</h2></div><p>πₖ, the admitted rate, and the two W values it separates</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+the ratio between them is exactly 1/(1 − π_K) = 2101/1845</div><p>The wrong line is not a rounding difference; it is 12% low, and it is low in the flattering direction. A team that computes it is reporting a response time that no admitted request experiences, on a system that is also dropping one arrival in eight. The lab prints both values side by side and labels them, because the only reliable defence against this mistake is seeing the two numbers together.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Bounded queues and loss</h2></div><p>πₖ, the admitted rate, and the two W values it separates</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Bounded queues and loss</strong><span>a buffer of K turns waiting into dropping &mdash; and changes which &lambda; Little's Law takes</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>&pi;<sub>n</sub></span><span class="tone-red"><i class="legend-swatch"></i>blocked</span><span class="tone-green"><i class="legend-swatch"></i>admitted rate</span><span class="tone-amber"><i class="legend-swatch"></i>the wrong W</span></div>
@@ -1420,10 +1456,10 @@ for comparison, the unbounded queue at the same ρ:
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="fiPlot" viewBox="0 0 520 190" role="img" aria-label="The truncated state distribution, with the blocked state marked, above the two candidate W values."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="fiTable"></table></div>
       <div class="status-banner" id="fiStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the buffer</h3>
-          <p>The truncated distribution, the blocking probability, the admitted rate and <span class="math" data-say="L">L</span> print as exact fractions &mdash; and <span class="math" data-say="W">W</span> prints twice, once from the admitted rate and once from the offered one, labelled. The gap between them is the size of the misconception.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the buffer</h3>
+            <p>The truncated distribution, the blocking probability, the admitted rate and <span class="math" data-say="L">L</span> print as exact fractions &mdash; and <span class="math" data-say="W">W</span> prints twice, once from the admitted rate and once from the offered one, labelled. The gap between them is the size of the misconception.</p>
         <div>
           <div class="range-row"><label class="small-copy" id="fiLamLab" for="fiLam">&lambda; &mdash; offered arrival rate (twentieths)</label><span class="range-value" id="fiLamOut">16</span></div>
           <input id="fiLam" type="range" min="1" max="30" step="1" value="16" />
@@ -1447,12 +1483,22 @@ for comparison, the unbounded queue at the same ρ:
           <div class="kpi"><span>W = L / &lambda; &mdash; wrong</span><strong id="fiWwrong">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="fiHint" style="margin:0;">The rate that crosses into a lossy system is the <em>admitted</em> one. “Little’s Law from a Trace” proved L = &lambda;W on a trace of arrivals that actually entered; feed it the offered rate instead and you get a W that is too small by exactly the factor (1 &minus; &pi;<sub>K</sub>). Both are printed below so the size of that mistake is visible rather than described.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The boundary form of the rule &mdash; that the rate in <span class="math" data-say="L equals lambda W">L = λW</span> is whatever crosses <em>into</em> the boundary you drew &mdash; is Operations Research, <span class="math" data-say="markov-chains-decisions-and-queues over littles-l A w">markov-chains-decisions-and-queues/littles-law</span>, which cites this path's proof. A dropped arrival never crossed the boundary, so it belongs in neither <span class="math" data-say="lambda">λ</span> nor <span class="math" data-say="W">W</span>.</p><h3>Sizing the buffer</h3><p>Loss falls quickly with <span class="math" data-say="K">K</span>, and the latency cap rises with it just as quickly, so the two constraints pull in opposite directions and the buffer size is where they meet.</p><div class="mathblock" data-say="lambda equals 4 over 5, mu equals 1, so S equals 1 seconds. K equals 4, pi sub K is approximately 12.2 percent, latency cap is approximately, 4 seconds. K equals 14, pi sub K is at most 1 percent, latency cap is approximately 14 seconds. K equals 24, pi sub K is at most 0.1 percent, latency cap is approximately 24 seconds. for comparison, the unbounded queue at the same rho. no loss at all, mean W equals S over the quantity 1 minus rho, equals 5 seconds, unbounded tail" tabindex="0" role="region" aria-label="Mathematical notation">λ = 4/5, μ = 1, so S = 1 s
+
+K = 4      π_K ≈ 12.2%        latency cap ≈  4 s
+K = 14     π_K ≤ 1%           latency cap ≈ 14 s
+K = 24     π_K ≤ 0.1%         latency cap ≈ 24 s
+
+for comparison, the unbounded queue at the same ρ:
+           no loss at all     mean W = S/(1 − ρ) = 5 s, unbounded tail</div><p>That table is bufferbloat in four lines. Pushing the loss from 12% to 0.1% costs a latency cap of twenty-four service times, and a queue that deep delivers work whose answer stopped being wanted twenty seconds ago. The interesting question is never &ldquo;how do we stop dropping&rdquo; but &ldquo;which of dropping and delaying is the cheaper failure for this request&rdquo;.</p><p>For an interactive request with a client timeout, delay beyond the timeout is loss with extra steps: the work is done, the resources are spent, and nobody is listening. A short buffer refuses the request early enough for the client to do something about it. For a batch pipeline with no reader waiting, the trade runs the other way and a deep buffer is exactly right.</p><p>Note also what a finite buffer does to the numbers of the previous lessons. <span class="math" data-say="L">L</span> and <span class="math" data-say="W">W</span> both fall, because the worst states have been removed from the distribution; throughput falls too, by the blocked fraction; and the response-time curve no longer has an asymptote at <span class="math" data-say="rho equals 1">ρ = 1</span>, because there is nothing left for it to blow up into.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sizing a bounded queue</h2></div><p>Two constraints, pulling opposite ways, and one rate that has to be the right one.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Compute <span class="math" data-say="rho">ρ</span>, and do not require it to be below one</h3><p>A finite buffer settles at any load. Above <span class="math" data-say="rho equals 1">ρ = 1</span> the answer is simply that most arrivals are refused, which is a legitimate operating point and not a failure of the model.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Get <span class="math" data-say="pi sub K">π_K</span> and the admitted rate</h3><p><span class="math" data-say="pi sub K equals 1 minus rho rho to the power K over the quantity 1 minus rho to the power the quantity K plus 1">π_K = (1 − ρ)ρ^K/(1 − ρ^(K+1))</span>, then <span class="math" data-say="lambda sub eff equals lambda times the quantity 1 minus pi sub K">λ_eff = λ(1 − π_K)</span>. Write the admitted rate down next to the offered one so that the two never get confused later.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute <span class="math" data-say="L">L</span>, then <span class="math" data-say="W">W</span> from the admitted rate</h3><p><span class="math" data-say="W equals L over lambda sub eff">W = L/λ_eff</span>. If you have computed <span class="math" data-say="L over lambda">L/λ</span>, you have computed the wait for a population that includes requests which never entered the system.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the latency cap off <span class="math" data-say="K">K</span></h3><p>About <span class="math" data-say="K times S">K·S</span>. This is the number the buffer was bought for, and it is the number to compare against a client timeout.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Choose <span class="math" data-say="K">K</span> from a loss target, then sanity-check the cap</h3><p>Walk <span class="math" data-say="K">K</span> up until <span class="math" data-say="pi sub K">π_K</span> meets the target, then look at <span class="math" data-say="K times S">K·S</span> and ask whether anybody still wants an answer that late. If not, the target was the wrong constraint.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sizing a bounded queue</h2>
+      <p class="lead-in">Two constraints, pulling opposite ways, and one rate that has to be the right one.</p>
+      <ol class="key-ideas method"><li><strong>Compute <span class="math" data-say="rho">ρ</span>, and do not require it to be below one.</strong> A finite buffer settles at any load. Above <span class="math" data-say="rho equals 1">ρ = 1</span> the answer is simply that most arrivals are refused, which is a legitimate operating point and not a failure of the model.</li><li><strong>Get <span class="math" data-say="pi sub K">π_K</span> and the admitted rate.</strong> <span class="math" data-say="pi sub K equals 1 minus rho rho to the power K over the quantity 1 minus rho to the power the quantity K plus 1">π_K = (1 − ρ)ρ^K/(1 − ρ^(K+1))</span>, then <span class="math" data-say="lambda sub eff equals lambda times the quantity 1 minus pi sub K">λ_eff = λ(1 − π_K)</span>. Write the admitted rate down next to the offered one so that the two never get confused later.</li><li><strong>Compute <span class="math" data-say="L">L</span>, then <span class="math" data-say="W">W</span> from the admitted rate.</strong> <span class="math" data-say="W equals L over lambda sub eff">W = L/λ_eff</span>. If you have computed <span class="math" data-say="L over lambda">L/λ</span>, you have computed the wait for a population that includes requests which never entered the system.</li><li><strong>Read the latency cap off <span class="math" data-say="K">K</span>.</strong> About <span class="math" data-say="K times S">K·S</span>. This is the number the buffer was bought for, and it is the number to compare against a client timeout.</li><li><strong>Choose <span class="math" data-say="K">K</span> from a loss target, then sanity-check the cap.</strong> Walk <span class="math" data-say="K">K</span> up until <span class="math" data-say="pi sub K">π_K</span> meets the target, then look at <span class="math" data-say="K times S">K·S</span> and ask whether anybody still wants an answer that late. If not, the target was the wrong constraint.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1478,17 +1524,16 @@ latency cap ≈ K·S = 4 s
 unbounded at the same ρ:  W = S/(1 − ρ) = 5 s, and no cap at all</div><p>The buffer bought a hard ceiling of about four seconds in place of a mean of five with an unbounded tail, and it paid for it by refusing one arrival in eight. Whether that is a good trade is a question about the client, not about the queue.</p><p>The two <span class="math" data-say="W">W</span> lines differ by exactly <span class="math" data-say="1 over the quantity 1 minus pi sub K, equals 2101 over 1845">1/(1 − π_K) = 2101/1845</span>. That factor is the whole misconception: it is small enough to look like noise and always in the direction that makes the system look better than it is.</p><p>For a faded rehearsal, keep <span class="math" data-say="lambda equals 4 over 5">λ = 4/5</span> and <span class="math" data-say="mu equals 1">μ = 1</span> and set <span class="math" data-say="K equals 2">K = 2</span>. The supplied first move is that <span class="math" data-say="pi sub K">π_K</span> will be much larger than 12%, so the admitted rate falls further from the offered one. Compute both <span class="math" data-say="W">W</span> values and the size of the factor between them.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using Little&#x27;s Law with the offered rate</strong><span>The rate that crosses into a lossy system is <span class="math" data-say="lambda times the quantity 1 minus pi sub K">λ(1 − π_K)</span>, not <span class="math" data-say="lambda">λ</span>. &ldquo;Little&rsquo;s Law from a Trace&rdquo; proved the identity on a trace of arrivals that actually entered, and a dropped arrival is not one of them. On the worked example the two answers are <span class="math" data-say="2.22">2.22</span> and <span class="math" data-say="1.95">1.95</span> seconds, and the wrong one is the smaller &mdash; which is why it survives review.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing a bigger buffer is always better</strong><span>Every unit of buffer is a unit of potential waiting, and the cap it removes is the only guarantee the buffer was providing. A buffer sized for 0.1% loss holds twenty-four service times of work, and if the client gave up after five of them that buffer is manufacturing expensive, unwanted answers.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the queue needs <span class="math" data-say="rho is less than 1">ρ &lt; 1</span> to settle</strong><span>That condition belongs to the unbounded model. A truncated chain has finitely many states and settles at every load; at <span class="math" data-say="rho equals 1">ρ = 1</span> with <span class="math" data-say="K equals 4">K = 4</span> the states are uniform and exactly <span class="math" data-say="1 over 5">1/5</span> of arrivals are blocked. Overload in a bounded system shows up as loss, not as growth.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the first thing you ask about a lossy system is which arrival rate the numbers used.</strong><p>You should be able to compute <span class="math" data-say="pi sub K">π_K</span>, the admitted rate, <span class="math" data-say="L">L</span> and both <span class="math" data-say="W">W</span> values, choose a <span class="math" data-say="K">K</span> from a loss target, state the latency cap that <span class="math" data-say="K">K</span> implies, and say why the truncated chain settles at every <span class="math" data-say="rho">ρ</span>.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A bounded buffer refuses work only once the queue is full. “Token Buckets and Rate Limiting” refuses it earlier and on purpose, by an explicit rule about how much may be admitted in any window &mdash; and the rule is not the one most people think they are enforcing.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using Little&#x27;s Law with the offered rate</strong><span>The rate that crosses into a lossy system is <span class="math" data-say="lambda times the quantity 1 minus pi sub K">λ(1 − π_K)</span>, not <span class="math" data-say="lambda">λ</span>. &ldquo;Little&rsquo;s Law from a Trace&rdquo; proved the identity on a trace of arrivals that actually entered, and a dropped arrival is not one of them. On the worked example the two answers are <span class="math" data-say="2.22">2.22</span> and <span class="math" data-say="1.95">1.95</span> seconds, and the wrong one is the smaller &mdash; which is why it survives review.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing a bigger buffer is always better</strong><span>Every unit of buffer is a unit of potential waiting, and the cap it removes is the only guarantee the buffer was providing. A buffer sized for 0.1% loss holds twenty-four service times of work, and if the client gave up after five of them that buffer is manufacturing expensive, unwanted answers.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the queue needs <span class="math" data-say="rho is less than 1">ρ &lt; 1</span> to settle</strong><span>That condition belongs to the unbounded model. A truncated chain has finitely many states and settles at every load; at <span class="math" data-say="rho equals 1">ρ = 1</span> with <span class="math" data-say="K equals 4">K = 4</span> the states are uniform and exactly <span class="math" data-say="1 over 5">1/5</span> of arrivals are blocked. Overload in a bounded system shows up as loss, not as growth.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the first thing you ask about a lossy system is which arrival rate the numbers used.</strong><p>You should be able to compute <span class="math" data-say="pi sub K">π_K</span>, the admitted rate, <span class="math" data-say="L">L</span> and both <span class="math" data-say="W">W</span> values, choose a <span class="math" data-say="K">K</span> from a loss target, state the latency cap that <span class="math" data-say="K">K</span> implies, and say why the truncated chain settles at every <span class="math" data-say="rho">ρ</span>.</p></div></div><div class="note"><strong>Note:</strong> A bounded buffer refuses work only once the queue is full. “Token Buckets and Rate Limiting” refuses it earlier and on purpose, by an explicit rule about how much may be admitted in any window &mdash; and the rule is not the one most people think they are enforcing.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A bound converts waiting into dropping</summary><p>The unbounded queue of &ldquo;The M/M/1 Queue&rdquo; makes everyone wait as long as it takes. Cap it at <span class="math" data-say="K">K</span> and arrivals that find it full are refused instead: the system stops trading latency for completeness and starts trading completeness for latency. Which of the two is the better failure depends on the application, and it is a decision rather than a default.</p></details><details class="recall"><summary>The cap on the queue is a cap on the latency</summary><p>At most <span class="math" data-say="K">K</span> jobs can be ahead of you, each taking about <span class="math" data-say="S">S</span>, so the time in the system cannot exceed roughly <span class="math" data-say="K times S">K·S</span> however hard the offered load pushes. That is the actual argument for a small buffer, and the argument against a large one: a buffer big enough never to drop anything is a buffer big enough to hold an unusable amount of waiting.</p></details><details class="recall"><summary><span class="math" data-say="L equals lambda W">L = λW</span> needs the rate that crosses the boundary</summary><p>A lossy system admits <span class="math" data-say="lambda times the quantity 1 minus pi sub K">λ(1 − π_K)</span> and refuses the rest. Little's Law was proved by counting the customers who actually entered, so it is the admitted rate that belongs in it. Using the offered rate produces a <span class="math" data-say="W">W</span> that is too small by exactly the factor <span class="math" data-say="1 minus pi sub K">1 − π_K</span>, and the error is invisible unless both numbers are printed.</p></details></div>
+      <h3>Summary</h3>
       <p>A buffer of <span class="math" data-say="K">K</span> converts waiting into dropping. The blocking probability is <span class="math" data-say="pi sub K equals 1 minus rho rho to the power K over the quantity 1 minus rho to the power the quantity K plus 1">π_K = (1 − ρ)ρ^K/(1 − ρ^(K+1))</span>, the wait can never exceed about <span class="math" data-say="K times S">K·S</span>, and the rate that actually enters the system is <span class="math" data-say="lambda times the quantity 1 minus pi sub K">λ(1 − π_K)</span> &mdash; which is the rate Little's Law must be given, and the one most readers forget to use.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A bound converts waiting into dropping.</strong> The unbounded queue of &ldquo;The M/M/1 Queue&rdquo; makes everyone wait as long as it takes. Cap it at <span class="math" data-say="K">K</span> and arrivals that find it full are refused instead: the system stops trading latency for completeness and starts trading completeness for latency. Which of the two is the better failure depends on the application, and it is a decision rather than a default.</li><li><strong>The cap on the queue is a cap on the latency.</strong> At most <span class="math" data-say="K">K</span> jobs can be ahead of you, each taking about <span class="math" data-say="S">S</span>, so the time in the system cannot exceed roughly <span class="math" data-say="K times S">K·S</span> however hard the offered load pushes. That is the actual argument for a small buffer, and the argument against a large one: a buffer big enough never to drop anything is a buffer big enough to hold an unusable amount of waiting.</li><li><strong><span class="math" data-say="L equals lambda W">L = λW</span> needs the rate that crosses the boundary.</strong> A lossy system admits <span class="math" data-say="lambda times the quantity 1 minus pi sub K">λ(1 − π_K)</span> and refuses the rest. Little's Law was proved by counting the customers who actually entered, so it is the admitted rate that belongs in it. Using the offered rate produces a <span class="math" data-say="W">W</span> that is too small by exactly the factor <span class="math" data-say="1 minus pi sub K">1 − π_K</span>, and the error is invisible unless both numbers are printed.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="pi sub K equals 1 minus rho rho to the power K over the quantity 1 minus rho to the power the quantity K plus 1, the fraction of TIME the system is full. loss equals pi sub K, by PASTA, because arrivals here are Poisson. admitted rate, lambda sub eff equals lambda times the quantity 1 minus pi sub K, the rate that crosses the boundary. W equals L over lambda sub eff, Little&#x27;s Law takes the ADMITTED rate. lambda equals 4 over 5, mu equals 1, K equals 4, pi sub K equals 256 over 2101 is approximately 12.2 percent. W equals 821 over 369 is approximately 2.22 seconds, not 4105 over 2101 is approximately 1.95 seconds" tabindex="0" role="region" aria-label="Mathematical notation">π_K = (1 − ρ)ρ^K/(1 − ρ^(K+1))     the fraction of TIME the system is full
 loss = π_K                          by PASTA, because arrivals here are Poisson
 admitted rate  λ_eff = λ(1 − π_K)   the rate that crosses the boundary
@@ -2826,11 +2871,42 @@ W = 821/369 ≈ 2.22 s        not 4105/2101 ≈ 1.95 s</div><figcaption>A trunca
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2898,7 +2974,7 @@ W = 821/369 ≈ 2.22 s        not 4105/2101 ≈ 1.95 s</div><figcaption>A trunca
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

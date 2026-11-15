@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Integer Programming</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Modelling with binaries</p>
       <h1>Either–Or Constraints</h1>
       <p class="lesson-lede">Write a disjunction as two relaxed rows switched by one binary, and verify both branches by re-solving.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Writing both rows writes the conjunction</li><li>A big-M term, switched by one binary, is what or costs</li><li>A fractional binary describes nothing</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Or, written with one binary and two constants</h2>
-      <article class="prose reading"><p>Two jobs share one machine. Job one takes four hours, job two takes three, and neither can run while the other is on the machine. Let <span class="math" data-say="x sub 1">x₁</span> and <span class="math" data-say="x sub 2">x₂</span> be the start times. Either job one finishes before job two starts, which is <span class="math" data-say="x sub 1 plus 4 is at most x sub 2">x₁ + 4 ≤ x₂</span>, or job two finishes before job one starts, which is <span class="math" data-say="x sub 2 plus 3 is at most x sub 1">x₂ + 3 ≤ x₁</span>. Exactly one of those must hold.</p><div class="defbox"><span class="label">Definition &middot; Either-or pair</span><p>Given two rows <span class="math" data-say="A of x is at most A">A(x) ≤ a</span> and <span class="math" data-say="B of x is at most b">B(x) ≤ b</span> of which at least one must hold, the <strong>disjunctive formulation</strong> introduces one binary <span class="math" data-say="y">y</span> and writes <span class="math" data-say="A of x is at most A plus M sub A of the quantity 1 minus y">A(x) ≤ a + M_A(1 − y)</span> together with <span class="math" data-say="B of x is at most b plus M sub B y">B(x) ≤ b + M_B y</span>, where each <span class="math" data-say="M">M</span> is large enough to make its own row vacuous over the rest of the feasible region.</p></div><p>Written as <span class="math" data-say="less-than-or-equal">≤</span> rows, the pair above is <span class="math" data-say="x sub 1 minus x sub 2 is at most negative 4">x₁ − x₂ ≤ −4</span> and <span class="math" data-say="negative x sub 1 plus x sub 2 is at most negative 3">−x₁ + x₂ ≤ −3</span>. With deadlines putting both start times in <span class="math" data-say="0, 10">[0, 10]</span>, the most the first left-hand side can exceed its right-hand side is <span class="math" data-say="10 minus 0 minus the quantity negative 4, equals 14">10 − 0 − (−4) = 14</span>, so <span class="math" data-say="M sub A equals 14">M_A = 14</span>; by the mirror argument <span class="math" data-say="M sub B equals 13">M_B = 13</span>. Each constant is the slack its own row needs to become harmless, and not one unit more.</p><div class="example"><span class="label">Example &middot; Both branches, solved</span><p>Minimise <span class="math" data-say="x sub 1 plus x sub 2">x₁ + x₂</span>. Fixing <span class="math" data-say="y equals 1">y = 1</span> enforces “job one first” and the model starts the jobs at <span class="math" data-say="0, 4">(0, 4)</span>, costing <span class="math" data-say="4">4</span>. Fixing <span class="math" data-say="y equals 0">y = 0</span> enforces “job two first” and starts them at <span class="math" data-say="3, 0">(3, 0)</span>, costing <span class="math" data-say="3">3</span>. Both are genuine schedules, the second is cheaper, and the integer problem wants the better of exactly these two &mdash; which is what the binary means.</p></div><h3>What the conjunction does, and what the relaxation does</h3><p>Write both original rows together and add them: the left-hand sides cancel to <span class="math" data-say="0">0</span> and the right-hand sides give <span class="math" data-say="negative 7">−7</span>, so the model asserts <span class="math" data-say="0 is at most negative 7">0 ≤ −7</span> and is infeasible. That is the diagnosis to recognise, because the symptom is a solver reporting infeasibility on data that is perfectly consistent, and the usual response is to go looking for a typo in the processing times.</p><p>Now leave <span class="math" data-say="y">y</span> continuous. The relaxation sets <span class="math" data-say="y equals 3 over 13">y = 3/13</span>, starts both jobs at time zero, and reports <span class="math" data-say="0">0</span>. Every row is satisfied: <span class="math" data-say="y">y</span> is large enough to relax the second row by <span class="math" data-say="3">3</span> and small enough to relax the first by <span class="math" data-say="4">4</span>, so both are half-off at once. The value <span class="math" data-say="0">0</span> is a perfectly good lower bound on the integer answer of <span class="math" data-say="3">3</span>. It is not a schedule, and the machine cannot run two jobs at once because a variable took a value between <span class="math" data-say="0">0</span> and <span class="math" data-say="1">1</span>.</p><p>The two constants need not be equal and each must be valid for its own row: here <span class="math" data-say="14">14</span> and <span class="math" data-say="13">13</span>. One <span class="math" data-say="M">M</span> used for both, unchecked, is how a disjunction quietly becomes an implication &mdash; if the shared value is big enough for one row and too small for the other, then one branch of the “or” is partially enforced even when the binary says it should be off, and the model answers a question with one alternative half-deleted.</p><p>The same pair, repeated over every pair of jobs on every machine, is what makes a job shop an integer programme rather than a linear one. That is why “Scheduling” can prove single-machine rules by exchange arguments and still needs this course the moment two jobs contend for one resource: the sequencing decision is a binary, and there is no linear model of it.</p><p>The device generalises past two alternatives. Three rows of which exactly one must hold need three binaries summing to <span class="math" data-say="1">1</span>, each relaxing its own row by <span class="math" data-say="M of the quantity 1 minus y sub k">M(1 − y_k)</span>; and a two-level capacity &mdash; either run at the small size or at the large one &mdash; is the same pattern with the two rows being the two capacity limits. What does not generalise is guessing the constants: each one is sized against its own row, every time.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Either-or constraints</h2></div><p>One binary relaxes one row and enforces the other, and a fractional y describes nothing</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Or, written with one binary and two constants</h2><div class="prose reading"><p>Two jobs share one machine. Job one takes four hours, job two takes three, and neither can run while the other is on the machine. Let <span class="math" data-say="x sub 1">x₁</span> and <span class="math" data-say="x sub 2">x₂</span> be the start times. Either job one finishes before job two starts, which is <span class="math" data-say="x sub 1 plus 4 is at most x sub 2">x₁ + 4 ≤ x₂</span>, or job two finishes before job one starts, which is <span class="math" data-say="x sub 2 plus 3 is at most x sub 1">x₂ + 3 ≤ x₁</span>. Exactly one of those must hold.</p><div class="defbox"><span class="label">Definition &middot; Either-or pair</span><p>Given two rows <span class="math" data-say="A of x is at most A">A(x) ≤ a</span> and <span class="math" data-say="B of x is at most b">B(x) ≤ b</span> of which at least one must hold, the <strong>disjunctive formulation</strong> introduces one binary <span class="math" data-say="y">y</span> and writes <span class="math" data-say="A of x is at most A plus M sub A of the quantity 1 minus y">A(x) ≤ a + M_A(1 − y)</span> together with <span class="math" data-say="B of x is at most b plus M sub B y">B(x) ≤ b + M_B y</span>, where each <span class="math" data-say="M">M</span> is large enough to make its own row vacuous over the rest of the feasible region.</p></div><p>Written as <span class="math" data-say="less-than-or-equal">≤</span> rows, the pair above is <span class="math" data-say="x sub 1 minus x sub 2 is at most negative 4">x₁ − x₂ ≤ −4</span> and <span class="math" data-say="negative x sub 1 plus x sub 2 is at most negative 3">−x₁ + x₂ ≤ −3</span>. With deadlines putting both start times in <span class="math" data-say="0, 10">[0, 10]</span>, the most the first left-hand side can exceed its right-hand side is <span class="math" data-say="10 minus 0 minus the quantity negative 4, equals 14">10 − 0 − (−4) = 14</span>, so <span class="math" data-say="M sub A equals 14">M_A = 14</span>; by the mirror argument <span class="math" data-say="M sub B equals 13">M_B = 13</span>. Each constant is the slack its own row needs to become harmless, and not one unit more.</p><div class="example"><span class="label">Example &middot; Both branches, solved</span><p>Minimise <span class="math" data-say="x sub 1 plus x sub 2">x₁ + x₂</span>. Fixing <span class="math" data-say="y equals 1">y = 1</span> enforces “job one first” and the model starts the jobs at <span class="math" data-say="0, 4">(0, 4)</span>, costing <span class="math" data-say="4">4</span>. Fixing <span class="math" data-say="y equals 0">y = 0</span> enforces “job two first” and starts them at <span class="math" data-say="3, 0">(3, 0)</span>, costing <span class="math" data-say="3">3</span>. Both are genuine schedules, the second is cheaper, and the integer problem wants the better of exactly these two &mdash; which is what the binary means.</p></div><h3>What the conjunction does, and what the relaxation does</h3><p>Write both original rows together and add them: the left-hand sides cancel to <span class="math" data-say="0">0</span> and the right-hand sides give <span class="math" data-say="negative 7">−7</span>, so the model asserts <span class="math" data-say="0 is at most negative 7">0 ≤ −7</span> and is infeasible. That is the diagnosis to recognise, because the symptom is a solver reporting infeasibility on data that is perfectly consistent, and the usual response is to go looking for a typo in the processing times.</p><p>Now leave <span class="math" data-say="y">y</span> continuous. The relaxation sets <span class="math" data-say="y equals 3 over 13">y = 3/13</span>, starts both jobs at time zero, and reports <span class="math" data-say="0">0</span>. Every row is satisfied: <span class="math" data-say="y">y</span> is large enough to relax the second row by <span class="math" data-say="3">3</span> and small enough to relax the first by <span class="math" data-say="4">4</span>, so both are half-off at once. The value <span class="math" data-say="0">0</span> is a perfectly good lower bound on the integer answer of <span class="math" data-say="3">3</span>. It is not a schedule, and the machine cannot run two jobs at once because a variable took a value between <span class="math" data-say="0">0</span> and <span class="math" data-say="1">1</span>.</p><p>The two constants need not be equal and each must be valid for its own row: here <span class="math" data-say="14">14</span> and <span class="math" data-say="13">13</span>. One <span class="math" data-say="M">M</span> used for both, unchecked, is how a disjunction quietly becomes an implication &mdash; if the shared value is big enough for one row and too small for the other, then one branch of the “or” is partially enforced even when the binary says it should be off, and the model answers a question with one alternative half-deleted.</p><p>The same pair, repeated over every pair of jobs on every machine, is what makes a job shop an integer programme rather than a linear one. That is why “Scheduling” can prove single-machine rules by exchange arguments and still needs this course the moment two jobs contend for one resource: the sequencing decision is a binary, and there is no linear model of it.</p><p>The device generalises past two alternatives. Three rows of which exactly one must hold need three binaries summing to <span class="math" data-say="1">1</span>, each relaxing its own row by <span class="math" data-say="M of the quantity 1 minus y sub k">M(1 − y_k)</span>; and a two-level capacity &mdash; either run at the small size or at the large one &mdash; is the same pattern with the two rows being the two capacity limits. What does not generalise is guessing the constants: each one is sized against its own row, every time.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Either-or constraints</h2></div><p>One binary relaxes one row and enforces the other, and a fractional y describes nothing</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Either, or</strong><span>writing both constraints writes the conjunction, and on a sequencing pair that is infeasible</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the branch y = 1 allows</span><span class="tone-purple"><i class="legend-swatch"></i>the branch y = 0 allows</span><span class="tone-amber"><i class="legend-swatch"></i>where the relaxation stops</span><span class="tone-red"><i class="legend-swatch"></i>writing both</span></div>
@@ -1404,10 +1447,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="djGrid" viewBox="0 0 520 300" role="img" aria-label="The region each branch of the disjunction leaves, drawn over the other."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="djTable"></table></div>
       <div class="status-banner" id="djStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Fix the binary either way, then let it go</h3>
-          <p>Each branch is solved exactly and drawn as its own region, the two regions do not overlap, and the relaxation is solved with the binary left continuous so its value can be read for what it is. The last setting writes both rows at once, which is the mistake.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Fix the binary either way, then let it go</h3>
+            <p>Each branch is solved exactly and drawn as its own region, the two regions do not overlap, and the relaxation is solved with the binary left continuous so its value can be read for what it is. The last setting writes both rows at once, which is the mistake.</p>
         <div class="field">
           <label for="djPreset">Instance</label>
           <select id="djPreset"><option value="machine" selected>two jobs of four and three hours competing for one machine</option><option value="tight">equal jobs and a deadline that only just fits one order</option><option value="uneven">a long job and a short one, where the order matters a great deal</option></select>
@@ -1433,12 +1476,14 @@
           <div class="kpi"><span>What the binary describes</span><strong id="djMeaning">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="djHint" style="margin:0;">The two values of M need not be equal and each must be valid for its own row. One M used for both, unchecked, is how a disjunction quietly becomes an implication &mdash; and the two sliders here are deliberately separate for that reason.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Writing a disjunction you can check</h2></div><p>The check at the end is two re-solves rather than eight rows, and it is the same discipline.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write each alternative on its own, as a <span data-say="less-than-or-equal">≤</span> row</h3><p><span class="math" data-say="x sub 1 minus x sub 2 is at most negative 4">x₁ − x₂ ≤ −4</span> and <span class="math" data-say="negative x sub 1 plus x sub 2 is at most negative 3">−x₁ + x₂ ≤ −3</span>. Getting both into the same relation first makes the relaxation term easy to place and makes the sign errors visible while they are still cheap.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Decide which alternative y = 1 enforces</h3><p>Then write <span class="math" data-say="M sub A of the quantity 1 minus y">M_A(1 − y)</span> on that row and <span class="math" data-say="M sub B y">M_B y</span> on the other. Writing the convention down is not ceremony: the two rows look alike, and a swapped pair gives a model that solves and means the opposite.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Size each M against its own row</h3><p>The most that row's left-hand side can exceed its right-hand side anywhere the other constraints allow. Here <span class="math" data-say="14">14</span> and <span class="math" data-say="13">13</span>, from the deadlines. Two rows, two constants, two reasons.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Fix y to each value and re-solve</h3><p><span class="math" data-say="y equals 1">y = 1</span> should give a schedule with job one first; <span class="math" data-say="y equals 0">y = 0</span> one with job two first. If either branch is infeasible or describes the wrong order, the fault is in the signs or in an <span class="math" data-say="M">M</span> that is too small, and you have just found out which.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Leave y continuous and read what it says</h3><p>A fractional <span class="math" data-say="y">y</span> is the relaxation's bound and it is not a plan. Looking at it once, and naming the impossible schedule it describes, is what stops it being reported later as an answer.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Writing a disjunction you can check</h2>
+      <p class="lead-in">The check at the end is two re-solves rather than eight rows, and it is the same discipline.</p>
+      <ol class="key-ideas method"><li><strong>Write each alternative on its own, as a <span data-say="less-than-or-equal">≤</span> row.</strong> <span class="math" data-say="x sub 1 minus x sub 2 is at most negative 4">x₁ − x₂ ≤ −4</span> and <span class="math" data-say="negative x sub 1 plus x sub 2 is at most negative 3">−x₁ + x₂ ≤ −3</span>. Getting both into the same relation first makes the relaxation term easy to place and makes the sign errors visible while they are still cheap.</li><li><strong>Decide which alternative y = 1 enforces.</strong> Then write <span class="math" data-say="M sub A of the quantity 1 minus y">M_A(1 − y)</span> on that row and <span class="math" data-say="M sub B y">M_B y</span> on the other. Writing the convention down is not ceremony: the two rows look alike, and a swapped pair gives a model that solves and means the opposite.</li><li><strong>Size each M against its own row.</strong> The most that row's left-hand side can exceed its right-hand side anywhere the other constraints allow. Here <span class="math" data-say="14">14</span> and <span class="math" data-say="13">13</span>, from the deadlines. Two rows, two constants, two reasons.</li><li><strong>Fix y to each value and re-solve.</strong> <span class="math" data-say="y equals 1">y = 1</span> should give a schedule with job one first; <span class="math" data-say="y equals 0">y = 0</span> one with job two first. If either branch is infeasible or describes the wrong order, the fault is in the signs or in an <span class="math" data-say="M">M</span> that is too small, and you have just found out which.</li><li><strong>Leave y continuous and read what it says.</strong> A fractional <span class="math" data-say="y">y</span> is the relaxation's bound and it is not a plan. Looking at it once, and naming the impossible schedule it describes, is what stops it being reported later as an answer.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1474,17 +1519,16 @@ RIGHT: one binary, two constants
           so (0, 0) satisfies both rows      cost 0   — a bound</div><p>The <span class="math" data-say="0 is at most negative 7">0 ≤ −7</span> line is the one to memorise, because it is what the model says rather than what the solver says. A solver reports “infeasible” and a reader goes looking for bad data; adding the two rows takes ten seconds and names the real cause, which is that “or” was written as “and”.</p><p>The relaxation's <span class="math" data-say="y equals 3 over 13">y = 3/13</span> is worth reading arithmetically once. It is the smallest <span class="math" data-say="y">y</span> that relaxes row B by the three hours it needs; and it is small enough that row A is still relaxed by <span class="math" data-say="140 over 13">140/13</span>, comfortably more than the four hours it needs. Both alternatives are switched most of the way off at the same time, which is precisely the plan that does not exist.</p><p>For a faded rehearsal, use the lab's second instance &mdash; a seven-hour job against a two-hour one, with the short job weighted twice as heavily in the objective. The supplied first move is that the tightest constants are now <span class="math" data-say="19">19</span> and <span class="math" data-say="14">14</span>, from the same deadline argument. Work out both branches before opening the quiz and say which order wins, and by how much.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing both constraints</strong><span>It is the conjunction, it forces both alternatives, and on a sequencing pair it makes the model infeasible. The reason this one is expensive is the diagnosis: infeasibility on consistent data sends readers looking for a data error, and the fault is in the formulation.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using one M for both rows without checking it</strong><span>The two rows need not need the same slack &mdash; here <span class="math" data-say="14">14</span> and <span class="math" data-say="13">13</span>. A shared value that is valid for one row and short for the other leaves part of one alternative enforced when the binary says it is off, so the disjunction has quietly become an implication and the model is answering a narrower question.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a fractional y as mostly one order</strong><span><span class="math" data-say="y equals 3 over 13">y = 3/13</span> is not “job one goes first about a quarter of the time”, and there is no probability in a linear programme. It is a point at which both rows are partly relaxed, describing a schedule that cannot be run. Its value is a bound; its coordinates are not a plan.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when writing both rows for an either-or reads as a category error rather than a near miss.</strong><p>You should be able to write a disjunctive pair with one binary and two separately sized constants, say what each value of the binary enforces and what it makes vacuous, show in one line why writing both rows is infeasible, and read a fractional binary as a bound with an impossible plan behind it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The two constants need not be equal and each must be valid for its own side; one <span class="math" data-say="M">M</span> used for both, unchecked, is how a disjunction quietly becomes an implication. Sequencing two jobs on one machine is exactly this pair of rows, which is why the job shop of &ldquo;Scheduling&rdquo; is an integer programme and its single-machine rules are not &mdash; and this lesson is where that boundary is drawn.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing both constraints</strong><span>It is the conjunction, it forces both alternatives, and on a sequencing pair it makes the model infeasible. The reason this one is expensive is the diagnosis: infeasibility on consistent data sends readers looking for a data error, and the fault is in the formulation.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using one M for both rows without checking it</strong><span>The two rows need not need the same slack &mdash; here <span class="math" data-say="14">14</span> and <span class="math" data-say="13">13</span>. A shared value that is valid for one row and short for the other leaves part of one alternative enforced when the binary says it is off, so the disjunction has quietly become an implication and the model is answering a narrower question.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a fractional y as mostly one order</strong><span><span class="math" data-say="y equals 3 over 13">y = 3/13</span> is not “job one goes first about a quarter of the time”, and there is no probability in a linear programme. It is a point at which both rows are partly relaxed, describing a schedule that cannot be run. Its value is a bound; its coordinates are not a plan.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when writing both rows for an either-or reads as a category error rather than a near miss.</strong><p>You should be able to write a disjunctive pair with one binary and two separately sized constants, say what each value of the binary enforces and what it makes vacuous, show in one line why writing both rows is infeasible, and read a fractional binary as a bound with an impossible plan behind it.</p></div></div><div class="note"><strong>Note:</strong> The two constants need not be equal and each must be valid for its own side; one <span class="math" data-say="M">M</span> used for both, unchecked, is how a disjunction quietly becomes an implication. Sequencing two jobs on one machine is exactly this pair of rows, which is why the job shop of &ldquo;Scheduling&rdquo; is an integer programme and its single-machine rules are not &mdash; and this lesson is where that boundary is drawn.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Writing both rows writes the conjunction</summary><p>Constraints in a model are simultaneous. Adding a row never creates a choice; it removes plans. So writing A and writing B asks for both, and on two jobs competing for one machine that asks job one to finish before job two starts <em>and</em> job two to finish before job one starts. Add the two rows and you get <span class="math" data-say="0 is at most negative 7">0 ≤ −7</span>.</p></details><details class="recall"><summary>A big-M term, switched by one binary, is what or costs</summary><p>Relax A by <span class="math" data-say="M sub A of the quantity 1 minus y">M_A(1 − y)</span> and B by <span class="math" data-say="M sub B y">M_B y</span>. At <span class="math" data-say="y equals 1">y = 1</span> the first term vanishes and A binds, while B has <span class="math" data-say="M sub B">M_B</span> added to its right-hand side and nothing in the region can break it. At <span class="math" data-say="y equals 0">y = 0</span> the roles swap. The binary is not a variable in the problem; it is the choice the problem contains.</p></details><details class="recall"><summary>A fractional binary describes nothing</summary><p>The relaxation may set <span class="math" data-say="y equals 3 over 13">y = 3/13</span>. Both rows are then half-relaxed at once, both jobs start at time zero on one machine, and the cost is <span class="math" data-say="0">0</span> &mdash; below either real branch, which is what a bound looks like. There is no schedule here at all: “job one is three-thirteenths before job two” is not a sentence about machines.</p></details></div>
+      <h3>Summary</h3>
       <p>“Constraint A or constraint B” cannot be written by writing both, because writing both is the conjunction &mdash; and on a sequencing pair the conjunction is infeasible. It is written by relaxing each row with a big-M term that a single binary switches off, so that one value of the binary enforces A and makes B vacuous and the other value does the reverse.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Writing both rows writes the conjunction.</strong> Constraints in a model are simultaneous. Adding a row never creates a choice; it removes plans. So writing A and writing B asks for both, and on two jobs competing for one machine that asks job one to finish before job two starts <em>and</em> job two to finish before job one starts. Add the two rows and you get <span class="math" data-say="0 is at most negative 7">0 ≤ −7</span>.</li><li><strong>A big-M term, switched by one binary, is what or costs.</strong> Relax A by <span class="math" data-say="M sub A of the quantity 1 minus y">M_A(1 − y)</span> and B by <span class="math" data-say="M sub B y">M_B y</span>. At <span class="math" data-say="y equals 1">y = 1</span> the first term vanishes and A binds, while B has <span class="math" data-say="M sub B">M_B</span> added to its right-hand side and nothing in the region can break it. At <span class="math" data-say="y equals 0">y = 0</span> the roles swap. The binary is not a variable in the problem; it is the choice the problem contains.</li><li><strong>A fractional binary describes nothing.</strong> The relaxation may set <span class="math" data-say="y equals 3 over 13">y = 3/13</span>. Both rows are then half-relaxed at once, both jobs start at time zero on one machine, and the cost is <span class="math" data-say="0">0</span> &mdash; below either real branch, which is what a bound looks like. There is no schedule here at all: “job one is three-thirteenths before job two” is not a sentence about machines.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="A or B, A relaxed by M sub A of the quantity 1 minus y, B relaxed by M sub B y. y equals 1, enforces A and makes B vacuous, y equals 0, does the reverse. x sub 1 minus x sub 2 is at most negative 4 plus 14 times the quantity 1 minus y, negative x sub 1 plus x sub 2 is at most negative 3 plus 13 y. y equals 1, start at 0, 4, cost 4, y equals 0, start at 3, 0, cost 3. y free, goes to, y equals 3 over 13, both jobs at 0, cost 0, a bound, not a schedule. both rows at once, goes to, 0 is at most negative 7, infeasible" tabindex="0" role="region" aria-label="Mathematical notation">A or B      A relaxed by M_A(1 − y)      B relaxed by M_B y
 y = 1  enforces A and makes B vacuous;  y = 0  does the reverse
 x₁ − x₂ ≤ −4 + 14(1 − y)        −x₁ + x₂ ≤ −3 + 13y
@@ -3170,11 +3214,42 @@ both rows at once  →  0 ≤ −7,  infeasible</div><figcaption>One binary, two
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3242,7 +3317,7 @@ both rows at once  →  0 ≤ −7,  infeasible</div><figcaption>One binary, two
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

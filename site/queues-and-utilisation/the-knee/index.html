@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,31 +1424,29 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Queues and Utilisation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The M/M/1 model</p>
       <h1>The Knee: Response Time vs Utilisation</h1>
       <p class="lesson-lede">Compute the response time at a given utilisation, and the utilisation at which it reaches k service times.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Response time tracks the headroom, not the load</li><li>The asymptote is the whole content</li><li>Planning reads the curve backwards</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The hyperbola, and the target utilisation it implies</h2>
-      <article class="prose reading"><p>From the previous lesson, <span class="math" data-say="W equals L over lambda">W = L/λ</span> with <span class="math" data-say="L equals rho over the quantity 1 minus rho">L = ρ/(1 − ρ)</span> gives <span class="math" data-say="W equals 1 over the quantity mu minus lambda">W = 1/(μ − λ)</span>, and dividing numerator and denominator by <span class="math" data-say="mu">μ</span> turns that into <span class="math" data-say="W equals S over the quantity 1 minus rho">W = S/(1 − ρ)</span> with <span class="math" data-say="S equals 1 over mu">S = 1/μ</span>. It is the same quantity in the units a designer thinks in: multiples of how long the work itself takes.</p><div class="defbox"><span class="label">Definition &middot; The response-time factor</span><p><span class="math" data-say="W over S equals 1 over the quantity 1 minus rho">W/S = 1/(1 − ρ)</span> is how many service times a request spends in the system. It is <span class="math" data-say="1">1</span> at <span class="math" data-say="rho equals 0">ρ = 0</span> &mdash; the work and nothing else &mdash; and it is unbounded as <span class="math" data-say="rho">ρ</span> approaches <span class="math" data-say="1">1</span>. The <strong>knee</strong> is not a particular point on this curve; it is the fact that the curve has no particular point, and that the interesting region is always the last few percent.</p></div><div class="mathblock" data-say="S equals 10 milliseconds. rho equals 1 over 2, W over S equals 2, W equals, 20 milliseconds. rho equals 9 over 10, W over S equals 10, W equals, 100 milliseconds. rho equals 99 over 100, W over S equals 100, W equals 1000 milliseconds. 50 percent goes to 90 percent, 10 divided by 2, equals 5, five times the wait. 90 percent goes to 99 percent, 100 divided by 10 equals 10, ten times again" tabindex="0" role="region" aria-label="Mathematical notation">S = 10 ms
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The hyperbola, and the target utilisation it implies</h2><div class="prose reading"><p>From the previous lesson, <span class="math" data-say="W equals L over lambda">W = L/λ</span> with <span class="math" data-say="L equals rho over the quantity 1 minus rho">L = ρ/(1 − ρ)</span> gives <span class="math" data-say="W equals 1 over the quantity mu minus lambda">W = 1/(μ − λ)</span>, and dividing numerator and denominator by <span class="math" data-say="mu">μ</span> turns that into <span class="math" data-say="W equals S over the quantity 1 minus rho">W = S/(1 − ρ)</span> with <span class="math" data-say="S equals 1 over mu">S = 1/μ</span>. It is the same quantity in the units a designer thinks in: multiples of how long the work itself takes.</p><div class="defbox"><span class="label">Definition &middot; The response-time factor</span><p><span class="math" data-say="W over S equals 1 over the quantity 1 minus rho">W/S = 1/(1 − ρ)</span> is how many service times a request spends in the system. It is <span class="math" data-say="1">1</span> at <span class="math" data-say="rho equals 0">ρ = 0</span> &mdash; the work and nothing else &mdash; and it is unbounded as <span class="math" data-say="rho">ρ</span> approaches <span class="math" data-say="1">1</span>. The <strong>knee</strong> is not a particular point on this curve; it is the fact that the curve has no particular point, and that the interesting region is always the last few percent.</p></div><div class="mathblock" data-say="S equals 10 milliseconds. rho equals 1 over 2, W over S equals 2, W equals, 20 milliseconds. rho equals 9 over 10, W over S equals 10, W equals, 100 milliseconds. rho equals 99 over 100, W over S equals 100, W equals 1000 milliseconds. 50 percent goes to 90 percent, 10 divided by 2, equals 5, five times the wait. 90 percent goes to 99 percent, 100 divided by 10 equals 10, ten times again" tabindex="0" role="region" aria-label="Mathematical notation">S = 10 ms
 
 ρ = 1/2       W/S = 2          W =   20 ms
 ρ = 9/10      W/S = 10         W =  100 ms
 ρ = 99/100    W/S = 100        W = 1000 ms
 
 50% → 90%     10 ÷ 2  = 5      five times the wait
-90% → 99%     100 ÷ 10 = 10    ten times again</div><p>Notice what those two multipliers have in common: the first covers forty points of utilisation and the second covers nine, and the second is the more expensive. The utilisation axis is the wrong axis to reason on. The headroom axis &mdash; <span class="math" data-say="1 minus rho">1 − ρ</span>, going <span class="math" data-say="1 over 2">1/2</span>, <span class="math" data-say="1 over 10">1/10</span>, <span class="math" data-say="1 over 100">1/100</span> &mdash; is the one the response time is actually a function of.</p><h3>Reading it backwards: the target utilisation</h3><p>Set <span class="math" data-say="W equals k S">W = kS</span> and solve. <span class="math" data-say="1 over the quantity 1 minus rho, equals k">1/(1 − ρ) = k</span> gives <span class="math" data-say="rho equals the quantity k minus 1, over k">ρ = (k − 1)/k</span>, so the headroom you must keep is exactly <span class="math" data-say="1 over k">1/k</span>. Tolerating twice the service time means running at <span class="math" data-say="1 over 2">1/2</span>; four times means <span class="math" data-say="3 over 4">3/4</span>; ten times means <span class="math" data-say="9 over 10">9/10</span>; a hundred times means <span class="math" data-say="99 over 100">99/100</span>, which is the point at which a single machine failure in a pool is an outage rather than an event.</p><div class="example"><span class="label">Example &middot; Where a capacity plan&#x27;s target comes from</span><p>Capacity Estimation divided an offered rate by a target utilisation rather than by <span class="math" data-say="mu">μ</span>, and took the target on trust. This is where it is earned: the target is <span class="math" data-say="the quantity k minus 1, over k">(k − 1)/k</span> for whatever <span class="math" data-say="k">k</span> multiple of the service time the design is willing to pay. A plan that names 80% has chosen <span class="math" data-say="k equals 5">k = 5</span>, whether or not anybody said so.</p></div><p>The curve also explains a familiar and confusing incident shape. A service at <span class="math" data-say="rho equals 1 over 2">ρ = 1/2</span> absorbs a doubling of traffic and moves from <span class="math" data-say="2 S">2S</span> to <span class="math" data-say="4 S">4S</span>, which nobody notices. The same doubling at <span class="math" data-say="rho equals 9 over 10">ρ = 9/10</span> is not survivable at all: <span class="math" data-say="rho">ρ</span> would be <span class="math" data-say="9 over 5">9/5</span>, above one, and there is no response time to quote &mdash; only the growth rate of &ldquo;<span data-say="lambda, mu">λ, μ</span> and <span data-say="rho">ρ</span>&rdquo;. Two systems, the same relative traffic change, and entirely different outcomes.</p><p>Two honest caveats. The constant in <span class="math" data-say="W equals S over the quantity 1 minus rho">W = S/(1 − ρ)</span> is M/M/1's: the <span class="math" data-say="1 over the quantity 1 minus rho">1/(1 − ρ)</span> shape is general and the multiplier in front of it depends on how variable the arrivals and the service times are, which the next lesson prices. And <span class="math" data-say="W">W</span> is a mean; the percentiles that Latency and the Tail measured sit further out still, because the number in the system is geometrically distributed rather than concentrated around its average.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The knee</h2></div><p>Response time against utilisation, and the asymptote you cannot tune away</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+90% → 99%     100 ÷ 10 = 10    ten times again</div><p>Notice what those two multipliers have in common: the first covers forty points of utilisation and the second covers nine, and the second is the more expensive. The utilisation axis is the wrong axis to reason on. The headroom axis &mdash; <span class="math" data-say="1 minus rho">1 − ρ</span>, going <span class="math" data-say="1 over 2">1/2</span>, <span class="math" data-say="1 over 10">1/10</span>, <span class="math" data-say="1 over 100">1/100</span> &mdash; is the one the response time is actually a function of.</p><h3>Reading it backwards: the target utilisation</h3><p>Set <span class="math" data-say="W equals k S">W = kS</span> and solve. <span class="math" data-say="1 over the quantity 1 minus rho, equals k">1/(1 − ρ) = k</span> gives <span class="math" data-say="rho equals the quantity k minus 1, over k">ρ = (k − 1)/k</span>, so the headroom you must keep is exactly <span class="math" data-say="1 over k">1/k</span>. Tolerating twice the service time means running at <span class="math" data-say="1 over 2">1/2</span>; four times means <span class="math" data-say="3 over 4">3/4</span>; ten times means <span class="math" data-say="9 over 10">9/10</span>; a hundred times means <span class="math" data-say="99 over 100">99/100</span>, which is the point at which a single machine failure in a pool is an outage rather than an event.</p><div class="example"><span class="label">Example &middot; Where a capacity plan&#x27;s target comes from</span><p>Capacity Estimation divided an offered rate by a target utilisation rather than by <span class="math" data-say="mu">μ</span>, and took the target on trust. This is where it is earned: the target is <span class="math" data-say="the quantity k minus 1, over k">(k − 1)/k</span> for whatever <span class="math" data-say="k">k</span> multiple of the service time the design is willing to pay. A plan that names 80% has chosen <span class="math" data-say="k equals 5">k = 5</span>, whether or not anybody said so.</p></div><p>The curve also explains a familiar and confusing incident shape. A service at <span class="math" data-say="rho equals 1 over 2">ρ = 1/2</span> absorbs a doubling of traffic and moves from <span class="math" data-say="2 S">2S</span> to <span class="math" data-say="4 S">4S</span>, which nobody notices. The same doubling at <span class="math" data-say="rho equals 9 over 10">ρ = 9/10</span> is not survivable at all: <span class="math" data-say="rho">ρ</span> would be <span class="math" data-say="9 over 5">9/5</span>, above one, and there is no response time to quote &mdash; only the growth rate of &ldquo;<span data-say="lambda, mu">λ, μ</span> and <span data-say="rho">ρ</span>&rdquo;. Two systems, the same relative traffic change, and entirely different outcomes.</p><p>Two honest caveats. The constant in <span class="math" data-say="W equals S over the quantity 1 minus rho">W = S/(1 − ρ)</span> is M/M/1's: the <span class="math" data-say="1 over the quantity 1 minus rho">1/(1 − ρ)</span> shape is general and the multiplier in front of it depends on how variable the arrivals and the service times are, which the next lesson prices. And <span class="math" data-say="W">W</span> is a mean; the percentiles that Latency and the Tail measured sit further out still, because the number in the system is geometrically distributed rather than concentrated around its average.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The knee</h2></div><p>Response time against utilisation, and the asymptote you cannot tune away</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The knee</strong><span>W/S = 1/(1 &minus; &rho;): a hyperbola, and the asymptote is the whole content</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>W/S</span><span class="tone-red"><i class="legend-swatch"></i>the asymptote at &rho; = 1</span><span class="tone-amber"><i class="legend-swatch"></i>where you are</span></div>
@@ -1411,10 +1454,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="knPlot" viewBox="0 0 520 200" role="img" aria-label="Response time against utilisation, drawn as a hyperbola with a vertical asymptote at one."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="knTable"></table></div>
       <div class="status-banner" id="knStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Drag the utilisation along the curve</h3>
-          <p><span class="math" data-say="W over S">W/S</span> is printed as an exact fraction at whatever <span class="math" data-say="rho">ρ</span> you choose, with the asymptote drawn at <span class="math" data-say="rho equals 1">ρ = 1</span>. The second control asks the inverse question: name the multiple of the service time you will tolerate and read off the utilisation and the headroom it leaves.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Drag the utilisation along the curve</h3>
+            <p><span class="math" data-say="W over S">W/S</span> is printed as an exact fraction at whatever <span class="math" data-say="rho">ρ</span> you choose, with the asymptote drawn at <span class="math" data-say="rho equals 1">ρ = 1</span>. The second control asks the inverse question: name the multiple of the service time you will tolerate and read off the utilisation and the headroom it leaves.</p>
         <div>
           <div class="range-row"><label class="small-copy" id="knRhoLab" for="knRho">&rho; &mdash; utilisation (hundredths)</label><span class="range-value" id="knRhoOut">90</span></div>
           <input id="knRho" type="range" min="1" max="99" step="1" value="90" />
@@ -1434,12 +1477,14 @@
           <div class="kpi"><span>Headroom left there</span><strong id="knHead">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="knHint" style="margin:0;">Response time does not grow with load; it grows with the <em>reciprocal of the headroom</em>. Going from 50% to 90% multiplies the wait by five. Going from 90% to 99% multiplies it by ten more. The last tenth of a machine costs more than the first nine, and no amount of tuning moves the asymptote.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Using the curve in a capacity decision</h2></div><p>Start from what you will tolerate, not from what the machine can take.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Measure <span class="math" data-say="S">S</span>, not the response time</h3><p><span class="math" data-say="S">S</span> is the service time with no queueing in it &mdash; the work itself. A measurement taken under load already contains the waiting this curve is about, and using it makes the arithmetic circular.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Name the multiple you will tolerate</h3><p><span class="math" data-say="k">k</span> in <span class="math" data-say="W equals k S">W = kS</span>. This is a product decision expressed as arithmetic: two service times, four, ten. It is the only free parameter on the page.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Convert it to a target utilisation</h3><p><span class="math" data-say="rho equals the quantity k minus 1, over k">ρ = (k − 1)/k</span>, leaving <span class="math" data-say="1 over k">1/k</span> of headroom. Quote the headroom alongside the utilisation, because the headroom is the quantity the response time depends on.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check what a plausible surge does to that point</h3><p>Multiply the offered load by whatever surge the system has to survive and recompute <span class="math" data-say="rho">ρ</span>. If it crosses one, the plan does not have a response time, it has a growth rate.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Using the curve in a capacity decision</h2>
+      <p class="lead-in">Start from what you will tolerate, not from what the machine can take.</p>
+      <ol class="key-ideas method"><li><strong>Measure <span class="math" data-say="S">S</span>, not the response time.</strong> <span class="math" data-say="S">S</span> is the service time with no queueing in it &mdash; the work itself. A measurement taken under load already contains the waiting this curve is about, and using it makes the arithmetic circular.</li><li><strong>Name the multiple you will tolerate.</strong> <span class="math" data-say="k">k</span> in <span class="math" data-say="W equals k S">W = kS</span>. This is a product decision expressed as arithmetic: two service times, four, ten. It is the only free parameter on the page.</li><li><strong>Convert it to a target utilisation.</strong> <span class="math" data-say="rho equals the quantity k minus 1, over k">ρ = (k − 1)/k</span>, leaving <span class="math" data-say="1 over k">1/k</span> of headroom. Quote the headroom alongside the utilisation, because the headroom is the quantity the response time depends on.</li><li><strong>Check what a plausible surge does to that point.</strong> Multiply the offered load by whatever surge the system has to survive and recompute <span class="math" data-say="rho">ρ</span>. If it crosses one, the plan does not have a response time, it has a growth rate.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1466,17 +1511,16 @@ tolerate W = 4S  →   ρ = 3/4,   headroom 1/4
 tolerate W = 2S  →   ρ = 1/2,   headroom 1/2</div><p>The three headroom figures are the whole table restated: <span class="math" data-say="1 over k">1/k</span> of a machine kept idle buys a response time of <span class="math" data-say="k">k</span> service times. Nothing else on this page is doing any work.</p><p>It also shows why &ldquo;we have 10% headroom&rdquo; and &ldquo;we have 1% headroom&rdquo; are not neighbouring states. They differ by a factor of ten in response time, and the second one has no room for the variability of &ldquo;Why Queues Form at <span class="math" data-say="rho is less than 1">ρ &lt; 1</span>&rdquo; at all.</p><p>For a faded rehearsal, take <span class="math" data-say="S equals 4">S = 4</span> ms and a tolerance of <span class="math" data-say="W equals 5 S">W = 5S</span>. The supplied first move is that <span class="math" data-say="k equals 5">k = 5</span> gives <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span>. Compute <span class="math" data-say="W">W</span> at that target, then compute what <span class="math" data-say="W">W</span> becomes if the service time degrades to 5 ms with the load unchanged.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting response time to grow with load</strong><span>It grows with the reciprocal of the headroom, which is a different function entirely. A graph of <span class="math" data-say="W">W</span> against <span class="math" data-say="rho">ρ</span> looks almost flat across most of its range and then leaves the page, and a team extrapolating linearly from two comfortable measurements will underestimate the third by an order of magnitude.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Planning to a maximum utilisation rather than a target</strong><span>&ldquo;The box can do 10 000 a second&rdquo; is a statement about <span class="math" data-say="rho equals 1">ρ = 1</span>, which is the one utilisation at which the system has no response time. The number a plan needs is <span class="math" data-say="the quantity k minus 1, over k">(k − 1)/k</span> for a stated <span class="math" data-say="k">k</span>, and the difference between the two is the entire safety margin.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting <span class="math" data-say="W equals S over the quantity 1 minus rho">W = S/(1 − ρ)</span> as universal</strong><span>The <span class="math" data-say="1 over the quantity 1 minus rho">1/(1 − ρ)</span> shape is general; the constant is M/M/1's. A service with very regular arrivals and durations waits less than this curve says, and one with bursty arrivals waits more. Carry the shape everywhere and carry the constant only where the assumptions hold.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a target utilisation reads as a choice of <span class="math" data-say="k">k</span> in <span class="math" data-say="W equals k S">W = kS</span>.</strong><p>You should be able to compute <span class="math" data-say="W over S">W/S</span> at any rational <span class="math" data-say="rho">ρ</span>, invert it to a target utilisation and a headroom, explain why nine points of load cost more than forty, and say what a plausible surge does to the point you have chosen.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The constant in front of the hyperbola is the next question. “Variability: the Kingman Approximation” splits the wait into three factors &mdash; utilisation, variability and service time &mdash; and the middle one is the only one on this course that can be halved without buying anything.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting response time to grow with load</strong><span>It grows with the reciprocal of the headroom, which is a different function entirely. A graph of <span class="math" data-say="W">W</span> against <span class="math" data-say="rho">ρ</span> looks almost flat across most of its range and then leaves the page, and a team extrapolating linearly from two comfortable measurements will underestimate the third by an order of magnitude.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Planning to a maximum utilisation rather than a target</strong><span>&ldquo;The box can do 10 000 a second&rdquo; is a statement about <span class="math" data-say="rho equals 1">ρ = 1</span>, which is the one utilisation at which the system has no response time. The number a plan needs is <span class="math" data-say="the quantity k minus 1, over k">(k − 1)/k</span> for a stated <span class="math" data-say="k">k</span>, and the difference between the two is the entire safety margin.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting <span class="math" data-say="W equals S over the quantity 1 minus rho">W = S/(1 − ρ)</span> as universal</strong><span>The <span class="math" data-say="1 over the quantity 1 minus rho">1/(1 − ρ)</span> shape is general; the constant is M/M/1's. A service with very regular arrivals and durations waits less than this curve says, and one with bursty arrivals waits more. Carry the shape everywhere and carry the constant only where the assumptions hold.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a target utilisation reads as a choice of <span class="math" data-say="k">k</span> in <span class="math" data-say="W equals k S">W = kS</span>.</strong><p>You should be able to compute <span class="math" data-say="W over S">W/S</span> at any rational <span class="math" data-say="rho">ρ</span>, invert it to a target utilisation and a headroom, explain why nine points of load cost more than forty, and say what a plausible surge does to the point you have chosen.</p></div></div><div class="note"><strong>Note:</strong> The constant in front of the hyperbola is the next question. “Variability: the Kingman Approximation” splits the wait into three factors &mdash; utilisation, variability and service time &mdash; and the middle one is the only one on this course that can be halved without buying anything.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Response time tracks the headroom, not the load</summary><p><span class="math" data-say="W over S equals 1 over the quantity 1 minus rho">W/S = 1/(1 − ρ)</span> has <span class="math" data-say="1 minus rho">1 − ρ</span> in the denominator, so what determines the wait is how much of the server is <em>spare</em>. Halving the spare capacity doubles the response time regardless of where you started, which is why the same ten percentage points of load cost five times as much at the top of the range as at the bottom.</p></details><details class="recall"><summary>The asymptote is the whole content</summary><p>As <span class="math" data-say="rho">ρ</span> approaches one the curve rises without bound. No faster disk, no better garbage collector and no amount of tuning moves a vertical asymptote: those things change <span class="math" data-say="S">S</span>, which scales the curve, while the blow-up stays exactly where it was. Algebra's <span class="math" data-say="graphs-and-asymptotes">graphs-and-asymptotes</span> is the shape.</p></details><details class="recall"><summary>Planning reads the curve backwards</summary><p>Nobody picks a utilisation and accepts the response time that falls out. The useful direction is to name what you will tolerate &mdash; <span class="math" data-say="W equals k S">W = kS</span> &mdash; and solve for <span class="math" data-say="rho equals the quantity k minus 1, over k">ρ = (k − 1)/k</span>. Tolerate four service times and you may run at three quarters; tolerate ten and you may run at nine tenths.</p></details></div>
+      <h3>Summary</h3>
       <p><span class="math" data-say="W equals S over the quantity 1 minus rho">W = S/(1 − ρ)</span> is the single most useful rearrangement on this path. Divided through by <span class="math" data-say="S">S</span> it says the response time is the reciprocal of the headroom: two service times at 50%, ten at 90%, a hundred at 99%. It is a hyperbola, its asymptote is at <span class="math" data-say="rho equals 1">ρ = 1</span>, and nothing a designer can buy moves it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Response time tracks the headroom, not the load.</strong> <span class="math" data-say="W over S equals 1 over the quantity 1 minus rho">W/S = 1/(1 − ρ)</span> has <span class="math" data-say="1 minus rho">1 − ρ</span> in the denominator, so what determines the wait is how much of the server is <em>spare</em>. Halving the spare capacity doubles the response time regardless of where you started, which is why the same ten percentage points of load cost five times as much at the top of the range as at the bottom.</li><li><strong>The asymptote is the whole content.</strong> As <span class="math" data-say="rho">ρ</span> approaches one the curve rises without bound. No faster disk, no better garbage collector and no amount of tuning moves a vertical asymptote: those things change <span class="math" data-say="S">S</span>, which scales the curve, while the blow-up stays exactly where it was. Algebra's <span class="math" data-say="graphs-and-asymptotes">graphs-and-asymptotes</span> is the shape.</li><li><strong>Planning reads the curve backwards.</strong> Nobody picks a utilisation and accepts the response time that falls out. The useful direction is to name what you will tolerate &mdash; <span class="math" data-say="W equals k S">W = kS</span> &mdash; and solve for <span class="math" data-say="rho equals the quantity k minus 1, over k">ρ = (k − 1)/k</span>. Tolerate four service times and you may run at three quarters; tolerate ten and you may run at nine tenths.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="W equals S over the quantity 1 minus rho, M over M over 1 prime s W, written in service times. W over S equals 1 over the quantity 1 minus rho, a hyperbola, the asymptote sits at rho equals 1. rho equals 1 over 2 goes to 2, rho equals 9 over 10 goes to 10, rho equals 99 over 100 goes to 100. 50 percent to 90 percent, times 5, 90 percent to 99 percent, times 10 more. W equals k S at rho equals the quantity k minus 1, over k, leaving exactly 1 over k of headroom" tabindex="0" role="region" aria-label="Mathematical notation">W = S/(1 − ρ)            M/M/1&#x27;s W, written in service times
 W/S = 1/(1 − ρ)          a hyperbola; the asymptote sits at ρ = 1
 ρ = 1/2 → 2      ρ = 9/10 → 10      ρ = 99/100 → 100
@@ -2789,11 +2833,42 @@ W = kS at ρ = (k − 1)/k  leaving exactly 1/k of headroom</div><figcaption>One
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2861,7 +2936,7 @@ W = kS at ρ = (k − 1)/k  leaving exactly 1/k of headroom</div><figcaption>One
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

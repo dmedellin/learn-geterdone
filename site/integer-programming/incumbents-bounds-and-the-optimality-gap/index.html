@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,28 +1424,26 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Integer Programming</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Search and bounds</p>
       <h1>Incumbents, Bounds and the Gap</h1>
       <p class="lesson-lede">Produce a plan and a bound, compute the gap, and say exactly what has been proved after each node.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Two bounds, from two entirely different kinds of object</li><li>The gap is what is proved, and the incumbent is usually better than it</li><li>Relative gap is measured against the value in hand</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two bounds, one gap, and the sentence it licenses</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Incumbent</span><p>The <strong>incumbent</strong> is the best feasible solution found so far, together with its value. It is a lower bound on the optimum of a maximisation and an upper bound for a minimisation, and its provenance is irrelevant: a plan is a plan.</p></div><div class="defbox"><span class="label">Definition &middot; Global bound and optimality gap</span><p>The <strong>global bound</strong> is the best bound over every node still open, or the incumbent's own value when none is. The <strong>absolute gap</strong> is the difference between the global bound and the incumbent; the <strong>relative gap</strong> is that difference divided by the incumbent. A gap of zero means the incumbent is optimal, and that is a proof.</p></div><p>Take <span class="math" data-say="max 4 x sub 1 plus 3 x sub 2">max 4x₁ + 3x₂</span> subject to <span class="math" data-say="3 x sub 1 plus 2 x sub 2 is at most 17">3x₁ + 2x₂ ≤ 17</span> welding and <span class="math" data-say="2 x sub 1 plus 5 x sub 2 is at most 23">2x₁ + 5x₂ ≤ 23</span> painting. The root relaxation is worth <span class="math" data-say="261 over 11">261/11</span>, about <span class="math" data-say="23.73">23.73</span>. Its answer is <span class="math" data-say="23">23</span>, at <span class="math" data-say="5, 1">(5, 1)</span>. Watch what is proved along the way, taking the newest open node each time.</p><div class="mathblock" data-say="after node, incumbent, global bound, gap, relative. 3, none, 47 over 2. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">  after node   incumbent   global bound   gap     relative
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two bounds, one gap, and the sentence it licenses</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Incumbent</span><p>The <strong>incumbent</strong> is the best feasible solution found so far, together with its value. It is a lower bound on the optimum of a maximisation and an upper bound for a minimisation, and its provenance is irrelevant: a plan is a plan.</p></div><div class="defbox"><span class="label">Definition &middot; Global bound and optimality gap</span><p>The <strong>global bound</strong> is the best bound over every node still open, or the incumbent's own value when none is. The <strong>absolute gap</strong> is the difference between the global bound and the incumbent; the <strong>relative gap</strong> is that difference divided by the incumbent. A gap of zero means the incumbent is optimal, and that is a proof.</p></div><p>Take <span class="math" data-say="max 4 x sub 1 plus 3 x sub 2">max 4x₁ + 3x₂</span> subject to <span class="math" data-say="3 x sub 1 plus 2 x sub 2 is at most 17">3x₁ + 2x₂ ≤ 17</span> welding and <span class="math" data-say="2 x sub 1 plus 5 x sub 2 is at most 23">2x₁ + 5x₂ ≤ 23</span> painting. The root relaxation is worth <span class="math" data-say="261 over 11">261/11</span>, about <span class="math" data-say="23.73">23.73</span>. Its answer is <span class="math" data-say="23">23</span>, at <span class="math" data-say="5, 1">(5, 1)</span>. Watch what is proved along the way, taking the newest open node each time.</p><div class="mathblock" data-say="after node, incumbent, global bound, gap, relative. 3, none, 47 over 2. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">  after node   incumbent   global bound   gap     relative
       3          none         47/2         —          —
       5           21          47/2        5/2      11.9%
       7           21          70/3        7/3      11.1%
-      9           23           23          0       0.00%</div><p>Read the second row as a sentence. “Nothing beats <span class="math" data-say="21">21</span> by more than <span class="math" data-say="5 over 2">5/2</span>.” That is all of it. It is a statement about <span class="math" data-say="47 over 2">47/2</span>, which is a property of a relaxation, and it contains no claim about how likely <span class="math" data-say="21">21</span> is to be best. As it happens <span class="math" data-say="21">21</span> is not best: the answer is <span class="math" data-say="23">23</span>, two more, and well within the <span class="math" data-say="5 over 2">5/2</span> the bound allowed.</p><p>The first row is worth as much as the others. With no incumbent there is no gap and nothing whatever has been proved &mdash; a bound alone rules out nothing, because it does not exhibit a plan. Two numbers are needed, and a report with one of them is not a weaker report; it is a different kind of statement.</p><h3>What a two per cent gap says, and what it does not</h3><p>A 2% gap proves that nothing beats the incumbent by more than 2%. There is no probability in that sentence and none can be smuggled in: the gap is a bound on how wrong the plan in hand could be, not an estimate of how wrong it is. The incumbent is frequently optimal long before the gap closes, and the nodes spent after it was found buy the proof rather than the plan.</p><p>That is also the honest answer to “can we stop?”. Stopping with a stated gap is a result: the plan is in hand and its worst case is quantified. Stopping without one leaves a plan and a hope, and the two look identical on a slide.</p><p>Search order changes the work and not the answer. On this instance, taking the newest open node closes the tree in nine nodes; taking the most promising open node closes it in seven, and reaches the answer without ever holding a worse incumbent &mdash; its first incumbent is <span class="math" data-say="23">23</span>, and the gap is zero the moment it appears. Neither order is right; they trade a good early plan against a fast-falling bound, and which helps depends on the instance.</p><p>The reason a gap is the deliverable at all is that the alternative cannot be promised. The search tree's worst case is exponential and that result belongs to the Algorithms path&rsquo;s &ldquo;Backtracking and Branch-and-Bound&rdquo;; the vocabulary for saying what kind of hardness this is belongs to Discrete Mathematics&rsquo; &ldquo;P, NP and NP-Completeness&rdquo;. Neither is restated here. What is this lesson's own is the consequence: if the tree may not close, then the number you report has to be the pair.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Incumbents, bounds and the gap</h2></div><p>Two numbers that squeeze the optimum, and the only thing proved at any moment</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+      9           23           23          0       0.00%</div><p>Read the second row as a sentence. “Nothing beats <span class="math" data-say="21">21</span> by more than <span class="math" data-say="5 over 2">5/2</span>.” That is all of it. It is a statement about <span class="math" data-say="47 over 2">47/2</span>, which is a property of a relaxation, and it contains no claim about how likely <span class="math" data-say="21">21</span> is to be best. As it happens <span class="math" data-say="21">21</span> is not best: the answer is <span class="math" data-say="23">23</span>, two more, and well within the <span class="math" data-say="5 over 2">5/2</span> the bound allowed.</p><p>The first row is worth as much as the others. With no incumbent there is no gap and nothing whatever has been proved &mdash; a bound alone rules out nothing, because it does not exhibit a plan. Two numbers are needed, and a report with one of them is not a weaker report; it is a different kind of statement.</p><h3>What a two per cent gap says, and what it does not</h3><p>A 2% gap proves that nothing beats the incumbent by more than 2%. There is no probability in that sentence and none can be smuggled in: the gap is a bound on how wrong the plan in hand could be, not an estimate of how wrong it is. The incumbent is frequently optimal long before the gap closes, and the nodes spent after it was found buy the proof rather than the plan.</p><p>That is also the honest answer to “can we stop?”. Stopping with a stated gap is a result: the plan is in hand and its worst case is quantified. Stopping without one leaves a plan and a hope, and the two look identical on a slide.</p><p>Search order changes the work and not the answer. On this instance, taking the newest open node closes the tree in nine nodes; taking the most promising open node closes it in seven, and reaches the answer without ever holding a worse incumbent &mdash; its first incumbent is <span class="math" data-say="23">23</span>, and the gap is zero the moment it appears. Neither order is right; they trade a good early plan against a fast-falling bound, and which helps depends on the instance.</p><p>The reason a gap is the deliverable at all is that the alternative cannot be promised. The search tree's worst case is exponential and that result belongs to the Algorithms path&rsquo;s &ldquo;Backtracking and Branch-and-Bound&rdquo;; the vocabulary for saying what kind of hardness this is belongs to Discrete Mathematics&rsquo; &ldquo;P, NP and NP-Completeness&rdquo;. Neither is restated here. What is this lesson's own is the consequence: if the tree may not close, then the number you report has to be the pair.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Incumbents, bounds and the gap</h2></div><p>Two numbers that squeeze the optimum, and the only thing proved at any moment</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The gap is the deliverable</strong><span>any feasible point bounds one side and any relaxation the other; the space between them is what is proved</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>the incumbent</span><span class="tone-amber"><i class="legend-swatch"></i>the global bound</span><span class="tone-purple"><i class="legend-swatch"></i>the gap between them</span><span class="tone-muted"><i class="legend-swatch"></i>the other search order</span></div>
@@ -1408,10 +1451,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="gpPlot" viewBox="0 0 660 240" role="img" aria-label="The incumbent and the global bound drawn against the node index as the tree grows."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gpTable"></table></div>
       <div class="status-banner" id="gpStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Watch the two bounds close on each other</h3>
-          <p>The incumbent comes from any feasible point and the bound from the relaxation; both are re-derived from the node list, so the same tree gives the same trace. Drag the node count back to the beginning and read the “what is proved” column one row at a time.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Watch the two bounds close on each other</h3>
+            <p>The incumbent comes from any feasible point and the bound from the relaxation; both are re-derived from the node list, so the same tree gives the same trace. Drag the node count back to the beginning and read the “what is proved” column one row at a time.</p>
         <div class="field">
           <label for="gpPreset">Instance</label>
           <select id="gpPreset"><option value="early" selected>an incumbent found early and proved optimal much later</option><option value="even">an objective that treats the two variables alike, so the orders separate</option><option value="slow">a bound that comes down slowly, so the gap is visible for several nodes</option></select>
@@ -1433,12 +1476,14 @@
           <div class="kpi"><span>Nodes, best bound</span><strong id="gpBb">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="gpHint" style="margin:0;">A small gap is not a probability. It says nothing beats the incumbent by more than that much &mdash; a statement about the bound. The incumbent is often optimal long before the gap closes, and the gap is what has been proved, not what is likely.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reporting a result with a gap attached</h2></div><p>Five steps, and the last is the one that makes the other four worth doing.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Get an incumbent from anywhere</h3><p>Greed, a heuristic, last year's plan, a guess that turns out feasible. Its quality does not matter yet; its existence does, because without a feasible plan there is nothing for a bound to bound.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Get a bound from a relaxation</h3><p>The root relaxation is the cheapest one. Later, the best bound over the open nodes is the global bound, and it falls as the tree grows because every child's region is smaller than its parent's.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute both gaps</h3><p>Absolute, as an exact difference, and relative, against the incumbent. Say which denominator you used: the same tree supports two different percentages and only one of them is the convention.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Say what is proved, in a sentence with no probability in it</h3><p>“Nothing beats <span class="math" data-say="21">21</span> by more than <span class="math" data-say="5 over 2">5/2</span>.” If the sentence you write contains “probably”, “roughly” or “close to”, it is not the sentence the arithmetic supports.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Report the pair, never the incumbent alone</h3><p>A plan with a gap of zero is an optimum with a proof. A plan with a gap of <span class="math" data-say="5 over 42">5/42</span> is a result. A plan with no gap is a number, and nobody reading it can tell which of the three they have been handed.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reporting a result with a gap attached</h2>
+      <p class="lead-in">Five steps, and the last is the one that makes the other four worth doing.</p>
+      <ol class="key-ideas method"><li><strong>Get an incumbent from anywhere.</strong> Greed, a heuristic, last year's plan, a guess that turns out feasible. Its quality does not matter yet; its existence does, because without a feasible plan there is nothing for a bound to bound.</li><li><strong>Get a bound from a relaxation.</strong> The root relaxation is the cheapest one. Later, the best bound over the open nodes is the global bound, and it falls as the tree grows because every child's region is smaller than its parent's.</li><li><strong>Compute both gaps.</strong> Absolute, as an exact difference, and relative, against the incumbent. Say which denominator you used: the same tree supports two different percentages and only one of them is the convention.</li><li><strong>Say what is proved, in a sentence with no probability in it.</strong> “Nothing beats <span class="math" data-say="21">21</span> by more than <span class="math" data-say="5 over 2">5/2</span>.” If the sentence you write contains “probably”, “roughly” or “close to”, it is not the sentence the arithmetic supports.</li><li><strong>Report the pair, never the incumbent alone.</strong> A plan with a gap of zero is an optimum with a proof. A plan with a gap of <span class="math" data-say="5 over 42">5/42</span> is a result. A plan with no gap is a number, and nobody reading it can tell which of the three they have been handed.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1474,17 +1519,16 @@ TAKING THE MOST PROMISING OPEN NODE
   9 nodes against 7, for the same answer</div><p>The two runs illustrate the trade directly. Depth first had a plan worth <span class="math" data-say="21">21</span> in hand after five nodes and spent four more proving it was beatable and then beaten. Best bound had no plan at all until node seven and then had the answer with a closed gap in the same step.</p><p>Which is preferable depends entirely on whether you might have to stop early. With a hard time limit, a run holding <span class="math" data-say="21">21</span> with an <span class="math" data-say="11.9 percent">11.9%</span> gap is worth more than a run holding nothing with a tighter bound, because the first can be acted on. That is a reason to prefer depth first early and best bound late, and it is why real solvers switch.</p><p>For a faded rehearsal, use the lab's first instance &mdash; the one whose bound comes down slowly &mdash; and stop the node count at each value in turn. The supplied first move is that the incumbent can never fall and the global bound can never rise, so the gap is non-increasing. Find the first node at which the gap is below <span class="math" data-say="5 percent">5%</span>, and then say whether the incumbent changed after that point.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a small gap as a probability</strong><span>“A 2% gap, so it is almost certainly optimal” is not what the arithmetic says. The gap bounds how much better anything could be; it is a statement about the relaxation. The incumbent may be optimal and it may be 2% short, and the gap does not distinguish those two cases &mdash; which is the point of reporting it rather than interpreting it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reporting the incumbent on its own</strong><span>One number cannot be checked. <span class="math" data-say="23">23</span> with a gap of zero is an optimum with a proof; <span class="math" data-say="23">23</span> with a gap of <span class="math" data-say="11 percent">11%</span> is a good plan; <span class="math" data-say="23">23</span> with no gap is a number whose status the reader has to guess. The pair costs one extra column and carries all the information.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a falling bound as progress on the answer</strong><span>On the instance above the bound went <span class="math" data-say="47 over 2">47/2</span>, then <span class="math" data-say="70 over 3">70/3</span>, then <span class="math" data-say="23">23</span> while the plan in hand sat at <span class="math" data-say="21">21</span> for four nodes and then jumped to <span class="math" data-say="23">23</span>. Most of the search's work went into the proof and none of it into the plan. A falling bound means the claim is getting stronger, not that the answer is improving.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would rather report two numbers with a proof than one number with a hope.</strong><p>You should be able to produce an incumbent from a heuristic and a bound from a relaxation, compute the absolute and relative gaps with the denominator named, write the one sentence each stage licenses without the word “probably” in it, and say what changes and what cannot change when the search order changes.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The gap is the deliverable, and the reason is that the alternative cannot be promised: the search tree&rsquo;s exponential worst case is the Algorithms path&rsquo;s result and the vocabulary of hardness is Discrete Mathematics&rsquo;, and neither is restated here. What this course adds next is a way of making the bound better rather than the tree bigger &mdash; &ldquo;Cutting Planes and Gomory Cuts&rdquo; derives an inequality that the relaxation breaks and no whole-number plan does.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a small gap as a probability</strong><span>“A 2% gap, so it is almost certainly optimal” is not what the arithmetic says. The gap bounds how much better anything could be; it is a statement about the relaxation. The incumbent may be optimal and it may be 2% short, and the gap does not distinguish those two cases &mdash; which is the point of reporting it rather than interpreting it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reporting the incumbent on its own</strong><span>One number cannot be checked. <span class="math" data-say="23">23</span> with a gap of zero is an optimum with a proof; <span class="math" data-say="23">23</span> with a gap of <span class="math" data-say="11 percent">11%</span> is a good plan; <span class="math" data-say="23">23</span> with no gap is a number whose status the reader has to guess. The pair costs one extra column and carries all the information.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a falling bound as progress on the answer</strong><span>On the instance above the bound went <span class="math" data-say="47 over 2">47/2</span>, then <span class="math" data-say="70 over 3">70/3</span>, then <span class="math" data-say="23">23</span> while the plan in hand sat at <span class="math" data-say="21">21</span> for four nodes and then jumped to <span class="math" data-say="23">23</span>. Most of the search's work went into the proof and none of it into the plan. A falling bound means the claim is getting stronger, not that the answer is improving.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would rather report two numbers with a proof than one number with a hope.</strong><p>You should be able to produce an incumbent from a heuristic and a bound from a relaxation, compute the absolute and relative gaps with the denominator named, write the one sentence each stage licenses without the word “probably” in it, and say what changes and what cannot change when the search order changes.</p></div></div><div class="note"><strong>Note:</strong> The gap is the deliverable, and the reason is that the alternative cannot be promised: the search tree&rsquo;s exponential worst case is the Algorithms path&rsquo;s result and the vocabulary of hardness is Discrete Mathematics&rsquo;, and neither is restated here. What this course adds next is a way of making the bound better rather than the tree bigger &mdash; &ldquo;Cutting Planes and Gomory Cuts&rdquo; derives an inequality that the relaxation breaks and no whole-number plan does.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Two bounds, from two entirely different kinds of object</summary><p>A feasible plan is a lower bound for a maximisation because it is achievable; it can come from greed, from a tree, from a person who knows the business. A relaxation is an upper bound because it optimises over a larger set. Neither knows about the other, and the optimum is between them.</p></details><details class="recall"><summary>The gap is what is proved, and the incumbent is usually better than it</summary><p>A gap of <span class="math" data-say="5 over 2">5/2</span> on an incumbent of <span class="math" data-say="21">21</span> proves that nothing whole beats <span class="math" data-say="21">21</span> by more than <span class="math" data-say="5 over 2">5/2</span>. It does not say the optimum is near <span class="math" data-say="23.5">23.5</span>, and it does not say <span class="math" data-say="21">21</span> is probably optimal. On this instance <span class="math" data-say="21">21</span> is <em>not</em> optimal, and on the next one the plan found at the third node is optimal for a long stretch of nodes during which nothing has been proved about it.</p></details><details class="recall"><summary>Relative gap is measured against the value in hand</summary><p><span class="math" data-say="gap divided by incumbent">gap ÷ incumbent</span>: <span class="math" data-say="5 over 2">5/2</span> on <span class="math" data-say="21">21</span> is <span class="math" data-say="5 over 42">5/42</span>, about <span class="math" data-say="11.9 percent">11.9%</span>. The incumbent is the number you have, which is the only one defined before the optimum is known, and it is what every solver reports. Dividing by the bound instead gives a different number and is a different claim, so the denominator belongs in the report.</p></details></div>
+      <h3>Summary</h3>
       <p>Any feasible plan, from any source at all, bounds the optimum from one side, and any relaxation bounds it from the other. The distance between them is the only thing actually proved at a given moment; closing it is what the search spends its time on; and reporting it is what honesty looks like when the exponential worst case cannot be ruled out. A small gap is not a probability.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Two bounds, from two entirely different kinds of object.</strong> A feasible plan is a lower bound for a maximisation because it is achievable; it can come from greed, from a tree, from a person who knows the business. A relaxation is an upper bound because it optimises over a larger set. Neither knows about the other, and the optimum is between them.</li><li><strong>The gap is what is proved, and the incumbent is usually better than it.</strong> A gap of <span class="math" data-say="5 over 2">5/2</span> on an incumbent of <span class="math" data-say="21">21</span> proves that nothing whole beats <span class="math" data-say="21">21</span> by more than <span class="math" data-say="5 over 2">5/2</span>. It does not say the optimum is near <span class="math" data-say="23.5">23.5</span>, and it does not say <span class="math" data-say="21">21</span> is probably optimal. On this instance <span class="math" data-say="21">21</span> is <em>not</em> optimal, and on the next one the plan found at the third node is optimal for a long stretch of nodes during which nothing has been proved about it.</li><li><strong>Relative gap is measured against the value in hand.</strong> <span class="math" data-say="gap divided by incumbent">gap ÷ incumbent</span>: <span class="math" data-say="5 over 2">5/2</span> on <span class="math" data-say="21">21</span> is <span class="math" data-say="5 over 42">5/42</span>, about <span class="math" data-say="11.9 percent">11.9%</span>. The incumbent is the number you have, which is the only one defined before the optimum is known, and it is what every solver reports. Dividing by the bound instead gives a different number and is a different claim, so the denominator belongs in the report.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="incumbent, any feasible plan, a lower bound max. global bound, the best bound over the open nodes, an upper bound. gap equals bound minus incumbent, relative gap equals gap divided by incumbent. after 5 nodes, 21 and 47 over 2, gap 5 over 2, relative 5 over 42 is approximately 11.9 percent. after 7 nodes, 21 and 70 over 3, gap 7 over 3, relative 1 over 9, is approximately 11.1 percent. after 9 nodes, 23 and 23, gap 0, and that is the proof" tabindex="0" role="region" aria-label="Mathematical notation">incumbent   any feasible plan        a lower bound (max)
 global bound   the best bound over the open nodes   an upper bound
 gap = bound − incumbent      relative gap = gap ÷ incumbent
@@ -3907,11 +3951,42 @@ after 9 nodes   23 and 23      gap 0 — and that is the proof</div><figcaption>
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3979,7 +4054,7 @@ after 9 nodes   23 and 23      gap 0 — and that is the proof</div><figcaption>
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

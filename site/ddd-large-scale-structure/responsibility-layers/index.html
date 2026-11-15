@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,50 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Large-Scale Structure and Strategy</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 16 · Large-Scale Structure</p>
       <h1>Responsibility Layers</h1>
       <p class="lesson-lede">Broad layers of responsibility cut along the domain&#x27;s own strata, each depending only on the layers beneath it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Responsibility layer</li><li>Relaxed layering</li><li>Upward dependency</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern, the layers Evans has seen, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Choosing a large-scale structure is less a technical decision than a business modeling decision.&rdquo; That line is from Choosing Appropriate Layers, at the end of the second pattern of Chapter 16, Responsibility Layers. Read the pattern and that section in your own copy first.</p><p>Evans starts from objects. Throughout the book each object has a narrow set of related responsibilities, but when every one of them is handcrafted there is no way to reason about large regions of the model at once. In some domains a deep understanding reveals a natural stratification: some concepts sit against a background of others that change independently, at a different rate and for different reasons. Layering is the established way to exploit that, and the chapter contrasts it with the layering that sorts itself out when you draw a module dependency diagram, which eases tracing but says little about the model.</p><p>The pattern unites the two ideas. Name a few broad responsibilities the domain itself shows, far wider than any object's, and refactor until every object, aggregate and module belongs to exactly one of them. Members of a layer may use the layers beneath and know nothing of those above. Evans prefers the relaxed variant, Buschmann and his co-authors' Relaxed Layered System, in which a layer may reach any lower layer, not only the next. The layers should tell the story of the system's purpose. This is a different cut from the Layered Architecture of Chapter 4, which separates user interface, application, domain and infrastructure; Responsibility Layers divides the domain layer itself.</p><p>The book's example is long, and only its shape is summarised here. Evans takes the shipping model of earlier chapters and has its team notice that schedules can be discussed without the cargo they carry, but not the other way round. They name two layers, then a third for the routing service once they see it helps decide rather than records what is. One attribute turns out to be a policy hiding in a capability object, and moving it out makes the model clearer. Then a new regulation arrives, and the first design that occurs to them would make an operational object depend on a decision-support service; they choose another that respects the layers. Evans is careful to say the second design is not simply better. Consistency across a team is worth modest trade-offs, and if the structure keeps forcing awkward choices, Evolving Order says to revise it.</p><p>Choosing Appropriate Layers gives three things to look for and preserve as layers are split, merged and redefined. Storytelling: the layers should bring out the business's priorities, which is the point of the quotation. Conceptual dependency: upper-layer concepts should have meaning against the lower ones, while lower ones make sense alone. And conceptual contours: where objects change at different rates or for different reasons, a layer boundary should run along that shearing line.</p><p>Then come five layers Evans has seen recur in enterprise systems, offered as examples rather than a template. Potential asks what the business could do: its resources, people and contracts. Operations asks what it is doing, and like Potential records reality as it is; an operational object may refer to potential ones, never the reverse. Decision Support asks what should be done, analysing the layers beneath. Policy holds rules and goals that constrain the other layers, sometimes passed into a lower method, sometimes as a Strategy. Commitment, which comes to the fore where capacity depends on current business, as in finance or insurance, records what has been promised.</p><p>He ends on restraint. Keep the layering simple: beyond four, or possibly five, layers stop telling a story, and the complexity they were meant to tame returns in another form. The five layers fit a range of enterprise systems, but a domain unlike those may need layers of its own, and forcing it into these would do harm. Start somewhere, he says, and let the order evolve.</p><p>Now the count. The lab holds a theatre box office in four layers, top to bottom <code>decision</code>, <code>policy</code>, <code>operations</code> and <code>potential</code>, with eight elements: Auditorium, Seat and Usher are potential; Performance, Booking and Ticket are operations; ConcessionRule is policy; PricingAdvisor is decision support. The first version has eleven dependencies, and among them a booking that holds its concession rule, like this:</p><pre class="codeblock" data-say="line 1, comment, Operations one booking of seats for one performance.. line 2, class booking. line 3, private final performance performance. line 4, private final list of ticket tickets is set to new array list. line 5, private final concession rule concessions, comment, a Policy object. line 7, long price cents. line 8, long total is set to 0. line 9, for ticket t in tickets. line 10, total is increased by concessions dot price cents of t, comment, operations asks policy. line 12, return total" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Operations: one booking of seats for one performance.</span>
-<span class="cl">class Booking {</span>
-<span class="cl">    private final Performance performance;</span>
-<span class="cl">    private final List&lt;Ticket&gt; tickets = new ArrayList&lt;&gt;();</span>
-<span class="cl">    private final ConcessionRule concessions;   // a Policy object</span>
-<span class="cl"></span>
-<span class="cl">    long priceCents() {</span>
-<span class="cl">        long total = 0;</span>
-<span class="cl">        for (Ticket t : tickets) {</span>
-<span class="cl">            total += concessions.priceCents(t); // operations asks policy</span>
-<span class="cl">        }</span>
-<span class="cl">        return total;</span>
-<span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>On the preset <code>as-first-written</code> the lab counts 11 dependencies: 6 downward, 3 within a layer (Seat on Auditorium, Booking on Performance and on Ticket) and 2 upward, listed as Booking on ConcessionRule and Auditorium on Performance, the second because each auditorium kept a list of its performances. One downward dependency, PricingAdvisor on Booking, skips over the policy layer, which relaxed layering allows; the lab counts it, 1, and does not list it as a fault. No layer is empty: the tile for layers with no element reads none, and a layer the story names but nothing fills would be worth asking about.</p><p>The preset <code>refactored</code> turns the first upward dependency round, as below: the rule reads the booking, and the booking never names the rule. The auditorium's list goes, replaced by asking a repository for an auditorium's performances. The lab then counts 10 dependencies, 7 downward, 3 within and 0 upward, with the same one skip. Whether the policy should own the price at all is a modelling question the count does not answer; what it shows is that every remaining dependency now runs in the direction the layers' story says.</p><pre class="codeblock" data-say="line 1, comment, Policy the rule reads the booking the booking never names the rule.. line 2, class concession rule. line 3, long price cents of booking booking. line 4, long total is set to 0. line 5, for ticket t in booking dot tickets. line 6, total is increased by price cents of t. line 8, return total. line 11, long price cents of ticket t. line 12, return t dot is concession, if so, t dot face cents divided by 2, otherwise, t dot face cents" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Policy: the rule reads the booking; the booking never names the rule.</span>
-<span class="cl">class ConcessionRule {</span>
-<span class="cl">    long priceCents(Booking booking) {</span>
-<span class="cl">        long total = 0;</span>
-<span class="cl">        for (Ticket t : booking.tickets()) {</span>
-<span class="cl">            total += priceCents(t);</span>
-<span class="cl">        }</span>
-<span class="cl">        return total;</span>
-<span class="cl">    }</span>
-<span class="cl"></span>
-<span class="cl">    long priceCents(Ticket t) {</span>
-<span class="cl">        return t.isConcession() ? t.faceCents() / 2 : t.faceCents();</span>
-<span class="cl">    }</span>
-<span class="cl">}</span></code></pre><h3>Exercise</h3><ul><li>A clinic in the same four layers: Clinician and Room are potential; Appointment and Visit are operations; BookingLimit is policy; ScheduleOptimizer is decision.</li><li>Dependencies, written dependent first: Appointment on Clinician; Appointment on Room; Visit on Appointment; Clinician on Appointment; BookingLimit on Appointment; ScheduleOptimizer on Room; Appointment on BookingLimit.</li></ul><p>By hand, sort the seven dependencies into downward, within a layer and upward, name the upward ones, and count the downward ones that skip a layer. Then type the model into the lab and compare.</p><p>Layers order what a system does. The next lesson, Knowledge Level, reads a structure that looks like a layer and is not one: objects whose job is to say how other objects may behave.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Modules and dependencies</h2></div><p>which dependencies run down the layers and which run up</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern, the layers Evans has seen, then the count</h2><div class="prose reading"><p>&ldquo;Choosing a large-scale structure is less a technical decision than a business modeling decision.&rdquo; That line is from Choosing Appropriate Layers, at the end of the second pattern of Chapter 16, Responsibility Layers. Read the pattern and that section in your own copy first.</p><p>Evans starts from objects. Throughout the book each object has a narrow set of related responsibilities, but when every one of them is handcrafted there is no way to reason about large regions of the model at once. In some domains a deep understanding reveals a natural stratification: some concepts sit against a background of others that change independently, at a different rate and for different reasons. Layering is the established way to exploit that, and the chapter contrasts it with the layering that sorts itself out when you draw a module dependency diagram, which eases tracing but says little about the model.</p><p>The pattern unites the two ideas. Name a few broad responsibilities the domain itself shows, far wider than any object's, and refactor until every object, aggregate and module belongs to exactly one of them. Members of a layer may use the layers beneath and know nothing of those above. Evans prefers the relaxed variant, Buschmann and his co-authors' Relaxed Layered System, in which a layer may reach any lower layer, not only the next. The layers should tell the story of the system's purpose. This is a different cut from the Layered Architecture of Chapter 4, which separates user interface, application, domain and infrastructure; Responsibility Layers divides the domain layer itself.</p><p>The book's example is long, and only its shape is summarised here. Evans takes the shipping model of earlier chapters and has its team notice that schedules can be discussed without the cargo they carry, but not the other way round. They name two layers, then a third for the routing service once they see it helps decide rather than records what is. One attribute turns out to be a policy hiding in a capability object, and moving it out makes the model clearer. Then a new regulation arrives, and the first design that occurs to them would make an operational object depend on a decision-support service; they choose another that respects the layers. Evans is careful to say the second design is not simply better. Consistency across a team is worth modest trade-offs, and if the structure keeps forcing awkward choices, Evolving Order says to revise it.</p><p>Choosing Appropriate Layers gives three things to look for and preserve as layers are split, merged and redefined. Storytelling: the layers should bring out the business's priorities, which is the point of the quotation. Conceptual dependency: upper-layer concepts should have meaning against the lower ones, while lower ones make sense alone. And conceptual contours: where objects change at different rates or for different reasons, a layer boundary should run along that shearing line.</p><p>Then come five layers Evans has seen recur in enterprise systems, offered as examples rather than a template. Potential asks what the business could do: its resources, people and contracts. Operations asks what it is doing, and like Potential records reality as it is; an operational object may refer to potential ones, never the reverse. Decision Support asks what should be done, analysing the layers beneath. Policy holds rules and goals that constrain the other layers, sometimes passed into a lower method, sometimes as a Strategy. Commitment, which comes to the fore where capacity depends on current business, as in finance or insurance, records what has been promised.</p><p>He ends on restraint. Keep the layering simple: beyond four, or possibly five, layers stop telling a story, and the complexity they were meant to tame returns in another form. The five layers fit a range of enterprise systems, but a domain unlike those may need layers of its own, and forcing it into these would do harm. Start somewhere, he says, and let the order evolve.</p><p>Now the count. The lab holds a theatre box office in four layers, top to bottom <code>decision</code>, <code>policy</code>, <code>operations</code> and <code>potential</code>, with eight elements: Auditorium, Seat and Usher are potential; Performance, Booking and Ticket are operations; ConcessionRule is policy; PricingAdvisor is decision support. The first version has eleven dependencies, and among them a booking that holds its concession rule, like this:</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Modules and dependencies</h2></div><p>which dependencies run down the layers and which run up</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Modules and dependencies</strong><span>which dependencies run down the layers and which run up</span></div>
       </div>
@@ -1484,10 +1501,10 @@
       <div class="table-wrap" id="dmoTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dmoTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> The layers are listed top to bottom. A dependency from an element in a higher layer to one in a lower layer runs downward, one between two elements of the same layer is within it, and one from a lower layer to a higher runs upward, which a strict layering forbids; upward ones are listed in the order given. Downward counts every downward dependency, and of those, skipping a layer counts the ones that pass over at least one layer between (allowed in a relaxed layering, counted separately, not as violations). So downward + within + upward = all.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Which dependencies run against the layers</h3>
-          <p>A count over the small model the lesson states. Layers are listed top to bottom; each element sits in one, and each dependency is written dependent first. The layers and the model are the lesson's, not the book's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Which dependencies run against the layers</h3>
+            <p>A count over the small model the lesson states. Layers are listed top to bottom; each element sits in one, and each dependency is written dependent first. The layers and the model are the lesson's, not the book's.</p>
         <div class="field">
           <label for="dmoPreset">Worked example</label>
           <select id="dmoPreset"><option value="as-first-written" selected>A theatre box office as first written</option><option value="refactored">The same, with the two upward dependencies removed</option></select>
@@ -1513,12 +1530,41 @@
           <div class="kpi"><span>Layers with no element</span><strong id="dmoEmpty">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, Operations one booking of seats for one performance.. line 2, class booking. line 3, private final performance performance. line 4, private final list of ticket tickets is set to new array list. line 5, private final concession rule concessions, comment, a Policy object. line 7, long price cents. line 8, long total is set to 0. line 9, for ticket t in tickets. line 10, total is increased by concessions dot price cents of t, comment, operations asks policy. line 12, return total" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Operations: one booking of seats for one performance.</span>
+<span class="cl">class Booking {</span>
+<span class="cl">    private final Performance performance;</span>
+<span class="cl">    private final List&lt;Ticket&gt; tickets = new ArrayList&lt;&gt;();</span>
+<span class="cl">    private final ConcessionRule concessions;   // a Policy object</span>
+<span class="cl"></span>
+<span class="cl">    long priceCents() {</span>
+<span class="cl">        long total = 0;</span>
+<span class="cl">        for (Ticket t : tickets) {</span>
+<span class="cl">            total += concessions.priceCents(t); // operations asks policy</span>
+<span class="cl">        }</span>
+<span class="cl">        return total;</span>
+<span class="cl">    }</span>
+<span class="cl">}</span></code></pre><p>On the preset <code>as-first-written</code> the lab counts 11 dependencies: 6 downward, 3 within a layer (Seat on Auditorium, Booking on Performance and on Ticket) and 2 upward, listed as Booking on ConcessionRule and Auditorium on Performance, the second because each auditorium kept a list of its performances. One downward dependency, PricingAdvisor on Booking, skips over the policy layer, which relaxed layering allows; the lab counts it, 1, and does not list it as a fault. No layer is empty: the tile for layers with no element reads none, and a layer the story names but nothing fills would be worth asking about.</p><p>The preset <code>refactored</code> turns the first upward dependency round, as below: the rule reads the booking, and the booking never names the rule. The auditorium's list goes, replaced by asking a repository for an auditorium's performances. The lab then counts 10 dependencies, 7 downward, 3 within and 0 upward, with the same one skip. Whether the policy should own the price at all is a modelling question the count does not answer; what it shows is that every remaining dependency now runs in the direction the layers' story says.</p><pre class="codeblock" data-say="line 1, comment, Policy the rule reads the booking the booking never names the rule.. line 2, class concession rule. line 3, long price cents of booking booking. line 4, long total is set to 0. line 5, for ticket t in booking dot tickets. line 6, total is increased by price cents of t. line 8, return total. line 11, long price cents of ticket t. line 12, return t dot is concession, if so, t dot face cents divided by 2, otherwise, t dot face cents" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Policy: the rule reads the booking; the booking never names the rule.</span>
+<span class="cl">class ConcessionRule {</span>
+<span class="cl">    long priceCents(Booking booking) {</span>
+<span class="cl">        long total = 0;</span>
+<span class="cl">        for (Ticket t : booking.tickets()) {</span>
+<span class="cl">            total += priceCents(t);</span>
+<span class="cl">        }</span>
+<span class="cl">        return total;</span>
+<span class="cl">    }</span>
+<span class="cl"></span>
+<span class="cl">    long priceCents(Ticket t) {</span>
+<span class="cl">        return t.isConcession() ? t.faceCents() / 2 : t.faceCents();</span>
+<span class="cl">    }</span>
+<span class="cl">}</span></code></pre><h3>Exercise</h3><ul><li>A clinic in the same four layers: Clinician and Room are potential; Appointment and Visit are operations; BookingLimit is policy; ScheduleOptimizer is decision.</li><li>Dependencies, written dependent first: Appointment on Clinician; Appointment on Room; Visit on Appointment; Clinician on Appointment; BookingLimit on Appointment; ScheduleOptimizer on Room; Appointment on BookingLimit.</li></ul><p>By hand, sort the seven dependencies into downward, within a layer and upward, name the upward ones, and count the downward ones that skip a layer. Then type the model into the lab and compare.</p><p>Layers order what a system does. The next lesson, Knowledge Level, reads a structure that looks like a layer and is not one: objects whose job is to say how other objects may behave.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Checking a model against its layers</h2></div><p>Four steps, the last of them on a system of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the layers and their members</h3><p>List the layers top to bottom and put every element in exactly one. An element you cannot place is a question about the layers, not a mistake in the list.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Classify each dependency</h3><p>For each dependency, compare the layer of the dependent with the layer of the one it uses: higher to lower is downward, the same is within, lower to higher is upward.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Decide what each upward one means</h3><p>For every upward dependency, say whether the dependency can be turned round, replaced by a query, or is evidence that an element sits in the wrong layer or that the layers need revising.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own system</h3><p>Pick four broad responsibilities in a system you know, assign ten of its classes to them, list the dependencies among those ten, and count the upward ones.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Checking a model against its layers</h2>
+      <p class="lead-in">Four steps, the last of them on a system of your own.</p>
+      <ol class="key-ideas method"><li><strong>Write the layers and their members.</strong> List the layers top to bottom and put every element in exactly one. An element you cannot place is a question about the layers, not a mistake in the list.</li><li><strong>Classify each dependency.</strong> For each dependency, compare the layer of the dependent with the layer of the one it uses: higher to lower is downward, the same is within, lower to higher is upward.</li><li><strong>Decide what each upward one means.</strong> For every upward dependency, say whether the dependency can be turned round, replaced by a query, or is evidence that an element sits in the wrong layer or that the layers need revising.</li><li><strong>Do it on your own system.</strong> Pick four broad responsibilities in a system you know, assign ten of its classes to them, list the dependencies among those ten, and count the upward ones.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1537,17 +1583,16 @@ down: PricingAdvisor on Booking and rule
 up: Booking on rule; Auditorium on Performance</div><p>That is 3 within, 6 downward and 2 upward. Of the six downward, only PricingAdvisor on Booking passes over a layer, from decision to operations across policy, which the relaxed variant allows.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking Responsibility Layers for the user interface, application, domain and infrastructure layers</strong><span>Those are Chapter 4's Layered Architecture, which isolates the domain from everything else in the program. Responsibility Layers divides the domain layer itself, by broad responsibilities in the business such as what could be done and what is being done, and the choice of them is, in the quotation's words, a business modelling decision.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating Evans&#x27;s five layers as a template every system should fill</strong><span>Choosing Appropriate Layers offers Potential, Operations, Decision Support, Policy and Commitment as layers seen in a range of enterprise systems, warns that forcing a different domain into them would be counterproductive, and says a domain unlike these may need layers of its own. Evans's advice is to start somewhere and let the order evolve.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Counting a dependency that skips a layer as a violation</strong><span>Evans adopts the relaxed variant of layering, in which a layer may use any layer below it. Only dependencies that run upward break the structure. The lab counts skipping dependencies so that you can see them, and lists only the upward ones as faults.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can check a model against its responsibility layers.</strong><p>Given layers, an assignment of elements and a list of dependencies, sort every dependency into downward, within or upward, name the upward ones, and count the downward ones that skip a layer.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab checks dependencies against the layers you give it. It cannot say whether those layers tell the domain's story, whether an element belongs in the layer you put it in, or which of two designs that both respect the layers is better; Evans treats those as modelling decisions made with domain experts.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking Responsibility Layers for the user interface, application, domain and infrastructure layers</strong><span>Those are Chapter 4's Layered Architecture, which isolates the domain from everything else in the program. Responsibility Layers divides the domain layer itself, by broad responsibilities in the business such as what could be done and what is being done, and the choice of them is, in the quotation's words, a business modelling decision.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating Evans&#x27;s five layers as a template every system should fill</strong><span>Choosing Appropriate Layers offers Potential, Operations, Decision Support, Policy and Commitment as layers seen in a range of enterprise systems, warns that forcing a different domain into them would be counterproductive, and says a domain unlike these may need layers of its own. Evans's advice is to start somewhere and let the order evolve.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Counting a dependency that skips a layer as a violation</strong><span>Evans adopts the relaxed variant of layering, in which a layer may use any layer below it. Only dependencies that run upward break the structure. The lab counts skipping dependencies so that you can see them, and lists only the upward ones as faults.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can check a model against its responsibility layers.</strong><p>Given layers, an assignment of elements and a list of dependencies, sort every dependency into downward, within or upward, name the upward ones, and count the downward ones that skip a layer.</p></div></div><div class="note"><strong>Note:</strong> The lab checks dependencies against the layers you give it. It cannot say whether those layers tell the domain's story, whether an element belongs in the layer you put it in, or which of two designs that both respect the layers is better; Evans treats those as modelling decisions made with domain experts.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Responsibility layer</summary><p>A broad responsibility, such as what the business could do or what it is doing now, cast as a layer. Every object, aggregate and module is factored to sit inside one of them.</p></details><details class="recall"><summary>Relaxed layering</summary><p>The variant of the layering pattern Evans prefers here: a layer may use any layer below it, not only the one directly beneath. Only dependencies that run upward break it.</p></details><details class="recall"><summary>Upward dependency</summary><p>A dependency from an element in one layer to an element in a higher layer. The lab lists each one; a dependency that skips over a layer on its way down is counted separately and is allowed.</p></details></div>
+      <h3>Summary</h3>
       <p>Responsibility Layers joins two ideas, layering and responsibility-driven design, at the scale of the whole model. Read Evans's case for layers that tell the domain's story, the five he has seen recur, and his advice on choosing them; then classify a theatre box office's dependencies against four layers and find the two that run upward.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Responsibility layer.</strong> A broad responsibility, such as what the business could do or what it is doing now, cast as a layer. Every object, aggregate and module is factored to sit inside one of them.</li><li><strong>Relaxed layering.</strong> The variant of the layering pattern Evans prefers here: a layer may use any layer below it, not only the one directly beneath. Only dependencies that run upward break it.</li><li><strong>Upward dependency.</strong> A dependency from an element in one layer to an element in a higher layer. The lab lists each one; a dependency that skips over a layer on its way down is counted separately and is allowed.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="layers cut along the domain the character s strata. each layer uses only the layers below. potential, operations, decision support. policy and commitment where they fit. an upward dependency breaks the story. four or five layers at most" tabindex="0" role="region" aria-label="Mathematical notation">layers cut along the domain&#x27;s strata
 each layer uses only the layers below
 potential, operations, decision support
@@ -2321,11 +2366,42 @@ four or five layers at most</div><figcaption>Responsibility Layers in six lines<
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2393,7 +2469,7 @@ four or five layers at most</div><figcaption>Responsibility Layers in six lines<
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

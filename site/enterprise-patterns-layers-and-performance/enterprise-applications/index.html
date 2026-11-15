@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Layers and Performance</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Introduction</p>
       <h1>Enterprise Applications</h1>
       <p class="lesson-lede">An enterprise application is known by its data, its many users and screens, the systems around it, and business rules that follow no principle.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Enterprise application</li><li>Business logic</li><li>Pattern</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The book&#x27;s opening, then the count</h2>
-      <article class="prose reading"><p>&ldquo;I find this a curious term because there are few things that are less logical than business logic.&rdquo; Fowler writes that of the phrase <em>business logic</em> in the Introduction's section Enterprise Applications, and the sentence holds the whole book's starting point: the hard part of these systems is not clever algorithms but a great deal of shared data and a great many rules nobody can derive. This lesson reads the Preface and the Introduction's first sections. Read them in your own copy first.</p><p>The Preface starts from a leasing system Fowler worked on with ThoughtWorks in 1999, whose rules grew one won deal at a time and which had to be stored, given screens, opened to other programs and built on a platform nobody yet knew. The book is written for that situation, in two parts: narrative chapters to read from start to finish, and patterns to dip into as a reference. This read-along takes them together, each narrative with the patterns it introduces.</p><p>The section Architecture is short and wary. Fowler calls the word one that mostly signals importance, and admits, with a smiley, that he is pragmatic enough to use it anyway. People agree on little, he says, except two elements: how a system is divided into its parts at the top, and the decisions that would be hard to reverse. Following a posting of Ralph Johnson's, he adds that architecture is subjective, a shared understanding among a project's expert developers, so that something found easy to change stops being architectural. The architectural pattern he likes most is layers, and the book is about how an enterprise application is divided into them.</p><p>Enterprise Applications gives the marks of the kind. The data is persistent, kept for years, outliving hardware, operating systems and compilers, and migrated whenever the application is replaced. There is a lot of it: a moderate system, Fowler says, holds over 1 GB in tens of millions of records, so looking after it is much of the work. Many people use it at once, through many screens, and there is batch processing that is easy to forget. And it lives among other systems built at different times with different technologies, which disagree even about what a customer is. Then come the rules: given to you, changeable only by political effort, full of strange conditions that interact. His example is a salesman who agreed to move one customer's payment to win the business; a few thousand such one-off cases add up to what he calls business illogic.</p><p>Kinds of Enterprise Application then refuses a single answer. Fowler sets out three points on a large plane: an online retailer with a very high number of users and fairly simple logic, which must scale; a leasing system with few users, at most a hundred or so at once, but complicated and arbitrary rules, a richer interface and a large schema; and a small company's expense tracker, simple in every way except that it must be built quickly and may grow. Each has different difficulties, so no one architecture suits all three. He has, he says, alarm bells that ring when someone says always do this, and much of his book is about choosing between alternatives.</p><p>Patterns closes the opening. Fowler starts from Christopher Alexander's definition, a recurring problem and the core of its solution, a core that can be reused endlessly and never comes out in quite the same form, and adds his own: a pattern is a piece of advice, rooted in practice, discovered rather than invented, and its value to an experienced designer is the shared vocabulary it gives. Each pattern in Part 2 is written to the same form, a name, an intent and a sketch, a motivating problem, How It Works, When to Use It, further reading and examples, though a pattern leaves out a section it has nothing good to put in. He insists that the example is not the pattern; patterns are, in his phrase, &ldquo;half baked,&rdquo; and you finish them in your own project.</p><pre class="codeblock" data-say="line 1, comment, Days from the start of the invoice month until payment is due.. line 2, int due day of customer c, int invoice day. line 3, int day is set to invoice day plus 30. line 4, if c dot is government. line 5, day is set to day plus 15. line 7, if c dot region equals region dot north and c dot years is greater than 5. line 8, day is set to day plus 10. line 10, if c dot is retail or c dot is online. line 11, if invoice day is greater than 25. line 12, day is set to day plus 5. line 15, if day is greater than 60 and not c dot is government. line 16, day is set to 60. line 18, return day" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Days from the start of the invoice month until payment is due.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The book&#x27;s opening, then the count</h2><div class="prose reading"><p>&ldquo;I find this a curious term because there are few things that are less logical than business logic.&rdquo; Fowler writes that of the phrase <em>business logic</em> in the Introduction's section Enterprise Applications, and the sentence holds the whole book's starting point: the hard part of these systems is not clever algorithms but a great deal of shared data and a great many rules nobody can derive. This lesson reads the Preface and the Introduction's first sections. Read them in your own copy first.</p><p>The Preface starts from a leasing system Fowler worked on with ThoughtWorks in 1999, whose rules grew one won deal at a time and which had to be stored, given screens, opened to other programs and built on a platform nobody yet knew. The book is written for that situation, in two parts: narrative chapters to read from start to finish, and patterns to dip into as a reference. This read-along takes them together, each narrative with the patterns it introduces.</p><p>The section Architecture is short and wary. Fowler calls the word one that mostly signals importance, and admits, with a smiley, that he is pragmatic enough to use it anyway. People agree on little, he says, except two elements: how a system is divided into its parts at the top, and the decisions that would be hard to reverse. Following a posting of Ralph Johnson's, he adds that architecture is subjective, a shared understanding among a project's expert developers, so that something found easy to change stops being architectural. The architectural pattern he likes most is layers, and the book is about how an enterprise application is divided into them.</p><p>Enterprise Applications gives the marks of the kind. The data is persistent, kept for years, outliving hardware, operating systems and compilers, and migrated whenever the application is replaced. There is a lot of it: a moderate system, Fowler says, holds over 1 GB in tens of millions of records, so looking after it is much of the work. Many people use it at once, through many screens, and there is batch processing that is easy to forget. And it lives among other systems built at different times with different technologies, which disagree even about what a customer is. Then come the rules: given to you, changeable only by political effort, full of strange conditions that interact. His example is a salesman who agreed to move one customer's payment to win the business; a few thousand such one-off cases add up to what he calls business illogic.</p><p>Kinds of Enterprise Application then refuses a single answer. Fowler sets out three points on a large plane: an online retailer with a very high number of users and fairly simple logic, which must scale; a leasing system with few users, at most a hundred or so at once, but complicated and arbitrary rules, a richer interface and a large schema; and a small company's expense tracker, simple in every way except that it must be built quickly and may grow. Each has different difficulties, so no one architecture suits all three. He has, he says, alarm bells that ring when someone says always do this, and much of his book is about choosing between alternatives.</p><p>Patterns closes the opening. Fowler starts from Christopher Alexander's definition, a recurring problem and the core of its solution, a core that can be reused endlessly and never comes out in quite the same form, and adds his own: a pattern is a piece of advice, rooted in practice, discovered rather than invented, and its value to an experienced designer is the shared vocabulary it gives. Each pattern in Part 2 is written to the same form, a name, an intent and a sketch, a motivating problem, How It Works, When to Use It, further reading and examples, though a pattern leaves out a section it has nothing good to put in. He insists that the example is not the pattern; patterns are, in his phrase, &ldquo;half baked,&rdquo; and you finish them in your own project.</p><pre class="codeblock" data-say="line 1, comment, Days from the start of the invoice month until payment is due.. line 2, int due day of customer c, int invoice day. line 3, int day is set to invoice day plus 30. line 4, if c dot is government. line 5, day is set to day plus 15. line 7, if c dot region equals region dot north and c dot years is greater than 5. line 8, day is set to day plus 10. line 10, if c dot is retail or c dot is online. line 11, if invoice day is greater than 25. line 12, day is set to day plus 5. line 15, if day is greater than 60 and not c dot is government. line 16, day is set to 60. line 18, return day" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Days from the start of the invoice month until payment is due.</span>
 <span class="cl">int dueDay(Customer c, int invoiceDay) {</span>
 <span class="cl">    int day = invoiceDay + 30;</span>
 <span class="cl">    if (c.isGovernment()) {</span>
@@ -1463,31 +1507,11 @@
 <span class="cl">        day = 60;</span>
 <span class="cl">    }</span>
 <span class="cl">    return day;</span>
-<span class="cl">}</span></code></pre><p>Here is a business rule written for the lesson, a due date with four agreements in it: government customers get fifteen more days, long-standing northern customers ten, retail or online customers invoiced late in the month five, and nobody but government waits past day 60. The agreements are invented; they stand for the kind Fowler describes. The lab counts decision points by a rule stated beside it: one, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. On the preset <code>due-day</code> it counts 9, and its breakdown prints how: 1 + if <span data-say="5 plus and 2 plus or 1">5 + && 2 + || 1</span>. The <span class="math" data-say="not">!</span> on line 15 adds nothing; it negates a condition and makes no new branch.</p><p>The lab prints three more tiles. The band, 6–10, places the count between McConnell's thresholds from <em>Code Complete</em>; Fowler gives no count and no threshold, so the band is another author's guidance, not this book's. The deepest nesting is 2, first reached at line 12, the statement inside the <span class="math" data-say="if">if</span> on line 11, which is inside the <span class="math" data-say="if">if</span> on line 10. The preset <code>due-day-plain</code>, below, is the same routine with every agreement taken out: 1 decision point, breakdown 1, band 0–5, nesting 0, line 3. The eight points between the two listings are the agreements, and none of them could have been derived from the plain rule. The four agreements cost eight points between them: government one (an <span class="math" data-say="if">if</span>), the northern customers two (an <span class="math" data-say="if">if</span> and an <span class="math" data-say="and">&amp;&amp;</span>), the late retail or online invoice three (two <span class="math" data-say="if">if</span>s and the <span class="math" data-say="or">||</span>), and the cap two (an <span class="math" data-say="if">if</span> and an <span class="math" data-say="and">&amp;&amp;</span>). That is what the count shows: not that the routine is badly written, but how much of it a reader has to learn case by case.</p><pre class="codeblock" data-say="line 1, comment, Days from the start of the invoice month until payment is due.. line 2, int due day of customer c, int invoice day. line 3, return invoice day plus 30" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Days from the start of the invoice month until payment is due.</span>
-<span class="cl">int dueDay(Customer c, int invoiceDay) {</span>
-<span class="cl">    return invoiceDay + 30;</span>
-<span class="cl">}</span></code></pre><h3>Exercise</h3><pre class="codeblock" data-say="line 1, comment, Fee in cents for a late payment, with the agreed exceptions.. line 2, long late fee of account A, int days late. line 3, long fee is set to 0. line 4, if days late is greater than 10. line 5, fee is set to 500. line 7, if days late is greater than 30 or A dot is flagged. line 8, fee is set to 2500. line 10, if A dot is charity and days late is less than 60. line 11, fee is set to 0. line 13, if A dot is new and A dot payments equals 0. line 14, fee is set to fee divided by 2. line 16, return fee" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Fee in cents for a late payment, with the agreed exceptions.</span>
-<span class="cl">long lateFee(Account a, int daysLate) {</span>
-<span class="cl">    long fee = 0;</span>
-<span class="cl">    if (daysLate &gt; 10) {</span>
-<span class="cl">        fee = 500;</span>
-<span class="cl">    }</span>
-<span class="cl">    if (daysLate &gt; 30 || a.isFlagged()) {</span>
-<span class="cl">        fee = 2500;</span>
-<span class="cl">    }</span>
-<span class="cl">    if (a.isCharity() &amp;&amp; daysLate &lt; 60) {</span>
-<span class="cl">        fee = 0;</span>
-<span class="cl">    }</span>
-<span class="cl">    if (a.isNew() &amp;&amp; a.payments() == 0) {</span>
-<span class="cl">        fee = fee / 2;</span>
-<span class="cl">    }</span>
-<span class="cl">    return fee;</span>
-<span class="cl">}</span></code></pre><p>Count the decision points in this late fee by the same rule, writing the breakdown as the lab does, and name the agreement each <span class="math" data-say="if">if</span> encodes. Then paste the routine into the lab and compare.</p><p>Fowler warns that advice about performance is not a fact until it is measured. The next lesson, Thinking About Performance, reads the words he uses for what is measured.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Here is a business rule written for the lesson, a due date with four agreements in it: government customers get fifteen more days, long-standing northern customers ten, retail or online customers invoiced late in the month five, and nobody but government waits past day 60. The agreements are invented; they stand for the kind Fowler describes. The lab counts decision points by a rule stated beside it: one, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. On the preset <code>due-day</code> it counts 9, and its breakdown prints how: 1 + if <span data-say="5 plus and 2 plus or 1">5 + && 2 + || 1</span>. The <span class="math" data-say="not">!</span> on line 15 adds nothing; it negates a condition and makes no new branch.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
       </div>
@@ -1507,10 +1531,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
       <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The special cases in a business rule</h3>
-          <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and each conditional and or conditional or. The bands beside the count are McConnell's, from Code Complete; Fowler gives no count. The listings are the lesson's, and the agreements in them are invented.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The special cases in a business rule</h3>
+            <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and each conditional and or conditional or. The bands beside the count are McConnell's, from Code Complete; Fowler gives no count. The listings are the lesson's, and the agreements in them are invented.</p>
         <div class="field">
           <label for="coPreset">Worked example</label>
           <select id="coPreset"><option value="due-day" selected>A due date with four agreements in it (illustrative)</option><option value="due-day-plain">The same due date with every agreement taken out</option></select>
@@ -1523,12 +1547,34 @@
           <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The lab prints three more tiles. The band, 6–10, places the count between McConnell's thresholds from <em>Code Complete</em>; Fowler gives no count and no threshold, so the band is another author's guidance, not this book's. The deepest nesting is 2, first reached at line 12, the statement inside the <span class="math" data-say="if">if</span> on line 11, which is inside the <span class="math" data-say="if">if</span> on line 10. The preset <code>due-day-plain</code>, below, is the same routine with every agreement taken out: 1 decision point, breakdown 1, band 0–5, nesting 0, line 3. The eight points between the two listings are the agreements, and none of them could have been derived from the plain rule. The four agreements cost eight points between them: government one (an <span class="math" data-say="if">if</span>), the northern customers two (an <span class="math" data-say="if">if</span> and an <span class="math" data-say="and">&amp;&amp;</span>), the late retail or online invoice three (two <span class="math" data-say="if">if</span>s and the <span class="math" data-say="or">||</span>), and the cap two (an <span class="math" data-say="if">if</span> and an <span class="math" data-say="and">&amp;&amp;</span>). That is what the count shows: not that the routine is badly written, but how much of it a reader has to learn case by case.</p><pre class="codeblock" data-say="line 1, comment, Days from the start of the invoice month until payment is due.. line 2, int due day of customer c, int invoice day. line 3, return invoice day plus 30" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Days from the start of the invoice month until payment is due.</span>
+<span class="cl">int dueDay(Customer c, int invoiceDay) {</span>
+<span class="cl">    return invoiceDay + 30;</span>
+<span class="cl">}</span></code></pre><h3>Exercise</h3><pre class="codeblock" data-say="line 1, comment, Fee in cents for a late payment, with the agreed exceptions.. line 2, long late fee of account A, int days late. line 3, long fee is set to 0. line 4, if days late is greater than 10. line 5, fee is set to 500. line 7, if days late is greater than 30 or A dot is flagged. line 8, fee is set to 2500. line 10, if A dot is charity and days late is less than 60. line 11, fee is set to 0. line 13, if A dot is new and A dot payments equals 0. line 14, fee is set to fee divided by 2. line 16, return fee" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Fee in cents for a late payment, with the agreed exceptions.</span>
+<span class="cl">long lateFee(Account a, int daysLate) {</span>
+<span class="cl">    long fee = 0;</span>
+<span class="cl">    if (daysLate &gt; 10) {</span>
+<span class="cl">        fee = 500;</span>
+<span class="cl">    }</span>
+<span class="cl">    if (daysLate &gt; 30 || a.isFlagged()) {</span>
+<span class="cl">        fee = 2500;</span>
+<span class="cl">    }</span>
+<span class="cl">    if (a.isCharity() &amp;&amp; daysLate &lt; 60) {</span>
+<span class="cl">        fee = 0;</span>
+<span class="cl">    }</span>
+<span class="cl">    if (a.isNew() &amp;&amp; a.payments() == 0) {</span>
+<span class="cl">        fee = fee / 2;</span>
+<span class="cl">    }</span>
+<span class="cl">    return fee;</span>
+<span class="cl">}</span></code></pre><p>Count the decision points in this late fee by the same rule, writing the breakdown as the lab does, and name the agreement each <span class="math" data-say="if">if</span> encodes. Then paste the routine into the lab and compare.</p><p>Fowler warns that advice about performance is not a fact until it is measured. The next lesson, Thinking About Performance, reads the words he uses for what is measured.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting a rule&#x27;s special cases</h2></div><p>Four steps, the last of them on a rule from a system you know.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the cases</h3><p>Read the routine and write down each condition under which it does something different, in the order the code tests them.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count by the stated rule</h3><p>Start at one and add one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. A <span class="math" data-say="not">!</span>, a comparison and an <span class="math" data-say="else">else</span> add nothing. Write the breakdown, kind by kind.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Name the agreement behind each</h3><p>For each decision point, say in a phrase which agreement it carries out, and mark any you cannot name: those are the ones to ask about.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a rule of your own</h3><p>Take one rule in a system you know that someone outside engineering agreed. Write its exceptions as a list and count them, then paste the code into the lab and set its count beside your list.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting a rule&#x27;s special cases</h2>
+      <p class="lead-in">Four steps, the last of them on a rule from a system you know.</p>
+      <ol class="key-ideas method"><li><strong>List the cases.</strong> Read the routine and write down each condition under which it does something different, in the order the code tests them.</li><li><strong>Count by the stated rule.</strong> Start at one and add one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. A <span class="math" data-say="not">!</span>, a comparison and an <span class="math" data-say="else">else</span> add nothing. Write the breakdown, kind by kind.</li><li><strong>Name the agreement behind each.</strong> For each decision point, say in a phrase which agreement it carries out, and mark any you cannot name: those are the ones to ask about.</li><li><strong>Do it on a rule of your own.</strong> Take one rule in a system you know that someone outside engineering agreed. Write its exceptions as a list and count them, then paste the code into the lab and set its count beside your list.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1547,17 +1593,16 @@ if: lines 4, 7, 10, 11 and 15, so 5
 without the agreements: 1</div><p>Every point past the first comes from an agreement someone made, and the plain routine shows what is left when they are taken out. The count does not say the agreements are wrong; it says how many a reader must learn.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking business logic is logic, so the special cases will go</strong><span>On this view, find the principle behind the rules and the special cases disappear. Fowler's point in Enterprise Applications is that they do not: the rules were agreed one negotiation at a time, often to win business, and the program has to carry them as they are, knowing only that they will change. On the lesson's illustration, eight of the due date's nine decision points come from agreements nobody could derive from the plain rule.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking an enterprise application to be a big one</strong><span>Fowler says plainly that not all enterprise applications are large, and Kinds of Enterprise Application gives a small company's expense tracker as one of its three examples. What makes an application enterprise is persistent, shared, integrated data and the rules over it, not its size; he adds that small systems, taken together, matter a great deal to a business.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Copying a pattern&#x27;s example as the pattern</strong><span>The Introduction insists that the example is not the pattern. Each example is kept simple to show one idea, leaves out error handling and much else, and is not meant to be used as it stands. A pattern is unfinished, as Fowler puts it: you finish it in your own project, and it never comes out quite the same twice.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can list a business rule&#x27;s special cases and count its decision points.</strong><p>Given a routine that encodes a business rule, list each special case it carries and count its decision points by the stated rule, one plus each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>, with the breakdown by kind.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts decision points in the listing; it cannot tell which came from an agreement and which from a slip, and it cannot say whether an agreement still holds. Fowler gives no count at all, and the bands are another book's. What the chapter asks of you is to organise these rules as well as possible, since the one thing sure about them is that they will change.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking business logic is logic, so the special cases will go</strong><span>On this view, find the principle behind the rules and the special cases disappear. Fowler's point in Enterprise Applications is that they do not: the rules were agreed one negotiation at a time, often to win business, and the program has to carry them as they are, knowing only that they will change. On the lesson's illustration, eight of the due date's nine decision points come from agreements nobody could derive from the plain rule.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking an enterprise application to be a big one</strong><span>Fowler says plainly that not all enterprise applications are large, and Kinds of Enterprise Application gives a small company's expense tracker as one of its three examples. What makes an application enterprise is persistent, shared, integrated data and the rules over it, not its size; he adds that small systems, taken together, matter a great deal to a business.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Copying a pattern&#x27;s example as the pattern</strong><span>The Introduction insists that the example is not the pattern. Each example is kept simple to show one idea, leaves out error handling and much else, and is not meant to be used as it stands. A pattern is unfinished, as Fowler puts it: you finish it in your own project, and it never comes out quite the same twice.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can list a business rule&#x27;s special cases and count its decision points.</strong><p>Given a routine that encodes a business rule, list each special case it carries and count its decision points by the stated rule, one plus each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>, with the breakdown by kind.</p></div></div><div class="note"><strong>Note:</strong> The lab counts decision points in the listing; it cannot tell which came from an agreement and which from a slip, and it cannot say whether an agreement still holds. Fowler gives no count at all, and the bands are another book's. What the chapter asks of you is to organise these rules as well as possible, since the one thing sure about them is that they will change.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Enterprise application</summary><p>Fowler gives no precise definition, only marks: persistent data that outlives the programs and machines that made it, a lot of it, used by many people at once through many screens, joined to other systems that disagree about what the data means. Payroll, patient records and foreign exchange trading are enterprise applications; compilers, games and elevator controllers are not.</p></details><details class="recall"><summary>Business logic</summary><p>The rules of the business the application carries out: what is charged, when, to whom, and with which exceptions. Fowler's point is that they are given to you, agreed one case at a time, and follow no principle you could derive them from.</p></details><details class="recall"><summary>Pattern</summary><p>In Christopher Alexander's sense, which the Introduction starts from, a problem that keeps recurring and the core of a solution that can be applied again and again, each time a little differently. Fowler adds that a pattern is a piece of advice, found by watching what works in practice, and that it always has to be finished off in your own project.</p></details></div>
+      <h3>Summary</h3>
       <p>The Preface and the Introduction's first sections: how the book is meant to be read, what Fowler means by architecture, what makes an application an enterprise application, the three kinds he contrasts, and what a pattern is. Count the decision points in a business rule written for the lesson, and see that each one comes from an agreement rather than from logic.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Enterprise application.</strong> Fowler gives no precise definition, only marks: persistent data that outlives the programs and machines that made it, a lot of it, used by many people at once through many screens, joined to other systems that disagree about what the data means. Payroll, patient records and foreign exchange trading are enterprise applications; compilers, games and elevator controllers are not.</li><li><strong>Business logic.</strong> The rules of the business the application carries out: what is charged, when, to whom, and with which exceptions. Fowler's point is that they are given to you, agreed one case at a time, and follow no principle you could derive them from.</li><li><strong>Pattern.</strong> In Christopher Alexander's sense, which the Introduction starts from, a problem that keeps recurring and the core of a solution that can be applied again and again, each time a little differently. Fowler adds that a pattern is a piece of advice, found by watching what works in practice, and that it always has to be finished off in your own project.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="narratives, read through, patterns, look up. enterprise, persistent, shared, integrated. business rules, agreed, not derived. points, 1 plus each if, for, while, case, and, or. a pattern, advice found in practice. the example is not the pattern" tabindex="0" role="region" aria-label="Mathematical notation">narratives: read through; patterns: look up
 enterprise: persistent, shared, integrated
 business rules: agreed, not derived
@@ -2584,11 +2629,42 @@ the example is not the pattern</div><figcaption>The Preface and Introduction in 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2656,7 +2732,7 @@ the example is not the pattern</div><figcaption>The Preface and Introduction in 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

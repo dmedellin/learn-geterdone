@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Queues and Utilisation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Randomness</p>
       <h1>Poisson Arrivals and Bursts</h1>
       <p class="lesson-lede">Compute the chance a window overflows a capacity, and the capacity a burst target needs.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A rate is a mean, not a schedule</li><li>The Poisson count is the binomial&#x27;s limit</li><li>Variance equals the mean, so headroom scales as <span class="math" data-say="the square root of m">√m</span></li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Counting arrivals in a window</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; The count in a window</span><p>Fix a window and let <span class="math" data-say="m">m</span> be the expected number of arrivals in it. Divide the window into <span class="math" data-say="n">n</span> equal opportunities, each carrying one arrival with probability <span class="math" data-say="m over n">m/n</span>. The count <span class="math" data-say="X">X</span> is <strong>binomial</strong>, <span class="math" data-say="P of X equals k, equals n choose k, times the quantity m over n, to the power k, times the quantity 1 minus m over n, to the power the quantity n minus k">P(X = k) = C(n,k)(m/n)^k(1 − m/n)^(n−k)</span>, and its limit as <span class="math" data-say="n">n</span> grows is the <strong>Poisson</strong> count <span class="math" data-say="P of X equals k equals e to the power the quantity negative m, times m to the power k over k factorial">P(X = k) = e^(−m)m^k/k!</span>.</p></div><p>Both columns are available at once, which is unusual and useful: the binomial is exact arithmetic on fractions at any <span class="math" data-say="n">n</span>, and the Poisson is the shape it is heading for. The lab draws them over each other so that the limit is something you watch rather than something you accept.</p><div class="mathblock" data-say="m equals 10 expected in the window, n equals 200 opportunities of 1 over 20 each. P of count is greater than 15, binomial, exact, 0.0443556. Poisson limit, 0.0487404, rounded. variance, binomial, m times the quantity 1 minus m over n, equals 10 times the quantity 19 over 20, equals 19 over 2, equals 9.5. Poisson, m, equals 10" tabindex="0" role="region" aria-label="Mathematical notation">m = 10 expected in the window,  n = 200 opportunities of 1/20 each
-
-P(count &gt; 15)   binomial, exact     0.0443556
-                Poisson limit       0.0487404      rounded
-
-variance        binomial  m(1 − m/n) = 10(19/20) = 19/2 = 9.5
-                Poisson                          m    = 10</div><p>The two tails differ in the third decimal place at <span class="math" data-say="n equals 200">n = 200</span>, and the difference is not noise: the binomial genuinely has a slightly smaller variance, because a chopped window can hold at most <span class="math" data-say="n">n</span> arrivals while a Poisson count has no upper bound at all. Chop it finer and the two converge.</p><h3>Sizing for a burst</h3><p>The design question is rarely &ldquo;what is the mean&rdquo;. It is &ldquo;how much must this window hold so that it overflows no more than one time in a hundred&rdquo;, and that is a tail: the smallest <span class="math" data-say="C">C</span> with <span class="math" data-say="P of count is greater than C is at most target">P(count > C) ≤ target</span>.</p><div class="mathblock" data-say="m equals 10 expected arrivals in the window. P of count is greater than C is at most 1 over 100, needs C equals 18, 80 percent over the mean. P of count is greater than C is at most 1 over 1000, needs C equals 21, 110 percent over the mean. and a window sized at the mean itself, C equals 10. P of count is greater than 10 is about 0.42, two windows in five" tabindex="0" role="region" aria-label="Mathematical notation">m = 10 expected arrivals in the window
-
-P(count &gt; C) ≤ 1/100     needs C = 18        80% over the mean
-P(count &gt; C) ≤ 1/1000    needs C = 21        110% over the mean
-
-and a window sized at the mean itself, C = 10:
-P(count &gt; 10) is about 0.42                  two windows in five</div><p>Sizing at the mean is therefore not a conservative choice or even a neutral one: it overflows about two windows in five. The three extra arrivals between 15 and 18 are the difference between overflowing 4.4% of the time and 1% of the time, which is what buying the tail costs.</p><p>The <span class="math" data-say="the square root of m">√m</span> scaling cuts the other way for large streams. A service taking 1000 a second has a standard deviation of about 32, so 1100 is over three standard deviations out; a service taking 10 a second is over three standard deviations out at 20. Consolidating ten small streams into one big one does not change the mean load and does reduce the relative burstiness &mdash; a first look at the pooling argument that &ldquo;Many Servers: Pooling, and Erlang C&rdquo; makes precisely.</p><p>Two limits are worth stating plainly. The Poisson column uses <span class="math" data-say="e to the power the quantity negative m">e^(−m)</span> summed as a series, so it is rounded and the lab bounds <span class="math" data-say="m">m</span> at 12, where the method still has its digits. The binomial column is exact fractions and has no such bound; it is capped only by how fine a chopping stays readable, since exactness at <span class="math" data-say="n equals 20 m">n = 20m</span> already means denominators of hundreds of digits.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Poisson arrivals and bursts</h2></div><p>The count in a window, and the headroom its spread costs</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Counting arrivals in a window</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The count in a window</span><p>Fix a window and let <span class="math" data-say="m">m</span> be the expected number of arrivals in it. Divide the window into <span class="math" data-say="n">n</span> equal opportunities, each carrying one arrival with probability <span class="math" data-say="m over n">m/n</span>. The count <span class="math" data-say="X">X</span> is <strong>binomial</strong>, <span class="math" data-say="P of X equals k, equals n choose k, times the quantity m over n, to the power k, times the quantity 1 minus m over n, to the power the quantity n minus k">P(X = k) = C(n,k)(m/n)^k(1 − m/n)^(n−k)</span>, and its limit as <span class="math" data-say="n">n</span> grows is the <strong>Poisson</strong> count <span class="math" data-say="P of X equals k equals e to the power the quantity negative m, times m to the power k over k factorial">P(X = k) = e^(−m)m^k/k!</span>.</p></div><p>Both columns are available at once, which is unusual and useful: the binomial is exact arithmetic on fractions at any <span class="math" data-say="n">n</span>, and the Poisson is the shape it is heading for. The lab draws them over each other so that the limit is something you watch rather than something you accept.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Poisson arrivals and bursts</h2></div><p>The count in a window, and the headroom its spread costs</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Poisson arrivals and bursts</strong><span>the count in a window is the binomial's limit, and its variance is its mean</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>binomial, exact</span><span class="tone-red"><i class="legend-swatch"></i>Poisson, rounded</span><span class="tone-amber"><i class="legend-swatch"></i>above the threshold</span></div>
@@ -1416,10 +1447,10 @@ P(count &gt; 10) is about 0.42                  two windows in five</div><p>Sizi
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="poPlot" viewBox="0 0 520 190" role="img" aria-label="The exact binomial distribution of the count in a window, with its Poisson limit over it."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="poTable"></table></div>
       <div class="status-banner" id="poStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the window and the capacity</h3>
-          <p>The exact binomial distribution is drawn with its Poisson limit over it, and both tails above the capacity are printed &mdash; the first exact, the second rounded and labelled. Change how finely the window is chopped and watch the two converge.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the window and the capacity</h3>
+            <p>The exact binomial distribution is drawn with its Poisson limit over it, and both tails above the capacity are printed &mdash; the first exact, the second rounded and labelled. Change how finely the window is chopped and watch the two converge.</p>
         <div>
           <div class="range-row"><label class="small-copy" id="poMLab" for="poM">Mean count in the window, m</label><span class="range-value" id="poMOut">10</span></div>
           <input id="poM" type="range" min="1" max="12" step="1" value="10" />
@@ -1443,12 +1474,27 @@ P(count &gt; 10) is about 0.42                  two windows in five</div><p>Sizi
           <div class="kpi"><span>C that meets the target</span><strong id="poNeed">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="poHint" style="margin:0;">"1000 per second" does not mean 1000 arrive each second. With a Poisson count the standard deviation is &radic;m, so a mean of 1000 is 1000 &plusmn; 32 and a window sized at exactly the mean is over capacity about half the time. Both limits on this page come from the <em>exact</em> side rather than the rounded one: the chopping stops at 20m because the bars are exact fractions and at 100m the denominators run to two thousand digits, and the mean stops at 12 for the same reason. The rounded column would have been happy to continue &mdash; e<sup>&minus;m</sup> is the reciprocal of a positive-term series, so nothing cancels and it is accurate to the last bit of a double well past any mean this page offers.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="m equals 10 expected in the window, n equals 200 opportunities of 1 over 20 each. P of count is greater than 15, binomial, exact, 0.0443556. Poisson limit, 0.0487404, rounded. variance, binomial, m times the quantity 1 minus m over n, equals 10 times the quantity 19 over 20, equals 19 over 2, equals 9.5. Poisson, m, equals 10" tabindex="0" role="region" aria-label="Mathematical notation">m = 10 expected in the window,  n = 200 opportunities of 1/20 each
+
+P(count &gt; 15)   binomial, exact     0.0443556
+                Poisson limit       0.0487404      rounded
+
+variance        binomial  m(1 − m/n) = 10(19/20) = 19/2 = 9.5
+                Poisson                          m    = 10</div><p>The two tails differ in the third decimal place at <span class="math" data-say="n equals 200">n = 200</span>, and the difference is not noise: the binomial genuinely has a slightly smaller variance, because a chopped window can hold at most <span class="math" data-say="n">n</span> arrivals while a Poisson count has no upper bound at all. Chop it finer and the two converge.</p><h3>Sizing for a burst</h3><p>The design question is rarely &ldquo;what is the mean&rdquo;. It is &ldquo;how much must this window hold so that it overflows no more than one time in a hundred&rdquo;, and that is a tail: the smallest <span class="math" data-say="C">C</span> with <span class="math" data-say="P of count is greater than C is at most target">P(count > C) ≤ target</span>.</p><div class="mathblock" data-say="m equals 10 expected arrivals in the window. P of count is greater than C is at most 1 over 100, needs C equals 18, 80 percent over the mean. P of count is greater than C is at most 1 over 1000, needs C equals 21, 110 percent over the mean. and a window sized at the mean itself, C equals 10. P of count is greater than 10 is about 0.42, two windows in five" tabindex="0" role="region" aria-label="Mathematical notation">m = 10 expected arrivals in the window
+
+P(count &gt; C) ≤ 1/100     needs C = 18        80% over the mean
+P(count &gt; C) ≤ 1/1000    needs C = 21        110% over the mean
+
+and a window sized at the mean itself, C = 10:
+P(count &gt; 10) is about 0.42                  two windows in five</div><p>Sizing at the mean is therefore not a conservative choice or even a neutral one: it overflows about two windows in five. The three extra arrivals between 15 and 18 are the difference between overflowing 4.4% of the time and 1% of the time, which is what buying the tail costs.</p><p>The <span class="math" data-say="the square root of m">√m</span> scaling cuts the other way for large streams. A service taking 1000 a second has a standard deviation of about 32, so 1100 is over three standard deviations out; a service taking 10 a second is over three standard deviations out at 20. Consolidating ten small streams into one big one does not change the mean load and does reduce the relative burstiness &mdash; a first look at the pooling argument that &ldquo;Many Servers: Pooling, and Erlang C&rdquo; makes precisely.</p><p>Two limits are worth stating plainly. The Poisson column uses <span class="math" data-say="e to the power the quantity negative m">e^(−m)</span> summed as a series, so it is rounded and the lab bounds <span class="math" data-say="m">m</span> at 12, where the method still has its digits. The binomial column is exact fractions and has no such bound; it is capped only by how fine a chopping stays readable, since exactness at <span class="math" data-say="n equals 20 m">n = 20m</span> already means denominators of hundreds of digits.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sizing a window for a burst target</h2></div><p>Everything here is a tail. The mean is the input, not the answer.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>State the window and the mean count in it</h3><p><span class="math" data-say="m">m</span> is a count, not a rate: a rate of 1000 a second is <span class="math" data-say="m equals 1000">m = 1000</span> for a one-second window and <span class="math" data-say="m equals 100">m = 100</span> for a hundred-millisecond one. The window has to be named before anything else is true.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Decide the target overflow fraction</h3><p>One window in a hundred, one in a thousand. This is a business decision and it is the only free parameter; everything downstream follows from it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the smallest <span class="math" data-say="C">C</span> whose tail is under the target</h3><p>Walk <span class="math" data-say="C">C</span> upward and read <span class="math" data-say="P of count is greater than C">P(count > C)</span> at each step. The lab does the search and prints the answer; doing it by hand once shows how flat the tail is in that region.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Quote the headroom as a multiple of the mean, and check the <span class="math" data-say="the square root of m">√m</span> scaling</h3><p><span class="math" data-say="C equals 18">C = 18</span> at <span class="math" data-say="m equals 10">m = 10</span> is 80% headroom. The same target at a much larger <span class="math" data-say="m">m</span> needs proportionally less, because the spread grows like <span class="math" data-say="the square root of m">√m</span> while the mean grows like <span class="math" data-say="m">m</span>.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sizing a window for a burst target</h2>
+      <p class="lead-in">Everything here is a tail. The mean is the input, not the answer.</p>
+      <ol class="key-ideas method"><li><strong>State the window and the mean count in it.</strong> <span class="math" data-say="m">m</span> is a count, not a rate: a rate of 1000 a second is <span class="math" data-say="m equals 1000">m = 1000</span> for a one-second window and <span class="math" data-say="m equals 100">m = 100</span> for a hundred-millisecond one. The window has to be named before anything else is true.</li><li><strong>Decide the target overflow fraction.</strong> One window in a hundred, one in a thousand. This is a business decision and it is the only free parameter; everything downstream follows from it.</li><li><strong>Find the smallest <span class="math" data-say="C">C</span> whose tail is under the target.</strong> Walk <span class="math" data-say="C">C</span> upward and read <span class="math" data-say="P of count is greater than C">P(count > C)</span> at each step. The lab does the search and prints the answer; doing it by hand once shows how flat the tail is in that region.</li><li><strong>Quote the headroom as a multiple of the mean, and check the <span class="math" data-say="the square root of m">√m</span> scaling.</strong> <span class="math" data-say="C equals 18">C = 18</span> at <span class="math" data-say="m equals 10">m = 10</span> is 80% headroom. The same target at a much larger <span class="math" data-say="m">m</span> needs proportionally less, because the spread grows like <span class="math" data-say="the square root of m">√m</span> while the mean grows like <span class="math" data-say="m">m</span>.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1475,17 +1521,16 @@ sizing            P(count &gt; C) ≤ 1/100    →   C = 18
 and at C = m = 10:  P(count &gt; 10) ≈ 0.42</div><p>Capacity 15 is 50% above the mean and still overflows one window in twenty-two. Capacity 18 is 80% above it and overflows one in a hundred. That steepness is the whole reason burst headroom is bought explicitly rather than assumed.</p><p>For a faded rehearsal, keep the target at one window in a hundred and set <span class="math" data-say="m equals 5">m = 5</span>. The supplied first move is that the answer must be above 5 and that the relative headroom will be <em>larger</em> than it was at <span class="math" data-say="m equals 10">m = 10</span>, because the spread scales as <span class="math" data-say="the square root of m">√m</span> and the mean does not. Predict the capacity, then read it off.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>“1000 a second” read as 1000 in each second</strong><span>It is a mean. The actual counts are spread around it with standard deviation about 32, so seconds carrying 1050 or 940 are ordinary and neither is an incident. Treating a rate as a schedule is the deterministic intuition of &ldquo;Why Queues Form at <span class="math" data-say="rho is less than 1">ρ &lt; 1</span>&rdquo; in a different costume.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sizing a window at the mean</strong><span>A capacity equal to the mean overflows roughly two windows in five, because a count is above its mean about half the time. Headroom is not a safety margin bolted onto a correct number; it <em>is</em> the number, and the target overflow fraction is what sets it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the Poisson column as the exact one</strong><span>It is the limit of the binomial and, here, a rounded series besides. The exact answer for a window chopped into <span class="math" data-say="n">n</span> opportunities is the binomial, and the two differ by about a tenth of the tail at <span class="math" data-say="n equals 20 m">n = 20m</span> &mdash; small, but not zero, and in a predictable direction.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a rate on a dashboard reads as a mean with a <span class="math" data-say="the square root of m">√m</span> spread around it.</strong><p>You should be able to build the count in a window as a binomial, say what it becomes in the limit and why, compute <span class="math" data-say="P of count is greater than C">P(count > C)</span> both ways, and size a capacity to a stated overflow target rather than to the mean.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Memoryless gaps and Poisson counts are the two halves of the same assumption, and together they name a queue: arrivals memoryless, service memoryless, one server. “The M/M/1 Queue” solves it by balancing flow across a cut, and the library&rsquo;s closed forms for <span class="math" data-say="L">L</span>, <span class="math" data-say="W">W</span> and the tail come from that one argument.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>“1000 a second” read as 1000 in each second</strong><span>It is a mean. The actual counts are spread around it with standard deviation about 32, so seconds carrying 1050 or 940 are ordinary and neither is an incident. Treating a rate as a schedule is the deterministic intuition of &ldquo;Why Queues Form at <span class="math" data-say="rho is less than 1">ρ &lt; 1</span>&rdquo; in a different costume.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sizing a window at the mean</strong><span>A capacity equal to the mean overflows roughly two windows in five, because a count is above its mean about half the time. Headroom is not a safety margin bolted onto a correct number; it <em>is</em> the number, and the target overflow fraction is what sets it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the Poisson column as the exact one</strong><span>It is the limit of the binomial and, here, a rounded series besides. The exact answer for a window chopped into <span class="math" data-say="n">n</span> opportunities is the binomial, and the two differ by about a tenth of the tail at <span class="math" data-say="n equals 20 m">n = 20m</span> &mdash; small, but not zero, and in a predictable direction.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a rate on a dashboard reads as a mean with a <span class="math" data-say="the square root of m">√m</span> spread around it.</strong><p>You should be able to build the count in a window as a binomial, say what it becomes in the limit and why, compute <span class="math" data-say="P of count is greater than C">P(count > C)</span> both ways, and size a capacity to a stated overflow target rather than to the mean.</p></div></div><div class="note"><strong>Note:</strong> Memoryless gaps and Poisson counts are the two halves of the same assumption, and together they name a queue: arrivals memoryless, service memoryless, one server. “The M/M/1 Queue” solves it by balancing flow across a cut, and the library&rsquo;s closed forms for <span class="math" data-say="L">L</span>, <span class="math" data-say="W">W</span> and the tail come from that one argument.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A rate is a mean, not a schedule</summary><p>1000 requests a second says that the expected count in a one-second window is 1000. It says nothing about any particular second, and the counts in consecutive seconds vary by tens without anything having gone wrong.</p></details><details class="recall"><summary>The Poisson count is the binomial&#x27;s limit</summary><p>Chop the window into <span class="math" data-say="n">n</span> opportunities, each carrying an arrival with probability <span class="math" data-say="m over n">m/n</span>. The count is <span class="math" data-say="Binomial of n and m over n">Binomial(n, m/n)</span> with mean <span class="math" data-say="m">m</span>, exactly. As <span class="math" data-say="n">n</span> grows the binomial's probabilities converge to <span class="math" data-say="e to the power the quantity negative m, times m to the power k over k factorial">e^(−m)m^k/k!</span>, and no density or integral is needed to say so.</p></details><details class="recall"><summary>Variance equals the mean, so headroom scales as <span class="math" data-say="the square root of m">√m</span></summary><p>The binomial's variance is <span class="math" data-say="m times the quantity 1 minus m over n">m(1 − m/n)</span>, which climbs to <span class="math" data-say="m">m</span> as the chopping gets finer. A standard deviation of <span class="math" data-say="the square root of m">√m</span> means the <em>relative</em> burstiness of a big stream is smaller than that of a small one: <span class="math" data-say="1000 plus or minus 32">1000 ± 32</span> is a 3% wobble, while <span class="math" data-say="10 plus or minus 3.2">10 ± 3.2</span> is a 32% one.</p></details></div>
+      <h3>Summary</h3>
       <p>&ldquo;A thousand requests a second&rdquo; is a mean, not a schedule. Chop the second into <span class="math" data-say="n">n</span> opportunities each of probability <span class="math" data-say="m over n">m/n</span> and the count is binomial; let <span class="math" data-say="n">n</span> grow and it becomes <span class="math" data-say="P of k equals e to the power the quantity negative m, times m to the power k over k factorial">P(k) = e^(−m)m^k/k!</span>, whose variance equals its mean. The burst headroom a system needs is <span class="math" data-say="P of count is greater than C">P(count > C)</span>.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A rate is a mean, not a schedule.</strong> 1000 requests a second says that the expected count in a one-second window is 1000. It says nothing about any particular second, and the counts in consecutive seconds vary by tens without anything having gone wrong.</li><li><strong>The Poisson count is the binomial&#x27;s limit.</strong> Chop the window into <span class="math" data-say="n">n</span> opportunities, each carrying an arrival with probability <span class="math" data-say="m over n">m/n</span>. The count is <span class="math" data-say="Binomial of n and m over n">Binomial(n, m/n)</span> with mean <span class="math" data-say="m">m</span>, exactly. As <span class="math" data-say="n">n</span> grows the binomial's probabilities converge to <span class="math" data-say="e to the power the quantity negative m, times m to the power k over k factorial">e^(−m)m^k/k!</span>, and no density or integral is needed to say so.</li><li><strong>Variance equals the mean, so headroom scales as <span class="math" data-say="the square root of m">√m</span>.</strong> The binomial's variance is <span class="math" data-say="m times the quantity 1 minus m over n">m(1 − m/n)</span>, which climbs to <span class="math" data-say="m">m</span> as the chopping gets finer. A standard deviation of <span class="math" data-say="the square root of m">√m</span> means the <em>relative</em> burstiness of a big stream is smaller than that of a small one: <span class="math" data-say="1000 plus or minus 32">1000 ± 32</span> is a 3% wobble, while <span class="math" data-say="10 plus or minus 3.2">10 ± 3.2</span> is a 32% one.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="count is approximately Binomial of n and m over n, n chances in the window, each small. P of k equals e to the power the quantity negative m, times m to the power k over k factorial, the limit as n grows, the Poisson count. variance equals mean equals m, so the spread is the square root of m. m equals 1000 per second, 1000 plus or minus 32, because the square root of 1000 is approximately 31.6. P of count is greater than C, the fraction of windows that overflow" tabindex="0" role="region" aria-label="Mathematical notation">count ~ Binomial(n, m/n)        n chances in the window, each small
 P(k) = e^(−m)m^k/k!             the limit as n grows: the Poisson count
 variance = mean = m             so the spread is √m
@@ -2819,11 +2864,42 @@ P(count &gt; C)                    the fraction of windows that overflow</div><f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2891,7 +2967,7 @@ P(count &gt; C)                    the fraction of windows that overflow</div><f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

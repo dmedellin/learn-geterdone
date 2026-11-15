@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Mind, Language and Meaning</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Mind</p>
       <h1>The Chinese Room and the Lookup Table</h1>
       <p class="lesson-lede">Count the entries a lookup table needs for a conversation, and use the count to state Block&#x27;s argument and Searle&#x27;s.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A table stores replies; a program generates them</li><li>A conversation is a sequence</li><li>Two arguments, one device</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Counting the table</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Lookup table</span><p>A <strong>lookup table</strong> answers by finding its input in a list and returning the reply stored beside it. It does not compute a reply; every reply it will ever give is already written down.</p></div><p>Suppose a machine is to pass the conversation test of the previous lessons by this method. Its reply at any moment depends on everything said so far, so the table has to be keyed on the whole conversation, not on the last remark. If at each turn the judge may say one of <span class="math" data-say="n">n</span> things, and the conversation has <span class="math" data-say="r">r</span> turns, the table needs a reply ready for every sequence of <span class="math" data-say="r">r</span> remarks.</p><p>That is a count of ordered choices with repetition: <span class="math" data-say="n">n</span> choices at the first turn, <span class="math" data-say="n">n</span> at the second, and so on, which gives <span class="math" data-say="n to the power r">nʳ</span>. Shorter conversations add a little more, because the table must also answer the ones that end early, but the largest term is the whole-conversation count. In the lab, set <span class="math" data-say="n">n</span> to 24 and <span class="math" data-say="r">r</span> to 12.</p><div class="mathblock" data-say="24 to the power 12, equals thirty-six quadrillion, five hundred twenty trillion, three hundred forty-seven billion, four hundred thirty-six million, fifty-six thousand, five hundred seventy-six" tabindex="0" role="region" aria-label="Mathematical notation">24¹²  =  36 520 347 436 056 576</div><p>That is over thirty-six quadrillion entries for a twelve-turn conversation in which the judge has only twenty-four things to say. Slide <span class="math" data-say="r">r</span> down and the table shrinks fast: at three turns it is 13 824, and each further turn multiplies it by 24. A real conversation has a vastly larger stock of remarks and many more turns, so the table grows at a rate no budget can meet.</p><p>Compare a program. A program that holds a rule for forming replies can be a few thousand lines and meet every one of those conversations, because it does not store them; it works them out. A table is the opposite of compression. Its size is the number of cases it covers, and a program's size is the length of the idea behind them.</p><p>Block takes the table as a thought experiment. Build one anyway, in principle, with every sensible conversation of some length written in. It passes the test with a Bayes factor of 1 and nothing in it is intelligent: it looks up. So behaviour that passes the test is not sufficient for intelligence, and behaviourism is false. The reply is that a table which cannot be built tells us little about what a thing that could be built must be like. Block's rejoinder is that behaviourism was a claim about what is conceptually enough, and an in-principle case refutes a claim of that strength.</p><p>Searle's room is a different case. A person who reads no Chinese sits in a room with a rulebook for manipulating Chinese symbols, and passes out replies that a Chinese speaker would accept. The room runs on rules, so its size is the size of the rulebook and not the number of conversations, and the count does not touch it. Searle argues that the person understands nothing, so following the rules cannot be understanding. The standard reply is that the whole system, room and rulebook and person together, understands. Searle's rejoinder is to let the person memorise the rulebook and work in the open, so that the system is the person, who still understands nothing. The lesson does not choose.</p><p>What the count settles is narrow. A passing system of any realistic size is not a table, so it generalises, and whether generalising amounts to understanding is the open question. What it does not settle is whether a table, if built, would think.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The four counting rules</h2></div><p>Enumerated while enumeration is possible</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Counting the table</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Lookup table</span><p>A <strong>lookup table</strong> answers by finding its input in a list and returning the reply stored beside it. It does not compute a reply; every reply it will ever give is already written down.</p></div><p>Suppose a machine is to pass the conversation test of the previous lessons by this method. Its reply at any moment depends on everything said so far, so the table has to be keyed on the whole conversation, not on the last remark. If at each turn the judge may say one of <span class="math" data-say="n">n</span> things, and the conversation has <span class="math" data-say="r">r</span> turns, the table needs a reply ready for every sequence of <span class="math" data-say="r">r</span> remarks.</p><p>That is a count of ordered choices with repetition: <span class="math" data-say="n">n</span> choices at the first turn, <span class="math" data-say="n">n</span> at the second, and so on, which gives <span class="math" data-say="n to the power r">nʳ</span>. Shorter conversations add a little more, because the table must also answer the ones that end early, but the largest term is the whole-conversation count. In the lab, set <span class="math" data-say="n">n</span> to 24 and <span class="math" data-say="r">r</span> to 12.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The four counting rules</h2></div><p>Enumerated while enumeration is possible</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Choosing r from n</strong><span>Order matters or not; repetition allowed or not</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>selected rule</span></div>
@@ -1405,10 +1448,10 @@
         <div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cntTable"></table></div>
         <div id="cntList" class="small-copy" style="margin-top:10px;"></div>
       </div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>How many conversations</h3>
-          <p>The first row counts ordered choices with repetition, which is the conversation count. Slide the number of turns down to three and up again, and watch the first row against the others.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>How many conversations</h3>
+            <p>The first row counts ordered choices with repetition, which is the conversation count. Slide the number of turns down to three and up again, and watch the first row against the others.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="cntN">n (things to choose from)</label><span class="range-value" id="cntNOut">5</span></div>
           <input id="cntN" type="range" min="1" max="24" value="5" />
@@ -1427,12 +1470,15 @@
           </select>
         </div>
         <div class="status-banner" id="cntStatus">Every total is computed in exact integer arithmetic.</div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="24 to the power 12, equals thirty-six quadrillion, five hundred twenty trillion, three hundred forty-seven billion, four hundred thirty-six million, fifty-six thousand, five hundred seventy-six" tabindex="0" role="region" aria-label="Mathematical notation">24¹²  =  36 520 347 436 056 576</div><p>That is over thirty-six quadrillion entries for a twelve-turn conversation in which the judge has only twenty-four things to say. Slide <span class="math" data-say="r">r</span> down and the table shrinks fast: at three turns it is 13 824, and each further turn multiplies it by 24. A real conversation has a vastly larger stock of remarks and many more turns, so the table grows at a rate no budget can meet.</p><p>Compare a program. A program that holds a rule for forming replies can be a few thousand lines and meet every one of those conversations, because it does not store them; it works them out. A table is the opposite of compression. Its size is the number of cases it covers, and a program's size is the length of the idea behind them.</p><p>Block takes the table as a thought experiment. Build one anyway, in principle, with every sensible conversation of some length written in. It passes the test with a Bayes factor of 1 and nothing in it is intelligent: it looks up. So behaviour that passes the test is not sufficient for intelligence, and behaviourism is false. The reply is that a table which cannot be built tells us little about what a thing that could be built must be like. Block's rejoinder is that behaviourism was a claim about what is conceptually enough, and an in-principle case refutes a claim of that strength.</p><p>Searle's room is a different case. A person who reads no Chinese sits in a room with a rulebook for manipulating Chinese symbols, and passes out replies that a Chinese speaker would accept. The room runs on rules, so its size is the size of the rulebook and not the number of conversations, and the count does not touch it. Searle argues that the person understands nothing, so following the rules cannot be understanding. The standard reply is that the whole system, room and rulebook and person together, understands. Searle's rejoinder is to let the person memorise the rulebook and work in the open, so that the system is the person, who still understands nothing. The lesson does not choose.</p><p>What the count settles is narrow. A passing system of any realistic size is not a table, so it generalises, and whether generalising amounts to understanding is the open question. What it does not settle is whether a table, if built, would think.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sizing a table</h2></div><p>Four steps. The second is the one that makes the number large.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix the inputs per turn</h3><p>Say how many things the judge can say at one turn. Call it <span class="math" data-say="n">n</span>. The lab's <span class="math" data-say="n">n</span> is that number.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Key the table on the whole conversation</h3><p>The reply may depend on everything said before, so the table needs an entry for each sequence of <span class="math" data-say="r">r</span> remarks, not for each remark.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the sequences</h3><p>Ordered, with repetition: <span class="math" data-say="n">n</span> at each turn, so <span class="math" data-say="n to the power r">nʳ</span>. Read it off the first row of the lab.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare it with a rule</h3><p>A program that forms replies is the length of its rule, whatever the number of conversations. A table is the length of the number of conversations.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sizing a table</h2>
+      <p class="lead-in">Four steps. The second is the one that makes the number large.</p>
+      <ol class="key-ideas method"><li><strong>Fix the inputs per turn.</strong> Say how many things the judge can say at one turn. Call it <span class="math" data-say="n">n</span>. The lab's <span class="math" data-say="n">n</span> is that number.</li><li><strong>Key the table on the whole conversation.</strong> The reply may depend on everything said before, so the table needs an entry for each sequence of <span class="math" data-say="r">r</span> remarks, not for each remark.</li><li><strong>Count the sequences.</strong> Ordered, with repetition: <span class="math" data-say="n">n</span> at each turn, so <span class="math" data-say="n to the power r">nʳ</span>. Read it off the first row of the lab.</li><li><strong>Compare it with a rule.</strong> A program that forms replies is the length of its rule, whatever the number of conversations. A table is the length of the number of conversations.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1449,17 +1495,16 @@
 each added turn multiplies the table by 24</div><p>The table grows with the number of conversations, and the number of conversations grows by a factor of 24 for every turn. So the machine that passes a long test is not a table of this kind in practice. It is something that computes, and Block's table is then an argument about what would follow if one existed.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking a lookup table for a small program</strong><span>A program is short because it generalises: it turns a rule into a reply for each case. A table has no rule, so its length is the number of cases, and that number is <span class="math" data-say="n to the power r">nʳ</span>. At 24 remarks and 12 turns the lab prints a count of more than thirty-six quadrillion, and each added turn multiplies it by 24.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the Chinese room and the lookup table as one argument</strong><span>The room has a rulebook and can be small, so the count does not touch it. The table is the large device with no rule at all. Block's argument needs the table, and Searle's needs the rulebook.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the count as a refutation of Block</strong><span>That a table cannot be built shows that nothing could pass by looking up. It does not show that a table, if built, would think, and Block's claim was about what is possible in principle. The count tells you what a real passer must be doing, not what an imaginary one would be.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count the table and say what each argument uses it for.</strong><p>Given the number of remarks and turns, you should be able to compute the entries a table needs, say why a program of the same behaviour is smaller, and state in a sentence what Block and what Searle infer from their devices.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's rows give the other counting rules beside the one used here. Only the first row, ordered with repetition, is the conversation count; the others answer different questions.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking a lookup table for a small program</strong><span>A program is short because it generalises: it turns a rule into a reply for each case. A table has no rule, so its length is the number of cases, and that number is <span class="math" data-say="n to the power r">nʳ</span>. At 24 remarks and 12 turns the lab prints a count of more than thirty-six quadrillion, and each added turn multiplies it by 24.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the Chinese room and the lookup table as one argument</strong><span>The room has a rulebook and can be small, so the count does not touch it. The table is the large device with no rule at all. Block's argument needs the table, and Searle's needs the rulebook.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the count as a refutation of Block</strong><span>That a table cannot be built shows that nothing could pass by looking up. It does not show that a table, if built, would think, and Block's claim was about what is possible in principle. The count tells you what a real passer must be doing, not what an imaginary one would be.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count the table and say what each argument uses it for.</strong><p>Given the number of remarks and turns, you should be able to compute the entries a table needs, say why a program of the same behaviour is smaller, and state in a sentence what Block and what Searle infer from their devices.</p></div></div><div class="note"><strong>Note:</strong> The lab's rows give the other counting rules beside the one used here. Only the first row, ordered with repetition, is the conversation count; the others answer different questions.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A table stores replies; a program generates them</summary><p>A lookup table holds a reply for every case it must meet and computes nothing. A program holds a rule from which the replies follow. The same replies can come from either, and the two have very different sizes.</p></details><details class="recall"><summary>A conversation is a sequence</summary><p>If each turn offers one of <span class="math" data-say="n">n</span> things to say and the conversation lasts <span class="math" data-say="r">r</span> turns, there are <span class="math" data-say="n to the power r">nʳ</span> complete conversations, because each turn multiplies the count by <span class="math" data-say="n">n</span>. This is the count of ordered choices with repetition from Combinatorics and Counting on the Discrete Mathematics path.</p></details><details class="recall"><summary>Two arguments, one device</summary><p>Block uses the table to argue that passing a behavioural test is not enough for intelligence. Searle uses a room with a rulebook to argue that running a program is not enough for understanding. The device differs, and so does the count that bears on it.</p></details></div>
+      <h3>Summary</h3>
       <p>A machine that passes a conversation test by consulting a table keyed on the whole conversation needs one entry for each possible conversation. Count them, see why that makes a table the opposite of a program, and state what Block and Searle each use the table for.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A table stores replies; a program generates them.</strong> A lookup table holds a reply for every case it must meet and computes nothing. A program holds a rule from which the replies follow. The same replies can come from either, and the two have very different sizes.</li><li><strong>A conversation is a sequence.</strong> If each turn offers one of <span class="math" data-say="n">n</span> things to say and the conversation lasts <span class="math" data-say="r">r</span> turns, there are <span class="math" data-say="n to the power r">nʳ</span> complete conversations, because each turn multiplies the count by <span class="math" data-say="n">n</span>. This is the count of ordered choices with repetition from Combinatorics and Counting on the Discrete Mathematics path.</li><li><strong>Two arguments, one device.</strong> Block uses the table to argue that passing a behavioural test is not enough for intelligence. Searle uses a room with a rulebook to argue that running a program is not enough for understanding. The device differs, and so does the count that bears on it.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="table, one reply per whole conversation. n inputs per turn, r turns, n to the power r entries. 24 inputs, 12 turns, 24 to the power 12 entries. each extra turn multiplies by 24. a program compresses, a table lists" tabindex="0" role="region" aria-label="Mathematical notation">table: one reply per whole conversation
 n inputs per turn, r turns: nʳ entries
 24 inputs, 12 turns: 24¹² entries
@@ -1914,11 +1959,42 @@ a program compresses; a table lists</div><figcaption>A table is as big as the co
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -1986,7 +2062,7 @@ a program compresses; a table lists</div><figcaption>A table is as big as the co
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

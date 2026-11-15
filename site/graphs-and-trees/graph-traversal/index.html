@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Graphs and Trees</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Traversal</p>
       <h1>Breadth-First and Depth-First Search</h1>
       <p class="lesson-lede">Two ways to visit everything, with different shapes and different uses.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>BFS settles by distance</li><li>DFS follows one branch to exhaustion</li><li>Both visit every vertex of the component</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The two searches</h2>
-      <article class="prose reading"><div class="mathblock" data-say="BFS of G and s. mark s visited, dist at s equals 0, queue equals s. while queue not empty. v equals queue, pop sub front of. for each neighbour u of v. if u unvisited. mark u, dist at u equals dist at v plus 1, parent at u equals v. queue, push sub back of u" tabindex="0" role="region" aria-label="Mathematical notation">BFS(G, s):
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The two searches</h2><div class="prose reading"><div class="mathblock" data-say="BFS of G and s. mark s visited, dist at s equals 0, queue equals s. while queue not empty. v equals queue, pop sub front of. for each neighbour u of v. if u unvisited. mark u, dist at u equals dist at v plus 1, parent at u equals v. queue, push sub back of u" tabindex="0" role="region" aria-label="Mathematical notation">BFS(G, s):
     mark s visited; dist[s] = 0;  queue = [s]
     while queue not empty:
         v = queue.pop_front()
@@ -1406,12 +1450,11 @@ shortest paths (unweighted)      cycle detection
 level structure / distances      topological sort
 bipartiteness testing            strongly connected components
 web crawling by depth            maze generation and solving
-                                 articulation points and bridges</div><p>Both find the components and both produce a spanning tree, and either serves for those. The distinctive uses come from the ORDER: BFS knows distances, DFS knows the nesting of the recursion, and each of those is the key to different problems.</p><h3>Cycle detection with DFS</h3><div class="thm"><span class="label">Theorem &middot; Back edges are cycles</span><p>During a depth-first search of an undirected graph, an edge to an already-visited vertex that is not the current vertex's parent closes a cycle. A graph is acyclic exactly when no such edge is found.</p></div><p>This is what makes DFS the tool for cycle detection: the search tree plus a single back edge exhibits the cycle explicitly. The parent exclusion matters &mdash; without it every edge would look like a cycle of length 2.</p><h3>Cost</h3><p>Each vertex is marked once and each edge examined twice (once from each end), so both searches cost <span class="math" data-say="theta of the quantity n plus the size of E">Θ(n + |E|)</span> with adjacency lists and <span class="math" data-say="theta of n squared">Θ(n²)</span> with a matrix. For a sparse graph that is the difference between linear and quadratic, which is “Graph Representations”'s trade-off arriving in practice.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Graph workbench</h2></div><p>Your graph, the course&#x27;s algorithms</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+                                 articulation points and bridges</div><p>Both find the components and both produce a spanning tree, and either serves for those. The distinctive uses come from the ORDER: BFS knows distances, DFS knows the nesting of the recursion, and each of those is the key to different problems.</p><h3>Cycle detection with DFS</h3><div class="thm"><span class="label">Theorem &middot; Back edges are cycles</span><p>During a depth-first search of an undirected graph, an edge to an already-visited vertex that is not the current vertex's parent closes a cycle. A graph is acyclic exactly when no such edge is found.</p></div><p>This is what makes DFS the tool for cycle detection: the search tree plus a single back edge exhibits the cycle explicitly. The parent exclusion matters &mdash; without it every edge would look like a cycle of length 2.</p><h3>Cost</h3><p>Each vertex is marked once and each edge examined twice (once from each end), so both searches cost <span class="math" data-say="theta of the quantity n plus the size of E">Θ(n + |E|)</span> with adjacency lists and <span class="math" data-say="theta of n squared">Θ(n²)</span> with a matrix. For a sparse graph that is the difference between linear and quadratic, which is “Graph Representations”'s trade-off arriving in practice.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Graph workbench</h2></div><p>Your graph, the course&#x27;s algorithms</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Build a graph, run the algorithms</strong><span id="gCaption">Click a cell in the adjacency matrix to toggle an edge</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>in the result</span><span class="tone-amber"><i class="legend-swatch"></i>visited / root</span><span class="tone-muted"><i class="legend-swatch"></i>not used</span></div>
@@ -1424,10 +1467,10 @@ web crawling by depth            maze generation and solving
         <div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gFacts"></table></div>
       </div>
       <div class="status-banner" id="gStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Distances, then order</h3>
-          <p>The worked example's graph is loaded. In BFS mode the labels are distances from vertex 1 &mdash; <span class="math" data-say="0, 1, 1, 2, 3, 4">0, 1, 1, 2, 3, 4</span> &mdash; the visit order is <span class="math" data-say="1 goes to 2 goes to 3 goes to 4 goes to 5 goes to 6">1 → 2 → 3 → 4 → 5 → 6</span> and the tree edges are <span class="math" data-say="1 to 2, 1 to 3, 2 to 4, 4 to 5, 5 to 6">1–2, 1–3, 2–4, 4–5, 5–6</span>. Switch to DFS: the labels become visit order, the order is <span class="math" data-say="1 goes to 2 goes to 4 goes to 3 goes to 5 goes to 6">1 → 2 → 4 → 3 → 5 → 6</span>, and the tree swaps <span class="math" data-say="1 to 3">1–3</span> for <span class="math" data-say="4 to 3">4–3</span>, reaching 3 at depth 3; the one edge left out, <span class="math" data-say="3 to 1">3–1</span>, is the back edge. Then load the Tree preset and switch between the two again: on a tree every edge is a tree edge, so both searches draw the same tree and differ only in order.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Distances, then order</h3>
+            <p>The worked example's graph is loaded. In BFS mode the labels are distances from vertex 1 &mdash; <span class="math" data-say="0, 1, 1, 2, 3, 4">0, 1, 1, 2, 3, 4</span> &mdash; the visit order is <span class="math" data-say="1 goes to 2 goes to 3 goes to 4 goes to 5 goes to 6">1 → 2 → 3 → 4 → 5 → 6</span> and the tree edges are <span class="math" data-say="1 to 2, 1 to 3, 2 to 4, 4 to 5, 5 to 6">1–2, 1–3, 2–4, 4–5, 5–6</span>. Switch to DFS: the labels become visit order, the order is <span class="math" data-say="1 goes to 2 goes to 4 goes to 3 goes to 5 goes to 6">1 → 2 → 4 → 3 → 5 → 6</span>, and the tree swaps <span class="math" data-say="1 to 3">1–3</span> for <span class="math" data-say="4 to 3">4–3</span>, reaching 3 at depth 3; the one edge left out, <span class="math" data-say="3 to 1">3–1</span>, is the back edge. Then load the Tree preset and switch between the two again: on a tree every edge is a tree edge, so both searches draw the same tree and differ only in order.</p>
         <div class="field">
           <label for="gAlgo">Algorithm</label>
           <select id="gAlgo">
@@ -1473,12 +1516,14 @@ web crawling by depth            maze generation and solving
           <div class="kpi"><span>|E|</span><strong id="gE">&mdash;</strong></div>
           <div class="kpi"><span>Σ deg</span><strong id="gSum">&mdash;</strong></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running a search</h2></div><p>Choose the structure from the question.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Pick BFS for distances</h3><p>Shortest paths, level structure, bipartiteness. Anything where "how far" matters.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Pick DFS for structure</h3><p>Cycles, dependency order, articulation points. Anything where the nesting of the search matters.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Mark on discovery, not on processing</h3><p>Marking a vertex when it is added to the queue prevents it being added twice. Marking on removal is the classic bug.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Repeat from unvisited vertices</h3><p>One search covers one component. A full traversal loops over starting points.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running a search</h2>
+      <p class="lead-in">Choose the structure from the question.</p>
+      <ol class="key-ideas method"><li><strong>Pick BFS for distances.</strong> Shortest paths, level structure, bipartiteness. Anything where "how far" matters.</li><li><strong>Pick DFS for structure.</strong> Cycles, dependency order, articulation points. Anything where the nesting of the search matters.</li><li><strong>Mark on discovery, not on processing.</strong> Marking a vertex when it is added to the queue prevents it being added twice. Marking on removal is the classic bug.</li><li><strong>Repeat from unvisited vertices.</strong> One search covers one component. A full traversal loops over starting points.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1506,17 +1551,16 @@ Different trees, same six vertices.  Note DFS reached 3 at depth 3,
 although its true distance from 1 is 1.</div><p>That last line is the reason DFS cannot be used for shortest paths. It found vertex 3 by the route <span class="math" data-say="1 goes to 2 goes to 4 goes to 3">1→2→4→3</span>, and the depth it records is a fact about the search order rather than about the graph. The edge <span class="math" data-say="3 to 1">3–1</span> is a back edge &mdash; at vertex 3 the neighbour 1 is already visited and is not 3's parent &mdash; and it closes the cycle <span class="math" data-say="1 to 2 to 4 to 3 to 1">1–2–4–3–1</span>. <span class="math" data-say="4 to 3">4–3</span> is a tree edge, since 3 was discovered from 4.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using DFS for shortest paths</strong><span>The depth it records is an artefact of the search order. Only BFS guarantees distance.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Marking vertices on removal rather than on discovery</strong><span>A vertex can then be queued several times before it is processed, which breaks both the cost bound and the distance guarantee.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting to exclude the parent in cycle detection</strong><span>Otherwise every edge looks like a cycle back to where you came from.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can predict both visit orders on a small graph.</strong><p>Take a graph on seven vertices, write out the BFS and DFS orders by hand, and mark the tree edges of each. The two trees should look nothing alike.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Dijkstra's algorithm in “Shortest Paths and Dijkstra's Algorithm” is BFS with a priority queue in place of the queue. The correspondence is exact, and it is why Dijkstra reduces to BFS when every weight is 1.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using DFS for shortest paths</strong><span>The depth it records is an artefact of the search order. Only BFS guarantees distance.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Marking vertices on removal rather than on discovery</strong><span>A vertex can then be queued several times before it is processed, which breaks both the cost bound and the distance guarantee.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting to exclude the parent in cycle detection</strong><span>Otherwise every edge looks like a cycle back to where you came from.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can predict both visit orders on a small graph.</strong><p>Take a graph on seven vertices, write out the BFS and DFS orders by hand, and mark the tree edges of each. The two trees should look nothing alike.</p></div></div><div class="note"><strong>Note:</strong> Dijkstra's algorithm in “Shortest Paths and Dijkstra's Algorithm” is BFS with a priority queue in place of the queue. The correspondence is exact, and it is why Dijkstra reduces to BFS when every weight is 1.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>BFS settles by distance</summary><p>Every vertex at distance <span class="math" data-say="k">k</span> is visited before any at distance <span class="math" data-say="k plus 1">k+1</span>, which is exactly why its tree gives shortest paths.</p></details><details class="recall"><summary>DFS follows one branch to exhaustion</summary><p>Then backtracks. Its tree is deep and narrow, and the order of backtracking is what topological sorting uses.</p></details><details class="recall"><summary>Both visit every vertex of the component</summary><p>They differ in order, not in coverage. Both cost <span class="math" data-say="theta of the quantity n plus the size of E">Θ(n + |E|)</span> with adjacency lists.</p></details></div>
+      <h3>Summary</h3>
       <p>Breadth-first search settles vertices in order of distance and therefore finds shortest paths in an unweighted graph. Depth-first goes as deep as possible first and is what detects cycles and orders dependencies.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>BFS settles by distance.</strong> Every vertex at distance <span class="math" data-say="k">k</span> is visited before any at distance <span class="math" data-say="k plus 1">k+1</span>, which is exactly why its tree gives shortest paths.</li><li><strong>DFS follows one branch to exhaustion.</strong> Then backtracks. Its tree is deep and narrow, and the order of backtracking is what topological sorting uses.</li><li><strong>Both visit every vertex of the component.</strong> They differ in order, not in coverage. Both cost <span class="math" data-say="theta of the quantity n plus the size of E">Θ(n + |E|)</span> with adjacency lists.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="BFS, queue, visits by increasing distance, implies, shortest paths unweighted. DFS, stack, follows one branch to the end, implies, cycles, components, ordering. both cost theta of the quantity n plus the size of E, with adjacency lists. each produces a SPANNING TREE of its component" tabindex="0" role="region" aria-label="Mathematical notation">BFS  queue   visits by increasing distance   ⟹  shortest paths (unweighted)
 DFS  stack   follows one branch to the end   ⟹  cycles, components, ordering
 both cost Θ(n + |E|) with adjacency lists
@@ -2665,11 +2709,42 @@ each produces a SPANNING TREE of its component</div><figcaption>Queue or stack</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2737,7 +2812,7 @@ each produces a SPANNING TREE of its component</div><figcaption>Queue or stack</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

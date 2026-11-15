@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,33 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Maintaining Model Integrity</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 14 · Maintaining Model Integrity</p>
       <h1>Context Map</h1>
       <p class="lesson-lede">Name every model on the project, say how each touches the others, and describe things as they are.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Context Map</li><li>Upstream and downstream</li><li>What a change reaches</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then its example, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Map the existing terrain. Take up transformations later.&rdquo; That is the last line of the Context Map pattern's statement in Chapter 14. This lesson reads the pattern, its example, and the two short sections after it, Testing at the Context Boundaries and Organizing and Documenting Context Maps.</p><p>The problem: a single Bounded Context still gives no global view. People on other teams do not know where its edges are and blur them without meaning to, and where two contexts must connect they tend to bleed into each other. Reusing code across a boundary is a hazard, Evans says; functionality and data should cross it through a translation. He places the map where project management and design overlap, because the boundaries follow the teams: people who work closely share a model, and people who do not talk, even on one team or at opposite ends of one building, drift into separate ones.</p><p>The pattern, as a tool. List every model the project really uses, counting the unstated models inside subsystems that are not object-oriented, and define the context of each. Give each context a name, and let those names enter the Ubiquitous Language. Set out where the models touch, with the translation explicit and any sharing marked. And describe the situation as it stands. The map takes whatever form the team will share, diagram or text or talk; it must name every context and make every contact clear. Where a relationship does not match one of the chapter's patterns, do not force it; describe what is there.</p><p>Two warnings follow. Where you find a splinter, a model entangled and inconsistent, mark it on the map as unknown country and finish the rest first; until every piece of work sits in some context with explicit relationships, fix only outright contradictions, and resist the urge to reorganise wholesale. And once the map is clear and you change teams or design, change the map only after the reality has changed.</p><p>Evans's example is a routing feature in a booking system, where the team doing the route-finding needed a quite different model, built for fast network algorithms. He yielded, and the two became separate contexts joined by one translator object, which both teams maintain together and which should be easy to unit-test. Testing at the Context Boundaries draws the moral: contact points deserve the most tests, because translation is subtle and communication thinnest there. Organizing and Documenting has only two points, that contexts have names in the language and that everyone knows where the boundaries lie, and asks you to say the model's name, not a colleague's, when you talk about a change.</p><p>Now the count. The lab reads a map: the contexts, and for each relationship its upstream, its downstream and its kind, one of the book's. Then it follows a change in one context's model. A Shared Kernel carries the change both ways, since both teams own the kernel; a Conformist or a Customer/Supplier relationship carries it downstream, since the downstream model is built on the upstream's; an Anticorruption Layer or an Open Host Service stops it at a translator, which must change instead. The next three lessons read those patterns; here they are the map's legend.</p><pre class="codeblock" data-say="line 1, programming, venue, shared minus kernel. line 2, programming, boxoffice, customer minus supplier. line 3, boxoffice, marketing, conformist. line 4, boxoffice, finance, acl. line 5, payments, boxoffice, acl. line 6, boxoffice, resellers, ohs" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">programming, venue, shared-kernel;</span>
-<span class="cl">programming, boxoffice, customer-supplier;</span>
-<span class="cl">boxoffice, marketing, conformist;</span>
-<span class="cl">boxoffice, finance, acl;</span>
-<span class="cl">payments, boxoffice, acl;</span>
-<span class="cl">boxoffice, resellers, ohs;</span></code></pre><p>The map is a theatre's seven contexts: programming, which plans the season; the venue; the box office; marketing; finance; an outside payments provider; and the agencies that resell tickets. On the preset <code>change-programming</code> the season planners change their model of a performance. The lab counts 6 relationships. The change reaches the venue through the Shared Kernel, the box office through Customer/Supplier, and marketing through the box office, which it conforms to: 3 models that must change. It stops at 2 translators, finance's layer and the box office's host service for the resellers. The lab counts 4 contexts reached, the three changed models and finance, whose layer changes though its model does not, and 2 untouched, payments and the resellers, whose side of the open protocol stays as it was.</p><p>The preset <code>change-payments</code> changes the outside provider instead. Its only edge is the box office's Anticorruption Layer, so the lab finds 0 models that must change, 1 translator to update, 1 context reached, the box office through its layer, and 5 untouched. That is the map doing what Evans asks of it: before anyone touches code, the team can say, in the language, that a change to the Programming model means changing the Venue, Box Office and Marketing models and two translators, and that a change at Payments means one translator.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, catalogue, lending, customer minus supplier. line 2, members, lending, shared minus kernel. line 3, lending, events, conformist. line 4, supplier minus feed, catalogue, acl. line 5, fines minus legacy, lending, acl" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">catalogue, lending, customer-supplier;</span>
-<span class="cl">members, lending, shared-kernel;</span>
-<span class="cl">lending, events, conformist;</span>
-<span class="cl">supplier-feed, catalogue, acl;</span>
-<span class="cl">fines-legacy, lending, acl;</span></code></pre><p>A public library's map: the catalogue, lending, members, events, a supplier's feed of new titles and an old fines system. The catalogue team changes its model of a title. By the lab's rules, find the models that must change, the translators to update and the contexts untouched. Watch the Shared Kernel's direction. Then load the map into the lab with <span class="math" data-say="catalogue">catalogue</span> as the changed context.</p><p>The map's legend has seven kinds. The next lesson, Shared Kernel and Customer/Supplier Teams, reads the two most cooperative.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Context map</h2></div><p>how far one model change reaches across the map</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then its example, then the count</h2><div class="prose reading"><p>&ldquo;Map the existing terrain. Take up transformations later.&rdquo; That is the last line of the Context Map pattern's statement in Chapter 14. This lesson reads the pattern, its example, and the two short sections after it, Testing at the Context Boundaries and Organizing and Documenting Context Maps.</p><p>The problem: a single Bounded Context still gives no global view. People on other teams do not know where its edges are and blur them without meaning to, and where two contexts must connect they tend to bleed into each other. Reusing code across a boundary is a hazard, Evans says; functionality and data should cross it through a translation. He places the map where project management and design overlap, because the boundaries follow the teams: people who work closely share a model, and people who do not talk, even on one team or at opposite ends of one building, drift into separate ones.</p><p>The pattern, as a tool. List every model the project really uses, counting the unstated models inside subsystems that are not object-oriented, and define the context of each. Give each context a name, and let those names enter the Ubiquitous Language. Set out where the models touch, with the translation explicit and any sharing marked. And describe the situation as it stands. The map takes whatever form the team will share, diagram or text or talk; it must name every context and make every contact clear. Where a relationship does not match one of the chapter's patterns, do not force it; describe what is there.</p><p>Two warnings follow. Where you find a splinter, a model entangled and inconsistent, mark it on the map as unknown country and finish the rest first; until every piece of work sits in some context with explicit relationships, fix only outright contradictions, and resist the urge to reorganise wholesale. And once the map is clear and you change teams or design, change the map only after the reality has changed.</p><p>Evans's example is a routing feature in a booking system, where the team doing the route-finding needed a quite different model, built for fast network algorithms. He yielded, and the two became separate contexts joined by one translator object, which both teams maintain together and which should be easy to unit-test. Testing at the Context Boundaries draws the moral: contact points deserve the most tests, because translation is subtle and communication thinnest there. Organizing and Documenting has only two points, that contexts have names in the language and that everyone knows where the boundaries lie, and asks you to say the model's name, not a colleague's, when you talk about a change.</p><p>Now the count. The lab reads a map: the contexts, and for each relationship its upstream, its downstream and its kind, one of the book's. Then it follows a change in one context's model. A Shared Kernel carries the change both ways, since both teams own the kernel; a Conformist or a Customer/Supplier relationship carries it downstream, since the downstream model is built on the upstream's; an Anticorruption Layer or an Open Host Service stops it at a translator, which must change instead. The next three lessons read those patterns; here they are the map's legend.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Context map</h2></div><p>how far one model change reaches across the map</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Context map</strong><span>how far one model change reaches across the map</span></div>
       </div>
@@ -1467,10 +1501,10 @@
       <div class="table-wrap" id="dcxTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dcxTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Kinds: shared-kernel, customer-supplier, conformist, acl (anticorruption layer), ohs (open host service), published-language, separate-ways; two contexts have at most one relationship. A model change crosses a shared kernel in both directions and goes down a conformist or a customer-supplier relationship to the downstream model, and it travels on only from a model that changed. It never travels upstream. An acl stops it at the downstream context's translator, and an ohs or published-language relationship at the upstream's protocol: each is a translator to update, the downstream model unchanged (it changes only if another route reaches it). The ohs and published-language relationships of one upstream share its one protocol, counted once; each acl is its own translator. Separate-ways has no effect. Contexts reached are the other models that change and the contexts whose acl is updated; lists go in the order the contexts are given, translators in the order of the relationships.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What one change reaches across a map</h3>
-          <p>A count over the small model the lesson states. Each relationship is an upstream context, a downstream context and one of the book's kinds. The lab follows a change in one context's model along the edges whose kind carries it: a Shared Kernel both ways, Conformist and Customer/Supplier downstream. An Anticorruption Layer or an Open Host Service stops it at a translator. The map is the lesson's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What one change reaches across a map</h3>
+            <p>A count over the small model the lesson states. Each relationship is an upstream context, a downstream context and one of the book's kinds. The lab follows a change in one context's model along the edges whose kind carries it: a Shared Kernel both ways, Conformist and Customer/Supplier downstream. An Anticorruption Layer or an Open Host Service stops it at a translator. The map is the lesson's.</p>
         <div class="field">
           <label for="dcxPreset">Worked example</label>
           <select id="dcxPreset"><option value="change-programming" selected>The season planners change their model of a performance</option><option value="change-payments">The outside payments provider changes its model</option></select>
@@ -1495,12 +1529,24 @@
           <div class="kpi"><span>Contexts untouched</span><strong id="dcxUntouched">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, programming, venue, shared minus kernel. line 2, programming, boxoffice, customer minus supplier. line 3, boxoffice, marketing, conformist. line 4, boxoffice, finance, acl. line 5, payments, boxoffice, acl. line 6, boxoffice, resellers, ohs" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">programming, venue, shared-kernel;</span>
+<span class="cl">programming, boxoffice, customer-supplier;</span>
+<span class="cl">boxoffice, marketing, conformist;</span>
+<span class="cl">boxoffice, finance, acl;</span>
+<span class="cl">payments, boxoffice, acl;</span>
+<span class="cl">boxoffice, resellers, ohs;</span></code></pre><p>The map is a theatre's seven contexts: programming, which plans the season; the venue; the box office; marketing; finance; an outside payments provider; and the agencies that resell tickets. On the preset <code>change-programming</code> the season planners change their model of a performance. The lab counts 6 relationships. The change reaches the venue through the Shared Kernel, the box office through Customer/Supplier, and marketing through the box office, which it conforms to: 3 models that must change. It stops at 2 translators, finance's layer and the box office's host service for the resellers. The lab counts 4 contexts reached, the three changed models and finance, whose layer changes though its model does not, and 2 untouched, payments and the resellers, whose side of the open protocol stays as it was.</p><p>The preset <code>change-payments</code> changes the outside provider instead. Its only edge is the box office's Anticorruption Layer, so the lab finds 0 models that must change, 1 translator to update, 1 context reached, the box office through its layer, and 5 untouched. That is the map doing what Evans asks of it: before anyone touches code, the team can say, in the language, that a change to the Programming model means changing the Venue, Box Office and Marketing models and two translators, and that a change at Payments means one translator.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, catalogue, lending, customer minus supplier. line 2, members, lending, shared minus kernel. line 3, lending, events, conformist. line 4, supplier minus feed, catalogue, acl. line 5, fines minus legacy, lending, acl" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">catalogue, lending, customer-supplier;</span>
+<span class="cl">members, lending, shared-kernel;</span>
+<span class="cl">lending, events, conformist;</span>
+<span class="cl">supplier-feed, catalogue, acl;</span>
+<span class="cl">fines-legacy, lending, acl;</span></code></pre><p>A public library's map: the catalogue, lending, members, events, a supplier's feed of new titles and an old fines system. The catalogue team changes its model of a title. By the lab's rules, find the models that must change, the translators to update and the contexts untouched. Watch the Shared Kernel's direction. Then load the map into the lab with <span class="math" data-say="catalogue">catalogue</span> as the changed context.</p><p>The map's legend has seven kinds. The next lesson, Shared Kernel and Customer/Supplier Teams, reads the two most cooperative.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Tracing a change across a map</h2></div><p>Four steps, the last of them on a map of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name every context</h3><p>List every model in play, including the legacy and outside systems and any subsystem that is not object-oriented, and give each a name the team will say.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Mark each relationship</h3><p>For each point of contact, write which side is upstream and which of the chapter's kinds it is, or describe it plainly if it fits none.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Follow the change</h3><p>From the changed context, cross every Shared Kernel in either direction and every Conformist or Customer/Supplier edge downstream; stop at each Anticorruption Layer or Open Host Service and note its translator.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own system</h3><p>Draw the contexts your team's code talks to, mark each edge, and pick one upstream change from last quarter. Count the models and translators it reached, and compare with what actually had to change.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Tracing a change across a map</h2>
+      <p class="lead-in">Four steps, the last of them on a map of your own.</p>
+      <ol class="key-ideas method"><li><strong>Name every context.</strong> List every model in play, including the legacy and outside systems and any subsystem that is not object-oriented, and give each a name the team will say.</li><li><strong>Mark each relationship.</strong> For each point of contact, write which side is upstream and which of the chapter's kinds it is, or describe it plainly if it fits none.</li><li><strong>Follow the change.</strong> From the changed context, cross every Shared Kernel in either direction and every Conformist or Customer/Supplier edge downstream; stop at each Anticorruption Layer or Open Host Service and note its translator.</li><li><strong>Do it on your own system.</strong> Draw the contexts your team's code talks to, mark each edge, and pick one upstream change from last quarter. Count the models and translators it reached, and compare with what actually had to change.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1519,17 +1565,16 @@ boxoffice to resellers: host, translator
 payments: upstream only, untouched</div><p>Three models and two translators. The count assumes the change crosses every edge its kind allows; on a real map a small change may touch only part of a kernel, which the lab cannot know.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Drawing the map you want instead of the one you have</strong><span>A map of the intended organisation looks more useful. Evans insists the map describe the situation as it stands, relationships that fit no pattern included, with transformations taken up later and the map changed only after the reality has. On the lesson's illustration the counts are of the theatre's map as drawn; a map of the hoped-for relationships would count a change the teams will not actually see.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Naming contexts after people or teams</strong><span>It is how talk naturally goes: George's team is changing its stuff. Organizing and Documenting asks for the model's name instead, so that the names enter the Ubiquitous Language and the sentence says which translator must change.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reusing code across a boundary to save a translation</strong><span>Evans calls reuse between contexts a hazard. Functionality and data should cross through a translation, which the map makes explicit and which the boundary tests watch; a shared class across the line is how the chapter's opening story began.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace a change across a context map.</strong><p>Given a map of contexts and relationships, state which models a change in one context reaches, which translators absorb it, and which contexts it leaves alone.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab assumes a change crosses every edge its kind allows. It cannot tell a change inside a Shared Kernel from one outside it, or whether a downstream context uses the part that changed. Nor does it count a downstream's own layer when that downstream's model changes: the box office's layer for payments may need its box-office side rewritten. And it cannot draw the map: finding the contexts and their real relationships is the work the pattern asks for.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Drawing the map you want instead of the one you have</strong><span>A map of the intended organisation looks more useful. Evans insists the map describe the situation as it stands, relationships that fit no pattern included, with transformations taken up later and the map changed only after the reality has. On the lesson's illustration the counts are of the theatre's map as drawn; a map of the hoped-for relationships would count a change the teams will not actually see.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Naming contexts after people or teams</strong><span>It is how talk naturally goes: George's team is changing its stuff. Organizing and Documenting asks for the model's name instead, so that the names enter the Ubiquitous Language and the sentence says which translator must change.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reusing code across a boundary to save a translation</strong><span>Evans calls reuse between contexts a hazard. Functionality and data should cross through a translation, which the map makes explicit and which the boundary tests watch; a shared class across the line is how the chapter's opening story began.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace a change across a context map.</strong><p>Given a map of contexts and relationships, state which models a change in one context reaches, which translators absorb it, and which contexts it leaves alone.</p></div></div><div class="note"><strong>Note:</strong> The lab assumes a change crosses every edge its kind allows. It cannot tell a change inside a Shared Kernel from one outside it, or whether a downstream context uses the part that changed. Nor does it count a downstream's own layer when that downstream's model changes: the box office's layer for payments may need its box-office side rewritten. And it cannot draw the map: finding the contexts and their real relationships is the work the pattern asks for.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Context Map</summary><p>A shared description of every model in play on a project, each in its named Bounded Context, with the points of contact between them and the nature of each. Its form is free: a diagram, a list, or talk, if everyone shares it.</p></details><details class="recall"><summary>Upstream and downstream</summary><p>The direction of dependence between two contexts. The downstream one depends on the upstream one's model or output; the upstream one does not depend back.</p></details><details class="recall"><summary>What a change reaches</summary><p>The contexts whose models must change when one context's model changes, followed along each relationship by the rule its kind implies, and the translators that absorb the change instead.</p></details></div>
+      <h3>Summary</h3>
       <p>One Bounded Context gives no view of the others. Read Evans's Context Map: every model named, every point of contact described, the terrain mapped as it is, and tests at the boundaries; then follow one change across a theatre's seven contexts and count what it reaches.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Context Map.</strong> A shared description of every model in play on a project, each in its named Bounded Context, with the points of contact between them and the nature of each. Its form is free: a diagram, a list, or talk, if everyone shares it.</li><li><strong>Upstream and downstream.</strong> The direction of dependence between two contexts. The downstream one depends on the upstream one's model or output; the upstream one does not depend back.</li><li><strong>What a change reaches.</strong> The contexts whose models must change when one context's model changes, followed along each relationship by the rule its kind implies, and the translators that absorb the change instead.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="name every context, and use the names. describe each point of contact. map the terrain as it is today. change the map after the reality. test hardest at the boundaries. a translator stops what a model passes on" tabindex="0" role="region" aria-label="Mathematical notation">name every context, and use the names
 describe each point of contact
 map the terrain as it is today
@@ -2307,11 +2352,42 @@ a translator stops what a model passes on</div><figcaption>Context Map in six li
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2379,7 +2455,7 @@ a translator stops what a model passes on</div><figcaption>Context Map in six li
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

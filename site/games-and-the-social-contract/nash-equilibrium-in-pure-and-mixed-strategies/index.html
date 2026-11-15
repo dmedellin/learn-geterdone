@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,38 +1424,34 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Games and the Social Contract</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; One-shot games</p>
       <h1>Nash Equilibrium in Pure and Mixed Strategies</h1>
       <p class="lesson-lede">An equilibrium is a pair of strategies, each a best response to the other, and where no cell qualifies the pair may randomise.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Equilibrium is mutual best response</li><li>A mixed strategy is a set of probabilities</li><li>Equilibrium describes stability, not merit</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Pure cells, and the mix when there are none</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Nash equilibrium</span><p>A combination of strategies, one for each player, is a <strong>Nash equilibrium</strong> when no player can get a larger payoff by changing their own strategy while the others keep theirs. An equilibrium in <strong>pure strategies</strong> is a cell of the table; an equilibrium in <strong>mixed strategies</strong> gives each player a probability for each pure strategy.</p></div><p>Pure equilibria are the doubly marked cells of the previous lesson, and a game can have none, one, or several. Chicken has two. Two drivers head for each other on a narrow road and each can swerve or go straight. If both swerve nothing is lost. If one swerves and the other does not, the one who swerves gets <span class="math" data-say="negative 1">-1</span> and the other gets <span class="math" data-say="1">1</span>. If neither swerves they crash and each gets <span class="math" data-say="negative 10">-10</span>.</p><div class="mathblock" data-say="column Swerve, column Straight. a table, shown on the page. row Straight, 1, negative 1, negative 10, negative 10" tabindex="0" role="region" aria-label="Mathematical notation">                    column Swerve    column Straight
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Pure cells, and the mix when there are none</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Nash equilibrium</span><p>A combination of strategies, one for each player, is a <strong>Nash equilibrium</strong> when no player can get a larger payoff by changing their own strategy while the others keep theirs. An equilibrium in <strong>pure strategies</strong> is a cell of the table; an equilibrium in <strong>mixed strategies</strong> gives each player a probability for each pure strategy.</p></div><p>Pure equilibria are the doubly marked cells of the previous lesson, and a game can have none, one, or several. Chicken has two. Two drivers head for each other on a narrow road and each can swerve or go straight. If both swerve nothing is lost. If one swerves and the other does not, the one who swerves gets <span class="math" data-say="negative 1">-1</span> and the other gets <span class="math" data-say="1">1</span>. If neither swerves they crash and each gets <span class="math" data-say="negative 10">-10</span>.</p><div class="mathblock" data-say="column Swerve, column Straight. a table, shown on the page. row Straight, 1, negative 1, negative 10, negative 10" tabindex="0" role="region" aria-label="Mathematical notation">                    column Swerve    column Straight
      row Swerve         0, 0             -1, 1
-     row Straight       1, -1           -10, -10</div><p>The cells Swerve, Straight and Straight, Swerve are equilibria. In the first, the driver going straight gets <span class="math" data-say="1">1</span> and would get <span class="math" data-say="0">0</span> by swerving, and the driver who swerved gets <span class="math" data-say="negative 1">-1</span> and would get <span class="math" data-say="negative 10">-10</span> by going straight. Swerve, Swerve is not an equilibrium, because either driver gains by going straight. It is the one cell in which nobody is hurt, and equilibrium does not choose it.</p><p>Matching pennies is the opposite case. No cell is an equilibrium, because in every cell the player who loses the match would rather have chosen the other side. Nash's theorem says that every game with finitely many strategies has an equilibrium if mixed strategies are allowed. The theorem is stated here and not proved. What the lab does is compute the mix for a two-by-two game.</p><h3>Solving for the mix</h3><p>Let the column player swerve with probability <span class="math" data-say="q">q</span>. The row player's expected payoff from swerving is <span class="math" data-say="0 times q minus 1 times the quantity 1 minus q">0·q − 1·(1 − q)</span>, which is <span class="math" data-say="q minus 1">q − 1</span>. From going straight it is <span class="math" data-say="1 times q minus 10 times the quantity 1 minus q">1·q − 10·(1 − q)</span>, which is <span class="math" data-say="11 q minus 10">11q − 10</span>. A row player who mixes must be indifferent between the two, so the column player's probability is the one that makes them equal:</p><div class="mathblock" data-say="q minus 1, equals, 11 q minus 10. 9, equals, 10 q. q, equals, 9 over 10" tabindex="0" role="region" aria-label="Mathematical notation">q − 1  =  11q − 10
-9  =  10q
-q  =  9/10</div><p>The column player swerves nine times in ten. The table is symmetric, so the row player does too. At that pair of mixes each driver expects <span class="math" data-say="negative 1 over 10">-1/10</span>, which is below the <span class="math" data-say="0">0</span> each would get if both simply swerved, and the two crash with probability <span class="math" data-say="1 over 10 times 1 over 10">1/10 · 1/10</span>, one time in a hundred. The mixed equilibrium is an equilibrium in the full sense, since at it neither driver gains by changing alone, and it is worse for both than the cell it does not use.</p><p>The surprise is whose numbers fix whose mix. Each player's probability is chosen so that the <em>other</em> is indifferent. A player does not randomise to be unpredictable at the cost of expected payoff; they randomise because, at that mix, the opponent has no better strategy to move to.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A game in a table</h2></div><p>best responses, equilibria, dominance and efficiency, computed from the payoffs</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+     row Straight       1, -1           -10, -10</div><p>The cells Swerve, Straight and Straight, Swerve are equilibria. In the first, the driver going straight gets <span class="math" data-say="1">1</span> and would get <span class="math" data-say="0">0</span> by swerving, and the driver who swerved gets <span class="math" data-say="negative 1">-1</span> and would get <span class="math" data-say="negative 10">-10</span> by going straight. Swerve, Swerve is not an equilibrium, because either driver gains by going straight. It is the one cell in which nobody is hurt, and equilibrium does not choose it.</p><p>Matching pennies is the opposite case. No cell is an equilibrium, because in every cell the player who loses the match would rather have chosen the other side. Nash's theorem says that every game with finitely many strategies has an equilibrium if mixed strategies are allowed. The theorem is stated here and not proved. What the lab does is compute the mix for a two-by-two game.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A game in a table</h2></div><p>best responses, equilibria, dominance and efficiency, computed from the payoffs</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Two players, payoffs row first</strong><span>an equilibrium is a cell where both are best-responding</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gaTable"></table></div>
       <div class="status-banner" id="gaStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Find the pure cells and the mix</h3>
-          <p>The mixed tile gives each player's probability of the first strategy. Change a payoff and the mix moves; when it would leave the interval from 0 to 1, the tile says none.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Find the pure cells and the mix</h3>
+            <p>The mixed tile gives each player's probability of the first strategy. Change a payoff and the mix moves; when it would leave the interval from 0 to 1, the tile says none.</p>
         <div class="field">
           <label for="gaPreset">Worked example</label>
           <select id="gaPreset"><option value="pennies" selected>Matching pennies, heads and tails</option><option value="chicken">Chicken, crash costs 10</option><option value="stag">A stag worth 4, a hare worth 3</option></select>
@@ -1438,12 +1479,17 @@ q  =  9/10</div><p>The column player swerves nine times in ten. The table is sym
           <div class="kpi"><span>Pareto</span><strong id="gaPareto">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Solving for the mix</h3><p>Let the column player swerve with probability <span class="math" data-say="q">q</span>. The row player's expected payoff from swerving is <span class="math" data-say="0 times q minus 1 times the quantity 1 minus q">0·q − 1·(1 − q)</span>, which is <span class="math" data-say="q minus 1">q − 1</span>. From going straight it is <span class="math" data-say="1 times q minus 10 times the quantity 1 minus q">1·q − 10·(1 − q)</span>, which is <span class="math" data-say="11 q minus 10">11q − 10</span>. A row player who mixes must be indifferent between the two, so the column player's probability is the one that makes them equal:</p><div class="mathblock" data-say="q minus 1, equals, 11 q minus 10. 9, equals, 10 q. q, equals, 9 over 10" tabindex="0" role="region" aria-label="Mathematical notation">q − 1  =  11q − 10
+9  =  10q
+q  =  9/10</div><p>The column player swerves nine times in ten. The table is symmetric, so the row player does too. At that pair of mixes each driver expects <span class="math" data-say="negative 1 over 10">-1/10</span>, which is below the <span class="math" data-say="0">0</span> each would get if both simply swerved, and the two crash with probability <span class="math" data-say="1 over 10 times 1 over 10">1/10 · 1/10</span>, one time in a hundred. The mixed equilibrium is an equilibrium in the full sense, since at it neither driver gains by changing alone, and it is worse for both than the cell it does not use.</p><p>The surprise is whose numbers fix whose mix. Each player's probability is chosen so that the <em>other</em> is indifferent. A player does not randomise to be unpredictable at the cost of expected payoff; they randomise because, at that mix, the opponent has no better strategy to move to.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Solving a two-by-two game</h2></div><p>Pure cells first, then the mix.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Mark the best responses and list the doubly marked cells</h3><p>These are the pure equilibria. There may be none, one or several.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Let the column player play the first strategy with probability q</h3><p>Write the row player's expected payoff from each row as a line in <span class="math" data-say="q">q</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Set the two expected payoffs equal and solve for q</h3><p>That is the mix that leaves the row player indifferent. If the answer is not strictly between 0 and 1, no completely mixed equilibrium exists.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Swap the roles to find the row player&#x27;s probability</h3><p>Let the row player play the first strategy with probability <span class="math" data-say="p">p</span> and make the column player indifferent.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Report all of them</h3><p>Pure and mixed together are the equilibria. Chicken has three, matching pennies has one.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Solving a two-by-two game</h2>
+      <p class="lead-in">Pure cells first, then the mix.</p>
+      <ol class="key-ideas method"><li><strong>Mark the best responses and list the doubly marked cells.</strong> These are the pure equilibria. There may be none, one or several.</li><li><strong>Let the column player play the first strategy with probability q.</strong> Write the row player's expected payoff from each row as a line in <span class="math" data-say="q">q</span>.</li><li><strong>Set the two expected payoffs equal and solve for q.</strong> That is the mix that leaves the row player indifferent. If the answer is not strictly between 0 and 1, no completely mixed equilibrium exists.</li><li><strong>Swap the roles to find the row player&#x27;s probability.</strong> Let the row player play the first strategy with probability <span class="math" data-say="p">p</span> and make the column player indifferent.</li><li><strong>Report all of them.</strong> Pure and mixed together are the equilibria. Chicken has three, matching pennies has one.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1461,17 +1507,16 @@ Solve:           10q = 9,   q = 9/10
 Each driver expects 0·(9/10) − 1·(1/10) = −1/10</div><p>The same calculation for the row driver gives <span class="math" data-say="9 over 10">9/10</span> again, since the table is symmetric. The lab prints this as the mixed equilibrium, with the two pure cells beside it, and it is the only completely mixed equilibrium the game has.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking an equilibrium to be the best outcome for the group</strong><span>Equilibrium is a property of each player's reply, and it says nothing about the pair. In chicken the cell where both swerve pays each <span class="math" data-say="0">0</span> and is not an equilibrium, while the mixed equilibrium expects <span class="math" data-say="negative 1 over 10">-1/10</span> each and crashes one time in a hundred. The previous lesson's dilemma is the same fact in starker form.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a player&#x27;s mix as a way of keeping the opponent guessing</strong><span>The weights are fixed by the opponent's payoffs, not one's own. Drivers in chicken swerve nine times in ten because that is the weight at which the other driver is exactly as well off going straight as swerving.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting one equilibrium per game</strong><span>Chicken has two pure equilibria and a mixed one. When a table has several, the table by itself does not say which will be played, and “Coordination, Conventions and the Stag Hunt” is about how people choose between them.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the mix of a two-by-two game and check it.</strong><p>Given a two-by-two table, list the pure equilibria, write one player's expected payoffs as lines in the other's probability, solve for the point where they cross, and say whether that mix is an equilibrium by checking that neither player gains from a pure deviation.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Chicken here is the textbook version with a crash costing ten, and its mix depends on that ten: a crash costing a hundred makes the drivers swerve more often. Try it in the payoffs box.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking an equilibrium to be the best outcome for the group</strong><span>Equilibrium is a property of each player's reply, and it says nothing about the pair. In chicken the cell where both swerve pays each <span class="math" data-say="0">0</span> and is not an equilibrium, while the mixed equilibrium expects <span class="math" data-say="negative 1 over 10">-1/10</span> each and crashes one time in a hundred. The previous lesson's dilemma is the same fact in starker form.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a player&#x27;s mix as a way of keeping the opponent guessing</strong><span>The weights are fixed by the opponent's payoffs, not one's own. Drivers in chicken swerve nine times in ten because that is the weight at which the other driver is exactly as well off going straight as swerving.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting one equilibrium per game</strong><span>Chicken has two pure equilibria and a mixed one. When a table has several, the table by itself does not say which will be played, and “Coordination, Conventions and the Stag Hunt” is about how people choose between them.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the mix of a two-by-two game and check it.</strong><p>Given a two-by-two table, list the pure equilibria, write one player's expected payoffs as lines in the other's probability, solve for the point where they cross, and say whether that mix is an equilibrium by checking that neither player gains from a pure deviation.</p></div></div><div class="note"><strong>Note:</strong> Chicken here is the textbook version with a crash costing ten, and its mix depends on that ten: a crash costing a hundred makes the drivers swerve more often. Try it in the payoffs box.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Equilibrium is mutual best response</summary><p>A combination of strategies is a Nash equilibrium when each player's strategy is a best response to the others'. Check it cell by cell: ask of each player whether switching alone would pay.</p></details><details class="recall"><summary>A mixed strategy is a set of probabilities</summary><p>A player who mixes picks each pure strategy with a stated probability, and a mix is a best response only if every strategy used in it is itself a best response. That is why a mixing player must be indifferent between the strategies mixed.</p></details><details class="recall"><summary>Equilibrium describes stability, not merit</summary><p>The definition says nothing about whether the outcome is good for the pair. A game may have an equilibrium that both would swap for another cell, and the previous lesson already showed one.</p></details></div>
+      <h3>Summary</h3>
       <p>A Nash equilibrium is a combination of strategies in which no player gains by changing alone. Some games have several such cells and some have none, and for the games with none a player may mix strategies with chosen probabilities. The mixed equilibrium of a two-by-two game is found exactly, by making each player's mix leave the other indifferent.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Equilibrium is mutual best response.</strong> A combination of strategies is a Nash equilibrium when each player's strategy is a best response to the others'. Check it cell by cell: ask of each player whether switching alone would pay.</li><li><strong>A mixed strategy is a set of probabilities.</strong> A player who mixes picks each pure strategy with a stated probability, and a mix is a best response only if every strategy used in it is itself a best response. That is why a mixing player must be indifferent between the strategies mixed.</li><li><strong>Equilibrium describes stability, not merit.</strong> The definition says nothing about whether the outcome is good for the pair. A game may have an equilibrium that both would swap for another cell, and the previous lesson already showed one.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="Nash, no player gains by moving alone. pure, a cell where both best-respond. mixed, weights that leave the other even. an equilibrium need not be the best outcome" tabindex="0" role="region" aria-label="Mathematical notation">Nash: no player gains by moving alone
 pure: a cell where both best-respond
 mixed: weights that leave the other even
@@ -2252,11 +2297,42 @@ an equilibrium need not be the best outcome</div><figcaption>Mutual best respons
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2324,7 +2400,7 @@ an equilibrium need not be the best outcome</div><figcaption>Mutual best respons
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

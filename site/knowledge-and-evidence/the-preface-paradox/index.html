@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Knowledge and Evidence</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Evidence and belief</p>
       <h1>The Preface Paradox</h1>
       <p class="lesson-lede">A hundred well-supported claims that could all be true, and probably are not.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Independent claims multiply</li><li>Consistent is not probable</li><li>Risk accumulates with length</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Believe each sentence, doubt the book</h2>
-      <article class="prose reading"><p>An author has checked a hundred claims for a book. Each is supported strongly enough to have credence <span class="math" data-say="99 over 100">99/100</span>, and the checks are independent: an error in one tells her nothing about another. At a threshold of <span class="math" data-say="95 over 100">95/100</span> she accepts every claim, and the lab reports 100 of 100.</p><p>Unlike the lottery, nothing logical ties the claims together. They could all be true, and the lab reports the accepted set as consistent. The question is how likely that is.</p><div class="defbox"><span class="label">Definition &middot; Independent claims</span><p>Claims are <strong>independent</strong> when the probability of two of them together is the product of their separate probabilities, and likewise for any number. For <span class="math" data-say="n">n</span> claims each at probability <span class="math" data-say="p">p</span>, the probability that all are true is <span class="math" data-say="p">p</span> multiplied by itself <span class="math" data-say="n">n</span> times.</p></div><div class="mathblock" data-say="P of all 100 true equals the quantity 99 over 100, to the power 100, about 0.37" tabindex="0" role="region" aria-label="Mathematical notation">P(all 100 true) = (99/100)¹⁰⁰, about 0.37</div><p>The lab prints the exact fraction. The conjunction of the hundred claims is true with probability about 0.37, well under the threshold of <span class="math" data-say="95 over 100">95/100</span>, so she does not accept it. She accepts every claim, and she does not accept the claim that all of them are true. That is the <strong>preface paradox</strong>: she may write that she is confident of each sentence and that some error remains.</p><p>The two paradoxes differ in kind. In the lottery, closure under conjunction fails because the conjunction is certainly false. In the preface the conjunction is possible and merely improbable. So the lottery shows that a threshold can accept an inconsistent set, while the preface shows that it can accept a consistent set whose conjunction it rejects.</p><h3>Why it matters outside books</h3><p>A valid argument preserves truth, not probability. If a conclusion follows from a hundred premises, each at <span class="math" data-say="99 over 100">99/100</span>, and the premises are independent, the conclusion is at least as probable as their conjunction, which is about 0.37. A long chain of reasoning in which every step is believable can end in a conclusion that is not. The principle that if you accept each premise you accept the conclusion fails for exactly this reason.</p><p>Shorten the book and the effect shrinks. Ten claims at <span class="math" data-say="9 over 10">9/10</span> give a conjunction of about 0.35, which the lab prints as <span class="math" data-say="3486784401 over 10000000000">3486784401/10000000000</span>: milder, but still far below the claims it is made of. Only at certainty does it vanish: a hundred claims at probability 1 have a conjunction of probability 1. Closure under conjunction holds for what is certain and is at risk for everything else.</p><p>The lab assumes independence, and real claims in a book are more often positively related, as when they rest on one source. That raises the probability that all are true, but not to 1, and the paradox remains for any set with enough independent risk.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A threshold for belief, and a book</h2></div><p>what a threshold accepts, whether it can all be true, and what incoherence costs</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Believe each sentence, doubt the book</h2><div class="prose reading"><p>An author has checked a hundred claims for a book. Each is supported strongly enough to have credence <span class="math" data-say="99 over 100">99/100</span>, and the checks are independent: an error in one tells her nothing about another. At a threshold of <span class="math" data-say="95 over 100">95/100</span> she accepts every claim, and the lab reports 100 of 100.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A threshold for belief, and a book</h2></div><p>what a threshold accepts, whether it can all be true, and what incoherence costs</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Accepting by threshold</strong><span>each claim on its own probability; the conjunction on the product</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="crTable"></table></div>
       <div class="status-banner" id="crStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Change the number of claims, their probability or the threshold</h3>
-          <p>Each claim has the probability in the second box and all are independent. Find how many claims at 99/100 it takes before the conjunction falls below one half.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Change the number of claims, their probability or the threshold</h3>
+            <p>Each claim has the probability in the second box and all are independent. Find how many claims at 99/100 it takes before the conjunction falls below one half.</p>
         <div class="field">
           <label for="crPreset">Worked example</label>
           <select id="crPreset"><option value="book" selected>100 claims at 99/100, threshold 95/100</option><option value="short">10 claims at 9/10, threshold 4/5</option><option value="certain">100 claims at 1, threshold 95/100</option></select>
@@ -1442,12 +1485,15 @@
           <div class="kpi"><span>Dutch book</span><strong id="crBook">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Unlike the lottery, nothing logical ties the claims together. They could all be true, and the lab reports the accepted set as consistent. The question is how likely that is.</p><div class="defbox"><span class="label">Definition &middot; Independent claims</span><p>Claims are <strong>independent</strong> when the probability of two of them together is the product of their separate probabilities, and likewise for any number. For <span class="math" data-say="n">n</span> claims each at probability <span class="math" data-say="p">p</span>, the probability that all are true is <span class="math" data-say="p">p</span> multiplied by itself <span class="math" data-say="n">n</span> times.</p></div><div class="mathblock" data-say="P of all 100 true equals the quantity 99 over 100, to the power 100, about 0.37" tabindex="0" role="region" aria-label="Mathematical notation">P(all 100 true) = (99/100)¹⁰⁰, about 0.37</div><p>The lab prints the exact fraction. The conjunction of the hundred claims is true with probability about 0.37, well under the threshold of <span class="math" data-say="95 over 100">95/100</span>, so she does not accept it. She accepts every claim, and she does not accept the claim that all of them are true. That is the <strong>preface paradox</strong>: she may write that she is confident of each sentence and that some error remains.</p><p>The two paradoxes differ in kind. In the lottery, closure under conjunction fails because the conjunction is certainly false. In the preface the conjunction is possible and merely improbable. So the lottery shows that a threshold can accept an inconsistent set, while the preface shows that it can accept a consistent set whose conjunction it rejects.</p><h3>Why it matters outside books</h3><p>A valid argument preserves truth, not probability. If a conclusion follows from a hundred premises, each at <span class="math" data-say="99 over 100">99/100</span>, and the premises are independent, the conclusion is at least as probable as their conjunction, which is about 0.37. A long chain of reasoning in which every step is believable can end in a conclusion that is not. The principle that if you accept each premise you accept the conclusion fails for exactly this reason.</p><p>Shorten the book and the effect shrinks. Ten claims at <span class="math" data-say="9 over 10">9/10</span> give a conjunction of about 0.35, which the lab prints as <span class="math" data-say="3486784401 over 10000000000">3486784401/10000000000</span>: milder, but still far below the claims it is made of. Only at certainty does it vanish: a hundred claims at probability 1 have a conjunction of probability 1. Closure under conjunction holds for what is certain and is at risk for everything else.</p><p>The lab assumes independence, and real claims in a book are more often positively related, as when they rest on one source. That raises the probability that all are true, but not to 1, and the paradox remains for any set with enough independent risk.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running the preface</h2></div><p>From independent claims to a rejected conjunction.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>State each claim’s probability</h3><p>All the claims are given the same probability here, and the claims are independent.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Apply the threshold</h3><p>Accept the claims whose probability is at least <span class="math" data-say="t">t</span>. If one is accepted they all are.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check consistency</h3><p>Nothing ties independent claims together, so they can all be true. The accepted set has a model.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Multiply for the conjunction</h3><p>The probability that all are true is the common probability multiplied by itself once for each claim. Compare it with <span class="math" data-say="t">t</span>.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Say what is given up</h3><p>If the product is below <span class="math" data-say="t">t</span>, the reasoner accepts every claim and not their conjunction, so closure fails without any inconsistency.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running the preface</h2>
+      <p class="lead-in">From independent claims to a rejected conjunction.</p>
+      <ol class="key-ideas method"><li><strong>State each claim’s probability.</strong> All the claims are given the same probability here, and the claims are independent.</li><li><strong>Apply the threshold.</strong> Accept the claims whose probability is at least <span class="math" data-say="t">t</span>. If one is accepted they all are.</li><li><strong>Check consistency.</strong> Nothing ties independent claims together, so they can all be true. The accepted set has a model.</li><li><strong>Multiply for the conjunction.</strong> The probability that all are true is the common probability multiplied by itself once for each claim. Compare it with <span class="math" data-say="t">t</span>.</li><li><strong>Say what is given up.</strong> If the product is below <span class="math" data-say="t">t</span>, the reasoner accepts every claim and not their conjunction, so closure fails without any inconsistency.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1465,17 +1511,16 @@ accepted set:                      consistent
 P(all true) = (99/100)¹⁰⁰:         about 0.37</div><p>Nothing in the claims prevents all of them being true, and yet the conjunction is well below the threshold. Believing every sentence and doubting the book is not a contradiction.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking an author who believes each sentence must believe the book has no errors</strong><span>Believing each claim at <span class="math" data-say="99 over 100">99/100</span> is compatible with giving the conjunction credence about 0.37, because the probability of all of them is the product and not the common value. The preface states exactly that: no particular sentence is doubted, and the whole is expected to contain a mistake.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the preface as the lottery again</strong><span>The lottery set is inconsistent, so one accepted claim is certainly false. The preface set is consistent, and every accepted claim might be true. They share a failure of closure and differ in why.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Dropping belief in each claim because the whole is doubtful</strong><span>The doubt about the book is a doubt about the conjunction. No sentence has become less probable, and withdrawing from every claim at <span class="math" data-say="99 over 100">99/100</span> would give up a hundred well-supported beliefs to avoid an inconsistency the set does not contain.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say why the set is consistent and the conjunction is not accepted.</strong><p>You should be able to apply a threshold to independent claims, state that the accepted set has a model, compute the probability that all are true as a product, and contrast the failure of closure here with its failure in the lottery.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Whether the author should believe the book is error-free, doubt it, or suspend judgement is contested; the lab shows only that the three cannot all be derived from the threshold rule together.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking an author who believes each sentence must believe the book has no errors</strong><span>Believing each claim at <span class="math" data-say="99 over 100">99/100</span> is compatible with giving the conjunction credence about 0.37, because the probability of all of them is the product and not the common value. The preface states exactly that: no particular sentence is doubted, and the whole is expected to contain a mistake.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the preface as the lottery again</strong><span>The lottery set is inconsistent, so one accepted claim is certainly false. The preface set is consistent, and every accepted claim might be true. They share a failure of closure and differ in why.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Dropping belief in each claim because the whole is doubtful</strong><span>The doubt about the book is a doubt about the conjunction. No sentence has become less probable, and withdrawing from every claim at <span class="math" data-say="99 over 100">99/100</span> would give up a hundred well-supported beliefs to avoid an inconsistency the set does not contain.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say why the set is consistent and the conjunction is not accepted.</strong><p>You should be able to apply a threshold to independent claims, state that the accepted set has a model, compute the probability that all are true as a product, and contrast the failure of closure here with its failure in the lottery.</p></div></div><div class="note"><strong>Note:</strong> Whether the author should believe the book is error-free, doubt it, or suspend judgement is contested; the lab shows only that the three cannot all be derived from the threshold rule together.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Independent claims multiply</summary><p>If the claims are independent, the probability that all are true is the product of their probabilities. A hundred factors of 99/100 multiply to far less than any one of them.</p></details><details class="recall"><summary>Consistent is not probable</summary><p>A set of claims can all be true without it being likely that they are. Consistency is a matter of logic and probability of how much risk accumulates.</p></details><details class="recall"><summary>Risk accumulates with length</summary><p>Each claim added to a book, or each premise added to an argument, adds a little chance of error, and the little chances add up.</p></details></div>
+      <h3>Summary</h3>
       <p>An author believes each sentence of a book and writes in the preface that errors remain. With claims independent and each at 99 in 100, a threshold accepts every one, the accepted set is consistent, and the probability that all are true is about 0.37. Closure under conjunction fails here by probability, not by logic.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Independent claims multiply.</strong> If the claims are independent, the probability that all are true is the product of their probabilities. A hundred factors of 99/100 multiply to far less than any one of them.</li><li><strong>Consistent is not probable.</strong> A set of claims can all be true without it being likely that they are. Consistency is a matter of logic and probability of how much risk accumulates.</li><li><strong>Risk accumulates with length.</strong> Each claim added to a book, or each premise added to an argument, adds a little chance of error, and the little chances add up.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="100 claims, each at 99 over 100, all accepted. they can all be true, the set is consistent. P of all true is the product, about 0.37. believe each, doubt the whole" tabindex="0" role="region" aria-label="Mathematical notation">100 claims, each at 99/100, all accepted
 they can all be true: the set is consistent
 P(all true) is the product: about 0.37
@@ -2222,11 +2267,42 @@ believe each, doubt the whole</div><figcaption>A careful book, an honest preface
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2294,7 +2370,7 @@ believe each, doubt the whole</div><figcaption>A careful book, an honest preface
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,42 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Organizing Domain Logic</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 18 · Base Patterns</p>
       <h1>Money</h1>
       <p class="lesson-lede">An amount with its currency, held as whole cents, and a way of splitting a sum that neither loses nor gains a penny.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Money</li><li>Allocation</li><li>An allocator</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the conundrum worked</h2>
-      <article class="prose reading"><p>&ldquo;There's no general rounding scheme I can apply to both that will avoid losing or gaining a penny.&rdquo; That is the end of Matt Foemmel's conundrum, as Fowler tells it in the Money pattern of Chapter 18, and this lesson works it. Read the pattern in your own copy first; its example class is by Foemmel and Fowler, and is better read there.</p><p>Fowler is puzzled that money is not a first-class type in any mainstream language, because its absence causes two kinds of trouble. The obvious one is currencies: adding dollars to yen. The subtle one is rounding: amounts are usually rounded to the smallest unit, and it is easy to lose pennies doing it. His answer is a Money class with an amount and a currency. The amount is an integral type or a fixed decimal, and he says to avoid any floating point type absolutely, because it brings back the rounding problems Money exists to avoid. The book's example shows the effect; the reason, in one sentence of this lesson's own: binary floating point cannot hold most decimal fractions exactly, so ten cents is stored as a number very near ten cents, and the error shows in totals.</p><p>Money is a Value Object, so its equality and hash code rest on the amount and the currency. Its arithmetic is currency-aware: adding two currencies is, most simply, an error, and Ward Cunningham's money bag, an object holding several currencies at once, is the more elaborate answer. Multiplying by a rate is ordinary. Converting between currencies goes through a convertor object, because some conversion rules, like the fixed euro rates, round in their own way. Comparison is currency-aware too, and Money can print and parse itself. When to Use It is broad: Fowler reaches for Money in nearly every calculation an object-oriented program does, chiefly to keep the rounding in one place.</p><p>Then the conundrum, which the book credits to Matt Foemmel. A rule says a sum must be split 70% to one account and 30% to another, and the sum is 5 cents. The exact shares are 3.5 and 1.5 cents. Rounding both to nearest gives 4 and 2, a penny gained; rounding both down gives 4 cents in all, a penny lost; rounding both up gives 6. Fowler lists the ways out he has seen: ignore it, which worries accountants; give the last share whatever is left, which keeps the total but can pile pennies onto the last share; let the caller choose a rounding for each share, which gets complicated across ten accounts; and his favourite, an allocator that takes the ratios and returns shares with no penny dropped. Its faults, he says, are that you must remember to use it, and that it is hard to guarantee which share gets each spare penny.</p><p>The lab works the split exactly. It takes an amount in cents, the ratios and a rule, computes each exact share as the amount times its ratio over the sum of the ratios, and prints five tiles: the shares, their total, the total less the amount, the exact shares, and the largest gap between a share and its exact value. Its <span class="math" data-say="allocator">allocator</span> rounds every share down and gives the cents left over one each to the shares in order from the first, which is what the Foemmel and Fowler example does; the panel says the book allows other ways of placing them. On Foemmel's 5 cents at 70 30, the book's illustration, <code>nearest</code> prints 4, 2, a total of 6, +1, exact shares 7/2 = 3.50 and 3/2 = 1.50, and a largest gap of 1/2 = 0.50. <code>round-down</code> prints 3, 1, a total of 4, −1.</p><p>The two rules that keep the total agree here. <code>rest-to-last</code> rounds the first share to nearest and gives the last what is left: 4, 1, a total of 5, 0. <code>allocator</code> floors both to 3 and 1, then gives the one cent left to the first share: 4, 1, 5, 0. With two shares there is nowhere else for a penny to go, so the difference between the rules needs more shares to show.</p><p>On <code>three-ways</code> a dollar is split equally three ways by nearest: 33, 33, 33, a total of 99, −1, a cent lost. On <code>three-ways-allocated</code> the allocator gives 34, 33, 33, a total of 100, 0, with the largest <span data-say="gap 2 divided by 3 is approximately 0.67">gap 2/3 ≈ 0.67</span>. On <code>pennies-to-last</code> a dollar is split seven ways with the last share taking what is left: 14 six times and then 16, a total of 100, 0, but a largest gap of <span data-say="12 over 7 is approximately 1.71">12/7 ≈ 1.71</span>. The total is kept and the last share takes two cents more than the others, which is the fault the book names. The allocator keeps every share within a cent of its exact value, because it rounds down and adds at most one.</p><p>The listing is the caller's side: a refund shared across the payments that made up an order, in proportion to each. It leaves the splitting to <span class="math" data-say="money">Money</span> and then checks that the parts add back up, throwing if they do not. Under a rule that rounds each share to nearest, that check can fail; under an allocator it cannot. There are no lab figures for this listing: the lab works the rule, and the exercise asks you to work it by hand.</p><pre class="codeblock" data-say="line 1, comment, Refunds an order across the payments that paid for it, in. line 2, comment, proportion to each Money does the splitting, this checks it.. line 3, list of refund refund of money total, list of payment paid. line 4, array of long weights is set to new long array of length paid dot size. line 5, for int i is set to 0, i is less than weights dot length, i is incremented. line 6, weights at index i is set to paid dot get of i dot amount dot cents. line 8, array of money parts is set to total dot split by of weights. line 9, money sum is set to money dot zero of total dot currency. line 10, list of refund out is set to new array list of refund. line 11, for int i is set to 0, i is less than parts dot length, i is incremented. line 12, sum is set to sum dot plus of parts at index i. line 13, out dot add of new refund of paid dot get of i, parts at index i. line 15, if not sum dot equals of total. line 16, throw new illegal state exception of refund parts do not add up. line 18, return out" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Refunds an order across the payments that paid for it, in</span>
-<span class="cl">// proportion to each; Money does the splitting, this checks it.</span>
-<span class="cl">List&lt;Refund&gt; refund(Money total, List&lt;Payment&gt; paid) {</span>
-<span class="cl">    long[] weights = new long[paid.size()];</span>
-<span class="cl">    for (int i = 0; i &lt; weights.length; i++) {</span>
-<span class="cl">        weights[i] = paid.get(i).amount().cents();</span>
-<span class="cl">    }</span>
-<span class="cl">    Money[] parts = total.splitBy(weights);</span>
-<span class="cl">    Money sum = Money.zero(total.currency());</span>
-<span class="cl">    List&lt;Refund&gt; out = new ArrayList&lt;Refund&gt;();</span>
-<span class="cl">    for (int i = 0; i &lt; parts.length; i++) {</span>
-<span class="cl">        sum = sum.plus(parts[i]);</span>
-<span class="cl">        out.add(new Refund(paid.get(i), parts[i]));</span>
-<span class="cl">    }</span>
-<span class="cl">    if (!sum.equals(total)) {</span>
-<span class="cl">        throw new IllegalStateException(&quot;refund parts do not add up&quot;);</span>
-<span class="cl">    }</span>
-<span class="cl">    return out;</span>
-<span class="cl">}</span></code></pre><h3>Exercise</h3><ul><li>Amount: 100 cents.</li><li>Ratios: six equal shares, 1 1 1 1 1 1.</li><li>Rules: nearest, then the allocator.</li></ul><p>Work each share, the total and the total less the amount under both rules, and the exact share, by hand. Then set the lab to the same amount, ratios and rule to check.</p><p>A Money object stands in for a number. The next lesson, Special Case, reads the object that stands in for a missing one.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Money arithmetic</h2></div><p>dividing an amount by ratios without losing a cent</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the conundrum worked</h2><div class="prose reading"><p>&ldquo;There's no general rounding scheme I can apply to both that will avoid losing or gaining a penny.&rdquo; That is the end of Matt Foemmel's conundrum, as Fowler tells it in the Money pattern of Chapter 18, and this lesson works it. Read the pattern in your own copy first; its example class is by Foemmel and Fowler, and is better read there.</p><p>Fowler is puzzled that money is not a first-class type in any mainstream language, because its absence causes two kinds of trouble. The obvious one is currencies: adding dollars to yen. The subtle one is rounding: amounts are usually rounded to the smallest unit, and it is easy to lose pennies doing it. His answer is a Money class with an amount and a currency. The amount is an integral type or a fixed decimal, and he says to avoid any floating point type absolutely, because it brings back the rounding problems Money exists to avoid. The book's example shows the effect; the reason, in one sentence of this lesson's own: binary floating point cannot hold most decimal fractions exactly, so ten cents is stored as a number very near ten cents, and the error shows in totals.</p><p>Money is a Value Object, so its equality and hash code rest on the amount and the currency. Its arithmetic is currency-aware: adding two currencies is, most simply, an error, and Ward Cunningham's money bag, an object holding several currencies at once, is the more elaborate answer. Multiplying by a rate is ordinary. Converting between currencies goes through a convertor object, because some conversion rules, like the fixed euro rates, round in their own way. Comparison is currency-aware too, and Money can print and parse itself. When to Use It is broad: Fowler reaches for Money in nearly every calculation an object-oriented program does, chiefly to keep the rounding in one place.</p><p>Then the conundrum, which the book credits to Matt Foemmel. A rule says a sum must be split 70% to one account and 30% to another, and the sum is 5 cents. The exact shares are 3.5 and 1.5 cents. Rounding both to nearest gives 4 and 2, a penny gained; rounding both down gives 4 cents in all, a penny lost; rounding both up gives 6. Fowler lists the ways out he has seen: ignore it, which worries accountants; give the last share whatever is left, which keeps the total but can pile pennies onto the last share; let the caller choose a rounding for each share, which gets complicated across ten accounts; and his favourite, an allocator that takes the ratios and returns shares with no penny dropped. Its faults, he says, are that you must remember to use it, and that it is hard to guarantee which share gets each spare penny.</p><p>The lab works the split exactly. It takes an amount in cents, the ratios and a rule, computes each exact share as the amount times its ratio over the sum of the ratios, and prints five tiles: the shares, their total, the total less the amount, the exact shares, and the largest gap between a share and its exact value. Its <span class="math" data-say="allocator">allocator</span> rounds every share down and gives the cents left over one each to the shares in order from the first, which is what the Foemmel and Fowler example does; the panel says the book allows other ways of placing them. On Foemmel's 5 cents at 70 30, the book's illustration, <code>nearest</code> prints 4, 2, a total of 6, +1, exact shares 7/2 = 3.50 and 3/2 = 1.50, and a largest gap of 1/2 = 0.50. <code>round-down</code> prints 3, 1, a total of 4, −1.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Money arithmetic</h2></div><p>dividing an amount by ratios without losing a cent</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Money arithmetic</strong><span>dividing an amount by ratios without losing a cent</span></div>
       </div>
@@ -1476,10 +1501,10 @@
       <div class="table-wrap" id="mnTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mnTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> The exact share is amount × ratio / the sum of the ratios. nearest: each rounded half up. down: each rounded down. up: each rounded up. last: nearest for all but the last share, which takes what is left (possibly negative). allocator: each rounded down, then the cents left over given one each to the shares in order from the first. Fowler's Money allows other ways of placing the leftover cents; allocator is the one his example uses.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Splitting a sum by ratios</h3>
-          <p>The arithmetic of the figures the lesson states (marked with their source). Give an amount in cents, the ratios and a rule. Each exact share is the amount times its ratio over the sum of the ratios. The allocator rounds every share down, then gives the cents left over one each to the shares in order from the first; Fowler's Money allows other ways of placing them, and this is the one his and Foemmel's example uses. Figures: the book's illustration in Chapter 18, Money (Matt Foemmel's five cents split 70 to 30) for the first four presets; the rest illustrative.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Splitting a sum by ratios</h3>
+            <p>The arithmetic of the figures the lesson states (marked with their source). Give an amount in cents, the ratios and a rule. Each exact share is the amount times its ratio over the sum of the ratios. The allocator rounds every share down, then gives the cents left over one each to the shares in order from the first; Fowler's Money allows other ways of placing them, and this is the one his and Foemmel's example uses. Figures: the book's illustration in Chapter 18, Money (Matt Foemmel's five cents split 70 to 30) for the first four presets; the rest illustrative.</p>
         <div class="field">
           <label for="mnPreset">Worked example</label>
           <select id="mnPreset"><option value="nearest" selected>5 cents at 70 30, each share to nearest (the book's illustration)</option><option value="round-down">5 cents at 70 30, each share down (the book's illustration)</option><option value="rest-to-last">5 cents at 70 30, the last share takes the rest (the book's illustration)</option><option value="allocator">5 cents at 70 30, by the allocator (the book's illustration)</option><option value="three-ways">A dollar in three equal shares, to nearest (illustrative)</option><option value="three-ways-allocated">A dollar in three equal shares, by the allocator (illustrative)</option><option value="pennies-to-last">A dollar in seven shares, the last taking the rest (illustrative)</option></select>
@@ -1504,12 +1529,33 @@
           <div class="kpi"><span>Largest gap from an exact share</span><strong id="mnFurthest">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The two rules that keep the total agree here. <code>rest-to-last</code> rounds the first share to nearest and gives the last what is left: 4, 1, a total of 5, 0. <code>allocator</code> floors both to 3 and 1, then gives the one cent left to the first share: 4, 1, 5, 0. With two shares there is nowhere else for a penny to go, so the difference between the rules needs more shares to show.</p><p>On <code>three-ways</code> a dollar is split equally three ways by nearest: 33, 33, 33, a total of 99, −1, a cent lost. On <code>three-ways-allocated</code> the allocator gives 34, 33, 33, a total of 100, 0, with the largest <span data-say="gap 2 divided by 3 is approximately 0.67">gap 2/3 ≈ 0.67</span>. On <code>pennies-to-last</code> a dollar is split seven ways with the last share taking what is left: 14 six times and then 16, a total of 100, 0, but a largest gap of <span data-say="12 over 7 is approximately 1.71">12/7 ≈ 1.71</span>. The total is kept and the last share takes two cents more than the others, which is the fault the book names. The allocator keeps every share within a cent of its exact value, because it rounds down and adds at most one.</p><p>The listing is the caller's side: a refund shared across the payments that made up an order, in proportion to each. It leaves the splitting to <span class="math" data-say="money">Money</span> and then checks that the parts add back up, throwing if they do not. Under a rule that rounds each share to nearest, that check can fail; under an allocator it cannot. There are no lab figures for this listing: the lab works the rule, and the exercise asks you to work it by hand.</p><pre class="codeblock" data-say="line 1, comment, Refunds an order across the payments that paid for it, in. line 2, comment, proportion to each Money does the splitting, this checks it.. line 3, list of refund refund of money total, list of payment paid. line 4, array of long weights is set to new long array of length paid dot size. line 5, for int i is set to 0, i is less than weights dot length, i is incremented. line 6, weights at index i is set to paid dot get of i dot amount dot cents. line 8, array of money parts is set to total dot split by of weights. line 9, money sum is set to money dot zero of total dot currency. line 10, list of refund out is set to new array list of refund. line 11, for int i is set to 0, i is less than parts dot length, i is incremented. line 12, sum is set to sum dot plus of parts at index i. line 13, out dot add of new refund of paid dot get of i, parts at index i. line 15, if not sum dot equals of total. line 16, throw new illegal state exception of refund parts do not add up. line 18, return out" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Refunds an order across the payments that paid for it, in</span>
+<span class="cl">// proportion to each; Money does the splitting, this checks it.</span>
+<span class="cl">List&lt;Refund&gt; refund(Money total, List&lt;Payment&gt; paid) {</span>
+<span class="cl">    long[] weights = new long[paid.size()];</span>
+<span class="cl">    for (int i = 0; i &lt; weights.length; i++) {</span>
+<span class="cl">        weights[i] = paid.get(i).amount().cents();</span>
+<span class="cl">    }</span>
+<span class="cl">    Money[] parts = total.splitBy(weights);</span>
+<span class="cl">    Money sum = Money.zero(total.currency());</span>
+<span class="cl">    List&lt;Refund&gt; out = new ArrayList&lt;Refund&gt;();</span>
+<span class="cl">    for (int i = 0; i &lt; parts.length; i++) {</span>
+<span class="cl">        sum = sum.plus(parts[i]);</span>
+<span class="cl">        out.add(new Refund(paid.get(i), parts[i]));</span>
+<span class="cl">    }</span>
+<span class="cl">    if (!sum.equals(total)) {</span>
+<span class="cl">        throw new IllegalStateException(&quot;refund parts do not add up&quot;);</span>
+<span class="cl">    }</span>
+<span class="cl">    return out;</span>
+<span class="cl">}</span></code></pre><h3>Exercise</h3><ul><li>Amount: 100 cents.</li><li>Ratios: six equal shares, 1 1 1 1 1 1.</li><li>Rules: nearest, then the allocator.</li></ul><p>Work each share, the total and the total less the amount under both rules, and the exact share, by hand. Then set the lab to the same amount, ratios and rule to check.</p><p>A Money object stands in for a number. The next lesson, Special Case, reads the object that stands in for a missing one.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Splitting a sum without losing a penny</h2></div><p>Four steps, the last of them on a system of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Work the exact shares</h3><p>Multiply the amount by each ratio and divide by the sum of the ratios. Keep the fractions.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Round by the rule</h3><p>Round each exact share by the rule in use: to nearest, down, up, or the last share taking what is left.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Total and compare</h3><p>Add the shares and subtract the amount. A non-zero difference is a penny gained or lost; a zero with one share far from its exact value is a penny moved.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own system</h3><p>Find one place a system you know splits an amount, such as tax, a discount across order lines or instalments. Write which rule it uses and what happens to the remainder.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Splitting a sum without losing a penny</h2>
+      <p class="lead-in">Four steps, the last of them on a system of your own.</p>
+      <ol class="key-ideas method"><li><strong>Work the exact shares.</strong> Multiply the amount by each ratio and divide by the sum of the ratios. Keep the fractions.</li><li><strong>Round by the rule.</strong> Round each exact share by the rule in use: to nearest, down, up, or the last share taking what is left.</li><li><strong>Total and compare.</strong> Add the shares and subtract the amount. A non-zero difference is a penny gained or lost; a zero with one share far from its exact value is a penny moved.</li><li><strong>Do it on your own system.</strong> Find one place a system you know splits an amount, such as tax, a discount across order lines or instalments. Write which rule it uses and what happens to the remainder.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1527,17 +1573,16 @@ total 6, a penny gained: +1
 each share half a cent from exact</div><p>Rounding down instead gives 3 and 1, a penny lost. Both rules fail for the same reason: each share is rounded without knowing what the others did. The allocator rounds all of them down first and then hands out what was lost, so its shares, 4 and 1, add up to 5.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking that rounding each share to the nearest cent keeps the total</strong><span>On the book's own example it gains a cent: 3.5 and 1.5 become 4 and 2, which is 6 from 5. On a three-way split of a dollar it loses one, 33 three times for 99. Each share is rounded without regard to the others, so the errors do not cancel; Fowler's point is that no rounding scheme applied to every share can promise they will.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using a double and rounding at the end</strong><span>The book's reason against it is that floating point brings back the rounding problems Money exists to avoid; it says to avoid any floating point type absolutely. The lesson adds, as its own explanation, that binary floating point cannot hold most decimal fractions exactly, so a sum of amounts drifts before any rounding is applied. Whole cents, or a fixed decimal, have no such drift.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the last share taking the rest solves the problem</strong><span>It keeps the total, and on two shares it looks as good as an allocator. Fowler names its fault: pennies can pile up on the last allocation. On <code>pennies-to-last</code>, a dollar split seven ways, the last share is 16 against 14 for the rest, nearly two cents from its exact value.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can split an amount by ratios and say what each rule does to the total.</strong><p>Given an amount in cents and ratios, compute each share exactly, then under nearest, down and allocator rounding, and state each rule's total.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab does the arithmetic of the amounts and ratios it is given, exactly, and its allocator is one rule among those the book allows. Which rule is right, and which share should take a spare cent, is a business decision the lab cannot make; Fowler says the allocator cannot easily guarantee where the spare pennies land.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking that rounding each share to the nearest cent keeps the total</strong><span>On the book's own example it gains a cent: 3.5 and 1.5 become 4 and 2, which is 6 from 5. On a three-way split of a dollar it loses one, 33 three times for 99. Each share is rounded without regard to the others, so the errors do not cancel; Fowler's point is that no rounding scheme applied to every share can promise they will.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using a double and rounding at the end</strong><span>The book's reason against it is that floating point brings back the rounding problems Money exists to avoid; it says to avoid any floating point type absolutely. The lesson adds, as its own explanation, that binary floating point cannot hold most decimal fractions exactly, so a sum of amounts drifts before any rounding is applied. Whole cents, or a fixed decimal, have no such drift.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the last share taking the rest solves the problem</strong><span>It keeps the total, and on two shares it looks as good as an allocator. Fowler names its fault: pennies can pile up on the last allocation. On <code>pennies-to-last</code>, a dollar split seven ways, the last share is 16 against 14 for the rest, nearly two cents from its exact value.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can split an amount by ratios and say what each rule does to the total.</strong><p>Given an amount in cents and ratios, compute each share exactly, then under nearest, down and allocator rounding, and state each rule's total.</p></div></div><div class="note"><strong>Note:</strong> The lab does the arithmetic of the amounts and ratios it is given, exactly, and its allocator is one rule among those the book allows. Which rule is right, and which share should take a spare cent, is a business decision the lab cannot make; Fowler says the allocator cannot easily guarantee where the spare pennies land.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Money</summary><p>A Value Object holding an amount and a currency. The amount is a whole number of the smallest unit, cents, or a fixed decimal, and adding or subtracting checks that the currencies match.</p></details><details class="recall"><summary>Allocation</summary><p>Splitting a sum of money between several places by given ratios, as opposed to multiplying it by a rate, such as a tax. The shares must add back to the sum exactly.</p></details><details class="recall"><summary>An allocator</summary><p>A method on Money that takes the ratios and returns the shares, with no penny dropped or added. The lab's allocator rounds every share down and then gives the cents left over one each to the shares in order, from the first.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 18's Money is an amount and a currency in one Value Object, never a floating point number, with arithmetic that knows its currency. Its hard part is splitting a sum: work Matt Foemmel's five cents split 70 to 30 under four rounding rules, and see which lose a penny, which gain one, and where the pennies go.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Money.</strong> A Value Object holding an amount and a currency. The amount is a whole number of the smallest unit, cents, or a fixed decimal, and adding or subtracting checks that the currencies match.</li><li><strong>Allocation.</strong> Splitting a sum of money between several places by given ratios, as opposed to multiplying it by a rate, such as a tax. The shares must add back to the sum exactly.</li><li><strong>An allocator.</strong> A method on Money that takes the ratios and returns the shares, with no penny dropped or added. The lab's allocator rounds every share down and then gives the cents left over one each to the shares in order, from the first.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="an amount and its currency, together. whole cents, never floating point. adding two currencies is an error. rounding each share can lose a penny. allocate, floor, then hand out the rest" tabindex="0" role="region" aria-label="Mathematical notation">an amount and its currency, together
 whole cents, never floating point
 adding two currencies is an error
@@ -2228,11 +2273,42 @@ allocate: floor, then hand out the rest</div><figcaption>Money in five lines</fi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2300,7 +2376,7 @@ allocate: floor, then hand out the rest</div><figcaption>Money in five lines</fi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

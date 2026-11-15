@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,49 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Dynamic Programming and Sequential Decisions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; When the next step is uncertain</p>
       <h1>The Stochastic Recursion</h1>
       <p class="lesson-lede">An expectation inside a maximum, filled backwards on exact fractions, and checked against every deterministic policy evaluated by pushing a distribution forward.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The expectation is inside the maximum, and the order is the model</li><li>A policy in a finite horizon is a function of time as well as state</li><li>Every policy can be evaluated without a value function at all</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>One change to the recursion, and one change to what an answer is</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; A finite-horizon Markov decision process</span><p>A set of <strong>states</strong>, a set of <strong>actions</strong>, a <strong>transition</strong> <span class="math" data-say="P of A, i, j">P(a, i, j)</span> giving the probability of moving to state <span class="math" data-say="j">j</span> when action <span class="math" data-say="A">a</span> is taken in state <span class="math" data-say="i">i</span>, a <strong>reward</strong> <span class="math" data-say="r of A and i">r(a, i)</span> earned immediately, and a horizon of <span class="math" data-say="T">T</span> periods. Every row of every transition table sums to 1 exactly.</p><p>A <strong>policy</strong> assigns an action to each state in each period. The <strong>value</strong> <span class="math" data-say="V sub t of i">Vₜ(i)</span> is the largest expected total reward obtainable from state <span class="math" data-say="i">i</span> with <span class="math" data-say="T minus t">T − t</span> periods left, and satisfies <span class="math" data-say="V sub t of i equals the max over a of the quantity r of A and i plus the sum over j of P of A, i, j times V sub t plus 1 of j">Vₜ(i) = max over a of [ r(a,i) + Σⱼ P(a,i,j) · Vₜ₊₁(j) ]</span> with <span class="math" data-say="V sub T of i equals 0">V_T(i) = 0</span>.</p></div><p>The lab refuses a transition row that does not sum to exactly 1, rather than normalising it. A distribution that does not add up is a modelling error and not a typing one: silently rescaling it would answer a question the reader did not ask, and every number on the page would be exactly right about it.</p><div class="mathblock" data-say="states, small large, actions, grow harvest, T equals 4. grow, from small to small 1 over 4, large 3 over 4, pays, small 0, large 1. from large to large 1. harvest, from small to small 1, pays, small 3, large 9. from large to small 3 over 4, large 1 over 4. filled from the end, V with 0 periods left is 0 in both states. 1 left, small, grow 0 plus 0 equals 0, harvest 3 plus 0 equals 3, to harvest, 3. large, grow 1 plus 0 equals 1, harvest 9 plus 0 equals 9, to harvest, 9. 2 left, small, grow 0 plus the quantity 1 over 4, times 3 plus the quantity 3 over 4, times 9 equals 15 over 2. harvest 3 plus 1 times 3, equals 6, to grow, 15 over 2. large, grow 1 plus 1 times 9, equals 10. harvest 9 plus the quantity 3 over 4, times 3 plus the quantity 1 over 4, times 9 equals 27 over 2, to harvest 27 over 2. 3 left, small, grow 0 plus the quantity 1 over 4, times the quantity 15 over 2, plus the quantity 3 over 4, times the quantity 27 over 2, equals 12, to grow, 12. harvest 3 plus 15 over 2 equals 21 over 2. large, grow 1 plus 27 over 2 equals 29 over 2. harvest 9 plus the quantity 3 over 4, times the quantity 15 over 2, plus the quantity 1 over 4, times the quantity 27 over 2, equals 18, to harvest 18. 4 left, small, grow 0 plus the quantity 1 over 4, times 12 plus the quantity 3 over 4, times 18 equals 33 over 2, to grow, 33 over 2. harvest 3 plus 12 equals 15. large, grow 1 plus 18 equals 19. harvest 9 plus the quantity 3 over 4, times 12 plus the quantity 1 over 4, times 18 equals 45 over 2, to harvest 45 over 2" tabindex="0" role="region" aria-label="Mathematical notation">states  small large       actions  grow harvest       T = 4
-
-   grow      from small -&gt; small 1/4, large 3/4        pays  small 0   large 1
-             from large -&gt; large 1
-   harvest   from small -&gt; small 1                     pays  small 3   large 9
-             from large -&gt; small 3/4, large 1/4
-
-filled from the end, V with 0 periods left is 0 in both states:
-
-1 left    small   grow 0 + 0 = 0        harvest 3 + 0 = 3        -&gt; harvest  3
-          large   grow 1 + 0 = 1        harvest 9 + 0 = 9        -&gt; harvest  9
-
-2 left    small   grow 0 + (1/4)(3) + (3/4)(9) = 15/2
-                  harvest 3 + (1)(3)           = 6               -&gt; grow  15/2
-          large   grow 1 + (1)(9)              = 10
-                  harvest 9 + (3/4)(3) + (1/4)(9) = 27/2         -&gt; harvest 27/2
-
-3 left    small   grow 0 + (1/4)(15/2) + (3/4)(27/2) = 12        -&gt; grow    12
-                  harvest 3 + 15/2 = 21/2
-          large   grow 1 + 27/2 = 29/2
-                  harvest 9 + (3/4)(15/2) + (1/4)(27/2) = 18     -&gt; harvest 18
-
-4 left    small   grow 0 + (1/4)(12) + (3/4)(18) = 33/2          -&gt; grow    33/2
-                  harvest 3 + 12 = 15
-          large   grow 1 + 18 = 19
-                  harvest 9 + (3/4)(12) + (1/4)(18) = 45/2       -&gt; harvest 45/2</div><p>Read the small state down the table: harvest, grow, grow, grow. With one period left there is nothing to grow into, so the 3 that harvesting pays immediately wins; with two or more, growing pays 0 now and puts three quarters of the probability into the large state, which is worth 9 and then 27/2 and then 18. The large state harvests throughout, because harvesting there pays 9 and only knocks you back three times in four.</p><h3>What the table does not say on its own</h3><p><span class="math" data-say="V sub 0 of small equals 33 over 2">V₀(small) = 33/2</span> is a claim about a number. &ldquo;The policy this table describes is worth 33/2 starting from the small state&rdquo; is a different claim, and it is the one a reader can act on. The lab makes it separately: it takes the argmax in each cell, treats that as a fixed policy, and evaluates it by pushing a probability distribution forward from each starting state through four periods. Both come to 33/2 and 45/2.</p><p>Then it does the harder thing. There are two actions, two states and four periods, so a deterministic policy is eight independent choices and there are 256 of them. Every one is evaluated the same forward way, and the best starting from each state is recorded. The best from the small state is 33/2 and from the large state 45/2, which is what the table said. Three routes to the same pair of numbers, and only two of them involve a value function.</p><div class="example"><span class="label">Example &middot; An action that ends the game</span><p>Switch to the example with an owned machine: keeping pays 3 a period and leaves it owned four times in five, selling pays 7 once and the sold state pays nothing ever again. With one period left the table sells, because 7 beats 3 and there is no future to protect. With two left it keeps, because keeping is worth 43/5; with three left it keeps again, at 247/25.</p><p>Same shape as the growing instance and a different story: here the action that pays best now is the one that destroys every future period, so it becomes correct only at the very end. An absorbing state is worth meeting because it is the cleanest case where a stationary policy is simply wrong.</p></div><h3>What the state left out</h3><p>The transition depends on the current state and the chosen action, and on nothing else. That is the Markov assumption, and it is doing a great deal of work: it says that how you arrived in the small state cannot matter, that the probabilities do not drift over the four periods, and that nothing outside the two named states influences anything. Each of those can be false, and each of them, if false, leaves every number in the table exactly right about a process that is not the one in front of you.</p><p>There is a second assumption hiding in the objective. Maximising expected total reward treats a certain 10 and a fifty-fifty gamble between 0 and 20 as the same thing. That is a choice about what the decision-maker cares about, it is not implied by anything in the model, and no amount of exact arithmetic on the expectation will reveal it. Say it out loud before quoting a policy.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The stochastic recursion, and every policy there is</h2></div><p>A value table is a claim; the policy it describes, evaluated forwards, is the evidence</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>One change to the recursion, and one change to what an answer is</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; A finite-horizon Markov decision process</span><p>A set of <strong>states</strong>, a set of <strong>actions</strong>, a <strong>transition</strong> <span class="math" data-say="P of A, i, j">P(a, i, j)</span> giving the probability of moving to state <span class="math" data-say="j">j</span> when action <span class="math" data-say="A">a</span> is taken in state <span class="math" data-say="i">i</span>, a <strong>reward</strong> <span class="math" data-say="r of A and i">r(a, i)</span> earned immediately, and a horizon of <span class="math" data-say="T">T</span> periods. Every row of every transition table sums to 1 exactly.</p><p>A <strong>policy</strong> assigns an action to each state in each period. The <strong>value</strong> <span class="math" data-say="V sub t of i">Vₜ(i)</span> is the largest expected total reward obtainable from state <span class="math" data-say="i">i</span> with <span class="math" data-say="T minus t">T − t</span> periods left, and satisfies <span class="math" data-say="V sub t of i equals the max over a of the quantity r of A and i plus the sum over j of P of A, i, j times V sub t plus 1 of j">Vₜ(i) = max over a of [ r(a,i) + Σⱼ P(a,i,j) · Vₜ₊₁(j) ]</span> with <span class="math" data-say="V sub T of i equals 0">V_T(i) = 0</span>.</p></div><p>The lab refuses a transition row that does not sum to exactly 1, rather than normalising it. A distribution that does not add up is a modelling error and not a typing one: silently rescaling it would answer a question the reader did not ask, and every number on the page would be exactly right about it.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The stochastic recursion, and every policy there is</h2></div><p>A value table is a claim; the policy it describes, evaluated forwards, is the evidence</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The stochastic recursion, and every policy there is</strong><span>a value is an expectation, and the action that maximises it can change with the horizon</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the first state</span><span class="tone-purple"><i class="legend-swatch"></i>the second</span><span class="tone-green"><i class="legend-swatch"></i>the action the recursion chose</span><span class="tone-amber"><i class="legend-swatch"></i>an action it rejected</span></div>
@@ -1430,10 +1448,10 @@ filled from the end, V with 0 periods left is 0 in both states:
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="sdTable"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="sdPolicy"></table></div>
       <div class="status-banner" id="sdStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Fill the table backwards, then check it forwards, twice</h3>
-          <p>Every cell shows both actions priced, so the argmax is visible rather than asserted, and the values stay exact fractions because an expectation of an expectation of an expectation is still rational. Beside it, two independent checks that never form a value: the policy the table describes, evaluated by pushing a distribution forward, and every deterministic policy there is, evaluated the same way. In this example the best action in one of the two states changes with how many periods are left.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Fill the table backwards, then check it forwards, twice</h3>
+            <p>Every cell shows both actions priced, so the argmax is visible rather than asserted, and the values stay exact fractions because an expectation of an expectation of an expectation is still rational. Beside it, two independent checks that never form a value: the policy the table describes, evaluated by pushing a distribution forward, and every deterministic policy there is, evaluated the same way. In this example the best action in one of the two states changes with how many periods are left.</p>
         <div class="field">
           <label for="sdPreset">Worked example</label>
           <select id="sdPreset"><option value="twoact">two states, two actions, three periods</option><option value="absorb">an action that ends the game</option><option value="flip" selected>the best action changes with how long is left</option></select>
@@ -1471,12 +1489,40 @@ filled from the end, V with 0 periods left is 0 in both states:
           <div class="kpi"><span>Does the chosen policy achieve it?</span><strong id="sdAchieves">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="sdHint" style="margin:0;">The recursion fills one column of values per period, backwards, and takes the best action in each cell. The check beside it never forms a value at all: it lists every deterministic policy, pushes a probability distribution forward through each one collecting reward as it goes, and reports the best. Two computations with no line in common.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="states, small large, actions, grow harvest, T equals 4. grow, from small to small 1 over 4, large 3 over 4, pays, small 0, large 1. from large to large 1. harvest, from small to small 1, pays, small 3, large 9. from large to small 3 over 4, large 1 over 4. filled from the end, V with 0 periods left is 0 in both states. 1 left, small, grow 0 plus 0 equals 0, harvest 3 plus 0 equals 3, to harvest, 3. large, grow 1 plus 0 equals 1, harvest 9 plus 0 equals 9, to harvest, 9. 2 left, small, grow 0 plus the quantity 1 over 4, times 3 plus the quantity 3 over 4, times 9 equals 15 over 2. harvest 3 plus 1 times 3, equals 6, to grow, 15 over 2. large, grow 1 plus 1 times 9, equals 10. harvest 9 plus the quantity 3 over 4, times 3 plus the quantity 1 over 4, times 9 equals 27 over 2, to harvest 27 over 2. 3 left, small, grow 0 plus the quantity 1 over 4, times the quantity 15 over 2, plus the quantity 3 over 4, times the quantity 27 over 2, equals 12, to grow, 12. harvest 3 plus 15 over 2 equals 21 over 2. large, grow 1 plus 27 over 2 equals 29 over 2. harvest 9 plus the quantity 3 over 4, times the quantity 15 over 2, plus the quantity 1 over 4, times the quantity 27 over 2, equals 18, to harvest 18. 4 left, small, grow 0 plus the quantity 1 over 4, times 12 plus the quantity 3 over 4, times 18 equals 33 over 2, to grow, 33 over 2. harvest 3 plus 12 equals 15. large, grow 1 plus 18 equals 19. harvest 9 plus the quantity 3 over 4, times 12 plus the quantity 1 over 4, times 18 equals 45 over 2, to harvest 45 over 2" tabindex="0" role="region" aria-label="Mathematical notation">states  small large       actions  grow harvest       T = 4
+
+   grow      from small -&gt; small 1/4, large 3/4        pays  small 0   large 1
+             from large -&gt; large 1
+   harvest   from small -&gt; small 1                     pays  small 3   large 9
+             from large -&gt; small 3/4, large 1/4
+
+filled from the end, V with 0 periods left is 0 in both states:
+
+1 left    small   grow 0 + 0 = 0        harvest 3 + 0 = 3        -&gt; harvest  3
+          large   grow 1 + 0 = 1        harvest 9 + 0 = 9        -&gt; harvest  9
+
+2 left    small   grow 0 + (1/4)(3) + (3/4)(9) = 15/2
+                  harvest 3 + (1)(3)           = 6               -&gt; grow  15/2
+          large   grow 1 + (1)(9)              = 10
+                  harvest 9 + (3/4)(3) + (1/4)(9) = 27/2         -&gt; harvest 27/2
+
+3 left    small   grow 0 + (1/4)(15/2) + (3/4)(27/2) = 12        -&gt; grow    12
+                  harvest 3 + 15/2 = 21/2
+          large   grow 1 + 27/2 = 29/2
+                  harvest 9 + (3/4)(15/2) + (1/4)(27/2) = 18     -&gt; harvest 18
+
+4 left    small   grow 0 + (1/4)(12) + (3/4)(18) = 33/2          -&gt; grow    33/2
+                  harvest 3 + 12 = 15
+          large   grow 1 + 18 = 19
+                  harvest 9 + (3/4)(12) + (1/4)(18) = 45/2       -&gt; harvest 45/2</div><p>Read the small state down the table: harvest, grow, grow, grow. With one period left there is nothing to grow into, so the 3 that harvesting pays immediately wins; with two or more, growing pays 0 now and puts three quarters of the probability into the large state, which is worth 9 and then 27/2 and then 18. The large state harvests throughout, because harvesting there pays 9 and only knocks you back three times in four.</p><h3>What the table does not say on its own</h3><p><span class="math" data-say="V sub 0 of small equals 33 over 2">V₀(small) = 33/2</span> is a claim about a number. &ldquo;The policy this table describes is worth 33/2 starting from the small state&rdquo; is a different claim, and it is the one a reader can act on. The lab makes it separately: it takes the argmax in each cell, treats that as a fixed policy, and evaluates it by pushing a probability distribution forward from each starting state through four periods. Both come to 33/2 and 45/2.</p><p>Then it does the harder thing. There are two actions, two states and four periods, so a deterministic policy is eight independent choices and there are 256 of them. Every one is evaluated the same forward way, and the best starting from each state is recorded. The best from the small state is 33/2 and from the large state 45/2, which is what the table said. Three routes to the same pair of numbers, and only two of them involve a value function.</p><div class="example"><span class="label">Example &middot; An action that ends the game</span><p>Switch to the example with an owned machine: keeping pays 3 a period and leaves it owned four times in five, selling pays 7 once and the sold state pays nothing ever again. With one period left the table sells, because 7 beats 3 and there is no future to protect. With two left it keeps, because keeping is worth 43/5; with three left it keeps again, at 247/25.</p><p>Same shape as the growing instance and a different story: here the action that pays best now is the one that destroys every future period, so it becomes correct only at the very end. An absorbing state is worth meeting because it is the cleanest case where a stationary policy is simply wrong.</p></div><h3>What the state left out</h3><p>The transition depends on the current state and the chosen action, and on nothing else. That is the Markov assumption, and it is doing a great deal of work: it says that how you arrived in the small state cannot matter, that the probabilities do not drift over the four periods, and that nothing outside the two named states influences anything. Each of those can be false, and each of them, if false, leaves every number in the table exactly right about a process that is not the one in front of you.</p><p>There is a second assumption hiding in the objective. Maximising expected total reward treats a certain 10 and a fifty-fifty gamble between 0 and 20 as the same thing. That is a choice about what the decision-maker cares about, it is not implied by anything in the model, and no amount of exact arithmetic on the expectation will reveal it. Say it out loud before quoting a policy.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Filling a stochastic table</h2></div><p>Five steps. The first is a check on the data and the last is a check on the answer, and skipping either produces confident nonsense.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check that every transition row sums to exactly one</h3><p>One row per state per action. A row that does not sum to 1 is not a distribution and nothing downstream is meaningful; the lab refuses rather than normalising, because rescaling silently answers a different question.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Set the value in the final period to zero and work backwards</h3><p><span class="math" data-say="V sub T of i equals 0">V_T(i) = 0</span> for every state, unless the problem gives a terminal payoff. Every later column depends only on the column to its right, so one right-to-left pass fills the table.</p></article><article class="card concept-card"><div class="icon">3</div><h3>In each cell, price every action and keep the maximum</h3><p><span class="math" data-say="r of A and i">r(a,i)</span> plus the sum over <span class="math" data-say="j">j</span> of <span class="math" data-say="P of A, i, j">P(a,i,j)</span> times the value of <span class="math" data-say="j">j</span> in the next column. Keep the arithmetic in fractions: the products and sums of rationals are rational, and a decimal here hides whether two actions are genuinely tied.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the policy down each row, and notice where it changes</h3><p>A state whose argmax is the same in every column has a stationary policy on this instance; a state where it changes does not, and the period where it changes is usually the interesting fact about the problem.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Evaluate the policy forwards, independently</h3><p>Put all the probability on a starting state, and for each period collect the reward the policy earns in each state weighted by the chance of being there, then push the distribution through that period's transitions. No maximum, no value function. The number that comes out should equal the table's first column.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Filling a stochastic table</h2>
+      <p class="lead-in">Five steps. The first is a check on the data and the last is a check on the answer, and skipping either produces confident nonsense.</p>
+      <ol class="key-ideas method"><li><strong>Check that every transition row sums to exactly one.</strong> One row per state per action. A row that does not sum to 1 is not a distribution and nothing downstream is meaningful; the lab refuses rather than normalising, because rescaling silently answers a different question.</li><li><strong>Set the value in the final period to zero and work backwards.</strong> <span class="math" data-say="V sub T of i equals 0">V_T(i) = 0</span> for every state, unless the problem gives a terminal payoff. Every later column depends only on the column to its right, so one right-to-left pass fills the table.</li><li><strong>In each cell, price every action and keep the maximum.</strong> <span class="math" data-say="r of A and i">r(a,i)</span> plus the sum over <span class="math" data-say="j">j</span> of <span class="math" data-say="P of A, i, j">P(a,i,j)</span> times the value of <span class="math" data-say="j">j</span> in the next column. Keep the arithmetic in fractions: the products and sums of rationals are rational, and a decimal here hides whether two actions are genuinely tied.</li><li><strong>Read the policy down each row, and notice where it changes.</strong> A state whose argmax is the same in every column has a stationary policy on this instance; a state where it changes does not, and the period where it changes is usually the interesting fact about the problem.</li><li><strong>Evaluate the policy forwards, independently.</strong> Put all the probability on a starting state, and for each period collect the reward the policy earns in each state weighted by the chance of being there, then push the distribution through that period's transitions. No maximum, no value function. The number that comes out should equal the table's first column.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1520,17 +1566,16 @@ EVERY POLICY
    best from small  33/2        best from large  45/2      both agree</div><p>The forward evaluation is worth doing once by hand because it makes the distribution concrete: after one period there is a three-quarters chance of being in the large state, and every reward from then on is weighted by where the process actually is rather than by where it was aimed. Nothing in that computation resembles the recursion, which is exactly why it is a check.</p><p>For a rehearsal, set the horizon to one period with the slider and read the policy: both states harvest, and the values are 3 and 9. Then raise it one period at a time and watch the small state flip to growing and stay there. The flip happens between one period and two, and the reason is visible in the arithmetic: growing is worth 15/2 against harvesting's 6.</p><p>The harder rehearsal: change the reward for harvesting in the small state from 3 to 8 and find the horizon at which the flip disappears altogether. Then ask what you would have concluded from a table filled at a single horizon, and what it would have taken to notice.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Averaging the maximum instead of maximising the average</strong><span><span class="math" data-say="E of max">E[max]</span> assumes the outcome is known before the choice, which is the perfect-information problem. It is never smaller than the right answer and it can be much larger, and the two look identical on a page until you ask what is known when. Write the two expressions out once and keep the version with <span class="math" data-say="max">max</span> on the outside where you can see it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming the optimal policy is stationary because it usually looks like one</strong><span>It is stationary on some instances and not on others, and the finite horizon is exactly where it fails. In the instance here one of the two states flips between one period left and two; in the absorbing example, selling is right only in the final period. A policy quoted without saying how many periods it was computed for is incomplete.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading exact fractions as a stylistic choice</strong><span>The values here are <span class="math" data-say="15 over 2">15/2</span>, <span class="math" data-say="27 over 2">27/2</span>, <span class="math" data-say="33 over 2">33/2</span>, <span class="math" data-say="45 over 2">45/2</span>, <span class="math" data-say="43 over 5">43/5</span>, <span class="math" data-say="247 over 25">247/25</span>. In decimal some of these are exact and some are not, and once rounded there is no way to tell whether two actions are genuinely tied or merely close &mdash; which matters, because a tie means two optimal policies and a near-miss means one. The arithmetic stays rational so that the distinction survives.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can fill a two-state, two-action table backwards in fractions, read the policy down each row, and evaluate that policy forwards without using the table.</strong><p>You should be able to write the recursion with the expectation inside the maximum and say why the other order is a different problem, check the transition rows before computing anything, identify the period at which an argmax changes and explain it from the arithmetic, and push a distribution forward through a fixed policy to reproduce the value independently.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Chance has been in the transition: you knew the state and not where the action would send you. The next lesson, &ldquo;Folding a Decision Tree Back&rdquo;, moves the uncertainty to the other side, where you do not know the state and can pay to learn something about it. The recursion is the same fold &mdash; a chance node is an average and a decision node is a maximum &mdash; and the new quantity is what a signal is worth, which turns out to have a ceiling that no signal can exceed and can be exactly zero for a signal that looks perfectly informative.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Averaging the maximum instead of maximising the average</strong><span><span class="math" data-say="E of max">E[max]</span> assumes the outcome is known before the choice, which is the perfect-information problem. It is never smaller than the right answer and it can be much larger, and the two look identical on a page until you ask what is known when. Write the two expressions out once and keep the version with <span class="math" data-say="max">max</span> on the outside where you can see it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming the optimal policy is stationary because it usually looks like one</strong><span>It is stationary on some instances and not on others, and the finite horizon is exactly where it fails. In the instance here one of the two states flips between one period left and two; in the absorbing example, selling is right only in the final period. A policy quoted without saying how many periods it was computed for is incomplete.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading exact fractions as a stylistic choice</strong><span>The values here are <span class="math" data-say="15 over 2">15/2</span>, <span class="math" data-say="27 over 2">27/2</span>, <span class="math" data-say="33 over 2">33/2</span>, <span class="math" data-say="45 over 2">45/2</span>, <span class="math" data-say="43 over 5">43/5</span>, <span class="math" data-say="247 over 25">247/25</span>. In decimal some of these are exact and some are not, and once rounded there is no way to tell whether two actions are genuinely tied or merely close &mdash; which matters, because a tie means two optimal policies and a near-miss means one. The arithmetic stays rational so that the distinction survives.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can fill a two-state, two-action table backwards in fractions, read the policy down each row, and evaluate that policy forwards without using the table.</strong><p>You should be able to write the recursion with the expectation inside the maximum and say why the other order is a different problem, check the transition rows before computing anything, identify the period at which an argmax changes and explain it from the arithmetic, and push a distribution forward through a fixed policy to reproduce the value independently.</p></div></div><div class="note"><strong>Note:</strong> Chance has been in the transition: you knew the state and not where the action would send you. The next lesson, &ldquo;Folding a Decision Tree Back&rdquo;, moves the uncertainty to the other side, where you do not know the state and can pay to learn something about it. The recursion is the same fold &mdash; a chance node is an average and a decision node is a maximum &mdash; and the new quantity is what a signal is worth, which turns out to have a ceiling that no signal can exceed and can be exactly zero for a signal that looks perfectly informative.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The expectation is inside the maximum, and the order is the model</summary><p><span class="math" data-say="the max over a of E of">max over a of E[...]</span> says you choose the action and then chance resolves. <span class="math" data-say="E of the max over a of">E[max over a of ...]</span> would say chance resolves first and you choose knowing the outcome, which is a completely different problem and a strictly better one &mdash; it is the perfect-information value that &ldquo;Folding a Decision Tree Back&rdquo; uses as an upper bound. Writing the two down side by side once is the cheapest way to stop confusing them.</p></details><details class="recall"><summary>A policy in a finite horizon is a function of time as well as state</summary><p>The table has one column per period, and the argmax in a cell can differ from the argmax in the cell above it. In the instance here the small state harvests when one period is left and grows whenever two or more are, because growing pays almost nothing now and improves where you will be &mdash; and with nothing left to come, improving where you will be is worth nothing. A stationary policy is what you get when that never happens, which is a fact about an instance.</p></details><details class="recall"><summary>Every policy can be evaluated without a value function at all</summary><p>Fix a policy, put all the probability on a starting state, and push the distribution forward period by period, collecting the reward that policy earns in each state weighted by the probability of being there. No maximum is ever taken and no value is ever written, so this computation cannot repeat a mistake the recursion made. With two states, two actions and four periods there are 256 deterministic policies and the lab evaluates all of them.</p></details></div>
+      <h3>Summary</h3>
       <p>An action no longer decides where you end up; it decides a distribution over where you end up. The recursion absorbs that with one change &mdash; the value of an action is its immediate reward plus the expected value of where it sends you &mdash; and everything else about filling the table backwards is unchanged. What is new is that the best action in a state can depend on how many periods remain, so a policy in a finite horizon carries a time index and a policy that does not is a special case rather than the norm.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The expectation is inside the maximum, and the order is the model.</strong> <span class="math" data-say="the max over a of E of">max over a of E[...]</span> says you choose the action and then chance resolves. <span class="math" data-say="E of the max over a of">E[max over a of ...]</span> would say chance resolves first and you choose knowing the outcome, which is a completely different problem and a strictly better one &mdash; it is the perfect-information value that &ldquo;Folding a Decision Tree Back&rdquo; uses as an upper bound. Writing the two down side by side once is the cheapest way to stop confusing them.</li><li><strong>A policy in a finite horizon is a function of time as well as state.</strong> The table has one column per period, and the argmax in a cell can differ from the argmax in the cell above it. In the instance here the small state harvests when one period is left and grows whenever two or more are, because growing pays almost nothing now and improves where you will be &mdash; and with nothing left to come, improving where you will be is worth nothing. A stationary policy is what you get when that never happens, which is a fact about an instance.</li><li><strong>Every policy can be evaluated without a value function at all.</strong> Fix a policy, put all the probability on a starting state, and push the distribution forward period by period, collecting the reward that policy earns in each state weighted by the probability of being there. No maximum is ever taken and no value is ever written, so this computation cannot repeat a mistake the recursion made. With two states, two actions and four periods there are 256 deterministic policies and the lab evaluates all of them.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="V sub t of i equals the max over a of the quantity r of A and i plus the sum over j of P of A, i, j times V sub t plus 1 of j, , V sub T of i equals 0. the expectation is INSIDE the maximum, choose, then average over what follows. states small large, acts grow harvest, four periods. V, 0, 0 then 3, 9 then 15 over 2, 27 over 2 then 12, 18 then 33 over 2, 45 over 2. with one period left the small state harvests, with two or more it grows. 256 deterministic policies, each evaluated forwards, and none beats the table" tabindex="0" role="region" aria-label="Mathematical notation">Vₜ(i) = max over a of [ r(a,i) + Σⱼ P(a,i,j) Vₜ₊₁(j) ],   V_T(i) = 0
 the expectation is INSIDE the maximum: choose, then average over what follows
 states small large,  acts grow harvest,  four periods
@@ -3157,11 +3202,42 @@ with one period left the small state harvests; with two or more it grows
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3229,7 +3305,7 @@ with one period left the small state harvests; with two or more it grows
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

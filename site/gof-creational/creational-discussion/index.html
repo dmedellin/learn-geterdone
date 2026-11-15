@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Creational Patterns</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 3 · Creational Patterns</p>
       <h1>Discussion of Creational Patterns</h1>
       <p class="lesson-lede">Two ways to vary the classes a system creates, by subclassing the creator or by passing in an object that knows them, and how the five patterns divide between them.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Parameterizing by subclassing</li><li>Parameterizing by composition</li><li>Evolving toward flexibility</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The discussion&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;There are two common ways to parameterize a system by the classes of objects it creates.&rdquo; The authors close Chapter 3 with that sentence and a short Discussion of Creational Patterns, and this lesson reads it. Read it in your own copy first. The lesson reads it as an argument, then counts one small design three ways.</p><p>The first way is to subclass the class that does the creating, which is Factory Method. Its drawback is that changing the product's class can take a new subclass, and the need can cascade: if the creator is itself made by a factory method, its own creator must be overridden as well. The second way leans on composition: define an object whose job is to know the product classes, and hand it to the system. Abstract Factory, Builder and Prototype all do this, each with its own kind of factory object: one that makes objects of several classes, one that builds a complex product step by step through a matching protocol, and one that copies itself, so that in Prototype the factory object and the sample of the product are one and the same.</p><p>The authors then return to the graphical editor framework of the Prototype pattern, whose tool must be parameterized by the class of graphic it adds, and try each pattern on it. Factory Method gives a tool subclass per graphic class. Abstract Factory gives a factory class per graphic class, each making a single product, and hands the tool the right factory. Prototype has each graphic class implement cloning and gives each tool a prototype to clone. Their judgement for that framework is that Factory Method is easiest at first but multiplies small subclasses that do little; that Abstract Factory offers little improvement, because its factory hierarchy is as large, and is worth it only where such a hierarchy already exists, provided by the language as in Smalltalk or needed elsewhere in the system; and that Prototype probably fits best, since it needs only a clone operation on each graphic class, and cloning also serves a Duplicate command.</p><p>The general lessons follow. Factory Method makes a design more customisable at little extra complexity, and needs a new operation where the others need new classes; people use it by default for making objects, but it is not needed when the instantiated class never changes, or when creation already happens in an operation subclasses can override. Designs built on Abstract Factory, Prototype or Builder are more flexible still, and more complex. &ldquo;Often, designs start out using Factory Method and evolve toward the other creational patterns as the designer discovers where more flexibility is needed.&rdquo; Knowing the patterns, the authors end, gives a designer more choices when one criterion has to be traded against another.</p><p>Two things are worth noticing about the comparison. It is made for one framework, with one kind of product per tool, and the authors say plainly that the best choice turns on many factors. And the comparison is not one of class counts. Factory Method and Abstract Factory have the same shape, a creator or factory per variant with one operation per kind of product, which is why an abstract factory is often built from factory methods; with two kinds per family they still count the same. What separates them in the authors' argument is where the choice is made, in a subclass of the class that needs the products or in an object passed to it. Prototype is the one that reduces subclassing, since it needs no creator or factory classes at all.</p><pre class="codeblock" data-say="line 1, comment, Three ways to give a palette tool the class it creates.. line 2, abstract class tool, comment, Factory Method. line 3, protected abstract question new question. line 4, final void click of quiz quiz quiz dot add of new question. line 7, interface question factory question make, comment, Abstract Factory. line 8, final class factory tool. line 9, private final question factory factory. line 10, factory tool of question factory factory this dot factory is set to factory. line 11, void click of quiz quiz quiz dot add of factory dot make. line 14, final class cloning tool, comment, Prototype. line 15, private final question prototype. line 16, cloning tool of question prototype this dot prototype is set to prototype. line 17, void click of quiz quiz quiz dot add of prototype dot copy" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Three ways to give a palette tool the class it creates.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The discussion&#x27;s argument first, then the count</h2><div class="prose reading"><p>&ldquo;There are two common ways to parameterize a system by the classes of objects it creates.&rdquo; The authors close Chapter 3 with that sentence and a short Discussion of Creational Patterns, and this lesson reads it. Read it in your own copy first. The lesson reads it as an argument, then counts one small design three ways.</p><p>The first way is to subclass the class that does the creating, which is Factory Method. Its drawback is that changing the product's class can take a new subclass, and the need can cascade: if the creator is itself made by a factory method, its own creator must be overridden as well. The second way leans on composition: define an object whose job is to know the product classes, and hand it to the system. Abstract Factory, Builder and Prototype all do this, each with its own kind of factory object: one that makes objects of several classes, one that builds a complex product step by step through a matching protocol, and one that copies itself, so that in Prototype the factory object and the sample of the product are one and the same.</p><p>The authors then return to the graphical editor framework of the Prototype pattern, whose tool must be parameterized by the class of graphic it adds, and try each pattern on it. Factory Method gives a tool subclass per graphic class. Abstract Factory gives a factory class per graphic class, each making a single product, and hands the tool the right factory. Prototype has each graphic class implement cloning and gives each tool a prototype to clone. Their judgement for that framework is that Factory Method is easiest at first but multiplies small subclasses that do little; that Abstract Factory offers little improvement, because its factory hierarchy is as large, and is worth it only where such a hierarchy already exists, provided by the language as in Smalltalk or needed elsewhere in the system; and that Prototype probably fits best, since it needs only a clone operation on each graphic class, and cloning also serves a Duplicate command.</p><p>The general lessons follow. Factory Method makes a design more customisable at little extra complexity, and needs a new operation where the others need new classes; people use it by default for making objects, but it is not needed when the instantiated class never changes, or when creation already happens in an operation subclasses can override. Designs built on Abstract Factory, Prototype or Builder are more flexible still, and more complex. &ldquo;Often, designs start out using Factory Method and evolve toward the other creational patterns as the designer discovers where more flexibility is needed.&rdquo; Knowing the patterns, the authors end, gives a designer more choices when one criterion has to be traded against another.</p><p>Two things are worth noticing about the comparison. It is made for one framework, with one kind of product per tool, and the authors say plainly that the best choice turns on many factors. And the comparison is not one of class counts. Factory Method and Abstract Factory have the same shape, a creator or factory per variant with one operation per kind of product, which is why an abstract factory is often built from factory methods; with two kinds per family they still count the same. What separates them in the authors' argument is where the choice is made, in a subclass of the class that needs the products or in an object passed to it. Prototype is the one that reduces subclassing, since it needs no creator or factory classes at all.</p><pre class="codeblock" data-say="line 1, comment, Three ways to give a palette tool the class it creates.. line 2, abstract class tool, comment, Factory Method. line 3, protected abstract question new question. line 4, final void click of quiz quiz quiz dot add of new question. line 7, interface question factory question make, comment, Abstract Factory. line 8, final class factory tool. line 9, private final question factory factory. line 10, factory tool of question factory factory this dot factory is set to factory. line 11, void click of quiz quiz quiz dot add of factory dot make. line 14, final class cloning tool, comment, Prototype. line 15, private final question prototype. line 16, cloning tool of question prototype this dot prototype is set to prototype. line 17, void click of quiz quiz quiz dot add of prototype dot copy" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Three ways to give a palette tool the class it creates.</span>
 <span class="cl">abstract class Tool {                                   // Factory Method</span>
 <span class="cl">    protected abstract Question newQuestion();</span>
 <span class="cl">    final void click(Quiz quiz) { quiz.add(newQuestion()); }</span>
@@ -1462,12 +1506,11 @@
 <span class="cl">    private final Question prototype;</span>
 <span class="cl">    CloningTool(Question prototype) { this.prototype = prototype; }</span>
 <span class="cl">    void click(Quiz quiz) { quiz.add(prototype.copy()); }</span>
-<span class="cl">}</span></code></pre><p>Now the lab, on a quiz builder rather than a drawing editor. Its editor has a palette with one tool per question type, multiple choice, true or false, short answer and matching, and each tool must create its own kind of question: 4 families of 1 kind each, stated once for all three presets. On <code>palette-fm</code>, Factory Method, the design has 1 abstract tool, 4 tool subclasses, 1 abstract question and 4 question classes, 1 + 4 + 1 + 4 = 10 classes, 5 of which create. On <code>palette-af</code>, Abstract Factory, the 5 creators are 1 abstract factory and 4 concrete factories, and the total is again 1 + 4 + 1 + 4 = 10: the equally large hierarchy the authors describe, 5 factory classes against 5 tool classes. The lab counts the tool only under Factory Method, where it is the creator; under the other two it is the client and left out, so the sketch's own classes come to 10, 11 and 6.</p><p>On <code>palette-proto</code>, Prototype, there is 1 prototype manager, which the sketch does without since each tool holds its own prototype, 1 abstract question and 4 question classes, 1 + 1 + 4 = 6 classes, and the configuration tile counts 4 configurations of 1 prototype each, one per tool. Each preset also adds a fifth question type, ordering. Factory Method adds 2 classes, a concrete tool and a question class, 10 to 12; Abstract Factory adds 2, a factory and a question class, 10 to 12; Prototype adds 1, the question class, 6 to 7, and 1 configuration that registers its prototype. None edits an existing class. The lab counts each question type as a class of its own; if the types differed only in values, Prototype could make them instances of one class, the authors' argument about whole and half notes, and its count would fall further.</p><h3>Exercise</h3><ul><li>Each of the quiz builder's question types now needs two products, a <span class="math" data-say="question">question</span> and a <span class="math" data-say="rubric">rubric</span> that marks it.</li><li>The families are the same four: <span class="math" data-say="choice">choice</span>, <span class="math" data-say="truefalse">truefalse</span>, <span class="math" data-say="short">short</span> and <span class="math" data-say="match">match</span>.</li></ul><p>By hand, using the formulas of the lab's rules sentence, count the classes in the design under Abstract Factory, Factory Method and Prototype, and what a fifth question type adds under each. Then set the kinds in the lab to <code>question rubric</code> and check each scheme.</p><p>Chapter 3 ends here. The next course, Structural Patterns, reads Chapter 4, on how classes and objects are composed into larger structures, beginning with Adapter.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Classes</h2></div><p>families and kinds of product, and who makes them</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Now the lab, on a quiz builder rather than a drawing editor. Its editor has a palette with one tool per question type, multiple choice, true or false, short answer and matching, and each tool must create its own kind of question: 4 families of 1 kind each, stated once for all three presets. On <code>palette-fm</code>, Factory Method, the design has 1 abstract tool, 4 tool subclasses, 1 abstract question and 4 question classes, 1 + 4 + 1 + 4 = 10 classes, 5 of which create. On <code>palette-af</code>, Abstract Factory, the 5 creators are 1 abstract factory and 4 concrete factories, and the total is again 1 + 4 + 1 + 4 = 10: the equally large hierarchy the authors describe, 5 factory classes against 5 tool classes. The lab counts the tool only under Factory Method, where it is the creator; under the other two it is the client and left out, so the sketch's own classes come to 10, 11 and 6.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Classes</h2></div><p>families and kinds of product, and who makes them</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Classes</strong><span>families and kinds of product, and who makes them</span></div>
       </div>
@@ -1475,10 +1518,10 @@
       <div class="table-wrap" id="gclTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gclTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> F families × K kinds of product. Every scheme has K abstract products and F × K concrete product classes, counted as if each concrete product differs in behaviour. Abstract Factory adds 1 abstract factory and 1 concrete factory per family: 1 + F + K + F × K. Factory Method has 1 abstract creator declaring one factory method per kind and 1 concrete creator subclass per family overriding them: 1 + F + K + F × K, the same count, the difference being that the client subclasses the creator instead of composing with a factory object. Prototype adds 1 prototype manager, a registry keyed by kind, and no factory subclasses: 1 + K + F × K; a family is a configuration of K prototype instances. A new family adds its K products and, under Abstract Factory, 1 concrete factory, under Factory Method 1 concrete creator, under Prototype 1 configuration; it edits no existing class. A new kind adds 1 abstract product and F concrete products; under Abstract Factory it edits the abstract factory and every concrete factory (1 + F classes), each gaining an operation, and under Factory Method the abstract creator and every concrete creator (1 + F), each gaining a factory method; under Prototype it edits no class, and each of the F configurations registers one more prototype. The client is not counted.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>One design under three creational patterns</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>One design under three creational patterns</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gclPreset">Worked example</label>
           <select id="gclPreset"><option value="palette-fm" selected>A quiz palette under Factory Method, a fifth question type</option><option value="palette-af">The same palette under Abstract Factory</option><option value="palette-proto">The same palette under Prototype</option></select>
@@ -1509,12 +1552,15 @@
           <div class="kpi"><span>Configurations the change touches</span><strong id="gclConfigChange">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>On <code>palette-proto</code>, Prototype, there is 1 prototype manager, which the sketch does without since each tool holds its own prototype, 1 abstract question and 4 question classes, 1 + 1 + 4 = 6 classes, and the configuration tile counts 4 configurations of 1 prototype each, one per tool. Each preset also adds a fifth question type, ordering. Factory Method adds 2 classes, a concrete tool and a question class, 10 to 12; Abstract Factory adds 2, a factory and a question class, 10 to 12; Prototype adds 1, the question class, 6 to 7, and 1 configuration that registers its prototype. None edits an existing class. The lab counts each question type as a class of its own; if the types differed only in values, Prototype could make them instances of one class, the authors' argument about whole and half notes, and its count would fall further.</p><h3>Exercise</h3><ul><li>Each of the quiz builder's question types now needs two products, a <span class="math" data-say="question">question</span> and a <span class="math" data-say="rubric">rubric</span> that marks it.</li><li>The families are the same four: <span class="math" data-say="choice">choice</span>, <span class="math" data-say="truefalse">truefalse</span>, <span class="math" data-say="short">short</span> and <span class="math" data-say="match">match</span>.</li></ul><p>By hand, using the formulas of the lab's rules sentence, count the classes in the design under Abstract Factory, Factory Method and Prototype, and what a fifth question type adds under each. Then set the kinds in the lab to <code>question rubric</code> and check each scheme.</p><p>Chapter 3 ends here. The next course, Structural Patterns, reads Chapter 4, on how classes and objects are composed into larger structures, beginning with Adapter.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Choosing how to parameterize what is created</h2></div><p>Four steps, the last of them on a design of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Ask whether the class created changes at all</h3><p>If it never does, a plain constructor call is enough, as the Discussion says of Factory Method itself.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the families and kinds</h3><p>Factory Method and Abstract Factory count the same for any number of kinds; only Prototype drops the creator classes. Decide by where the choice should be made.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count all three schemes</h3><p>Type the families and kinds into the lab once and switch the scheme, reading the classes and what a new family adds under each.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own design</h3><p>Take a place in a system you know where the class created varies. Count it under the three schemes, then write down which one it uses today and where the next change would land.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Choosing how to parameterize what is created</h2>
+      <p class="lead-in">Four steps, the last of them on a design of your own.</p>
+      <ol class="key-ideas method"><li><strong>Ask whether the class created changes at all.</strong> If it never does, a plain constructor call is enough, as the Discussion says of Factory Method itself.</li><li><strong>Count the families and kinds.</strong> Factory Method and Abstract Factory count the same for any number of kinds; only Prototype drops the creator classes. Decide by where the choice should be made.</li><li><strong>Count all three schemes.</strong> Type the families and kinds into the lab once and switch the scheme, reading the classes and what a new family adds under each.</li><li><strong>Do it on your own design.</strong> Take a place in a system you know where the class created varies. Count it under the three schemes, then write down which one it uses today and where the next change would land.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1532,17 +1578,16 @@ ordering: 2 under each factory scheme
 ordering under Prototype: 1, and a config</div><p>The first two lines are the authors' remark that Abstract Factory's hierarchy is as large as Factory Method's. Neither scheme uses a family of more than one product here, so neither gains from it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the drawing-editor verdict as a ranking of the patterns</strong><span>The authors choose Prototype for one framework with one product per tool, and say the best choice depends on many factors. On the lab's palette Abstract Factory and Factory Method both count 10 classes, and with two kinds per type both count 15; the difference the authors draw is subclassing the creator against passing in a factory object.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Starting with the most flexible pattern</strong><span>The authors observe designs that begin with Factory Method and move to Abstract Factory, Prototype or Builder where flexibility proves to be needed. The composed patterns are more flexible and more complex, and the extra complexity pays only where the variation arrives.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking composition needs no new classes</strong><span>Abstract Factory needs a factory class per family; only Prototype does without factory classes, and then every product class must implement cloning, its own liability. The classes move; they do not all disappear.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count one design under three creational patterns and say what the counts leave out.</strong><p>Given the families and kinds of a design, state the classes under Factory Method, Abstract Factory and Prototype and what a new family adds under each, and give the authors' two ways of parameterizing a system and their comparison on the drawing editor.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts classes by three stated formulas, each product a class. It cannot weigh what the authors weigh: whether a factory hierarchy already exists, whether products differ only in values, whether cloning is hard for your classes, or where flexibility will be needed. The Discussion says the choice turns on many factors, and no count settles it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the drawing-editor verdict as a ranking of the patterns</strong><span>The authors choose Prototype for one framework with one product per tool, and say the best choice depends on many factors. On the lab's palette Abstract Factory and Factory Method both count 10 classes, and with two kinds per type both count 15; the difference the authors draw is subclassing the creator against passing in a factory object.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Starting with the most flexible pattern</strong><span>The authors observe designs that begin with Factory Method and move to Abstract Factory, Prototype or Builder where flexibility proves to be needed. The composed patterns are more flexible and more complex, and the extra complexity pays only where the variation arrives.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking composition needs no new classes</strong><span>Abstract Factory needs a factory class per family; only Prototype does without factory classes, and then every product class must implement cloning, its own liability. The classes move; they do not all disappear.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count one design under three creational patterns and say what the counts leave out.</strong><p>Given the families and kinds of a design, state the classes under Factory Method, Abstract Factory and Prototype and what a new family adds under each, and give the authors' two ways of parameterizing a system and their comparison on the drawing editor.</p></div></div><div class="note"><strong>Note:</strong> The lab counts classes by three stated formulas, each product a class. It cannot weigh what the authors weigh: whether a factory hierarchy already exists, whether products differ only in values, whether cloning is hard for your classes, or where flexibility will be needed. The Discussion says the choice turns on many factors, and no count settles it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Parameterizing by subclassing</summary><p>Varying the class a system creates by subclassing the class that creates it: Factory Method. Simple, but a new product can need a new creator subclass, and the change can cascade to whatever creates the creator.</p></details><details class="recall"><summary>Parameterizing by composition</summary><p>Varying it by giving the system an object that knows which classes to create: Abstract Factory's factory, Builder's builder, Prototype's prototype. The factory object is a parameter, and replacing it changes what is made.</p></details><details class="recall"><summary>Evolving toward flexibility</summary><p>The authors' observation that designs often begin with Factory Method and move to the other creational patterns where more flexibility turns out to be needed, accepting their extra complexity there and only there.</p></details></div>
+      <h3>Summary</h3>
       <p>The chapter closes by setting its patterns side by side: Factory Method against the three that pass in a factory object, compared on the drawing editor of the Prototype pattern. Read the discussion, then count one quiz builder's palette under Factory Method, Abstract Factory and Prototype, and what a new question type adds under each.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Parameterizing by subclassing.</strong> Varying the class a system creates by subclassing the class that creates it: Factory Method. Simple, but a new product can need a new creator subclass, and the change can cascade to whatever creates the creator.</li><li><strong>Parameterizing by composition.</strong> Varying it by giving the system an object that knows which classes to create: Abstract Factory's factory, Builder's builder, Prototype's prototype. The factory object is a parameter, and replacing it changes what is made.</li><li><strong>Evolving toward flexibility.</strong> The authors' observation that designs often begin with Factory Method and move to the other creational patterns where more flexibility turns out to be needed, accepting their extra complexity there and only there.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="subclass the creator, factory method. pass in a factory object, composition. one product per family, no gain. prototypes drop the creator classes. start simple, add flexibility as needed" tabindex="0" role="region" aria-label="Mathematical notation">subclass the creator: Factory Method
 pass in a factory object: composition
 one product per family: no gain
@@ -2338,11 +2383,42 @@ start simple, add flexibility as needed</div><figcaption>The discussion in five 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2410,7 +2486,7 @@ start simple, add flexibility as needed</div><figcaption>The discussion in five 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

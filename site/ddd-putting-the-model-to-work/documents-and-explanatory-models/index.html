@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,33 +1478,28 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Putting the Domain Model to Work</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 2 · Communication and the Use of Language</p>
       <h1>Documents, Diagrams and Explanatory Models</h1>
       <p class="lesson-lede">Diagrams that anchor a conversation, documents that say what the code cannot, and the test that a document still speaks the team&#x27;s language.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A design document</li><li>Explanatory model</li><li>A stale term</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s guidelines first, then the document, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Always remember that the model is not the diagram.&rdquo; Evans writes it at the close of Documents and Diagrams, in the second half of Chapter 2. This lesson reads that section, Written Design Documents with its two guidelines, Executable Bedrock, and Explanatory Models.</p><p>Evans draws constantly in meetings, mostly class diagrams and object interactions, and he gives diagrams their due: UML is good at relationships and fair at interactions. A sketch of a handful of objects, three to five, at the centre of the question keeps a discussion focused and puts everyone on the same names, and it changes as fast as the talk does. The trouble starts when a diagram tries to hold the whole model. It becomes too complete to read, and still leaves out half the story: what the concepts mean and what the objects are for, which no box and line can state. He has seen no attempt to generate code from UML that helped.</p><p>So he turns the usual arrangement inside out. Rather than a diagram annotated with text, he writes text illustrated with a few small, simplified diagrams of the parts that matter, and lets the code hold the detail, since well-written Java says as much as UML in its own way. The diagrams in his book are of that kind: skeletons of ideas, not specifications.</p><p>Written Design Documents grants that a team of any size needs some writing that holds still, and that writing tends to fall behind the code and the language. Its first guideline is that documents should complement code and speech. Evans states the Extreme Programming position fairly: running code does not lie, comments and documents drift, and relying on code keeps it clean. But code can bury a reader in detail, its behaviour is exact without being obvious, and developers are not the only readers. &ldquo;A document shouldn't try to do what the code already does well.&rdquo; It should give meaning, the large structure and the core.</p><p>The second guideline, Documents Should Work for a Living and Stay Current, comes with a test, and the test is the language. Is the document written in the words the team speaks now, and in the words of the code? If its terms never turn up in conversation or in the code, it is not doing its job. If the language moves on and the document does not, it could be archived as history: left in use it may confuse, and if it plays no important part, keeping it current by willpower is wasted effort.</p><p>Executable Bedrock returns to the code-only position and qualifies it. The behaviour of code cannot be argued with, but its message can be wrong: a method's name can be vague, misleading or out of date, and only discipline keeps code saying what it does. Still, code is closer to the ground than any other document, and it must use the same language as the requirements and the team.</p><p>Explanatory Models ends the chapter. One model should drive the code, the design and the talk, but other models can teach the domain, and may range wider than the code's model, which must be pared to what the software needs. They are better not drawn as object models, so no one mistakes them for the design. Evans's example sets a class diagram of a shipping route beside a picture of the same route as a sequence of handling, storage and transport, which does not match the classes in detail, and which, read beside the class diagram, makes both easier to follow.</p><p>Now a domain of the lesson's own: a city bike-share, whose design document was written at launch a year ago. Each record is a concept, then the document's term, the word the team speaks now, and the code's name, with a dash where one of them has no name.</p><pre class="codeblock" data-say="line 1, station, station, station, station. line 2, dock, dock, dock, dock. line 3, trip, rental, ride, ride. line 4, rebalancing, redistribution, rebalancing, rebalancing. line 5, membership, subscription, membership, membership. line 6, day pass, none, day pass, day pass. line 7, morning peak, morning peak, morning peak, none" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">station, station, station, station;</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s guidelines first, then the document, then the count</h2><div class="prose reading"><p>&ldquo;Always remember that the model is not the diagram.&rdquo; Evans writes it at the close of Documents and Diagrams, in the second half of Chapter 2. This lesson reads that section, Written Design Documents with its two guidelines, Executable Bedrock, and Explanatory Models.</p><p>Evans draws constantly in meetings, mostly class diagrams and object interactions, and he gives diagrams their due: UML is good at relationships and fair at interactions. A sketch of a handful of objects, three to five, at the centre of the question keeps a discussion focused and puts everyone on the same names, and it changes as fast as the talk does. The trouble starts when a diagram tries to hold the whole model. It becomes too complete to read, and still leaves out half the story: what the concepts mean and what the objects are for, which no box and line can state. He has seen no attempt to generate code from UML that helped.</p><p>So he turns the usual arrangement inside out. Rather than a diagram annotated with text, he writes text illustrated with a few small, simplified diagrams of the parts that matter, and lets the code hold the detail, since well-written Java says as much as UML in its own way. The diagrams in his book are of that kind: skeletons of ideas, not specifications.</p><p>Written Design Documents grants that a team of any size needs some writing that holds still, and that writing tends to fall behind the code and the language. Its first guideline is that documents should complement code and speech. Evans states the Extreme Programming position fairly: running code does not lie, comments and documents drift, and relying on code keeps it clean. But code can bury a reader in detail, its behaviour is exact without being obvious, and developers are not the only readers. &ldquo;A document shouldn't try to do what the code already does well.&rdquo; It should give meaning, the large structure and the core.</p><p>The second guideline, Documents Should Work for a Living and Stay Current, comes with a test, and the test is the language. Is the document written in the words the team speaks now, and in the words of the code? If its terms never turn up in conversation or in the code, it is not doing its job. If the language moves on and the document does not, it could be archived as history: left in use it may confuse, and if it plays no important part, keeping it current by willpower is wasted effort.</p><p>Executable Bedrock returns to the code-only position and qualifies it. The behaviour of code cannot be argued with, but its message can be wrong: a method's name can be vague, misleading or out of date, and only discipline keeps code saying what it does. Still, code is closer to the ground than any other document, and it must use the same language as the requirements and the team.</p><p>Explanatory Models ends the chapter. One model should drive the code, the design and the talk, but other models can teach the domain, and may range wider than the code's model, which must be pared to what the software needs. They are better not drawn as object models, so no one mistakes them for the design. Evans's example sets a class diagram of a shipping route beside a picture of the same route as a sequence of handling, storage and transport, which does not match the classes in detail, and which, read beside the class diagram, makes both easier to follow.</p><p>Now a domain of the lesson's own: a city bike-share, whose design document was written at launch a year ago. Each record is a concept, then the document's term, the word the team speaks now, and the code's name, with a dash where one of them has no name.</p><pre class="codeblock" data-say="line 1, station, station, station, station. line 2, dock, dock, dock, dock. line 3, trip, rental, ride, ride. line 4, rebalancing, redistribution, rebalancing, rebalancing. line 5, membership, subscription, membership, membership. line 6, day pass, none, day pass, day pass. line 7, morning peak, morning peak, morning peak, none" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">station, station, station, station;</span>
 <span class="cl">dock, dock, dock, dock;</span>
 <span class="cl">trip, rental, ride, ride;</span>
 <span class="cl">rebalancing, redistribution, rebalancing, rebalancing;</span>
 <span class="cl">membership, subscription, membership, membership;</span>
 <span class="cl">day_pass, -, day_pass, day_pass;</span>
-<span class="cl">morning_peak, morning_peak, morning_peak, -;</span></code></pre><p>On the preset <code>last-years-document</code> the lab finds 7 concepts, 2 named alike by all three, and the translations fall where the document parts company: rental for a ride, redistribution for rebalancing, subscription for a membership, two translations each, 6 in all, where speech and code agree and the document alone differs. Those three are the stale terms. The tile for names missing shows two different gaps. The document has no word for the day pass, a product added after launch, so it cannot help anyone with it. The code has no name for the morning peak, and should not: the flow of riders downhill before nine is an explanatory model the team uses to reason about rebalancing, not a class.</p><p>The preset <code>revised-document</code> is the document after a morning's work: the three stale terms replaced and a paragraph on the day pass added. The lab finds 6 concepts named alike and no translation between document, speech and code on any concept all three name; the only gap left is the code's, on the morning peak, by design. Whether the document was worth that morning is Evans's second guideline, and the count cannot answer it.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, fault report, fault ticket, fault report, fault report. line 2, repair, repair, repair, repair. line 3, e bike, electric bike, e bike, e bike. line 4, battery swap, charging, battery swap, swap" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">fault_report, fault_ticket, fault_report, fault_report;</span>
-<span class="cl">repair, repair, repair, repair;</span>
-<span class="cl">e_bike, electric_bike, e_bike, e_bike;</span>
-<span class="cl">battery_swap, charging, battery_swap, swap;</span></code></pre><p>Four concepts from the bike-share's repair workshop, with the document's term, the spoken word and the code's name in that order. By hand, count the translations, and name the stale document terms: those where speech and code agree and the document differs. Say what is different about the battery swap.</p><p>A document is tested against the code. The next lesson, Model-Driven Design and Hands-On Modelers, reads Chapter 3's case that the code must be the model.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The language</h2></div><p>one concept, several audiences, how many names</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">morning_peak, morning_peak, morning_peak, -;</span></code></pre><p>On the preset <code>last-years-document</code> the lab finds 7 concepts, 2 named alike by all three, and the translations fall where the document parts company: rental for a ride, redistribution for rebalancing, subscription for a membership, two translations each, 6 in all, where speech and code agree and the document alone differs. Those three are the stale terms. The tile for names missing shows two different gaps. The document has no word for the day pass, a product added after launch, so it cannot help anyone with it. The code has no name for the morning peak, and should not: the flow of riders downhill before nine is an explanatory model the team uses to reason about rebalancing, not a class.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The language</h2></div><p>one concept, several audiences, how many names</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The language</strong><span>one concept, several audiences, how many names</span></div>
       </div>
@@ -1467,10 +1507,10 @@
       <div class="table-wrap" id="dlnTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dlnTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record names one concept and then gives one name for it per audience, in the order of the audiences; - means that audience has no name for it. Names compare ignoring letter case and nothing else (Loan = loan; loan_record ≠ loan). A translation is one pair of audiences whose names for one concept differ, counted once per pair and per concept; a pair where either name is missing is not a translation but a name missing. A concept is named alike when every audience names it and all the names agree. A name is ambiguous when one audience uses it for two or more concepts. Lists follow the order of the records and of the audiences.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A design document against speech and code</h3>
-          <p>A count over the small model the lesson states. Here it is a glossary: one record a concept, with the name each audience gives it, and a dash where an audience has none. The lab counts a translation for each pair of audiences whose names for a concept differ. The count is one consequence of one choice of words; the choice is weighed in the book, against the domain, the team and the project.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A design document against speech and code</h3>
+            <p>A count over the small model the lesson states. Here it is a glossary: one record a concept, with the name each audience gives it, and a dash where an audience has none. The lab counts a translation for each pair of audiences whose names for a concept differ. The count is one consequence of one choice of words; the choice is weighed in the book, against the domain, the team and the project.</p>
         <div class="field">
           <label for="dlnPreset">Worked example</label>
           <select id="dlnPreset"><option value="last-years-document" selected>The design document written at launch</option><option value="revised-document">The same document, brought up to date</option></select>
@@ -1497,12 +1537,18 @@ morning_peak, morning_peak, morning_peak, -;</textarea>
           <div class="kpi"><span>Ambiguous names (one name, two or more concepts)</span><strong id="dlnAmbiguous">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>revised-document</code> is the document after a morning's work: the three stale terms replaced and a paragraph on the day pass added. The lab finds 6 concepts named alike and no translation between document, speech and code on any concept all three name; the only gap left is the code's, on the morning peak, by design. Whether the document was worth that morning is Evans's second guideline, and the count cannot answer it.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, fault report, fault ticket, fault report, fault report. line 2, repair, repair, repair, repair. line 3, e bike, electric bike, e bike, e bike. line 4, battery swap, charging, battery swap, swap" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">fault_report, fault_ticket, fault_report, fault_report;</span>
+<span class="cl">repair, repair, repair, repair;</span>
+<span class="cl">e_bike, electric_bike, e_bike, e_bike;</span>
+<span class="cl">battery_swap, charging, battery_swap, swap;</span></code></pre><p>Four concepts from the bike-share's repair workshop, with the document's term, the spoken word and the code's name in that order. By hand, count the translations, and name the stale document terms: those where speech and code agree and the document differs. Say what is different about the battery swap.</p><p>A document is tested against the code. The next lesson, Model-Driven Design and Hands-On Modelers, reads Chapter 3's case that the code must be the model.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Holding a document to the language</h2></div><p>Four steps, the last of them on a document you know.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the document&#x27;s terms</h3><p>Write down each concept the document defines or names, with the term it uses.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Set speech and code beside them</h3><p>For each, write the word the team says now and the name in the code, with a dash where either has none.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Mark the stale and the missing</h3><p>Mark each term where speech and code agree against the document, each concept the document cannot name, and each the code has no name for and should not.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a document you know</h3><p>Take a design document or wiki page from a project you work on, list five of its terms, and count the stale ones. Decide whether to update it or archive it, and write down why.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Holding a document to the language</h2>
+      <p class="lead-in">Four steps, the last of them on a document you know.</p>
+      <ol class="key-ideas method"><li><strong>List the document&#x27;s terms.</strong> Write down each concept the document defines or names, with the term it uses.</li><li><strong>Set speech and code beside them.</strong> For each, write the word the team says now and the name in the code, with a dash where either has none.</li><li><strong>Mark the stale and the missing.</strong> Mark each term where speech and code agree against the document, each concept the document cannot name, and each the code has no name for and should not.</li><li><strong>Do it on a document you know.</strong> Take a design document or wiki page from a project you work on, list five of its terms, and count the stale ones. Decide whether to update it or archive it, and write down why.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1522,17 +1568,16 @@ morning peak: no class: explanatory
 stale terms: 3, each 2 translations</div><p>The two gaps look alike in the table and mean opposite things. The document's gap is a failure of the second guideline: the language moved and the document did not. The code's gap is the chapter's advice followed: an explanatory model kept out of the design.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking the diagram for the model</strong><span>The diagram exists to communicate and explain the model, Evans says, and the code holds the detail. A diagram that tries to show every object is too complete to read and still cannot say what the concepts mean. The bike-share's morning peak is a picture the team reasons with that is deliberately not in the code at all.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Keeping every document current by discipline</strong><span>Evans's second guideline is that a document must work for a living. If its terms never reach the team's talk or code, it is not working; if the language moves on without it, it can be archived as history. Keeping a document current by willpower when it plays no real part, he says, wastes effort. On the lesson's illustration the stale terms are the signal to decide, not an order to rewrite.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding that the code is the only document a team needs</strong><span>Evans states the Extreme Programming position at its strength and then qualifies it: code's behaviour is exact without being obvious, it can bury a reader in detail, its names can mislead, and developers are not its only readers. Documents should do what code does not do well: give meaning, show the large structure, point to the core.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can hold a design document to the team&#x27;s language.</strong><p>Given a document's terms, the words spoken now and the code's names, count the translations, name the stale terms and the gaps, and say which gap is a fault and which is by design.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab finds where a document's words differ from speech and code. It cannot say whether the document is read, whether it explains anything the code does not, or whether it is worth the upkeep; that is Evans's test, and only the team can apply it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking the diagram for the model</strong><span>The diagram exists to communicate and explain the model, Evans says, and the code holds the detail. A diagram that tries to show every object is too complete to read and still cannot say what the concepts mean. The bike-share's morning peak is a picture the team reasons with that is deliberately not in the code at all.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Keeping every document current by discipline</strong><span>Evans's second guideline is that a document must work for a living. If its terms never reach the team's talk or code, it is not working; if the language moves on without it, it can be archived as history. Keeping a document current by willpower when it plays no real part, he says, wastes effort. On the lesson's illustration the stale terms are the signal to decide, not an order to rewrite.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding that the code is the only document a team needs</strong><span>Evans states the Extreme Programming position at its strength and then qualifies it: code's behaviour is exact without being obvious, it can bury a reader in detail, its names can mislead, and developers are not its only readers. Documents should do what code does not do well: give meaning, show the large structure, point to the core.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can hold a design document to the team&#x27;s language.</strong><p>Given a document's terms, the words spoken now and the code's names, count the translations, name the stale terms and the gaps, and say which gap is a fault and which is by design.</p></div></div><div class="note"><strong>Note:</strong> The lab finds where a document's words differ from speech and code. It cannot say whether the document is read, whether it explains anything the code does not, or whether it is worth the upkeep; that is Evans's test, and only the team can apply it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A design document</summary><p>Writing that explains the model's concepts, helps a reader find a way through the code, and shows how the model is meant to be used. Evans prescribes no set of documents, only two tests for any one.</p></details><details class="recall"><summary>Explanatory model</summary><p>A picture or description of the domain made to teach it, not to drive the code: a timeline, a map, the experts' own sketch. It may cover more than the software needs, and is best not drawn in UML.</p></details><details class="recall"><summary>A stale term</summary><p>In this lesson, a document's word for a concept where the team's speech and the code agree on another. The document was right once, and the language moved on without it.</p></details></div>
+      <h3>Summary</h3>
       <p>The second half of Chapter 2: what diagrams are good for and what they cannot say, two guidelines for a written design document, the case for and against letting the code be the only document, and explanatory models kept apart from the one that drives the code. Read a bike-share's design document against the words its team speaks and the names in its code, and find the stale terms.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A design document.</strong> Writing that explains the model's concepts, helps a reader find a way through the code, and shows how the model is meant to be used. Evans prescribes no set of documents, only two tests for any one.</li><li><strong>Explanatory model.</strong> A picture or description of the domain made to teach it, not to drive the code: a timeline, a map, the experts' own sketch. It may cover more than the software needs, and is best not drawn in UML.</li><li><strong>A stale term.</strong> In this lesson, a document's word for a concept where the team's speech and the code agree on another. The document was right once, and the language moved on without it.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the model is not the diagram. small diagrams anchor talk. documents complement code and speech. a document must work for a living. test it against the spoken language. explanatory models stay out of code" tabindex="0" role="region" aria-label="Mathematical notation">the model is not the diagram
 small diagrams anchor talk
 documents complement code and speech
@@ -2299,11 +2344,42 @@ explanatory models stay out of code</div><figcaption>Documents and diagrams in s
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2371,7 +2447,7 @@ explanatory models stay out of code</div><figcaption>Documents and diagrams in s
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

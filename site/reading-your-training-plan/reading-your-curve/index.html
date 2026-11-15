@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Your Training Plan</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The plan</p>
       <h1>Reading Your Curve</h1>
       <p class="lesson-lede">Decide from a log whether your effective rate has changed, by the median of your last three tests against your baseline range.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The best session is selected</li><li>A median of three resists one day</li><li>Only like is compared with like</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>What the curve says, and what it does not</h2>
-      <article class="prose reading"><p>The warm-up above the lab is a test reading of a passage about rainbows, at natural pace, with six questions. Do it first: when it scores, the panel reads your log again, so your own curve ends with today. The passage comes from the standard band of the practice pool, the band of your baselines, so it can stand beside them on the chart.</p><p>The lab reads your log and keeps only the baseline and test readings of standard passages that had questions. It puts every baseline first and the tests after them, sets the box for the number of baselines, and prints the median of the baselines, the median of the last three readings, the latest effective rate and the verdict. Measure Your Reading took three baselines; if you added a fourth, the range is built from all four. Practice readings are drawn as a lighter dashed line and enter no tile; notes and every other entry are listed, greyed, under the chart. With an empty log, the boxes hold one of three example logs. A test on an easy or a hard passage is greyed too: it says more about the passage than about you. An entry with no band, such as one logged before the log recorded bands, is counted.</p><p>The rule is the one from One Reading Is One Measurement. The baselines give a range: how far apart your readings fall with nothing changed. A single test above the top of that range happens about one time in four by chance, because a fourth reading from the same reader is the highest of the four about one time in four. A change is evidence when the median of the last three tests is above the range.</p><p>Take real-gain. Its baselines are 238, 245 and 251 effective words a minute: a median of 245, and a range from 238 to 251, 13 wide with nothing changed. Its tests are 262, 270 and 281. Each is above 251, but the verdict does not rest on the 281: the median of the three is 270, which is 19 above the top of the range, and the lab prints above the baseline range on the median of the last three tests. That is the Subject's evidence of a change. The log also holds four practice readings at the pacer, drawn lighter, with effective rates from 240 to 290; they count for nothing here, because the pacer set their rate.</p><p>Now noise: the same baselines, and tests of 244, 262 and 239. The 262 is the best session in the log, 11 above the top of the range, and a reader who stopped there would announce a new level. The median of the three is 244, inside the range, and the latest, 239, is inside too, so the lab prints inside the baseline range. The 262 is the one-in-four day.</p><p>Then rate-only. Its tests were read at 354, 360 and 357 words a minute, against baselines read at 251 to 294, with four questions right each time instead of five or six. The rate rose by sixty words a minute or more; the effective rates are 236, 240 and 238, with a median of 238, the bottom of the range, and the verdict is inside. A curve of rate would have called this a gain. It is a reader turning pages faster and understanding less, which is why every figure on this curve is an effective rate.</p><p>Which entries does the verdict leave out? Practice at the pacer, because its rate was set for you. The conditions of the compare drills in earlier courses, because each was a technique on trial. Skims, scans and recall, because they measure something else. And any reading without questions, because a rate with no comprehension has no effective rate. What is left should be a short list: with a test every fifth session, about one a week.</p><p>One thing the rule cannot see is the passage. A test on a harder passage reads lower for that reason alone, and the practice pool grows harder toward its end. If your recent tests fall just as the pool reaches its hard passages, read the fall as the passages until tests on standard ones say otherwise; today's warm-up was a standard one for that reason.</p><p>When you have read your verdict, write it in the note box under the lab with the date, so that the log carries what you concluded as well as what you measured. The next lesson, Plateaus and Transfer, asks what a curve that has stopped rising means, and tries your practice on a kind of text it never gave you.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Your practice log</h2></div><p>your own numbers, compared with themselves</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>What the curve says, and what it does not</h2><div class="prose reading"><p>The warm-up above the lab is a test reading of a passage about rainbows, at natural pace, with six questions. Do it first: when it scores, the panel reads your log again, so your own curve ends with today. The passage comes from the standard band of the practice pool, the band of your baselines, so it can stand beside them on the chart.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Your practice log</h2></div><p>your own numbers, compared with themselves</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Your practice log</strong><span>your own numbers, compared with themselves</span></div>
       </div>
@@ -1421,10 +1464,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="lgTable"></table></div>
       <div class="status-banner" id="lgStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Your curve, by the Subject&#x27;s rule</h3>
-          <p>Your measurement, from your log: baseline and test readings with questions only, as effective rates, every baseline in the range. Until your log has some, the boxes hold an example log. Nothing leaves your browser.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Your curve, by the Subject&#x27;s rule</h3>
+            <p>Your measurement, from your log: baseline and test readings with questions only, as effective rates, every baseline in the range. Until your log has some, the boxes hold an example log. Nothing leaves your browser.</p>
         <div class="field">
           <label for="lgPreset">Worked example</label>
           <select id="lgPreset"><option value="real-gain" selected>Tests 262, 270, 281</option><option value="noise">Tests 244, 262, 239</option><option value="rate-only">Faster, fewer right</option></select>
@@ -1449,12 +1492,15 @@
           <div class="kpi"><span>Verdict</span><strong id="lgVerdict">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The lab reads your log and keeps only the baseline and test readings of standard passages that had questions. It puts every baseline first and the tests after them, sets the box for the number of baselines, and prints the median of the baselines, the median of the last three readings, the latest effective rate and the verdict. Measure Your Reading took three baselines; if you added a fourth, the range is built from all four. Practice readings are drawn as a lighter dashed line and enter no tile; notes and every other entry are listed, greyed, under the chart. With an empty log, the boxes hold one of three example logs. A test on an easy or a hard passage is greyed too: it says more about the passage than about you. An entry with no band, such as one logged before the log recorded bands, is counted.</p><p>The rule is the one from One Reading Is One Measurement. The baselines give a range: how far apart your readings fall with nothing changed. A single test above the top of that range happens about one time in four by chance, because a fourth reading from the same reader is the highest of the four about one time in four. A change is evidence when the median of the last three tests is above the range.</p><p>Take real-gain. Its baselines are 238, 245 and 251 effective words a minute: a median of 245, and a range from 238 to 251, 13 wide with nothing changed. Its tests are 262, 270 and 281. Each is above 251, but the verdict does not rest on the 281: the median of the three is 270, which is 19 above the top of the range, and the lab prints above the baseline range on the median of the last three tests. That is the Subject's evidence of a change. The log also holds four practice readings at the pacer, drawn lighter, with effective rates from 240 to 290; they count for nothing here, because the pacer set their rate.</p><p>Now noise: the same baselines, and tests of 244, 262 and 239. The 262 is the best session in the log, 11 above the top of the range, and a reader who stopped there would announce a new level. The median of the three is 244, inside the range, and the latest, 239, is inside too, so the lab prints inside the baseline range. The 262 is the one-in-four day.</p><p>Then rate-only. Its tests were read at 354, 360 and 357 words a minute, against baselines read at 251 to 294, with four questions right each time instead of five or six. The rate rose by sixty words a minute or more; the effective rates are 236, 240 and 238, with a median of 238, the bottom of the range, and the verdict is inside. A curve of rate would have called this a gain. It is a reader turning pages faster and understanding less, which is why every figure on this curve is an effective rate.</p><p>Which entries does the verdict leave out? Practice at the pacer, because its rate was set for you. The conditions of the compare drills in earlier courses, because each was a technique on trial. Skims, scans and recall, because they measure something else. And any reading without questions, because a rate with no comprehension has no effective rate. What is left should be a short list: with a test every fifth session, about one a week.</p><p>One thing the rule cannot see is the passage. A test on a harder passage reads lower for that reason alone, and the practice pool grows harder toward its end. If your recent tests fall just as the pool reaches its hard passages, read the fall as the passages until tests on standard ones say otherwise; today's warm-up was a standard one for that reason.</p><p>When you have read your verdict, write it in the note box under the lab with the date, so that the log carries what you concluded as well as what you measured. The next lesson, Plateaus and Transfer, asks what a curve that has stopped rising means, and tries your practice on a kind of text it never gave you.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading your curve</h2></div><p>Do this once a week, after the week's test.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Take the week&#x27;s test</h3><p>A reading at natural pace with no pacer, with its questions, from the Daily Drill's test box or a lesson's warm-up.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Open your log and strike what does not count</h3><p>On this page, after the test, check that the counted sessions are your baselines and tests of standard passages; practice, conditions, skims, tests on easy, hard or mixed passages and readings without questions are greyed, and stay out.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read the median, not the peak</h3><p>Find the median of the last three tests and set it against the baseline range. Then give the verdict in the Subject's three tiers: inside, above once, or above on the median of three.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Write the verdict down</h3><p>Add a note with the date, the median and the verdict, and whether the recent tests were on harder passages.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Do today's session on The Daily Drill page: the next pool passage with the pacer at your hold target, or a test at natural pace if one is due.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading your curve</h2>
+      <p class="lead-in">Do this once a week, after the week's test.</p>
+      <ol class="key-ideas method"><li><strong>Take the week&#x27;s test.</strong> A reading at natural pace with no pacer, with its questions, from the Daily Drill's test box or a lesson's warm-up.</li><li><strong>Open your log and strike what does not count.</strong> On this page, after the test, check that the counted sessions are your baselines and tests of standard passages; practice, conditions, skims, tests on easy, hard or mixed passages and readings without questions are greyed, and stay out.</li><li><strong>Read the median, not the peak.</strong> Find the median of the last three tests and set it against the baseline range. Then give the verdict in the Subject's three tiers: inside, above once, or above on the median of three.</li><li><strong>Write the verdict down.</strong> Add a note with the date, the median and the verdict, and whether the recent tests were on harder passages.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Do today's session on The Daily Drill page: the next pool passage with the pacer at your hold target, or a test at natural pace if one is due.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1472,17 +1518,16 @@ median of the last three tests = 270
 verdict: above, on the median of three</div><p>Had the tests been 244, 262 and 239, the median would be 244 and the verdict inside, whatever the 262 felt like on the day.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>My best session is my new level</strong><span>The best session in a log is picked for being high, so part of its height is that day's luck. In the noise log the best test is 262, 11 above the range, and the median of the three tests is 244, inside it: one test above the range happens about one time in four with nothing changed. The honest comparison is the median of the last three tests against the baseline range.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting practice readings in the curve</strong><span>A practice reading's rate is close to the pacer's setting, so a curve that includes practice shows how fast the pacer was set. In real-gain the practice readings are read at 330 to 360 words a minute, faster than every test; the lab draws them lighter and leaves them out of every tile.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a curve of rate</strong><span>In rate-only the rate went up by sixty words a minute or more and the effective rate stayed at 236 to 240, inside the range. A curve of rate cannot tell a faster reader from a faster page-turner, which is why the lab's curve is of effective rate.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can read a log and give its verdict.</strong><p>Given a log of baselines, tests and other entries, strike the entries that do not count and say why, compute the baseline range and the median of the last three tests, and state the verdict in the Subject's three tiers.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The rule is a rule of thumb for one reader's log, not a statistical test: three baselines give a rough range, and a median of three is still a small sample. It cannot see the passages, so a run of tests on harder texts reads lower for that reason alone. What it does well is refuse to be impressed by one day.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>My best session is my new level</strong><span>The best session in a log is picked for being high, so part of its height is that day's luck. In the noise log the best test is 262, 11 above the range, and the median of the three tests is 244, inside it: one test above the range happens about one time in four with nothing changed. The honest comparison is the median of the last three tests against the baseline range.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting practice readings in the curve</strong><span>A practice reading's rate is close to the pacer's setting, so a curve that includes practice shows how fast the pacer was set. In real-gain the practice readings are read at 330 to 360 words a minute, faster than every test; the lab draws them lighter and leaves them out of every tile.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a curve of rate</strong><span>In rate-only the rate went up by sixty words a minute or more and the effective rate stayed at 236 to 240, inside the range. A curve of rate cannot tell a faster reader from a faster page-turner, which is why the lab's curve is of effective rate.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can read a log and give its verdict.</strong><p>Given a log of baselines, tests and other entries, strike the entries that do not count and say why, compute the baseline range and the median of the last three tests, and state the verdict in the Subject's three tiers.</p></div></div><div class="note"><strong>Note:</strong> The rule is a rule of thumb for one reader's log, not a statistical test: three baselines give a rough range, and a median of three is still a small sample. It cannot see the passages, so a run of tests on harder texts reads lower for that reason alone. What it does well is refuse to be impressed by one day.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The best session is selected</summary><p>Among a dozen readings the highest is high partly because it was picked for being high. Some of its height is that day's luck, and the next reading will most likely fall back toward the rest.</p></details><details class="recall"><summary>A median of three resists one day</summary><p>The median of three readings is the middle one, so a single unusually good or bad day cannot move it past the other two. A change that lifts the median has shown up on at least two days.</p></details><details class="recall"><summary>Only like is compared with like</summary><p>Baselines and tests are readings at natural pace, with questions, and their effective rates are the curve. Practice is paced, a condition is a technique on trial, and a skim measures something else; the verdict leaves all of them out.</p></details></div>
+      <h3>Summary</h3>
       <p>A log of readings draws a curve, and a curve invites you to look at its highest point. The Subject's rule looks elsewhere: the median of the last three tests against the range of the baselines. The lab applies the rule to your own log or to three example logs, and leaves practice readings out of the verdict.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The best session is selected.</strong> Among a dozen readings the highest is high partly because it was picked for being high. Some of its height is that day's luck, and the next reading will most likely fall back toward the rest.</li><li><strong>A median of three resists one day.</strong> The median of three readings is the middle one, so a single unusually good or bad day cannot move it past the other two. A change that lifts the median has shown up on at least two days.</li><li><strong>Only like is compared with like.</strong> Baselines and tests are readings at natural pace, with questions, and their effective rates are the curve. Practice is paced, a condition is a technique on trial, and a skim measures something else; the verdict leaves all of them out.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="range, lowest to highest baseline. evidence, median of last 3 tests is greater than range. one test above, about 1 time in 4. practice readings are not counted. every figure is an effective rate" tabindex="0" role="region" aria-label="Mathematical notation">range: lowest to highest baseline
 evidence: median of last 3 tests &gt; range
 one test above: about 1 time in 4
@@ -2655,11 +2700,42 @@ every figure is an effective rate</div><figcaption>The rule in five lines</figca
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2727,7 +2803,7 @@ every figure is an effective rate</div><figcaption>The rule in five lines</figca
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

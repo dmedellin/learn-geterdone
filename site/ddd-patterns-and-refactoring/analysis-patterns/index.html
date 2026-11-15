@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,53 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Analysis Patterns, Design Patterns and Refactoring</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 11 · Applying Analysis Patterns</p>
       <h1>Applying Analysis Patterns</h1>
       <p class="lesson-lede">A model someone has already worked out for a common kind of business problem, taken as a starting point and then refactored to fit.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Analysis pattern</li><li>Account and Entry</li><li>Transaction</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the pattern, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Analysis patterns are not technological solutions; they are guides to help you work out a model in a particular domain.&rdquo; Evans writes that near the start of Chapter 11, Applying Analysis Patterns, the first of three short chapters that close Part III. This lesson reads the chapter's opening and its first example, Earning Interest with Accounts. Read both in your own copy first.</p><p>The opening is an argument about where a deep model comes from. Usually, Evans says, it is earned slowly, by learning, talking and trying. Now and then a developer meets a problem whose shape is familiar, a kind of responsibility or a web of relationships solved once before, and can start from what was learned then. Some of those solutions have been written down. They sit higher than Part II's building blocks and Chapter 10's principles of supple design: each uses a few objects to stand for one concept. They save trial and error, and they give you a model that already communicates and can be built; but they are where refactoring starts, not a finished part to install. Evans takes the definition from Fowler's 1997 book Analysis Patterns, which calls them groups of concepts for a construction common in business modelling, belonging to one domain or to many.</p><p>He then corrects the name. &ldquo;Analysis&rdquo; suggests modelling done apart from building, yet Fowler's patterns discuss implementation at length, code included, and even look ahead to maintenance: Evans cites Fowler's remark that a new accounting practice can be set up as new instances of a rule, while the system keeps running, with no rebuild. That experience is the most valuable thing a pattern carries. Taking its model ideas without it, Evans warns, reopens the split between analysis and design that Model-Driven Design, in Putting the Domain Model to Work's Model-Driven Design and Hands-On Modelers, exists to close.</p><p>The example returns to the interest-tracking application of Chapter 10. It calculates what a borrower owes and pays, and a nightly batch hands the figures to an older accounting system, naming the ledger for each. It does the job, though it is clumsy to use and hard to change. One developer reads the accounting chapter of Fowler's book, and Evans summarises the part she finds useful: the models this lesson's lab counts.</p><p>Read as a tool, Fowler's basic model is two objects. An Account holds value; every change to that value is an Entry, positive to add and negative to take away, and entries are kept rather than edited, so the account's whole history stays. Its balance is what all its entries come to, and whether it is added up on demand or cached is hidden behind the account's interface. The second model adds conservation: money only moves, from one account to another, so a Transaction groups entries whose amounts add up to zero, every credit matched by a debit. Evans, following Fowler, adds the condition and the qualification: the rule holds only in a closed system, and many simple applications do not need the rigour.</p><pre class="codeblock" data-say="line 1, comment, An account keeps every entry its balance is their sum.. line 2, final class account. line 3, private final string name. line 4, private final list of entry entries is set to new array list. line 6, account of string name this dot name is set to name. line 8, void post of entry e. line 9, entries dot add of e, comment, an entry is never removed or edited. line 12, long balance cents. line 13, long sum is set to 0. line 14, for entry e in entries. line 15, sum is increased by e dot cents. line 17, return sum" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// An account keeps every entry; its balance is their sum.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the pattern, then the count</h2><div class="prose reading"><p>&ldquo;Analysis patterns are not technological solutions; they are guides to help you work out a model in a particular domain.&rdquo; Evans writes that near the start of Chapter 11, Applying Analysis Patterns, the first of three short chapters that close Part III. This lesson reads the chapter's opening and its first example, Earning Interest with Accounts. Read both in your own copy first.</p><p>The opening is an argument about where a deep model comes from. Usually, Evans says, it is earned slowly, by learning, talking and trying. Now and then a developer meets a problem whose shape is familiar, a kind of responsibility or a web of relationships solved once before, and can start from what was learned then. Some of those solutions have been written down. They sit higher than Part II's building blocks and Chapter 10's principles of supple design: each uses a few objects to stand for one concept. They save trial and error, and they give you a model that already communicates and can be built; but they are where refactoring starts, not a finished part to install. Evans takes the definition from Fowler's 1997 book Analysis Patterns, which calls them groups of concepts for a construction common in business modelling, belonging to one domain or to many.</p><p>He then corrects the name. &ldquo;Analysis&rdquo; suggests modelling done apart from building, yet Fowler's patterns discuss implementation at length, code included, and even look ahead to maintenance: Evans cites Fowler's remark that a new accounting practice can be set up as new instances of a rule, while the system keeps running, with no rebuild. That experience is the most valuable thing a pattern carries. Taking its model ideas without it, Evans warns, reopens the split between analysis and design that Model-Driven Design, in Putting the Domain Model to Work's Model-Driven Design and Hands-On Modelers, exists to close.</p><p>The example returns to the interest-tracking application of Chapter 10. It calculates what a borrower owes and pays, and a nightly batch hands the figures to an older accounting system, naming the ledger for each. It does the job, though it is clumsy to use and hard to change. One developer reads the accounting chapter of Fowler's book, and Evans summarises the part she finds useful: the models this lesson's lab counts.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Accounts and entries</h2></div><p>balances from entries, and transactions that do not balance</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Accounts and entries</strong><span>balances from entries, and transactions that do not balance</span></div>
+      </div>
+      <div class="status-banner" id="dleStatus" style="margin-top:12px;" aria-live="polite"></div>
+      <div class="table-wrap" id="dleTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dleTable"></table></div>
+      <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Amounts are signed and exact to the cent (at most 2 decimal places). An account's balance is the sum of its entries; accounts are listed in the order they first appear. A transaction balances when its entries sum to 0; the others are listed, in the order first given, with their net.</p>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Entries, balances and the transactions that do not balance</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
+        <div class="field">
+          <label for="dlePreset">Worked example</label>
+          <select id="dlePreset"><option value="week-balanced" selected>A box office's week: sale, voucher sold, voucher redeemed, refund</option><option value="week-two-slips">The same week with one credit mistyped and one refund one-sided</option></select>
+        </div>
+        <div class="field">
+          <label for="dleInEntries">Entries (transaction, account, amount)</label>
+          <textarea id="dleInEntries" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:0.85rem;line-height:1.5;">t1, cash, 120.00; t1, ticket-sales, -120.00; t2, cash, 50.00; t2, vouchers, -50.00; t3, vouchers, 30.00; t3, ticket-sales, -30.00; t4, ticket-sales, 24.00; t4, cash, -24.00</textarea>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Accounts</span><strong id="dleAccounts">&mdash;</strong></div>
+          <div class="kpi"><span>Balances</span><strong id="dleBalances">&mdash;</strong></div>
+          <div class="kpi"><span>Transactions</span><strong id="dleTxns">&mdash;</strong></div>
+          <div class="kpi"><span>Unbalanced transactions (net)</span><strong id="dleUnbalanced">&mdash;</strong></div>
+          <div class="kpi"><span>Total of all entries</span><strong id="dleTotal">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Read as a tool, Fowler's basic model is two objects. An Account holds value; every change to that value is an Entry, positive to add and negative to take away, and entries are kept rather than edited, so the account's whole history stays. Its balance is what all its entries come to, and whether it is added up on demand or cached is hidden behind the account's interface. The second model adds conservation: money only moves, from one account to another, so a Transaction groups entries whose amounts add up to zero, every credit matched by a debit. Evans, following Fowler, adds the condition and the qualification: the rule holds only in a closed system, and many simple applications do not need the rigour.</p><pre class="codeblock" data-say="line 1, comment, An account keeps every entry its balance is their sum.. line 2, final class account. line 3, private final string name. line 4, private final list of entry entries is set to new array list. line 6, account of string name this dot name is set to name. line 8, void post of entry e. line 9, entries dot add of e, comment, an entry is never removed or edited. line 12, long balance cents. line 13, long sum is set to 0. line 14, for entry e in entries. line 15, sum is increased by e dot cents. line 17, return sum" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// An account keeps every entry; its balance is their sum.</span>
 <span class="cl">final class Account {</span>
 <span class="cl">    private final String name;</span>
 <span class="cl">    private final List&lt;Entry&gt; entries = new ArrayList&lt;&gt;();</span>
@@ -1484,45 +1563,12 @@
 <span class="cl">b3, cash, 6.00;</span>
 <span class="cl">b3, bar-sales, -6.50;</span>
 <span class="cl">b4, bar-sales, 4.00;</span>
-<span class="cl">b4, cash, -4.00</span></code></pre><p>The theatre bar's evening, in the lab's record form: transaction, account, amount. By hand, give each account's balance and the total of all entries, and name every transaction whose entries do not add up to zero, with its net. Then type the records into the lab to check, and say in a sentence what the slip probably was.</p><p>An account's entries were all made by hand here. The next lesson, Posting Rules and the Nightly Batch, reads the chapter's second example, where rules derive entries from other entries, and Evans's account of what an analysis pattern is for.</p></article>
+<span class="cl">b4, cash, -4.00</span></code></pre><p>The theatre bar's evening, in the lab's record form: transaction, account, amount. By hand, give each account's balance and the total of all entries, and name every transaction whose entries do not add up to zero, with its net. Then type the records into the lab to check, and say in a sentence what the slip probably was.</p><p>An account's entries were all made by hand here. The next lesson, Posting Rules and the Nightly Batch, reads the chapter's second example, where rules derive entries from other entries, and Evans's account of what an analysis pattern is for.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Accounts and entries</h2></div><p>balances from entries, and transactions that do not balance</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Accounts and entries</strong><span>balances from entries, and transactions that do not balance</span></div>
-      </div>
-      <div class="status-banner" id="dleStatus" style="margin-top:12px;" aria-live="polite"></div>
-      <div class="table-wrap" id="dleTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dleTable"></table></div>
-      <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Amounts are signed and exact to the cent (at most 2 decimal places). An account's balance is the sum of its entries; accounts are listed in the order they first appear. A transaction balances when its entries sum to 0; the others are listed, in the order first given, with their net.</p>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Entries, balances and the transactions that do not balance</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
-        <div class="field">
-          <label for="dlePreset">Worked example</label>
-          <select id="dlePreset"><option value="week-balanced" selected>A box office's week: sale, voucher sold, voucher redeemed, refund</option><option value="week-two-slips">The same week with one credit mistyped and one refund one-sided</option></select>
-        </div>
-        <div class="field">
-          <label for="dleInEntries">Entries (transaction, account, amount)</label>
-          <textarea id="dleInEntries" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:0.85rem;line-height:1.5;">t1, cash, 120.00; t1, ticket-sales, -120.00; t2, cash, 50.00; t2, vouchers, -50.00; t3, vouchers, 30.00; t3, ticket-sales, -30.00; t4, ticket-sales, 24.00; t4, cash, -24.00</textarea>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Accounts</span><strong id="dleAccounts">&mdash;</strong></div>
-          <div class="kpi"><span>Balances</span><strong id="dleBalances">&mdash;</strong></div>
-          <div class="kpi"><span>Transactions</span><strong id="dleTxns">&mdash;</strong></div>
-          <div class="kpi"><span>Unbalanced transactions (net)</span><strong id="dleUnbalanced">&mdash;</strong></div>
-          <div class="kpi"><span>Total of all entries</span><strong id="dleTotal">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a ledger the way the pattern does</h2></div><p>Four steps, the last of them on records of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Add each account&#x27;s entries</h3><p>List the accounts in the order they first appear and add every entry to each. That sum is the balance: no entry is skipped or edited.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Add each transaction&#x27;s entries</h3><p>Group the entries by transaction and add each group. Any group that does not come to zero is unbalanced; write down its net, with its sign.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compare with the grand total</h3><p>Add every entry. A total of zero does not prove every transaction balances, since errors can offset; the per-transaction check is the one that finds them.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on records of your own</h3><p>Take a statement, an expense sheet or a till report you know and write a few of its movements as transaction, account, amount. Count the accounts, say which movements need a matching entry, and decide whether your domain is a closed system in which the conservation rule should hold.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a ledger the way the pattern does</h2>
+      <p class="lead-in">Four steps, the last of them on records of your own.</p>
+      <ol class="key-ideas method"><li><strong>Add each account&#x27;s entries.</strong> List the accounts in the order they first appear and add every entry to each. That sum is the balance: no entry is skipped or edited.</li><li><strong>Add each transaction&#x27;s entries.</strong> Group the entries by transaction and add each group. Any group that does not come to zero is unbalanced; write down its net, with its sign.</li><li><strong>Compare with the grand total.</strong> Add every entry. A total of zero does not prove every transaction balances, since errors can offset; the per-transaction check is the one that finds them.</li><li><strong>Do it on records of your own.</strong> Take a statement, an expense sheet or a till report you know and write a few of its movements as transaction, account, amount. Count the accounts, say which movements need a matching entry, and decide whether your domain is a closed system in which the conservation rule should hold.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1541,17 +1587,16 @@ total: +27.00 − 24.00 = +3.00
 two slips; the total shows 3.00</div><p>Each transaction is checked on its own, which is how the slips are found. The total of all entries is the same check over the whole ledger at once, and two errors of opposite sign leave it looking nearly right.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Installing an analysis pattern whole, as a finished component</strong><span>Evans says plainly that these are not out-of-the-box solutions: they give a starting model, and refactoring and experiment go on from there. His own example's team kept Fowler's accounts and entries and dropped his Transaction, because it did not match how their charges and payments behaved. On the lesson's illustration the lab can count what a Transaction would check; it cannot say whether your domain has one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming every money-like system needs double entry</strong><span>Fowler's conservation rule, as Evans summarises it, applies to a closed system that includes every source and sink of value, and many simple applications do not need that rigour. The interest application's team found their balances and entries were what the experts needed.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the word analysis as analysis without design</strong><span>The name suggests models drawn before and apart from the code. Evans points out that Fowler's patterns discuss implementation and even long-term maintenance, and that model ideas lifted out of that discussion are harder to apply and reopen the divide between analysis and design that Model-Driven Design is meant to close.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can post entries to accounts and find what does not balance.</strong><p>Given a list of entries, state every account's balance and the total, name each unbalanced transaction with its net, and say what Fowler's Transaction assumes about the domain.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab adds exact amounts. It cannot tell whether your domain is a closed system, whether its movements belong together as transactions, or which of Fowler's models fit it; Evans's example shows a team deciding that with its domain expert, and keeping only part of the pattern.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Installing an analysis pattern whole, as a finished component</strong><span>Evans says plainly that these are not out-of-the-box solutions: they give a starting model, and refactoring and experiment go on from there. His own example's team kept Fowler's accounts and entries and dropped his Transaction, because it did not match how their charges and payments behaved. On the lesson's illustration the lab can count what a Transaction would check; it cannot say whether your domain has one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming every money-like system needs double entry</strong><span>Fowler's conservation rule, as Evans summarises it, applies to a closed system that includes every source and sink of value, and many simple applications do not need that rigour. The interest application's team found their balances and entries were what the experts needed.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the word analysis as analysis without design</strong><span>The name suggests models drawn before and apart from the code. Evans points out that Fowler's patterns discuss implementation and even long-term maintenance, and that model ideas lifted out of that discussion are harder to apply and reopen the divide between analysis and design that Model-Driven Design is meant to close.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can post entries to accounts and find what does not balance.</strong><p>Given a list of entries, state every account's balance and the total, name each unbalanced transaction with its net, and say what Fowler's Transaction assumes about the domain.</p></div></div><div class="note"><strong>Note:</strong> The lab adds exact amounts. It cannot tell whether your domain is a closed system, whether its movements belong together as transactions, or which of Fowler's models fit it; Evans's example shows a team deciding that with its domain expert, and keeping only part of the pattern.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Analysis pattern</summary><p>A small group of concepts, worked out in practice, that represents a construction business models keep needing: accounts, quantities, parties, plans. It may belong to one domain or recur across many. The term and the best-known catalogue are Martin Fowler's, from his 1997 book Analysis Patterns.</p></details><details class="recall"><summary>Account and Entry</summary><p>An account holds something of value, usually money, and records every change to it as an entry. Value is added with a positive entry and taken away with a negative one; no entry is deleted, so the history stays. The balance is what all the entries add up to.</p></details><details class="recall"><summary>Transaction</summary><p>A group of entries that moves value from some accounts to others, so that its entries add up to zero: the conservation rule of double-entry book-keeping. It holds only in a closed system, one that includes every source and every sink of value.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 11 opens with what an analysis pattern is and how a team draws on one, and works its first example through Martin Fowler's accounts and entries. Read Evans on why such a pattern is a lead and not a recipe, then post a week's entries to accounts, read off the balances, and find the transactions that do not balance.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Analysis pattern.</strong> A small group of concepts, worked out in practice, that represents a construction business models keep needing: accounts, quantities, parties, plans. It may belong to one domain or recur across many. The term and the best-known catalogue are Martin Fowler's, from his 1997 book Analysis Patterns.</li><li><strong>Account and Entry.</strong> An account holds something of value, usually money, and records every change to it as an entry. Value is added with a positive entry and taken away with a negative one; no entry is deleted, so the history stays. The balance is what all the entries add up to.</li><li><strong>Transaction.</strong> A group of entries that moves value from some accounts to others, so that its entries add up to zero: the conservation rule of double-entry book-keeping. It holds only in a closed system, one that includes every source and every sink of value.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a model for a common business problem. a starting point, then refactor. an account keeps every entry. a balance is the sum of entries. the entries of a transaction net to zero. take what fits, leave what does not" tabindex="0" role="region" aria-label="Mathematical notation">a model for a common business problem
 a starting point, then refactor
 an account keeps every entry
@@ -2311,11 +2356,42 @@ take what fits, leave what does not</div><figcaption>Analysis patterns in six li
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2383,7 +2459,7 @@ take what fits, leave what does not</div><figcaption>Analysis patterns in six li
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

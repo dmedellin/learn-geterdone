@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Foundations of Algebra</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Building expressions</p>
       <h1>Translating Words into Algebra</h1>
       <p class="lesson-lede">Turning a sentence into an expression, and naming the unknown.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Name the unknown before writing anything</li><li>Addition and multiplication do not care about order; subtraction and division do</li><li>A bracket is what &quot;the sum of&quot; and &quot;the quantity&quot; produce</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>From a sentence to an expression</h2>
-      <article class="prose reading"><h3>Name the unknown first, with its units</h3><p>Before translating anything, write a sentence of the form "let <span class="math" data-say="n">n</span> be the number of ..." or "let <span class="math" data-say="c">c</span> be the cost in dollars of ...". It takes a line and it settles two things that otherwise stay vague: what is being counted or measured, and in what units. The reason is that expressions are checked by substituting, and you cannot check <span class="math" data-say="25 n">25n</span> unless you know whether <span class="math" data-say="n">n</span> is a number of quarters or an amount of money. If <span class="math" data-say="n">n</span> is the number of quarters then <span class="math" data-say="25 n">25n</span> is the value in cents and the expression is right; if <span class="math" data-say="n">n</span> is already an amount in dollars then <span class="math" data-say="25 n">25n</span> is meaningless.</p><h3>The vocabulary</h3><div class="mathblock" data-say="the sum of a and b, A plus b. a increased by b, A plus b. the difference of a and b, A minus b. a decreased by b, A minus b. the product of a and b, ab. twice A, a doubled, 2 a. the quotient of a and b, A over b. half of a, A over 2. the square of a, a squared. a more than b, b plus A. a less than b, b minus a, note the order" tabindex="0" role="region" aria-label="Mathematical notation">the sum of a and b            a + b
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>From a sentence to an expression</h2><div class="prose reading"><h3>Name the unknown first, with its units</h3><p>Before translating anything, write a sentence of the form "let <span class="math" data-say="n">n</span> be the number of ..." or "let <span class="math" data-say="c">c</span> be the cost in dollars of ...". It takes a line and it settles two things that otherwise stay vague: what is being counted or measured, and in what units. The reason is that expressions are checked by substituting, and you cannot check <span class="math" data-say="25 n">25n</span> unless you know whether <span class="math" data-say="n">n</span> is a number of quarters or an amount of money. If <span class="math" data-say="n">n</span> is the number of quarters then <span class="math" data-say="25 n">25n</span> is the value in cents and the expression is right; if <span class="math" data-say="n">n</span> is already an amount in dollars then <span class="math" data-say="25 n">25n</span> is meaningless.</p><h3>The vocabulary</h3><div class="mathblock" data-say="the sum of a and b, A plus b. a increased by b, A plus b. the difference of a and b, A minus b. a decreased by b, A minus b. the product of a and b, ab. twice A, a doubled, 2 a. the quotient of a and b, A over b. half of a, A over 2. the square of a, a squared. a more than b, b plus A. a less than b, b minus a, note the order" tabindex="0" role="region" aria-label="Mathematical notation">the sum of a and b            a + b
 a increased by b              a + b
 the difference of a and b     a − b
 a decreased by b              a − b
@@ -1416,12 +1460,11 @@ three less than the square of n   n² − 3
 the square of three less than n   (n − 3)²
 
 test at n = 5:   the square is 25, three less is 22    5² − 3 = 22
-                 three less than 5 is 2, squared is 4  (5 − 3)² = 4</div><p>In each pair the words are almost the same and the expressions are not close: at <span class="math" data-say="n equals 5">n = 5</span> they differ by <span class="math" data-say="3">3</span> in the first pair and by <span class="math" data-say="18">18</span> in the second. The bracket is carrying the meaning, and dropping it does not produce a slightly different answer, it produces a different quantity.</p><h3>Quantities that come in families</h3><p>Some phrases describe several unknowns at once, and the point of algebra is that one letter covers them all:</p><ul><li>Three consecutive integers, the smallest being <span class="math" data-say="n">n</span>: <span class="math" data-say="n">n</span>, <span class="math" data-say="n plus 1">n + 1</span>, <span class="math" data-say="n plus 2">n + 2</span>.</li><li>Three consecutive even integers, the smallest being <span class="math" data-say="n">n</span>: <span class="math" data-say="n">n</span>, <span class="math" data-say="n plus 2">n + 2</span>, <span class="math" data-say="n plus 4">n + 4</span>. The <span class="math" data-say="n">n</span> itself has to be even, which is a condition on the letter and not part of the expression.</li><li>A rectangle <span class="math" data-say="3">3</span> cm longer than it is wide, width <span class="math" data-say="w">w</span> cm: length <span class="math" data-say="w plus 3">w + 3</span>, perimeter <span class="math" data-say="2 w plus 2 times the quantity w plus 3, equals 4 w plus 6">2w + 2(w + 3) = 4w + 6</span>, area <span class="math" data-say="w of the quantity w plus 3">w(w + 3)</span>.</li><li>The value in cents of <span class="math" data-say="q">q</span> quarters and <span class="math" data-say="d">d</span> dimes: <span class="math" data-say="25 q plus 10 d">25q + 10d</span>. Two unknowns need two letters, and the units have to match before the terms may be added.</li></ul><div class="example"><span class="label">Example &middot; Checking a translation</span><p>Pick a number, read the English sentence aloud with that number in it, and compare with your expression evaluated there. For "twice the sum of <span class="math" data-say="n">n</span> and 3" at <span class="math" data-say="n equals 5">n = 5</span>: the sentence says the sum is <span class="math" data-say="8">8</span> and twice that is <span class="math" data-say="16">16</span>; <span class="math" data-say="2 times the quantity n plus 3">2(n + 3)</span> gives <span class="math" data-say="16">16</span> and <span class="math" data-say="2 n plus 3">2n + 3</span> gives <span class="math" data-say="13">13</span>. That test rules out <span class="math" data-say="2 n plus 3">2n + 3</span>. It does not prove <span class="math" data-say="2 times the quantity n plus 3">2(n + 3)</span> is right &mdash; agreement at one number never does &mdash; but a wrong translation almost always fails it.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>English into algebra</h2></div><p>Two readings, tested against each other</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+                 three less than 5 is 2, squared is 4  (5 − 3)² = 4</div><p>In each pair the words are almost the same and the expressions are not close: at <span class="math" data-say="n equals 5">n = 5</span> they differ by <span class="math" data-say="3">3</span> in the first pair and by <span class="math" data-say="18">18</span> in the second. The bracket is carrying the meaning, and dropping it does not produce a slightly different answer, it produces a different quantity.</p><h3>Quantities that come in families</h3><p>Some phrases describe several unknowns at once, and the point of algebra is that one letter covers them all:</p><ul><li>Three consecutive integers, the smallest being <span class="math" data-say="n">n</span>: <span class="math" data-say="n">n</span>, <span class="math" data-say="n plus 1">n + 1</span>, <span class="math" data-say="n plus 2">n + 2</span>.</li><li>Three consecutive even integers, the smallest being <span class="math" data-say="n">n</span>: <span class="math" data-say="n">n</span>, <span class="math" data-say="n plus 2">n + 2</span>, <span class="math" data-say="n plus 4">n + 4</span>. The <span class="math" data-say="n">n</span> itself has to be even, which is a condition on the letter and not part of the expression.</li><li>A rectangle <span class="math" data-say="3">3</span> cm longer than it is wide, width <span class="math" data-say="w">w</span> cm: length <span class="math" data-say="w plus 3">w + 3</span>, perimeter <span class="math" data-say="2 w plus 2 times the quantity w plus 3, equals 4 w plus 6">2w + 2(w + 3) = 4w + 6</span>, area <span class="math" data-say="w of the quantity w plus 3">w(w + 3)</span>.</li><li>The value in cents of <span class="math" data-say="q">q</span> quarters and <span class="math" data-say="d">d</span> dimes: <span class="math" data-say="25 q plus 10 d">25q + 10d</span>. Two unknowns need two letters, and the units have to match before the terms may be added.</li></ul><div class="example"><span class="label">Example &middot; Checking a translation</span><p>Pick a number, read the English sentence aloud with that number in it, and compare with your expression evaluated there. For "twice the sum of <span class="math" data-say="n">n</span> and 3" at <span class="math" data-say="n equals 5">n = 5</span>: the sentence says the sum is <span class="math" data-say="8">8</span> and twice that is <span class="math" data-say="16">16</span>; <span class="math" data-say="2 times the quantity n plus 3">2(n + 3)</span> gives <span class="math" data-say="16">16</span> and <span class="math" data-say="2 n plus 3">2n + 3</span> gives <span class="math" data-say="13">13</span>. That test rules out <span class="math" data-say="2 n plus 3">2n + 3</span>. It does not prove <span class="math" data-say="2 times the quantity n plus 3">2(n + 3)</span> is right &mdash; agreement at one number never does &mdash; but a wrong translation almost always fails it.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>English into algebra</h2></div><p>Two readings, tested against each other</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>English into algebra</strong><span id="exSub"></span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>agrees</span><span class="tone-red"><i class="legend-swatch"></i>differs</span></div>
@@ -1429,10 +1472,10 @@ test at n = 5:   the square is 25, three less is 22    5² − 3 = 22
       <div class="lab-stage" id="exStage"></div>
       <div id="exWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="exStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Two readings of one phrase</h3>
-          <p>Choose a phrase and edit the expression in <span class="math" data-say="n">n</span> you think it means. The lab evaluates your reading and the rival reading at seven values of <span class="math" data-say="n">n</span>. Write the letter definition and predict one separating value before selecting the phrase; the first disagreement diagnoses an order or grouping error.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Two readings of one phrase</h3>
+            <p>Choose a phrase and edit the expression in <span class="math" data-say="n">n</span> you think it means. The lab evaluates your reading and the rival reading at seven values of <span class="math" data-say="n">n</span>. Write the letter definition and predict one separating value before selecting the phrase; the first disagreement diagnoses an order or grouping error.</p>
         <div class="field">
           <label for="exPreset">Phrase</label>
           <select id="exPreset"><option value="five less than a number n|n - 5|5 - n">five less than a number n</option><option value="twice the sum of n and 3|2(n + 3)|2n + 3">twice the sum of n and 3</option><option value="the sum of twice n and 3|2n + 3|2(n + 3)">the sum of twice n and 3</option><option value="three less than the square of n|n^2 - 3|(n - 3)^2">three less than the square of n</option><option value="half of n, increased by 4|n/2 + 4|n/(2 + 4)">half of n, increased by 4</option><option value="the quotient of n and 4, decreased by 1|n/4 - 1|n/(4 - 1)">the quotient of n and 4, decreased by 1</option></select>
@@ -1443,12 +1486,14 @@ test at n = 5:   the square is 25, three less is 22    5² − 3 = 22
         </div>
         <div class="kpi-grid"><div class="kpi"><span>Test values</span><strong id="exK1">&mdash;</strong></div><div class="kpi"><span>Agreements</span><strong id="exK2">&mdash;</strong></div><div class="kpi"><span>Verdict</span><strong id="exK3">&mdash;</strong></div></div>
         <p class="small-copy" style="margin:0;">Use <code>n</code> for the number the phrase is about. <code>2(n + 3)</code> and <code>2n + 3</code> are both valid algebra; only one of them is what the phrase says.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Translating a sentence</h2></div><p>The first two steps produce no algebra at all, and skipping them is what goes wrong.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down what the letter stands for, with units</h3><p>"Let <span class="math" data-say="w">w</span> be the width in centimetres." One line, and every later expression can be checked against it. If the problem has two independent unknowns, it needs two letters.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Express every other quantity in terms of that letter</h3><p>The length is <span class="math" data-say="w plus 3">w + 3</span>; the second integer is <span class="math" data-say="n plus 1">n + 1</span>; the number of dimes in a purse of 20 coins holding <span class="math" data-say="q">q</span> quarters is <span class="math" data-say="20 minus q">20 − q</span>. Do this before assembling anything, so that the final expression is built from pieces you have already justified.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Translate phrase by phrase, bracketing anything the English packages</h3><p>Work outward from the innermost quantity. Wherever the sentence says "the sum of" or "the quantity", put a bracket round it, and only then apply whatever is done to it.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Test with one number, chosen to separate the readings</h3><p>Substitute a value and compute the sentence in English alongside your expression. Avoid <span class="math" data-say="0">0</span> and <span class="math" data-say="1">1</span>, which make too many wrong expressions agree with the right one, and then check that the value you picked does separate the two readings in front of you: <span class="math" data-say="n equals 5">n = 5</span> is no use for "five less than <span class="math" data-say="n">n</span>", because <span class="math" data-say="n minus 5">n − 5</span> and <span class="math" data-say="5 minus n">5 − n</span> are both <span class="math" data-say="0">0</span> there.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Translating a sentence</h2>
+      <p class="lead-in">The first two steps produce no algebra at all, and skipping them is what goes wrong.</p>
+      <ol class="key-ideas method"><li><strong>Write down what the letter stands for, with units.</strong> "Let <span class="math" data-say="w">w</span> be the width in centimetres." One line, and every later expression can be checked against it. If the problem has two independent unknowns, it needs two letters.</li><li><strong>Express every other quantity in terms of that letter.</strong> The length is <span class="math" data-say="w plus 3">w + 3</span>; the second integer is <span class="math" data-say="n plus 1">n + 1</span>; the number of dimes in a purse of 20 coins holding <span class="math" data-say="q">q</span> quarters is <span class="math" data-say="20 minus q">20 − q</span>. Do this before assembling anything, so that the final expression is built from pieces you have already justified.</li><li><strong>Translate phrase by phrase, bracketing anything the English packages.</strong> Work outward from the innermost quantity. Wherever the sentence says "the sum of" or "the quantity", put a bracket round it, and only then apply whatever is done to it.</li><li><strong>Test with one number, chosen to separate the readings.</strong> Substitute a value and compute the sentence in English alongside your expression. Avoid <span class="math" data-say="0">0</span> and <span class="math" data-say="1">1</span>, which make too many wrong expressions agree with the right one, and then check that the value you picked does separate the two readings in front of you: <span class="math" data-say="n equals 5">n = 5</span> is no use for "five less than <span class="math" data-say="n">n</span>", because <span class="math" data-say="n minus 5">n − 5</span> and <span class="math" data-say="5 minus n">5 − n</span> are both <span class="math" data-say="0">0</span> there.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1475,17 +1520,16 @@ test at n = 5:   the square is 25, three less is 22    5² − 3 = 22
                       (n − 3)² = 4,           a different quantity</div><p>Phrases 2 and 3 use the same seven words in a different order and mean different things. English marks the difference with word order alone; algebra marks it with a bracket, which is one reason the translation is worth doing early rather than carrying the sentence around in your head.</p><p>Every test above rules a rival reading out. None of them proves the chosen reading correct, because two different expressions can agree at one value &mdash; <span class="math" data-say="n minus 5">n − 5</span> and <span class="math" data-say="5 minus n">5 − n</span> both give <span class="math" data-say="0">0</span> at <span class="math" data-say="n equals 5">n = 5</span>, which is exactly why <span class="math" data-say="n equals 5">n = 5</span> would have been a bad test for phrase 1.</p><p>Now fade the wording: "three times the difference of <span class="math" data-say="n">n</span> and 4". The packaged quantity is the difference, so the expression is <span class="math" data-say="3 times the quantity n minus 4">3(n − 4)</span>. At <span class="math" data-say="n equals 6">n = 6</span> it gives <span class="math" data-say="6">6</span>; <span class="math" data-say="3 n minus 4">3n − 4</span> gives <span class="math" data-say="14">14</span> and reveals that only the first quantity was tripled.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing &quot;five less than n&quot; as <span class="math" data-say="5 minus n">5 − n</span></strong><span>The English puts the subtracted amount first and algebra puts it second. Subtraction is not commutative, so the two expressions differ at every <span class="math" data-say="n">n</span> except <span class="math" data-say="n equals 5">n = 5</span>, where both are <span class="math" data-say="0">0</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dropping the bracket that &quot;the sum of&quot; asks for</strong><span>"Twice the sum of <span class="math" data-say="n">n</span> and 3" is <span class="math" data-say="2 times the quantity n plus 3">2(n + 3)</span>, not <span class="math" data-say="2 n plus 3">2n + 3</span>. The phrase names a single quantity and then doubles it, and without the bracket only the first part gets doubled.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Not saying what the letter stands for</strong><span>"Let <span class="math" data-say="n">n</span> be the money" cannot be checked: <span class="math" data-say="n">n</span> might be dollars or cents, and <span class="math" data-say="25 n">25n</span> is right in one reading and nonsense in the other. Name the quantity and its units in a full sentence before any expression is written.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you write the &quot;let n be ...&quot; line without being asked.</strong><p>For a taxi fare with a <span class="math" data-say="$4">$4</span> fixed charge and <span class="math" data-say="$2.50">$2.50</span> per mile, define the unknown with units, write the total for an unknown number of miles, and choose a value that separates it from the common product-of-the-whole-sum error. Then translate "four less than three times the sum of a number and two" and test the nearest rival reading.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This is the last lesson of the course, and it is the one that gets used first. Linear Equations and Inequalities turns these expressions into equations by setting two of them equal, and every technique it teaches for solving is worthless if the equation was written from a misread sentence.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing &quot;five less than n&quot; as <span class="math" data-say="5 minus n">5 − n</span></strong><span>The English puts the subtracted amount first and algebra puts it second. Subtraction is not commutative, so the two expressions differ at every <span class="math" data-say="n">n</span> except <span class="math" data-say="n equals 5">n = 5</span>, where both are <span class="math" data-say="0">0</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dropping the bracket that &quot;the sum of&quot; asks for</strong><span>"Twice the sum of <span class="math" data-say="n">n</span> and 3" is <span class="math" data-say="2 times the quantity n plus 3">2(n + 3)</span>, not <span class="math" data-say="2 n plus 3">2n + 3</span>. The phrase names a single quantity and then doubles it, and without the bracket only the first part gets doubled.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Not saying what the letter stands for</strong><span>"Let <span class="math" data-say="n">n</span> be the money" cannot be checked: <span class="math" data-say="n">n</span> might be dollars or cents, and <span class="math" data-say="25 n">25n</span> is right in one reading and nonsense in the other. Name the quantity and its units in a full sentence before any expression is written.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you write the &quot;let n be ...&quot; line without being asked.</strong><p>For a taxi fare with a <span class="math" data-say="$4">$4</span> fixed charge and <span class="math" data-say="$2.50">$2.50</span> per mile, define the unknown with units, write the total for an unknown number of miles, and choose a value that separates it from the common product-of-the-whole-sum error. Then translate "four less than three times the sum of a number and two" and test the nearest rival reading.</p></div></div><div class="note"><strong>Note:</strong> This is the last lesson of the course, and it is the one that gets used first. Linear Equations and Inequalities turns these expressions into equations by setting two of them equal, and every technique it teaches for solving is worthless if the equation was written from a misread sentence.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Name the unknown before writing anything</summary><p>"Let <span class="math" data-say="n">n</span> be the number of quarters" is a definition you can check against later. "Let <span class="math" data-say="n">n</span> be the quarters" is not, because it does not say whether <span class="math" data-say="n">n</span> counts coins or measures money. Half the errors in Linear Equations and Inequalities are made in this sentence and inherited by everything after it.</p></details><details class="recall"><summary>Addition and multiplication do not care about order; subtraction and division do</summary><p><span class="math" data-say="n plus 5">n + 5</span> and <span class="math" data-say="5 plus n">5 + n</span> are the same expression, so no phrase involving "sum" can be got wrong by ordering. <span class="math" data-say="n minus 5">n − 5</span> and <span class="math" data-say="5 minus n">5 − n</span> are different, so every phrase involving "less than" or "subtracted from" has to be read carefully.</p></details><details class="recall"><summary>A bracket is what &quot;the sum of&quot; and &quot;the quantity&quot; produce</summary><p>"Twice the sum of <span class="math" data-say="n">n</span> and 3" is <span class="math" data-say="2 times the quantity n plus 3">2(n + 3)</span>: the phrase names one quantity and then doubles it. "The sum of twice <span class="math" data-say="n">n</span> and 3" is <span class="math" data-say="2 n plus 3">2n + 3</span>. Word order is doing the work brackets do in algebra, and it does it less clearly.</p></details></div>
+      <h3>Summary</h3>
       <p>Most word-problem errors are made before any algebra happens, in deciding what the letter stands for and which way round a subtraction goes. The translation itself is a short vocabulary plus two rules: which phrases reverse the order, and which phrases create a bracket.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Name the unknown before writing anything.</strong> "Let <span class="math" data-say="n">n</span> be the number of quarters" is a definition you can check against later. "Let <span class="math" data-say="n">n</span> be the quarters" is not, because it does not say whether <span class="math" data-say="n">n</span> counts coins or measures money. Half the errors in Linear Equations and Inequalities are made in this sentence and inherited by everything after it.</li><li><strong>Addition and multiplication do not care about order; subtraction and division do.</strong> <span class="math" data-say="n plus 5">n + 5</span> and <span class="math" data-say="5 plus n">5 + n</span> are the same expression, so no phrase involving "sum" can be got wrong by ordering. <span class="math" data-say="n minus 5">n − 5</span> and <span class="math" data-say="5 minus n">5 − n</span> are different, so every phrase involving "less than" or "subtracted from" has to be read carefully.</li><li><strong>A bracket is what &quot;the sum of&quot; and &quot;the quantity&quot; produce.</strong> "Twice the sum of <span class="math" data-say="n">n</span> and 3" is <span class="math" data-say="2 times the quantity n plus 3">2(n + 3)</span>: the phrase names one quantity and then doubles it. "The sum of twice <span class="math" data-say="n">n</span> and 3" is <span class="math" data-say="2 n plus 3">2n + 3</span>. Word order is doing the work brackets do in algebra, and it does it less clearly.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="five less than a number n, n minus 5, not 5 minus n. twice the sum of n and 3, 2 times the quantity n plus 3. the sum of twice n and 3, 2 n plus 3. three less than the square of n, n squared minus 3, not the quantity n minus 3, squared" tabindex="0" role="region" aria-label="Mathematical notation">five less than a number n         n − 5        not 5 − n
 twice the sum of n and 3          2(n + 3)
 the sum of twice n and 3          2n + 3
@@ -2829,11 +2873,42 @@ three less than the square of n   n² − 3       not (n − 3)²</div><figcapti
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2901,7 +2976,7 @@ three less than the square of n   n² − 3       not (n − 3)²</div><figcapti
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

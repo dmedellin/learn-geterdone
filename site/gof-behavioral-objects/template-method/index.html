@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Behavioral Patterns II: Notification, State and Algorithms, and the Conclusion</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · Behavioral Patterns</p>
       <h1>Template Method</h1>
       <p class="lesson-lede">A parent class fixes the order of an algorithm&#x27;s steps and lets subclasses write some of them.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Template method</li><li>Primitive operation and hook</li><li>Inverted control</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Define the skeleton of an algorithm in an operation, deferring some steps to subclasses.&rdquo; That is the first sentence of Template Method's intent, in Chapter 5, Behavioral Patterns. The rest says the point: subclasses may redefine some steps, and the algorithm's structure stays as the parent wrote it. It is the one pattern of this course with class scope, done with inheritance rather than with objects.</p><p>The book's Motivation, summarised, is an application framework whose abstract application class opens a document by a fixed series of steps: check that the document can be opened, create the right kind of document object, add it to the open documents and read it in. Subclasses for a drawing program or a spreadsheet supply the check, the creation and the reading; one more operation, called just before the document opens, lets them react if they care to. The Applicability gives three uses: write the invariant part of an algorithm once; factor behaviour that subclasses duplicate into one place, which the book calls refactoring to generalize after Opdyke and Johnson; and control how subclasses extend a class, by allowing it only at hooks.</p><p>The participants are two: the AbstractClass declares the primitive operations and implements the template method that calls them, along with its own operations and other objects'; each ConcreteClass implements the primitives. The concrete class relies on the abstract one for the steps that do not vary.</p><p>The Consequences call template methods a fundamental technique for reuse, the way class libraries factor out common behaviour. They invert control, the book says, by what is sometimes called the Hollywood principle, &ldquo;Don't call us, we'll call you&rdquo;, a phrase it credits to Richard Sweet's 1985 paper on the Mesa environment: the parent calls the subclass. A template method may call concrete operations, the abstract class's own useful operations, primitive operations, factory methods and hooks, and it must make clear which operations may be overridden and which must be. Hooks also cure a common slip. A subclass that extends an inherited operation by overriding it and calling the parent's version can forget the call; if the parent instead calls an empty hook from the operation, the subclass overrides the hook and cannot forget anything.</p><pre class="codeblock" data-say="line 1, abstract class map tile. line 2, public final image render of tile key key, comment, the template method. line 3, array of byte raw is set to fetch bytes of key. line 4, image img is set to style of decode of raw. line 5, label of img, comment, hook. line 6, shade of img, comment, hook. line 7, cache of key, img. line 8, return show of img. line 10, protected abstract image decode of array of byte raw, comment, primitive must be written. line 11, protected abstract image style of image img, comment, primitive must be written. line 12, protected void label of image img, comment, hook default nothing. line 13, protected void shade of image img. line 14, private array of byte fetch bytes of tile key key return tile store dot download of key. line 15, private void cache of tile key key, image img tile store dot keep of key, img. line 16, private image show of image img return img" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">abstract class MapTile {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the count</h2><div class="prose reading"><p>&ldquo;Define the skeleton of an algorithm in an operation, deferring some steps to subclasses.&rdquo; That is the first sentence of Template Method's intent, in Chapter 5, Behavioral Patterns. The rest says the point: subclasses may redefine some steps, and the algorithm's structure stays as the parent wrote it. It is the one pattern of this course with class scope, done with inheritance rather than with objects.</p><p>The book's Motivation, summarised, is an application framework whose abstract application class opens a document by a fixed series of steps: check that the document can be opened, create the right kind of document object, add it to the open documents and read it in. Subclasses for a drawing program or a spreadsheet supply the check, the creation and the reading; one more operation, called just before the document opens, lets them react if they care to. The Applicability gives three uses: write the invariant part of an algorithm once; factor behaviour that subclasses duplicate into one place, which the book calls refactoring to generalize after Opdyke and Johnson; and control how subclasses extend a class, by allowing it only at hooks.</p><p>The participants are two: the AbstractClass declares the primitive operations and implements the template method that calls them, along with its own operations and other objects'; each ConcreteClass implements the primitives. The concrete class relies on the abstract one for the steps that do not vary.</p><p>The Consequences call template methods a fundamental technique for reuse, the way class libraries factor out common behaviour. They invert control, the book says, by what is sometimes called the Hollywood principle, &ldquo;Don't call us, we'll call you&rdquo;, a phrase it credits to Richard Sweet's 1985 paper on the Mesa environment: the parent calls the subclass. A template method may call concrete operations, the abstract class's own useful operations, primitive operations, factory methods and hooks, and it must make clear which operations may be overridden and which must be. Hooks also cure a common slip. A subclass that extends an inherited operation by overriding it and calling the parent's version can forget the call; if the parent instead calls an empty hook from the operation, the subclass overrides the hook and cannot forget anything.</p><pre class="codeblock" data-say="line 1, abstract class map tile. line 2, public final image render of tile key key, comment, the template method. line 3, array of byte raw is set to fetch bytes of key. line 4, image img is set to style of decode of raw. line 5, label of img, comment, hook. line 6, shade of img, comment, hook. line 7, cache of key, img. line 8, return show of img. line 10, protected abstract image decode of array of byte raw, comment, primitive must be written. line 11, protected abstract image style of image img, comment, primitive must be written. line 12, protected void label of image img, comment, hook default nothing. line 13, protected void shade of image img. line 14, private array of byte fetch bytes of tile key key return tile store dot download of key. line 15, private void cache of tile key key, image img tile store dot keep of key, img. line 16, private image show of image img return img" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">abstract class MapTile {</span>
 <span class="cl">    public final Image render(TileKey key) {       // the template method</span>
 <span class="cl">        byte[] raw = fetchBytes(key);</span>
 <span class="cl">        Image img = style(decode(raw));</span>
@@ -1461,13 +1505,11 @@
 <span class="cl">    private byte[] fetchBytes(TileKey key) { return TileStore.download(key); }</span>
 <span class="cl">    private void cache(TileKey key, Image img) { TileStore.keep(key, img); }</span>
 <span class="cl">    private Image show(Image img) { return img; }</span>
-<span class="cl">}</span></code></pre><p>The sketch is the lesson's own: a map viewer's tile, in Java. <code>render</code> is <code>final</code>, so no subclass can reorder the steps; <code>decode</code> and <code>style</code> are abstract, the primitives; <code>label</code> and <code>shade</code> do nothing unless overridden, the hooks; and the fixed steps are private. That is the Implementation's first issue in Java's terms, where the book's is C++ access control: protected primitives, pure virtual where they must be overridden, and a template method that is not virtual. The second issue is to keep the primitives few, since each is one more operation every subclass writer must supply; the third, naming them so they stand out, as MacApp prefixed its with Do.</p><p>The Sample Code, from NeXT's AppKit and summarised, shows a parent class enforcing an invariant: a view's display operation sets up the drawing state, calls a hook that subclasses override to draw, and releases the state afterwards, so no subclass can draw without the setup. Known Uses says template methods are in nearly every abstract class, and points to Wirfs-Brock and colleagues. Related Patterns: template methods often call factory methods, as the document-opening example does; and Strategy, last lesson, varies the whole algorithm by delegation where Template Method varies part of it by inheritance.</p><p>Now the lab, on the tile above. It has seven steps: three fixed, two primitive, two hooks. Three subclasses override some: road tiles write decode, style and the label hook; satellite tiles decode and style; terrain tiles decode and the shading hook. On the preset <code>map-tiles</code> the lab lists the sequence each subclass runs, step by step, as the base's or its own, and gives the steps each writes, 3, 2 and 2, and the hooks each overrides, 1, 0 and 1. It flags one subclass left abstract: terrain tiles lack style, so the Java would not compile until that primitive is written.</p><p>The same preset counts the step bodies. Written whole in each subclass the algorithm would be 21, seven steps three times. With the template it is 12: the 5 the base writes once, its fixed steps and its two hook defaults, and the 7 overrides. The preset <code>map-tiles-fixed</code> gives terrain tiles their style: no subclass is left abstract, and the count with the template rises to 13, against 21. The gap is the duplication the Applicability's second use removes; it is not a measure of how well the steps were chosen, which is the Implementation's question.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, steps, take, fixed, brew, primitive, milk, hook, serve, fixed. line 2, subclasses, espresso, brew, latte, brew, milk, cortado, milk" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">steps:       take, fixed; brew, primitive; milk, hook; serve, fixed</span>
-<span class="cl">subclasses:  Espresso, brew; Latte, brew, milk; Cortado, milk</span></code></pre><p>A coffee bar's order, as a template of four steps and three subclasses. By hand, name any subclass left abstract and the primitive it lacks, and count the step bodies written whole in each subclass against those with the template. Then enter it into the lab to check.</p><p>Template Method lets subclasses fill in an algorithm's steps. The next lesson, Visitor, the last pattern of the catalog, lets you add whole operations to a structure without touching its classes.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Requests in motion</h2></div><p>the steps a template method runs for each subclass</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The sketch is the lesson's own: a map viewer's tile, in Java. <code>render</code> is <code>final</code>, so no subclass can reorder the steps; <code>decode</code> and <code>style</code> are abstract, the primitives; <code>label</code> and <code>shade</code> do nothing unless overridden, the hooks; and the fixed steps are private. That is the Implementation's first issue in Java's terms, where the book's is C++ access control: protected primitives, pure virtual where they must be overridden, and a template method that is not virtual. The second issue is to keep the primitives few, since each is one more operation every subclass writer must supply; the third, naming them so they stand out, as MacApp prefixed its with Do.</p><p>The Sample Code, from NeXT's AppKit and summarised, shows a parent class enforcing an invariant: a view's display operation sets up the drawing state, calls a hook that subclasses override to draw, and releases the state afterwards, so no subclass can draw without the setup. Known Uses says template methods are in nearly every abstract class, and points to Wirfs-Brock and colleagues. Related Patterns: template methods often call factory methods, as the document-opening example does; and Strategy, last lesson, varies the whole algorithm by delegation where Template Method varies part of it by inheritance.</p><p>Now the lab, on the tile above. It has seven steps: three fixed, two primitive, two hooks. Three subclasses override some: road tiles write decode, style and the label hook; satellite tiles decode and style; terrain tiles decode and the shading hook. On the preset <code>map-tiles</code> the lab lists the sequence each subclass runs, step by step, as the base's or its own, and gives the steps each writes, 3, 2 and 2, and the hooks each overrides, 1, 0 and 1. It flags one subclass left abstract: terrain tiles lack style, so the Java would not compile until that primitive is written.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Requests in motion</h2></div><p>the steps a template method runs for each subclass</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Requests in motion</strong><span>the steps a template method runs for each subclass</span></div>
       </div>
@@ -1475,10 +1517,10 @@
       <div class="table-wrap" id="grtTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="grtTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> The base class's template method runs the steps in order for every subclass. A fixed step is the base class's own and is never overridden; a primitive operation is abstract in the base and each subclass must supply it, and a subclass that lacks one is left abstract (it cannot be made), its missing steps named; a hook has a default in the base that a subclass may override. Step bodies count the code written for steps: with every subclass writing the algorithm whole, steps × subclasses; with the template, the fixed steps and hook defaults once in the base plus each subclass's overrides.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What each subclass writes</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What each subclass writes</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="grtPreset">Worked example</label>
           <select id="grtPreset"><option value="map-tiles" selected>A map viewer's three kinds of tile, one primitive missing</option><option value="map-tiles-fixed">The same tiles with terrain's style written</option></select>
@@ -1501,12 +1543,16 @@
           <div class="kpi"><span>Step bodies with the template</span><strong id="grtWith">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The same preset counts the step bodies. Written whole in each subclass the algorithm would be 21, seven steps three times. With the template it is 12: the 5 the base writes once, its fixed steps and its two hook defaults, and the 7 overrides. The preset <code>map-tiles-fixed</code> gives terrain tiles their style: no subclass is left abstract, and the count with the template rises to 13, against 21. The gap is the duplication the Applicability's second use removes; it is not a measure of how well the steps were chosen, which is the Implementation's question.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, steps, take, fixed, brew, primitive, milk, hook, serve, fixed. line 2, subclasses, espresso, brew, latte, brew, milk, cortado, milk" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">steps:       take, fixed; brew, primitive; milk, hook; serve, fixed</span>
+<span class="cl">subclasses:  Espresso, brew; Latte, brew, milk; Cortado, milk</span></code></pre><p>A coffee bar's order, as a template of four steps and three subclasses. By hand, name any subclass left abstract and the primitive it lacks, and count the step bodies written whole in each subclass against those with the template. Then enter it into the lab to check.</p><p>Template Method lets subclasses fill in an algorithm's steps. The next lesson, Visitor, the last pattern of the catalog, lets you add whole operations to a structure without touching its classes.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a template and its subclasses</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the steps in order</h3><p>Write each step of the template method, and mark it fixed, primitive (must be written by every subclass) or hook (has a default).</p></article><article class="card concept-card"><div class="icon">2</div><h3>List each subclass&#x27;s overrides</h3><p>For each subclass, write the steps it overrides. Any primitive missing from the list leaves that subclass abstract.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the step bodies</h3><p>Whole in each subclass: steps times subclasses. With the template: the fixed steps and the hook defaults once, plus every override.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on code of your own</h3><p>Find an abstract class in code you know that calls methods its subclasses write. Sort them into primitives and hooks, count what each subclass writes, and say whether any hook is really a primitive in disguise.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a template and its subclasses</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the steps in order.</strong> Write each step of the template method, and mark it fixed, primitive (must be written by every subclass) or hook (has a default).</li><li><strong>List each subclass&#x27;s overrides.</strong> For each subclass, write the steps it overrides. Any primitive missing from the list leaves that subclass abstract.</li><li><strong>Count the step bodies.</strong> Whole in each subclass: steps times subclasses. With the template: the fixed steps and the hook defaults once, plus every override.</li><li><strong>Do it on code of your own.</strong> Find an abstract class in code you know that calls methods its subclasses write. Sort them into primitives and hooks, count what each subclass writes, and say whether any hook is really a primitive in disguise.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1525,17 +1571,16 @@ with the template: 5 + 7 = 12
 TerrainTile lacks style: abstract</div><p>The primitives are not written in the base, so they appear only among the overrides; a subclass that skips one adds nothing to the count and leaves a hole the compiler finds.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Extending an inherited operation by overriding it and calling the parent</strong><span>It works until a subclass forgets the call. The book's alternative is a template method in the parent that calls an empty hook at the point of extension: the subclass overrides the hook, and the parent's part always runs.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Leaving unclear which operations may be overridden</strong><span>A subclass writer who cannot tell a hook from a primitive, or either from a step not meant to change, will override the wrong thing. The book asks template methods to make that explicit, and suggests naming conventions to help.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Making every step a primitive for flexibility</strong><span>Each primitive is a method every subclass must write. On the lesson's illustration one forgotten primitive leaves a subclass abstract; the book's advice is to keep primitives as few as the algorithm allows and use hooks where a default will do.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a template fixes and what its subclasses write.</strong><p>Given a template's steps and each subclass's overrides, name any subclass left abstract, and count the step bodies with and without the template.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts steps and overrides. It cannot say whether the steps were cut in the right places, whether a hook should have been a primitive, or whether a subclass's override keeps the parent's invariant; those are the Implementation's questions, and the reader's.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Extending an inherited operation by overriding it and calling the parent</strong><span>It works until a subclass forgets the call. The book's alternative is a template method in the parent that calls an empty hook at the point of extension: the subclass overrides the hook, and the parent's part always runs.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Leaving unclear which operations may be overridden</strong><span>A subclass writer who cannot tell a hook from a primitive, or either from a step not meant to change, will override the wrong thing. The book asks template methods to make that explicit, and suggests naming conventions to help.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Making every step a primitive for flexibility</strong><span>Each primitive is a method every subclass must write. On the lesson's illustration one forgotten primitive leaves a subclass abstract; the book's advice is to keep primitives as few as the algorithm allows and use hooks where a default will do.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a template fixes and what its subclasses write.</strong><p>Given a template's steps and each subclass's overrides, name any subclass left abstract, and count the step bodies with and without the template.</p></div></div><div class="note"><strong>Note:</strong> The lab counts steps and overrides. It cannot say whether the steps were cut in the right places, whether a hook should have been a primitive, or whether a subclass's override keeps the parent's invariant; those are the Implementation's questions, and the reader's.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Template method</summary><p>An operation in a parent class that runs an algorithm's steps in a fixed order, some written in the parent and some left for subclasses. It is itself not meant to be overridden.</p></details><details class="recall"><summary>Primitive operation and hook</summary><p>A primitive operation is abstract: every concrete subclass must write it. A hook has a default in the parent, often doing nothing, and a subclass overrides it only to add something at that point.</p></details><details class="recall"><summary>Inverted control</summary><p>The parent class calls the subclass's operations, not the other way round. The subclass supplies pieces; it never decides when they run.</p></details></div>
+      <h3>Summary</h3>
       <p>Template Method writes an algorithm's skeleton once in a parent class and defers chosen steps to subclasses. Read the pattern, then count, for a map viewer's three kinds of tile, the steps each subclass writes, the one it forgot, and the step bodies the template saves.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Template method.</strong> An operation in a parent class that runs an algorithm's steps in a fixed order, some written in the parent and some left for subclasses. It is itself not meant to be overridden.</li><li><strong>Primitive operation and hook.</strong> A primitive operation is abstract: every concrete subclass must write it. A hook has a default in the parent, often doing nothing, and a subclass overrides it only to add something at that point.</li><li><strong>Inverted control.</strong> The parent class calls the subclass's operations, not the other way round. The subclass supplies pieces; it never decides when they run.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the parent fixes the order of the steps. primitives must be written, hooks may be. the parent calls the subclass. say which operations are hooks. keep the primitives few" tabindex="0" role="region" aria-label="Mathematical notation">the parent fixes the order of the steps
 primitives must be written; hooks may be
 the parent calls the subclass
@@ -2311,11 +2356,42 @@ keep the primitives few</div><figcaption>Template Method in five lines</figcapti
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2383,7 +2459,7 @@ keep the primitives few</div><figcaption>Template Method in five lines</figcapti
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

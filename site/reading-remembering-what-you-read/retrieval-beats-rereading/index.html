@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,27 +1424,25 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Remembering What You Read</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Recall</p>
       <h1>Retrieval Beats Rereading</h1>
       <p class="lesson-lede">Study one passage by reading it twice and another by recalling it once, and test both two days later.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Retrieval practice</li><li>Immediate and delayed tests disagree</li><li>A comparison of two conditions</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>What the study found, and what your drill can find</h2>
-      <article class="prose reading"><p>The drill has two parts, and both happen today. Condition 1 is The Mould on the Plate: read it at your usual pace and press Done, then read it again and press Done. There is no test. Condition 2 is The Tower That Was Meant to Come Down: read it once, then write what you remember with the page hidden and tick its idea units, as in Free Recall. When both are logged, the page gives the date the test is due, two days on.</p><p>From that date, every page of this Subject shows a banner with a link back here, and this page offers the delayed test: both passages' six questions, twelve in all, with neither passage shown. It is offered once, and it writes your two delayed scores into the boxes, with the idea units you ticked today in the last two, so that every figure on the page is then your own. Until then the boxes hold the presets, and you can finish the lesson today on them and come back for your own figures.</p><p>The design follows Roediger and Karpicke (2006). In their first experiment students studied short prose passages either by reading them twice, or by reading once and then taking a free-recall test with no feedback, and were tested by free recall five minutes, two days or a week later. At five minutes the rereaders recalled more, about 81% against 75%. At two days the order had reversed, about 54% against 68%, and at a week the group that had been tested was still ahead.</p><p>The published-shape preset puts those two-day figures in the boxes as scores out of 100, rounded and labelled as the study's: 54 for the passage read twice, 68 for the passage recalled, a difference of +14 points. Its last box holds 70 of 100, the recall at the time: on the free-recall test that took the place of a second reading, students wrote down about 70% of the passage's idea units.</p><div class="mathblock" data-say="5 minutes, 2 days. read twice, is approximately 81 percent, is approximately 54 percent. recalled, is approximately 75 percent, is approximately 68 percent. difference, is approximately negative 6, is approximately plus 14 points" tabindex="0" role="region" aria-label="Mathematical notation">              5 minutes   2 days
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>What the study found, and what your drill can find</h2><div class="prose reading"><p>The drill has two parts, and both happen today. Condition 1 is The Mould on the Plate: read it at your usual pace and press Done, then read it again and press Done. There is no test. Condition 2 is The Tower That Was Meant to Come Down: read it once, then write what you remember with the page hidden and tick its idea units, as in Free Recall. When both are logged, the page gives the date the test is due, two days on.</p><p>From that date, every page of this Subject shows a banner with a link back here, and this page offers the delayed test: both passages' six questions, twelve in all, with neither passage shown. It is offered once, and it writes your two delayed scores into the boxes, with the idea units you ticked today in the last two, so that every figure on the page is then your own. Until then the boxes hold the presets, and you can finish the lesson today on them and come back for your own figures.</p><p>The design follows Roediger and Karpicke (2006). In their first experiment students studied short prose passages either by reading them twice, or by reading once and then taking a free-recall test with no feedback, and were tested by free recall five minutes, two days or a week later. At five minutes the rereaders recalled more, about 81% against 75%. At two days the order had reversed, about 54% against 68%, and at a week the group that had been tested was still ahead.</p><p>The published-shape preset puts those two-day figures in the boxes as scores out of 100, rounded and labelled as the study's: 54 for the passage read twice, 68 for the passage recalled, a difference of +14 points. Its last box holds 70 of 100, the recall at the time: on the free-recall test that took the place of a second reading, students wrote down about 70% of the passage's idea units.</p><div class="mathblock" data-say="5 minutes, 2 days. read twice, is approximately 81 percent, is approximately 54 percent. recalled, is approximately 75 percent, is approximately 68 percent. difference, is approximately negative 6, is approximately plus 14 points" tabindex="0" role="region" aria-label="Mathematical notation">              5 minutes   2 days
 read twice    ≈ 81%       ≈ 54%
 recalled      ≈ 75%       ≈ 68%
-difference    ≈ −6        ≈ +14 points</div><p>The reader-example preset is an illustration, not a study: a reader who, two days later, got 2 of 6 right on the passage read twice and 4 of 6 on the passage recalled. The difference is 4/6 &minus; 2/6 = 1/3, about +33.3 points, which is two questions. On six questions one question is &asymp; 16.7 points, so a one-question difference is not a result, and two questions on one pair of passages is still a single measurement.</p><p>Why would rereading win at five minutes? A second reading comes just after the first, so every idea has been met twice and the text is fresh; the recall group met their passage once and wrote down only what they could find, with no feedback on what they missed. One reading of the reversal is that what was only fluent fades over two days, while what was once retrieved is easier to retrieve again.</p><p>Your drill is a gentler test than theirs. Their final test was free recall; yours is multiple choice, a recognition test, which tends to show a smaller testing effect, so a small difference on your drill, or none, is not a contradiction. And it has the two confounds of every comparison here: the two passages differ in content and difficulty, and which one you read first may matter.</p><p>So a reader whose result goes the other way has not refuted the study, and the study has not refuted them. What the study does settle is narrower and still useful: for its students and its passages, the way of studying that did better at five minutes did worse at two days.</p><p>Rereading also feels better. The second pass is smooth and every sentence is familiar, and that fluency is easy to take for knowing. That feeling is why the next lesson, Spacing Your Reviews, asks when to come back to a text rather than how many times to read it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Retrieval against rereading</h2></div><p>what is kept, measured by you</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+difference    ≈ −6        ≈ +14 points</div><p>The reader-example preset is an illustration, not a study: a reader who, two days later, got 2 of 6 right on the passage read twice and 4 of 6 on the passage recalled. The difference is 4/6 &minus; 2/6 = 1/3, about +33.3 points, which is two questions. On six questions one question is &asymp; 16.7 points, so a one-question difference is not a result, and two questions on one pair of passages is still a single measurement.</p><p>Why would rereading win at five minutes? A second reading comes just after the first, so every idea has been met twice and the text is fresh; the recall group met their passage once and wrote down only what they could find, with no feedback on what they missed. One reading of the reversal is that what was only fluent fades over two days, while what was once retrieved is easier to retrieve again.</p><p>Your drill is a gentler test than theirs. Their final test was free recall; yours is multiple choice, a recognition test, which tends to show a smaller testing effect, so a small difference on your drill, or none, is not a contradiction. And it has the two confounds of every comparison here: the two passages differ in content and difficulty, and which one you read first may matter.</p><p>So a reader whose result goes the other way has not refuted the study, and the study has not refuted them. What the study does settle is narrower and still useful: for its students and its passages, the way of studying that did better at five minutes did worse at two days.</p><p>Rereading also feels better. The second pass is smooth and every sentence is familiar, and that fluency is easy to take for knowing. That feeling is why the next lesson, Spacing Your Reviews, asks when to come back to a text rather than how many times to read it.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Retrieval against rereading</h2></div><p>what is kept, measured by you</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Retrieval against rereading</strong><span>what is kept, measured by you</span></div>
       </div>
@@ -1425,10 +1468,10 @@ difference    ≈ −6        ≈ +14 points</div><p>The reader-example preset i
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="reTable"></table></div>
       <div class="status-banner" id="reStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Two ways of studying, tested two days later</h3>
-          <p>Your measurement once the delayed test is done; until then the boxes hold a preset. The published-shape preset carries the study's rounded percentages as scores out of 100. On your own test one question is <span data-say="is approximately 16.7">≈ 16.7</span> points, and a one-question difference is not a result.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Two ways of studying, tested two days later</h3>
+            <p>Your measurement once the delayed test is done; until then the boxes hold a preset. The published-shape preset carries the study's rounded percentages as scores out of 100. On your own test one question is <span data-say="is approximately 16.7">≈ 16.7</span> points, and a one-question difference is not a result.</p>
         <div class="field">
           <label for="rePreset">Worked example</label>
           <select id="rePreset"><option value="reader-example" selected>Reader example (illustrative): 2 of 6 against 4 of 6</option><option value="published-shape">Published shape (Roediger and Karpicke 2006, rounded)</option></select>
@@ -1460,12 +1503,14 @@ difference    ≈ −6        ≈ +14 points</div><p>The reader-example preset i
           <div class="kpi"><span>Recall at the time (recalled passage)</span><strong id="reRecallB">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>The comparison on your own texts</h2></div><p>Five steps over two or more days. The third is the hardest to keep.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Choose two texts of the same kind</h3><p>Two articles of similar length and difficulty that you have not read, or two sections of one long piece. Decide in advance which one you will reread.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Reread one, recall the other</h3><p>Read the first twice through with no test. Read the second once, then write what you remember with it hidden, and only then look back at it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Put the test in the calendar</h3><p>Two or more days ahead. Until then, do not look at either text.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Test both cold</h3><p>On the day, write what you remember of each, or answer questions someone else has set, and compute the difference in points. Next time, swap which kind of text gets which method, and which comes first.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Run The Daily Drill as usual; the two readings here do not replace it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>The comparison on your own texts</h2>
+      <p class="lead-in">Five steps over two or more days. The third is the hardest to keep.</p>
+      <ol class="key-ideas method"><li><strong>Choose two texts of the same kind.</strong> Two articles of similar length and difficulty that you have not read, or two sections of one long piece. Decide in advance which one you will reread.</li><li><strong>Reread one, recall the other.</strong> Read the first twice through with no test. Read the second once, then write what you remember with it hidden, and only then look back at it.</li><li><strong>Put the test in the calendar.</strong> Two or more days ahead. Until then, do not look at either text.</li><li><strong>Test both cold.</strong> On the day, write what you remember of each, or answer questions someone else has set, and compute the difference in points. Next time, swap which kind of text gets which method, and which comes first.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Run The Daily Drill as usual; the two readings here do not replace it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1481,17 +1526,16 @@ recalled:    4/6 ≈ 66.7%
 4/6 − 2/6 = 1/3 ≈ 33.3 points</div><p>Two questions' difference, on one pair of passages. The published-shape preset puts the study's two-day figures in the same boxes: 68 &minus; 54 = 14 points.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading it again is the best way to remember it</strong><span>Rereading wins on an immediate test and loses on a delayed one. In Roediger and Karpicke's first experiment the rereaders recalled about 81% at five minutes against 75% for the group that had been tested, and about 54% against 68% two days later. Their test was free recall without feedback; this drill's delayed test is multiple choice, which tends to show a smaller effect.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Judging a way of studying by how it feels</strong><span>The second reading is smooth and familiar, and that fluency feels like knowing; the recall is effortful and shows you the gaps. The five-minute test agrees with the feeling and the two-day test does not, which is why the drill waits two days before it asks.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking one pair of passages as your result</strong><span>The two passages differ, and you read one before the other. One question is &asymp; 16.7 points, so a one-question difference is not a result; a difference that holds on other pairs, with the order swapped, is evidence about you.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the delayed difference and explain the reversal.</strong><p>Given the delayed scores of a passage read twice and a passage recalled, compute both shares and the difference in points, say whether one question could account for it, and explain why an immediate test would have favoured rereading. The figures right, with the reason, is the pass.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Two passages and one delayed test: the passages differ in content and difficulty, and which you read first may matter, so one result in either direction is one measurement. The study was a laboratory task with students and short prose passages; your drill's delayed test is a recognition test, which tends to show a smaller effect.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading it again is the best way to remember it</strong><span>Rereading wins on an immediate test and loses on a delayed one. In Roediger and Karpicke's first experiment the rereaders recalled about 81% at five minutes against 75% for the group that had been tested, and about 54% against 68% two days later. Their test was free recall without feedback; this drill's delayed test is multiple choice, which tends to show a smaller effect.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Judging a way of studying by how it feels</strong><span>The second reading is smooth and familiar, and that fluency feels like knowing; the recall is effortful and shows you the gaps. The five-minute test agrees with the feeling and the two-day test does not, which is why the drill waits two days before it asks.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking one pair of passages as your result</strong><span>The two passages differ, and you read one before the other. One question is &asymp; 16.7 points, so a one-question difference is not a result; a difference that holds on other pairs, with the order swapped, is evidence about you.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the delayed difference and explain the reversal.</strong><p>Given the delayed scores of a passage read twice and a passage recalled, compute both shares and the difference in points, say whether one question could account for it, and explain why an immediate test would have favoured rereading. The figures right, with the reason, is the pass.</p></div></div><div class="note"><strong>Note:</strong> Two passages and one delayed test: the passages differ in content and difficulty, and which you read first may matter, so one result in either direction is one measurement. The study was a laboratory task with students and short prose passages; your drill's delayed test is a recognition test, which tends to show a smaller effect.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Retrieval practice</summary><p>Pulling something out of memory with nothing to look at is a way of studying it, not only a way of testing it. The free recall from the last lesson, done in place of a second reading, is retrieval practice.</p></details><details class="recall"><summary>Immediate and delayed tests disagree</summary><p>Just after studying, rereading tends to come out ahead: the text is fresh and it has been met twice. Days later the order tends to reverse. Which test you take decides which method looks better.</p></details><details class="recall"><summary>A comparison of two conditions</summary><p>Two passages, two ways of studying, one delayed test. The difference between the two scores is the result, and like every comparison in this Subject it carries two confounds: the passages differ, and one was read first.</p></details></div>
+      <h3>Summary</h3>
       <p>Read one passage twice through, and another once followed by writing down what you remember. Two or more days later the Subject offers both passages' questions with neither passage shown, and the lab computes the difference between the two delayed scores in points. The question is which way of studying keeps more once the feeling of fluency has faded.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Retrieval practice.</strong> Pulling something out of memory with nothing to look at is a way of studying it, not only a way of testing it. The free recall from the last lesson, done in place of a second reading, is retrieval practice.</li><li><strong>Immediate and delayed tests disagree.</strong> Just after studying, rereading tends to come out ahead: the text is fresh and it has been met twice. Days later the order tends to reverse. Which test you take decides which method looks better.</li><li><strong>A comparison of two conditions.</strong> Two passages, two ways of studying, one delayed test. The difference between the two scores is the result, and like every comparison in this Subject it carries two confounds: the passages differ, and one was read first.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="delayed score equals right over 6. difference equals recalled minus read twice. 4 over 6 minus 2 over 6 equals 1 over 3 is approximately 33.3 points. one question is approximately 16.7 points. the immediate test favours rereading" tabindex="0" role="region" aria-label="Mathematical notation">delayed score = right / 6
 difference = recalled − read twice
 4/6 − 2/6 = 1/3 ≈ 33.3 points
@@ -2556,11 +2600,42 @@ the immediate test favours rereading</div><figcaption>Rereading against retrieva
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2628,7 +2703,7 @@ the immediate test favours rereading</div><figcaption>Rereading against retrieva
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Behavioral Patterns II: Notification, State and Algorithms, and the Conclusion</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · Behavioral Patterns</p>
       <h1>State</h1>
       <p class="lesson-lede">An object whose behaviour depends on its state hands each request to an object standing for that state, and swaps it when the state changes.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Context and state object</li><li>Transition</li><li>Branches against classes</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the trace</h2>
-      <article class="prose reading"><p>&ldquo;Allow an object to alter its behavior when its internal state changes. The object will appear to change its class.&rdquo; That is the intent of State, the next pattern of Chapter 5, Behavioral Patterns, also called Objects for States. The second sentence is the striking one: a client calling the same operation on the same object gets different behaviour, as if the object had been replaced by an instance of some other class.</p><p>The book's Motivation, summarised, is a network connection that answers an open or a close request differently depending on whether it is established, listening or closed. An abstract state class declares the requests; one subclass per state implements them; the connection keeps an instance of the current one, forwards every state-specific request to it, and swaps it for another when the state changes. Reach for it, on the Applicability's reading, when what an object does at run time turns on a status it carries, and that status is tested by switch after switch through its methods; each tested case becomes a class.</p><p>Three participants. The Context is the interface clients use and holds the current concrete state. The State declares the interface for behaviour tied to a state. Each ConcreteState implements it for one state. In the collaborations the context delegates; it may pass itself so the state can reach its data; clients may configure it with states and then never touch them; and either the context or the states may decide which state comes next.</p><p>The Consequences are three. State localizes what each state does, so a new state is a new subclass; the alternative, data values the context's operations test, spreads similar conditionals through every operation, and a new state can mean editing several. The authors are fair about the cost: more classes, less compact than one class, and worth it when there are many states. Second, transitions become explicit, and atomic from the context's side, one variable rebound instead of several. Third, state objects with no fields can be shared among contexts: flyweights, in the book's terms, with behaviour and no intrinsic state.</p><pre class="codeblock" data-say="line 1, interface copy state, comment, an event a state ignores leaves it as it is. line 2, default copy state lend return this. line 3, default copy state give back return this. line 4, default copy state fall due return this. line 6, enum shelf implements copy state instance. line 7, public copy state lend return on loan dot instance. line 9, enum on loan implements copy state instance. line 10, public copy state give back return shelf dot instance. line 11, public copy state fall due return overdue dot instance. line 13, comment, Held, Overdue and Lost are written the same way.. line 14, final class copy. line 15, private copy state state is set to shelf dot instance. line 16, void lend state is set to state dot lend. line 17, void give back state is set to state dot give back. line 18, void fall due state is set to state dot fall due" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">interface CopyState {   // an event a state ignores leaves it as it is</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the trace</h2><div class="prose reading"><p>&ldquo;Allow an object to alter its behavior when its internal state changes. The object will appear to change its class.&rdquo; That is the intent of State, the next pattern of Chapter 5, Behavioral Patterns, also called Objects for States. The second sentence is the striking one: a client calling the same operation on the same object gets different behaviour, as if the object had been replaced by an instance of some other class.</p><p>The book's Motivation, summarised, is a network connection that answers an open or a close request differently depending on whether it is established, listening or closed. An abstract state class declares the requests; one subclass per state implements them; the connection keeps an instance of the current one, forwards every state-specific request to it, and swaps it for another when the state changes. Reach for it, on the Applicability's reading, when what an object does at run time turns on a status it carries, and that status is tested by switch after switch through its methods; each tested case becomes a class.</p><p>Three participants. The Context is the interface clients use and holds the current concrete state. The State declares the interface for behaviour tied to a state. Each ConcreteState implements it for one state. In the collaborations the context delegates; it may pass itself so the state can reach its data; clients may configure it with states and then never touch them; and either the context or the states may decide which state comes next.</p><p>The Consequences are three. State localizes what each state does, so a new state is a new subclass; the alternative, data values the context's operations test, spreads similar conditionals through every operation, and a new state can mean editing several. The authors are fair about the cost: more classes, less compact than one class, and worth it when there are many states. Second, transitions become explicit, and atomic from the context's side, one variable rebound instead of several. Third, state objects with no fields can be shared among contexts: flyweights, in the book's terms, with behaviour and no intrinsic state.</p><pre class="codeblock" data-say="line 1, interface copy state, comment, an event a state ignores leaves it as it is. line 2, default copy state lend return this. line 3, default copy state give back return this. line 4, default copy state fall due return this. line 6, enum shelf implements copy state instance. line 7, public copy state lend return on loan dot instance. line 9, enum on loan implements copy state instance. line 10, public copy state give back return shelf dot instance. line 11, public copy state fall due return overdue dot instance. line 13, comment, Held, Overdue and Lost are written the same way.. line 14, final class copy. line 15, private copy state state is set to shelf dot instance. line 16, void lend state is set to state dot lend. line 17, void give back state is set to state dot give back. line 18, void fall due state is set to state dot fall due" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">interface CopyState {   // an event a state ignores leaves it as it is</span>
 <span class="cl">    default CopyState lend()     { return this; }</span>
 <span class="cl">    default CopyState giveBack() { return this; }</span>
 <span class="cl">    default CopyState fallDue()  { return this; }</span>
@@ -1463,18 +1507,11 @@
 <span class="cl">    void lend()     { state = state.lend(); }</span>
 <span class="cl">    void giveBack() { state = state.giveBack(); }</span>
 <span class="cl">    void fallDue()  { state = state.fallDue(); }</span>
-<span class="cl">}</span></code></pre><p>The sketch is the lesson's own: a library copy whose states are Java enums, so each is a single shared instance, as the book's sample makes its states Singletons. The interface's default methods return the state unchanged, which is how an ignored event looks here, and each state returns its successor, so the states choose the transitions and the copy only rebinds. The method is <code>giveBack</code> because <code>return</code> is a Java keyword.</p><p>The Implementation asks first who defines the transitions. Fixed rules can live in the context; letting the states name their successors is usually more flexible and easier to extend, at the price that each state class knows at least one other. Second, a table-driven alternative from Cargill's C++ Programming Style maps each state and input to the next state: regular, and changed by editing data, but slower than a call, less explicit, and awkward when a transition must do something. State models what each state does; a table models the transitions. Third, create state objects when entered and discard them, or create them all once; fourth, languages such as Self can change an object's delegation at run time and so support the pattern directly.</p><p>The Sample Code is a simplified C++ connection whose states, holding no fields, are Singletons. Known Uses names Johnson and Zweig's account of the pattern, and the tools of interactive drawing programs, HotDraw and Unidraw among them, where the current tool decides what a click does. Coplien's Envelope-Letter idiom, for swapping an object's class while the program runs, is related. Related Patterns: Flyweight, on sharing states, and Singleton.</p><p>Now the lab, on a library copy of the lesson's own: five states, shelf, on loan, held, overdue and lost, seven events and nine transitions. On the preset <code>library-copy</code> the copy starts on the shelf and the lab traces ten events to a final state of lost. Two are ignored, a return while on the shelf and a renewal while overdue; no state is never entered; and the largest state class is on loan, with three transitions. One conditional over the state and event needs 14 branches, a branch for each of the 9 transitions and a default for each of the 5 states; State needs 7 classes, the 5 states, the context and the abstract state.</p><p>The preset <code>library-repair</code> adds a repair state and two events: a copy on the shelf or on loan can be damaged, and a fix returns it to the shelf. The conditional grows to 18 branches, three new transitions and a default for the new state, each a case added to code that already worked. State grows to 8 classes, one of them new; the shelf and on-loan classes each gain a transition, and the interface two default methods. On this short input two states, overdue and lost, are never entered, and the largest class is now on loan, with four. The figures compare sizes; whether 8 small classes are clearer than one 18-branch method is the book's judgement about many states, not something the count settles.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, states, docked ready playing paused of docked is the start. line 2, events, lift play pause dock. line 3, transitions, docked, lift, ready, ready, play, playing. line 4, playing, pause, paused, paused, play, playing. line 5, playing, dock, docked, paused, dock, docked. line 6, ready, dock, docked. line 7, input, play lift play pause pause play dock lift" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">states:       docked ready playing paused   (docked is the start)</span>
-<span class="cl">events:       lift play pause dock</span>
-<span class="cl">transitions:  docked, lift, ready; ready, play, playing;</span>
-<span class="cl">              playing, pause, paused; paused, play, playing;</span>
-<span class="cl">              playing, dock, docked; paused, dock, docked;</span>
-<span class="cl">              ready, dock, docked</span>
-<span class="cl">input:        play lift play pause pause play dock lift</span></code></pre><p>A museum audio guide's handset. By hand, trace the input from the start state and give the final state and the events ignored; then count the branches one conditional needs and the classes State needs. Then enter the machine into the lab to check.</p><p>State varies what an object does with its state. The next lesson, Strategy, varies how an object does one thing, by handing it an algorithm.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A state machine</h2></div><p>a trace over events, and one conditional against the classes of State</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The sketch is the lesson's own: a library copy whose states are Java enums, so each is a single shared instance, as the book's sample makes its states Singletons. The interface's default methods return the state unchanged, which is how an ignored event looks here, and each state returns its successor, so the states choose the transitions and the copy only rebinds. The method is <code>giveBack</code> because <code>return</code> is a Java keyword.</p><p>The Implementation asks first who defines the transitions. Fixed rules can live in the context; letting the states name their successors is usually more flexible and easier to extend, at the price that each state class knows at least one other. Second, a table-driven alternative from Cargill's C++ Programming Style maps each state and input to the next state: regular, and changed by editing data, but slower than a call, less explicit, and awkward when a transition must do something. State models what each state does; a table models the transitions. Third, create state objects when entered and discard them, or create them all once; fourth, languages such as Self can change an object's delegation at run time and so support the pattern directly.</p><p>The Sample Code is a simplified C++ connection whose states, holding no fields, are Singletons. Known Uses names Johnson and Zweig's account of the pattern, and the tools of interactive drawing programs, HotDraw and Unidraw among them, where the current tool decides what a click does. Coplien's Envelope-Letter idiom, for swapping an object's class while the program runs, is related. Related Patterns: Flyweight, on sharing states, and Singleton.</p><p>Now the lab, on a library copy of the lesson's own: five states, shelf, on loan, held, overdue and lost, seven events and nine transitions. On the preset <code>library-copy</code> the copy starts on the shelf and the lab traces ten events to a final state of lost. Two are ignored, a return while on the shelf and a renewal while overdue; no state is never entered; and the largest state class is on loan, with three transitions. One conditional over the state and event needs 14 branches, a branch for each of the 9 transitions and a default for each of the 5 states; State needs 7 classes, the 5 states, the context and the abstract state.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A state machine</h2></div><p>a trace over events, and one conditional against the classes of State</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A state machine</strong><span>a trace over events, and one conditional against the classes of State</span></div>
       </div>
@@ -1482,10 +1519,10 @@
       <div class="table-wrap" id="gsmTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gsmTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> The machine starts in the first state. An event with a transition from the current state moves it to the next state; an event with none is ignored and the state stays. A state and an event have at most one transition. One conditional on the state and the event needs one branch per transition plus one default (ignore) branch per state: transitions + states, all in one method. With State it is one class per state, the context and the abstract state: states + 2, each state class handling only its own transitions (the abstract state ignores every event by default); the largest is the state with the most transitions, a tie going to the first given.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A trace, and two ways to write it</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A trace, and two ways to write it</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gsmPreset">Worked example</label>
           <select id="gsmPreset"><option value="library-copy" selected>A library copy over ten events</option><option value="library-repair">The same copy with a repair state</option></select>
@@ -1516,12 +1553,21 @@
           <div class="kpi"><span>States never entered</span><strong id="gsmNever">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>library-repair</code> adds a repair state and two events: a copy on the shelf or on loan can be damaged, and a fix returns it to the shelf. The conditional grows to 18 branches, three new transitions and a default for the new state, each a case added to code that already worked. State grows to 8 classes, one of them new; the shelf and on-loan classes each gain a transition, and the interface two default methods. On this short input two states, overdue and lost, are never entered, and the largest class is now on loan, with four. The figures compare sizes; whether 8 small classes are clearer than one 18-branch method is the book's judgement about many states, not something the count settles.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, states, docked ready playing paused of docked is the start. line 2, events, lift play pause dock. line 3, transitions, docked, lift, ready, ready, play, playing. line 4, playing, pause, paused, paused, play, playing. line 5, playing, dock, docked, paused, dock, docked. line 6, ready, dock, docked. line 7, input, play lift play pause pause play dock lift" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">states:       docked ready playing paused   (docked is the start)</span>
+<span class="cl">events:       lift play pause dock</span>
+<span class="cl">transitions:  docked, lift, ready; ready, play, playing;</span>
+<span class="cl">              playing, pause, paused; paused, play, playing;</span>
+<span class="cl">              playing, dock, docked; paused, dock, docked;</span>
+<span class="cl">              ready, dock, docked</span>
+<span class="cl">input:        play lift play pause pause play dock lift</span></code></pre><p>A museum audio guide's handset. By hand, trace the input from the start state and give the final state and the events ignored; then count the branches one conditional needs and the classes State needs. Then enter the machine into the lab to check.</p><p>State varies what an object does with its state. The next lesson, Strategy, varies how an object does one thing, by handing it an algorithm.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Tracing a state machine and sizing it</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the states and transitions</h3><p>List the states, starting state first, the events, and for each state the events it responds to and the state each leads to.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Trace an input</h3><p>From the start state, take each event in turn: follow its transition if the current state has one, and otherwise note the event as ignored and stay put.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count both designs</h3><p>One conditional: one branch per transition plus one default per state. State: one class per state, plus the context and the abstract state.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on code of your own</h3><p>Find a class in code you know that tests a status field in more than one method. Write its states and transitions, count both figures, and say who decides each transition now.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Tracing a state machine and sizing it</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>Write the states and transitions.</strong> List the states, starting state first, the events, and for each state the events it responds to and the state each leads to.</li><li><strong>Trace an input.</strong> From the start state, take each event in turn: follow its transition if the current state has one, and otherwise note the event as ignored and stay put.</li><li><strong>Count both designs.</strong> One conditional: one branch per transition plus one default per state. State: one class per state, plus the context and the abstract state.</li><li><strong>Do it on code of your own.</strong> Find a class in code you know that tests a status field in more than one method. Write its states and transitions, count both figures, and say who decides each transition now.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1541,17 +1587,16 @@
 branches: 9 + 5 = 14; classes: 5 + 2 = 7</div><p>A renewal is a transition from on loan to itself: it counts as a branch and as part of the on-loan class, though the state does not change.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting State to make the code smaller</strong><span>The book says the opposite: the pattern spreads behaviour over more classes and is less compact than one class, and is worth it when there are many states. On the lesson's illustration one conditional needs 14 branches and State 7 classes; the gain the book claims is where a new state's code goes, which the repair preset shows.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Keeping state as flags and assignments</strong><span>Then a transition is only some variables changing, possibly several, with moments in between where the object is half in one state and half in another. A state object makes the transition one rebinding, and gives it a place in the code.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the context must decide every transition</strong><span>The pattern leaves it open. Fixed rules can live in the context; more often the states name their successors, which is easier to extend and couples the state classes to each other.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace a state machine and size both ways of writing it.</strong><p>Given states, events, transitions and an input, give the final state and the ignored events, and count the branches and the classes each design needs.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts transitions and classes, not what a state does on each event; the book's main claim for the pattern, that each state's behaviour is in one place, is about the code's shape, which a count of branches only hints at.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting State to make the code smaller</strong><span>The book says the opposite: the pattern spreads behaviour over more classes and is less compact than one class, and is worth it when there are many states. On the lesson's illustration one conditional needs 14 branches and State 7 classes; the gain the book claims is where a new state's code goes, which the repair preset shows.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Keeping state as flags and assignments</strong><span>Then a transition is only some variables changing, possibly several, with moments in between where the object is half in one state and half in another. A state object makes the transition one rebinding, and gives it a place in the code.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the context must decide every transition</strong><span>The pattern leaves it open. Fixed rules can live in the context; more often the states name their successors, which is easier to extend and couples the state classes to each other.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace a state machine and size both ways of writing it.</strong><p>Given states, events, transitions and an input, give the final state and the ignored events, and count the branches and the classes each design needs.</p></div></div><div class="note"><strong>Note:</strong> The lab counts transitions and classes, not what a state does on each event; the book's main claim for the pattern, that each state's behaviour is in one place, is about the code's shape, which a count of branches only hints at.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Context and state object</summary><p>The context is the object clients use; it holds a reference to one state object and passes each state-dependent request to it. Changing state is replacing that reference with another state object.</p></details><details class="recall"><summary>Transition</summary><p>A move from one state to the next on some event. Under State it is written in a state class, or in the context when the rules are fixed; as flags and assignments it has no place of its own in the code.</p></details><details class="recall"><summary>Branches against classes</summary><p>With one conditional the code needs a branch for each transition and a default for each state that ignores the rest; with State it needs a class per state, plus the context and the abstract state. The lab counts both.</p></details></div>
+      <h3>Summary</h3>
       <p>State gives each state of an object a class of its own, and lets the object delegate to whichever is current. Read the pattern, then trace a library copy through ten events, and count the branches one conditional needs against the classes State needs, before and after a repair state is added.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Context and state object.</strong> The context is the object clients use; it holds a reference to one state object and passes each state-dependent request to it. Changing state is replacing that reference with another state object.</li><li><strong>Transition.</strong> A move from one state to the next on some event. Under State it is written in a state class, or in the context when the rules are fixed; as flags and assignments it has no place of its own in the code.</li><li><strong>Branches against classes.</strong> With one conditional the code needs a branch for each transition and a default for each state that ignores the rest; with State it needs a class per state, plus the context and the abstract state. The lab counts both.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="one class for every state. the context delegates to its state. a transition rebinds one variable. stateless states can be shared. say who chooses the next state. tables define transitions, state, behaviour" tabindex="0" role="region" aria-label="Mathematical notation">one class for every state
 the context delegates to its state
 a transition rebinds one variable
@@ -2325,11 +2370,42 @@ tables define transitions; State, behaviour</div><figcaption>State in six lines<
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2397,7 +2473,7 @@ tables define transitions; State, behaviour</div><figcaption>State in six lines<
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

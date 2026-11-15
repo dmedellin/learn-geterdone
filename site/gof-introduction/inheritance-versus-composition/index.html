@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">What Design Patterns Are</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 1 · Introduction</p>
       <h1>Inheritance Versus Composition</h1>
       <p class="lesson-lede">Reuse by subclassing is fixed when the code is compiled and exposes the parent; reuse by composing objects can change while it runs, at the cost of more objects.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>White-box and black-box reuse</li><li>Delegation</li><li>Aggregation and acquaintance</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The section&#x27;s argument first, then the principle, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Favor object composition over class inheritance.&rdquo; That is the second principle of Section 1.6, and the authors give their reason plainly: in their experience &ldquo;designers overuse inheritance as a reuse technique, and designs are often made more reusable (and simpler) by depending more on object composition.&rdquo; This lesson reads Putting Reuse Mechanisms to Work, with its parts on delegation and parameterized types, and Relating Run-Time and Compile-Time Structures. Read them in your own copy first.</p><p>There are two common ways to reuse what a class does. You can inherit from it, so the new class is defined in terms of the old one's implementation, which the authors call white-box reuse because the parent's insides are often visible to the child. Or you can hold an object of it and send it requests, building larger behaviour out of objects with well-defined interfaces, which is black-box reuse.</p><p>Inheritance has real advantages, the section says: the language supports it directly, it is easy to use, and overriding some operations can change what the inherited ones do. Its disadvantages are two. What a class inherits cannot be swapped while the program runs. And, the worse of the two, a parent often fixes part of its children's representation, so a subclass is bound to its parent's implementation and must change when that changes, the sense of the saying that inheritance breaks encapsulation. One remedy is to inherit only from abstract classes, which carry little or no implementation.</p><p>Composition is set up while the program runs, by objects getting references to other objects. It asks for interfaces designed with care, but in return no encapsulation is broken, any object can be replaced by another of the same type, and there are far fewer implementation dependencies. It also keeps classes small and each on one task. Its cost, which the authors state in the same paragraph, is more objects, if fewer classes, and behaviour that lives in how those objects are connected rather than in one place you can read. They do not set the two against each other in the end: the components on hand are never quite enough, inheritance makes new ones easy to write, and the two work together.</p><p>Delegation is the strong form of composition. The receiving object forwards a request to a delegate and passes itself along, so the delegate can refer back to it, the way an inherited operation refers to <code>this</code> in C++ or <code>self</code> in Smalltalk. The book's example is a window that, instead of being a subclass of rectangle, holds a rectangle and forwards its area to it, so it can become a circle while the program runs by swapping that object. The price, the authors say, is that software so dynamic and so parameterized is harder to understand, and some run time; delegation is a good choice only when it removes more complexity than it adds, and works best in the stylized forms that patterns give it, as State, Strategy and Visitor do.</p><p>Parameterized types, C++ templates or Ada and Eiffel generics, are a third way. The section's example is a sort that compares elements: the comparison could be an operation a subclass supplies, which is Template Method; an object passed to the sort, which is Strategy; or a template parameter. Composition can change at run time but costs indirection; inheritance gives defaults that subclasses override; parameterized types change the types a class uses, and neither of the last two changes at run time. Java gained generics in 2004, nine years after the book, and its <code>Comparator</code> is the Strategy form of the example.</p><p>The last part contrasts a program's two structures. The code is frozen when compiled, classes in fixed inheritance relationships; the running program is a changing network of objects. Aggregation, one object owning another with the same lifetime, and acquaintance, one object merely knowing another, are usually written the same way, as a reference, and differ in intent; acquaintances are made and unmade more often and are harder to see in the source. So, the authors conclude, the code will not show everything about how a system runs, and patterns with object scope, Composite, Decorator, Observer, Chain of Responsibility, are often what make the run-time structure readable.</p><pre class="codeblock" data-say="line 1, comment, A player is composed of a source and an order, each behind an interface.. line 2, final class player. line 3, private final track source source. line 4, private play order order. line 6, player of track source source, play order order. line 7, this dot source is set to source. line 8, this dot order is set to order. line 11, void set order of play order order, comment, changed while the player runs. line 12, this dot order is set to order. line 15, track next. line 16, return order dot next of source dot tracks, comment, delegated, not inherited" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A player is composed of a source and an order, each behind an interface.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The section&#x27;s argument first, then the principle, then the count</h2><div class="prose reading"><p>&ldquo;Favor object composition over class inheritance.&rdquo; That is the second principle of Section 1.6, and the authors give their reason plainly: in their experience &ldquo;designers overuse inheritance as a reuse technique, and designs are often made more reusable (and simpler) by depending more on object composition.&rdquo; This lesson reads Putting Reuse Mechanisms to Work, with its parts on delegation and parameterized types, and Relating Run-Time and Compile-Time Structures. Read them in your own copy first.</p><p>There are two common ways to reuse what a class does. You can inherit from it, so the new class is defined in terms of the old one's implementation, which the authors call white-box reuse because the parent's insides are often visible to the child. Or you can hold an object of it and send it requests, building larger behaviour out of objects with well-defined interfaces, which is black-box reuse.</p><p>Inheritance has real advantages, the section says: the language supports it directly, it is easy to use, and overriding some operations can change what the inherited ones do. Its disadvantages are two. What a class inherits cannot be swapped while the program runs. And, the worse of the two, a parent often fixes part of its children's representation, so a subclass is bound to its parent's implementation and must change when that changes, the sense of the saying that inheritance breaks encapsulation. One remedy is to inherit only from abstract classes, which carry little or no implementation.</p><p>Composition is set up while the program runs, by objects getting references to other objects. It asks for interfaces designed with care, but in return no encapsulation is broken, any object can be replaced by another of the same type, and there are far fewer implementation dependencies. It also keeps classes small and each on one task. Its cost, which the authors state in the same paragraph, is more objects, if fewer classes, and behaviour that lives in how those objects are connected rather than in one place you can read. They do not set the two against each other in the end: the components on hand are never quite enough, inheritance makes new ones easy to write, and the two work together.</p><p>Delegation is the strong form of composition. The receiving object forwards a request to a delegate and passes itself along, so the delegate can refer back to it, the way an inherited operation refers to <code>this</code> in C++ or <code>self</code> in Smalltalk. The book's example is a window that, instead of being a subclass of rectangle, holds a rectangle and forwards its area to it, so it can become a circle while the program runs by swapping that object. The price, the authors say, is that software so dynamic and so parameterized is harder to understand, and some run time; delegation is a good choice only when it removes more complexity than it adds, and works best in the stylized forms that patterns give it, as State, Strategy and Visitor do.</p><p>Parameterized types, C++ templates or Ada and Eiffel generics, are a third way. The section's example is a sort that compares elements: the comparison could be an operation a subclass supplies, which is Template Method; an object passed to the sort, which is Strategy; or a template parameter. Composition can change at run time but costs indirection; inheritance gives defaults that subclasses override; parameterized types change the types a class uses, and neither of the last two changes at run time. Java gained generics in 2004, nine years after the book, and its <code>Comparator</code> is the Strategy form of the example.</p><p>The last part contrasts a program's two structures. The code is frozen when compiled, classes in fixed inheritance relationships; the running program is a changing network of objects. Aggregation, one object owning another with the same lifetime, and acquaintance, one object merely knowing another, are usually written the same way, as a reference, and differ in intent; acquaintances are made and unmade more often and are harder to see in the source. So, the authors conclude, the code will not show everything about how a system runs, and patterns with object scope, Composite, Decorator, Observer, Chain of Responsibility, are often what make the run-time structure readable.</p><pre class="codeblock" data-say="line 1, comment, A player is composed of a source and an order, each behind an interface.. line 2, final class player. line 3, private final track source source. line 4, private play order order. line 6, player of track source source, play order order. line 7, this dot source is set to source. line 8, this dot order is set to order. line 11, void set order of play order order, comment, changed while the player runs. line 12, this dot order is set to order. line 15, track next. line 16, return order dot next of source dot tracks, comment, delegated, not inherited" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A player is composed of a source and an order, each behind an interface.</span>
 <span class="cl">final class Player {</span>
 <span class="cl">    private final TrackSource source;</span>
 <span class="cl">    private PlayOrder order;</span>
@@ -1462,14 +1506,11 @@
 <span class="cl">    Track next() {</span>
 <span class="cl">        return order.next(source.tracks());   // delegated, not inherited</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Now the count, on a music player of the lesson's own. It varies in two ways: where tracks come from (a local library, a stream, a radio station, a podcast feed) and the order they play in (in order, shuffled, repeated). The preset <code>two-aspects</code> makes every combination a subclass of one abstract player: <span data-say="4 times 3 equals 12">4 × 3 = 12</span> combinations and 13 classes. With one hierarchy per aspect, an abstract class and a concrete class per variant joined by composition as in the sketch, it needs (4 + 1) + (3 + 1) = 9, a ratio of <span data-say="13 over 9 is approximately 1.4 times">13/9 ≈ 1.4×</span>. The lab treats the first aspect as the one a client holds, so each source object holds 1 reference, to an order; the sketch keeps both references in a small <code>Player</code>, one class the count leaves out. A new order, say one that plays by mood, adds 4 classes as subclasses, one per source, against 1 class with composition.</p><p>The preset <code>three-aspects</code> adds the output, a speaker or headphones. Combinations double to 24 and subclassing needs 25 classes, while composition needs 12; the ratio grows to <span data-say="25 over 12 is approximately 2.1 times">25/12 ≈ 2.1×</span>, each source holds 2 references, and a new order now adds 8 subclasses against 1. That growth by multiplication is what the section's list of causes of redesign, in the next lesson, calls an explosion of classes. It is one consequence. The count does not show the cost the authors put beside it, that the composed player's behaviour is spread over three objects; <em>Code Complete, Read Along</em> weighs the same choice from the other side in Inheritance, Containment and Members.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, trigger, timer, moisture, weather. line 2, zone, lawn, beds, pots. line 3, valve, solenoid, drip" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">trigger, timer, moisture, weather;</span>
-<span class="cl">zone, lawn, beds, pots;</span>
-<span class="cl">valve, solenoid, drip</span></code></pre><p>A garden irrigation controller varies in what triggers watering, which zone it waters and which kind of valve it drives. By hand, count the combinations, the classes as one subclass per combination, and the classes as one hierarchy per aspect, and the classes a new trigger adds under each. Then type the aspects into the lab to check.</p><p>Inheritance and composition are mechanisms. Section 1.6 ends on what they are for: building a system that can take the changes it will meet. The next lesson is Designing for Change.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Classes</h2></div><p>every combination a subclass, or one hierarchy per aspect</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Now the count, on a music player of the lesson's own. It varies in two ways: where tracks come from (a local library, a stream, a radio station, a podcast feed) and the order they play in (in order, shuffled, repeated). The preset <code>two-aspects</code> makes every combination a subclass of one abstract player: <span data-say="4 times 3 equals 12">4 × 3 = 12</span> combinations and 13 classes. With one hierarchy per aspect, an abstract class and a concrete class per variant joined by composition as in the sketch, it needs (4 + 1) + (3 + 1) = 9, a ratio of <span data-say="13 over 9 is approximately 1.4 times">13/9 ≈ 1.4×</span>. The lab treats the first aspect as the one a client holds, so each source object holds 1 reference, to an order; the sketch keeps both references in a small <code>Player</code>, one class the count leaves out. A new order, say one that plays by mood, adds 4 classes as subclasses, one per source, against 1 class with composition.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Classes</h2></div><p>every combination a subclass, or one hierarchy per aspect</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Classes</strong><span>every combination a subclass, or one hierarchy per aspect</span></div>
       </div>
@@ -1477,10 +1518,10 @@
       <div class="table-wrap" id="gclTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gclTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is one aspect that varies, then its variants (2 to 4 aspects, 1 to 8 variants each); every name is a class and is used once. Combinations = the product of the variant counts. With one subclass per combination the design has that product + 1 classes (one abstract base). With one hierarchy per aspect, joined by composition, each aspect has 1 abstract class + 1 concrete class per variant, so the design has the sum of the variant counts + the number of aspects; the client holds the first aspect's abstract class, and each of its objects holds one reference per other aspect. The ratio is the first count over the second. One new variant of the added aspect adds the product of the other aspects' counts under subclassing and 1 class under composition; neither design edits an existing class for it.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Classes as one subclass per combination and as one hierarchy per aspect</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Classes as one subclass per combination and as one hierarchy per aspect</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gclPreset">Worked example</label>
           <select id="gclPreset"><option value="two-aspects" selected>A music player: four sources and three orders</option><option value="three-aspects">The same player, with two outputs as well</option></select>
@@ -1503,12 +1544,17 @@
           <div class="kpi"><span>A new variant: classes added by composition</span><strong id="gclAddCompose">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>three-aspects</code> adds the output, a speaker or headphones. Combinations double to 24 and subclassing needs 25 classes, while composition needs 12; the ratio grows to <span data-say="25 over 12 is approximately 2.1 times">25/12 ≈ 2.1×</span>, each source holds 2 references, and a new order now adds 8 subclasses against 1. That growth by multiplication is what the section's list of causes of redesign, in the next lesson, calls an explosion of classes. It is one consequence. The count does not show the cost the authors put beside it, that the composed player's behaviour is spread over three objects; <em>Code Complete, Read Along</em> weighs the same choice from the other side in Inheritance, Containment and Members.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, trigger, timer, moisture, weather. line 2, zone, lawn, beds, pots. line 3, valve, solenoid, drip" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">trigger, timer, moisture, weather;</span>
+<span class="cl">zone, lawn, beds, pots;</span>
+<span class="cl">valve, solenoid, drip</span></code></pre><p>A garden irrigation controller varies in what triggers watering, which zone it waters and which kind of valve it drives. By hand, count the combinations, the classes as one subclass per combination, and the classes as one hierarchy per aspect, and the classes a new trigger adds under each. Then type the aspects into the lab to check.</p><p>Inheritance and composition are mechanisms. Section 1.6 ends on what they are for: building a system that can take the changes it will meet. The next lesson is Designing for Change.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting the classes a design&#x27;s variations need</h2></div><p>Four steps, the last of them on a design of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the aspects that vary</h3><p>Write each independent way the design varies, with its variants. Two aspects are independent when any variant of one can go with any variant of the other.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count both designs</h3><p>Multiply the variant counts and add 1 for one subclass per combination; add the variant counts and one abstract class per aspect for composition.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add a variant</h3><p>Add one variant to one aspect. Under subclassing it adds the product of the other aspects' counts; under composition it adds one class.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a design of your own</h3><p>Find a class hierarchy in your own code whose subclass names join two words, such as a format and a destination. Count its aspects and variants, count both designs, and say what the composed version would make harder to read.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting the classes a design&#x27;s variations need</h2>
+      <p class="lead-in">Four steps, the last of them on a design of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the aspects that vary.</strong> Write each independent way the design varies, with its variants. Two aspects are independent when any variant of one can go with any variant of the other.</li><li><strong>Count both designs.</strong> Multiply the variant counts and add 1 for one subclass per combination; add the variant counts and one abstract class per aspect for composition.</li><li><strong>Add a variant.</strong> Add one variant to one aspect. Under subclassing it adds the product of the other aspects' counts; under composition it adds one class.</li><li><strong>Do it on a design of your own.</strong> Find a class hierarchy in your own code whose subclass names join two words, such as a format and a destination. Count its aspects and variants, count both designs, and say what the composed version would make harder to read.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1527,17 +1573,16 @@ a mood order as subclasses: 4 × 2 gives 8 more
 a mood order by composition: 1 more</div><p>Subclassing grows with the product of the counts and composition with their sum. Neither design edits an existing class to add the mood order; the difference is how many new ones it takes.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the principle as never inherit</strong><span>The authors say favor, not replace. They point out that the set of components on hand is never rich enough, that inheritance makes new components easy to write, and that inheritance and composition work together; and they state composition's own costs, more objects and behaviour spread across their connections.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking the case against inheritance is the class count</strong><span>The count is the lesson's illustration. The section's reasons are that an inherited implementation cannot change at run time and that a subclass is bound to its parent's representation, so a change in the parent forces changes in the child. A design with few subclasses can still suffer both.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the code to show owning and knowing</strong><span>Aggregation and acquaintance are usually written the same way, as a reference, and the authors say the distinction is one of intent that the compile-time structure may hide. The run-time structure has to be designed and documented; patterns help make it visible.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count classes both ways and state the trade-offs in the book&#x27;s terms.</strong><p>Given the aspects a design varies in, state the classes under each design and what a new variant adds, give inheritance's two disadvantages and composition's cost, and say what delegation adds to composition.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts classes, and only classes. It cannot weigh the cost the authors set beside composition, behaviour spread over several objects and harder to follow, nor say whether the aspects really vary independently; both decide whether the smaller count is worth having.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the principle as never inherit</strong><span>The authors say favor, not replace. They point out that the set of components on hand is never rich enough, that inheritance makes new components easy to write, and that inheritance and composition work together; and they state composition's own costs, more objects and behaviour spread across their connections.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking the case against inheritance is the class count</strong><span>The count is the lesson's illustration. The section's reasons are that an inherited implementation cannot change at run time and that a subclass is bound to its parent's representation, so a change in the parent forces changes in the child. A design with few subclasses can still suffer both.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the code to show owning and knowing</strong><span>Aggregation and acquaintance are usually written the same way, as a reference, and the authors say the distinction is one of intent that the compile-time structure may hide. The run-time structure has to be designed and documented; patterns help make it visible.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count classes both ways and state the trade-offs in the book&#x27;s terms.</strong><p>Given the aspects a design varies in, state the classes under each design and what a new variant adds, give inheritance's two disadvantages and composition's cost, and say what delegation adds to composition.</p></div></div><div class="note"><strong>Note:</strong> The lab counts classes, and only classes. It cannot weigh the cost the authors set beside composition, behaviour spread over several objects and harder to follow, nor say whether the aspects really vary independently; both decide whether the smaller count is worth having.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>White-box and black-box reuse</summary><p>Reuse by subclassing is white-box: the parent's internals are often visible to the subclass. Reuse by composing objects is black-box: each object is used only through its interface, and its insides stay hidden.</p></details><details class="recall"><summary>Delegation</summary><p>Composition made as strong as inheritance: an object handles a request by passing it to another object, its delegate, and passes itself along so the delegate can refer back to it, as an inherited operation can refer to <code>this</code>.</p></details><details class="recall"><summary>Aggregation and acquaintance</summary><p>Aggregation means one object owns another and they share a lifetime. Acquaintance means one object merely knows another and may send it requests. Both are usually written as a reference, so the difference lies in intent and shows at run time more than in the code.</p></details></div>
+      <h3>Summary</h3>
       <p>The second part of Section 1.6 weighs the two ways to reuse what a class does, inheriting from it or holding an instance of it, and states the book's second principle: favor object composition over class inheritance. Read the argument, then count the classes a design needs when every combination of its variations is a subclass and when each variation is its own hierarchy.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>White-box and black-box reuse.</strong> Reuse by subclassing is white-box: the parent's internals are often visible to the subclass. Reuse by composing objects is black-box: each object is used only through its interface, and its insides stay hidden.</li><li><strong>Delegation.</strong> Composition made as strong as inheritance: an object handles a request by passing it to another object, its delegate, and passes itself along so the delegate can refer back to it, as an inherited operation can refer to <code>this</code>.</li><li><strong>Aggregation and acquaintance.</strong> Aggregation means one object owns another and they share a lifetime. Acquaintance means one object merely knows another and may send it requests. Both are usually written as a reference, so the difference lies in intent and shows at run time more than in the code.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="inheritance, white box, fixed at compile time. composition, black box, set at run time. favor composition over inheritance. delegation, forward and pass yourself. subclass per combination, a product. hierarchy per aspect, a sum" tabindex="0" role="region" aria-label="Mathematical notation">inheritance: white box, fixed at compile time
 composition: black box, set at run time
 favor composition over inheritance
@@ -2313,11 +2358,42 @@ hierarchy per aspect: a sum</div><figcaption>Reuse in six lines</figcaption></fi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2385,7 +2461,7 @@ hierarchy per aspect: a sum</div><figcaption>Reuse in six lines</figcaption></fi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

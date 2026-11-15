@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Science Behind the Book</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 13 · Introduction to Psychometrics</p>
       <h1>Several Views, and a Safeguard Against Rogue Data</h1>
       <p class="lesson-lede">Items that belong to one construct should go together and stay apart from the others, and a test that says so is also an alarm.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Convergent and discriminant validity</li><li>Reliability (internal consistency)</li><li>A stray item</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Several views of one idea, and what happens when one of them goes wrong</h2>
-      <article class="prose reading"><p>&ldquo;Taken together, validity and reliability statistical tests confirm our measures. They come before any analysis.&rdquo; Forsgren, Humble and Kim write that in Chapter 13, in the section on how latent constructs give several views into the data. The last lesson scored a construct from its items. This one asks how you would know the items belong together, and what the authors do when they find that some do not.</p><p>Once the data is in, the authors say, they run statistical tests that check the items all measure the same underlying idea. Discriminant validity tests make sure that items that should not be related are unrelated; their example is items thought not to capture culture that turn out to relate to it. Convergent validity tests make sure that items that should be related are, so that items meant to measure culture do measure it. Reliability tests, also called internal consistency, give assurance that the people taking the survey read and interpret the items alike. The tests are an order of work, as the opening sentence says: constructs are confirmed first, and only constructs that pass go forward to the analyses of the rungs above.</p><p>Their model case is the culture construct. Seven items, rated on the seven-point agreement scale, passed the tests and are, the authors say, statistically valid and reliable. They also note a decision made when the items were written, a departure from Westrum's original frame: the items ask about a team and not an organisation, because an organisation can hold pockets of different cultures and a person's answer about their own team is likelier to be accurate.</p><p>The third section adds a second use of the same tests. A construct that passes today may not pass tomorrow, so the authors recommend retesting those that have good psychometric properties periodically, particularly if you suspect the system or its environment has changed. A construct that fails after passing is a rogue-data alarm: something about the data has changed.</p><p>Their example is a construct that was not so well behaved. They wanted to measure how teams learn of failures, with five items: two about being told by people outside the automated process (customers and a network operations centre), and three about alerts and monitoring from systems. In a pilot with about 20 technical professionals the items loaded together, which means they measured one underlying idea. In the final, larger data collection the tests did not confirm one construct but revealed two: notification from outside the automated processes, and notification from systems, which the authors call proactive failure notification. They found the second predictive of software delivery performance. Had they asked a single question about failure monitoring, they say, they would not have known that where the notice comes from matters.</p><p>Now read a matrix the way the first of those tests does, in outline. The lab's sample is six invented items in two constructs: <code>A1</code>, <code>A2</code> and <code>A3</code> measure confidence in releasing, and <code>B1</code>, <code>B2</code> and <code>B3</code> measure the burden of being on call. Each cell is the correlation of two items across the people who answered, and the matrix is shown with only its lower triangle.</p><div class="mathblock" data-say="a 1 a 2 a 3 b 1 b 2. a 2 0.72. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">      A1    A2    A3    B1    B2
-A2    0.72
-A3    0.68  0.64
-B1    0.18  0.15  0.21
-B2    0.22  0.20  0.17  0.70
-B3    0.55  0.50  0.52  0.20  0.24</div><p>On the preset <code>one-stray-item</code>, the lab reports the average correlation among each construct's own items: 0.68 for the first construct, 0.38 for the second. The average across the two constructs, over the nine cross pairs, is 0.3. The first construct's items agree strongly; the second does not, and the item-by-item table shows why. For every item the table gives its average correlation with its own construct's other items and with the other construct's items. For <code>A1</code> that is 0.7 against 19/60, about 0.317, and the other four ordinary items show the same wide gap. <code>B3</code> shows 0.22 with its own and 157/300, about 0.523, with the first construct, so the lab lists it as the one item that goes with the wrong construct.</p><p>Move it where it belongs. On the preset <code>reassigned</code> the same correlations are used, with <code>B3</code> written as part of the first construct. That construct now averages about 0.602 over its six pairs, the second has one pair at 0.7, and the average across the two falls to 0.19625 over eight pairs. No item is listed any longer. The cross-construct average being lower after the move is the sign that the items were mislabelled and not that the data improved: nothing in the numbers was changed.</p><p>The lab is a picture of the test, not the test. Appendix C runs principal components with varimax rotation and asks for loadings above 0.60 without cross-loading, average variance extracted above 0.50, the square root of that above each correlation with another construct, and correlations below 0.85, which Surveys, Data and Statistical Methods reads and computes. The averages here show the pattern those tests look for, with six items and no people, and a stray item can hide in an average that looks acceptable.</p><h3>Exercise</h3><ul><li>Items: <span class="math" data-say="p 1, p, p 2, p, p 3, p, q 1, q, q 2, q">P1, p; P2, p; P3, p; Q1, q; Q2, q</span>.</li><li>Correlations: <span class="math" data-say="p 1, p 2, 0.65, p 1, p 3, 0.60, p 2, p 3, 0.55, q 1, q 2, 0.60, p 1, q 1, 0.15, p 1, q 2, 0.10, p 2, q 1, 0.20, p 2, q 2, 0.15, p 3, q 1, 0.60, p 3, q 2, 0.65">P1, P2, 0.65; P1, P3, 0.60; P2, P3, 0.55; Q1, Q2, 0.60; P1, Q1, 0.15; P1, Q2, 0.10; P2, Q1, 0.20; P2, Q2, 0.15; P3, Q1, 0.60; P3, Q2, 0.65</span>.</li></ul><p>For each item, average its correlations with its own construct's other items and with the other construct's items. Say which item the lab will list and by how much, then check your table in the lab.</p><p>A construct that holds together can be scored and relied on, and the same idea reaches beyond surveys. The next lesson, Latent Constructs and System Data, reads how.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Validity of constructs</h2></div><p>do items correlate more with their own construct than with others?</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Several views of one idea, and what happens when one of them goes wrong</h2><div class="prose reading"><p>&ldquo;Taken together, validity and reliability statistical tests confirm our measures. They come before any analysis.&rdquo; Forsgren, Humble and Kim write that in Chapter 13, in the section on how latent constructs give several views into the data. The last lesson scored a construct from its items. This one asks how you would know the items belong together, and what the authors do when they find that some do not.</p><p>Once the data is in, the authors say, they run statistical tests that check the items all measure the same underlying idea. Discriminant validity tests make sure that items that should not be related are unrelated; their example is items thought not to capture culture that turn out to relate to it. Convergent validity tests make sure that items that should be related are, so that items meant to measure culture do measure it. Reliability tests, also called internal consistency, give assurance that the people taking the survey read and interpret the items alike. The tests are an order of work, as the opening sentence says: constructs are confirmed first, and only constructs that pass go forward to the analyses of the rungs above.</p><p>Their model case is the culture construct. Seven items, rated on the seven-point agreement scale, passed the tests and are, the authors say, statistically valid and reliable. They also note a decision made when the items were written, a departure from Westrum's original frame: the items ask about a team and not an organisation, because an organisation can hold pockets of different cultures and a person's answer about their own team is likelier to be accurate.</p><p>The third section adds a second use of the same tests. A construct that passes today may not pass tomorrow, so the authors recommend retesting those that have good psychometric properties periodically, particularly if you suspect the system or its environment has changed. A construct that fails after passing is a rogue-data alarm: something about the data has changed.</p><p>Their example is a construct that was not so well behaved. They wanted to measure how teams learn of failures, with five items: two about being told by people outside the automated process (customers and a network operations centre), and three about alerts and monitoring from systems. In a pilot with about 20 technical professionals the items loaded together, which means they measured one underlying idea. In the final, larger data collection the tests did not confirm one construct but revealed two: notification from outside the automated processes, and notification from systems, which the authors call proactive failure notification. They found the second predictive of software delivery performance. Had they asked a single question about failure monitoring, they say, they would not have known that where the notice comes from matters.</p><p>Now read a matrix the way the first of those tests does, in outline. The lab's sample is six invented items in two constructs: <code>A1</code>, <code>A2</code> and <code>A3</code> measure confidence in releasing, and <code>B1</code>, <code>B2</code> and <code>B3</code> measure the burden of being on call. Each cell is the correlation of two items across the people who answered, and the matrix is shown with only its lower triangle.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Validity of constructs</h2></div><p>do items correlate more with their own construct than with others?</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Validity of constructs</strong><span>do items correlate more with their own construct than with others?</span></div>
       </div>
@@ -1409,10 +1447,10 @@ B3    0.55  0.50  0.52  0.20  0.24</div><p>On the preset <code>one-stray-item</c
       <div class="table-wrap" id="avdTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="avdTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Every pair of different items is given once, in either order. A construct's within mean is the mean r over pairs of its own items; the across mean is over every pair from different constructs. For each item, its own mean is its mean r with the other items of its construct, and for each other construct its mean r with that construct's items; an item is listed when one of those is greater than its own (signed r, compared exactly). An item alone in its construct has no own mean and is not tested. Items and constructs go in the order given.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Which items go with which construct</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Which items go with which construct</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="avdPreset">Worked example</label>
           <select id="avdPreset"><option value="one-stray-item" selected>Six invented items in two constructs, one of them out of place</option><option value="reassigned">The same correlations with the stray item written for the first construct</option></select>
@@ -1432,12 +1470,20 @@ B3    0.55  0.50  0.52  0.20  0.24</div><p>On the preset <code>one-stray-item</c
           <div class="kpi"><span>Items closer to another construct than to their own</span><strong id="avdFlagged">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="a 1 a 2 a 3 b 1 b 2. a 2 0.72. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">      A1    A2    A3    B1    B2
+A2    0.72
+A3    0.68  0.64
+B1    0.18  0.15  0.21
+B2    0.22  0.20  0.17  0.70
+B3    0.55  0.50  0.52  0.20  0.24</div><p>On the preset <code>one-stray-item</code>, the lab reports the average correlation among each construct's own items: 0.68 for the first construct, 0.38 for the second. The average across the two constructs, over the nine cross pairs, is 0.3. The first construct's items agree strongly; the second does not, and the item-by-item table shows why. For every item the table gives its average correlation with its own construct's other items and with the other construct's items. For <code>A1</code> that is 0.7 against 19/60, about 0.317, and the other four ordinary items show the same wide gap. <code>B3</code> shows 0.22 with its own and 157/300, about 0.523, with the first construct, so the lab lists it as the one item that goes with the wrong construct.</p><p>Move it where it belongs. On the preset <code>reassigned</code> the same correlations are used, with <code>B3</code> written as part of the first construct. That construct now averages about 0.602 over its six pairs, the second has one pair at 0.7, and the average across the two falls to 0.19625 over eight pairs. No item is listed any longer. The cross-construct average being lower after the move is the sign that the items were mislabelled and not that the data improved: nothing in the numbers was changed.</p><p>The lab is a picture of the test, not the test. Appendix C runs principal components with varimax rotation and asks for loadings above 0.60 without cross-loading, average variance extracted above 0.50, the square root of that above each correlation with another construct, and correlations below 0.85, which Surveys, Data and Statistical Methods reads and computes. The averages here show the pattern those tests look for, with six items and no people, and a stray item can hide in an average that looks acceptable.</p><h3>Exercise</h3><ul><li>Items: <span class="math" data-say="p 1, p, p 2, p, p 3, p, q 1, q, q 2, q">P1, p; P2, p; P3, p; Q1, q; Q2, q</span>.</li><li>Correlations: <span class="math" data-say="p 1, p 2, 0.65, p 1, p 3, 0.60, p 2, p 3, 0.55, q 1, q 2, 0.60, p 1, q 1, 0.15, p 1, q 2, 0.10, p 2, q 1, 0.20, p 2, q 2, 0.15, p 3, q 1, 0.60, p 3, q 2, 0.65">P1, P2, 0.65; P1, P3, 0.60; P2, P3, 0.55; Q1, Q2, 0.60; P1, Q1, 0.15; P1, Q2, 0.10; P2, Q1, 0.20; P2, Q2, 0.15; P3, Q1, 0.60; P3, Q2, 0.65</span>.</li></ul><p>For each item, average its correlations with its own construct's other items and with the other construct's items. Say which item the lab will list and by how much, then check your table in the lab.</p><p>A construct that holds together can be scored and relied on, and the same idea reaches beyond surveys. The next lesson, Latent Constructs and System Data, reads how.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a correlation matrix for a stray item</h2></div><p>Five steps, the last of them on items of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Say which construct each item was written for</h3><p>List the items with the construct each is meant to measure. This is the design, and the matrix tests it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Average the within-construct correlations</h3><p>For each construct, add the correlations among its own items and divide by the number of pairs. Do the same for all pairs that cross between constructs.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compare each item with its own and with the others</h3><p>For one item, average its correlations with its own construct's other items, then with the items of each other construct.</p></article><article class="card concept-card"><div class="icon">4</div><h3>List the items that go with the wrong group</h3><p>An item whose average with another construct exceeds its average with its own is a candidate stray. Look at its wording before you move it.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on items of your own</h3><p>Take a short survey you have on file with two constructs and at least three items each, get its correlation matrix from any spreadsheet, and type the lower triangle into the lab. Write down any item the lab lists and what the item asks.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a correlation matrix for a stray item</h2>
+      <p class="lead-in">Five steps, the last of them on items of your own.</p>
+      <ol class="key-ideas method"><li><strong>Say which construct each item was written for.</strong> List the items with the construct each is meant to measure. This is the design, and the matrix tests it.</li><li><strong>Average the within-construct correlations.</strong> For each construct, add the correlations among its own items and divide by the number of pairs. Do the same for all pairs that cross between constructs.</li><li><strong>Compare each item with its own and with the others.</strong> For one item, average its correlations with its own construct's other items, then with the items of each other construct.</li><li><strong>List the items that go with the wrong group.</strong> An item whose average with another construct exceeds its average with its own is a candidate stray. Look at its wording before you move it.</li><li><strong>Do it on items of your own.</strong> Take a short survey you have on file with two constructs and at least three items each, get its correlation matrix from any spreadsheet, and type the lower triangle into the lab. Write down any item the lab lists and what the item asks.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1456,17 +1502,16 @@ B3 with the first construct: (0.55 + 0.50 + 0.52) / 3 = 1.57 / 3 ≈ 0.523
 0.523 &gt; 0.22: B3 is listed</div><p>The nine cross pairs add as the three items of the first construct against B1, B2 and B3. Without B3's three the other six cross pairs average 0.188, so the single stray item raises the average across constructs from about 0.188 to 0.3.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking one well-worded question to be enough</strong><span>A single question cannot be checked against anything. The chapter's failure-notification example shows what a question would have hidden: the five items were two constructs, and where the notice comes from mattered to the outcome.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating a construct that passed once as settled</strong><span>The authors recommend retesting periodically, especially if the system or environment may have changed, because items that belonged together can stop doing so. A construct is passing, not proven.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading several views as immunity from a bad source</strong><span>The chapter says several measures make it harder for one bad source to skew results, and give a better chance of noticing it. Neither is a guarantee: in the lab a stray item raises the cross-construct average from about 0.188 to 0.3 and shows up only because the matrix is read item by item.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can read a matrix for a stray item.</strong><p>Given two constructs' items and a lower-triangle correlation matrix, find each construct's average correlation, each item's own and cross averages, and name the item that goes with the wrong group.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab compares averages in a matrix you type. It is not the principal-components, variance-extracted and reliability tests the book reports in Appendix C, and it cannot tell why an item goes with the wrong group; that is a reading of what the item asks.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking one well-worded question to be enough</strong><span>A single question cannot be checked against anything. The chapter's failure-notification example shows what a question would have hidden: the five items were two constructs, and where the notice comes from mattered to the outcome.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating a construct that passed once as settled</strong><span>The authors recommend retesting periodically, especially if the system or environment may have changed, because items that belonged together can stop doing so. A construct is passing, not proven.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading several views as immunity from a bad source</strong><span>The chapter says several measures make it harder for one bad source to skew results, and give a better chance of noticing it. Neither is a guarantee: in the lab a stray item raises the cross-construct average from about 0.188 to 0.3 and shows up only because the matrix is read item by item.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can read a matrix for a stray item.</strong><p>Given two constructs' items and a lower-triangle correlation matrix, find each construct's average correlation, each item's own and cross averages, and name the item that goes with the wrong group.</p></div></div><div class="note"><strong>Note:</strong> The lab compares averages in a matrix you type. It is not the principal-components, variance-extracted and reliability tests the book reports in Appendix C, and it cannot tell why an item goes with the wrong group; that is a reading of what the item asks.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Convergent and discriminant validity</summary><p>Two tests that the items of a construct measure one thing. Convergent validity asks whether items meant to go together do correlate; discriminant validity asks whether items meant to be separate fail to. Appendix C reads them with principal components, average variance extracted and a ceiling on cross-construct correlations.</p></details><details class="recall"><summary>Reliability (internal consistency)</summary><p>Assurance that the people who answer read and interpret the items similarly. The next lesson computes one such figure, Cronbach's alpha. A construct that passes the validity and reliability tests is said to exhibit good psychometric properties.</p></details><details class="recall"><summary>A stray item</summary><p>An item written for one construct whose answers move more with another construct's items than with its own. The lab spots one by comparing each item's average correlation with its own construct's other items against its average with each other construct's items.</p></details></div>
+      <h3>Summary</h3>
       <p>A score is only worth reporting if the items behave. Read what the validity and reliability tests are for, why the authors run them before any analysis and again from time to time, and how a five-item construct turned out to be two. Then read a correlation matrix for two invented constructs and find the item that belongs with the wrong one.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Convergent and discriminant validity.</strong> Two tests that the items of a construct measure one thing. Convergent validity asks whether items meant to go together do correlate; discriminant validity asks whether items meant to be separate fail to. Appendix C reads them with principal components, average variance extracted and a ceiling on cross-construct correlations.</li><li><strong>Reliability (internal consistency).</strong> Assurance that the people who answer read and interpret the items similarly. The next lesson computes one such figure, Cronbach's alpha. A construct that passes the validity and reliability tests is said to exhibit good psychometric properties.</li><li><strong>A stray item.</strong> An item written for one construct whose answers move more with another construct's items than with its own. The lab spots one by comparing each item's average correlation with its own construct's other items against its average with each other construct's items.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="convergent, items that go together do. discriminant, items that should not, don the character t. reliability, items read the same way. tests come before any analysis. retest, a construct can stop passing. one stray item shows in the matrix" tabindex="0" role="region" aria-label="Mathematical notation">convergent: items that go together do
 discriminant: items that should not, don&#x27;t
 reliability: items read the same way
@@ -2342,11 +2387,42 @@ one stray item shows in the matrix</div><figcaption>Validity, reliability and ro
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2414,7 +2490,7 @@ one stray item shows in the matrix</div><figcaption>Validity, reliability and ro
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

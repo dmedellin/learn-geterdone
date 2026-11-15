@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,28 +1424,26 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Foundations of Algebra</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Building expressions</p>
       <h1>Variables, Expressions, and Terms</h1>
       <p class="lesson-lede">Variables, terms, coefficients, and the anatomy of an expression.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A letter is a number whose value is not being supplied</li><li>Terms are separated by plus and minus signs, at the top level</li><li>The sign in front of a term is part of the term</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The parts of an expression</h2>
-      <article class="prose reading"><p>An expression is a recipe for a number: it says what to do, and given values for the letters it produces a value. It does not claim anything. <span class="math" data-say="2 x plus 5">2x + 5</span> is an expression; <span class="math" data-say="2 x plus 5 equals 11">2x + 5 = 11</span> is an equation, which does make a claim and is Linear Equations and Inequalities's subject. The distinction matters immediately, because you can solve an equation and you cannot solve an expression.</p><div class="defbox"><span class="label">Definition &middot; Variable, constant, expression</span><p>A <strong>variable</strong> is a letter standing for a number whose value is not fixed. A <strong>constant</strong> is a number written as itself. An <strong>algebraic expression</strong> is any combination of variables and constants built with the operations of arithmetic.</p><p>The word variable is slightly misleading: within one calculation the letter stands for one number and does not change while you work. It varies across problems, not across lines.</p></div><div class="defbox"><span class="label">Definition &middot; Term</span><p>The <strong>terms</strong> of an expression are the pieces it separates into at its top-level <span class="math" data-say="plus">+</span> and <span class="math" data-say="negative">−</span> signs. Top-level means not inside any bracket.</p><p>The sign immediately in front of a piece belongs to that piece. An expression is therefore always a <em>sum</em> of its terms, some of which are negative.</p></div><div class="mathblock" data-say="3 x squared minus 5 x plus 7, equals, 3 x squared, plus, negative 5 x, plus, 7. term 1, 3 x squared. term 2, negative 5 x, the minus sign belongs to it. term 3, 7" tabindex="0" role="region" aria-label="Mathematical notation">3x² − 5x + 7        =        3x²   +   (−5x)   +   7
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The parts of an expression</h2><div class="prose reading"><p>An expression is a recipe for a number: it says what to do, and given values for the letters it produces a value. It does not claim anything. <span class="math" data-say="2 x plus 5">2x + 5</span> is an expression; <span class="math" data-say="2 x plus 5 equals 11">2x + 5 = 11</span> is an equation, which does make a claim and is Linear Equations and Inequalities's subject. The distinction matters immediately, because you can solve an equation and you cannot solve an expression.</p><div class="defbox"><span class="label">Definition &middot; Variable, constant, expression</span><p>A <strong>variable</strong> is a letter standing for a number whose value is not fixed. A <strong>constant</strong> is a number written as itself. An <strong>algebraic expression</strong> is any combination of variables and constants built with the operations of arithmetic.</p><p>The word variable is slightly misleading: within one calculation the letter stands for one number and does not change while you work. It varies across problems, not across lines.</p></div><div class="defbox"><span class="label">Definition &middot; Term</span><p>The <strong>terms</strong> of an expression are the pieces it separates into at its top-level <span class="math" data-say="plus">+</span> and <span class="math" data-say="negative">−</span> signs. Top-level means not inside any bracket.</p><p>The sign immediately in front of a piece belongs to that piece. An expression is therefore always a <em>sum</em> of its terms, some of which are negative.</p></div><div class="mathblock" data-say="3 x squared minus 5 x plus 7, equals, 3 x squared, plus, negative 5 x, plus, 7. term 1, 3 x squared. term 2, negative 5 x, the minus sign belongs to it. term 3, 7" tabindex="0" role="region" aria-label="Mathematical notation">3x² − 5x + 7        =        3x²   +   (−5x)   +   7
 
         term 1   3x²
         term 2   −5x          the minus sign belongs to it
-        term 3   7</div><p>Writing the subtraction as an addition once, as above, is worth the line. “Properties of the Real Numbers” will license reordering these terms by commutativity of addition. For now the reading skill is narrower: if a term eventually moves, its attached sign must move with it.</p><div class="defbox"><span class="label">Definition &middot; Coefficient and variable part</span><p>A term that is a number times a product of variables splits into a <strong>coefficient</strong> &mdash; the numerical factor, sign included &mdash; and a <strong>variable part</strong>, the letters with their exponents.</p><p>In <span class="math" data-say="negative 5 x">−5x</span> the coefficient is <span class="math" data-say="negative 5">−5</span> and the variable part is <span class="math" data-say="x">x</span>. In <span class="math" data-say="the quantity 2 over 3, times x squared">(2/3)x²</span> the coefficient is <span class="math" data-say="2 over 3">2/3</span>. A term with no letters at all, such as <span class="math" data-say="7">7</span>, is a <strong>constant term</strong>.</p></div><p>Two coefficients are written invisibly and are misread constantly. <span class="math" data-say="x">x</span> means <span class="math" data-say="1 x">1x</span>, so its coefficient is <span class="math" data-say="1">1</span>. <span class="math" data-say="negative x">−x</span> means <span class="math" data-say="the quantity negative 1, times x">(−1)x</span>, so its coefficient is <span class="math" data-say="negative 1">−1</span>. Neither is zero and neither is absent; the <span class="math" data-say="1">1</span> is simply not printed, because writing it would add nothing.</p><h3>Terms and factors are different things</h3><p>Terms are what an expression is added out of. <strong>Factors</strong> are what a term is multiplied out of. <span class="math" data-say="4 x y">4xy</span> is a single term with factors <span class="math" data-say="4">4</span>, <span class="math" data-say="x">x</span> and <span class="math" data-say="y">y</span>. Confusing the two is what makes people cancel across a plus sign, and it causes real damage in Rational and Radical Expressions.</p><p>A bracket makes this visible. <span class="math" data-say="5 times the quantity x plus 2">5(x + 2)</span> is one term, because there is no top-level <span class="math" data-say="plus">+</span> or <span class="math" data-say="negative">−</span> anywhere in it: it is a product of the two factors <span class="math" data-say="5">5</span> and <span class="math" data-say="x plus 2">(x + 2)</span>. Multiply it out and you get <span class="math" data-say="5 x plus 10">5x + 10</span>, which is two terms. Both expressions have the same value for every <span class="math" data-say="x">x</span>; “The Distributive Law” proves that with distribution. They do not have the same number of terms. So "how many terms" is a question about a particular way of writing, and the honest answer names the form: one as written, two expanded.</p><div class="defbox"><span class="label">Definition &middot; Degree</span><p>The <strong>degree of a term</strong> is the sum of the exponents on its variables. The <strong>degree of an expression</strong> is the largest degree of any of its terms, once like terms have been combined.</p><p><span class="math" data-say="4 x y">4xy</span> has degree <span class="math" data-say="1 plus 1 equals 2">1 + 1 = 2</span>. A constant term such as <span class="math" data-say="7">7</span> has degree <span class="math" data-say="0">0</span>, since <span class="math" data-say="7 equals 7 x to the power 0">7 = 7x⁰</span>.</p></div><p>The qualification about combining is a preview of “Combining Like Terms”. In <span class="math" data-say="5 x minus 5 x plus 4">5x − 5x + 4</span> the highest degree written on the page is <span class="math" data-say="1">1</span>, but the two <span class="math" data-say="x">x</span> terms sum to <span class="math" data-say="0">0</span> and the expression is <span class="math" data-say="4">4</span>, of degree <span class="math" data-say="0">0</span>. Degree describes the expression, not the ink.</p><div class="example"><span class="label">Example &middot; Two expressions, read part by part</span><p><span class="math" data-say="4 x y minus y squared plus 2">4xy − y² + 2</span> has three terms. Their coefficients are <span class="math" data-say="4">4</span>, <span class="math" data-say="negative 1">−1</span> and <span class="math" data-say="2">2</span>; their degrees are <span class="math" data-say="2">2</span>, <span class="math" data-say="2">2</span> and <span class="math" data-say="0">0</span>; the expression has degree <span class="math" data-say="2">2</span>. <span class="math" data-say="negative x plus the quantity 2 over 3, times x squared minus 5">−x + (2/3)x² − 5</span> has three terms with coefficients <span class="math" data-say="negative 1">−1</span>, <span class="math" data-say="2 over 3">2/3</span> and <span class="math" data-say="negative 5">−5</span>, and degree <span class="math" data-say="2">2</span>. The second is not written in descending order of degree, which is legal and sometimes inconvenient.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The parts of an expression</h2></div><p>Terms, coefficients, factors, degree</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+        term 3   7</div><p>Writing the subtraction as an addition once, as above, is worth the line. “Properties of the Real Numbers” will license reordering these terms by commutativity of addition. For now the reading skill is narrower: if a term eventually moves, its attached sign must move with it.</p><div class="defbox"><span class="label">Definition &middot; Coefficient and variable part</span><p>A term that is a number times a product of variables splits into a <strong>coefficient</strong> &mdash; the numerical factor, sign included &mdash; and a <strong>variable part</strong>, the letters with their exponents.</p><p>In <span class="math" data-say="negative 5 x">−5x</span> the coefficient is <span class="math" data-say="negative 5">−5</span> and the variable part is <span class="math" data-say="x">x</span>. In <span class="math" data-say="the quantity 2 over 3, times x squared">(2/3)x²</span> the coefficient is <span class="math" data-say="2 over 3">2/3</span>. A term with no letters at all, such as <span class="math" data-say="7">7</span>, is a <strong>constant term</strong>.</p></div><p>Two coefficients are written invisibly and are misread constantly. <span class="math" data-say="x">x</span> means <span class="math" data-say="1 x">1x</span>, so its coefficient is <span class="math" data-say="1">1</span>. <span class="math" data-say="negative x">−x</span> means <span class="math" data-say="the quantity negative 1, times x">(−1)x</span>, so its coefficient is <span class="math" data-say="negative 1">−1</span>. Neither is zero and neither is absent; the <span class="math" data-say="1">1</span> is simply not printed, because writing it would add nothing.</p><h3>Terms and factors are different things</h3><p>Terms are what an expression is added out of. <strong>Factors</strong> are what a term is multiplied out of. <span class="math" data-say="4 x y">4xy</span> is a single term with factors <span class="math" data-say="4">4</span>, <span class="math" data-say="x">x</span> and <span class="math" data-say="y">y</span>. Confusing the two is what makes people cancel across a plus sign, and it causes real damage in Rational and Radical Expressions.</p><p>A bracket makes this visible. <span class="math" data-say="5 times the quantity x plus 2">5(x + 2)</span> is one term, because there is no top-level <span class="math" data-say="plus">+</span> or <span class="math" data-say="negative">−</span> anywhere in it: it is a product of the two factors <span class="math" data-say="5">5</span> and <span class="math" data-say="x plus 2">(x + 2)</span>. Multiply it out and you get <span class="math" data-say="5 x plus 10">5x + 10</span>, which is two terms. Both expressions have the same value for every <span class="math" data-say="x">x</span>; “The Distributive Law” proves that with distribution. They do not have the same number of terms. So "how many terms" is a question about a particular way of writing, and the honest answer names the form: one as written, two expanded.</p><div class="defbox"><span class="label">Definition &middot; Degree</span><p>The <strong>degree of a term</strong> is the sum of the exponents on its variables. The <strong>degree of an expression</strong> is the largest degree of any of its terms, once like terms have been combined.</p><p><span class="math" data-say="4 x y">4xy</span> has degree <span class="math" data-say="1 plus 1 equals 2">1 + 1 = 2</span>. A constant term such as <span class="math" data-say="7">7</span> has degree <span class="math" data-say="0">0</span>, since <span class="math" data-say="7 equals 7 x to the power 0">7 = 7x⁰</span>.</p></div><p>The qualification about combining is a preview of “Combining Like Terms”. In <span class="math" data-say="5 x minus 5 x plus 4">5x − 5x + 4</span> the highest degree written on the page is <span class="math" data-say="1">1</span>, but the two <span class="math" data-say="x">x</span> terms sum to <span class="math" data-say="0">0</span> and the expression is <span class="math" data-say="4">4</span>, of degree <span class="math" data-say="0">0</span>. Degree describes the expression, not the ink.</p><div class="example"><span class="label">Example &middot; Two expressions, read part by part</span><p><span class="math" data-say="4 x y minus y squared plus 2">4xy − y² + 2</span> has three terms. Their coefficients are <span class="math" data-say="4">4</span>, <span class="math" data-say="negative 1">−1</span> and <span class="math" data-say="2">2</span>; their degrees are <span class="math" data-say="2">2</span>, <span class="math" data-say="2">2</span> and <span class="math" data-say="0">0</span>; the expression has degree <span class="math" data-say="2">2</span>. <span class="math" data-say="negative x plus the quantity 2 over 3, times x squared minus 5">−x + (2/3)x² − 5</span> has three terms with coefficients <span class="math" data-say="negative 1">−1</span>, <span class="math" data-say="2 over 3">2/3</span> and <span class="math" data-say="negative 5">−5</span>, and degree <span class="math" data-say="2">2</span>. The second is not written in descending order of degree, which is legal and sometimes inconvenient.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The parts of an expression</h2></div><p>Terms, coefficients, factors, degree</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The parts of an expression</strong><span id="exSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>as written</span><span class="tone-purple"><i class="legend-swatch"></i>after expanding</span></div>
@@ -1408,10 +1451,10 @@
       <div class="lab-stage" id="exStage"></div>
       <div id="exWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="exStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Take an expression apart</h3>
-          <p>Type an expression and the lab splits it at its top-level <span class="math" data-say="plus">+</span> and <span class="math" data-say="negative">−</span> signs, naming the coefficient and degree of each term. It also expands the expression and counts the terms again, so feed it <span class="math" data-say="5 times the quantity x plus 2">5(x + 2)</span> and predict the as-written count first. The expanded count previews “The Distributive Law”; the degree column previews Polynomials and Factoring and is not part of this lesson's completion standard.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Take an expression apart</h3>
+            <p>Type an expression and the lab splits it at its top-level <span class="math" data-say="plus">+</span> and <span class="math" data-say="negative">−</span> signs, naming the coefficient and degree of each term. It also expands the expression and counts the terms again, so feed it <span class="math" data-say="5 times the quantity x plus 2">5(x + 2)</span> and predict the as-written count first. The expanded count previews “The Distributive Law”; the degree column previews Polynomials and Factoring and is not part of this lesson's completion standard.</p>
         <div class="field">
           <label for="exPreset">Expression</label>
           <select id="exPreset"><option value="3x^2 - 5x + 7">3x^2 - 5x + 7</option><option value="4xy - y^2 + 2">4xy - y^2 + 2</option><option value="-x + (2/3)x^2 - 5">-x + (2/3)x^2 - 5</option><option value="5(x + 2)">5(x + 2)</option><option value="x^2y - 3xy^2">x^2y - 3xy^2</option><option value="5x - 5x + 4">5x - 5x + 4</option></select>
@@ -1422,12 +1465,14 @@
         </div>
         <div class="kpi-grid"><div class="kpi"><span>Terms as written</span><strong id="exK1">&mdash;</strong></div><div class="kpi"><span>After expanding</span><strong id="exK2">&mdash;</strong></div><div class="kpi"><span>Degree</span><strong id="exK3">&mdash;</strong></div></div>
         <p class="small-copy" style="margin:0;">Letters, numbers, <code>^</code> for powers, brackets, and juxtaposition for multiplication: <code>4xy - y^2 + 2</code>.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading an expression correctly</h2></div><p>Four passes. Do them in order; the bracket pass changes everything after it.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the top-level plus and minus signs</h3><p>Ignore every sign inside a bracket. What is left between those signs are the terms, and their number is the number of terms as written.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Attach each sign to the term that follows it</h3><p>A term preceded by <span class="math" data-say="negative">−</span> is a negative term. Once the signs are attached, the expression is a sum and the terms may be written in any order.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Split each term into its coefficient and its variable part</h3><p>The coefficient carries the sign. A term with no printed number has coefficient <span class="math" data-say="1">1</span> or <span class="math" data-say="negative 1">−1</span>; write it in if that helps, and then stop writing it in once it stops helping.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the degree, term by term</h3><p>Add the exponents within each term, then take the largest &mdash; but only after combining like terms, because cancellation can lower it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading an expression correctly</h2>
+      <p class="lead-in">Four passes. Do them in order; the bracket pass changes everything after it.</p>
+      <ol class="key-ideas method"><li><strong>Find the top-level plus and minus signs.</strong> Ignore every sign inside a bracket. What is left between those signs are the terms, and their number is the number of terms as written.</li><li><strong>Attach each sign to the term that follows it.</strong> A term preceded by <span class="math" data-say="negative">−</span> is a negative term. Once the signs are attached, the expression is a sum and the terms may be written in any order.</li><li><strong>Split each term into its coefficient and its variable part.</strong> The coefficient carries the sign. A term with no printed number has coefficient <span class="math" data-say="1">1</span> or <span class="math" data-say="negative 1">−1</span>; write it in if that helps, and then stop writing it in once it stops helping.</li><li><strong>Read the degree, term by term.</strong> Add the exponents within each term, then take the largest &mdash; but only after combining like terms, because cancellation can lower it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1457,17 +1502,16 @@
         combined     4,  a single term of degree 0</div><p>The coefficient <span class="math" data-say="negative 1">−1</span> in the first line is the one people leave blank or call <span class="math" data-say="0">0</span>. It is neither. <span class="math" data-say="negative x">−x</span> contributes <span class="math" data-say="negative 1">−1</span> of an <span class="math" data-say="x">x</span> to every sum it is in, and in “Combining Like Terms” that <span class="math" data-say="negative 1">−1</span> has to be added to other coefficients like any other number.</p><p>The last line shows why degree is read after combining and not before. Nothing about <span class="math" data-say="5 x minus 5 x plus 4">5x − 5x + 4</span> looks like a constant until the middle step is done.</p><p>Fade the table for <span class="math" data-say="negative 3 a squared b plus 4 b minus 7">−3a²b + 4b − 7</span>: mark the top-level signs first, then supply the entries. It has three terms with coefficients <span class="math" data-say="negative 3">−3</span>, <span class="math" data-say="4">4</span> and <span class="math" data-say="negative 7">−7</span>. Calling the first coefficient <span class="math" data-say="3">3</span> leaves its sign behind; counting <span class="math" data-say="A squared">a²</span> and <span class="math" data-say="b">b</span> separately confuses factors with terms.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Leaving the minus sign behind when naming a term</strong><span>In <span class="math" data-say="3 x squared minus 5 x plus 7">3x² − 5x + 7</span> the second term is <span class="math" data-say="negative 5 x">−5x</span>. Calling it <span class="math" data-say="5 x">5x</span> and remembering the sign separately works until the terms get reordered, and then the sign is attached to the wrong one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading an invisible coefficient as zero or as nothing</strong><span><span class="math" data-say="x">x</span> has coefficient <span class="math" data-say="1">1</span> and <span class="math" data-say="negative x">−x</span> has coefficient <span class="math" data-say="negative 1">−1</span>. Treating either as <span class="math" data-say="0">0</span> deletes a term; treating <span class="math" data-say="negative x">−x</span> as having coefficient <span class="math" data-say="1">1</span> loses a sign.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Counting the factors of a term as terms</strong><span><span class="math" data-say="4 x y">4xy</span> is one term with three factors. Only a top-level <span class="math" data-say="plus">+</span> or <span class="math" data-say="negative">−</span> standing between two pieces starts a new term, and multiplication never does. Count the pieces, not the signs: <span class="math" data-say="negative x plus the quantity 2 over 3, times x squared minus 5">−x + (2/3)x² − 5</span> carries three signs and has three terms, because the leading <span class="math" data-say="negative">−</span> separates nothing.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can point at every term, sign included, without pausing.</strong><p>For <span class="math" data-say="negative 4 x squared y plus y minus 2 times the quantity x plus 1">−4x²y + y − 2(x + 1)</span>, name the terms as written, the sign and coefficient of each monomial term, and every factor of the bracketed term. Do not expand it: “The Distributive Law” owns that move. The reading is finished when another reader can point to the same pieces.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The vocabulary here is not decoration. "Combine like terms" in “Combining Like Terms”, "cancel a common factor" in Rational and Radical Expressions and "the leading coefficient" in Polynomials and Factoring are all instructions that name one of these parts, and following them requires having found the right part first.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Leaving the minus sign behind when naming a term</strong><span>In <span class="math" data-say="3 x squared minus 5 x plus 7">3x² − 5x + 7</span> the second term is <span class="math" data-say="negative 5 x">−5x</span>. Calling it <span class="math" data-say="5 x">5x</span> and remembering the sign separately works until the terms get reordered, and then the sign is attached to the wrong one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading an invisible coefficient as zero or as nothing</strong><span><span class="math" data-say="x">x</span> has coefficient <span class="math" data-say="1">1</span> and <span class="math" data-say="negative x">−x</span> has coefficient <span class="math" data-say="negative 1">−1</span>. Treating either as <span class="math" data-say="0">0</span> deletes a term; treating <span class="math" data-say="negative x">−x</span> as having coefficient <span class="math" data-say="1">1</span> loses a sign.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Counting the factors of a term as terms</strong><span><span class="math" data-say="4 x y">4xy</span> is one term with three factors. Only a top-level <span class="math" data-say="plus">+</span> or <span class="math" data-say="negative">−</span> standing between two pieces starts a new term, and multiplication never does. Count the pieces, not the signs: <span class="math" data-say="negative x plus the quantity 2 over 3, times x squared minus 5">−x + (2/3)x² − 5</span> carries three signs and has three terms, because the leading <span class="math" data-say="negative">−</span> separates nothing.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can point at every term, sign included, without pausing.</strong><p>For <span class="math" data-say="negative 4 x squared y plus y minus 2 times the quantity x plus 1">−4x²y + y − 2(x + 1)</span>, name the terms as written, the sign and coefficient of each monomial term, and every factor of the bracketed term. Do not expand it: “The Distributive Law” owns that move. The reading is finished when another reader can point to the same pieces.</p></div></div><div class="note"><strong>Note:</strong> The vocabulary here is not decoration. "Combine like terms" in “Combining Like Terms”, "cancel a common factor" in Rational and Radical Expressions and "the leading coefficient" in Polynomials and Factoring are all instructions that name one of these parts, and following them requires having found the right part first.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A letter is a number whose value is not being supplied</summary><p>It is not a new kind of object and it obeys no new rules. Everything in the arithmetic prerequisite and the reading convention of “Order of Operations” applies to <span class="math" data-say="x">x</span>, because whatever number <span class="math" data-say="x">x</span> is, those statements remain true.</p></details><details class="recall"><summary>Terms are separated by plus and minus signs, at the top level</summary><p>That is the whole rule for finding them, and it is why brackets matter so much: a plus sign inside a bracket does not separate terms. <span class="math" data-say="5 times the quantity x plus 2">5(x + 2)</span> is one term; <span class="math" data-say="5 x plus 10">5x + 10</span> is two.</p></details><details class="recall"><summary>The sign in front of a term is part of the term</summary><p>In <span class="math" data-say="3 x squared minus 5 x plus 7">3x² − 5x + 7</span> the second term is <span class="math" data-say="negative 5 x">−5x</span>, not <span class="math" data-say="5 x">5x</span>. Subtraction is addition of a negative, so the expression is a sum of <span class="math" data-say="3 x squared">3x²</span>, <span class="math" data-say="negative 5 x">−5x</span> and <span class="math" data-say="7">7</span> &mdash; and reading it that way removes most sign errors before they happen.</p></details></div>
+      <h3>Summary</h3>
       <p>An expression is arithmetic with a letter standing in for a number. The letter is defined before any symbolic rule uses it, then the expression is read into terms, signs, coefficients and factors without rearranging it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A letter is a number whose value is not being supplied.</strong> It is not a new kind of object and it obeys no new rules. Everything in the arithmetic prerequisite and the reading convention of “Order of Operations” applies to <span class="math" data-say="x">x</span>, because whatever number <span class="math" data-say="x">x</span> is, those statements remain true.</li><li><strong>Terms are separated by plus and minus signs, at the top level.</strong> That is the whole rule for finding them, and it is why brackets matter so much: a plus sign inside a bracket does not separate terms. <span class="math" data-say="5 times the quantity x plus 2">5(x + 2)</span> is one term; <span class="math" data-say="5 x plus 10">5x + 10</span> is two.</li><li><strong>The sign in front of a term is part of the term.</strong> In <span class="math" data-say="3 x squared minus 5 x plus 7">3x² − 5x + 7</span> the second term is <span class="math" data-say="negative 5 x">−5x</span>, not <span class="math" data-say="5 x">5x</span>. Subtraction is addition of a negative, so the expression is a sum of <span class="math" data-say="3 x squared">3x²</span>, <span class="math" data-say="negative 5 x">−5x</span> and <span class="math" data-say="7">7</span> &mdash; and reading it that way removes most sign errors before they happen.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="3 x squared minus 5 x plus 7, three terms, 3 x squared, negative 5 x, 7. a table, shown on the page. negative x, one term, coefficient negative 1, degree 1. 5 times the quantity x plus 2, ONE term as written, two after expanding" tabindex="0" role="region" aria-label="Mathematical notation">3x² − 5x + 7        three terms:   3x²,   −5x,    7
                     coefficients:   3,     −5,    7
 −x                  one term, coefficient −1, degree 1
@@ -2772,11 +2816,42 @@
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2844,7 +2919,7 @@
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,39 +1424,37 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Games and the Social Contract</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Repeated games</p>
       <h1>The Shadow of the Future</h1>
       <p class="lesson-lede">Cooperation is stable when the future counts for enough, and the amount can be computed from the four payoffs.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The continuation probability</li><li>A punishment makes defection costly later</li><li>A known last round has no future</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>When the future outweighs the temptation</h2>
-      <article class="prose reading"><p>Take the standard payoffs, <span class="math" data-say="R equals 3">R = 3</span>, <span class="math" data-say="S equals 0">S = 0</span>, <span class="math" data-say="T equals 5">T = 5</span> and <span class="math" data-say="P equals 1">P = 1</span>, and let the game continue after each round with probability <span class="math" data-say="delta">δ</span>. A payoff <span class="math" data-say="n">n</span> rounds away is then worth <span class="math" data-say="delta to the power n">δ^n</span> times as much now, so getting <span class="math" data-say="x">x</span> every round is worth <span class="math" data-say="x times the quantity 1 plus delta plus delta squared plus and so on">x·(1 + δ + δ^2 + …)</span>. The sum in the brackets is <span class="math" data-say="1 over the quantity 1 minus delta">1 / (1 − δ)</span> whenever <span class="math" data-say="delta">δ</span> is below <span class="math" data-say="1">1</span>: multiply it by <span class="math" data-say="delta">δ</span> and subtract, and every term but the first cancels. So the value of <span class="math" data-say="x">x</span> every round is <span class="math" data-say="x over the quantity 1 minus delta">x / (1 − δ)</span>, and the expected number of rounds, which is the same sum with <span class="math" data-say="x equals 1">x = 1</span>, is <span class="math" data-say="1 over the quantity 1 minus delta">1 / (1 − δ)</span>. “The St Petersburg Game” summed one tail of this series; this is the whole of it.</p><h3>Against a player who never forgives</h3><p>GRIM cooperates until it is defected against once and defects forever after. A player who meets GRIM can cooperate throughout, or defect and be punished. Cooperating throughout earns <span class="math" data-say="R over the quantity 1 minus delta">R / (1 − δ)</span>. Defecting at once earns <span class="math" data-say="T">T</span> this round and then, with GRIM defecting for good, <span class="math" data-say="P">P</span> in every later round, worth <span class="math" data-say="delta times P over the quantity 1 minus delta">δ·P / (1 − δ)</span> altogether. Cooperation is at least as good when</p><div class="mathblock" data-say="R over the quantity 1 minus delta, is at least, T plus delta times P over the quantity 1 minus delta. R, is at least, T times the quantity 1 minus delta, plus delta times P. delta times the quantity T minus P, is at least, T minus R. delta, is at least, the quantity T minus R, over the quantity T minus P" tabindex="0" role="region" aria-label="Mathematical notation">R / (1 − δ)  ≥  T + δ·P / (1 − δ)
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>When the future outweighs the temptation</h2><div class="prose reading"><p>Take the standard payoffs, <span class="math" data-say="R equals 3">R = 3</span>, <span class="math" data-say="S equals 0">S = 0</span>, <span class="math" data-say="T equals 5">T = 5</span> and <span class="math" data-say="P equals 1">P = 1</span>, and let the game continue after each round with probability <span class="math" data-say="delta">δ</span>. A payoff <span class="math" data-say="n">n</span> rounds away is then worth <span class="math" data-say="delta to the power n">δ^n</span> times as much now, so getting <span class="math" data-say="x">x</span> every round is worth <span class="math" data-say="x times the quantity 1 plus delta plus delta squared plus and so on">x·(1 + δ + δ^2 + …)</span>. The sum in the brackets is <span class="math" data-say="1 over the quantity 1 minus delta">1 / (1 − δ)</span> whenever <span class="math" data-say="delta">δ</span> is below <span class="math" data-say="1">1</span>: multiply it by <span class="math" data-say="delta">δ</span> and subtract, and every term but the first cancels. So the value of <span class="math" data-say="x">x</span> every round is <span class="math" data-say="x over the quantity 1 minus delta">x / (1 − δ)</span>, and the expected number of rounds, which is the same sum with <span class="math" data-say="x equals 1">x = 1</span>, is <span class="math" data-say="1 over the quantity 1 minus delta">1 / (1 − δ)</span>. “The St Petersburg Game” summed one tail of this series; this is the whole of it.</p><h3>Against a player who never forgives</h3><p>GRIM cooperates until it is defected against once and defects forever after. A player who meets GRIM can cooperate throughout, or defect and be punished. Cooperating throughout earns <span class="math" data-say="R over the quantity 1 minus delta">R / (1 − δ)</span>. Defecting at once earns <span class="math" data-say="T">T</span> this round and then, with GRIM defecting for good, <span class="math" data-say="P">P</span> in every later round, worth <span class="math" data-say="delta times P over the quantity 1 minus delta">δ·P / (1 − δ)</span> altogether. Cooperation is at least as good when</p><div class="mathblock" data-say="R over the quantity 1 minus delta, is at least, T plus delta times P over the quantity 1 minus delta. R, is at least, T times the quantity 1 minus delta, plus delta times P. delta times the quantity T minus P, is at least, T minus R. delta, is at least, the quantity T minus R, over the quantity T minus P" tabindex="0" role="region" aria-label="Mathematical notation">R / (1 − δ)  ≥  T + δ·P / (1 − δ)
 R  ≥  T·(1 − δ) + δ·P
 δ·(T − P)  ≥  T − R
 δ  ≥  (T − R) / (T − P)</div><p>With the standard payoffs that is <span class="math" data-say="2 over 4">2 / 4</span>, or <span class="math" data-say="1 over 2">1/2</span>.</p><h3>Against a player who forgives</h3><p>TFT punishes only for as long as the other defects. The best deviation against it is one of two. Defect forever, which is as bad as it is against GRIM and needs the same <span class="math" data-say="delta">δ</span>. Or defect once and go back to cooperating, which earns <span class="math" data-say="T">T</span> now, <span class="math" data-say="S">S</span> next round while TFT retaliates and <span class="math" data-say="R">R</span> afterwards. Comparing the two streams round by round, the first two rounds of cooperating pay <span class="math" data-say="R plus delta times R">R + δ·R</span> and the two rounds of the deviation pay <span class="math" data-say="T plus delta times S">T + δ·S</span>, with everything later equal. Cooperation is at least as good when</p><div class="mathblock" data-say="R plus delta times R, is at least, T plus delta times S. delta times the quantity R minus S, is at least, T minus R. delta, is at least, the quantity T minus R, over the quantity R minus S" tabindex="0" role="region" aria-label="Mathematical notation">R + δ·R  ≥  T + δ·S
 δ·(R − S)  ≥  T − R
-δ  ≥  (T − R) / (R − S)</div><p>With the standard payoffs this is <span class="math" data-say="2 over 3">2 / 3</span>. The lab reports the larger of the two thresholds for TFT, since both deviations must be unprofitable, and the first alone for GRIM. With these payoffs the milder punishment needs the more patient player, because a deviator who returns to cooperation loses only one round to the retaliation.</p><h3>The end that must not be known</h3><p>Suppose the game lasts exactly one hundred rounds and both players know it. In round one hundred there is no later round to punish in, so defecting dominates, as in the one-shot dilemma. Both defect then whatever happened before. So in round ninety-nine nothing the players do changes round one hundred, the same argument applies, and so on back to the first round. A hundred rounds is not a long game in this sense; it is a game with a last round. A game that ends after each round with probability one half lasts two rounds on average, and with these payoffs it just sustains cooperation against GRIM.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The repeated prisoner&#x27;s dilemma</h2></div><p>one match, a tournament of seven strategies, and the discount that sustains cooperation</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+δ  ≥  (T − R) / (R − S)</div><p>With the standard payoffs this is <span class="math" data-say="2 over 3">2 / 3</span>. The lab reports the larger of the two thresholds for TFT, since both deviations must be unprofitable, and the first alone for GRIM. With these payoffs the milder punishment needs the more patient player, because a deviator who returns to cooperation loses only one round to the retaliation.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The repeated prisoner&#x27;s dilemma</h2></div><p>one match, a tournament of seven strategies, and the discount that sustains cooperation</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Playing the dilemma again</strong><span>C cooperates, D defects; payoffs R S T P</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="itTable"></table></div>
       <div class="status-banner" id="itStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Change the payoffs or the continuation probability</h3>
-          <p>The last tile gives the two thresholds and says whether the stated delta clears them. Raise the temptation and watch both thresholds rise; they depend on the four payoffs and nothing else.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Change the payoffs or the continuation probability</h3>
+            <p>The last tile gives the two thresholds and says whether the stated delta clears them. Raise the temptation and watch both thresholds rise; they depend on the four payoffs and nothing else.</p>
         <div class="field">
           <label for="itPreset">Worked example</label>
           <select id="itPreset"><option value="standard" selected>Payoffs 3, 0, 5, 1 and a continuation chance of 9/10</option><option value="low-delta">The same payoffs and a continuation chance of 1/4</option><option value="high-temptation">Payoffs 6, 0, 11, 2 and a chance of 3/4</option></select>
@@ -1443,12 +1486,15 @@ R  ≥  T·(1 − δ) + δ·P
           <div class="kpi"><span>Cooperation needs</span><strong id="itThresh">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>The end that must not be known</h3><p>Suppose the game lasts exactly one hundred rounds and both players know it. In round one hundred there is no later round to punish in, so defecting dominates, as in the one-shot dilemma. Both defect then whatever happened before. So in round ninety-nine nothing the players do changes round one hundred, the same argument applies, and so on back to the first round. A hundred rounds is not a long game in this sense; it is a game with a last round. A game that ends after each round with probability one half lasts two rounds on average, and with these payoffs it just sustains cooperation against GRIM.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding the discount factor</h2></div><p>The same five lines for any partner who punishes.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the value of cooperating forever</h3><p>It is the reward every round: <span class="math" data-say="R over the quantity 1 minus delta">R / (1 − δ)</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the value of the best deviation</h3><p>The temptation now, then whatever the partner's reply yields in the rounds after.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Set cooperation at least as large and cancel</h3><p>Multiply through by <span class="math" data-say="1 minus delta">1 − δ</span> to clear the denominator and collect the terms in <span class="math" data-say="delta">δ</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Solve for the smallest delta</h3><p>The result is a ratio of two gaps between payoffs: the gain from defecting over the gain of cooperation, against how much the reply takes away.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Compare with the delta you have</h3><p>If it is above the threshold the deviation does not pay. If it is below, it does.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding the discount factor</h2>
+      <p class="lead-in">The same five lines for any partner who punishes.</p>
+      <ol class="key-ideas method"><li><strong>Write the value of cooperating forever.</strong> It is the reward every round: <span class="math" data-say="R over the quantity 1 minus delta">R / (1 − δ)</span>.</li><li><strong>Write the value of the best deviation.</strong> The temptation now, then whatever the partner's reply yields in the rounds after.</li><li><strong>Set cooperation at least as large and cancel.</strong> Multiply through by <span class="math" data-say="1 minus delta">1 − δ</span> to clear the denominator and collect the terms in <span class="math" data-say="delta">δ</span>.</li><li><strong>Solve for the smallest delta.</strong> The result is a ratio of two gaps between payoffs: the gain from defecting over the gain of cooperation, against how much the reply takes away.</li><li><strong>Compare with the delta you have.</strong> If it is above the threshold the deviation does not pay. If it is below, it does.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1466,17 +1512,16 @@ Defect at once:  5 + (9/10)·1/(1/10) = 5 + 9 = 14
 9/10 clears 1/2 and 2/3: cooperation is stable</div><p>Thirty against fourteen is not close. At <span class="math" data-say="delta equals 1 over 4">δ = 1/4</span> the comparison reverses: cooperating for good is worth <span class="math" data-say="4">4</span> and defecting at once is worth about <span class="math" data-say="5.33">5.33</span>, and the lab says the future does not count enough.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking cooperation needs a long game when it needs an uncertain end</strong><span>A game of exactly one hundred rounds unravels from the last round back, while a game that continues with probability one half, two rounds on average, sustains cooperation against GRIM with the standard payoffs. What counts is whether a next round is possible at every point, not how many there will be.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming a mild punishment sustains cooperation as easily as a harsh one</strong><span>GRIM needs a continuation probability of <span class="math" data-say="1 over 2">1/2</span> and TFT needs <span class="math" data-say="2 over 3">2/3</span>. A deviator against TFT who goes back to cooperating loses only one round to the reply, so the shadow of the future has to be heavier.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the threshold as a prediction that players will cooperate</strong><span>It says cooperation is stable, that nobody gains by deviating. Both players always defecting is also stable in the repeated game, so the threshold says what is possible, not what will happen.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can derive a threshold and use it.</strong><p>Given the four payoffs, compute the continuation probability above which cooperation is stable against GRIM and against TFT, say whether a stated delta clears each, and explain why a known final round removes the threshold.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab refuses payoffs that are not a dilemma, and refuses 2R below T + S as well, since then taking turns to exploit beats cooperating and the derivation above is not the right comparison. That is why the high-temptation preset is the standard game scaled by two, with the temptation raised to eleven.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking cooperation needs a long game when it needs an uncertain end</strong><span>A game of exactly one hundred rounds unravels from the last round back, while a game that continues with probability one half, two rounds on average, sustains cooperation against GRIM with the standard payoffs. What counts is whether a next round is possible at every point, not how many there will be.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming a mild punishment sustains cooperation as easily as a harsh one</strong><span>GRIM needs a continuation probability of <span class="math" data-say="1 over 2">1/2</span> and TFT needs <span class="math" data-say="2 over 3">2/3</span>. A deviator against TFT who goes back to cooperating loses only one round to the reply, so the shadow of the future has to be heavier.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the threshold as a prediction that players will cooperate</strong><span>It says cooperation is stable, that nobody gains by deviating. Both players always defecting is also stable in the repeated game, so the threshold says what is possible, not what will happen.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can derive a threshold and use it.</strong><p>Given the four payoffs, compute the continuation probability above which cooperation is stable against GRIM and against TFT, say whether a stated delta clears each, and explain why a known final round removes the threshold.</p></div></div><div class="note"><strong>Note:</strong> The lab refuses payoffs that are not a dilemma, and refuses 2R below T + S as well, since then taking turns to exploit beats cooperating and the derivation above is not the right comparison. That is why the high-temptation preset is the standard game scaled by two, with the temptation raised to eleven.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The continuation probability</summary><p>After every round the game goes on with probability <span class="math" data-say="delta">δ</span>, so a payoff <span class="math" data-say="n">n</span> rounds away is worth <span class="math" data-say="delta">δ</span> to the power <span class="math" data-say="n">n</span> times as much now. A larger <span class="math" data-say="delta">δ</span> means the future weighs more.</p></details><details class="recall"><summary>A punishment makes defection costly later</summary><p>A player who defects gains the temptation now, and loses whatever the partner's reply costs in the rounds that follow. Cooperation is stable when the loss outweighs the gain.</p></details><details class="recall"><summary>A known last round has no future</summary><p>In the final round there is nothing to protect, so defecting dominates; with that round settled, the one before has no future either. The argument runs backwards to the first round.</p></details></div>
+      <h3>Summary</h3>
       <p>Suppose each round is followed by another with probability delta. Against a partner who punishes defection, cooperating forever beats defecting once exactly when delta is above a threshold fixed by the four payoffs. The threshold needs an uncertain end rather than a long game: a last round that is known unravels the whole thing.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The continuation probability.</strong> After every round the game goes on with probability <span class="math" data-say="delta">δ</span>, so a payoff <span class="math" data-say="n">n</span> rounds away is worth <span class="math" data-say="delta">δ</span> to the power <span class="math" data-say="n">n</span> times as much now. A larger <span class="math" data-say="delta">δ</span> means the future weighs more.</li><li><strong>A punishment makes defection costly later.</strong> A player who defects gains the temptation now, and loses whatever the partner's reply costs in the rounds that follow. Cooperation is stable when the loss outweighs the gain.</li><li><strong>A known last round has no future.</strong> In the final round there is nothing to protect, so defecting dominates; with that round settled, the one before has no future either. The argument runs backwards to the first round.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="delta, the chance there is a next round. GRIM holds if delta is at least the quantity T minus R, over the quantity T minus P. TFT holds if delta is at least the quantity T minus R, over the quantity R minus S, as well. a known last round unravels, backwards" tabindex="0" role="region" aria-label="Mathematical notation">δ: the chance there is a next round
 GRIM holds if δ ≥ (T − R) / (T − P)
 TFT holds if δ ≥ (T − R) / (R − S) as well
@@ -2155,11 +2200,42 @@ a known last round unravels, backwards</div><figcaption>How much the future must
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2227,7 +2303,7 @@ a known last round unravels, backwards</div><figcaption>How much the future must
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

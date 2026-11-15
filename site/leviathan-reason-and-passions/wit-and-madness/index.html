@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Reason, Science and the Passions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 8 · Of the Vertues commonly called Intellectuall; and their contrary Defects</p>
       <h1>Intellectual Virtues and Madness</h1>
       <p class="lesson-lede">Hobbes says wit is judgement with or without fancy, that the passions explain the differences of wit and the varieties of madness, and that the schoolmen&#x27;s insignificant speech is a madness too.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Fancy, judgement and wit</li><li>The passions as the cause of difference</li><li>Insignificant speech</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Wit, madness and the schoolmen</h2>
-      <article class="prose reading"><p><strong>Chapter 8.</strong> &ldquo;So that where Wit is wanting, it is not Fancy that is wanting, but Discretion. Judgement therefore without Fancy is Wit, but Fancy without Judgement not.&rdquo;</p><p>You have met both people. One tells a story at dinner that leaps from the dinner to a cousin to a ship to a recipe, each connection bright and none of them on the road to the point, and by the end the table is lost. Another says little, and what she says is exactly what the moment needed. Hobbes's claim is that the second has wit and the first, for all the brightness, has not. Wit is judgement, the noticing of differences, of &ldquo;times, places, and persons&rdquo;; fancy is the noticing of likenesses, and it is a virtue only when it is steadied by a direction to some end. &ldquo;without Stedinesse, and Direction to some End, a great Fancy is one kind of Madnesse&rdquo;.</p><p>He gives a table of how the two mix. In a poem, both are needed and fancy must be the more eminent, because poems please by extravagancy. In a history, &ldquo;the Judgement must be eminent&rdquo;, and &ldquo;Fancy has no place, but onely in adorning the stile&rdquo;. In an oration of praise or invective fancy is paramount, because the design is not truth. And in &ldquo;Demonstration, in Councell, and all rigourous search of Truth&rdquo; judgement does all, and metaphors are &ldquo;utterly excluded&rdquo;, as Chapter 5 said. His own cases make the lab's wit preset: the counsellor, in whom &ldquo;Judgement does all&rdquo;; the digresser, all fancy and no direction; and the poet, both. On the sentence of the passage, that wit is judgement, the counsellor and the poet have wit and the digresser does not. (Earlier in the chapter he defines natural wit as &ldquo;Celerity of Imagining&rdquo; and &ldquo;steddy direction to some approved end&rdquo;; the lab takes the sentence of the passage, which is the conclusion of one comparison.)</p><p>Where do the differences come from? Not from the body's instruments. If the difference proceeded from the temper of the brain and the organs of sense, he argues, &ldquo;there would be no lesse difference of men in their Sight, Hearing, or other Senses, than in their Fancies, and Discretions&rdquo;. It comes from the passions, and in particular from &ldquo;the more or lesse Desire of Power, of Riches, of Knowledge, and of Honour&rdquo;, which are all desire of power, &ldquo;For Riches, Knowledge and Honour are but severall sorts of Power&rdquo;. The thoughts, he says in a picture that is easy to remember, &ldquo;are to the Desires, as Scouts, and Spies, to range abroad, and find the way to the things Desired&rdquo;. A man with no great passion for anything, though he may be inoffensive, can have neither great fancy nor much judgement.</p><p>That sets up the sentence the chapter is remembered for. &ldquo;as to have no Desire, is to be Dead: so to have weak Passions, is Dulnesse; and to have Passions indifferently for every thing, Giddinesse, and Distraction; and to have stronger, and more vehement Passions for any thing, than is ordinarily seen in others, is that which men call Madnesse&rdquo;. Madness on this account is the same thing as the passions that make wit, turned up: not a separate sickness but the passions in excess, and it comes in as many kinds as the passions do. In the wit preset dullness and madness are weak and vehement passion, and giddiness is passion spread over everything. Dullness is madness comes out absurd, since weak and vehement passion cannot be joined, while giddiness is madness is only false, because vehemence is missing. That sorting is the lab's, not Hobbes's: he counts a false general claim absurd too.</p><p>He applies the account in the way that made it dangerous. The passions that make madness are pride, which he calls great vain-glory, and great dejection, and an excessive opinion of one's own inspiration &ldquo;becomes Distraction, and Giddinesse&rdquo;. A man may show no extravagance alone, but &ldquo;when many of them conspire together, the Rage of the whole multitude is visible enough&rdquo;, and he calls the opinion of being inspired the &ldquo;Private Spirit&rdquo;. In England in 1651, with sects of every kind preaching on private revelation, it was not an abstract remark. And his example is a man in Bedlam who tells you, in sober discourse, that he is God the Father: you need expect no extravagant action &ldquo;for argument of his Madnesse&rdquo;. The claim to inspiration is itself the evidence.</p><p>He had a historical argument, too, and it is worth telling. Opinions of the cause of madness, he says, have been two: the passions, or spirits entering a man. At Abdera a crowd came to see the tragedy of Andromeda on a very hot day, many of them fell into fevers, and for a while they could only recite iambics about Perseus and Andromeda, until winter cured it: the passion of the play had been imprinted. In another Greek city young women began to hang themselves, and most thought it the work of the devil; but one who suspected that &ldquo;contempt of life in them, might proceed from some Passion of the mind&rdquo;, and that they would not contemn their honour, advised the magistrates to &ldquo;strip such as so hang'd themselves, and let them hang out naked&rdquo;, and the story says it cured them. The Jews, he adds, &ldquo;called mad-men Prophets&rdquo; or demoniacs, and he says he can imagine no reason but &ldquo;the want of curiosity to search naturall causes&rdquo;.</p><p>Then he turns to the Gospels, and the way he does it is the thing to read carefully. Of the demoniacs he says: &ldquo;I see nothing at all in the Scripture, that requireth a beliefe, that Daemoniacks were any other thing but Mad-men.&rdquo; The question he is asked is why Christ treats them as possessed. His answer is that Scripture &ldquo;was written to shew unto men the kingdome of God, and to prepare their mindes to become his obedient subjects; leaving the world, and the Philosophy thereof, to the disputation of men, for the exercising of their naturall Reason&rdquo;, the same answer, he says, as to those who urge Scripture against the motion of the Earth. Christ speaks to the disease as to a person as all who cure by words do, and rebukes the winds and a fever which are not devils. It would be wrong to read this as a denial that Christ cured: it is a claim about what the text obliges a reader to believe, and it matters politically because a doctrine of possession was one of the sources of the authority of exorcists and of those who claimed the spirit. Those who held possession to be the plain sense of the Gospels would say that he explains the text away.</p><p>The last pages are about the schoolmen, whose speech he counts as another madness: speech that, &ldquo;put together, have in them no signification at all&rdquo;. His sample is the title of a chapter of the Jesuit Francisco Suárez, which he translates: &ldquo;The first cause does not necessarily inflow any thing into the second, by force of the Essentiall subordination of the second causes, by Which it may help it to worke&rdquo;. &ldquo;When men write whole volumes of such stuffe&rdquo;, he asks, &ldquo;are they not Mad, or intend to make others so?&rdquo;. In the lab's suarez preset, a first cause is a cause and a second cause is a cause, so both are true; a first cause is a second cause is absurd, because first and second are an opposed pair; and a first cause is an inflow is insignificant, since <em>inflow</em> has no definition in the vocabulary. This is the difference the lab draws and Hobbes does not: a phrase that clashes, and a phrase that is empty.</p><p>His second target is transubstantiation, and the argument is a reductio. The schoolmen say that whiteness, roundness and the like, &ldquo;all which are incorporeall&rdquo;, go out of the wafer into the body of Christ. But &ldquo;by Spirits, they mean alwayes things, that being incorporeall, are neverthelesse moveable from one place to another&rdquo;, and so, he says, they make &ldquo;those Nesses, Tudes, and Ties, to be so many spirits&rdquo;. Run the nesses preset. If whiteness is an incorporeal accident that moves from the wafer to the body, then by the definitions given, whiteness is a spirit, which is true by their own words; a wafer is a spirit is absurd; a spirit is an accident is only false; and whiteness is a tude is insignificant, since the word has no definition. The lab shows that the doctrine as stated yields his consequence. Whether the schoolmen's accidents are as he defines them is what they would deny.</p><p>A defender of the schoolmen would say that their technical terms had definitions inside the school's own vocabulary, and that to ask for a translation into tolerable Latin is to measure them against the wrong language. Hobbes's own remark is that &ldquo;common sort of men seldome speak Insignificantly&rdquo;, and that they are called idiots by those who do. The next lesson, <em>The Several Subjects of Knowledge</em>, shows what he put in place of the schoolmen's order: a table of all the sciences, set out as nested definitions.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reckoning with names</h2></div><p>what a name adds up to, and whether an affirmation is true by it</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Wit, madness and the schoolmen</h2><div class="prose reading"><p><strong>Chapter 8.</strong> &ldquo;So that where Wit is wanting, it is not Fancy that is wanting, but Discretion. Judgement therefore without Fancy is Wit, but Fancy without Judgement not.&rdquo;</p><p>You have met both people. One tells a story at dinner that leaps from the dinner to a cousin to a ship to a recipe, each connection bright and none of them on the road to the point, and by the end the table is lost. Another says little, and what she says is exactly what the moment needed. Hobbes's claim is that the second has wit and the first, for all the brightness, has not. Wit is judgement, the noticing of differences, of &ldquo;times, places, and persons&rdquo;; fancy is the noticing of likenesses, and it is a virtue only when it is steadied by a direction to some end. &ldquo;without Stedinesse, and Direction to some End, a great Fancy is one kind of Madnesse&rdquo;.</p><p>He gives a table of how the two mix. In a poem, both are needed and fancy must be the more eminent, because poems please by extravagancy. In a history, &ldquo;the Judgement must be eminent&rdquo;, and &ldquo;Fancy has no place, but onely in adorning the stile&rdquo;. In an oration of praise or invective fancy is paramount, because the design is not truth. And in &ldquo;Demonstration, in Councell, and all rigourous search of Truth&rdquo; judgement does all, and metaphors are &ldquo;utterly excluded&rdquo;, as Chapter 5 said. His own cases make the lab's wit preset: the counsellor, in whom &ldquo;Judgement does all&rdquo;; the digresser, all fancy and no direction; and the poet, both. On the sentence of the passage, that wit is judgement, the counsellor and the poet have wit and the digresser does not. (Earlier in the chapter he defines natural wit as &ldquo;Celerity of Imagining&rdquo; and &ldquo;steddy direction to some approved end&rdquo;; the lab takes the sentence of the passage, which is the conclusion of one comparison.)</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reckoning with names</h2></div><p>what a name adds up to, and whether an affirmation is true by it</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Reckoning with names</strong><span>what a name adds up to, and whether an affirmation is true by it</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="lrkTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="lrkTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A defined name is the sum of its parts, and a part may itself be defined; adding up every part down to the simple names gives the name's expansion (listed in alphabetical order). A claim 'subject is predicate' may give several names on either side, read as their sum. Its verdict, in this order of precedence: insignificant, when a name in it, or a name it is defined through, is neither simple nor defined, so stands for nothing; else absurd, when the subject, the predicate, or the two together contain a pair of names that cannot be added; else true, when every simple name of the predicate is in the subject's expansion; else false. A name defined through itself, directly or through others, is refused, naming the circle.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Which phrases clash, and which are empty?</h3>
-          <p>A figure computed from what the lesson states. Each claim is checked against the definitions in the preset. A claim is absurd when it would join an opposed pair, insignificant when a name has no definition, and otherwise true or false by the parts. Run the three presets, then define one of the empty words and see its verdict change.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Which phrases clash, and which are empty?</h3>
+            <p>A figure computed from what the lesson states. Each claim is checked against the definitions in the preset. A claim is absurd when it would join an opposed pair, insignificant when a name has no definition, and otherwise true or false by the parts. Run the three presets, then define one of the empty words and see its verdict change.</p>
         <div class="field">
           <label for="lrkPreset">Worked example</label>
           <select id="lrkPreset"><option value="wit" selected>Wit, fancy, judgement and the grades of passion</option><option value="suarez">The first cause and the second</option><option value="nesses">The wafer, whiteness and the spirits</option></select>
@@ -1439,12 +1482,15 @@
           <div class="kpi"><span>Insignificant</span><strong id="lrkEmpty">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Where do the differences come from? Not from the body's instruments. If the difference proceeded from the temper of the brain and the organs of sense, he argues, &ldquo;there would be no lesse difference of men in their Sight, Hearing, or other Senses, than in their Fancies, and Discretions&rdquo;. It comes from the passions, and in particular from &ldquo;the more or lesse Desire of Power, of Riches, of Knowledge, and of Honour&rdquo;, which are all desire of power, &ldquo;For Riches, Knowledge and Honour are but severall sorts of Power&rdquo;. The thoughts, he says in a picture that is easy to remember, &ldquo;are to the Desires, as Scouts, and Spies, to range abroad, and find the way to the things Desired&rdquo;. A man with no great passion for anything, though he may be inoffensive, can have neither great fancy nor much judgement.</p><p>That sets up the sentence the chapter is remembered for. &ldquo;as to have no Desire, is to be Dead: so to have weak Passions, is Dulnesse; and to have Passions indifferently for every thing, Giddinesse, and Distraction; and to have stronger, and more vehement Passions for any thing, than is ordinarily seen in others, is that which men call Madnesse&rdquo;. Madness on this account is the same thing as the passions that make wit, turned up: not a separate sickness but the passions in excess, and it comes in as many kinds as the passions do. In the wit preset dullness and madness are weak and vehement passion, and giddiness is passion spread over everything. Dullness is madness comes out absurd, since weak and vehement passion cannot be joined, while giddiness is madness is only false, because vehemence is missing. That sorting is the lab's, not Hobbes's: he counts a false general claim absurd too.</p><p>He applies the account in the way that made it dangerous. The passions that make madness are pride, which he calls great vain-glory, and great dejection, and an excessive opinion of one's own inspiration &ldquo;becomes Distraction, and Giddinesse&rdquo;. A man may show no extravagance alone, but &ldquo;when many of them conspire together, the Rage of the whole multitude is visible enough&rdquo;, and he calls the opinion of being inspired the &ldquo;Private Spirit&rdquo;. In England in 1651, with sects of every kind preaching on private revelation, it was not an abstract remark. And his example is a man in Bedlam who tells you, in sober discourse, that he is God the Father: you need expect no extravagant action &ldquo;for argument of his Madnesse&rdquo;. The claim to inspiration is itself the evidence.</p><p>He had a historical argument, too, and it is worth telling. Opinions of the cause of madness, he says, have been two: the passions, or spirits entering a man. At Abdera a crowd came to see the tragedy of Andromeda on a very hot day, many of them fell into fevers, and for a while they could only recite iambics about Perseus and Andromeda, until winter cured it: the passion of the play had been imprinted. In another Greek city young women began to hang themselves, and most thought it the work of the devil; but one who suspected that &ldquo;contempt of life in them, might proceed from some Passion of the mind&rdquo;, and that they would not contemn their honour, advised the magistrates to &ldquo;strip such as so hang'd themselves, and let them hang out naked&rdquo;, and the story says it cured them. The Jews, he adds, &ldquo;called mad-men Prophets&rdquo; or demoniacs, and he says he can imagine no reason but &ldquo;the want of curiosity to search naturall causes&rdquo;.</p><p>Then he turns to the Gospels, and the way he does it is the thing to read carefully. Of the demoniacs he says: &ldquo;I see nothing at all in the Scripture, that requireth a beliefe, that Daemoniacks were any other thing but Mad-men.&rdquo; The question he is asked is why Christ treats them as possessed. His answer is that Scripture &ldquo;was written to shew unto men the kingdome of God, and to prepare their mindes to become his obedient subjects; leaving the world, and the Philosophy thereof, to the disputation of men, for the exercising of their naturall Reason&rdquo;, the same answer, he says, as to those who urge Scripture against the motion of the Earth. Christ speaks to the disease as to a person as all who cure by words do, and rebukes the winds and a fever which are not devils. It would be wrong to read this as a denial that Christ cured: it is a claim about what the text obliges a reader to believe, and it matters politically because a doctrine of possession was one of the sources of the authority of exorcists and of those who claimed the spirit. Those who held possession to be the plain sense of the Gospels would say that he explains the text away.</p><p>The last pages are about the schoolmen, whose speech he counts as another madness: speech that, &ldquo;put together, have in them no signification at all&rdquo;. His sample is the title of a chapter of the Jesuit Francisco Suárez, which he translates: &ldquo;The first cause does not necessarily inflow any thing into the second, by force of the Essentiall subordination of the second causes, by Which it may help it to worke&rdquo;. &ldquo;When men write whole volumes of such stuffe&rdquo;, he asks, &ldquo;are they not Mad, or intend to make others so?&rdquo;. In the lab's suarez preset, a first cause is a cause and a second cause is a cause, so both are true; a first cause is a second cause is absurd, because first and second are an opposed pair; and a first cause is an inflow is insignificant, since <em>inflow</em> has no definition in the vocabulary. This is the difference the lab draws and Hobbes does not: a phrase that clashes, and a phrase that is empty.</p><p>His second target is transubstantiation, and the argument is a reductio. The schoolmen say that whiteness, roundness and the like, &ldquo;all which are incorporeall&rdquo;, go out of the wafer into the body of Christ. But &ldquo;by Spirits, they mean alwayes things, that being incorporeall, are neverthelesse moveable from one place to another&rdquo;, and so, he says, they make &ldquo;those Nesses, Tudes, and Ties, to be so many spirits&rdquo;. Run the nesses preset. If whiteness is an incorporeal accident that moves from the wafer to the body, then by the definitions given, whiteness is a spirit, which is true by their own words; a wafer is a spirit is absurd; a spirit is an accident is only false; and whiteness is a tude is insignificant, since the word has no definition. The lab shows that the doctrine as stated yields his consequence. Whether the schoolmen's accidents are as he defines them is what they would deny.</p><p>A defender of the schoolmen would say that their technical terms had definitions inside the school's own vocabulary, and that to ask for a translation into tolerable Latin is to measure them against the wrong language. Hobbes's own remark is that &ldquo;common sort of men seldome speak Insignificantly&rdquo;, and that they are called idiots by those who do. The next lesson, <em>The Several Subjects of Knowledge</em>, shows what he put in place of the schoolmen's order: a table of all the sciences, set out as nested definitions.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sorting a phrase</h2></div><p>Four steps, asking the questions in this order.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Look for names with no definition</h3><p>If any word in the claim has no definition in the vocabulary, the claim is empty: it stands for nothing, and cannot be true, false or absurd.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Expand the names</h3><p>Replace each defined name by the simple names that make it up.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Look for a clash</h3><p>If the two expansions together contain an opposed pair, the claim is absurd, however it is worded.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare the parts</h3><p>If neither of those, the claim is true when everything in the predicate is in the subject, and false when something is missing.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sorting a phrase</h2>
+      <p class="lead-in">Four steps, asking the questions in this order.</p>
+      <ol class="key-ideas method"><li><strong>Look for names with no definition.</strong> If any word in the claim has no definition in the vocabulary, the claim is empty: it stands for nothing, and cannot be true, false or absurd.</li><li><strong>Expand the names.</strong> Replace each defined name by the simple names that make it up.</li><li><strong>Look for a clash.</strong> If the two expansions together contain an opposed pair, the claim is absurd, however it is worded.</li><li><strong>Compare the parts.</strong> If neither of those, the claim is true when everything in the predicate is in the subject, and false when something is missing.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1461,17 +1507,16 @@ no clash, and both parts of spirit are in whiteness
 so whiteness is a spirit: true</div><p>That is Hobbes's reductio: on their own definitions the accidents they send from the wafer to the body are spirits. A critic of the argument will say they would not accept the definition of whiteness, and the lab can only show what follows from it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a lively fancy is the same as wit</strong><span>The table of poem, history and oration is Hobbes's own answer: fancy is a virtue in a poem and has no place in a history. In the wit preset the digresser, who is only fancy, has no wit on the passage's definition, and the poet, who has both, has it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading madness as a separate sickness</strong><span>In the chapter madness is the same thing as the passions in excess, in as many kinds as there are passions. He goes further, saying that if the excesses are madness there is no doubt the passions themselves, when they tend to evil, are degrees of the same. The wit preset puts dullness and madness at opposite ends, and giddiness off that scale.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking Hobbes denies that Christ healed the demoniacs</strong><span>He says nothing of the sort. He says the text does not oblige a belief that they were possessed, and explains Christ's speaking to the disease as the usual phrase of one who cures by words, as he rebuked the winds and a fever.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can sort a phrase as true, false, absurd or empty against stated definitions.</strong><p>Given a vocabulary and a list of phrases, say which are absurd because names clash, which are insignificant because a name is undefined, and which are true or false by the parts.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab applies Hobbes's tests of insignificant speech to vocabularies written for this lesson, and the definitions of the schoolmen's terms are his account of them, which they would dispute. It cannot say whether the passions explain wit and madness, or whether the Gospels' demoniacs were mad. It also separates absurd from empty, which Hobbes does not: he calls both insignificant, and holds that a false general affirmation is absurd too, so the lab's false, absurd and insignificant are its own sorting and not his.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a lively fancy is the same as wit</strong><span>The table of poem, history and oration is Hobbes's own answer: fancy is a virtue in a poem and has no place in a history. In the wit preset the digresser, who is only fancy, has no wit on the passage's definition, and the poet, who has both, has it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading madness as a separate sickness</strong><span>In the chapter madness is the same thing as the passions in excess, in as many kinds as there are passions. He goes further, saying that if the excesses are madness there is no doubt the passions themselves, when they tend to evil, are degrees of the same. The wit preset puts dullness and madness at opposite ends, and giddiness off that scale.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking Hobbes denies that Christ healed the demoniacs</strong><span>He says nothing of the sort. He says the text does not oblige a belief that they were possessed, and explains Christ's speaking to the disease as the usual phrase of one who cures by words, as he rebuked the winds and a fever.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can sort a phrase as true, false, absurd or empty against stated definitions.</strong><p>Given a vocabulary and a list of phrases, say which are absurd because names clash, which are insignificant because a name is undefined, and which are true or false by the parts.</p></div></div><div class="note"><strong>Note:</strong> The lab applies Hobbes's tests of insignificant speech to vocabularies written for this lesson, and the definitions of the schoolmen's terms are his account of them, which they would dispute. It cannot say whether the passions explain wit and madness, or whether the Gospels' demoniacs were mad. It also separates absurd from empty, which Hobbes does not: he calls both insignificant, and holds that a false general affirmation is absurd too, so the lab's false, absurd and insignificant are its own sorting and not his.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Fancy, judgement and wit</summary><p>Natural wit is swiftness of imagining and steady direction to an end. Those who notice similitudes that others rarely see have a good fancy, and those who notice differences have a good judgement. Judgement without fancy is wit, but fancy without judgement is not.</p></details><details class="recall"><summary>The passions as the cause of difference</summary><p>The causes of differences of wit are in the passions, and above all the more or less desire of power, riches, knowledge and honour, all of which reduce to desire of power. Weak passions make dullness, passions for everything make giddiness, and passions more vehement than ordinary make madness.</p></details><details class="recall"><summary>Insignificant speech</summary><p>There is another sort of madness, the abuse of words he called absurdity in Chapter 5: speech that signifies nothing, learned by rote or used to deceive by obscurity, and incident, he says, to those who converse in questions of matters incomprehensible, as the schoolmen do.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 8 asks what makes one mind better than another, and answers that it is the strength and steadiness of the passions, which is also what, in excess, makes madness. It ends on the speech of the schoolmen, which he says signifies nothing. Test his definitions of wit and madness against cases, and sort the schoolmen's phrases into those that clash and those that are empty.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Fancy, judgement and wit.</strong> Natural wit is swiftness of imagining and steady direction to an end. Those who notice similitudes that others rarely see have a good fancy, and those who notice differences have a good judgement. Judgement without fancy is wit, but fancy without judgement is not.</li><li><strong>The passions as the cause of difference.</strong> The causes of differences of wit are in the passions, and above all the more or less desire of power, riches, knowledge and honour, all of which reduce to desire of power. Weak passions make dullness, passions for everything make giddiness, and passions more vehement than ordinary make madness.</li><li><strong>Insignificant speech.</strong> There is another sort of madness, the abuse of words he called absurdity in Chapter 5: speech that signifies nothing, learned by rote or used to deceive by obscurity, and incident, he says, to those who converse in questions of matters incomprehensible, as the schoolmen do.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="w i t equals judgement, fancy alone is not wit. the passions make the difference of wits. weak passion, dullness, vehement, madness. absurd speech joins names that clash. insignificant, a name with no meaning" tabindex="0" role="region" aria-label="Mathematical notation">wit = judgement; fancy alone is not wit
 the passions make the difference of wits
 weak passion: dullness; vehement: madness
@@ -2319,11 +2364,42 @@ insignificant: a name with no meaning</div><figcaption>Wit, madness and empty sp
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2391,7 +2467,7 @@ insignificant: a name with no meaning</div><figcaption>Wit, madness and empty sp
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

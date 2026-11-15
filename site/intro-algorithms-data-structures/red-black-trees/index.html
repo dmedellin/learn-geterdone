@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,30 +1424,28 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Data Structures</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 13 · Red-Black Trees</p>
       <h1>Red-Black Trees and Rotations</h1>
       <p class="lesson-lede">A red-black tree is a search tree that spends one bit per node on a colour and obeys five rules about the colours; the rules force every root-to-leaf path to within a factor of two of every other, so the height is at most 2 lg(n + 1).</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The red-black properties</li><li>Black-height</li><li>Rotation</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the check</h2>
-      <article class="prose reading"><p>A red-black tree, the authors write in Section 13.1, constrains colours so that &ldquo;no such path is more than twice as long as any other, so that the tree is approximately balanced.&rdquo; The paths are the ones from the root down to a leaf, and the claim is the chapter's whole purpose: Chapter 12 made every operation cost the height, and this chapter keeps the height logarithmic whatever order the keys arrive in. This lesson reads the opening and sections 13.1 and 13.2.</p><p>Section 13.1 starts with a convention. Wherever a node lacks a child, the missing child is treated as a leaf, an external node, and the key-bearing nodes are internal. Every internal node then has exactly two children, and the properties can speak of leaves without exceptions. The book uses one sentinel, <span class="math" data-say="T, nil">T.nil</span>, a black node standing for every leaf and for the root's parent, which is the economy Section 10.2 recommended: one extra object per tree rather than one per missing child. Drawings usually leave the leaves out.</p><div class="defbox"><span class="label">Definition &middot; The five red-black properties, in the book&#x27;s order</span><p>1. Each node carries one of two colours, red or black. 2. The root must be black. 3. Each leaf, <span class="math" data-say="T, nil">T.nil</span>, is black. 4. A red node has two black children. 5. From any node, every downward path to a leaf meets equally many black nodes.</p></div><p>Properties 4 and 5 together do the work. By property 5 every path from the root to a leaf has the same number of black nodes, the black-height; by property 4 no two reds are adjacent, so reds can at most alternate with blacks. The shortest possible path is all black and the longest alternates, which is the factor of two in the quotation. The other three properties make the count well defined: every node has a colour, the leaves are black, and the root is black, which a fix-up can always restore by recolouring it.</p><div class="thm"><span class="label">Theorem &middot; Lemma 13.1</span><p>If a red-black tree has n internal nodes, its height is at most <span class="math" data-say="2 times log base 2 of the quantity n plus 1">2·lg(n + 1)</span>.</p></div><p>The proof has two steps. First, by induction on height, the subtree rooted at any node x holds at least <span class="math" data-say="2 to the power b h of x minus 1">2^bh(x) − 1</span> internal nodes: a leaf holds 0, and each child of an internal node has black-height at least <span class="math" data-say="bh of x minus 1">bh(x) − 1</span>, so x's subtree holds at least <span class="math" data-say="2 times the quantity 2 to the power the quantity bh of x minus 1, minus 1, plus 1">2·(2^(bh(x) − 1) − 1) + 1</span> nodes, which is the claim. Second, property 4 means black nodes make up at least half of every root-to-leaf path, the root left out, so a tree of height h has black-height at least h/2. Then <span class="math" data-say="n is at least 2 to the power the quantity h over 2, minus 1">n ≥ 2^(h/2) − 1</span>, and taking logarithms gives the bound. Search, minimum, maximum, successor and predecessor therefore run in <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> with no change to Chapter 12's code.</p><p>Insertion and deletion are a different matter, since Chapter 12's versions can break the properties. Section 13.2 supplies the tool for repairing them. LEFT-ROTATE at a node x whose right child y is not <span class="math" data-say="T, nil">T.nil</span> makes y the root of the subtree, makes x y's left child, and gives y's former left subtree to x as its right subtree. RIGHT-ROTATE is the mirror image. Each runs in <span class="math" data-say="big O of 1">O(1)</span> and changes only pointers; the inorder sequence, and with it the search-tree property, is untouched. The Algorithms Subject's lesson Rotations and the AVL Invariant lets you rotate any node of a tree and watch what stays fixed.</p><div class="mathblock" data-say="a left rotation at x, with y equals x &#x27; s right child. before, x has left subtree alpha and right child y. y has left subtree beta and right subtree gamma. after, y has left child x and right subtree gamma. x has left subtree alpha and right subtree beta. inorder, before and after, alpha, x, beta, y, gamma" tabindex="0" role="region" aria-label="Mathematical notation">a left rotation at x, with y = x&#x27;s right child
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the check</h2><div class="prose reading"><p>A red-black tree, the authors write in Section 13.1, constrains colours so that &ldquo;no such path is more than twice as long as any other, so that the tree is approximately balanced.&rdquo; The paths are the ones from the root down to a leaf, and the claim is the chapter's whole purpose: Chapter 12 made every operation cost the height, and this chapter keeps the height logarithmic whatever order the keys arrive in. This lesson reads the opening and sections 13.1 and 13.2.</p><p>Section 13.1 starts with a convention. Wherever a node lacks a child, the missing child is treated as a leaf, an external node, and the key-bearing nodes are internal. Every internal node then has exactly two children, and the properties can speak of leaves without exceptions. The book uses one sentinel, <span class="math" data-say="T, nil">T.nil</span>, a black node standing for every leaf and for the root's parent, which is the economy Section 10.2 recommended: one extra object per tree rather than one per missing child. Drawings usually leave the leaves out.</p><div class="defbox"><span class="label">Definition &middot; The five red-black properties, in the book&#x27;s order</span><p>1. Each node carries one of two colours, red or black. 2. The root must be black. 3. Each leaf, <span class="math" data-say="T, nil">T.nil</span>, is black. 4. A red node has two black children. 5. From any node, every downward path to a leaf meets equally many black nodes.</p></div><p>Properties 4 and 5 together do the work. By property 5 every path from the root to a leaf has the same number of black nodes, the black-height; by property 4 no two reds are adjacent, so reds can at most alternate with blacks. The shortest possible path is all black and the longest alternates, which is the factor of two in the quotation. The other three properties make the count well defined: every node has a colour, the leaves are black, and the root is black, which a fix-up can always restore by recolouring it.</p><div class="thm"><span class="label">Theorem &middot; Lemma 13.1</span><p>If a red-black tree has n internal nodes, its height is at most <span class="math" data-say="2 times log base 2 of the quantity n plus 1">2·lg(n + 1)</span>.</p></div><p>The proof has two steps. First, by induction on height, the subtree rooted at any node x holds at least <span class="math" data-say="2 to the power b h of x minus 1">2^bh(x) − 1</span> internal nodes: a leaf holds 0, and each child of an internal node has black-height at least <span class="math" data-say="bh of x minus 1">bh(x) − 1</span>, so x's subtree holds at least <span class="math" data-say="2 times the quantity 2 to the power the quantity bh of x minus 1, minus 1, plus 1">2·(2^(bh(x) − 1) − 1) + 1</span> nodes, which is the claim. Second, property 4 means black nodes make up at least half of every root-to-leaf path, the root left out, so a tree of height h has black-height at least h/2. Then <span class="math" data-say="n is at least 2 to the power the quantity h over 2, minus 1">n ≥ 2^(h/2) − 1</span>, and taking logarithms gives the bound. Search, minimum, maximum, successor and predecessor therefore run in <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> with no change to Chapter 12's code.</p><p>Insertion and deletion are a different matter, since Chapter 12's versions can break the properties. Section 13.2 supplies the tool for repairing them. LEFT-ROTATE at a node x whose right child y is not <span class="math" data-say="T, nil">T.nil</span> makes y the root of the subtree, makes x y's left child, and gives y's former left subtree to x as its right subtree. RIGHT-ROTATE is the mirror image. Each runs in <span class="math" data-say="big O of 1">O(1)</span> and changes only pointers; the inorder sequence, and with it the search-tree property, is untouched. The Algorithms Subject's lesson Rotations and the AVL Invariant lets you rotate any node of a tree and watch what stays fixed.</p><div class="mathblock" data-say="a left rotation at x, with y equals x &#x27; s right child. before, x has left subtree alpha and right child y. y has left subtree beta and right subtree gamma. after, y has left child x and right subtree gamma. x has left subtree alpha and right subtree beta. inorder, before and after, alpha, x, beta, y, gamma" tabindex="0" role="region" aria-label="Mathematical notation">a left rotation at x, with y = x&#x27;s right child
 
 before:   x has left subtree α and right child y;
           y has left subtree β and right subtree γ
 after:    y has left child x and right subtree γ;
           x has left subtree α and right subtree β
-inorder, before and after:   α  x  β  y  γ</div><p>Now the lab, which checks a tree against all five properties and against search-tree order. You write the tree as records, one per node: its key, its colour, and its parent's key, or a dash for the root; a child smaller than its parent is its left child. The tiles say whether the tree is red-black, then each property in turn, holding or failing at the first node found, then search-tree order, the number of nodes, the root's black-height, the height, and the bound of Lemma 13.1. The lab's height counts the edges down to the deepest leaf, NIL included, as the lemma's proof does, so it is one more than Chapter 12's height of the same tree.</p><p>The worked example <code>valid-eight</code> is the tree of the worked example below: every property holds, 8 nodes, black-height 2, height 4, against the bound <span class="math" data-say="2 times log base 2 of 9 is approximately 6.34">2 lg 9 ≈ 6.34</span>. <code>red-child</code> adds a red 30 below the red 33, and property 4 fails at 33 while property 5 still holds, since a red node adds no black. <code>unequal-black</code> blackens 52, and property 5 fails at 41: one black node down its left side, two down its right. <code>red-root</code> is a tree whose only fault is its red root, the fault RB-INSERT-FIXUP's last line repairs by recolouring. And <code>out-of-order</code> is coloured correctly and is not a search tree: 30 sits in 26's left subtree, which the colours cannot detect.</p><p>Each verdict is about the tree on screen, and the lemma is about every tree. No tree of 8 nodes has height below 4 in the lab's count, and the lemma says no valid red-black tree of 8 nodes can reach 7; only its proof shows that.</p><h3>Exercise</h3><p>Check by hand the tree with root 20 black; 10 black and 30 red below it; 5 red below 10; 25 and 40 black below 30; 35 and 45 red below 40. Give every node's black-height. Then colour 40 red and 35 and 45 black, and say which property fails, at which node, and whether the black-height changes. Type both trees into the lab to check.</p><p>Rotations restore balance, but something has to decide when to rotate and what to recolour. The next lesson, Red-Black Insertion and Deletion, reads the two fix-up procedures that do, and counts their work.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Red-black trees</h2></div><p>the five red-black properties, checked</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+inorder, before and after:   α  x  β  y  γ</div><p>Now the lab, which checks a tree against all five properties and against search-tree order. You write the tree as records, one per node: its key, its colour, and its parent's key, or a dash for the root; a child smaller than its parent is its left child. The tiles say whether the tree is red-black, then each property in turn, holding or failing at the first node found, then search-tree order, the number of nodes, the root's black-height, the height, and the bound of Lemma 13.1. The lab's height counts the edges down to the deepest leaf, NIL included, as the lemma's proof does, so it is one more than Chapter 12's height of the same tree.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Red-black trees</h2></div><p>the five red-black properties, checked</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Red-black trees</strong><span>the five red-black properties, checked</span></div>
       </div>
@@ -1410,10 +1453,10 @@ inorder, before and after:   α  x  β  y  γ</div><p>Now the lab, which checks 
       <div class="table-wrap" id="rbiTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="rbiTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is a node: its key, its color and its parent's key. A child with a smaller key than its parent is the left child, otherwise the right; every missing child is a black NIL leaf. Property 4 names the first red node with a red child in preorder (root, left subtree, right subtree). Property 5 names the first node, in postorder (left subtree, right subtree, node), whose two sides have different numbers of black nodes down to their NIL leaves. Search-tree order names the first pair out of order in the inorder walk. The height counts the edges from the root down to its deepest NIL leaf, so a lone node has height 1; black-height bh(x) counts the black nodes below x on a path down to a NIL leaf, the NIL leaf counted and x not. Lemma 13.1's bound 2 lg(n + 1) is printed to two places, rounded half up by exact integer comparison, with = only when it is exact.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Check a tree against the five properties</h3>
-          <p>A count over the situation the lesson states. Write one record per node: key, colour, parent (a dash for the root). The lab checks each red-black property and search-tree order, names the first node where one fails, and sets the height beside Lemma 13.1's bound. A verdict is about this tree; the lemma holds for every red-black tree.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Check a tree against the five properties</h3>
+            <p>A count over the situation the lesson states. Write one record per node: key, colour, parent (a dash for the root). The lab checks each red-black property and search-tree order, names the first node where one fails, and sets the height beside Lemma 13.1's bound. A verdict is about this tree; the lemma holds for every red-black tree.</p>
         <div class="field">
           <label for="rbiPreset">Worked example</label>
           <select id="rbiPreset"><option value="valid-eight" selected>An eight-node tree, the lesson's worked example</option><option value="red-child">The same tree with a red 30 below the red 33</option><option value="unequal-black">The same tree with 52 coloured black</option><option value="red-root">A seven-node tree with a red root</option><option value="out-of-order">A seven-node tree with 30 below 14</option></select>
@@ -1436,12 +1479,15 @@ inorder, before and after:   α  x  β  y  γ</div><p>Now the lab, which checks 
           <div class="kpi"><span>Lemma 13.1 bound</span><strong id="rbiBound">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The worked example <code>valid-eight</code> is the tree of the worked example below: every property holds, 8 nodes, black-height 2, height 4, against the bound <span class="math" data-say="2 times log base 2 of 9 is approximately 6.34">2 lg 9 ≈ 6.34</span>. <code>red-child</code> adds a red 30 below the red 33, and property 4 fails at 33 while property 5 still holds, since a red node adds no black. <code>unequal-black</code> blackens 52, and property 5 fails at 41: one black node down its left side, two down its right. <code>red-root</code> is a tree whose only fault is its red root, the fault RB-INSERT-FIXUP's last line repairs by recolouring. And <code>out-of-order</code> is coloured correctly and is not a search tree: 30 sits in 26's left subtree, which the colours cannot detect.</p><p>Each verdict is about the tree on screen, and the lemma is about every tree. No tree of 8 nodes has height below 4 in the lab's count, and the lemma says no valid red-black tree of 8 nodes can reach 7; only its proof shows that.</p><h3>Exercise</h3><p>Check by hand the tree with root 20 black; 10 black and 30 red below it; 5 red below 10; 25 and 40 black below 30; 35 and 45 red below 40. Give every node's black-height. Then colour 40 red and 35 and 45 black, and say which property fails, at which node, and whether the black-height changes. Type both trees into the lab to check.</p><p>Rotations restore balance, but something has to decide when to rotate and what to recolour. The next lesson, Red-Black Insertion and Deletion, reads the two fix-up procedures that do, and counts their work.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Checking a red-black tree by hand</h2></div><p>Four steps on a drawn tree, then one in the lab.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Draw the leaves</h3><p>Hang a black NIL leaf wherever a node lacks a child. Every internal node now has two children, and properties 3 and 5 can be read off the drawing.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Check the colours locally</h3><p>The root must be black, and no red node may have a red child. These are properties 2 and 4, and each needs only a node and its children.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute black-heights from the bottom</h3><p>A NIL has black-height 0. For each node, add 1 to a child's black-height if the child is black; the two children must give the same number, or property 5 fails at that node.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Apply the lemma</h3><p>With n internal nodes, check <span class="math" data-say="2 to the power b h minus 1 is at most n">2^bh − 1 ≤ n</span> at the root and the height against <span class="math" data-say="2 times log base 2 of the quantity n plus 1">2·lg(n + 1)</span>.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Check a tree of your own</h3><p>Draw a red-black tree of nine to twelve nodes, type it into the lab, and confirm your black-height. Then recolour one node so that exactly one property fails, and predict which node the lab will name.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Checking a red-black tree by hand</h2>
+      <p class="lead-in">Four steps on a drawn tree, then one in the lab.</p>
+      <ol class="key-ideas method"><li><strong>Draw the leaves.</strong> Hang a black NIL leaf wherever a node lacks a child. Every internal node now has two children, and properties 3 and 5 can be read off the drawing.</li><li><strong>Check the colours locally.</strong> The root must be black, and no red node may have a red child. These are properties 2 and 4, and each needs only a node and its children.</li><li><strong>Compute black-heights from the bottom.</strong> A NIL has black-height 0. For each node, add 1 to a child's black-height if the child is black; the two children must give the same number, or property 5 fails at that node.</li><li><strong>Apply the lemma.</strong> With n internal nodes, check <span class="math" data-say="2 to the power b h minus 1 is at most n">2^bh − 1 ≤ n</span> at the root and the height against <span class="math" data-say="2 times log base 2 of the quantity n plus 1">2·lg(n + 1)</span>.</li><li><strong>Check a tree of your own.</strong> Draw a red-black tree of nine to twelve nodes, type it into the lab, and confirm your black-height. Then recolour one node so that exactly one property fails, and predict which node the lab will name.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1462,17 +1508,16 @@ longest path 26, 14, 9, 5, NIL: 4 edges
 bound 2·lg 9 ≈ 6.34</div><p>Property 5 holds at every node because each node's two children give the same count; at 26 the red 14 adds nothing and the black 41 adds one, and both sides come to 2. Property 4 holds because the reds, 14, 5, 33 and 52, all have black children or NIL leaves. The longest path alternates red and black for part of its length, which is as long as the rules allow a path to be.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the red-black rules as making the tree perfectly balanced</strong><span>The rules bound the longest root-to-leaf path at twice the shortest, not at one more. The worked example's tree has paths of 3 and 4 edges to its leaves, and Lemma 13.1 allows a valid tree of 8 nodes a height of up to 6. What the rules buy is a guarantee of <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> height for every insertion order, with a constant of 2, at the price of one bit per node.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting black-height wrongly</strong><span>The book's <span class="math" data-say="bh of x">bh(x)</span> leaves x out and counts the NIL leaf. Counting x, or leaving out the leaf, gives a number one off, and Lemma 13.1's <span class="math" data-say="2 to the power b h of x minus 1">2^bh(x) − 1</span> then stops matching small cases. In the worked example the root 26 has black-height 2: the path 26, 14, 9 and its leaf passes 9 and the leaf, and not 26.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the colours can stand in for the search-tree property</strong><span>The colours constrain shape and say nothing about key order. The lab's <code>out-of-order</code> tree satisfies all five properties and is not a search tree, because 30 sits in 26's left subtree. A red-black tree is first a binary search tree, and the five properties are added to it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can check a red-black tree and bound its height.</strong><p>Given a coloured tree of eight to fifteen nodes, check each property, give every node's black-height, name the first node where a property fails, and compare the height with <span class="math" data-say="2 times log base 2 of the quantity n plus 1">2·lg(n + 1)</span>.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab checks a tree you write; it does not rotate. Rotation is worked by hand here, and the Algorithms lesson named above rotates any node. Its height counts the edges to the deepest NIL leaf, one more than Chapter 12's height. Each verdict is about one tree; Lemma 13.1 is proved for all of them.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the red-black rules as making the tree perfectly balanced</strong><span>The rules bound the longest root-to-leaf path at twice the shortest, not at one more. The worked example's tree has paths of 3 and 4 edges to its leaves, and Lemma 13.1 allows a valid tree of 8 nodes a height of up to 6. What the rules buy is a guarantee of <span class="math" data-say="big O of log base 2 of n">O(lg n)</span> height for every insertion order, with a constant of 2, at the price of one bit per node.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting black-height wrongly</strong><span>The book's <span class="math" data-say="bh of x">bh(x)</span> leaves x out and counts the NIL leaf. Counting x, or leaving out the leaf, gives a number one off, and Lemma 13.1's <span class="math" data-say="2 to the power b h of x minus 1">2^bh(x) − 1</span> then stops matching small cases. In the worked example the root 26 has black-height 2: the path 26, 14, 9 and its leaf passes 9 and the leaf, and not 26.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the colours can stand in for the search-tree property</strong><span>The colours constrain shape and say nothing about key order. The lab's <code>out-of-order</code> tree satisfies all five properties and is not a search tree, because 30 sits in 26's left subtree. A red-black tree is first a binary search tree, and the five properties are added to it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can check a red-black tree and bound its height.</strong><p>Given a coloured tree of eight to fifteen nodes, check each property, give every node's black-height, name the first node where a property fails, and compare the height with <span class="math" data-say="2 times log base 2 of the quantity n plus 1">2·lg(n + 1)</span>.</p></div></div><div class="note"><strong>Note:</strong> The lab checks a tree you write; it does not rotate. Rotation is worked by hand here, and the Algorithms lesson named above rotates any node. Its height counts the edges to the deepest NIL leaf, one more than Chapter 12's height. Each verdict is about one tree; Lemma 13.1 is proved for all of them.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The red-black properties</summary><p>Five rules on a search tree whose nodes are coloured: every node is red or black; the root is black; every leaf, the NIL below a node with a missing child, is black; a red node's children are both black; and from each node, every path down to a leaf passes the same number of black nodes.</p></details><details class="recall"><summary>Black-height</summary><p>For a node x, the number of black nodes on any path from x down to a leaf, not counting x and counting the NIL leaf. Property 5 is exactly the statement that this number is the same on every path, so <span class="math" data-say="bh of x">bh(x)</span> is well defined. The tree's black-height is its root's.</p></details><details class="recall"><summary>Rotation</summary><p>A local change at a node x and one child y that makes y the parent and x its child, handing y's inner subtree across to x. A left rotation lifts x's right child, a right rotation its left. It changes a constant number of pointers and keeps the inorder sequence, so the search-tree property survives.</p></details></div>
+      <h3>Summary</h3>
       <p>Sections 13.1 and 13.2 add a colour to each node of a search tree, state the five red-black properties, define black-height, and prove that a tree obeying them has height at most 2 lg(n + 1). They then give the rotation, the local restructuring that later sections use to restore the properties without breaking search-tree order. Check a tree's properties by hand, then let the lab check five trees and point to the first node where each property fails.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The red-black properties.</strong> Five rules on a search tree whose nodes are coloured: every node is red or black; the root is black; every leaf, the NIL below a node with a missing child, is black; a red node's children are both black; and from each node, every path down to a leaf passes the same number of black nodes.</li><li><strong>Black-height.</strong> For a node x, the number of black nodes on any path from x down to a leaf, not counting x and counting the NIL leaf. Property 5 is exactly the statement that this number is the same on every path, so <span class="math" data-say="bh of x">bh(x)</span> is well defined. The tree's black-height is its root's.</li><li><strong>Rotation.</strong> A local change at a node x and one child y that makes y the parent and x its child, handing y's inner subtree across to x. A left rotation lifts x's right child, a right rotation its left. It changes a constant number of pointers and keeps the inorder sequence, so the search-tree property survives.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="every node red or black, the root black. every NIL leaf counts as black. a red node has two black children. equal black counts down every path. bh of x, black nodes below x to a leaf. height at most 2 times log base 2 of the quantity n plus 1. a rotation keeps the inorder sequence" tabindex="0" role="region" aria-label="Mathematical notation">every node red or black; the root black
 every NIL leaf counts as black
 a red node has two black children
@@ -2253,11 +2298,42 @@ a rotation keeps the inorder sequence</div><figcaption>Sections 13.1 and 13.2 in
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2325,7 +2401,7 @@ a rotation keeps the inorder sequence</div><figcaption>Sections 13.1 and 13.2 in
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

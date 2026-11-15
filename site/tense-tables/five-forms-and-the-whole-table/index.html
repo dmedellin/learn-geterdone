@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,37 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Tense Tables</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; A table you can build</p>
       <h1>Five Forms Make Twelve</h1>
       <p class="lesson-lede">Learn five forms of a verb and the twelve boxes fill themselves.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Twelve boxes, but not twelve things to learn</li><li>Four of the five follow a rule</li><li>A rule is a claim, and a claim can be checked</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>One verb, five forms, four boxes</h2>
-      <article class="prose reading"><p>Open any book for learners and you will find a page with twelve boxes on it. Three times: now, before, later. Four shapes for each. Every box has a name, and the book asks you to learn the names and the forms that go in them.</p><p>You do not have to do that, and this lesson is about why.</p><h3>The five forms</h3><p>A verb in English has five forms. For <em>walk</em> they are <em>walk</em>, <em>walks</em>, <em>walking</em>, <em>walked</em>, and the form used after <em>have</em>, which for this verb is also <em>walked</em>. One verb has more: <em>be</em> has eight (<em>am</em>, <em>is</em>, <em>are</em>, <em>was</em>, <em>were</em>, <em>be</em>, <em>being</em>, <em>been</em>), and the course called Irregular Verbs sets it apart from every other verb. The small helping words, <em>will</em> among them, have fewer, and they only ever stand in front.</p><p>Those five fill all twelve boxes. Two of the boxes, <em>walk</em> and <em>walked</em>, are a form on its own. The other ten are simply one of these forms with a small word in front of it. <em>Have</em> gives you the shape that looks back from now. <em>Be</em> with the <em>-ing</em> form gives you the shape that is still going on. <em>Will</em> moves the whole thing later. That is the entire table.</p><ul><li><strong>Simple</strong>: the verb on its own, or with <em>will</em>. <em>She walks. She walked. She will walk.</em></li><li><strong>Progressive</strong>: <em>be</em> and the <em>-ing</em> form. <em>She is walking. She was walking. She will be walking.</em></li><li><strong>Perfect</strong>: <em>have</em> and the form after have. <em>She has walked. She had walked. She will have walked.</em></li><li><strong>Perfect progressive</strong>: <em>have</em>, <em>been</em> and the <em>-ing</em> form. <em>She has been walking. She had been walking. She will have been walking.</em></li></ul><h3>The rules that make four of the five</h3><p>You learn the base form when you learn the word. The other four come from rules, and here they are, exactly as the lab runs them.</p><ul><li>For <em>he</em>, <em>she</em> or <em>it</em>, add <em>-s</em>. After a hissing sound, add <em>-es</em>: <em>passes</em>, <em>wishes</em>, <em>watches</em>. After a consonant and <em>-y</em>, the <em>-y</em> becomes <em>-ies</em>: <em>carries</em>. After a consonant and <em>-o</em>, add <em>-es</em> as well: <em>goes</em>.</li><li>For the <em>-ing</em> form, add <em>-ing</em>, dropping a silent <em>-e</em> first: <em>hope</em>, <em>hoping</em>. A verb ending <em>-ie</em> becomes <em>-ying</em>: <em>lie</em>, <em>lying</em>. A verb ending <em>-ee</em>, <em>-oe</em> or <em>-ye</em> keeps its <em>-e</em>: <em>see</em>, <em>seeing</em>.</li><li>For the past, add <em>-ed</em>. After a silent <em>-e</em> only <em>-d</em> is needed, <em>hope</em>, <em>hoped</em>, and the <em>-y</em> change is the same: <em>carry</em>, <em>carried</em>.</li><li>If the word ends consonant, vowel, consonant, the last letter is not <em>w</em>, <em>x</em> or <em>y</em>, and the last part is the strong part, double that last letter before <em>-ing</em> and <em>-ed</em>: <em>stop</em>, <em>stopping</em>, <em>stopped</em>. Nothing ever doubles before <em>-s</em>.</li></ul><p>That last rule is the only one needing the sound of the word and not only its letters. <em>Stop</em> is one part, so the last part is the strong part, and it doubles: <em>stopping</em>. <em>Listen</em> has two parts and the strong one is the first, so nothing doubles: <em>listening</em>. The lesson &ldquo;When the Last Letter Doubles&rdquo; takes this rule apart on its own.</p><p>The lab applies all four, and it prints the one that fired beside every answer. Type a verb, read the three forms, then read the reason. If you had a different answer, find which rule you used and which one the lab used. The list of 1,210 verbs under the lab is the one the next lesson, &ldquo;Scoring a Rule on 1,210 Real Verbs&rdquo;, scores these rules on, with the words they miss.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Twelve cells, five rules, and the verb you typed</h2></div><p>Every cell is formed on the page by the rule named beside it</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>One verb, five forms, four boxes</h2><div class="prose reading"><p>Open any book for learners and you will find a page with twelve boxes on it. Three times: now, before, later. Four shapes for each. Every box has a name, and the book asks you to learn the names and the forms that go in them.</p><p>You do not have to do that, and this lesson is about why.</p><h3>The five forms</h3><p>A verb in English has five forms. For <em>walk</em> they are <em>walk</em>, <em>walks</em>, <em>walking</em>, <em>walked</em>, and the form used after <em>have</em>, which for this verb is also <em>walked</em>. One verb has more: <em>be</em> has eight (<em>am</em>, <em>is</em>, <em>are</em>, <em>was</em>, <em>were</em>, <em>be</em>, <em>being</em>, <em>been</em>), and the course called Irregular Verbs sets it apart from every other verb. The small helping words, <em>will</em> among them, have fewer, and they only ever stand in front.</p><p>Those five fill all twelve boxes. Two of the boxes, <em>walk</em> and <em>walked</em>, are a form on its own. The other ten are simply one of these forms with a small word in front of it. <em>Have</em> gives you the shape that looks back from now. <em>Be</em> with the <em>-ing</em> form gives you the shape that is still going on. <em>Will</em> moves the whole thing later. That is the entire table.</p><ul><li><strong>Simple</strong>: the verb on its own, or with <em>will</em>. <em>She walks. She walked. She will walk.</em></li><li><strong>Progressive</strong>: <em>be</em> and the <em>-ing</em> form. <em>She is walking. She was walking. She will be walking.</em></li><li><strong>Perfect</strong>: <em>have</em> and the form after have. <em>She has walked. She had walked. She will have walked.</em></li><li><strong>Perfect progressive</strong>: <em>have</em>, <em>been</em> and the <em>-ing</em> form. <em>She has been walking. She had been walking. She will have been walking.</em></li></ul><h3>The rules that make four of the five</h3><p>You learn the base form when you learn the word. The other four come from rules, and here they are, exactly as the lab runs them.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Twelve cells, five rules, and the verb you typed</h2></div><p>Every cell is formed on the page by the rule named beside it</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
 <div class="kpi-grid"><div class="kpi"><span>he / she / it</span><strong id="tbThird">walks</strong></div><div class="kpi"><span>-ing form</span><strong id="tbIng">walking</strong></div><div class="kpi"><span>past form</span><strong id="tbEd">walked</strong></div><div class="kpi"><span>rule that fired</span><strong id="tbRule">nothing special</strong></div></div><div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table id="tbGrid"><thead><tr><th>time</th><th>simple</th><th>progressive</th><th>perfect</th><th>perfect progressive</th></tr></thead><tbody id="tbBody"></tbody></table></div><p class="small-copy" id="tbsHead">The rules scored on every regular verb in the printed list below.</p><div class="kpi-grid"><div class="kpi"><span>rule</span><strong id="tbsRule">&mdash;</strong></div><div class="kpi"><span>right</span><strong id="tbsHit">&mdash;</strong></div><div class="kpi"><span>share right</span><strong id="tbsPct">&mdash;</strong></div><div class="kpi"><span>missed</span><strong id="tbsMiss">&mdash;</strong></div><div class="kpi"><span>the words it missed</span><strong id="tbsFirst">&mdash;</strong></div></div><div class="table-wrap" style="max-height:18rem;overflow-y:auto;" tabindex="0" role="region" aria-label="Data table"><table id="tbsTable"><thead><tr id="tbsCols"></tr></thead><tbody id="tbsBody"></tbody></table></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Type any verb and watch the table fill</h3>
-          <p>Nothing here is looked up except the six verbs the page marks irregular. The three forms at the top are made by the rules this lesson states, and the box beside them names the rule that fired, so you can check the answer against the reason for it. Type a verb that is not in the list and the same rules run, with one gap: the page cannot hear a word it does not carry, so for a new verb it treats the last part as the strong part. The menu under <em>Score a rule on the list</em> counts how often a rule is right, and the next lesson, &ldquo;Scoring a Rule on 1,210 Real Verbs&rdquo;, shows what it prints.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Type any verb and watch the table fill</h3>
+            <p>Nothing here is looked up except the six verbs the page marks irregular. The three forms at the top are made by the rules this lesson states, and the box beside them names the rule that fired, so you can check the answer against the reason for it. Type a verb that is not in the list and the same rules run, with one gap: the page cannot hear a word it does not carry, so for a new verb it treats the last part as the strong part. The menu under <em>Score a rule on the list</em> counts how often a rule is right, and the next lesson, &ldquo;Scoring a Rule on 1,210 Real Verbs&rdquo;, shows what it prints.</p>
 <label for="tbVerb">A verb</label> <input id="tbVerb" type="text" value="walk" size="14" /> <label for="tbPreset">or one that shows a rule</label> <select id="tbPreset"><option value="walk">walk — nothing special happens</option><option value="stop">stop — the last letter doubles</option><option value="carry">carry — -y becomes -ies</option><option value="hope">hope — the silent -e goes</option><option value="listen">listen — CVC, but the stress is early, so no doubling</option><option value="go">go — irregular: looked up, not formed</option></select> <label for="tbScore">Score a rule on the list</label> <select id="tbScore"><option value="s">the -s rule (he / she / it)</option><option value="oes">the -s rule before the -o fix (every -o takes -es)</option><option value="ves">the -s rule with f becoming -ves added</option><option value="ing">the -ing rule</option><option value="ed">the past (-ed) rule</option></select> <label for="tbShow">List</label> <select id="tbShow"><option value="residue" selected>the words the rule misses</option><option value="all">every verb in the list</option><option value="excluded">the words left out of the list, and why</option></select>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><ul><li>For <em>he</em>, <em>she</em> or <em>it</em>, add <em>-s</em>. After a hissing sound, add <em>-es</em>: <em>passes</em>, <em>wishes</em>, <em>watches</em>. After a consonant and <em>-y</em>, the <em>-y</em> becomes <em>-ies</em>: <em>carries</em>. After a consonant and <em>-o</em>, add <em>-es</em> as well: <em>goes</em>.</li><li>For the <em>-ing</em> form, add <em>-ing</em>, dropping a silent <em>-e</em> first: <em>hope</em>, <em>hoping</em>. A verb ending <em>-ie</em> becomes <em>-ying</em>: <em>lie</em>, <em>lying</em>. A verb ending <em>-ee</em>, <em>-oe</em> or <em>-ye</em> keeps its <em>-e</em>: <em>see</em>, <em>seeing</em>.</li><li>For the past, add <em>-ed</em>. After a silent <em>-e</em> only <em>-d</em> is needed, <em>hope</em>, <em>hoped</em>, and the <em>-y</em> change is the same: <em>carry</em>, <em>carried</em>.</li><li>If the word ends consonant, vowel, consonant, the last letter is not <em>w</em>, <em>x</em> or <em>y</em>, and the last part is the strong part, double that last letter before <em>-ing</em> and <em>-ed</em>: <em>stop</em>, <em>stopping</em>, <em>stopped</em>. Nothing ever doubles before <em>-s</em>.</li></ul><p>That last rule is the only one needing the sound of the word and not only its letters. <em>Stop</em> is one part, so the last part is the strong part, and it doubles: <em>stopping</em>. <em>Listen</em> has two parts and the strong one is the first, so nothing doubles: <em>listening</em>. The lesson &ldquo;When the Last Letter Doubles&rdquo; takes this rule apart on its own.</p><p>The lab applies all four, and it prints the one that fired beside every answer. Type a verb, read the three forms, then read the reason. If you had a different answer, find which rule you used and which one the lab used. The list of 1,210 verbs under the lab is the one the next lesson, &ldquo;Scoring a Rule on 1,210 Real Verbs&rdquo;, scores these rules on, with the words they miss.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Building a box</h2></div><p>To write any box of the table, do this.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Start from the base form</h3><p>The form you would find in a word list. This is the one form you have to learn; the rest are made from it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Make the other four forms</h3><p>Add <em>-s</em>, <em>-ing</em> and <em>-ed</em> by the rules below, or look the verb up if it is one of the few that break them. The lab names the rule it used beside each form.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Choose the time you mean</h3><p>Now, before, or later. This picks the row of the table.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Put the small word in front</h3><p><em>Have</em> to look back, <em>be</em> with the <em>-ing</em> form for something still going on, <em>will</em> to move it later. This picks the column, and the box is written.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Building a box</h2>
+      <p class="lead-in">To write any box of the table, do this.</p>
+      <ol class="key-ideas method"><li><strong>Start from the base form.</strong> The form you would find in a word list. This is the one form you have to learn; the rest are made from it.</li><li><strong>Make the other four forms.</strong> Add <em>-s</em>, <em>-ing</em> and <em>-ed</em> by the rules below, or look the verb up if it is one of the few that break them. The lab names the rule it used beside each form.</li><li><strong>Choose the time you mean.</strong> Now, before, or later. This picks the row of the table.</li><li><strong>Put the small word in front.</strong> <em>Have</em> to look back, <em>be</em> with the <em>-ing</em> form for something still going on, <em>will</em> to move it later. This picks the column, and the box is written.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1430,17 +1476,16 @@ she has walked        have + the form after have
 she has been walking  have + been + the -ing form</div><p>The last box has two small words in front. <em>Has been</em> is <em>have</em> and <em>be</em> together, and <em>walking</em> is the <em>-ing</em> form behind them. Nothing new was learned: <em>walking</em> was already one of the five forms.</p><p>Try <em>stop</em>, <em>carry</em> and <em>hope</em> in the lab. The five forms change, <em>stopping</em>, <em>carries</em>, <em>hoping</em>, and the box beside them says which rule did it. The twelve boxes do not change at all. <em>Have</em>, <em>be</em> and <em>will</em> have forms of their own, <em>has</em>, <em>was</em>, <em>been</em>, and the course called Helping Verbs takes those one at a time.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the twelve boxes as twelve things to learn</strong><span>Twelve boxes for every verb is a very large number of things to hold. Five forms and four rules is a small one, and it works on a verb you have never met.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Doubling the last letter when the strong part is early</strong><span><em>Stop</em> becomes <em>stopping</em>, but <em>listen</em> does not become <em>listenning</em>. The letter only doubles when the last part of the word is the strong part, which is why the rule needs the sound and not only the letters.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Putting -s or -ed on the verb behind will</strong><span>After <em>will</em> the verb is the base form: <em>she will walk</em>, not <em>she will walks</em>. After <em>have</em> it is the form after have: <em>she has walked</em>. The small word decides which form follows it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build the full table for a verb you have never seen, and name the rule that made each form.</strong><p>You should be able to take any regular verb, write its five forms by rule, say which of the four rules fired and why, and fill all twelve boxes by placing <em>have</em>, <em>be</em> and <em>will</em> in front of those forms.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Five forms and four rules is a small thing to hold. Twelve boxes for every verb you meet is a very large one.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the twelve boxes as twelve things to learn</strong><span>Twelve boxes for every verb is a very large number of things to hold. Five forms and four rules is a small one, and it works on a verb you have never met.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Doubling the last letter when the strong part is early</strong><span><em>Stop</em> becomes <em>stopping</em>, but <em>listen</em> does not become <em>listenning</em>. The letter only doubles when the last part of the word is the strong part, which is why the rule needs the sound and not only the letters.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Putting -s or -ed on the verb behind will</strong><span>After <em>will</em> the verb is the base form: <em>she will walk</em>, not <em>she will walks</em>. After <em>have</em> it is the form after have: <em>she has walked</em>. The small word decides which form follows it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build the full table for a verb you have never seen, and name the rule that made each form.</strong><p>You should be able to take any regular verb, write its five forms by rule, say which of the four rules fired and why, and fill all twelve boxes by placing <em>have</em>, <em>be</em> and <em>will</em> in front of those forms.</p></div></div><div class="note"><strong>Note:</strong> Five forms and four rules is a small thing to hold. Twelve boxes for every verb you meet is a very large one.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Twelve boxes, but not twelve things to learn</summary><p>The table has three times down the side and four shapes across the top. That makes twelve boxes. But you never learn twelve forms of a verb, because ten of the boxes are the same few forms with <em>have</em>, <em>be</em> or <em>will</em> placed in front of them, and the other two are a form on its own. Learn five forms and you can write any box.</p></details><details class="recall"><summary>Four of the five follow a rule</summary><p>Only the base form has to be learned. The other four are made from it: add <em>-s</em>, add <em>-ing</em>, add <em>-ed</em>. What makes English feel hard is that each rule has a small change for certain endings, and those changes are what this lesson states exactly.</p></details><details class="recall"><summary>A rule is a claim, and a claim can be checked</summary><p>Anyone can give you a rule. The question is how often it is right. The rules in this lesson are the ones the lab runs, and the next lesson, &ldquo;Scoring a Rule on 1,210 Real Verbs&rdquo;, runs them over a printed list and counts. Here you only need to know that each one is a rule you can state and test, not a feeling about English.</p></details></div>
+      <h3>Summary</h3>
       <p>A tense table has twelve boxes. Books print them and ask you to learn them. You do not have to. Every box is built from five forms of the verb, and four of those five follow rules you can state in one line each. This lesson gives you the rules and a table that fills itself for any verb you type.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Twelve boxes, but not twelve things to learn.</strong> The table has three times down the side and four shapes across the top. That makes twelve boxes. But you never learn twelve forms of a verb, because ten of the boxes are the same few forms with <em>have</em>, <em>be</em> or <em>will</em> placed in front of them, and the other two are a form on its own. Learn five forms and you can write any box.</li><li><strong>Four of the five follow a rule.</strong> Only the base form has to be learned. The other four are made from it: add <em>-s</em>, add <em>-ing</em>, add <em>-ed</em>. What makes English feel hard is that each rule has a small change for certain endings, and those changes are what this lesson states exactly.</li><li><strong>A rule is a claim, and a claim can be checked.</strong> Anyone can give you a rule. The question is how often it is right. The rules in this lesson are the ones the lab runs, and the next lesson, &ldquo;Scoring a Rule on 1,210 Real Verbs&rdquo;, runs them over a printed list and counts. Here you only need to know that each one is a rule you can state and test, not a feeling about English.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="base, walk. he, she, it, walks. the ing form, walking. past, walked. after have, walked. two boxes are a form on its own. ten are a form with have, be or will in front" tabindex="0" role="region" aria-label="Mathematical notation">base            walk
 he, she, it     walks
 -ing form       walking
@@ -2071,11 +2116,42 @@ var vbPct2 = function (hit, total) {
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2143,7 +2219,7 @@ var vbPct2 = function (hit, total) {
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

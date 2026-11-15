@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Talking to the Database</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 3 · Mapping to Relational Databases</p>
       <h1>Building the Mapping</h1>
       <p class="lesson-lede">Build a Domain Model first only within short iterations, and when one kind of data has two sources, map it in two steps so the shared conversions are written once.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The three situations</li><li>Double mapping</li><li>Logical data store schema</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The narrative&#x27;s three situations, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Although building the model first is a reasonable way of thinking about it, this advice only applies within short iterative cycles.&rdquo; Chapter 3's Building the Mapping gives that advice and its limit in one sentence. This lesson reads the section as an argument, with the part of Chapter 8 that sums it up. Read both in your own copy first.</p><p>Fowler sorts the work into three situations: you choose the schema; you map to an existing schema that cannot change; or you map to an existing one whose changes are negotiable. The simplest is the first with little to moderate domain logic, a Transaction Script or a Table Module. Then design the tables around the data in the usual way of database design, and keep the SQL apart from the domain code with a Row or a Table Data Gateway.</p><p>With a Domain Model the advice turns round. Beware a model that looks like a database design: build the model without regard to the database, so as to make the domain logic as simple as it can be, and treat the database as the way its data persists. A Data Mapper gives the most room for that; an Active Record suits a database shaped like the model. Then the quotation's limit. A model built for months with no database and only then persisted is highly risky, he says: by then the design may be too slow in ways that would take more rework than anyone can afford. Grow the database with the model instead, in iterations of six weeks at most and shorter if you can, the book's figure, so that what the database does to the design shows up early.</p><p>With a schema that already exists, the options do not change but the order of work does. Simple logic sits on gateways shaped like the tables. Complex logic needs a Domain Model, which will almost never fit tables designed before it, so it grows a piece at a time with Data Mappers writing it to the old schema. Chapter 8's Down to the Data Source Layer pairs the patterns the same way: a Row or Table Data Gateway for a Transaction Script, a Table Data Gateway for a Table Module, and for a Domain Model an Active Record while it is a couple of dozen classes close to the database, the book's illustration of simple, then a Data Mapper as it grows.</p><p>The section ends with double mapping: one kind of data with several origins. They may be several databases holding the same data with small schema differences left by copy-and-paste reuse; Fowler observes that the smaller the difference, the more it annoys. Or the data may arrive sometimes from tables and sometimes in messages. The simplest answer is a mapping layer for each source, which duplicates a lot when the data is similar. The other is a two-step mapping. Fowler's first step converts the in-memory objects to a logical schema designed to make the sources look alike; his second maps the logical schema to each physical store, and holds the differences. He adds that the extra step pays for itself only when there are many commonalities, and that the second step can be treated as a Gateway.</p><p>The lesson's first snippet maps one customer from two sources: a row of a table, read through JDBC's <span class="math" data-say="result set">ResultSet</span>, and an XML message, read through the attributes of a DOM <span class="math" data-say="element">Element</span>. Each reads three values and then converts them the same way.</p><pre class="codeblock" data-say="line 1, comment, The same customer arrives from a table and from a message.. line 2, customer from row of result set rs throws SQL exception. line 3, string name is set to rs dot get string of name. line 4, string postcode is set to rs dot get string of postcode. line 5, long limit is set to rs dot get long of credit limit. line 6, customer c is set to new customer of name dot trim, postcode dot to upper case. line 7, c dot set credit limit of limit. line 8, return c. line 11, customer from message of element msg. line 12, string name is set to msg dot get attribute of name. line 13, string postcode is set to msg dot get attribute of post code. line 14, long limit is set to long dot parse long of msg dot get attribute of limit. line 15, customer c is set to new customer of name dot trim, postcode dot to upper case. line 16, c dot set credit limit of limit. line 17, return c" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The same customer arrives from a table and from a message.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The narrative&#x27;s three situations, then the count</h2><div class="prose reading"><p>&ldquo;Although building the model first is a reasonable way of thinking about it, this advice only applies within short iterative cycles.&rdquo; Chapter 3's Building the Mapping gives that advice and its limit in one sentence. This lesson reads the section as an argument, with the part of Chapter 8 that sums it up. Read both in your own copy first.</p><p>Fowler sorts the work into three situations: you choose the schema; you map to an existing schema that cannot change; or you map to an existing one whose changes are negotiable. The simplest is the first with little to moderate domain logic, a Transaction Script or a Table Module. Then design the tables around the data in the usual way of database design, and keep the SQL apart from the domain code with a Row or a Table Data Gateway.</p><p>With a Domain Model the advice turns round. Beware a model that looks like a database design: build the model without regard to the database, so as to make the domain logic as simple as it can be, and treat the database as the way its data persists. A Data Mapper gives the most room for that; an Active Record suits a database shaped like the model. Then the quotation's limit. A model built for months with no database and only then persisted is highly risky, he says: by then the design may be too slow in ways that would take more rework than anyone can afford. Grow the database with the model instead, in iterations of six weeks at most and shorter if you can, the book's figure, so that what the database does to the design shows up early.</p><p>With a schema that already exists, the options do not change but the order of work does. Simple logic sits on gateways shaped like the tables. Complex logic needs a Domain Model, which will almost never fit tables designed before it, so it grows a piece at a time with Data Mappers writing it to the old schema. Chapter 8's Down to the Data Source Layer pairs the patterns the same way: a Row or Table Data Gateway for a Transaction Script, a Table Data Gateway for a Table Module, and for a Domain Model an Active Record while it is a couple of dozen classes close to the database, the book's illustration of simple, then a Data Mapper as it grows.</p><p>The section ends with double mapping: one kind of data with several origins. They may be several databases holding the same data with small schema differences left by copy-and-paste reuse; Fowler observes that the smaller the difference, the more it annoys. Or the data may arrive sometimes from tables and sometimes in messages. The simplest answer is a mapping layer for each source, which duplicates a lot when the data is similar. The other is a two-step mapping. Fowler's first step converts the in-memory objects to a logical schema designed to make the sources look alike; his second maps the logical schema to each physical store, and holds the differences. He adds that the extra step pays for itself only when there are many commonalities, and that the second step can be treated as a Gateway.</p><p>The lesson's first snippet maps one customer from two sources: a row of a table, read through JDBC's <span class="math" data-say="result set">ResultSet</span>, and an XML message, read through the attributes of a DOM <span class="math" data-say="element">Element</span>. Each reads three values and then converts them the same way.</p><pre class="codeblock" data-say="line 1, comment, The same customer arrives from a table and from a message.. line 2, customer from row of result set rs throws SQL exception. line 3, string name is set to rs dot get string of name. line 4, string postcode is set to rs dot get string of postcode. line 5, long limit is set to rs dot get long of credit limit. line 6, customer c is set to new customer of name dot trim, postcode dot to upper case. line 7, c dot set credit limit of limit. line 8, return c. line 11, customer from message of element msg. line 12, string name is set to msg dot get attribute of name. line 13, string postcode is set to msg dot get attribute of post code. line 14, long limit is set to long dot parse long of msg dot get attribute of limit. line 15, customer c is set to new customer of name dot trim, postcode dot to upper case. line 16, c dot set credit limit of limit. line 17, return c" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The same customer arrives from a table and from a message.</span>
 <span class="cl">Customer fromRow(ResultSet rs) throws SQLException {</span>
 <span class="cl">    String name = rs.getString(&quot;name&quot;);</span>
 <span class="cl">    String postcode = rs.getString(&quot;postcode&quot;);</span>
@@ -1462,7 +1506,48 @@
 <span class="cl">    Customer c = new Customer(name.trim(), postcode.toUpperCase());</span>
 <span class="cl">    c.setCreditLimit(limit);</span>
 <span class="cl">    return c;</span>
-<span class="cl">}</span></code></pre><p>Now the count. The lab looks for runs of at least two identical lines and prints three tiles: the repeated blocks, the lines in all the copies, and where they are. On <code>two-sources</code> it prints 1 block, 6 lines, lines 6–8 and lines 15–17: the constructor with its trimming and upper casing, the credit limit and the return, written in both mappings. The kit finds only identical lines. Lines 3–5 and 12–14 repeat in shape and differ in their source calls and column names, so they are not counted; those differences are exactly what a per-source step is for.</p><p>The second snippet maps in two steps. Because it reads data in, its comments number the steps from the source: its step one, a routine for each source that fills a <span class="math" data-say="customer data">CustomerData</span>, is the step Fowler numbers second, the one between the logical schema and a physical store, which holds the differences. Its step two, <span class="math" data-say="to customer">toCustomer</span>, written once, is Fowler's first.</p><pre class="codeblock" data-say="line 1, comment, Step one, per source, holds the differences to a logical record.. line 2, customer data from row of result set rs throws SQL exception. line 3, return new customer data of rs dot get string of name. line 4, rs dot get string of postcode, rs dot get long of credit limit. line 7, customer data from message of element msg. line 8, return new customer data of msg dot get attribute of name. line 9, msg dot get attribute of post code. line 10, long dot parse long of msg dot get attribute of limit. line 13, comment, Step two, once, holds what they share the record to the object.. line 14, customer to customer of customer data d. line 15, customer c is set to new customer of d dot name dot trim, d dot postcode dot to upper case. line 16, c dot set credit limit of d dot limit. line 17, return c" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Step one, per source, holds the differences: to a logical record.</span>
+<span class="cl">}</span></code></pre><p>Now the count. The lab looks for runs of at least two identical lines and prints three tiles: the repeated blocks, the lines in all the copies, and where they are. On <code>two-sources</code> it prints 1 block, 6 lines, lines 6–8 and lines 15–17: the constructor with its trimming and upper casing, the credit limit and the return, written in both mappings. The kit finds only identical lines. Lines 3–5 and 12–14 repeat in shape and differ in their source calls and column names, so they are not counted; those differences are exactly what a per-source step is for.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>repeated runs of statements, matched as text</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>repeated runs of statements, matched as text</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>This view compares statement lines as text, white space collapsed. A repeated block is a run of at least the lesson's minimum of consecutive statement lines that occurs again, not overlapping, and as long as it can be made at its start.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What two mappings repeat</h3>
+            <p>A count over code, by the rules stated below the listing. Paste Java. The lab finds runs of at least two identical lines, after collapsing white space, and lists where each copy is. Lines that repeat in shape with different names are not counted, so the duplication double mapping causes is wider than the count. The listings are the lesson's.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="two-sources" selected>One customer mapped from a table and from a message</option><option value="two-step">The same, through a logical record and one shared step</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Repeated blocks</span><strong id="coDupBlocks">&mdash;</strong></div>
+          <div class="kpi"><span>Lines in all the copies</span><strong id="coDupLines">&mdash;</strong></div>
+          <div class="kpi"><span>Where</span><strong id="coDupWhere">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The second snippet maps in two steps. Because it reads data in, its comments number the steps from the source: its step one, a routine for each source that fills a <span class="math" data-say="customer data">CustomerData</span>, is the step Fowler numbers second, the one between the logical schema and a physical store, which holds the differences. Its step two, <span class="math" data-say="to customer">toCustomer</span>, written once, is Fowler's first.</p><pre class="codeblock" data-say="line 1, comment, Step one, per source, holds the differences to a logical record.. line 2, customer data from row of result set rs throws SQL exception. line 3, return new customer data of rs dot get string of name. line 4, rs dot get string of postcode, rs dot get long of credit limit. line 7, customer data from message of element msg. line 8, return new customer data of msg dot get attribute of name. line 9, msg dot get attribute of post code. line 10, long dot parse long of msg dot get attribute of limit. line 13, comment, Step two, once, holds what they share the record to the object.. line 14, customer to customer of customer data d. line 15, customer c is set to new customer of d dot name dot trim, d dot postcode dot to upper case. line 16, c dot set credit limit of d dot limit. line 17, return c" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Step one, per source, holds the differences: to a logical record.</span>
 <span class="cl">CustomerData fromRow(ResultSet rs) throws SQLException {</span>
 <span class="cl">    return new CustomerData(rs.getString(&quot;name&quot;),</span>
 <span class="cl">        rs.getString(&quot;postcode&quot;), rs.getLong(&quot;credit_limit&quot;));</span>
@@ -1496,51 +1581,12 @@
 <span class="cl">    msg.setAttribute(&quot;ref&quot;, ref);</span>
 <span class="cl">    msg.setAttribute(&quot;grams&quot;, Long.toString(grams));</span>
 <span class="cl">    msg.setAttribute(&quot;to&quot;, to);</span>
-<span class="cl">}</span></code></pre><p>This writes one shipment to two sinks, a table and a message. Mark by hand the lines the two routines repeat. Then write the logical record that would carry the converted values, and say what the shared step and each sink's step would hold. Paste it into the lab afterwards to check the lines.</p><p>Every one of these mappings runs over a connection. The next lesson, Database Connections and Registry, reads how a connection is found, kept and closed, and counts what batching statements saves.</p></article>
+<span class="cl">}</span></code></pre><p>This writes one shipment to two sinks, a table and a message. Mark by hand the lines the two routines repeat. Then write the logical record that would carry the converted values, and say what the shared step and each sink's step would hold. Paste it into the lab afterwards to check the lines.</p><p>Every one of these mappings runs over a connection. The next lesson, Database Connections and Registry, reads how a connection is found, kept and closed, and counts what batching statements saves.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>repeated runs of statements, matched as text</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>repeated runs of statements, matched as text</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>This view compares statement lines as text, white space collapsed. A repeated block is a run of at least the lesson's minimum of consecutive statement lines that occurs again, not overlapping, and as long as it can be made at its start.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What two mappings repeat</h3>
-          <p>A count over code, by the rules stated below the listing. Paste Java. The lab finds runs of at least two identical lines, after collapsing white space, and lists where each copy is. Lines that repeat in shape with different names are not counted, so the duplication double mapping causes is wider than the count. The listings are the lesson's.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="two-sources" selected>One customer mapped from a table and from a message</option><option value="two-step">The same, through a logical record and one shared step</option></select>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Repeated blocks</span><strong id="coDupBlocks">&mdash;</strong></div>
-          <div class="kpi"><span>Lines in all the copies</span><strong id="coDupLines">&mdash;</strong></div>
-          <div class="kpi"><span>Where</span><strong id="coDupWhere">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding what a second source repeats</h2></div><p>Four steps, the last of them on data of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the situation</h3><p>Say whether you choose the schema, map to one that cannot change, or map to one whose changes are negotiable, and which domain pattern you use.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Mark the repeats</h3><p>Put the two mappings side by side and mark the lines that are the same in both, and the lines that differ only in the source's calls and names.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write the logical record</h3><p>Write a record with one field for each value the sources share. The identical lines go in one step between that record and the objects; each source's own calls go in its own step.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count it on data you know</h3><p>Take one kind of data in a system you know that arrives or leaves by two routes, a table and an API, a file and a queue. Count the conversions written in both, and write whether a shared step would hold them.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding what a second source repeats</h2>
+      <p class="lead-in">Four steps, the last of them on data of your own.</p>
+      <ol class="key-ideas method"><li><strong>Name the situation.</strong> Say whether you choose the schema, map to one that cannot change, or map to one whose changes are negotiable, and which domain pattern you use.</li><li><strong>Mark the repeats.</strong> Put the two mappings side by side and mark the lines that are the same in both, and the lines that differ only in the source's calls and names.</li><li><strong>Write the logical record.</strong> Write a record with one field for each value the sources share. The identical lines go in one step between that record and the objects; each source's own calls go in its own step.</li><li><strong>Count it on data you know.</strong> Take one kind of data in a system you know that arrives or leaves by two routes, a table and an API, a file and a queue. Count the conversions written in both, and write whether a shared step would hold them.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1559,17 +1605,16 @@ they differ in the source calls
 identical lines only: not counted</div><p>The six counted lines are the conversion both sources share: what <span class="math" data-say="to customer">toCustomer</span> holds in <code>two-step</code>. The six uncounted ones are where the sources differ, and they stay, one routine a source.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Designing the database first, then the objects to fit</strong><span>For a Domain Model, Building the Mapping says the reverse: build the model without regard to the database and treat the database as its persistence, beware a model that looks like a database design, and do it within short iterations, building the database up as you go. Designing the tables around the data is its advice for a Transaction Script or a Table Module.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking double mapping means mapping twice to the same database</strong><span>It means one kind of data fed from two sources: two databases with small differences in schema, or a database and a feed of messages. On the lesson's illustration the second source is an XML message, and the repeated lines are the conversions both sources share.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Adding the logical step whenever there are two sources</strong><span>Fowler says the extra step pays for itself only when there are many commonalities, and keeps it for stores alike in most things and irritatingly unlike in a few. The lab's 0 repeated lines on <code>two-step</code> leave out what the step costs: a logical record class and a second call on every read.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find and split what two mappings repeat.</strong><p>Given mapping code for one kind of data from two sources, mark the repeated lines, and write the logical record and the shared step that would hold them once.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab finds identical lines only. Mappings that repeat a conversion with different names, or in a different order, are not counted, so the duplication two sources cause is usually wider than the count; and the lab cannot weigh the cost of the extra step, which is the section's own condition for taking it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Designing the database first, then the objects to fit</strong><span>For a Domain Model, Building the Mapping says the reverse: build the model without regard to the database and treat the database as its persistence, beware a model that looks like a database design, and do it within short iterations, building the database up as you go. Designing the tables around the data is its advice for a Transaction Script or a Table Module.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking double mapping means mapping twice to the same database</strong><span>It means one kind of data fed from two sources: two databases with small differences in schema, or a database and a feed of messages. On the lesson's illustration the second source is an XML message, and the repeated lines are the conversions both sources share.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Adding the logical step whenever there are two sources</strong><span>Fowler says the extra step pays for itself only when there are many commonalities, and keeps it for stores alike in most things and irritatingly unlike in a few. The lab's 0 repeated lines on <code>two-step</code> leave out what the step costs: a logical record class and a second call on every read.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find and split what two mappings repeat.</strong><p>Given mapping code for one kind of data from two sources, mark the repeated lines, and write the logical record and the shared step that would hold them once.</p></div></div><div class="note"><strong>Note:</strong> The lab finds identical lines only. Mappings that repeat a conversion with different names, or in a different order, are not counted, so the duplication two sources cause is usually wider than the count; and the lab cannot weigh the cost of the extra step, which is the section's own condition for taking it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The three situations</summary><p>You choose the schema yourself; you map to an existing schema that cannot change; or you map to an existing one whose changes are negotiable. Which you are in, with the domain pattern, decides what to build.</p></details><details class="recall"><summary>Double mapping</summary><p>One kind of data that arrives from several places: two databases whose schemas differ a little, or a database and a stream of messages. Each source needs its own mapping.</p></details><details class="recall"><summary>Logical data store schema</summary><p>A schema designed to make the sources look as alike as they can. Mapping through it takes two steps: one between the objects and the logical schema, written once, and one between the logical schema and each real store, which holds the differences.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 3's Building the Mapping names three situations, a schema you choose, one you cannot change and one you can negotiate, and says what to build in each. It ends with double mapping, one kind of data from two sources. Find the conversions two mappings of one customer repeat, and see a two-step mapping write them once.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The three situations.</strong> You choose the schema yourself; you map to an existing schema that cannot change; or you map to an existing one whose changes are negotiable. Which you are in, with the domain pattern, decides what to build.</li><li><strong>Double mapping.</strong> One kind of data that arrives from several places: two databases whose schemas differ a little, or a database and a stream of messages. Each source needs its own mapping.</li><li><strong>Logical data store schema.</strong> A schema designed to make the sources look as alike as they can. Mapping through it takes two steps: one between the objects and the logical schema, written once, and one between the logical schema and each real store, which holds the differences.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="own schema, simple logic, tables first. domain model, the model first, in short cycles. existing schema, build the model gradually. two sources, a mapping layer for each. or two steps through a logical schema" tabindex="0" role="region" aria-label="Mathematical notation">own schema, simple logic: tables first
 Domain Model: the model first, in short cycles
 existing schema: build the model gradually
@@ -2573,11 +2618,42 @@ or two steps through a logical schema</div><figcaption>Building the Mapping in f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2645,7 +2721,7 @@ or two steps through a logical schema</div><figcaption>Building the Mapping in f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

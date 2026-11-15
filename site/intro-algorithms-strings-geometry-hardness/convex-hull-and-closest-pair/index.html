@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,24 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Strings, Geometry and Hardness</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 33 · Computational Geometry</p>
       <h1>Convex Hull and the Closest Pair</h1>
       <p class="lesson-lede">Graham&#x27;s scan keeps a stack of candidate corners and pops any point that makes a non-left turn; the closest pair is found by dividing the points and checking a narrow strip.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The convex hull</li><li>Rotational sweep</li><li>The strip</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Intuitively, we can think of each point in Q as being a nail sticking out from a board.&rdquo; The rubber band stretched around the nails is the convex hull, and section 33.3 gives two ways to find it with the cross product of the previous lesson as the only geometric operation. Section 33.4 then applies divide and conquer to the closest pair of points. This lesson reads both sections and runs Graham's scan by hand on points of its own.</p><p>Section 33.3 defines CH(Q) and states the two algorithms' bounds before either is given: Graham's scan runs in <span class="math" data-say="big O of n times log base 2 of n">O(n lg n)</span>, Jarvis's march in <span class="math" data-say="big O of the quantity n times h">O(n·h)</span>, where h is the number of hull vertices. It surveys other methods too, the incremental method, divide and conquer and prune and search, the last running in <span class="math" data-say="big O of n times log base 2 of h">O(n lg h)</span>, and it notes that the farthest pair of points lies on the hull, so a hull is often the first step of another algorithm.</p><p>GRAHAM-SCAN takes the point with the lowest y-coordinate, the leftmost in a tie, as p0, and sorts the others by polar angle about it, keeping only the farthest of any points at the same angle. It pushes p0 and the first two points onto a stack. Then, for each remaining point in angle order, it pops the stack while the top two entries and the new point fail to make a left turn, and pushes the new point. When the loop ends the stack holds the hull's vertices in counterclockwise order.</p><p>The correctness proof is a loop invariant: at the start of each iteration, the stack holds exactly the vertices of the convex hull of the points processed so far, in counterclockwise order. A point popped is inside the triangle formed by p0, the point below it on the stack and the new point, so it cannot be a hull vertex. The running time is an aggregate count again: each point is pushed once and popped at most once, so the whole loop is <span class="math" data-say="big O of n">O(n)</span> and the <span class="math" data-say="big O of n times log base 2 of n">O(n lg n)</span> sort dominates.</p><p>Jarvis's march wraps the set like paper. From the lowest point it repeatedly chooses the point with the smallest polar angle about the vertex just found, one pass over all n points per vertex found: angles measured from the positive x-axis build the right chain up to the highest point, and angles from the negative x-axis build the left chain back down. With h vertices that is <span class="math" data-say="big O of the quantity n times h">O(n·h)</span>, asymptotically better than Graham's scan when h grows more slowly than lg n, and worse when nearly every point is a vertex.</p><p>Section 33.4 finds the closest pair among n points in <span class="math" data-say="big O of n times log base 2 of n">O(n lg n)</span>, where testing every pair costs <span class="math" data-say="theta of n squared">Θ(n²)</span>. It divides the points by a vertical line into two halves, solves each recursively to get the smaller distance <span data-say="delta">δ</span>, and then looks for a closer pair crossing the line. Such a pair lies in the strip of width <span data-say="2 delta">2δ</span> about the line, and the authors show that at most eight points fit in a <span data-say="delta">δ</span> by <span data-say="2 delta">2δ</span> rectangle, so each strip point, taken in order of y, needs comparing with only the next seven. Presorting by x and y and splitting the sorted lists keeps each level linear, giving <span class="math" data-say="T of n equals 2 T of the quantity n over 2, plus big O of n">T(n) = 2T(n/2) + O(n)</span>. The Algorithms lessons The Convex Hull and Its Definition and The Closest Pair and the Strip run both algorithms.</p><p>Now the lab. It does not run GRAHAM-SCAN. It runs Andrew's monotone chain, a close relative: it has no p0 and no angular sort, but sorts the points by x and builds a lower and an upper chain, each with the same stack and the same pop-while-not-a-left-turn rule. Each point is pushed twice, once per chain, and the lab compares pushes and pops with 4n. Its hull is the same as GRAHAM-SCAN's; its pushes and pops are not, so trace GRAHAM-SCAN by hand, as the worked example below does. It also runs gift wrapping, Jarvis's march, and reports the vertices it returns, the points on the boundary by definition, and the work <span data-say="n times h">n·h</span> beside <span data-say="n times log base 2 of n">n·lg n</span>. A second run with floating-point turns shows what rounding does.</p><p>Its presets: <code>general</code> has nine points and 4 hull vertices by every route, with 18 + 12 = 30 stack operations against 36. <code>edges</code> puts a point at the middle of each side of a square: the chain returns 4 vertices, the boundary holds 8 points and gift wrapping returns 6, so the answer depends on whether colinear boundary points count. <code>segment</code> is five points on a line, a hull of 2. <code>duplicate</code> has 6 points typed and 4 distinct. <code>needle</code> is a thin triangle whose floating-point run returns 2 vertices, a vertex short. <code>single</code> is one point typed twice. The book's assumption, distinct points with at least three not colinear, rules out segment, duplicate and single; edges and needle satisfy it, and show what is left: points in the middle of a side, which GRAHAM-SCAN discards, and floating-point turns, which exact integer cross products avoid.</p><p>Then type the lesson's points: <span class="math" data-say="1, 0, 7, 1, 4, 3, 9, 5, 5, 9, 0, 6, 6, 6, 2, 3">1, 0; 7, 1; 4, 3; 9, 5; 5, 9; 0, 6; 6, 6; 2, 3</span>. The lab finds 5 hull vertices, (1, 0), (7, 1), (9, 5), (5, 9) and (0, 6), agreeing with the definition point by point; (4, 3), (6, 6) and (2, 3) are inside. The monotone chain made 16 pushes and 9 pops, 25 against 4n = 32. Gift wrapping's work is <span data-say="n times h equals 40">n·h = 40</span> against <span data-say="n times log base 2 of n equals 24">n·lg n = 24</span> on these eight points; that comparison is about this set, not about the algorithms.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, 0, 0, 4, 1, 2, 2, 5, 4, 1, 4, 3, 2" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">0, 0; 4, 1; 2, 2; 5, 4; 1, 4; 3, 2</span></code></pre><p>Run GRAHAM-SCAN on these six points by hand: choose p0, sort the rest by polar angle about it, and record every push and pop with the turn that caused it. Give the hull's vertices in counterclockwise order and the number of pops. Then type the points into the lab and compare the vertex set.</p><p>The next lesson leaves algorithms that are fast for questions about which problems might never have one. Polynomial Time and Verification opens Chapter 34.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The convex hull, and the three answers a collinear point produces</h2></div><p>Two algorithms and two predicates, refereed by the definition itself</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the count</h2><div class="prose reading"><p>&ldquo;Intuitively, we can think of each point in Q as being a nail sticking out from a board.&rdquo; The rubber band stretched around the nails is the convex hull, and section 33.3 gives two ways to find it with the cross product of the previous lesson as the only geometric operation. Section 33.4 then applies divide and conquer to the closest pair of points. This lesson reads both sections and runs Graham's scan by hand on points of its own.</p><p>Section 33.3 defines CH(Q) and states the two algorithms' bounds before either is given: Graham's scan runs in <span class="math" data-say="big O of n times log base 2 of n">O(n lg n)</span>, Jarvis's march in <span class="math" data-say="big O of the quantity n times h">O(n·h)</span>, where h is the number of hull vertices. It surveys other methods too, the incremental method, divide and conquer and prune and search, the last running in <span class="math" data-say="big O of n times log base 2 of h">O(n lg h)</span>, and it notes that the farthest pair of points lies on the hull, so a hull is often the first step of another algorithm.</p><p>GRAHAM-SCAN takes the point with the lowest y-coordinate, the leftmost in a tie, as p0, and sorts the others by polar angle about it, keeping only the farthest of any points at the same angle. It pushes p0 and the first two points onto a stack. Then, for each remaining point in angle order, it pops the stack while the top two entries and the new point fail to make a left turn, and pushes the new point. When the loop ends the stack holds the hull's vertices in counterclockwise order.</p><p>The correctness proof is a loop invariant: at the start of each iteration, the stack holds exactly the vertices of the convex hull of the points processed so far, in counterclockwise order. A point popped is inside the triangle formed by p0, the point below it on the stack and the new point, so it cannot be a hull vertex. The running time is an aggregate count again: each point is pushed once and popped at most once, so the whole loop is <span class="math" data-say="big O of n">O(n)</span> and the <span class="math" data-say="big O of n times log base 2 of n">O(n lg n)</span> sort dominates.</p><p>Jarvis's march wraps the set like paper. From the lowest point it repeatedly chooses the point with the smallest polar angle about the vertex just found, one pass over all n points per vertex found: angles measured from the positive x-axis build the right chain up to the highest point, and angles from the negative x-axis build the left chain back down. With h vertices that is <span class="math" data-say="big O of the quantity n times h">O(n·h)</span>, asymptotically better than Graham's scan when h grows more slowly than lg n, and worse when nearly every point is a vertex.</p><p>Section 33.4 finds the closest pair among n points in <span class="math" data-say="big O of n times log base 2 of n">O(n lg n)</span>, where testing every pair costs <span class="math" data-say="theta of n squared">Θ(n²)</span>. It divides the points by a vertical line into two halves, solves each recursively to get the smaller distance <span data-say="delta">δ</span>, and then looks for a closer pair crossing the line. Such a pair lies in the strip of width <span data-say="2 delta">2δ</span> about the line, and the authors show that at most eight points fit in a <span data-say="delta">δ</span> by <span data-say="2 delta">2δ</span> rectangle, so each strip point, taken in order of y, needs comparing with only the next seven. Presorting by x and y and splitting the sorted lists keeps each level linear, giving <span class="math" data-say="T of n equals 2 T of the quantity n over 2, plus big O of n">T(n) = 2T(n/2) + O(n)</span>. The Algorithms lessons The Convex Hull and Its Definition and The Closest Pair and the Strip run both algorithms.</p><p>Now the lab. It does not run GRAHAM-SCAN. It runs Andrew's monotone chain, a close relative: it has no p0 and no angular sort, but sorts the points by x and builds a lower and an upper chain, each with the same stack and the same pop-while-not-a-left-turn rule. Each point is pushed twice, once per chain, and the lab compares pushes and pops with 4n. Its hull is the same as GRAHAM-SCAN's; its pushes and pops are not, so trace GRAHAM-SCAN by hand, as the worked example below does. It also runs gift wrapping, Jarvis's march, and reports the vertices it returns, the points on the boundary by definition, and the work <span data-say="n times h">n·h</span> beside <span data-say="n times log base 2 of n">n·lg n</span>. A second run with floating-point turns shows what rounding does.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The convex hull, and the three answers a collinear point produces</h2></div><p>Two algorithms and two predicates, refereed by the definition itself</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The convex hull, and the definition that referees it</strong><span>two algorithms, two predicates, one brute-force answer</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>a hull vertex, by the definition</span><span class="tone-amber"><i class="legend-swatch"></i>on the boundary but not a vertex</span><span class="tone-muted"><i class="legend-swatch"></i>strictly inside</span></div>
@@ -1459,10 +1502,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="huPoints"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="huTrace"></table></div>
       <div class="status-banner" id="huStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Find the hull, and count the stack operations</h3>
-          <p>Type points as x, y pairs. The lab runs the monotone chain, a relative of GRAHAM-SCAN that sorts by x and builds two chains, and gift wrapping, and checks both against the definition point by point. Type the lesson's eight points, then the exercise's six.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Find the hull, and count the stack operations</h3>
+            <p>Type points as x, y pairs. The lab runs the monotone chain, a relative of GRAHAM-SCAN that sorts by x and builds two chains, and gift wrapping, and checks both against the definition point by point. Type the lesson's eight points, then the exercise's six.</p>
         <div class="field">
           <label for="huPreset">Worked example</label>
           <select id="huPreset"><option value="general" selected>nine points, the collinear triples all interior</option><option value="edges">a square with a point in the middle of each side</option><option value="segment">five points on one line: the hull is a segment</option><option value="duplicate">the same point typed more than once</option><option value="needle">a triangle the double predicate flattens</option><option value="single">one point, typed twice</option></select>
@@ -1490,12 +1533,15 @@
           <div class="kpi"><span>Work: n·h against n log2 n</span><strong id="huWork">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="huHint" style="margin:0;">Points are <span class="tt">x, y</span> separated by semicolons. Duplicates are removed first and counted, because both algorithms return a repeated point when handed one. The colour of each point is decided by the definition and not by either algorithm: a point is a vertex when some line through it has every other point strictly beyond it, and on the boundary when some line through it has every other point on one side.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Its presets: <code>general</code> has nine points and 4 hull vertices by every route, with 18 + 12 = 30 stack operations against 36. <code>edges</code> puts a point at the middle of each side of a square: the chain returns 4 vertices, the boundary holds 8 points and gift wrapping returns 6, so the answer depends on whether colinear boundary points count. <code>segment</code> is five points on a line, a hull of 2. <code>duplicate</code> has 6 points typed and 4 distinct. <code>needle</code> is a thin triangle whose floating-point run returns 2 vertices, a vertex short. <code>single</code> is one point typed twice. The book's assumption, distinct points with at least three not colinear, rules out segment, duplicate and single; edges and needle satisfy it, and show what is left: points in the middle of a side, which GRAHAM-SCAN discards, and floating-point turns, which exact integer cross products avoid.</p><p>Then type the lesson's points: <span class="math" data-say="1, 0, 7, 1, 4, 3, 9, 5, 5, 9, 0, 6, 6, 6, 2, 3">1, 0; 7, 1; 4, 3; 9, 5; 5, 9; 0, 6; 6, 6; 2, 3</span>. The lab finds 5 hull vertices, (1, 0), (7, 1), (9, 5), (5, 9) and (0, 6), agreeing with the definition point by point; (4, 3), (6, 6) and (2, 3) are inside. The monotone chain made 16 pushes and 9 pops, 25 against 4n = 32. Gift wrapping's work is <span data-say="n times h equals 40">n·h = 40</span> against <span data-say="n times log base 2 of n equals 24">n·lg n = 24</span> on these eight points; that comparison is about this set, not about the algorithms.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, 0, 0, 4, 1, 2, 2, 5, 4, 1, 4, 3, 2" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">0, 0; 4, 1; 2, 2; 5, 4; 1, 4; 3, 2</span></code></pre><p>Run GRAHAM-SCAN on these six points by hand: choose p0, sort the rest by polar angle about it, and record every push and pop with the turn that caused it. Give the hull's vertices in counterclockwise order and the number of pops. Then type the points into the lab and compare the vertex set.</p><p>The next lesson leaves algorithms that are fast for questions about which problems might never have one. Polynomial Time and Verification opens Chapter 34.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running Graham&#x27;s scan by hand</h2></div><p>Four steps follow GRAHAM-SCAN; the fifth is a set of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Choose p0 and sort</h3><p>Take the lowest point, the leftmost if two tie. Sort the others by the angle of the vector from p0, comparing two of them by the sign of a cross product rather than by computing angles.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Start the stack</h3><p>Push p0 and the first two points in sorted order.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Pop while the turn is not left</h3><p>For each next point, look at the top two entries of the stack and the new point. If they make a right turn or are colinear, pop the top and look again. Then push the new point.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read off the hull and the count</h3><p>The stack, bottom to top, is the hull counterclockwise. Count the pops: never more than the pushes, which is n.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Try a set that defeats the march</h3><p>Type ten points of your own into the lab, all of them hull vertices (points on a circle of integer coordinates will do), and note <span data-say="n times h">n·h</span> against <span data-say="n times log base 2 of n">n·lg n</span>. Then move most of them inside and note how both figures change.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running Graham&#x27;s scan by hand</h2>
+      <p class="lead-in">Four steps follow GRAHAM-SCAN; the fifth is a set of your own.</p>
+      <ol class="key-ideas method"><li><strong>Choose p0 and sort.</strong> Take the lowest point, the leftmost if two tie. Sort the others by the angle of the vector from p0, comparing two of them by the sign of a cross product rather than by computing angles.</li><li><strong>Start the stack.</strong> Push p0 and the first two points in sorted order.</li><li><strong>Pop while the turn is not left.</strong> For each next point, look at the top two entries of the stack and the new point. If they make a right turn or are colinear, pop the top and look again. Then push the new point.</li><li><strong>Read off the hull and the count.</strong> The stack, bottom to top, is the hull counterclockwise. Count the pops: never more than the pushes, which is n.</li><li><strong>Try a set that defeats the march.</strong> Type ten points of your own into the lab, all of them hull vertices (points on a circle of integer coordinates will do), and note <span data-say="n times h">n·h</span> against <span data-say="n times log base 2 of n">n·lg n</span>. Then move most of them inside and note how both figures change.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1518,17 +1564,16 @@
 stack: (1, 0) (7, 1) (9, 5) (5, 9) (0, 6)</div><p>Eight pushes and three pops, and the stack holds the five vertices the lab found. The lab's monotone chain made 16 pushes and 9 pops on the same points because it sorts by x and builds two chains, pushing every point once in each; the counts differ, the hull does not, and both stay within the linear bound that the push-once, pop-at-most-once argument gives.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the hull algorithm must find interior points to discard them</strong><span>Neither algorithm tests a point for being inside. Graham's scan pops a point when a later point makes a non-left turn with it, and the invariant guarantees that such a point is not a vertex of the hull so far. On the lesson's points, (4, 3) is pushed and later popped; nothing ever asked whether it was inside.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting every algorithm to return the same list on every input</strong><span>The book assumes only distinct points with at least three not colinear, so a point may sit in the middle of a hull side. On the lab's edges preset, a square with midpoints, the monotone chain returns 4 vertices, the boundary has 8 points and gift wrapping returns 6. Each answers a slightly different question. GRAHAM-SCAN drops such points, by the farthest-only rule of its sort or by popping on a colinear turn, and returns the 4 corners.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading <span data-say="big O of the quantity n times h">O(n·h)</span> as always faster or always slower</strong><span>Jarvis's march wins asymptotically when h grows more slowly than lg n and loses when h is large. Which applies depends on the input, and on the lesson's eight points <span data-say="n times h equals 40">n·h = 40</span> against <span data-say="n times log base 2 of n equals 24">n·lg n = 24</span> says only that this set has many hull vertices for its size.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run Graham&#x27;s scan by hand.</strong><p>For six to eight points with small integer coordinates, choose p0, sort by angle, trace every push and pop with its turn, give the hull, and explain why the loop is linear and why the strip check in section 33.4 is too.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's hull algorithm is the monotone chain, a variant of Graham's scan that sorts by x; its push and pop counts are not GRAHAM-SCAN's, though its hull is the same, and this lab does not run the closest-pair algorithm. The counts are of one point set; the linear loop and the O(n lg n) bound come from the book's arguments.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the hull algorithm must find interior points to discard them</strong><span>Neither algorithm tests a point for being inside. Graham's scan pops a point when a later point makes a non-left turn with it, and the invariant guarantees that such a point is not a vertex of the hull so far. On the lesson's points, (4, 3) is pushed and later popped; nothing ever asked whether it was inside.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting every algorithm to return the same list on every input</strong><span>The book assumes only distinct points with at least three not colinear, so a point may sit in the middle of a hull side. On the lab's edges preset, a square with midpoints, the monotone chain returns 4 vertices, the boundary has 8 points and gift wrapping returns 6. Each answers a slightly different question. GRAHAM-SCAN drops such points, by the farthest-only rule of its sort or by popping on a colinear turn, and returns the 4 corners.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading <span data-say="big O of the quantity n times h">O(n·h)</span> as always faster or always slower</strong><span>Jarvis's march wins asymptotically when h grows more slowly than lg n and loses when h is large. Which applies depends on the input, and on the lesson's eight points <span data-say="n times h equals 40">n·h = 40</span> against <span data-say="n times log base 2 of n equals 24">n·lg n = 24</span> says only that this set has many hull vertices for its size.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run Graham&#x27;s scan by hand.</strong><p>For six to eight points with small integer coordinates, choose p0, sort by angle, trace every push and pop with its turn, give the hull, and explain why the loop is linear and why the strip check in section 33.4 is too.</p></div></div><div class="note"><strong>Note:</strong> The lab's hull algorithm is the monotone chain, a variant of Graham's scan that sorts by x; its push and pop counts are not GRAHAM-SCAN's, though its hull is the same, and this lab does not run the closest-pair algorithm. The counts are of one point set; the linear loop and the O(n lg n) bound come from the book's arguments.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The convex hull</summary><p>CH(Q) is the smallest convex polygon such that every point of Q lies on its boundary or inside it. Its vertices are points of Q. The section assumes the points are distinct and that at least three of them are not colinear.</p></details><details class="recall"><summary>Rotational sweep</summary><p>Both hull algorithms in the section process points in order of the polar angle they make with a reference point. Graham's scan sorts by that angle once; Jarvis's march finds the next smallest angle each time it adds a vertex.</p></details><details class="recall"><summary>The strip</summary><p>After the closest pair on each side of a dividing line is found at distance <span data-say="delta">δ</span>, any closer pair must straddle the line within the band of width <span data-say="2 delta">2δ</span> around it. Sorted by y, each point in that band needs comparing only with the next seven.</p></details></div>
+      <h3>Summary</h3>
       <p>Sections 33.3 and 33.4: the convex hull, Graham's scan with its O(n lg n) bound and Jarvis's march with <span data-say="big O of the quantity n times h">O(n·h)</span>, and the divide-and-conquer algorithm for the closest pair of points with its strip of width <span data-say="2 delta">2δ</span>. Run Graham's scan by hand on eight points written for the lesson, then compare the lab's stack counts and <span data-say="n times h">n·h</span>.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The convex hull.</strong> CH(Q) is the smallest convex polygon such that every point of Q lies on its boundary or inside it. Its vertices are points of Q. The section assumes the points are distinct and that at least three of them are not colinear.</li><li><strong>Rotational sweep.</strong> Both hull algorithms in the section process points in order of the polar angle they make with a reference point. Graham's scan sorts by that angle once; Jarvis's march finds the next smallest angle each time it adds a vertex.</li><li><strong>The strip.</strong> After the closest pair on each side of a dividing line is found at distance <span data-say="delta">δ</span>, any closer pair must straddle the line within the band of width <span data-say="2 delta">2δ</span> around it. Sorted by y, each point in that band needs comparing only with the next seven.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="hull, smallest convex polygon around all. Graham, sort by angle, pop unless a left turn. each point pushed once, popped at most once. Graham, big O of n times log base 2 of n, sort dominates. Jarvis, big O of the quantity n times h, h hull vertices. closest pair, T of n equals 2 T of the quantity n over 2, plus big O of n. in the strip, check the next 7 points" tabindex="0" role="region" aria-label="Mathematical notation">hull: smallest convex polygon around all
 Graham: sort by angle, pop unless a left turn
 each point pushed once, popped at most once
@@ -2897,11 +2942,42 @@ in the strip, check the next 7 points</div><figcaption>Sections 33.3 and 33.4 in
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2969,7 +3045,7 @@ in the strip, check the next 7 points</div><figcaption>Sections 33.3 and 33.4 in
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

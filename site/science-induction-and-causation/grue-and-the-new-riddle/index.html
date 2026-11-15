@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,37 +1424,35 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Science, Induction and Causation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Induction</p>
       <h1>Grue and the New Riddle</h1>
       <p class="lesson-lede">Two hypotheses can fit every observation and differ in the future, and the data cannot choose.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Grue agrees with green until t</li><li>A Bayes factor of 1 means the data did not discriminate</li><li>Projectibility lives in the prior</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Defining the rival</h2>
-      <article class="prose reading"><p>Every emerald ever examined has been green. That supports &ldquo;all emeralds are green&rdquo;, and by the reasoning of the last lesson it supports &ldquo;the next emerald will be green&rdquo;. Now introduce a word.</p><div class="defbox"><span class="label">Definition &middot; Grue</span><p>Fix a time <span class="math" data-say="t">t</span> in the future. An object is <strong>grue</strong> if it is examined before <span class="math" data-say="t">t</span> and is green, or is not examined before <span class="math" data-say="t">t</span> and is blue.</p></div><p>Every emerald examined so far was examined before <span class="math" data-say="t">t</span> and was green, so it was grue. &ldquo;All emeralds are grue&rdquo; has exactly as much observed support as &ldquo;all emeralds are green&rdquo;, and the two predict opposite colours for the first emerald examined after <span class="math" data-say="t">t</span>.</p><div class="mathblock" data-say="an emerald examined, H-green says, H-grue says. before t, green, green. after t, green, blue" tabindex="0" role="region" aria-label="Mathematical notation">an emerald examined   H-green says   H-grue says
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Defining the rival</h2><div class="prose reading"><p>Every emerald ever examined has been green. That supports &ldquo;all emeralds are green&rdquo;, and by the reasoning of the last lesson it supports &ldquo;the next emerald will be green&rdquo;. Now introduce a word.</p><div class="defbox"><span class="label">Definition &middot; Grue</span><p>Fix a time <span class="math" data-say="t">t</span> in the future. An object is <strong>grue</strong> if it is examined before <span class="math" data-say="t">t</span> and is green, or is not examined before <span class="math" data-say="t">t</span> and is blue.</p></div><p>Every emerald examined so far was examined before <span class="math" data-say="t">t</span> and was green, so it was grue. &ldquo;All emeralds are grue&rdquo; has exactly as much observed support as &ldquo;all emeralds are green&rdquo;, and the two predict opposite colours for the first emerald examined after <span class="math" data-say="t">t</span>.</p><div class="mathblock" data-say="an emerald examined, H-green says, H-grue says. before t, green, green. after t, green, blue" tabindex="0" role="region" aria-label="Mathematical notation">an emerald examined   H-green says   H-grue says
 -----------------------------------------------
 before t              green           green
-after t               green           blue</div><p>The lab takes two outcomes, green and blue, for an emerald as examined. Before <span class="math" data-say="t">t</span> both hypotheses give green probability 1, so their likelihood rows are identical. Put the prior <span class="math" data-say="3 over 4">3/4</span> on green and <span class="math" data-say="1 over 4">1/4</span> on grue and enter 100 green emeralds.</p><div class="thm"><span class="label">Theorem &middot; Identical rows give a Bayes factor of 1</span><p>If <span class="math" data-say="P of data given H equals P of data given H prime">P(data | H) = P(data | H′)</span> then the Bayes factor of <span class="math" data-say="H">H</span> against <span class="math" data-say="H prime">H′</span> is <span class="math" data-say="1">1</span>, and the posterior odds equal the prior odds. With only these two hypotheses it follows that the posterior of <span class="math" data-say="H">H</span> equals its prior.</p></div><p>The lab prints exactly that: the Bayes factor is 1, the posterior of green is still <span class="math" data-say="3 over 4">3/4</span>, and the tile that classifies the data says they are neutral. One hundred emeralds and one thousand do the same, because each multiplies both likelihoods by 1.</p><p>The second preset adds the one difference that matters. Suppose the next emerald is examined after <span class="math" data-say="t">t</span> and is green. Under grue it should have been blue, so grue gives it probability 0 and green gives it 1. The Bayes factor is infinite, the posterior of green is 1, and the lab says the data prove green against this one rival. Until such an observation arrives, nothing in the evidence tells the hypotheses apart.</p><p>Goodman's riddle is that no formal feature of the data prefers green to grue. The standard replies place the difference elsewhere. One says grue is gerrymandered, because it mentions a time; but a speaker of a language with grue and bleen as primitives would call green the gerrymandered word. Another says natural kinds are the projectible ones, which relocates the question to what makes a kind natural. Each is a claim about the prior, and the lab can show that it must be.</p><p>The lab's limit is the same as in the last lesson: it computes from the prior it is given. It does not say that <span class="math" data-say="3 over 4">3/4</span> on green is the right number, and a reader who sets the prior on grue at <span class="math" data-say="3 over 4">3/4</span> gets the mirror result.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Exact Bayesian updating</h2></div><p>prior times likelihood, normalised; the Bayes factor is the weight of the data</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+after t               green           blue</div><p>The lab takes two outcomes, green and blue, for an emerald as examined. Before <span class="math" data-say="t">t</span> both hypotheses give green probability 1, so their likelihood rows are identical. Put the prior <span class="math" data-say="3 over 4">3/4</span> on green and <span class="math" data-say="1 over 4">1/4</span> on grue and enter 100 green emeralds.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Exact Bayesian updating</h2></div><p>prior times likelihood, normalised; the Bayes factor is the weight of the data</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Hypotheses, data, posterior</strong><span>every figure is an exact fraction</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="upTable"></table></div>
       <div class="status-banner" id="upStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Change the prior, the likelihoods or the data</h3>
-          <p>A prior or a likelihood row that does not sum to 1 is refused, not rescaled.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Change the prior, the likelihoods or the data</h3>
+            <p>A prior or a likelihood row that does not sum to 1 is refused, not rescaled.</p>
         <div class="field">
           <label for="upPreset">Worked example</label>
           <select id="upPreset"><option value="grue" selected>Green and grue, 100 green emeralds before t</option><option value="tell">One emerald examined after t, found green</option></select>
@@ -1442,12 +1485,15 @@ after t               green           blue</div><p>The lab takes two outcomes, g
           <div class="kpi"><span>Best act now</span><strong id="upBest">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="thm"><span class="label">Theorem &middot; Identical rows give a Bayes factor of 1</span><p>If <span class="math" data-say="P of data given H equals P of data given H prime">P(data | H) = P(data | H′)</span> then the Bayes factor of <span class="math" data-say="H">H</span> against <span class="math" data-say="H prime">H′</span> is <span class="math" data-say="1">1</span>, and the posterior odds equal the prior odds. With only these two hypotheses it follows that the posterior of <span class="math" data-say="H">H</span> equals its prior.</p></div><p>The lab prints exactly that: the Bayes factor is 1, the posterior of green is still <span class="math" data-say="3 over 4">3/4</span>, and the tile that classifies the data says they are neutral. One hundred emeralds and one thousand do the same, because each multiplies both likelihoods by 1.</p><p>The second preset adds the one difference that matters. Suppose the next emerald is examined after <span class="math" data-say="t">t</span> and is green. Under grue it should have been blue, so grue gives it probability 0 and green gives it 1. The Bayes factor is infinite, the posterior of green is 1, and the lab says the data prove green against this one rival. Until such an observation arrives, nothing in the evidence tells the hypotheses apart.</p><p>Goodman's riddle is that no formal feature of the data prefers green to grue. The standard replies place the difference elsewhere. One says grue is gerrymandered, because it mentions a time; but a speaker of a language with grue and bleen as primitives would call green the gerrymandered word. Another says natural kinds are the projectible ones, which relocates the question to what makes a kind natural. Each is a claim about the prior, and the lab can show that it must be.</p><p>The lab's limit is the same as in the last lesson: it computes from the prior it is given. It does not say that <span class="math" data-say="3 over 4">3/4</span> on green is the right number, and a reader who sets the prior on grue at <span class="math" data-say="3 over 4">3/4</span> gets the mirror result.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing whether data favour one hypothesis</h2></div><p>Four steps, applied to any pair of rival hypotheses.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write what each predicts</h3><p>For each observation you have, record the probability each hypothesis gave it. Do this before computing anything.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compare the rows</h3><p>If the two rows agree on every outcome that occurred, the Bayes factor is exactly 1 and the data are idle between them.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the outcome where they differ</h3><p>Look for an observation, possible in principle, on which the rows disagree. That is the only kind of evidence that can separate them.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Ask where the preference came from</h3><p>If you favoured one hypothesis while the Bayes factor was 1, the preference came from the prior. Say what justified it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing whether data favour one hypothesis</h2>
+      <p class="lead-in">Four steps, applied to any pair of rival hypotheses.</p>
+      <ol class="key-ideas method"><li><strong>Write what each predicts.</strong> For each observation you have, record the probability each hypothesis gave it. Do this before computing anything.</li><li><strong>Compare the rows.</strong> If the two rows agree on every outcome that occurred, the Bayes factor is exactly 1 and the data are idle between them.</li><li><strong>Find the outcome where they differ.</strong> Look for an observation, possible in principle, on which the rows disagree. That is the only kind of evidence that can separate them.</li><li><strong>Ask where the preference came from.</strong> If you favoured one hypothesis while the Bayes factor was 1, the preference came from the prior. Say what justified it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1465,17 +1511,16 @@ posterior of green: (3/4 · 1) / (3/4 · 1 + 1/4 · 1) = 3/4
 prior ratio 3 to 1; posterior ratio 3 to 1</div><p>The posterior ratio equals the prior ratio to the digit. One hundred emeralds were examined, and the evidence for green is exactly the evidence for grue.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking more green emeralds favour green over grue</strong><span>Each green emerald examined before <span class="math" data-say="t">t</span> has probability 1 under both hypotheses. The Bayes factor stays at exactly 1 after one emerald and after a hundred, and the posterior ratio is the prior ratio, so the count of green emeralds is no argument at all.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating “grue” as a trick of language that the data can sweep aside</strong><span>The hypothesis is as well defined as green and fits as well. It is excluded by a judgement that colours are projectible and time-indexed colours are not, and that judgement is prior to the data.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding that induction is hopeless</strong><span>The lab shows only that induction needs a prior that treats some predicates as projectible. A reader can hold such a prior, defend it, and compute with it; what cannot be done is to derive it from the observations it is applied to.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can show a Bayes factor of 1 and say what follows.</strong><p>Given two hypotheses and a record of observations, you should be able to write their likelihood rows, show that the Bayes factor is 1, compute the posterior from the prior, and name the kind of observation that would separate them.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The time <span class="math" data-say="t">t</span> is stipulated and never reached by the data in the first preset; the second preset is the one where it is reached. Some authors prefer to make the riddle about properties rather than times, and the arithmetic of identical rows is the same.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking more green emeralds favour green over grue</strong><span>Each green emerald examined before <span class="math" data-say="t">t</span> has probability 1 under both hypotheses. The Bayes factor stays at exactly 1 after one emerald and after a hundred, and the posterior ratio is the prior ratio, so the count of green emeralds is no argument at all.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating “grue” as a trick of language that the data can sweep aside</strong><span>The hypothesis is as well defined as green and fits as well. It is excluded by a judgement that colours are projectible and time-indexed colours are not, and that judgement is prior to the data.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding that induction is hopeless</strong><span>The lab shows only that induction needs a prior that treats some predicates as projectible. A reader can hold such a prior, defend it, and compute with it; what cannot be done is to derive it from the observations it is applied to.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can show a Bayes factor of 1 and say what follows.</strong><p>Given two hypotheses and a record of observations, you should be able to write their likelihood rows, show that the Bayes factor is 1, compute the posterior from the prior, and name the kind of observation that would separate them.</p></div></div><div class="note"><strong>Note:</strong> The time <span class="math" data-say="t">t</span> is stipulated and never reached by the data in the first preset; the second preset is the one where it is reached. Some authors prefer to make the riddle about properties rather than times, and the arithmetic of identical rows is the same.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Grue agrees with green until t</summary><p>An object is grue if it is examined before time <span class="math" data-say="t">t</span> and green, or not so examined and blue. Every emerald examined before <span class="math" data-say="t">t</span> that was green was therefore grue as well.</p></details><details class="recall"><summary>A Bayes factor of 1 means the data did not discriminate</summary><p>If two hypotheses give the observed data the same probability, the data move neither relative to the other, however many observations there are.</p></details><details class="recall"><summary>Projectibility lives in the prior</summary><p>Treating green as projectible and grue as not is a judgement made before the data, since the data are the same for both.</p></details></div>
+      <h3>Summary</h3>
       <p>Define &ldquo;grue&rdquo; so that every emerald examined so far is both green and grue. The two hypotheses assign the same probability to every observation before the critical time, so their Bayes factor is exactly 1 and the posterior ratio equals the prior ratio. Which predicate is projectible is a fact about the prior.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Grue agrees with green until t.</strong> An object is grue if it is examined before time <span class="math" data-say="t">t</span> and green, or not so examined and blue. Every emerald examined before <span class="math" data-say="t">t</span> that was green was therefore grue as well.</li><li><strong>A Bayes factor of 1 means the data did not discriminate.</strong> If two hypotheses give the observed data the same probability, the data move neither relative to the other, however many observations there are.</li><li><strong>Projectibility lives in the prior.</strong> Treating green as projectible and grue as not is a judgement made before the data, since the data are the same for both.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="grue, green if seen before t, else blue. same rows before t, BF equals 1 exactly. posterior ratio equals prior ratio. 100 green emeralds do not separate them" tabindex="0" role="region" aria-label="Mathematical notation">grue: green if seen before t, else blue
 same rows before t: BF = 1 exactly
 posterior ratio = prior ratio
@@ -2199,11 +2244,42 @@ posterior ratio = prior ratio
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2271,7 +2347,7 @@ posterior ratio = prior ratio
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

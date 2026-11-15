@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Accelerate and Measuring Performance</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 2 · Measuring Performance</p>
       <h1>Delivery and Organizational Performance</h1>
       <p class="lesson-lede">High performers&#x27; organizations were twice as likely to exceed their goals, and the lab shows what a ratio like that is, and is not.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Organizational performance</li><li>Times as likely</li><li>Difference and odds ratio</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Does delivery performance matter, and how to use the measures</h2>
-      <article class="prose reading"><p>The question of this part is the reason for the four measures: does delivery performance matter to the organization? To find out, respondents rated their organization&rsquo;s relative performance on profitability, market share and productivity, a scale the authors say has been validated several times, found to correlate with return on investment and to hold up through economic cycles. The finding is stated in one sentence: across several years, &ldquo;high-performing organizations were consistently twice as likely to exceed these goals as low performers&rdquo;. The authors read it as showing that software delivery capability can be a competitive advantage.</p><p>Two things about the measure matter for how to hold the finding. It is self-reported: the delivery measures and the organizational rating are both survey answers, and Fowler&rsquo;s foreword notes that a survey captures subjective perceptions. And it is relative: respondents place their organization against others, not against a number. The authors answer the first by the validation of the scale and by the longer argument in Part II; the lesson notes it and moves on.</p><p>In 2017 they added a measure of noncommercial goals, which any organization has, with a scale also validated before, and found that high performers were again twice as likely to exceed their objectives, across five noncommercial goals that include customer satisfaction and the organization's mission. The chapter&rsquo;s Figure 2.4 draws this as arrows from software delivery performance to the two kinds of organizational performance, and a box on reading the book&rsquo;s figures explains the arrows: each is a predictive relationship, read as drives, predicts, affects or impacts. The authors say that the analyses go beyond correlation into prediction, and Chapter 12 says in what sense, which later lessons take up.</p><p>Three consequences follow in the chapter. The ability to work in small batches lets a team collect user feedback quickly, for example by A/B testing, and the authors add that teams able to experiment with their product tend also to be the ones with the technical practices of continuous delivery. Delivery performance is an argument against outsourcing software that is strategic to a business, while software such as payroll or office tools is not strategic and can be bought as a service; telling the two apart is of enormous importance, and they point to Simon Wardley&rsquo;s mapping method for that.</p><p>The last section, Driving Change, is about using the numbers. With delivery performance defined, teams can be compared with their organizations and the industry, tracked over time and tested for what moves them. The authors give a spoiler: change approval boards do not improve delivery performance, they are correlated negatively with both tempo and stability. They invite readers to place their own teams in the book&rsquo;s taxonomy and to set targets on the four measures. Then comes the caution that ends the chapter. In pathological and bureaucratic cultures, runs a passage the authors quote from Humble and colleagues' Lean Enterprise (2014), measurement becomes a means of control and people keep back what would unsettle those in charge; and, in Deming's words as that passage gives them, &ldquo;whenever there is fear, you get the wrong numbers&rdquo;. Culture first, then, and Chapter 3 is where the book begins.</p><p>Now the arithmetic of the headline. The lab takes groups, how many teams each has and how many met a goal, and prints each group&rsquo;s share, the ratio of two groups&rsquo; shares, their difference in percentage points and, separately, the odds ratio. The sample is forty invented teams: twenty high performers and twenty low. On <code>half-the-teams</code>, 12 of the high group and 6 of the low group met the goal: 60 percent and 30 percent, a ratio of 2.00, a difference of 30 points. The odds are 12 to 8 and 6 to 14, an odds ratio of 3.50. The sentence &lsquo;twice as likely&rsquo; is the first figure and not the last.</p><p>The preset <code>rare-goal</code> changes the goal and keeps the ratio: 4 of the high group and 2 of the low group met it, 20 percent and 10 percent. The ratio is again 2.00, and the difference is 10 points, not 30; the odds ratio is 2.25. &lsquo;Twice as likely&rsquo; is compatible with a difference that is large or small, depending on how common the outcome is, which the book&rsquo;s sentence does not say, since it gives no underlying shares. Whether the finding is big enough to matter is a question about the shares, and the lab asks for them.</p><p>None of these is a cause. The ratio compares two groups drawn by the clustering in each year's survey; it does not show that moving a team from the low group to the high one would change its organization&rsquo;s results. The book&rsquo;s case that it would rests on prediction from many years of data and on theory, which Part II sets out, and on the survey&rsquo;s limits that Fowler names. The lab shows what the ratio is arithmetically.</p><h3>Exercise</h3><p>A goal is met by 18 of 20 high-performing teams and 9 of 20 low-performing teams. Find each share, the ratio, the difference in points and the odds ratio. Then type the groups in to check, and say which of the three comparisons would make the result look largest in a headline, and which looks smallest.</p><p>The next course, Measuring and Changing Culture, begins with its first lesson, Modeling and Measuring Culture: the authors&rsquo; model of the culture that, they say, makes measurement safe.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Groups and shares</h2></div><p>&quot;twice as likely&quot;: two shares, their ratio, their difference and the odds ratio</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Does delivery performance matter, and how to use the measures</h2><div class="prose reading"><p>The question of this part is the reason for the four measures: does delivery performance matter to the organization? To find out, respondents rated their organization&rsquo;s relative performance on profitability, market share and productivity, a scale the authors say has been validated several times, found to correlate with return on investment and to hold up through economic cycles. The finding is stated in one sentence: across several years, &ldquo;high-performing organizations were consistently twice as likely to exceed these goals as low performers&rdquo;. The authors read it as showing that software delivery capability can be a competitive advantage.</p><p>Two things about the measure matter for how to hold the finding. It is self-reported: the delivery measures and the organizational rating are both survey answers, and Fowler&rsquo;s foreword notes that a survey captures subjective perceptions. And it is relative: respondents place their organization against others, not against a number. The authors answer the first by the validation of the scale and by the longer argument in Part II; the lesson notes it and moves on.</p><p>In 2017 they added a measure of noncommercial goals, which any organization has, with a scale also validated before, and found that high performers were again twice as likely to exceed their objectives, across five noncommercial goals that include customer satisfaction and the organization's mission. The chapter&rsquo;s Figure 2.4 draws this as arrows from software delivery performance to the two kinds of organizational performance, and a box on reading the book&rsquo;s figures explains the arrows: each is a predictive relationship, read as drives, predicts, affects or impacts. The authors say that the analyses go beyond correlation into prediction, and Chapter 12 says in what sense, which later lessons take up.</p><p>Three consequences follow in the chapter. The ability to work in small batches lets a team collect user feedback quickly, for example by A/B testing, and the authors add that teams able to experiment with their product tend also to be the ones with the technical practices of continuous delivery. Delivery performance is an argument against outsourcing software that is strategic to a business, while software such as payroll or office tools is not strategic and can be bought as a service; telling the two apart is of enormous importance, and they point to Simon Wardley&rsquo;s mapping method for that.</p><p>The last section, Driving Change, is about using the numbers. With delivery performance defined, teams can be compared with their organizations and the industry, tracked over time and tested for what moves them. The authors give a spoiler: change approval boards do not improve delivery performance, they are correlated negatively with both tempo and stability. They invite readers to place their own teams in the book&rsquo;s taxonomy and to set targets on the four measures. Then comes the caution that ends the chapter. In pathological and bureaucratic cultures, runs a passage the authors quote from Humble and colleagues' Lean Enterprise (2014), measurement becomes a means of control and people keep back what would unsettle those in charge; and, in Deming's words as that passage gives them, &ldquo;whenever there is fear, you get the wrong numbers&rdquo;. Culture first, then, and Chapter 3 is where the book begins.</p><p>Now the arithmetic of the headline. The lab takes groups, how many teams each has and how many met a goal, and prints each group&rsquo;s share, the ratio of two groups&rsquo; shares, their difference in percentage points and, separately, the odds ratio. The sample is forty invented teams: twenty high performers and twenty low. On <code>half-the-teams</code>, 12 of the high group and 6 of the low group met the goal: 60 percent and 30 percent, a ratio of 2.00, a difference of 30 points. The odds are 12 to 8 and 6 to 14, an odds ratio of 3.50. The sentence &lsquo;twice as likely&rsquo; is the first figure and not the last.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Groups and shares</h2></div><p>&quot;twice as likely&quot;: two shares, their ratio, their difference and the odds ratio</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Groups and shares</strong><span>"twice as likely": two shares, their ratio, their difference and the odds ratio</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="agrTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="agrTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A group's share is those meeting the outcome over its n, exact. "Times as likely" is the first group's share over the second's, shown to 2 places; the difference is the first share less the second in percentage points, to 1 place. The odds of a group are those meeting it over those not; the odds ratio is the first group's odds over the second's, to 2 places. The two ratios agree only when the outcome is rare, and neither is defined when it divides by 0.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>How much likelier, and what that ratio hides</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>How much likelier, and what that ratio hides</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="agrPreset">Worked example</label>
           <select id="agrPreset"><option value="half-the-teams" selected>Twenty high and twenty low performers, a common goal</option><option value="rare-goal">The same groups, a goal few met</option></select>
@@ -1431,12 +1474,15 @@
           <div class="kpi"><span>Odds ratio (a different figure)</span><strong id="agrOdds">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>rare-goal</code> changes the goal and keeps the ratio: 4 of the high group and 2 of the low group met it, 20 percent and 10 percent. The ratio is again 2.00, and the difference is 10 points, not 30; the odds ratio is 2.25. &lsquo;Twice as likely&rsquo; is compatible with a difference that is large or small, depending on how common the outcome is, which the book&rsquo;s sentence does not say, since it gives no underlying shares. Whether the finding is big enough to matter is a question about the shares, and the lab asks for them.</p><p>None of these is a cause. The ratio compares two groups drawn by the clustering in each year's survey; it does not show that moving a team from the low group to the high one would change its organization&rsquo;s results. The book&rsquo;s case that it would rests on prediction from many years of data and on theory, which Part II sets out, and on the survey&rsquo;s limits that Fowler names. The lab shows what the ratio is arithmetically.</p><h3>Exercise</h3><p>A goal is met by 18 of 20 high-performing teams and 9 of 20 low-performing teams. Find each share, the ratio, the difference in points and the odds ratio. Then type the groups in to check, and say which of the three comparisons would make the result look largest in a headline, and which looks smallest.</p><p>The next course, Measuring and Changing Culture, begins with its first lesson, Modeling and Measuring Culture: the authors&rsquo; model of the culture that, they say, makes measurement safe.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a &#x27;times as likely&#x27;</h2></div><p>Four steps, the last of them on a claim you have read.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the two shares</h3><p>For each group divide those who met the goal by the group's size. Without the shares, a ratio cannot be judged.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Divide them</h3><p>Divide the larger share by the smaller to get times as likely, and subtract them to get the difference in points.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add the odds ratio if the odds are quoted</h3><p>For each group divide those who met the goal by those who did not, then divide the two figures. It will not match the ratio of shares.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a claim of your own</h3><p>Take a report that says one group is some times as likely to succeed. Find the two shares in it, or note that it does not give them.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a &#x27;times as likely&#x27;</h2>
+      <p class="lead-in">Four steps, the last of them on a claim you have read.</p>
+      <ol class="key-ideas method"><li><strong>Find the two shares.</strong> For each group divide those who met the goal by the group's size. Without the shares, a ratio cannot be judged.</li><li><strong>Divide them.</strong> Divide the larger share by the smaller to get times as likely, and subtract them to get the difference in points.</li><li><strong>Add the odds ratio if the odds are quoted.</strong> For each group divide those who met the goal by those who did not, then divide the two figures. It will not match the ratio of shares.</li><li><strong>Do it on a claim of your own.</strong> Take a report that says one group is some times as likely to succeed. Find the two shares in it, or note that it does not give them.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1456,17 +1502,16 @@ odds low: 6 to 14 = 3/7
 odds ratio: (3/2) / (3/7) = 7/2 = 3.50</div><p>All three describe the same forty teams. Which one a sentence uses changes how large the result sounds, and none of them says why the groups differ.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading &#x27;twice as likely&#x27; as twice the result</strong><span>It is a ratio of two shares of teams meeting a goal. On the lesson's sample it is 2.00 for shares of 60 and 30 percent and for 20 and 10 percent, with differences of 30 and 10 points. It says nothing of how far the goal was exceeded.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using the measures to rank and reward teams</strong><span>The chapter ends on a warning it quotes: in a pathological or bureaucratic culture, people fear the measurement and keep back what challenges those in charge, and the numbers are wrong. The four measures are for a team to learn from and to set its own targets against.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the arrows as proof of cause</strong><span>The authors say their arrows are predictive relationships, going beyond correlation; they do not say each is an experiment. Fowler's foreword adds that confirmation from other approaches would give him more confidence. The finding is strong evidence of a pattern and the argument for its cause is the book's.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compare two groups three ways.</strong><p>Given each group's size and how many met a goal, compute the share, the ratio, the difference in points and the odds ratio, and say what each does and does not show.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab compares the shares you give it. It cannot tell whether the groups were drawn well, whether the goal was a fair one, or whether the difference is a cause; the book's 'twice as likely' is its survey's, from respondents' own ratings in several years.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading &#x27;twice as likely&#x27; as twice the result</strong><span>It is a ratio of two shares of teams meeting a goal. On the lesson's sample it is 2.00 for shares of 60 and 30 percent and for 20 and 10 percent, with differences of 30 and 10 points. It says nothing of how far the goal was exceeded.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using the measures to rank and reward teams</strong><span>The chapter ends on a warning it quotes: in a pathological or bureaucratic culture, people fear the measurement and keep back what challenges those in charge, and the numbers are wrong. The four measures are for a team to learn from and to set its own targets against.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the arrows as proof of cause</strong><span>The authors say their arrows are predictive relationships, going beyond correlation; they do not say each is an experiment. Fowler's foreword adds that confirmation from other approaches would give him more confidence. The finding is strong evidence of a pattern and the argument for its cause is the book's.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compare two groups three ways.</strong><p>Given each group's size and how many met a goal, compute the share, the ratio, the difference in points and the odds ratio, and say what each does and does not show.</p></div></div><div class="note"><strong>Note:</strong> The lab compares the shares you give it. It cannot tell whether the groups were drawn well, whether the goal was a fair one, or whether the difference is a cause; the book's 'twice as likely' is its survey's, from respondents' own ratings in several years.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Organizational performance</summary><p>How respondents rated their organization's relative performance on profitability, market share and productivity, a scale used and validated in earlier research. It is the respondents' own rating, not a figure taken from accounts.</p></details><details class="recall"><summary>Times as likely</summary><p>The share of one group meeting a goal divided by the share of another. If 60 percent of one group and 30 percent of the other meet it, the first is twice as likely. The book does not give its computation; this is the plain reading of the phrase.</p></details><details class="recall"><summary>Difference and odds ratio</summary><p>Two other comparisons of the same shares. The difference is the percentage points between them; the odds ratio divides each group's odds, those who met the goal over those who did not. Neither equals the ratio of shares.</p></details></div>
+      <h3>Summary</h3>
       <p>The last part of Chapter 2 asks whether delivery performance matters to the organization, and ends with advice on using the measures. Read how organizational performance was measured, what 'twice as likely' reports, how the authors read the arrows in their figures, and why they warn against measures used for control; then work the ratio on invented teams, beside the difference and the odds ratio it is mistaken for.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Organizational performance.</strong> How respondents rated their organization's relative performance on profitability, market share and productivity, a scale used and validated in earlier research. It is the respondents' own rating, not a figure taken from accounts.</li><li><strong>Times as likely.</strong> The share of one group meeting a goal divided by the share of another. If 60 percent of one group and 30 percent of the other meet it, the first is twice as likely. The book does not give its computation; this is the plain reading of the phrase.</li><li><strong>Difference and odds ratio.</strong> Two other comparisons of the same shares. The difference is the percentage points between them; the odds ratio divides each group's odds, those who met the goal over those who did not. Neither equals the ratio of shares.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="organizational performance is a self rating. twice as likely, a ratio of two shares. a ratio is not a difference in shares. a ratio is not an odds ratio. an arrow is a prediction, not a proof. measure to learn, not to punish" tabindex="0" role="region" aria-label="Mathematical notation">organizational performance is a self rating
 twice as likely: a ratio of two shares
 a ratio is not a difference in shares
@@ -2318,11 +2363,42 @@ measure to learn, not to punish</div><figcaption>Delivery and the organization i
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2390,7 +2466,7 @@ measure to learn, not to punish</div><figcaption>Delivery and the organization i
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

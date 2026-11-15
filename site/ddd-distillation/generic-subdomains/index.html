@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Distillation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 15 · Distillation</p>
       <h1>Generic Subdomains</h1>
       <p class="lesson-lede">The parts of the model many businesses would need, factored into modules of their own and bought, adopted, outsourced or built with less of the team&#x27;s best effort.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Generic Subdomain</li><li>The four options</li><li>Weeks freed</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern, its options, then the count</h2>
-      <article class="prose reading"><p>&ldquo;There is a part of your model that you would like to take for granted.&rdquo; That is how Evans introduces Generic Subdomains, the next pattern of Chapter 15. This lesson reads the pattern with its four options, the story of two projects and their time zones, and two short sections after it, Generic Doesn't Mean Reusable and Project Risk Management. Read them in your own copy first.</p><p>The problem is clutter. Some parts of a model add complexity without carrying any special knowledge: principles everybody knows, or details from specialties that support the project without being its focus. However generic, they are needed for the system to work, and mixed in with the core they make it harder to see. Evans's examples are an organisation chart, which shipping, banking and manufacturing all need in some form, and the receivables and expense ledgers a generic accounting model could handle. He has watched two projects put their best developers on dates and times with time zones for weeks.</p><p>The pattern, as you would apply it: find the subdomains that support the project without being its point, and give each a generic model in a Module of its own that holds nothing peculiar to your business. Then rank their work below the core's, keep the core's developers elsewhere, because they would learn little of the business there, and check whether a package or a published model would serve before you build.</p><p>Then the four options, each with its costs. An off-the-shelf solution means less code and maintenance carried by someone else, usually by code more mature than yours; but it still has to be evaluated and understood, its quality cannot be assumed, it may be overbuilt, it may sit in a Bounded Context of its own and refer awkwardly to your Entities, and it can bring platform dependencies. Evans finds such solutions worth investigating and usually not worth the trouble, though he has seen elaborate workflow engines and a deeply integrated error log succeed. A published design or model is more mature than a home-grown one and comes documented, though it may fit badly or be more than you need; where a field has a rigorous formal model, as accounting and physics do, use it, and implement only the consistent subset you need. Fowler's <em>Analysis Patterns</em>, read in this Subject's sixth course, is the kind of source he means.</p><p>An outsourced implementation keeps the core team on the core and adds capacity without spreading knowledge of the core thin, and handing the work outside forces an interface-oriented, generic design. It still costs the core team time to explain the interface and the standards, bringing the code back in has an overhead, and its quality may be better or worse than your own; Evans recommends requiring unit tests and, better, specifying the acceptance tests yourself. An in-house implementation integrates easily, does exactly what you want, and can be given to temporary contractors; its costs are maintenance, training and a time estimate that is easy to get wrong. Generic subdomains, he adds, are the right place for outside design expertise and the place where confidentiality matters least.</p><p>The time-zone story is two projects that spent their best developers' weeks on time zones. On a shipping scheduler the need was proven and the core was mature, no adequate package existed, and the work went to a strong programmer on a short contract, who adapted a public-domain implementation. On an insurance claims system a long-term junior developer, later joined by a senior one, built a fully general time-zone model before any requirement was known, and the core went undeveloped. Both did one thing right: they kept the time-zone model out of the core.</p><p>Generic Doesn't Mean Reusable corrects a natural reading. Evans has said generic, not reusable, on purpose: if you build the subdomain yourself, do not design that code for reuse, because the point of distillation is to put as much effort as you can into the core and only what is needed into the rest. Model reuse, through a published model, is often the better kind. Implement only the part you need, but stay strictly inside the generic concept: anything specific to your industry makes the subdomain harder to extend, and belongs in the core or in a specialised subdomain of its own, which is worth more than the generic one. Project Risk Management then asks what an early end-to-end system should be made of. Building it on a generic part is tempting because such parts are easy to analyse, but unless the team's skills are proven and the domain well known, the first cut should rest on part of the core, even a small one, since that is where the risk is.</p><p>Now the count, on the bike-share of the last lesson. The preset <code>all-built</code> is the drifted team with an option written on each generic part, all of them <span class="math" data-say="build">build</span>: 100 weeks, 24 on the core and 48 on generic parts, four generic parts built in house, and 48 weeks a decision to buy or outsource could free. The preset <code>buy-and-outsource</code> buys payments and map tiles, outsources login, and keeps messaging in house. Buying is not free, so it adds two supporting parts, <span class="math" data-say="payments fit">payments_fit</span> and <span class="math" data-say="map fit">map_fit</span>, for the 3 and 1 weeks of evaluating and integrating the packages. The team's own weeks fall to 64, of which 24 are core, three eighths; the 8 weeks of messaging are the only generic weeks left, and the only ones still to free.</p><p>That preset also shows what buying does not do. The strongest developers are on the two integrations and on messaging: still 0 of 3 on the core, because no decision about people was made. The preset <code>freed-to-core</code> makes it: the 36 weeks the purchases saved go to rebalancing and the forecast, and so do the three strongest developers, so the core holds 60 of the team's 100 weeks and 3 of 3 of the strongest. Which option suits a part is Evans's list of advantages and drawbacks weighed against your own case; the lab counts only the weeks each choice takes off the team's list.</p><h3>Exercise</h3><ul><li>The clinic from the last lesson: triage-scheduling, core, 10 weeks; patient-records, supporting, 14; billing, generic, 15; login, generic, 6; reminders, generic, 5.</li><li>The team buys billing, adding a supporting part billing-fit of 1 week; outsources login; and builds reminders.</li></ul><p>By hand, find the team's own weeks after these decisions, the share of them on the core, the generic parts still built in house, and the weeks a further decision could free. Then type the parts, with an option on each generic one, into the lab.</p><p>A generic subdomain leaves the core in plainer view, but only for those who already know what it is. The next lesson, Domain Vision Statement and Highlighted Core, reads two cheap ways of telling everyone.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Distillation: where the effort goes</h2></div><p>the share of effort and of the strongest developers on the core domain</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern, its options, then the count</h2><div class="prose reading"><p>&ldquo;There is a part of your model that you would like to take for granted.&rdquo; That is how Evans introduces Generic Subdomains, the next pattern of Chapter 15. This lesson reads the pattern with its four options, the story of two projects and their time zones, and two short sections after it, Generic Doesn't Mean Reusable and Project Risk Management. Read them in your own copy first.</p><p>The problem is clutter. Some parts of a model add complexity without carrying any special knowledge: principles everybody knows, or details from specialties that support the project without being its focus. However generic, they are needed for the system to work, and mixed in with the core they make it harder to see. Evans's examples are an organisation chart, which shipping, banking and manufacturing all need in some form, and the receivables and expense ledgers a generic accounting model could handle. He has watched two projects put their best developers on dates and times with time zones for weeks.</p><p>The pattern, as you would apply it: find the subdomains that support the project without being its point, and give each a generic model in a Module of its own that holds nothing peculiar to your business. Then rank their work below the core's, keep the core's developers elsewhere, because they would learn little of the business there, and check whether a package or a published model would serve before you build.</p><p>Then the four options, each with its costs. An off-the-shelf solution means less code and maintenance carried by someone else, usually by code more mature than yours; but it still has to be evaluated and understood, its quality cannot be assumed, it may be overbuilt, it may sit in a Bounded Context of its own and refer awkwardly to your Entities, and it can bring platform dependencies. Evans finds such solutions worth investigating and usually not worth the trouble, though he has seen elaborate workflow engines and a deeply integrated error log succeed. A published design or model is more mature than a home-grown one and comes documented, though it may fit badly or be more than you need; where a field has a rigorous formal model, as accounting and physics do, use it, and implement only the consistent subset you need. Fowler's <em>Analysis Patterns</em>, read in this Subject's sixth course, is the kind of source he means.</p><p>An outsourced implementation keeps the core team on the core and adds capacity without spreading knowledge of the core thin, and handing the work outside forces an interface-oriented, generic design. It still costs the core team time to explain the interface and the standards, bringing the code back in has an overhead, and its quality may be better or worse than your own; Evans recommends requiring unit tests and, better, specifying the acceptance tests yourself. An in-house implementation integrates easily, does exactly what you want, and can be given to temporary contractors; its costs are maintenance, training and a time estimate that is easy to get wrong. Generic subdomains, he adds, are the right place for outside design expertise and the place where confidentiality matters least.</p><p>The time-zone story is two projects that spent their best developers' weeks on time zones. On a shipping scheduler the need was proven and the core was mature, no adequate package existed, and the work went to a strong programmer on a short contract, who adapted a public-domain implementation. On an insurance claims system a long-term junior developer, later joined by a senior one, built a fully general time-zone model before any requirement was known, and the core went undeveloped. Both did one thing right: they kept the time-zone model out of the core.</p><p>Generic Doesn't Mean Reusable corrects a natural reading. Evans has said generic, not reusable, on purpose: if you build the subdomain yourself, do not design that code for reuse, because the point of distillation is to put as much effort as you can into the core and only what is needed into the rest. Model reuse, through a published model, is often the better kind. Implement only the part you need, but stay strictly inside the generic concept: anything specific to your industry makes the subdomain harder to extend, and belongs in the core or in a specialised subdomain of its own, which is worth more than the generic one. Project Risk Management then asks what an early end-to-end system should be made of. Building it on a generic part is tempting because such parts are easy to analyse, but unless the team's skills are proven and the domain well known, the first cut should rest on part of the core, even a small one, since that is where the risk is.</p><p>Now the count, on the bike-share of the last lesson. The preset <code>all-built</code> is the drifted team with an option written on each generic part, all of them <span class="math" data-say="build">build</span>: 100 weeks, 24 on the core and 48 on generic parts, four generic parts built in house, and 48 weeks a decision to buy or outsource could free. The preset <code>buy-and-outsource</code> buys payments and map tiles, outsources login, and keeps messaging in house. Buying is not free, so it adds two supporting parts, <span class="math" data-say="payments fit">payments_fit</span> and <span class="math" data-say="map fit">map_fit</span>, for the 3 and 1 weeks of evaluating and integrating the packages. The team's own weeks fall to 64, of which 24 are core, three eighths; the 8 weeks of messaging are the only generic weeks left, and the only ones still to free.</p><p>That preset also shows what buying does not do. The strongest developers are on the two integrations and on messaging: still 0 of 3 on the core, because no decision about people was made. The preset <code>freed-to-core</code> makes it: the 36 weeks the purchases saved go to rebalancing and the forecast, and so do the three strongest developers, so the core holds 60 of the team's 100 weeks and 3 of 3 of the strongest. Which option suits a part is Evans's list of advantages and drawbacks weighed against your own case; the lab counts only the weeks each choice takes off the team's list.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Distillation: where the effort goes</h2></div><p>the share of effort and of the strongest developers on the core domain</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Distillation: where the effort goes</strong><span>the share of effort and of the strongest developers on the core domain</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="ddsTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ddsTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each part is core, supporting or generic, with its developer-weeks and the number of the team's strongest developers on it. A part may end with an option: build (the same as none), buy, published (a published model adopted) or outsource; only a generic part may take one other than build, and a part not built has no strongest developers on it. Only built parts count their weeks. The shares are each kind's built weeks over all built weeks, exact. The strongest on the core are counted against the strongest on every built part. The weeks buying or publishing would free are those of the generic parts still built in house.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The weeks a decision about a generic part frees</h3>
-          <p>A count over the small model the lesson states. Each record is one part of a project: its kind, the developer-weeks it takes, and how many of the team's strongest developers work on it. The lab adds the weeks and the developers by kind. Which part is the core is the team's choice, which the book weighs; the lab only counts what that choice does to the shares.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The weeks a decision about a generic part frees</h3>
+            <p>A count over the small model the lesson states. Each record is one part of a project: its kind, the developer-weeks it takes, and how many of the team's strongest developers work on it. The lab adds the weeks and the developers by kind. Which part is the core is the team's choice, which the book weighs; the lab only counts what that choice does to the shares.</p>
         <div class="field">
           <label for="ddsPreset">Worked example</label>
           <select id="ddsPreset"><option value="all-built" selected>The drifted bike-share, every generic part built in house</option><option value="buy-and-outsource">Payments and map tiles bought, login outsourced</option><option value="freed-to-core">The weeks saved and the strongest developers moved to the core</option></select>
@@ -1426,12 +1469,15 @@
           <div class="kpi"><span>Weeks buying or publishing would free</span><strong id="ddsFree">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Exercise</h3><ul><li>The clinic from the last lesson: triage-scheduling, core, 10 weeks; patient-records, supporting, 14; billing, generic, 15; login, generic, 6; reminders, generic, 5.</li><li>The team buys billing, adding a supporting part billing-fit of 1 week; outsources login; and builds reminders.</li></ul><p>By hand, find the team's own weeks after these decisions, the share of them on the core, the generic parts still built in house, and the weeks a further decision could free. Then type the parts, with an option on each generic one, into the lab.</p><p>A generic subdomain leaves the core in plainer view, but only for those who already know what it is. The next lesson, Domain Vision Statement and Highlighted Core, reads two cheap ways of telling everyone.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding how to get a generic part</h2></div><p>Four steps, the last of them on a project of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check that it is generic</h3><p>Say which other kinds of business would need the part in much the same form; if the answer is none, it is supporting or core, not generic.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Strip out your specialty</h3><p>List anything in the part that only your industry would recognise, and move it to the core or to a specialised subdomain.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Weigh the four options</h3><p>For each of buying, adopting a published model, outsourcing and building, write the one advantage and the one drawback Evans names that matter most for this part, and choose.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own project</h3><p>Take the generic parts of a system you know, write an option on each in the lab, add a supporting part for any integration a purchase needs, and write down the weeks the decisions free and where those weeks and people go.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Deciding how to get a generic part</h2>
+      <p class="lead-in">Four steps, the last of them on a project of your own.</p>
+      <ol class="key-ideas method"><li><strong>Check that it is generic.</strong> Say which other kinds of business would need the part in much the same form; if the answer is none, it is supporting or core, not generic.</li><li><strong>Strip out your specialty.</strong> List anything in the part that only your industry would recognise, and move it to the core or to a specialised subdomain.</li><li><strong>Weigh the four options.</strong> For each of buying, adopting a published model, outsourcing and building, write the one advantage and the one drawback Evans names that matter most for this part, and choose.</li><li><strong>Do it on your own project.</strong> Take the generic parts of a system you know, write an option on each in the lab, add a supporting part for any integration a purchase needs, and write down the weeks the decisions free and where those weeks and people go.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1450,17 +1496,16 @@ the team: 24 + 32 + 8, so 64 weeks
 core share 24 of 64, three eighths</div><p>The purchases took 40 weeks off the list and the integrations put 4 back. The core's share rose only because the total fell; its own weeks did not move until a separate decision moved them.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking generic to mean designed for reuse</strong><span>Evans chose the word generic and not reusable deliberately. Code built in house for a generic subdomain should do only what this business needs, because effort spent generalising it is effort the core does not get. The reuse he values more is of models, as when a team adopts a published one. What he does insist on is purity: nothing industry-specific in the generic module.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Giving the generic part to the strongest developers because it is hard and well defined</strong><span>Evans's two time-zone projects both spent strong developers on a generic problem. The one that did it well had proven the need, had a mature core and used a strong programmer on a short contract; the other used long-term developers who should have been learning insurance, before any requirement was known. On the lesson's illustration, buying parts frees weeks but leaves the strongest developers at 0 of 3 on the core until people are moved too.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Starting a project with the generic parts to reduce risk</strong><span>Project Risk Management says the opposite: unless the team has proven skills and knows the domain well, the first-cut system should be built on part of the core, because that is where the unforeseen complexity and the missing knowledge are. A generic part is easier to analyse, which is why it tempts.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can choose how to get a generic part and say what it frees.</strong><p>Given a project's parts, state which are generic, give one advantage and one drawback of each of the four options, and count the team's weeks and the weeks still to free after a set of decisions.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab takes bought and outsourced parts off the team's weeks and counts only the integration you add back. It knows nothing of a package's quality, its fit or its licence, which are most of Evans's list of drawbacks, and it cannot say whether a part is generic: that is the team's reading of its domain.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking generic to mean designed for reuse</strong><span>Evans chose the word generic and not reusable deliberately. Code built in house for a generic subdomain should do only what this business needs, because effort spent generalising it is effort the core does not get. The reuse he values more is of models, as when a team adopts a published one. What he does insist on is purity: nothing industry-specific in the generic module.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Giving the generic part to the strongest developers because it is hard and well defined</strong><span>Evans's two time-zone projects both spent strong developers on a generic problem. The one that did it well had proven the need, had a mature core and used a strong programmer on a short contract; the other used long-term developers who should have been learning insurance, before any requirement was known. On the lesson's illustration, buying parts frees weeks but leaves the strongest developers at 0 of 3 on the core until people are moved too.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Starting a project with the generic parts to reduce risk</strong><span>Project Risk Management says the opposite: unless the team has proven skills and knows the domain well, the first-cut system should be built on part of the core, because that is where the unforeseen complexity and the missing knowledge are. A generic part is easier to analyse, which is why it tempts.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can choose how to get a generic part and say what it frees.</strong><p>Given a project's parts, state which are generic, give one advantage and one drawback of each of the four options, and count the team's weeks and the weeks still to free after a set of decisions.</p></div></div><div class="note"><strong>Note:</strong> The lab takes bought and outsourced parts off the team's weeks and counts only the integration you add back. It knows nothing of a package's quality, its fit or its licence, which are most of Evans's list of drawbacks, and it cannot say whether a part is generic: that is the team's reading of its domain.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Generic Subdomain</summary><p>A cohesive part of the model that is genuinely part of the domain but abstracts concepts a great many businesses need: an organisation's structure, an accounting ledger, a calendar. It is essential to the system and is not what the project is for.</p></details><details class="recall"><summary>The four options</summary><p>Evans's ways of getting a generic subdomain: an off-the-shelf solution bought or taken from open source; a published design or model, adopted; an outsourced implementation; and an in-house implementation. A published model combines with either of the last two.</p></details><details class="recall"><summary>Weeks freed</summary><p>In the lab, the developer-weeks of the generic parts still built in house: the weeks a decision to buy or outsource each of them would take off the team's own list. A part marked <span class="math" data-say="buy">buy</span> or <span class="math" data-say="outsource">outsource</span> no longer counts in the team's weeks. A published model still has to be built, in house or outside, so mark such a part <span class="math" data-say="build">build</span> or <span class="math" data-say="outsource">outsource</span>, whatever the tile's label says.</p></details></div>
+      <h3>Summary</h3>
       <p>The first distillation that changes the design: find the subdomains that are not why the project exists, separate them, and decide how to get each one. Read Evans's four options with their advantages and drawbacks, why generic does not mean reusable, and why the first system should not be built on a generic part; then count the weeks a decision to buy frees.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Generic Subdomain.</strong> A cohesive part of the model that is genuinely part of the domain but abstracts concepts a great many businesses need: an organisation's structure, an accounting ledger, a calendar. It is essential to the system and is not what the project is for.</li><li><strong>The four options.</strong> Evans's ways of getting a generic subdomain: an off-the-shelf solution bought or taken from open source; a published design or model, adopted; an outsourced implementation; and an in-house implementation. A published model combines with either of the last two.</li><li><strong>Weeks freed.</strong> In the lab, the developer-weeks of the generic parts still built in house: the weeks a decision to buy or outsource each of them would take off the team's own list. A part marked <span class="math" data-say="buy">buy</span> or <span class="math" data-say="outsource">outsource</span> no longer counts in the team's weeks. A published model still has to be built, in house or outside, so mark such a part <span class="math" data-say="build">build</span> or <span class="math" data-say="outsource">outsource</span>, whatever the tile's label says.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="generic, needed by many businesses. factor it into a module of its own. keep your own specialties out of it. buy, publish, outsource or build. generic does not mean designed for reuse. build the first system on the core" tabindex="0" role="region" aria-label="Mathematical notation">generic: needed by many businesses
 factor it into a module of its own
 keep your own specialties out of it
@@ -2212,11 +2257,42 @@ build the first system on the core</div><figcaption>Generic Subdomains in six li
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2284,7 +2360,7 @@ build the first system on the core</div><figcaption>Generic Subdomains in six li
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

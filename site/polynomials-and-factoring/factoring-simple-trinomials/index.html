@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,26 +1424,24 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Polynomials and Factoring</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Factoring</p>
       <h1>Factoring Simple Trinomials</h1>
       <p class="lesson-lede">Exhaust the product-sum pairs for <span data-say="x squared plus b x plus c">x² + bx + c</span> and defend either result.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The identity tells you exactly what to look for</li><li>The candidate list is finite, so the search is complete</li><li>&quot;It does not factor over the rationals&quot; is a result, not a surrender</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Product and sum</h2>
-      <article class="prose reading"><p>Multiply out <span class="math" data-say="the quantity x plus p, times the quantity x plus q">(x + p)(x + q)</span> and compare with <span class="math" data-say="x squared plus b x plus c">x² + bx + c</span>:</p><div class="mathblock" data-say="the quantity x plus p, times the quantity x plus q, equals, x squared plus q x plus p x plus p q, equals, x squared plus the quantity p plus q, times x plus p q. x squared plus, b x, plus, c" tabindex="0" role="region" aria-label="Mathematical notation">(x + p)(x + q)  =  x² + qx + px + pq  =  x² + (p + q)x + pq
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Product and sum</h2><div class="prose reading"><p>Multiply out <span class="math" data-say="the quantity x plus p, times the quantity x plus q">(x + p)(x + q)</span> and compare with <span class="math" data-say="x squared plus b x plus c">x² + bx + c</span>:</p><div class="mathblock" data-say="the quantity x plus p, times the quantity x plus q, equals, x squared plus q x plus p x plus p q, equals, x squared plus the quantity p plus q, times x plus p q. x squared plus, b x, plus, c" tabindex="0" role="region" aria-label="Mathematical notation">(x + p)(x + q)  =  x² + qx + px + pq  =  x² + (p + q)x + pq
 
-                       x² +    b x   +  c</div><div class="thm"><span class="label">Theorem &middot; The factoring condition</span><p>A monic trinomial <span class="math" data-say="x squared plus b x plus c">x² + bx + c</span> factors as <span class="math" data-say="the quantity x plus p, times the quantity x plus q">(x + p)(x + q)</span> with <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> integers exactly when there are integers <span class="math" data-say="p">p</span>, <span class="math" data-say="q">q</span> with <span class="math" data-say="p q equals c">pq = c</span> and <span class="math" data-say="p plus q equals b">p + q = b</span>.</p><p>Two coefficients, two conditions. Because <span class="math" data-say="p">p</span> must divide <span class="math" data-say="c">c</span>, only finitely many <span class="math" data-say="p">p</span> need testing.</p></div><p>This applies when the leading coefficient is <span class="math" data-say="1">1</span>. When it is not, either take it out as a common factor if you can, or use the AC method of “The AC Method”.</p><h3>Reading the signs before you search</h3><p>The two conditions constrain the signs, so you never need to test the whole list blindly:</p><ul><li><strong><span class="math" data-say="c is greater than 0">c &gt; 0</span>.</strong> The product is positive, so <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> have the <em>same</em> sign &mdash; and that sign is the sign of <span class="math" data-say="b">b</span>, since they must sum to it. In <span class="math" data-say="x squared minus 7 x plus 12">x² − 7x + 12</span>, both are negative.</li><li><strong><span class="math" data-say="c is less than 0">c &lt; 0</span>.</strong> The product is negative, so <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> have <em>opposite</em> signs. The one with the larger absolute value carries the sign of <span class="math" data-say="b">b</span>.</li><li><strong><span class="math" data-say="c equals 0">c = 0</span>.</strong> There is no trinomial to search: <span class="math" data-say="x squared plus b x">x² + bx</span> has a common factor <span class="math" data-say="x">x</span>, and “Factoring Out the Greatest Common Factor” already handled it.</li></ul><p>These are not extra rules to memorise. Each one is read straight off <span class="math" data-say="p q equals c">pq = c</span> and <span class="math" data-say="p plus q equals b">p + q = b</span>, and deriving them on the spot is safer than recalling them.</p><h3>Why a finite search settles the question</h3><p>Suppose no pair on the list works. Could there still be a factorisation using fractions &mdash; something like <span class="math" data-say="the quantity x plus 1 over 2, times the quantity x plus 8">(x + 1/2)(x + 8)</span>? For a monic trinomial the answer is no. If <span class="math" data-say="x squared plus b x plus c">x² + bx + c</span> with integer coefficients factors into linear factors with rational numbers, those numbers are necessarily integers, so they are already on the list.</p><p>“The Factor Theorem and Rational Roots” proves this as part of the rational root theorem. For now, take it as the reason the search is trustworthy: an empty result means the trinomial does not factor over the rationals, not merely that you did not find how.</p><div class="example"><span class="label">Example &middot; A complete search that fails</span><p><span class="math" data-say="x squared plus x plus 1">x² + x + 1</span>. The divisor pairs of <span class="math" data-say="1">1</span> are <span class="math" data-say="1, 1">(1, 1)</span> and <span class="math" data-say="negative 1, negative 1">(−1, −1)</span>, giving sums <span class="math" data-say="2">2</span> and <span class="math" data-say="negative 2">−2</span>. Neither equals <span class="math" data-say="1">1</span>, and the list is exhausted. The trinomial is irreducible over the integers, and by the paragraph above, over the rationals too.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>x^2 + bx + c</h2></div><p>Every pair that multiplies to c, with its sum</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+                       x² +    b x   +  c</div><div class="thm"><span class="label">Theorem &middot; The factoring condition</span><p>A monic trinomial <span class="math" data-say="x squared plus b x plus c">x² + bx + c</span> factors as <span class="math" data-say="the quantity x plus p, times the quantity x plus q">(x + p)(x + q)</span> with <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> integers exactly when there are integers <span class="math" data-say="p">p</span>, <span class="math" data-say="q">q</span> with <span class="math" data-say="p q equals c">pq = c</span> and <span class="math" data-say="p plus q equals b">p + q = b</span>.</p><p>Two coefficients, two conditions. Because <span class="math" data-say="p">p</span> must divide <span class="math" data-say="c">c</span>, only finitely many <span class="math" data-say="p">p</span> need testing.</p></div><p>This applies when the leading coefficient is <span class="math" data-say="1">1</span>. When it is not, either take it out as a common factor if you can, or use the AC method of “The AC Method”.</p><h3>Reading the signs before you search</h3><p>The two conditions constrain the signs, so you never need to test the whole list blindly:</p><ul><li><strong><span class="math" data-say="c is greater than 0">c &gt; 0</span>.</strong> The product is positive, so <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> have the <em>same</em> sign &mdash; and that sign is the sign of <span class="math" data-say="b">b</span>, since they must sum to it. In <span class="math" data-say="x squared minus 7 x plus 12">x² − 7x + 12</span>, both are negative.</li><li><strong><span class="math" data-say="c is less than 0">c &lt; 0</span>.</strong> The product is negative, so <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> have <em>opposite</em> signs. The one with the larger absolute value carries the sign of <span class="math" data-say="b">b</span>.</li><li><strong><span class="math" data-say="c equals 0">c = 0</span>.</strong> There is no trinomial to search: <span class="math" data-say="x squared plus b x">x² + bx</span> has a common factor <span class="math" data-say="x">x</span>, and “Factoring Out the Greatest Common Factor” already handled it.</li></ul><p>These are not extra rules to memorise. Each one is read straight off <span class="math" data-say="p q equals c">pq = c</span> and <span class="math" data-say="p plus q equals b">p + q = b</span>, and deriving them on the spot is safer than recalling them.</p><h3>Why a finite search settles the question</h3><p>Suppose no pair on the list works. Could there still be a factorisation using fractions &mdash; something like <span class="math" data-say="the quantity x plus 1 over 2, times the quantity x plus 8">(x + 1/2)(x + 8)</span>? For a monic trinomial the answer is no. If <span class="math" data-say="x squared plus b x plus c">x² + bx + c</span> with integer coefficients factors into linear factors with rational numbers, those numbers are necessarily integers, so they are already on the list.</p><p>“The Factor Theorem and Rational Roots” proves this as part of the rational root theorem. For now, take it as the reason the search is trustworthy: an empty result means the trinomial does not factor over the rationals, not merely that you did not find how.</p><div class="example"><span class="label">Example &middot; A complete search that fails</span><p><span class="math" data-say="x squared plus x plus 1">x² + x + 1</span>. The divisor pairs of <span class="math" data-say="1">1</span> are <span class="math" data-say="1, 1">(1, 1)</span> and <span class="math" data-say="negative 1, negative 1">(−1, −1)</span>, giving sums <span class="math" data-say="2">2</span> and <span class="math" data-say="negative 2">−2</span>. Neither equals <span class="math" data-say="1">1</span>, and the list is exhausted. The trinomial is irreducible over the integers, and by the paragraph above, over the rationals too.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>x^2 + bx + c</h2></div><p>Every pair that multiplies to c, with its sum</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="fcTitle">x^2 + bx + c</strong><span id="fcSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the polynomial</span><span class="tone-green"><i class="legend-swatch"></i>rational roots</span><span class="tone-muted"><i class="legend-swatch"></i>candidates that failed</span></div>
@@ -1406,10 +1449,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="fcPlot"></svg></div>
       <div id="fcWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="fcStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The divisor-pair search</h3>
-          <p>Enter <span class="math" data-say="b">b</span> and <span class="math" data-say="c">c</span>. The lab lists every divisor pair of <span class="math" data-say="c">c</span> with its sum, marks the pair that works, and reports an empty search as a result. Try <span class="math" data-say="b equals 1">b = 1</span>, <span class="math" data-say="c equals 1">c = 1</span>.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The divisor-pair search</h3>
+            <p>Enter <span class="math" data-say="b">b</span> and <span class="math" data-say="c">c</span>. The lab lists every divisor pair of <span class="math" data-say="c">c</span> with its sum, marks the pair that works, and reports an empty search as a result. Try <span class="math" data-say="b equals 1">b = 1</span>, <span class="math" data-say="c equals 1">c = 1</span>.</p>
         <div class="field">
           <label for="fcPreset">Example</label>
           <select id="fcPreset"><option value="x^2 + 7x + 12">x^2 + 7x + 12</option><option value="x^2 - 5x + 6">x^2 - 5x + 6</option><option value="x^2 + 2x - 15">x^2 + 2x - 15</option><option value="x^2 + x + 1">x^2 + x + 1   (no pair works)</option><option value="x^2 + 6x + 9">x^2 + 6x + 9   (a repeated factor)</option><option value="2x^2 + 7x + 3">2x^2 + 7x + 3   (a is not 1: wrong method)</option></select>
@@ -1422,12 +1465,14 @@
         <p class="small-copy" style="margin:0;">Type as you would write it: <code>6x^3 + 9x^2 - 15x</code>,
         <code>(1/2)x^2 + 3/4</code>. Every divisor list, every pair tried and every test below is
         computed in your browser from what is in this box.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Factoring <span data-say="x squared plus b x plus c">x² + bx + c</span></h2></div><p>The search is short if you use the signs to prune it first.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check the leading coefficient is 1, and take out any GCF</h3><p>If the polynomial is <span class="math" data-say="2 x squared plus 10 x plus 12">2x² + 10x + 12</span>, factor out the <span class="math" data-say="2">2</span> first: <span class="math" data-say="2 times the quantity x squared plus 5 x plus 6">2(x² + 5x + 6)</span>. If the leading coefficient survives that, this lesson does not apply and “The AC Method” does.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Use the sign of c, then the sign of b</h3><p><span class="math" data-say="c">c</span> positive means both numbers share the sign of <span class="math" data-say="b">b</span>; <span class="math" data-say="c">c</span> negative means opposite signs. This halves the list before you test anything.</p></article><article class="card concept-card"><div class="icon">3</div><h3>List the divisor pairs of c and add each one</h3><p>Work systematically from <span class="math" data-say="1">1</span> upward so nothing is skipped. Stop at the first pair whose sum is <span class="math" data-say="b">b</span> &mdash; there cannot be a second.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Write the factors and expand to check; if the list is empty, say so</h3><p>The pair <span class="math" data-say="p">p</span>, <span class="math" data-say="q">q</span> gives <span class="math" data-say="the quantity x plus p, times the quantity x plus q">(x + p)(x + q)</span>, and expanding must return the original. If no pair summed to <span class="math" data-say="b">b</span>, the answer is that it does not factor over the rationals.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Factoring <span data-say="x squared plus b x plus c">x² + bx + c</span></h2>
+      <p class="lead-in">The search is short if you use the signs to prune it first.</p>
+      <ol class="key-ideas method"><li><strong>Check the leading coefficient is 1, and take out any GCF.</strong> If the polynomial is <span class="math" data-say="2 x squared plus 10 x plus 12">2x² + 10x + 12</span>, factor out the <span class="math" data-say="2">2</span> first: <span class="math" data-say="2 times the quantity x squared plus 5 x plus 6">2(x² + 5x + 6)</span>. If the leading coefficient survives that, this lesson does not apply and “The AC Method” does.</li><li><strong>Use the sign of c, then the sign of b.</strong> <span class="math" data-say="c">c</span> positive means both numbers share the sign of <span class="math" data-say="b">b</span>; <span class="math" data-say="c">c</span> negative means opposite signs. This halves the list before you test anything.</li><li><strong>List the divisor pairs of c and add each one.</strong> Work systematically from <span class="math" data-say="1">1</span> upward so nothing is skipped. Stop at the first pair whose sum is <span class="math" data-say="b">b</span> &mdash; there cannot be a second.</li><li><strong>Write the factors and expand to check; if the list is empty, say so.</strong> The pair <span class="math" data-say="p">p</span>, <span class="math" data-say="q">q</span> gives <span class="math" data-say="the quantity x plus p, times the quantity x plus q">(x + p)(x + q)</span>, and expanding must return the original. If no pair summed to <span class="math" data-say="b">b</span>, the answer is that it does not factor over the rationals.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1457,17 +1502,16 @@ C.  x² + x + 1         c &gt; 0, b &gt; 0  →  both positive
     answer  does not factor over the rationals</div><p>In B the pair <span class="math" data-say="negative 3, 5">(−3, 5)</span> has the larger number positive, matching <span class="math" data-say="b equals plus 2">b = +2</span>, exactly as the sign reading predicted. Listing all four pairs takes seconds and removes any guesswork about which arrangement is right.</p><p>C is the important one. The search ended not because it got difficult but because the list ran out, and an exhausted list is a proof. Compare <span class="math" data-say="x squared plus 2 x plus 1">x² + 2x + 1</span>, where the pair <span class="math" data-say="1, 1">(1, 1)</span> sums to <span class="math" data-say="2">2</span> and the answer is <span class="math" data-say="the quantity x plus 1, squared">(x + 1)²</span>.</p><p>For a faded search, take <span class="math" data-say="x squared minus 2 x minus 24">x² − 2x − 24</span>. The supplied sign decision is that the pair has opposite signs and the larger absolute value is negative. List the positive divisor pairs of <span class="math" data-say="24">24</span>, assign signs, and expand your result. The pair is <span class="math" data-say="4">4</span> and <span class="math" data-say="negative 6">−6</span>, so the answer is <span class="math" data-say="the quantity x plus 4, times the quantity x minus 6">(x + 4)(x − 6)</span>; choosing <span class="math" data-say="negative 4">−4</span> and <span class="math" data-say="6">6</span> gives the right product but the wrong middle coefficient.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Matching the product but not the sum</strong><span>Both conditions must hold. <span class="math" data-say="the quantity x plus 2, times the quantity x plus 10">(x + 2)(x + 10)</span> has product <span class="math" data-say="20">20</span> but sum <span class="math" data-say="12">12</span>, so it is not a factorisation of <span class="math" data-say="x squared plus 9 x plus 20">x² + 9x + 20</span> &mdash; and expanding it says so immediately.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Guessing signs instead of reading them off</strong><span>The sign of <span class="math" data-say="c">c</span> decides whether the numbers agree in sign and the sign of <span class="math" data-say="b">b</span> decides which way. Derived in two seconds, this removes the most common source of near-miss answers.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating an unsuccessful search as an unfinished one</strong><span>When every divisor pair has been tested and none works, the trinomial does not factor over the rationals. Writing that is the complete answer; hunting for a cleverer pair is not.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can factor by search and defend a negative result.</strong><p>Given <span class="math" data-say="x squared plus b x plus c">x² + bx + c</span> you should list the divisor pairs of <span class="math" data-say="c">c</span> in order, use the signs to skip half of them, and either produce the factors or state that none exist &mdash; naming the pairs you tested as your evidence. That habit is exactly what “The Factor Theorem and Rational Roots” formalises for polynomials of any degree.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab shows the whole candidate list, including the sums that miss. That display is the point of it: watching a complete search come back empty on <span class="math" data-say="x squared plus x plus 1">x² + x + 1</span> is what turns "I cannot factor this" into "this does not factor", which are very different statements.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Matching the product but not the sum</strong><span>Both conditions must hold. <span class="math" data-say="the quantity x plus 2, times the quantity x plus 10">(x + 2)(x + 10)</span> has product <span class="math" data-say="20">20</span> but sum <span class="math" data-say="12">12</span>, so it is not a factorisation of <span class="math" data-say="x squared plus 9 x plus 20">x² + 9x + 20</span> &mdash; and expanding it says so immediately.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Guessing signs instead of reading them off</strong><span>The sign of <span class="math" data-say="c">c</span> decides whether the numbers agree in sign and the sign of <span class="math" data-say="b">b</span> decides which way. Derived in two seconds, this removes the most common source of near-miss answers.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating an unsuccessful search as an unfinished one</strong><span>When every divisor pair has been tested and none works, the trinomial does not factor over the rationals. Writing that is the complete answer; hunting for a cleverer pair is not.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can factor by search and defend a negative result.</strong><p>Given <span class="math" data-say="x squared plus b x plus c">x² + bx + c</span> you should list the divisor pairs of <span class="math" data-say="c">c</span> in order, use the signs to skip half of them, and either produce the factors or state that none exist &mdash; naming the pairs you tested as your evidence. That habit is exactly what “The Factor Theorem and Rational Roots” formalises for polynomials of any degree.</p></div></div><div class="note"><strong>Note:</strong> The lab shows the whole candidate list, including the sums that miss. That display is the point of it: watching a complete search come back empty on <span class="math" data-say="x squared plus x plus 1">x² + x + 1</span> is what turns "I cannot factor this" into "this does not factor", which are very different statements.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The identity tells you exactly what to look for</summary><p>Expanding <span class="math" data-say="the quantity x plus p, times the quantity x plus q">(x + p)(x + q)</span> gives <span class="math" data-say="x squared plus the quantity p plus q, times x plus p q">x² + (p + q)x + pq</span>. Matching coefficients turns factoring into two simultaneous conditions on two numbers &mdash; product <span class="math" data-say="c">c</span>, sum <span class="math" data-say="b">b</span> &mdash; and nothing else.</p></details><details class="recall"><summary>The candidate list is finite, so the search is complete</summary><p><span class="math" data-say="p">p</span> must divide <span class="math" data-say="c">c</span>, and a nonzero integer has finitely many divisors. List the divisor pairs, check the sums, and you have either found the answer or shown there is none.</p></details><details class="recall"><summary>&quot;It does not factor over the rationals&quot; is a result, not a surrender</summary><p><span class="math" data-say="x squared plus x plus 1">x² + x + 1</span> has divisor pairs <span class="math" data-say="1, 1">(1, 1)</span> and <span class="math" data-say="negative 1, negative 1">(−1, −1)</span>, with sums <span class="math" data-say="2">2</span> and <span class="math" data-say="negative 2">−2</span>. Neither is <span class="math" data-say="1">1</span>, so no rational factorisation exists. That is a proved statement, with its number system named, and it is the correct final answer.</p></details></div>
+      <h3>Summary</h3>
       <p>For <span class="math" data-say="x squared plus b x plus c">x² + bx + c</span> the whole problem reduces to finding two integers whose product is <span class="math" data-say="c">c</span> and whose sum is <span class="math" data-say="b">b</span>. The candidate list is finite, so the search either succeeds or proves that no integer factorisation exists.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The identity tells you exactly what to look for.</strong> Expanding <span class="math" data-say="the quantity x plus p, times the quantity x plus q">(x + p)(x + q)</span> gives <span class="math" data-say="x squared plus the quantity p plus q, times x plus p q">x² + (p + q)x + pq</span>. Matching coefficients turns factoring into two simultaneous conditions on two numbers &mdash; product <span class="math" data-say="c">c</span>, sum <span class="math" data-say="b">b</span> &mdash; and nothing else.</li><li><strong>The candidate list is finite, so the search is complete.</strong> <span class="math" data-say="p">p</span> must divide <span class="math" data-say="c">c</span>, and a nonzero integer has finitely many divisors. List the divisor pairs, check the sums, and you have either found the answer or shown there is none.</li><li><strong>&quot;It does not factor over the rationals&quot; is a result, not a surrender.</strong> <span class="math" data-say="x squared plus x plus 1">x² + x + 1</span> has divisor pairs <span class="math" data-say="1, 1">(1, 1)</span> and <span class="math" data-say="negative 1, negative 1">(−1, −1)</span>, with sums <span class="math" data-say="2">2</span> and <span class="math" data-say="negative 2">−2</span>. Neither is <span class="math" data-say="1">1</span>, so no rational factorisation exists. That is a proved statement, with its number system named, and it is the correct final answer.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the quantity x plus p, times the quantity x plus q, equals, x squared plus the quantity p plus q, times x plus p q. so for x squared plus b x plus c, find p, q, with, p times q equals c, and, p plus q equals b. x squared minus 7 x plus 12, goes to, the quantity negative 3, times the quantity negative 4, equals 12, negative 3 plus negative 4 equals negative 7, goes to, the quantity x minus 3, times the quantity x minus 4" tabindex="0" role="region" aria-label="Mathematical notation">(x + p)(x + q)  =  x² + (p + q)x + pq
 
 so for x² + bx + c    find p, q  with   p·q = c   and   p + q = b
@@ -3807,11 +3851,42 @@ x² − 7x + 12   →   (−3)(−4) = 12,  (−3) + (−4) = −7   →  (x −
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3879,7 +3954,7 @@ x² − 7x + 12   →   (−3)(−4) = 12,  (−3) + (−4) = −7   →  (x −
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

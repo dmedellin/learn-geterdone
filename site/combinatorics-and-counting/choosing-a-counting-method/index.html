@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Combinatorics and Counting</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Technique</p>
       <h1>Choosing a Counting Method</h1>
       <p class="lesson-lede">The decision procedure, and how to check the answer.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Classify before computing</li><li>Restrictions are handled by three techniques</li><li>Always check a small case</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The decision procedure</h2>
-      <article class="prose reading"><h3>Step 1: order and repetition</h3><div class="mathblock" data-say="order matters, order does not. repetition forbidden, P of n and r, n choose r. repetition allowed, n to the power r, n plus r minus 1 choose r" tabindex="0" role="region" aria-label="Mathematical notation">                        order matters      order does not
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The decision procedure</h2><div class="prose reading"><h3>Step 1: order and repetition</h3><div class="mathblock" data-say="order matters, order does not. repetition forbidden, P of n and r, n choose r. repetition allowed, n to the power r, n plus r minus 1 choose r" tabindex="0" role="region" aria-label="Mathematical notation">                        order matters      order does not
 repetition forbidden      P(n, r)              C(n, r)
 repetition allowed         nʳ             C(n + r − 1, r)</div><p>Ask what makes two outcomes different. If rearranging the same objects gives a new outcome, order matters. If an object can be used twice, repetition is allowed. At <span class="math" data-say="n equals 5">n = 5</span>, <span class="math" data-say="r equals 3">r = 3</span> these give 60, 10, 125 and 35 &mdash; four different answers to four different questions.</p><h3>Step 2: restrictions</h3><ul><li><strong>A constrained position:</strong> choose it first, then the rest freely.</li><li><strong>Varying counts:</strong> split into cases where the count is constant, then add.</li><li><strong>"At least one":</strong> count the complement.</li><li><strong>Overlapping conditions:</strong> inclusion and exclusion.</li><li><strong>Adjacency required:</strong> glue into a block, count, multiply by internal arrangements.</li><li><strong>Adjacency forbidden:</strong> arrange the others, then choose gaps.</li></ul><h3>Step 3: the whole toolkit</h3><div class="mathblock" data-say="identical objects, distinct boxes, n plus r minus 1 choose r, stars and bars. distinct objects, distinct boxes, multinomial coefficient. arrangements of a multiset, n factorial over n sub 1 and so on n sub k factorial. circular arrangements, the quantity n minus 1, factorial. no fixed points, D sub n. at least one of several properties, inclusion to exclusion. answer needed for every n, generating function. an identity to prove, double count or biject. existence rather than a count, pigeonhole" tabindex="0" role="region" aria-label="Mathematical notation">identical objects, distinct boxes      C(n + r − 1, r)     stars and bars
 distinct objects, distinct boxes       multinomial coefficient
@@ -1401,12 +1445,11 @@ no fixed points                        Dₙ
 at least one of several properties     inclusion–exclusion
 answer needed for every n              generating function
 an identity to prove                   double count or biject
-existence rather than a count          pigeonhole</div><h3>Step 4: verification</h3><ul><li><strong>Shrink and enumerate.</strong> Set <span class="math" data-say="n equals 3">n = 3</span>, <span class="math" data-say="r equals 2">r = 2</span> and list. The lab does this up to 400 objects.</li><li><strong>Count a second way.</strong> Cases and complement should agree. Two routes to one number is the strongest cheap check available.</li><li><strong>Check the magnitude.</strong> The answer cannot exceed the unrestricted count or fall below zero.</li><li><strong>Check the extremes.</strong> Does the formula give the right answer at <span class="math" data-say="r equals 0">r = 0</span> and <span class="math" data-say="r equals n">r = n</span>? Those are where off-by-one errors surface.</li></ul><p>The habit worth taking from this course is the last one. A formula checked at its boundaries and against one small enumeration is very unlikely to be the right calculation of the wrong quantity, which is the failure this whole procedure exists to prevent.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The four counting rules</h2></div><p>Enumerated while enumeration is possible</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+existence rather than a count          pigeonhole</div><h3>Step 4: verification</h3><ul><li><strong>Shrink and enumerate.</strong> Set <span class="math" data-say="n equals 3">n = 3</span>, <span class="math" data-say="r equals 2">r = 2</span> and list. The lab does this up to 400 objects.</li><li><strong>Count a second way.</strong> Cases and complement should agree. Two routes to one number is the strongest cheap check available.</li><li><strong>Check the magnitude.</strong> The answer cannot exceed the unrestricted count or fall below zero.</li><li><strong>Check the extremes.</strong> Does the formula give the right answer at <span class="math" data-say="r equals 0">r = 0</span> and <span class="math" data-say="r equals n">r = n</span>? Those are where off-by-one errors surface.</li></ul></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The four counting rules</h2></div><p>Enumerated while enumeration is possible</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Choosing r from n</strong><span>Order matters or not; repetition allowed or not</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>selected rule</span></div>
@@ -1415,10 +1458,10 @@ existence rather than a count          pigeonhole</div><h3>Step 4: verification<
         <div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cntTable"></table></div>
         <div id="cntList" class="small-copy" style="margin-top:10px;"></div>
       </div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>All four, side by side</h3>
-          <p>At <span class="math" data-say="n equals 5">n = 5</span>, <span class="math" data-say="r equals 3">r = 3</span> the four rules give 125, 60, 10 and 35. The classification decides which is your answer, and the enumeration shows why they differ.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>All four, side by side</h3>
+            <p>At <span class="math" data-say="n equals 5">n = 5</span>, <span class="math" data-say="r equals 3">r = 3</span> the four rules give 125, 60, 10 and 35. The classification decides which is your answer, and the enumeration shows why they differ.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="cntN">n (things to choose from)</label><span class="range-value" id="cntNOut">5</span></div>
           <input id="cntN" type="range" min="1" max="24" value="5" />
@@ -1437,12 +1480,15 @@ existence rather than a count          pigeonhole</div><h3>Step 4: verification<
           </select>
         </div>
         <div class="status-banner" id="cntStatus">Every total is computed in exact integer arithmetic.</div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The habit worth taking from this course is the last one. A formula checked at its boundaries and against one small enumeration is very unlikely to be the right calculation of the wrong quantity, which is the failure this whole procedure exists to prevent.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>The procedure</h2></div><p>Four questions, in order, before any arithmetic.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Does order matter?</h3><p>Ask what makes two outcomes different. Committees and hands: no. Podiums and passwords: yes.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Is repetition allowed?</h3><p>Can an object be used twice? Drawing with replacement, yes; without, no.</p></article><article class="card concept-card"><div class="icon">3</div><h3>What are the restrictions, and which technique fits?</h3><p>Constrain first, split into cases, complement, or inclusion and exclusion.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Verify</h3><p>A small enumeration, a second method, and the boundary values. Three cheap checks that between them catch nearly everything.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>The procedure</h2>
+      <p class="lead-in">Four questions, in order, before any arithmetic.</p>
+      <ol class="key-ideas method"><li><strong>Does order matter?.</strong> Ask what makes two outcomes different. Committees and hands: no. Podiums and passwords: yes.</li><li><strong>Is repetition allowed?.</strong> Can an object be used twice? Drawing with replacement, yes; without, no.</li><li><strong>What are the restrictions, and which technique fits?.</strong> Constrain first, split into cases, complement, or inclusion and exclusion.</li><li><strong>Verify.</strong> A small enumeration, a second method, and the boundary values. Three cheap checks that between them catch nearly everything.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1472,17 +1518,16 @@ existence rather than a count          pigeonhole</div><h3>Step 4: verification<
                and listing gives ab,ba,ac,ca,ad,da       ✓</div><p>The small-case check is the one that would catch a misclassification. Enumerating six strings takes ten seconds and confirms that the formula counts what was intended, which no amount of re-reading the arithmetic can.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Computing before classifying</strong><span>The formula is the last step, not the first. Two sentences of classification prevent most wrong answers.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Skipping the check because the reasoning felt sound</strong><span>Wrong classifications feel exactly as sound as right ones. That is what makes them dangerous and what makes the check worth doing.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Ignoring the boundaries</strong><span><span class="math" data-say="r equals 0">r = 0</span> and <span class="math" data-say="r equals n">r = n</span> are where off-by-one errors show. Both take a second to evaluate.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when classification precedes computation automatically.</strong><p>Five problems from this course, without looking back: the 4-digit PINs, the podium from ten runners, the 5-card hands, five doughnuts from three kinds, and the arrangements of BANANA. For each, write the two answers &mdash; order? repetition? &mdash; and the rule they select before computing anything; they should land on four different rules and one multiset. Then verify the doughnuts by listing. That sequence &mdash; classify, compute, check &mdash; is the whole course.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Discrete Probability turns these counts into probabilities by dividing by the size of the sample space, so every classification error here becomes a wrong probability there. The counting is the hard part; the division is not.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Computing before classifying</strong><span>The formula is the last step, not the first. Two sentences of classification prevent most wrong answers.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Skipping the check because the reasoning felt sound</strong><span>Wrong classifications feel exactly as sound as right ones. That is what makes them dangerous and what makes the check worth doing.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Ignoring the boundaries</strong><span><span class="math" data-say="r equals 0">r = 0</span> and <span class="math" data-say="r equals n">r = n</span> are where off-by-one errors show. Both take a second to evaluate.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when classification precedes computation automatically.</strong><p>Five problems from this course, without looking back: the 4-digit PINs, the podium from ten runners, the 5-card hands, five doughnuts from three kinds, and the arrangements of BANANA. For each, write the two answers &mdash; order? repetition? &mdash; and the rule they select before computing anything; they should land on four different rules and one multiset. Then verify the doughnuts by listing. That sequence &mdash; classify, compute, check &mdash; is the whole course.</p></div></div><div class="note"><strong>Note:</strong> Discrete Probability turns these counts into probabilities by dividing by the size of the sample space, so every classification error here becomes a wrong probability there. The counting is the hard part; the division is not.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Classify before computing</summary><p>Order and repetition determine which of four formulas applies. Answering those two questions out loud prevents most errors.</p></details><details class="recall"><summary>Restrictions are handled by three techniques</summary><p>Constrain first, split into cases, or count the complement. Inclusion and exclusion is the general version of the third.</p></details><details class="recall"><summary>Always check a small case</summary><p>Shrink the parameters until enumeration is possible. A formula disagreeing with a list is wrong, whatever the reasoning looked like.</p></details></div>
+      <h3>Summary</h3>
       <p>A summary of the course as a procedure: classify the problem, apply the rule, and verify. Most errors are classification errors, and most of them are caught by a small-case check.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Classify before computing.</strong> Order and repetition determine which of four formulas applies. Answering those two questions out loud prevents most errors.</li><li><strong>Restrictions are handled by three techniques.</strong> Constrain first, split into cases, or count the complement. Inclusion and exclusion is the general version of the third.</li><li><strong>Always check a small case.</strong> Shrink the parameters until enumeration is possible. A formula disagreeing with a list is wrong, whatever the reasoning looked like.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="1, Does ORDER matter ?, 2, Is REPETITION allowed ?. 3, Are there RESTRICTIONS ?, cases, complement, or inclusion to exclusion. 4, CHECK on a small case where enumeration is possible. A right calculation of the wrong quantity is the standard failure" tabindex="0" role="region" aria-label="Mathematical notation">1. Does ORDER matter?      2. Is REPETITION allowed?
 3. Are there RESTRICTIONS?    cases, complement, or inclusion–exclusion
 4. CHECK on a small case where enumeration is possible.
@@ -1936,11 +1981,42 @@ A right calculation of the wrong quantity is the standard failure.</div><figcapt
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2008,7 +2084,7 @@ A right calculation of the wrong quantity is the standard failure.</div><figcapt
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Second-Order Linear Equations</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The characteristic equation</p>
       <h1>The Characteristic Equation</h1>
       <p class="lesson-lede">Substitute <span data-say="y equals e to the power r t">y = e^(rt)</span> into <span data-say="A times y double prime plus b times y prime plus c times y equals 0">a·y″ + b·y′ + c·y = 0</span>, obtain <span data-say="A times r squared plus b times r plus c equals 0">a·r² + b·r + c = 0</span>, and solve it exactly.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The exponential is the function whose rates are copies of itself</li><li>The exponential factors out, and a quadratic remains</li><li>The discriminant says which of three things happens</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>From the equation to its quadratic</h2>
-      <article class="prose reading"><p>Separable Equations, Growth and Decay met <span class="math" data-say="y prime equals k times y">y′ = k·y</span> and its solution <span class="math" data-say="e to the power k t">e^(kt)</span>, and the previous course leaned on that exponential at every step. Here the equation is <span class="math" data-say="A times y double prime plus b times y prime plus c times y equals 0">a·y″ + b·y′ + c·y = 0</span>, with <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span> and <span class="math" data-say="c">c</span> constants and <span class="math" data-say="A">a</span> not zero, and the same function is the natural thing to try. The only unknown is the number <span class="math" data-say="r">r</span> in the exponent.</p><div class="mathblock" data-say="y equals e to the power r t. y prime equals r times e to the power r t. y double prime equals r squared times e to the power r t. A times r squared times e to the power r t plus b times r times e to the power r t plus c times e to the power r t equals 0. the quantity A times r squared plus b times r plus c, times e to the power r t equals 0" tabindex="0" role="region" aria-label="Mathematical notation">y = e^(rt)
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>From the equation to its quadratic</h2><div class="prose reading"><p>Separable Equations, Growth and Decay met <span class="math" data-say="y prime equals k times y">y′ = k·y</span> and its solution <span class="math" data-say="e to the power k t">e^(kt)</span>, and the previous course leaned on that exponential at every step. Here the equation is <span class="math" data-say="A times y double prime plus b times y prime plus c times y equals 0">a·y″ + b·y′ + c·y = 0</span>, with <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span> and <span class="math" data-say="c">c</span> constants and <span class="math" data-say="A">a</span> not zero, and the same function is the natural thing to try. The only unknown is the number <span class="math" data-say="r">r</span> in the exponent.</p><div class="mathblock" data-say="y equals e to the power r t. y prime equals r times e to the power r t. y double prime equals r squared times e to the power r t. A times r squared times e to the power r t plus b times r times e to the power r t plus c times e to the power r t equals 0. the quantity A times r squared plus b times r plus c, times e to the power r t equals 0" tabindex="0" role="region" aria-label="Mathematical notation">y = e^(rt)
 y′ = r·e^(rt)
 y″ = r²·e^(rt)
 a·r²·e^(rt) + b·r·e^(rt) + c·e^(rt) = 0
 (a·r² + b·r + c)·e^(rt) = 0</div><div class="thm"><span class="label">Theorem &middot; The characteristic equation</span><p>The function <span class="math" data-say="e to the power r t">e^(rt)</span> solves <span class="math" data-say="A times y double prime plus b times y prime plus c times y equals 0">a·y″ + b·y′ + c·y = 0</span> exactly when <span class="math" data-say="r">r</span> solves <span class="math" data-say="A times r squared plus b times r plus c equals 0">a·r² + b·r + c = 0</span>.</p></div><div class="proof"><p>From the substitution above, <span class="math" data-say="e to the power r t">e^(rt)</span> solves the equation exactly when <span class="math" data-say="the quantity A times r squared plus b times r plus c, times e to the power r t">(a·r² + b·r + c)·e^(rt)</span> is zero for every <span class="math" data-say="t">t</span>.</p><p>The factor <span class="math" data-say="e to the power r t">e^(rt)</span> is positive for every <span class="math" data-say="t">t</span>, so the product is zero exactly when the bracket is. The bracket has no <span class="math" data-say="t">t</span> in it, so it is zero exactly when <span class="math" data-say="r">r</span> is a root.</p><p><span class="qed">&#9633;</span></p></div><p>The rate of the exponential, <span class="math" data-say="the derivative of e to the power r t equals r times e to the power r t">(e^(rt))′ = r·e^(rt)</span>, is the claim Rates of Change and the Derivative demonstrated with rounded quotients in &ldquo;The Exponential and Its Rate&rdquo;; the proof above uses it and nothing else new. What is left is the algebra of a quadratic, which is &ldquo;The Quadratic Formula&rdquo; in Algebra's Quadratics and Complex Numbers.</p><div class="mathblock" data-say="r equals the quantity negative b plus or minus the square root of the quantity b squared minus 4 A c, over 2 A. disc equals b squared minus 4 A c" tabindex="0" role="region" aria-label="Mathematical notation">r = (−b ± √(b² − 4ac)) / (2a)
-disc = b² − 4ac</div><h3>The four presets</h3><p>Each preset is an equation and its quadratic. The lab prints the discriminant, the kind of root and the roots, all exactly. For <span class="math" data-say="y double prime plus 3 y prime plus 2 y equals 0">y″ + 3y′ + 2y = 0</span> the discriminant is <span class="math" data-say="9 minus 8 equals 1">9 − 8 = 1</span>, a perfect square, so the roots are rational. For <span class="math" data-say="y double prime plus 4 y prime plus 4 y equals 0">y″ + 4y′ + 4y = 0</span> it is <span class="math" data-say="16 minus 16 equals 0">16 − 16 = 0</span>, one root twice. For <span class="math" data-say="y double prime plus 2 y prime plus 5 y equals 0">y″ + 2y′ + 5y = 0</span> it is <span class="math" data-say="4 minus 20 equals negative 16">4 − 20 = −16</span>, so the roots are the complex pair <span class="math" data-say="negative 1 plus or minus 2 i">−1 ± 2i</span>.</p><div class="example"><span class="label">Example &middot; A discriminant that is positive and not a square</span><p>For <span class="math" data-say="y double prime minus y prime minus y equals 0">y″ − y′ − y = 0</span> the discriminant is <span class="math" data-say="1 plus 4 equals 5">1 + 4 = 5</span>. Both roots are real, and they are <span class="math" data-say="the quantity 1 plus or minus the square root of 5, over 2">(1 ± √5)/2</span>. The lab prints that surd exactly.</p><p>Rounded, the roots are <span class="math" data-say="is approximately 1.61803">≈ 1.61803</span> and <span class="math" data-say="is approximately negative 0.618034">≈ −0.618034</span>; the rounded numbers are for the eye only, and the exact surd is what the next lessons would carry into a solution.</p></div><p>Every equation of this form has a characteristic quadratic, and every root of it gives one exponential solution. What is still to decide is how to build the full set of solutions from the roots, and that depends on the kind of root: one lesson each, starting with two real roots.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The characteristic equation</h2></div><p>Roots, the general solution and the constants, exactly</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+disc = b² − 4ac</div><h3>The four presets</h3><p>Each preset is an equation and its quadratic. The lab prints the discriminant, the kind of root and the roots, all exactly. For <span class="math" data-say="y double prime plus 3 y prime plus 2 y equals 0">y″ + 3y′ + 2y = 0</span> the discriminant is <span class="math" data-say="9 minus 8 equals 1">9 − 8 = 1</span>, a perfect square, so the roots are rational. For <span class="math" data-say="y double prime plus 4 y prime plus 4 y equals 0">y″ + 4y′ + 4y = 0</span> it is <span class="math" data-say="16 minus 16 equals 0">16 − 16 = 0</span>, one root twice. For <span class="math" data-say="y double prime plus 2 y prime plus 5 y equals 0">y″ + 2y′ + 5y = 0</span> it is <span class="math" data-say="4 minus 20 equals negative 16">4 − 20 = −16</span>, so the roots are the complex pair <span class="math" data-say="negative 1 plus or minus 2 i">−1 ± 2i</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The characteristic equation</h2></div><p>Roots, the general solution and the constants, exactly</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The characteristic equation</strong><span>y = e^(rt) turns a·y″ + b·y′ + c·y = 0 into a·r² + b·r + c = 0</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the curve shown</span><span class="tone-purple"><i class="legend-swatch"></i>second solution</span><span class="tone-green"><i class="legend-swatch"></i>roots</span></div>
@@ -1409,10 +1452,10 @@ disc = b² − 4ac</div><h3>The four presets</h3><p>Each preset is an equation a
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="cePlot" viewBox="0 0 660 420" role="img" aria-label="the characteristic equation and its solutions"></svg></div>
       <div class="status-banner" id="ceStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The characteristic quadratic of <span data-say="A times y double prime plus b times y prime plus c times y equals 0">a·y″ + b·y′ + c·y = 0</span></h3>
-          <p>Choose a preset, or type a, b and c. The lab prints the discriminant, the kind of root and the roots exactly. Before each preset, compute <span data-say="b squared minus 4 A c">b² − 4ac</span> yourself and predict the kind.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The characteristic quadratic of <span data-say="A times y double prime plus b times y prime plus c times y equals 0">a·y″ + b·y′ + c·y = 0</span></h3>
+            <p>Choose a preset, or type a, b and c. The lab prints the discriminant, the kind of root and the roots exactly. Before each preset, compute <span data-say="b squared minus 4 A c">b² − 4ac</span> yourself and predict the kind.</p>
         <div class="field">
           <label for="cePreset">Equation</label>
           <select id="cePreset"><option value="distinct" selected>y″ + 3y′ + 2y = 0, two real roots</option><option value="repeated">y″ + 4y′ + 4y = 0, one root twice</option><option value="complex">y″ + 2y′ + 5y = 0, a complex pair</option><option value="surd">y″ − y′ − y = 0, roots with a square root</option></select>
@@ -1448,12 +1491,15 @@ disc = b² − 4ac</div><h3>The four presets</h3><p>Each preset is an equation a
         </div>
         <p class="small-copy" style="margin:0;">Three rational coefficients; the initial values are two numbers, y(0) then y′(0).</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="example"><span class="label">Example &middot; A discriminant that is positive and not a square</span><p>For <span class="math" data-say="y double prime minus y prime minus y equals 0">y″ − y′ − y = 0</span> the discriminant is <span class="math" data-say="1 plus 4 equals 5">1 + 4 = 5</span>. Both roots are real, and they are <span class="math" data-say="the quantity 1 plus or minus the square root of 5, over 2">(1 ± √5)/2</span>. The lab prints that surd exactly.</p><p>Rounded, the roots are <span class="math" data-say="is approximately 1.61803">≈ 1.61803</span> and <span class="math" data-say="is approximately negative 0.618034">≈ −0.618034</span>; the rounded numbers are for the eye only, and the exact surd is what the next lessons would carry into a solution.</p></div><p>Every equation of this form has a characteristic quadratic, and every root of it gives one exponential solution. What is still to decide is how to build the full set of solutions from the roots, and that depends on the kind of root: one lesson each, starting with two real roots.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>From an equation to its roots</h2></div><p>Five moves. The substitution is always the same, so the work is in the quadratic.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Read a, b and c with their signs</h3><p>Take them from <span class="math" data-say="A times y double prime plus b times y prime plus c times y equals 0">a·y″ + b·y′ + c·y = 0</span>. For <span class="math" data-say="y double prime minus y prime minus y equals 0">y″ − y′ − y = 0</span> they are <span class="math" data-say="1">1</span>, <span class="math" data-say="negative 1">−1</span> and <span class="math" data-say="negative 1">−1</span>; a missing term has coefficient <span class="math" data-say="0">0</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the characteristic equation</h3><p>Replace <span class="math" data-say="y double prime">y″</span> by <span class="math" data-say="r squared">r²</span>, <span class="math" data-say="y prime">y′</span> by <span class="math" data-say="r">r</span> and <span class="math" data-say="y">y</span> by <span class="math" data-say="1">1</span>, keeping the coefficients: <span class="math" data-say="A times r squared plus b times r plus c equals 0">a·r² + b·r + c = 0</span>, with a zero on the right.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the discriminant</h3><p><span class="math" data-say="b squared minus 4 A c">b² − 4ac</span>. Its sign, and whether it is a perfect square, name the kind of root before any root is found.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Apply the quadratic formula</h3><p><span class="math" data-say="r equals the quantity negative b plus or minus the square root of disc, over 2 A">r = (−b ± √disc)/(2a)</span>. Keep a surd as a surd, and a negative discriminant as an <span class="math" data-say="i">i</span>.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Check one root</h3><p>Put it back into <span class="math" data-say="A times r squared plus b times r plus c">a·r² + b·r + c</span>. It should be <span class="math" data-say="0">0</span> exactly.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>From an equation to its roots</h2>
+      <p class="lead-in">Five moves. The substitution is always the same, so the work is in the quadratic.</p>
+      <ol class="key-ideas method"><li><strong>Read a, b and c with their signs.</strong> Take them from <span class="math" data-say="A times y double prime plus b times y prime plus c times y equals 0">a·y″ + b·y′ + c·y = 0</span>. For <span class="math" data-say="y double prime minus y prime minus y equals 0">y″ − y′ − y = 0</span> they are <span class="math" data-say="1">1</span>, <span class="math" data-say="negative 1">−1</span> and <span class="math" data-say="negative 1">−1</span>; a missing term has coefficient <span class="math" data-say="0">0</span>.</li><li><strong>Write the characteristic equation.</strong> Replace <span class="math" data-say="y double prime">y″</span> by <span class="math" data-say="r squared">r²</span>, <span class="math" data-say="y prime">y′</span> by <span class="math" data-say="r">r</span> and <span class="math" data-say="y">y</span> by <span class="math" data-say="1">1</span>, keeping the coefficients: <span class="math" data-say="A times r squared plus b times r plus c equals 0">a·r² + b·r + c = 0</span>, with a zero on the right.</li><li><strong>Compute the discriminant.</strong> <span class="math" data-say="b squared minus 4 A c">b² − 4ac</span>. Its sign, and whether it is a perfect square, name the kind of root before any root is found.</li><li><strong>Apply the quadratic formula.</strong> <span class="math" data-say="r equals the quantity negative b plus or minus the square root of disc, over 2 A">r = (−b ± √disc)/(2a)</span>. Keep a surd as a surd, and a negative discriminant as an <span class="math" data-say="i">i</span>.</li><li><strong>Check one root.</strong> Put it back into <span class="math" data-say="A times r squared plus b times r plus c">a·r² + b·r + c</span>. It should be <span class="math" data-say="0">0</span> exactly.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1472,17 +1518,16 @@ r = (−3 ± 1)/2
 r = −1   or   r = −2</div><p>Each root gives a solution: <span class="math" data-say="e to the power the quantity negative t">e^(−t)</span> and <span class="math" data-say="e to the power the quantity negative 2 t">e^(−2t)</span>. Check <span class="math" data-say="r equals negative 1">r = −1</span> in the quadratic: <span class="math" data-say="1 minus 3 plus 2 equals 0">1 − 3 + 2 = 0</span>; check <span class="math" data-say="r equals negative 2">r = −2</span>: <span class="math" data-say="4 minus 6 plus 2 equals 0">4 − 6 + 2 = 0</span>.</p><p>The discriminant <span class="math" data-say="1">1</span> is a perfect square, and the lab confirms the kind as two real roots. Putting the two solutions together into one answer is the work of the next lesson.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing the characteristic equation as <span data-say="A times r squared plus b times r plus c equals y">a·r² + b·r + c = y</span></strong><span>The right side of the characteristic equation is zero, not <span class="math" data-say="y">y</span>. For <span class="math" data-say="y double prime plus 3 y prime plus 2 y equals 0">y″ + 3y′ + 2y = 0</span> and <span class="math" data-say="r equals negative 1">r = −1</span> the quadratic <span class="math" data-say="r squared plus 3 r plus 2">r² + 3r + 2</span> is <span class="math" data-say="0">0</span>, but <span class="math" data-say="y equals e to the power the quantity negative t">y = e^(−t)</span> is not <span class="math" data-say="0">0</span>. Setting the quadratic equal to <span class="math" data-say="y">y</span> would ask a number to equal a function of <span class="math" data-say="t">t</span>, and no <span class="math" data-say="r">r</span> does that for every <span class="math" data-say="t">t</span>. The bracket is multiplied by <span class="math" data-say="e to the power r t">e^(rt)</span>, and it is the product that equals the zero on the right.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the signs of b and c wrongly</strong><span>For <span class="math" data-say="y double prime minus 5 y prime plus 6 y equals 0">y″ − 5y′ + 6y = 0</span> the coefficients are <span class="math" data-say="1">1</span>, <span class="math" data-say="negative 5">−5</span> and <span class="math" data-say="6">6</span>, and the roots are <span class="math" data-say="2">2</span> and <span class="math" data-say="3">3</span>. Reading <span class="math" data-say="b">b</span> as <span class="math" data-say="plus 5">+5</span> solves <span class="math" data-say="r squared plus 5 r plus 6 equals 0">r² + 5r + 6 = 0</span> instead and gives <span class="math" data-say="negative 2">−2</span> and <span class="math" data-say="negative 3">−3</span>. Put <span class="math" data-say="negative 2">−2</span> back into the true quadratic and it gives <span class="math" data-say="the quantity negative 2, squared minus 5 times the quantity negative 2, plus 6 equals 20">(−2)² − 5·(−2) + 6 = 20</span>, not <span class="math" data-say="0">0</span>. One root put back into the quadratic catches the slip.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a positive discriminant to mean rational roots</strong><span>The discriminant of <span class="math" data-say="y double prime minus y prime minus y equals 0">y″ − y′ − y = 0</span> is <span class="math" data-say="5">5</span>, which is positive, but the roots <span class="math" data-say="the quantity 1 plus or minus the square root of 5, over 2">(1 ± √5)/2</span> are irrational. Only a perfect-square discriminant gives rational roots. The lab prints the kind as &ldquo;two real roots (irrational)&rdquo; for exactly this case.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can turn <span data-say="A times y double prime plus b times y prime plus c times y equals 0">a·y″ + b·y′ + c·y = 0</span> into its quadratic and name the kind of root before you solve it.</strong><p>You should be able to substitute <span data-say="y equals e to the power r t">y = e^(rt)</span>, obtain <span data-say="A times r squared plus b times r plus c equals 0">a·r² + b·r + c = 0</span>, compute the discriminant, classify the roots as two real, one repeated or a complex pair, and solve exactly, keeping a surd as a surd.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The next lesson takes the first kind of root, two real roots that differ, and turns them into <em><span data-say="C sub 1 times e to the power r sub 1 t plus C sub 2 times e to the power r sub 2 t">C₁·e^(r₁t) + C₂·e^(r₂t)</span></em> with the constants fitted from the starting value and the starting rate.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing the characteristic equation as <span data-say="A times r squared plus b times r plus c equals y">a·r² + b·r + c = y</span></strong><span>The right side of the characteristic equation is zero, not <span class="math" data-say="y">y</span>. For <span class="math" data-say="y double prime plus 3 y prime plus 2 y equals 0">y″ + 3y′ + 2y = 0</span> and <span class="math" data-say="r equals negative 1">r = −1</span> the quadratic <span class="math" data-say="r squared plus 3 r plus 2">r² + 3r + 2</span> is <span class="math" data-say="0">0</span>, but <span class="math" data-say="y equals e to the power the quantity negative t">y = e^(−t)</span> is not <span class="math" data-say="0">0</span>. Setting the quadratic equal to <span class="math" data-say="y">y</span> would ask a number to equal a function of <span class="math" data-say="t">t</span>, and no <span class="math" data-say="r">r</span> does that for every <span class="math" data-say="t">t</span>. The bracket is multiplied by <span class="math" data-say="e to the power r t">e^(rt)</span>, and it is the product that equals the zero on the right.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the signs of b and c wrongly</strong><span>For <span class="math" data-say="y double prime minus 5 y prime plus 6 y equals 0">y″ − 5y′ + 6y = 0</span> the coefficients are <span class="math" data-say="1">1</span>, <span class="math" data-say="negative 5">−5</span> and <span class="math" data-say="6">6</span>, and the roots are <span class="math" data-say="2">2</span> and <span class="math" data-say="3">3</span>. Reading <span class="math" data-say="b">b</span> as <span class="math" data-say="plus 5">+5</span> solves <span class="math" data-say="r squared plus 5 r plus 6 equals 0">r² + 5r + 6 = 0</span> instead and gives <span class="math" data-say="negative 2">−2</span> and <span class="math" data-say="negative 3">−3</span>. Put <span class="math" data-say="negative 2">−2</span> back into the true quadratic and it gives <span class="math" data-say="the quantity negative 2, squared minus 5 times the quantity negative 2, plus 6 equals 20">(−2)² − 5·(−2) + 6 = 20</span>, not <span class="math" data-say="0">0</span>. One root put back into the quadratic catches the slip.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a positive discriminant to mean rational roots</strong><span>The discriminant of <span class="math" data-say="y double prime minus y prime minus y equals 0">y″ − y′ − y = 0</span> is <span class="math" data-say="5">5</span>, which is positive, but the roots <span class="math" data-say="the quantity 1 plus or minus the square root of 5, over 2">(1 ± √5)/2</span> are irrational. Only a perfect-square discriminant gives rational roots. The lab prints the kind as &ldquo;two real roots (irrational)&rdquo; for exactly this case.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can turn <span data-say="A times y double prime plus b times y prime plus c times y equals 0">a·y″ + b·y′ + c·y = 0</span> into its quadratic and name the kind of root before you solve it.</strong><p>You should be able to substitute <span data-say="y equals e to the power r t">y = e^(rt)</span>, obtain <span data-say="A times r squared plus b times r plus c equals 0">a·r² + b·r + c = 0</span>, compute the discriminant, classify the roots as two real, one repeated or a complex pair, and solve exactly, keeping a surd as a surd.</p></div></div><div class="note"><strong>Note:</strong> The next lesson takes the first kind of root, two real roots that differ, and turns them into <em><span data-say="C sub 1 times e to the power r sub 1 t plus C sub 2 times e to the power r sub 2 t">C₁·e^(r₁t) + C₂·e^(r₂t)</span></em> with the constants fitted from the starting value and the starting rate.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The exponential is the function whose rates are copies of itself</summary><p>The rate of <span class="math" data-say="e to the power r t">e^(rt)</span> is <span class="math" data-say="r times e to the power r t">r·e^(rt)</span>, a number times the same function, and the rate of that is <span class="math" data-say="r squared times e to the power r t">r²·e^(rt)</span>. An equation that adds multiples of <span class="math" data-say="y">y</span>, <span class="math" data-say="y prime">y′</span> and <span class="math" data-say="y double prime">y″</span> therefore adds multiples of one function, and that is the only kind of guess for which the sum can collapse.</p></details><details class="recall"><summary>The exponential factors out, and a quadratic remains</summary><p>Substituting gives <span class="math" data-say="A times r squared times e to the power r t plus b times r times e to the power r t plus c times e to the power r t equals 0">a·r²·e^(rt) + b·r·e^(rt) + c·e^(rt) = 0</span>, which is <span class="math" data-say="the quantity A times r squared plus b times r plus c, times e to the power r t equals 0">(a·r² + b·r + c)·e^(rt) = 0</span>. Because <span class="math" data-say="e to the power r t">e^(rt)</span> is never zero, the bracket has to be, and that is the <em>characteristic equation</em>. It is an equation in the number <span class="math" data-say="r">r</span>, with no <span class="math" data-say="t">t</span> in it.</p></details><details class="recall"><summary>The discriminant says which of three things happens</summary><p><span class="math" data-say="b squared minus 4 A c">b² − 4ac</span> positive means two real roots, zero means one repeated root, negative means a complex pair. A positive discriminant that is not a perfect square gives roots with a surd in them, such as <span class="math" data-say="the quantity 1 plus or minus the square root of 5, over 2">(1 ± √5)/2</span>; the lab prints the surd and does not round it.</p></details></div>
+      <h3>Summary</h3>
       <p>Guessing the solution of a second-order equation does not scale, but one guess does: <span class="math" data-say="y equals e to the power r t">y = e^(rt)</span>. Its rate and the rate of its rate are multiples of itself, so the equation collapses to a quadratic in <span class="math" data-say="r">r</span> after the exponential is divided out. The quadratic is called the characteristic equation, its discriminant names the kind of root, and the next three lessons turn each kind of root into a solution.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The exponential is the function whose rates are copies of itself.</strong> The rate of <span class="math" data-say="e to the power r t">e^(rt)</span> is <span class="math" data-say="r times e to the power r t">r·e^(rt)</span>, a number times the same function, and the rate of that is <span class="math" data-say="r squared times e to the power r t">r²·e^(rt)</span>. An equation that adds multiples of <span class="math" data-say="y">y</span>, <span class="math" data-say="y prime">y′</span> and <span class="math" data-say="y double prime">y″</span> therefore adds multiples of one function, and that is the only kind of guess for which the sum can collapse.</li><li><strong>The exponential factors out, and a quadratic remains.</strong> Substituting gives <span class="math" data-say="A times r squared times e to the power r t plus b times r times e to the power r t plus c times e to the power r t equals 0">a·r²·e^(rt) + b·r·e^(rt) + c·e^(rt) = 0</span>, which is <span class="math" data-say="the quantity A times r squared plus b times r plus c, times e to the power r t equals 0">(a·r² + b·r + c)·e^(rt) = 0</span>. Because <span class="math" data-say="e to the power r t">e^(rt)</span> is never zero, the bracket has to be, and that is the <em>characteristic equation</em>. It is an equation in the number <span class="math" data-say="r">r</span>, with no <span class="math" data-say="t">t</span> in it.</li><li><strong>The discriminant says which of three things happens.</strong> <span class="math" data-say="b squared minus 4 A c">b² − 4ac</span> positive means two real roots, zero means one repeated root, negative means a complex pair. A positive discriminant that is not a perfect square gives roots with a surd in them, such as <span class="math" data-say="the quantity 1 plus or minus the square root of 5, over 2">(1 ± √5)/2</span>; the lab prints the surd and does not round it.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="y equals e to the power r t, y prime equals r times e to the power r t, y double prime equals r squared times e to the power r t. the quantity A times r squared plus b times r plus c, times e to the power r t equals 0. e to the power r t is never 0, so, A times r squared plus b times r plus c equals 0. disc equals b squared minus 4 A c picks the kind of root. roots, negative b plus or minus the square root of disc, over 2 a" tabindex="0" role="region" aria-label="Mathematical notation">y = e^(rt),  y′ = r·e^(rt),  y″ = r²·e^(rt)
 (a·r² + b·r + c)·e^(rt) = 0
 e^(rt) is never 0,  so  a·r² + b·r + c = 0
@@ -3454,11 +3499,42 @@ roots: −b ± √disc, over 2a</div><figcaption>One substitution, one quadratic
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3526,7 +3602,7 @@ roots: −b ± √disc, over 2a</div><figcaption>One substitution, one quadratic
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

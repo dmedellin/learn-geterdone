@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Distribution and Putting It Together</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 8 · Putting It All Together</p>
       <h1>Putting It All Together</h1>
       <p class="lesson-lede">Fowler&#x27;s summary of the book: the domain-logic choice first, the data source and presentation it leads to, the platforms of 2002, and the other layering schemes mapped onto the patterns.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The central decision</li><li>Mediating layers</li><li>A deployment</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Use this advice to prod your thinking, but don't use it as a replacement for your thinking.&rdquo; Fowler writes that near the start of Chapter 8, Putting It All Together, after borrowing Frodo's warning that the Elves will say both no and yes. He even wonders whether the chapter was needed, since it repeats earlier advice; he keeps it to put the discussion in context, and reminds you that you know your own project far better than he can. Read the chapter in your own copy first.</p><p>He also says your decisions are not cast in stone. Architectural refactoring is hard and its full costs are unknown, but it is possible, and he asks you to consider seriously three practices, even if you dislike the rest of extreme programming: continuous integration, test-driven development and refactoring. They are no panacea, he says, but they make it easier to change your mind. You will need to change it, he adds, unless you are luckier or more skilful than anyone he has met.</p><p>Starting with the Domain Layer repeats Chapter 2, with a second force added. The strongest force is still the complexity of the domain logic, which nobody can yet measure; the second is the difficulty of the connection to the database. Transaction Script is the simplest and is easy to build on a relational database, but it handles complex logic badly and invites duplication. Domain Model handles really complex logic better than anything, Fowler says, but is hard to learn and hard to map to tables. Table Module sits between them and fits a relational database, and tools that work with Record Sets, very well. He calls this the central decision, and lets it shape the rest.</p><p>Down to the Data Source Layer follows each choice. A Transaction Script takes a Row Data Gateway or a Table Data Gateway, with Optimistic Offline Lock when one request loads data for editing and a later one saves it. A Table Module takes a Table Data Gateway. A Domain Model that is fairly simple, the book's illustration is a couple of dozen classes close to the database, can use Active Record; a more complex one needs Data Mapper, ideally with a mapping tool, and then most of the object-relational patterns, Unit of Work above all.</p><p>The Presentation Layer prefers an HTML browser to a rich client where you can get away with it, with Model View Controller underneath, Page Controller for a document-oriented site and Front Controller for complex navigation, and Template View or Transform View as the team's skills decide, with Two Step View for several looks. Then the sentence this course turns on: run everything in one process if you can, and if you cannot, wrap the domain layer in a Remote Facade and talk to the web server with Data Transfer Objects.</p><p>Some Technology-Specific Advice applies all this to Java and .NET, and Fowler dates it himself: he is writing in early 2002, and technologies change faster than patterns. For J2EE he says you do not need Enterprise Java Beans to build a good application, wraps a Domain Model in session beans acting as Remote Facades, and keeps entity beans local, since they need fine-grained interfaces. For .NET, Table Module is the default, and there is no real reason to split web server and domain into separate processes. Stored procedures are an optimisation for clear performance problems, not an architectural principle. Web services are for integrating applications, not for building one: expose parts of an application as Remote Facades, and remember the First Law.</p><p>Other Layering Schemes compares the three layers with five others. The Brown model adds two mediating layers, which Fowler reads as Application Controller and Data Mapper. Core J2EE, after Alur, Crupi and Malks, splits the presentation into the part on the client and the part on the server. Microsoft DNA, after Kirtland, passes record sets up through every layer, which Fowler reads as a Record Set acting as a Data Transfer Object over Table Modules. Marinescu and Nilsson split the domain into a services layer over a domain layer, which is Stafford's Service Layer over a Domain Model; Fowler finds that split occasionally useful, and says designers he respects disagree. Every mediating layer, to him, is an optional extra, added when one of the three gets too complex.</p><pre class="codeblock" data-say="line 1, comment, One request through every layer the service runs the domain. line 2, comment, logic inside a unit of work, and the mappers do the SQL.. line 3, string place order of string cart id throws SQL exception. line 4, unit of work uow is set to new unit of work. line 5, cart cart is set to carts dot find of cart id. line 6, order order is set to cart dot check out. line 7, uow dot mark new of order. line 8, uow dot mark changed of cart. line 9, uow dot commit of mapper. line 10, return Order plus order dot number plus placed" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One request through every layer: the service runs the domain</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the count</h2><div class="prose reading"><p>&ldquo;Use this advice to prod your thinking, but don't use it as a replacement for your thinking.&rdquo; Fowler writes that near the start of Chapter 8, Putting It All Together, after borrowing Frodo's warning that the Elves will say both no and yes. He even wonders whether the chapter was needed, since it repeats earlier advice; he keeps it to put the discussion in context, and reminds you that you know your own project far better than he can. Read the chapter in your own copy first.</p><p>He also says your decisions are not cast in stone. Architectural refactoring is hard and its full costs are unknown, but it is possible, and he asks you to consider seriously three practices, even if you dislike the rest of extreme programming: continuous integration, test-driven development and refactoring. They are no panacea, he says, but they make it easier to change your mind. You will need to change it, he adds, unless you are luckier or more skilful than anyone he has met.</p><p>Starting with the Domain Layer repeats Chapter 2, with a second force added. The strongest force is still the complexity of the domain logic, which nobody can yet measure; the second is the difficulty of the connection to the database. Transaction Script is the simplest and is easy to build on a relational database, but it handles complex logic badly and invites duplication. Domain Model handles really complex logic better than anything, Fowler says, but is hard to learn and hard to map to tables. Table Module sits between them and fits a relational database, and tools that work with Record Sets, very well. He calls this the central decision, and lets it shape the rest.</p><p>Down to the Data Source Layer follows each choice. A Transaction Script takes a Row Data Gateway or a Table Data Gateway, with Optimistic Offline Lock when one request loads data for editing and a later one saves it. A Table Module takes a Table Data Gateway. A Domain Model that is fairly simple, the book's illustration is a couple of dozen classes close to the database, can use Active Record; a more complex one needs Data Mapper, ideally with a mapping tool, and then most of the object-relational patterns, Unit of Work above all.</p><p>The Presentation Layer prefers an HTML browser to a rich client where you can get away with it, with Model View Controller underneath, Page Controller for a document-oriented site and Front Controller for complex navigation, and Template View or Transform View as the team's skills decide, with Two Step View for several looks. Then the sentence this course turns on: run everything in one process if you can, and if you cannot, wrap the domain layer in a Remote Facade and talk to the web server with Data Transfer Objects.</p><p>Some Technology-Specific Advice applies all this to Java and .NET, and Fowler dates it himself: he is writing in early 2002, and technologies change faster than patterns. For J2EE he says you do not need Enterprise Java Beans to build a good application, wraps a Domain Model in session beans acting as Remote Facades, and keeps entity beans local, since they need fine-grained interfaces. For .NET, Table Module is the default, and there is no real reason to split web server and domain into separate processes. Stored procedures are an optimisation for clear performance problems, not an architectural principle. Web services are for integrating applications, not for building one: expose parts of an application as Remote Facades, and remember the First Law.</p><p>Other Layering Schemes compares the three layers with five others. The Brown model adds two mediating layers, which Fowler reads as Application Controller and Data Mapper. Core J2EE, after Alur, Crupi and Malks, splits the presentation into the part on the client and the part on the server. Microsoft DNA, after Kirtland, passes record sets up through every layer, which Fowler reads as a Record Set acting as a Data Transfer Object over Table Modules. Marinescu and Nilsson split the domain into a services layer over a domain layer, which is Stafford's Service Layer over a Domain Model; Fowler finds that split occasionally useful, and says designers he respects disagree. Every mediating layer, to him, is an optional extra, added when one of the three gets too complex.</p><pre class="codeblock" data-say="line 1, comment, One request through every layer the service runs the domain. line 2, comment, logic inside a unit of work, and the mappers do the SQL.. line 3, string place order of string cart id throws SQL exception. line 4, unit of work uow is set to new unit of work. line 5, cart cart is set to carts dot find of cart id. line 6, order order is set to cart dot check out. line 7, uow dot mark new of order. line 8, uow dot mark changed of cart. line 9, uow dot commit of mapper. line 10, return Order plus order dot number plus placed" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One request through every layer: the service runs the domain</span>
 <span class="cl">// logic inside a unit of work, and the mappers do the SQL.</span>
 <span class="cl">String placeOrder(String cartId) throws SQLException {</span>
 <span class="cl">    UnitOfWork uow = new UnitOfWork();</span>
@@ -1455,12 +1499,11 @@
 <span class="cl">    uow.markChanged(cart);</span>
 <span class="cl">    uow.commit(mapper);</span>
 <span class="cl">    return &quot;Order &quot; + order.number() + &quot; placed&quot;;</span>
-<span class="cl">}</span></code></pre><p>The snippet is one request through the layers Fowler recommends for a complex domain: a service method that opens a Unit of Work (line 4), finds the cart through a mapper (line 5), lets the domain check it out (line 6), registers the new order and the changed cart (lines 7 and 8), and commits, the mappers writing the SQL (line 9). Every one of those calls is cheap if the layers share a process. The lab asks what they cost if they do not.</p><p>The lab is the boundary view of the first lesson, with layers in place of classes. One request makes 1 call from the browser to the page, 2 from the page to the service, 40 from the service to the domain, 25 from the domain to the mappers and 6 from the mappers to the database, 74 in all, at 2,000 µs a remote call and 1 µs a local one. The preset <code>web-and-database</code> puts the browser and the database on their own nodes, the two boundaries Chapter 7 expects most systems to keep, client and server, and application and database: 7 remote calls, 14,067 µs, <span data-say="14067 over 74 is approximately 190.1 times">14,067/74 ≈ 190.1×</span> the time on one node.</p><p>The preset <code>service-split-off</code> moves the service, domain and mappers to an application node, a boundary above the Service Layer: 9 remote calls, 18,065 µs. The preset <code>domain-split-off</code> leaves the service with the page and moves the domain and mappers, a boundary under the Service Layer: 47 remote calls, 94,027 µs. On the lesson's illustration the first adds 2 remote calls to those seven and the second adds 40: a boundary above the Service Layer is crossed by a few coarse calls, one under it by the domain's many fine ones, which is the arithmetic behind Chapter 8's advice to wrap the domain layer in a Remote Facade when the presentation must run apart. The lab prices every remote hop alike, the browser's and the database's; the panel says so.</p><h3>Exercise</h3><ul><li>Calls for one screen of a phone app: <span class="math" data-say="app, facade, 3, facade, domain, 30, domain, mapper, 20, mapper, db, 4">app, facade, 3; facade, domain, 30; domain, mapper, 20; mapper, db, 4</span>.</li><li>Nodes: <span class="math" data-say="app">app</span> on the phone; the facade, domain, mappers and database on the server's node, so that the only slow hop is the phone's.</li><li>A remote call costs 50,000 µs and a local one 1 µs.</li></ul><p>Find by hand the calls, the remote calls and the total time, the ratio to one node, and the time if one Remote Facade method served the whole screen in a single call, with the work behind it unchanged.</p><p>Two of Chapter 18's base patterns let a system like this be wired differently for its tests than for production. The next lesson, Plugin and Service Stub, reads them.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Remote calls</h2></div><p>calls that cross a node boundary</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The snippet is one request through the layers Fowler recommends for a complex domain: a service method that opens a Unit of Work (line 4), finds the cart through a mapper (line 5), lets the domain check it out (line 6), registers the new order and the changed cart (lines 7 and 8), and commits, the mappers writing the SQL (line 9). Every one of those calls is cheap if the layers share a process. The lab asks what they cost if they do not.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Remote calls</h2></div><p>calls that cross a node boundary</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Remote calls</strong><span>calls that cross a node boundary</span></div>
       </div>
@@ -1468,10 +1511,10 @@
       <div class="table-wrap" id="rrTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="rrTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A call is remote when its caller and callee are on different nodes; a class no node is given for runs on main. Time is remote calls × the remote time plus local calls × the local time, in microseconds.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>One request under three deployments</h3>
-          <p>A count over the situation the lesson states. Each record is one pair of layers and how many times the first calls the second for one request; each node assignment puts a layer on a named node. One remote cost prices every hop alike, the browser's and the database's as well as any boundary between layers, and where the one-node tile says every class, read every layer. The times are the lesson's, in microseconds.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>One request under three deployments</h3>
+            <p>A count over the situation the lesson states. Each record is one pair of layers and how many times the first calls the second for one request; each node assignment puts a layer on a named node. One remote cost prices every hop alike, the browser's and the database's as well as any boundary between layers, and where the one-node tile says every class, read every layer. The times are the lesson's, in microseconds.</p>
         <div class="field">
           <label for="rrPreset">Worked example</label>
           <select id="rrPreset"><option value="web-and-database" selected>Only the browser and the database apart (illustrative)</option><option value="service-split-off">The service, domain and mappers on an application node</option><option value="domain-split-off">The domain and mappers apart from the page and the service</option></select>
@@ -1501,12 +1544,15 @@
           <div class="kpi"><span>Time against one node</span><strong id="rrRatio">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The lab is the boundary view of the first lesson, with layers in place of classes. One request makes 1 call from the browser to the page, 2 from the page to the service, 40 from the service to the domain, 25 from the domain to the mappers and 6 from the mappers to the database, 74 in all, at 2,000 µs a remote call and 1 µs a local one. The preset <code>web-and-database</code> puts the browser and the database on their own nodes, the two boundaries Chapter 7 expects most systems to keep, client and server, and application and database: 7 remote calls, 14,067 µs, <span data-say="14067 over 74 is approximately 190.1 times">14,067/74 ≈ 190.1×</span> the time on one node.</p><p>The preset <code>service-split-off</code> moves the service, domain and mappers to an application node, a boundary above the Service Layer: 9 remote calls, 18,065 µs. The preset <code>domain-split-off</code> leaves the service with the page and moves the domain and mappers, a boundary under the Service Layer: 47 remote calls, 94,027 µs. On the lesson's illustration the first adds 2 remote calls to those seven and the second adds 40: a boundary above the Service Layer is crossed by a few coarse calls, one under it by the domain's many fine ones, which is the arithmetic behind Chapter 8's advice to wrap the domain layer in a Remote Facade when the presentation must run apart. The lab prices every remote hop alike, the browser's and the database's; the panel says so.</p><h3>Exercise</h3><ul><li>Calls for one screen of a phone app: <span class="math" data-say="app, facade, 3, facade, domain, 30, domain, mapper, 20, mapper, db, 4">app, facade, 3; facade, domain, 30; domain, mapper, 20; mapper, db, 4</span>.</li><li>Nodes: <span class="math" data-say="app">app</span> on the phone; the facade, domain, mappers and database on the server's node, so that the only slow hop is the phone's.</li><li>A remote call costs 50,000 µs and a local one 1 µs.</li></ul><p>Find by hand the calls, the remote calls and the total time, the ratio to one node, and the time if one Remote Facade method served the whole screen in a single call, with the work behind it unchanged.</p><p>Two of Chapter 18's base patterns let a system like this be wired differently for its tests than for production. The next lesson, Plugin and Service Stub, reads them.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Pricing a deployment of the layers</h2></div><p>Four steps, the last of them on a system of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the calls for one request</h3><p>List each pair of layers that call each other for one request, and how many times, from the browser down to the database.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Place the layers on nodes</h3><p>Mark first the nodes most systems keep apart, the client and the database, then any boundary between layers you are considering.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Price each deployment</h3><p>Count the calls that cross a node, price them and the local calls, and compare each deployment with the one that keeps only those two.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a system you know</h3><p>Write the layers of one system you know with the node each runs on. Count the calls that cross a node for one request, write the figure, and say in one sentence which boundary you would remove first.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Pricing a deployment of the layers</h2>
+      <p class="lead-in">Four steps, the last of them on a system of your own.</p>
+      <ol class="key-ideas method"><li><strong>Write the calls for one request.</strong> List each pair of layers that call each other for one request, and how many times, from the browser down to the database.</li><li><strong>Place the layers on nodes.</strong> Mark first the nodes most systems keep apart, the client and the database, then any boundary between layers you are considering.</li><li><strong>Price each deployment.</strong> Count the calls that cross a node, price them and the local calls, and compare each deployment with the one that keeps only those two.</li><li><strong>Do it on a system you know.</strong> Write the layers of one system you know with the node each runs on. Count the calls that cross a node for one request, write the figure, and say in one sentence which boundary you would remove first.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1524,17 +1570,16 @@ local: 67 calls at 1 µs, 67 µs
 time: 14,067 µs</div><p>Almost all the time is in seven calls, and none of them can be removed by rearranging the layers between those two nodes. Any further split can only add to it; the question is how much, and the two other presets answer it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the chapter as a decision procedure</strong><span>The chapter does go step by step, domain first, then data source, then presentation, and it is tempting to follow it like a flowchart. Fowler says otherwise in the quotation, warns that advice can do harm, and reminds you that you know your own project better than he can. The order is a way of thinking about the decisions, and the decisions remain yours.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the technology advice for the chapter&#x27;s point</strong><span>Some Technology-Specific Advice is the most concrete section, with entity beans, data sets and web services. Fowler dates it himself, to early 2002, and says technologies change much faster than the patterns. The patterns, and the forces that choose between them, are the point; the platform section shows them applied once.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the other layering schemes contradict the three layers</strong><span>Brown's five layers, Core J2EE's five and Nilsson's seven look like rivals. Fowler maps each onto his three, reading the extra layers as patterns the reader has met: Application Controller and Data Mapper as mediating layers, Service Layer as a split of the domain, Record Set as a transfer object. He treats them as optional extras, added when a layer gets too complex.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can price a deployment of the layers by hand.</strong><p>Given the calls between layers for one request and the node each layer runs on, compute the remote calls and the time for each deployment, and say which boundaries Chapter 7 says you will usually have to keep.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> What has happened to distribution since 2002, services and then microservices, is argued largely in Chapter 7's vocabulary: coarse-grained interfaces at the boundary, transfer objects on the wire, a facade in front of each service. Some of it is argued against the First Law, on the ground that separate deployment, ownership and scaling of parts of a system can be worth the remote calls; others hold that the law still applies and the calls still cost what the chapter says. The lab cannot settle that: it prices calls, not the organisational reasons for a boundary, and it prices every hop alike.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the chapter as a decision procedure</strong><span>The chapter does go step by step, domain first, then data source, then presentation, and it is tempting to follow it like a flowchart. Fowler says otherwise in the quotation, warns that advice can do harm, and reminds you that you know your own project better than he can. The order is a way of thinking about the decisions, and the decisions remain yours.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the technology advice for the chapter&#x27;s point</strong><span>Some Technology-Specific Advice is the most concrete section, with entity beans, data sets and web services. Fowler dates it himself, to early 2002, and says technologies change much faster than the patterns. The patterns, and the forces that choose between them, are the point; the platform section shows them applied once.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the other layering schemes contradict the three layers</strong><span>Brown's five layers, Core J2EE's five and Nilsson's seven look like rivals. Fowler maps each onto his three, reading the extra layers as patterns the reader has met: Application Controller and Data Mapper as mediating layers, Service Layer as a split of the domain, Record Set as a transfer object. He treats them as optional extras, added when a layer gets too complex.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can price a deployment of the layers by hand.</strong><p>Given the calls between layers for one request and the node each layer runs on, compute the remote calls and the time for each deployment, and say which boundaries Chapter 7 says you will usually have to keep.</p></div></div><div class="note"><strong>Note:</strong> What has happened to distribution since 2002, services and then microservices, is argued largely in Chapter 7's vocabulary: coarse-grained interfaces at the boundary, transfer objects on the wire, a facade in front of each service. Some of it is argued against the First Law, on the ground that separate deployment, ownership and scaling of parts of a system can be worth the remote calls; others hold that the law still applies and the calls still cost what the chapter says. The lab cannot settle that: it prices calls, not the organisational reasons for a boundary, and it prices every hop alike.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The central decision</summary><p>Fowler's name for the choice among Transaction Script, Table Module and Domain Model. The complexity of the domain logic drives it most, the difficulty of the database connection next, and the decisions below are shaped by it.</p></details><details class="recall"><summary>Mediating layers</summary><p>Layers that other schemes put between the three basic ones, such as a controller between presentation and domain or a data-mapping layer between domain and data source. Fowler treats them as patterns, Application Controller and Data Mapper, useful some of the time.</p></details><details class="recall"><summary>A deployment</summary><p>Which node each layer runs on. The same layers can run in one process or be split at the browser, the database, the service or the domain, and each split adds remote calls.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 8 sweeps the narratives together: choose the domain logic first, let it choose the data-source patterns, then the presentation, and keep everything in one process if you can. It closes by mapping five other layering schemes onto the patterns. Price one request's calls through every layer under three deployments.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The central decision.</strong> Fowler's name for the choice among Transaction Script, Table Module and Domain Model. The complexity of the domain logic drives it most, the difficulty of the database connection next, and the decisions below are shaped by it.</li><li><strong>Mediating layers.</strong> Layers that other schemes put between the three basic ones, such as a controller between presentation and domain or a data-mapping layer between domain and data source. Fowler treats them as patterns, Application Controller and Data Mapper, useful some of the time.</li><li><strong>A deployment.</strong> Which node each layer runs on. The same layers can run in one process or be split at the browser, the database, the service or the domain, and each split adds remote calls.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="choose the domain logic first. the domain choice picks the data source. one process if you can, a facade if not. the platform advice is dated, by fowler. advice prods thinking, it is no recipe" tabindex="0" role="region" aria-label="Mathematical notation">choose the domain logic first
 the domain choice picks the data source
 one process if you can; a facade if not
@@ -2216,11 +2261,42 @@ advice prods thinking; it is no recipe</div><figcaption>Chapter 8 in five lines<
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2288,7 +2364,7 @@ advice prods thinking; it is no recipe</div><figcaption>Chapter 8 in five lines<
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

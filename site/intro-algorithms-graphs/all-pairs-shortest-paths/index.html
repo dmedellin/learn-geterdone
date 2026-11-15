@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Graph Algorithms</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 25 · All-Pairs Shortest Paths</p>
       <h1>All-Pairs Shortest Paths</h1>
       <p class="lesson-lede">Fill a matrix of distances by allowing one more edge, or one more interior vertex, at a time; or reweight the arcs so that Dijkstra can run from every vertex.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Paths of at most m edges</li><li>Paths through the first k vertices</li><li>Reweighting</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the matrix</h2>
-      <article class="prose reading"><p>&ldquo;This problem might arise in making a table of distances between all pairs of cities for a road atlas.&rdquo; Chapter 25 of CLRS wants the whole table at once. The obvious answer runs a single-source algorithm from every vertex: Dijkstra <span data-say="the size of V">|V|</span> times if no weight is negative, <span data-say="big O of V cubed">O(V³)</span> with an array, or Bellman-Ford <span data-say="the size of V">|V|</span> times otherwise, <span data-say="big O of V squared E">O(V²E)</span>, which is <span data-say="big O of V to the power 4">O(V⁴)</span> on a dense graph. The chapter does better, and most of it works on an adjacency matrix rather than lists.</p><p>Section 25.1 builds a dynamic program from the subpaths lemma. Let the entry in row <span class="math" data-say="i">i</span> and column <span class="math" data-say="j">j</span> of a matrix L(m) be the least weight of a path from <span class="math" data-say="i">i</span> to <span class="math" data-say="j">j</span> with at most <span class="math" data-say="m">m</span> edges. L(1) is the weight matrix itself. A path of at most <span class="math" data-say="m">m</span> edges is a path of at most <span class="math" data-say="m minus 1">m − 1</span> edges followed by one more edge, so L(m) comes from L(m − 1) by trying every possible last edge. Written out, that step is a matrix product in which minimum replaces sum and addition replaces multiplication. With no negative cycle, shortest paths are simple, so L(n − 1) is the answer.</p><p>Computing L(2), L(3), up to L(n − 1) one product at a time costs <span data-say="theta of n to the power 4">Θ(n⁴)</span>. But the product is associative, and any L(m) with m at least n − 1 is the same answer, so the section squares instead: L(2), L(4), L(8), until the exponent passes n − 1. That is <span data-say="the ceiling of log base 2 of the quantity n minus 1">⌈lg(n − 1)⌉</span> products, <span data-say="theta of n cubed log base 2 of n">Θ(n³ lg n)</span> in all. The authors' point is the shape, shortest paths as repeated matrix multiplication, more than the bound.</p><p>Section 25.2 changes the subproblem and wins the logarithm back. Let <span class="math" data-say="D of k">D(k)</span> hold, for each pair, the least weight of a path whose interior vertices all come from vertices 1 to <span class="math" data-say="k">k</span>. A best such path either avoids vertex <span class="math" data-say="k">k</span>, so its weight is the entry of <span class="math" data-say="D of the quantity k minus 1">D(k − 1)</span>, or passes through <span class="math" data-say="k">k</span> once and splits there into two paths that use only vertices 1 to <span class="math" data-say="k minus 1">k − 1</span>. Each entry of <span class="math" data-say="D of k">D(k)</span> is the smaller of those two. FLOYD-WARSHALL computes <span class="math" data-say="D of 1">D(1)</span> up to <span class="math" data-say="D of n">D(n)</span> with three nested loops, <span class="math" data-say="k">k</span> outermost, <span data-say="theta of n cubed">Θ(n³)</span> in all, and a predecessor matrix alongside rebuilds the paths. The same scheme with logical or and and computes a graph's transitive closure.</p><p>Section 25.3's Johnson's algorithm suits sparse graphs. Add a new vertex with a 0-weight arc to every vertex, run Bellman-Ford from it, and stop if it finds a negative cycle; otherwise call the distances <span class="math" data-say="h">h</span>. Replace each arc's weight <span class="math" data-say="w">w</span> from <span class="math" data-say="u">u</span> to <span class="math" data-say="v">v</span> by <span class="math" data-say="w plus h of u minus h of v">w + h(u) − h(v)</span>. The triangle inequality makes every new weight nonnegative, and Lemma 25.1 shows every path between the same two vertices shifts by the same amount, so shortest paths are unchanged. Then Dijkstra from every vertex, with a Fibonacci heap, gives <span data-say="big O of the quantity V squared log base 2 of V plus VE">O(V² lg V + VE)</span> in all.</p><p>The lab runs Floyd-Warshall in your browser. A slider sets how many interior vertices are allowed, so you can watch the matrix after each value of <span class="math" data-say="k">k</span>, and it rebuilds the path between two chosen vertices and compares every entry with Bellman-Ford run from each source. It opens on its preset <code>interior</code>, four arcs where the route from 1 to 3 needs two interior vertices: distance 23, along <span data-say="1 goes to 2 goes to 4 goes to 3">1 → 2 → 4 → 3</span>. The preset <code>sparse</code>, a chain of eight vertices, does 512 relaxations for 512 cell visits, against a reference of 168 for running a heap-based single source from each vertex; <code>negcycle</code>, five arcs with a loop through a −3, reports the negative diagonal entries 2, 3, 4.</p><p>This lesson's graph has four vertices, six arcs and one negative weight: <code>1>2 3, 2>3 4, 3>1 -2, 1>4 7, 4>3 1, 2>4 2</code>. Rebuild the path from 4 to 2. The lab prints distance 2 along <span data-say="4 goes to 3 goes to 1 goes to 2">4 → 3 → 1 → 2</span>, 64 relaxations for 64 cell visits (four cubed), no negative diagonal, and agreement on every pair with the rounds method. Its reference for a heap-based pass from every source is 48, which this graph's negative arc would not allow anyway.</p><p>Now step the slider. Through vertex 1, two cells move: 3 to 2 becomes 1, along <span data-say="3 goes to 1 goes to 2">3 → 1 → 2</span>, and 3 to 4 becomes 5. Through vertex 2, 1 to 3 becomes 7, 1 to 4 becomes 5 and 3 to 4 falls to 3. Through vertex 3, row 4 fills in, 4 to 1 at −1 and 4 to 2 at 2, and 2 to 1 becomes 2. Through vertex 4, three cells improve: 1 to 3 to 6, 2 to 1 to 1 and 2 to 3 to 3. The final rows are 0, 3, 6, 5; 1, 0, 3, 2; −2, 1, 0, 3; and −1, 2, 1, 0. The entry for 4 to 2 first appears at <span class="math" data-say="k">k</span> = 3, because its path needs both 3 and 1 inside.</p><p>Reweight the same graph by hand as Johnson would. From an added vertex with 0-weight arcs to all four, Bellman-Ford gives <span class="math" data-say="h">h</span> = (−2, 0, 0, 0): only vertex 1 gains, through 3. The new weights are 1 for <span class="math" data-say="1 goes to 2">1 → 2</span>, 4 for <span class="math" data-say="2 goes to 3">2 → 3</span>, 0 for <span class="math" data-say="3 goes to 1">3 → 1</span>, 5 for <span class="math" data-say="1 goes to 4">1 → 4</span>, 1 for <span class="math" data-say="4 goes to 3">4 → 3</span> and 2 for <span class="math" data-say="2 goes to 4">2 → 4</span>, all nonnegative. The shortest reweighted route from 1 to 3 is <span data-say="1 goes to 2 goes to 4 goes to 3">1 → 2 → 4 → 3</span> at 4, and undoing the shift, 4 − h(1) + h(3) = 6, matches the matrix.</p><h3>Exercise</h3><p>Add the arc <code>3>4 -6</code> to the lesson's graph. Before typing it, predict which diagonal entries Floyd-Warshall will make negative and why, then check in the lab. Then remove it, and compute L(2) for the original graph by hand with the min-plus product: which entries differ from L(1)?</p><p>Every algorithm so far has moved along paths. The next lesson, Flow Networks and Ford-Fulkerson, opens Chapter 26 and asks how much can move along all of them at once.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Floyd–Warshall, one interior vertex at a time</h2></div><p>The outer loop is the subproblem, and the path comes back out of next rather than being stored</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the matrix</h2><div class="prose reading"><p>&ldquo;This problem might arise in making a table of distances between all pairs of cities for a road atlas.&rdquo; Chapter 25 of CLRS wants the whole table at once. The obvious answer runs a single-source algorithm from every vertex: Dijkstra <span data-say="the size of V">|V|</span> times if no weight is negative, <span data-say="big O of V cubed">O(V³)</span> with an array, or Bellman-Ford <span data-say="the size of V">|V|</span> times otherwise, <span data-say="big O of V squared E">O(V²E)</span>, which is <span data-say="big O of V to the power 4">O(V⁴)</span> on a dense graph. The chapter does better, and most of it works on an adjacency matrix rather than lists.</p><p>Section 25.1 builds a dynamic program from the subpaths lemma. Let the entry in row <span class="math" data-say="i">i</span> and column <span class="math" data-say="j">j</span> of a matrix L(m) be the least weight of a path from <span class="math" data-say="i">i</span> to <span class="math" data-say="j">j</span> with at most <span class="math" data-say="m">m</span> edges. L(1) is the weight matrix itself. A path of at most <span class="math" data-say="m">m</span> edges is a path of at most <span class="math" data-say="m minus 1">m − 1</span> edges followed by one more edge, so L(m) comes from L(m − 1) by trying every possible last edge. Written out, that step is a matrix product in which minimum replaces sum and addition replaces multiplication. With no negative cycle, shortest paths are simple, so L(n − 1) is the answer.</p><p>Computing L(2), L(3), up to L(n − 1) one product at a time costs <span data-say="theta of n to the power 4">Θ(n⁴)</span>. But the product is associative, and any L(m) with m at least n − 1 is the same answer, so the section squares instead: L(2), L(4), L(8), until the exponent passes n − 1. That is <span data-say="the ceiling of log base 2 of the quantity n minus 1">⌈lg(n − 1)⌉</span> products, <span data-say="theta of n cubed log base 2 of n">Θ(n³ lg n)</span> in all. The authors' point is the shape, shortest paths as repeated matrix multiplication, more than the bound.</p><p>Section 25.2 changes the subproblem and wins the logarithm back. Let <span class="math" data-say="D of k">D(k)</span> hold, for each pair, the least weight of a path whose interior vertices all come from vertices 1 to <span class="math" data-say="k">k</span>. A best such path either avoids vertex <span class="math" data-say="k">k</span>, so its weight is the entry of <span class="math" data-say="D of the quantity k minus 1">D(k − 1)</span>, or passes through <span class="math" data-say="k">k</span> once and splits there into two paths that use only vertices 1 to <span class="math" data-say="k minus 1">k − 1</span>. Each entry of <span class="math" data-say="D of k">D(k)</span> is the smaller of those two. FLOYD-WARSHALL computes <span class="math" data-say="D of 1">D(1)</span> up to <span class="math" data-say="D of n">D(n)</span> with three nested loops, <span class="math" data-say="k">k</span> outermost, <span data-say="theta of n cubed">Θ(n³)</span> in all, and a predecessor matrix alongside rebuilds the paths. The same scheme with logical or and and computes a graph's transitive closure.</p><p>Section 25.3's Johnson's algorithm suits sparse graphs. Add a new vertex with a 0-weight arc to every vertex, run Bellman-Ford from it, and stop if it finds a negative cycle; otherwise call the distances <span class="math" data-say="h">h</span>. Replace each arc's weight <span class="math" data-say="w">w</span> from <span class="math" data-say="u">u</span> to <span class="math" data-say="v">v</span> by <span class="math" data-say="w plus h of u minus h of v">w + h(u) − h(v)</span>. The triangle inequality makes every new weight nonnegative, and Lemma 25.1 shows every path between the same two vertices shifts by the same amount, so shortest paths are unchanged. Then Dijkstra from every vertex, with a Fibonacci heap, gives <span data-say="big O of the quantity V squared log base 2 of V plus VE">O(V² lg V + VE)</span> in all.</p><p>The lab runs Floyd-Warshall in your browser. A slider sets how many interior vertices are allowed, so you can watch the matrix after each value of <span class="math" data-say="k">k</span>, and it rebuilds the path between two chosen vertices and compares every entry with Bellman-Ford run from each source. It opens on its preset <code>interior</code>, four arcs where the route from 1 to 3 needs two interior vertices: distance 23, along <span data-say="1 goes to 2 goes to 4 goes to 3">1 → 2 → 4 → 3</span>. The preset <code>sparse</code>, a chain of eight vertices, does 512 relaxations for 512 cell visits, against a reference of 168 for running a heap-based single source from each vertex; <code>negcycle</code>, five arcs with a loop through a −3, reports the negative diagonal entries 2, 3, 4.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Floyd–Warshall, one interior vertex at a time</h2></div><p>The outer loop is the subproblem, and the path comes back out of next rather than being stored</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>One matrix, one interior vertex at a time</strong><span>the outer loop says which vertices a route is allowed to pass through</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>improved at this step</span><span class="tone-purple"><i class="legend-swatch"></i>on the rebuilt path</span><span class="tone-red"><i class="legend-swatch"></i>a negative diagonal</span></div>
@@ -1405,10 +1448,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="fwMatrix"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="fwCheck"></table></div>
       <div class="status-banner" id="fwStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Let in one interior vertex at a time</h3>
-          <p>Type weighted arcs as <span data-say="tail is greater than head w">tail&gt;head w</span>, then slide how many interior vertices are allowed and watch which cells of the matrix move. The path between two chosen vertices is rebuilt, and every entry is checked against Bellman-Ford from each source. Paste the lesson's graph and rebuild the path from 4 to 2.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Let in one interior vertex at a time</h3>
+            <p>Type weighted arcs as <span data-say="tail is greater than head w">tail&gt;head w</span>, then slide how many interior vertices are allowed and watch which cells of the matrix move. The path between two chosen vertices is rebuilt, and every entry is checked against Bellman-Ford from each source. Paste the lesson's graph and rebuild the path from 4 to 2.</p>
         <div class="field">
           <label for="fwPreset">Worked example</label>
           <select id="fwPreset"><option value="interior" selected>a route that needs two interior vertices</option><option value="negative">ten arcs, three of them negative</option><option value="negcycle">five arcs, one of them −3, three of them a loop</option><option value="sparse">a chain of eight vertices, every weight 1</option></select>
@@ -1438,12 +1481,15 @@
           <div class="kpi"><span>Agrees with the rounds method</span><strong id="fwAgree">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="fwHint" style="margin:0;">The subproblem is the whole content: after step k, the cell <span class="tt">D[i][j]</span> is the best route from i to j whose interior vertices are all among the first k. That is why the k loop is the outer one &mdash; write the loops in another order and you compute something else that often looks right. Step k below and watch which cells move.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>This lesson's graph has four vertices, six arcs and one negative weight: <code>1>2 3, 2>3 4, 3>1 -2, 1>4 7, 4>3 1, 2>4 2</code>. Rebuild the path from 4 to 2. The lab prints distance 2 along <span data-say="4 goes to 3 goes to 1 goes to 2">4 → 3 → 1 → 2</span>, 64 relaxations for 64 cell visits (four cubed), no negative diagonal, and agreement on every pair with the rounds method. Its reference for a heap-based pass from every source is 48, which this graph's negative arc would not allow anyway.</p><p>Now step the slider. Through vertex 1, two cells move: 3 to 2 becomes 1, along <span data-say="3 goes to 1 goes to 2">3 → 1 → 2</span>, and 3 to 4 becomes 5. Through vertex 2, 1 to 3 becomes 7, 1 to 4 becomes 5 and 3 to 4 falls to 3. Through vertex 3, row 4 fills in, 4 to 1 at −1 and 4 to 2 at 2, and 2 to 1 becomes 2. Through vertex 4, three cells improve: 1 to 3 to 6, 2 to 1 to 1 and 2 to 3 to 3. The final rows are 0, 3, 6, 5; 1, 0, 3, 2; −2, 1, 0, 3; and −1, 2, 1, 0. The entry for 4 to 2 first appears at <span class="math" data-say="k">k</span> = 3, because its path needs both 3 and 1 inside.</p><p>Reweight the same graph by hand as Johnson would. From an added vertex with 0-weight arcs to all four, Bellman-Ford gives <span class="math" data-say="h">h</span> = (−2, 0, 0, 0): only vertex 1 gains, through 3. The new weights are 1 for <span class="math" data-say="1 goes to 2">1 → 2</span>, 4 for <span class="math" data-say="2 goes to 3">2 → 3</span>, 0 for <span class="math" data-say="3 goes to 1">3 → 1</span>, 5 for <span class="math" data-say="1 goes to 4">1 → 4</span>, 1 for <span class="math" data-say="4 goes to 3">4 → 3</span> and 2 for <span class="math" data-say="2 goes to 4">2 → 4</span>, all nonnegative. The shortest reweighted route from 1 to 3 is <span data-say="1 goes to 2 goes to 4 goes to 3">1 → 2 → 4 → 3</span> at 4, and undoing the shift, 4 − h(1) + h(3) = 6, matches the matrix.</p><h3>Exercise</h3><p>Add the arc <code>3>4 -6</code> to the lesson's graph. Before typing it, predict which diagonal entries Floyd-Warshall will make negative and why, then check in the lab. Then remove it, and compute L(2) for the original graph by hand with the min-plus product: which entries differ from L(1)?</p><p>Every algorithm so far has moved along paths. The next lesson, Flow Networks and Ford-Fulkerson, opens Chapter 26 and asks how much can move along all of them at once.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running Floyd-Warshall by hand</h2></div><p>Five steps, the last on a graph of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the weight matrix</h3><p>Row i, column j holds the weight of the arc from i to j, 0 on the diagonal and infinity where there is no arc. This is D(0).</p></article><article class="card concept-card"><div class="icon">2</div><h3>Allow vertex k</h3><p>For each pair, compare the current entry with the entry from i to k plus the entry from k to j, and keep the smaller. Note which cells move.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Repeat for k from 1 to n</h3><p>Keep k as the outer loop: every entry must be finished for vertices 1 to k − 1 before vertex k is allowed.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the diagonal</h3><p>A negative entry on the diagonal means a negative cycle through that vertex, and the other entries are not distances.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on a graph of your own</h3><p>Write the costs between four or five places of your own as arcs, one of them negative such as a refund, and type them into the lab. Step k from 1 to n and note which entries move at each step.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running Floyd-Warshall by hand</h2>
+      <p class="lead-in">Five steps, the last on a graph of your own.</p>
+      <ol class="key-ideas method"><li><strong>Write the weight matrix.</strong> Row i, column j holds the weight of the arc from i to j, 0 on the diagonal and infinity where there is no arc. This is D(0).</li><li><strong>Allow vertex k.</strong> For each pair, compare the current entry with the entry from i to k plus the entry from k to j, and keep the smaller. Note which cells move.</li><li><strong>Repeat for k from 1 to n.</strong> Keep k as the outer loop: every entry must be finished for vertices 1 to k − 1 before vertex k is allowed.</li><li><strong>Read the diagonal.</strong> A negative entry on the diagonal means a negative cycle through that vertex, and the other entries are not distances.</li><li><strong>Do it on a graph of your own.</strong> Write the costs between four or five places of your own as arcs, one of them negative such as a refund, and type them into the lab. Step k from 1 to n and note which entries move at each step.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1463,17 +1509,16 @@ k = 4: 1 to 3 is 6, 2 to 3 is 3
   and 2 to 1 is 1</div><p>Sixty-four comparisons, one per cell per value of k, and the final matrix matches the lab's. The path from 4 to 2 rebuilt from the predecessors is <span data-say="4 goes to 3 goes to 1 goes to 2">4 → 3 → 1 → 2</span>, of weight 1 − 2 + 3 = 2.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading Floyd-Warshall&#x27;s k as the number of edges on a path</strong><span>Section 25.1's index m counts edges; Section 25.2's k bounds the labels of interior vertices, however many edges the path has. On the lesson's graph the entry from 4 to 2 first appears at k = 3 with a path of three edges, and the entry from 3 to 2 at k = 1 with two.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the loop order as a detail</strong><span>With the pair loops outside and k inside, each entry would be computed once with whatever its neighbours held at the time, which is not the recurrence. The lab's hint makes the same point: the outer k loop is the subproblem order, and putting it anywhere else computes something that often looks right.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking reweighting can add one constant to every arc</strong><span>Adding the same constant to every arc does make weights nonnegative, but it penalises a path once per edge, so paths with more edges lose and the shortest paths change. Johnson's shift w + h(u) − h(v) moves every path between the same two ends by the same amount, which is why Lemma 25.1 can say nothing changes.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run Floyd-Warshall by hand and reweight a graph for Johnson.</strong><p>For a weighted digraph of four vertices, write D(k) for each k, rebuild one path, detect a negative cycle from the diagonal, and compute Johnson's h and the new weights.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab runs Floyd-Warshall and checks it against Bellman-Ford from each source on your graph; it does not run Section 25.1's products or Johnson's algorithm, which the lesson does by hand. That D(n) is correct on every graph without a negative cycle is the recurrence's proof, not the agreement on one.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading Floyd-Warshall&#x27;s k as the number of edges on a path</strong><span>Section 25.1's index m counts edges; Section 25.2's k bounds the labels of interior vertices, however many edges the path has. On the lesson's graph the entry from 4 to 2 first appears at k = 3 with a path of three edges, and the entry from 3 to 2 at k = 1 with two.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the loop order as a detail</strong><span>With the pair loops outside and k inside, each entry would be computed once with whatever its neighbours held at the time, which is not the recurrence. The lab's hint makes the same point: the outer k loop is the subproblem order, and putting it anywhere else computes something that often looks right.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking reweighting can add one constant to every arc</strong><span>Adding the same constant to every arc does make weights nonnegative, but it penalises a path once per edge, so paths with more edges lose and the shortest paths change. Johnson's shift w + h(u) − h(v) moves every path between the same two ends by the same amount, which is why Lemma 25.1 can say nothing changes.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run Floyd-Warshall by hand and reweight a graph for Johnson.</strong><p>For a weighted digraph of four vertices, write D(k) for each k, rebuild one path, detect a negative cycle from the diagonal, and compute Johnson's h and the new weights.</p></div></div><div class="note"><strong>Note:</strong> The lab runs Floyd-Warshall and checks it against Bellman-Ford from each source on your graph; it does not run Section 25.1's products or Johnson's algorithm, which the lesson does by hand. That D(n) is correct on every graph without a negative cycle is the recurrence's proof, not the agreement on one.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Paths of at most m edges</summary><p>Section 25.1's subproblem: the least weight of a path from i to j using at most m edges. Going from m − 1 to m means trying every last edge, which is a matrix product with minimum in place of sum and addition in place of product. With no negative cycle, m = n − 1 gives the distances.</p></details><details class="recall"><summary>Paths through the first k vertices</summary><p>Floyd-Warshall's subproblem: the least weight of a path from i to j whose interior vertices all lie among vertices 1 to k. Allowing vertex k either does not help or splits the path at k into two paths through the first k − 1 vertices.</p></details><details class="recall"><summary>Reweighting</summary><p>Johnson's device: give each vertex a number h(v) and replace each arc's weight w by w + h(u) − h(v). Every path from u to v changes by the same h(u) − h(v), so shortest paths stay shortest (Lemma 25.1); with h taken as distances from an added vertex, every new weight is nonnegative.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 25 answers the shortest-path question for every pair at once. Section 25.1 lets paths grow one edge at a time and finds matrix multiplication inside; Section 25.2's Floyd-Warshall algorithm lets in one interior vertex at a time in <span data-say="theta of V cubed">Θ(V³)</span>; Section 25.3's Johnson reweights so that Dijkstra can run from every vertex. Watch Floyd-Warshall's matrix change on a four-vertex graph with a negative arc, and reweight it by hand.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Paths of at most m edges.</strong> Section 25.1's subproblem: the least weight of a path from i to j using at most m edges. Going from m − 1 to m means trying every last edge, which is a matrix product with minimum in place of sum and addition in place of product. With no negative cycle, m = n − 1 gives the distances.</li><li><strong>Paths through the first k vertices.</strong> Floyd-Warshall's subproblem: the least weight of a path from i to j whose interior vertices all lie among vertices 1 to k. Allowing vertex k either does not help or splits the path at k into two paths through the first k − 1 vertices.</li><li><strong>Reweighting.</strong> Johnson's device: give each vertex a number h(v) and replace each arc's weight w by w + h(u) − h(v). Every path from u to v changes by the same h(u) − h(v), so shortest paths stay shortest (Lemma 25.1); with h taken as distances from an added vertex, every new weight is nonnegative.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="L of m, best paths of at most m edges. min-plus product extends L by one edge. repeated squaring, theta of V cubed log base 2 of V. D of k, interior vertices among 1 to k. Floyd-Warshall, k outermost, theta of V cubed. negative diagonal, a negative cycle. Johnson, w plus h of u minus h of v, then Dijkstra" tabindex="0" role="region" aria-label="Mathematical notation">L(m): best paths of at most m edges
 min-plus product extends L by one edge
 repeated squaring: Θ(V³ lg V)
@@ -3276,11 +3321,42 @@ Johnson: w + h(u) − h(v), then Dijkstra</div><figcaption>Chapter 25 in seven l
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3348,7 +3424,7 @@ Johnson: w + h(u) − h(v), then Dijkstra</div><figcaption>Chapter 25 in seven l
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

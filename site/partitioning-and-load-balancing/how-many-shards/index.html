@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Partitioning and Load Balancing</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Choosing the count</p>
       <h1>How Many Shards</h1>
       <p class="lesson-lede">Compute the shard count from load and the shard count from storage, and build the larger of the two.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Each constraint is a ceiling, not a division</li><li><span class="math" data-say="c">c</span> is one node&#x27;s capacity, never a count of nodes</li><li>The constraint that does not bind is your headroom</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two constraints, two ceilings, one count</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Shard</span><p>A <strong>shard</strong> is a disjoint piece of a dataset, together with the node or nodes that serve it. Every key belongs to exactly one shard, and the rule that decides which is the <strong>partitioning function</strong>. A shard is not a <strong>replica</strong>: a replica is a copy of a piece, a shard is a piece. Splitting is this course; copying is “Replication and Consistency”.</p></div><p>Two independent questions decide how many shards you build, and they are asked of different resources. The first is about throughput: how many nodes does it take for the peak request rate, divided among them, to sit under the utilisation you are willing to run at? The second is about bytes: how many nodes does it take to hold the dataset once every item has been written <span class="math" data-say="RF">RF</span> times?</p><div class="mathblock" data-say="load, N sub load, equals the ceiling of lambda sub peak over the quantity c times rho sub target. storage, N sub storage equals the ceiling of D times RF over per-node. the count, N, equals the max of N sub load and N sub storage. lambda sub peak equals 120000 per second, c equals 8000 per second, rho sub target equals 0.65. D equals 48 terabytes, RF equals 3, per-node equals 4 terabytes. N sub load, equals the ceiling of 120000 over 5200, equals the ceiling of 300 over 13, equals the ceiling of 23.08, equals 24. N sub storage equals the ceiling of 144 terabytes over 4 terabytes, equals the ceiling of 36.00, equals 36. N, equals the max of 24 and 36 equals 36" tabindex="0" role="region" aria-label="Mathematical notation">load        N_load    = ⌈ λ_peak / (c · ρ_target) ⌉
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two constraints, two ceilings, one count</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Shard</span><p>A <strong>shard</strong> is a disjoint piece of a dataset, together with the node or nodes that serve it. Every key belongs to exactly one shard, and the rule that decides which is the <strong>partitioning function</strong>. A shard is not a <strong>replica</strong>: a replica is a copy of a piece, a shard is a piece. Splitting is this course; copying is “Replication and Consistency”.</p></div><p>Two independent questions decide how many shards you build, and they are asked of different resources. The first is about throughput: how many nodes does it take for the peak request rate, divided among them, to sit under the utilisation you are willing to run at? The second is about bytes: how many nodes does it take to hold the dataset once every item has been written <span class="math" data-say="RF">RF</span> times?</p><div class="mathblock" data-say="load, N sub load, equals the ceiling of lambda sub peak over the quantity c times rho sub target. storage, N sub storage equals the ceiling of D times RF over per-node. the count, N, equals the max of N sub load and N sub storage. lambda sub peak equals 120000 per second, c equals 8000 per second, rho sub target equals 0.65. D equals 48 terabytes, RF equals 3, per-node equals 4 terabytes. N sub load, equals the ceiling of 120000 over 5200, equals the ceiling of 300 over 13, equals the ceiling of 23.08, equals 24. N sub storage equals the ceiling of 144 terabytes over 4 terabytes, equals the ceiling of 36.00, equals 36. N, equals the max of 24 and 36 equals 36" tabindex="0" role="region" aria-label="Mathematical notation">load        N_load    = ⌈ λ_peak / (c · ρ_target) ⌉
 storage     N_storage = ⌈ D · RF / per-node ⌉
 the count   N         = max(N_load, N_storage)
 
@@ -1400,12 +1444,11 @@ D = 48 TB   RF = 3   per-node = 4 TB
 
 N_load    = ⌈ 120 000 / 5 200 ⌉ = ⌈ 300/13 ⌉ = ⌈ 23.08 ⌉ = 24
 N_storage = ⌈ 144 TB / 4 TB ⌉   = ⌈ 36.00 ⌉             = 36
-N         = max(24, 36) = 36</div><p>The <span class="math" data-say="RF">RF</span> in the storage line is the whole of that constraint. A 48 TB dataset at three copies is 144 TB of stored bytes, and it is the 144 that has to fit. Dropping the factor gives 12 shards instead of 36 — a fleet a third the size, sized against a number that never existed on any disk.</p><div class="example"><span class="label">Example &middot; The same fleet, one constraint at a time</span><p>At the numbers above, load asks for 24 and storage asks for 36, so you build 36 and storage binds by 12 shards. Hold the storage figures and take the peak to <span class="math" data-say="200000 per second">200 000 /s</span>: load now asks for <span class="math" data-say="the ceiling of 200000 over 5200, equals the ceiling of 38.46, equals 39">⌈200 000/5 200⌉ = ⌈38.46⌉ = 39</span>, storage still asks for 36, and load binds by 3. Hold the load figures and take the dataset to 20 TB: storage asks for <span class="math" data-say="the ceiling of 60 over 4, equals 15">⌈60/4⌉ = 15</span> and load binds by 9. Nothing about the method changed; which constraint won changed twice.</p></div><h3>What the slack tells you, and what no slack tells you</h3><p>At 36 shards each node serves <span class="math" data-say="120000 over 36 equals 3333 per second">120 000/36 = 3 333 /s</span> against a capacity of <span class="math" data-say="8000 per second">8 000 /s</span>, which is 41.67% — well under the 65% target that produced the load ceiling. Request traffic could grow by more than half before load starts to bind, and that is a real answer to “when do we reshard?”.</p><p>Storage at the same count has no slack at all. Each node holds <span class="math" data-say="144 terabytes over 36 equals 4.00 terabytes">144 TB/36 = 4.00 TB</span> of a 4 TB node, because the storage ceiling happened to land on a whole number. A dataset that grows by one byte adds a shard, and the lab shows this by moving the dataset slider a single terabyte. A ceiling that comes out exact is the least comfortable answer this arithmetic can give.</p><h3>Where the load ceiling came from</h3><p>The load line is not new. “From a Request's Cost to a Machine Count” derives it from one request's cost and one machine's capacity, and everything this lesson adds is the second constraint and the maximum. If the utilisation target in it looks arbitrary, “The Knee: Response Time vs Utilisation” is where the number comes from: the wait rises without bound as <span class="math" data-say="rho">ρ</span> approaches 1, so the target is chosen on the flat part of that curve and then divided into.</p><p>Both ceilings are computed as exact fractions in the lab and rounded only at the ceiling itself, which matters more than it sounds: <span class="math" data-say="300 over 13">300/13</span> is <span class="math" data-say="23.076923 and so on">23.076923…</span>, and a calculation that rounds to 23.1 before taking the ceiling still gives 24, while one that rounds to 23 gives 23 and under-provisions the fleet by a node.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>How many shards</h2></div><p>Load gives one count, storage gives another, and you build the larger</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+N         = max(24, 36) = 36</div><p>The <span class="math" data-say="RF">RF</span> in the storage line is the whole of that constraint. A 48 TB dataset at three copies is 144 TB of stored bytes, and it is the 144 that has to fit. Dropping the factor gives 12 shards instead of 36 — a fleet a third the size, sized against a number that never existed on any disk.</p><div class="example"><span class="label">Example &middot; The same fleet, one constraint at a time</span><p>At the numbers above, load asks for 24 and storage asks for 36, so you build 36 and storage binds by 12 shards. Hold the storage figures and take the peak to <span class="math" data-say="200000 per second">200 000 /s</span>: load now asks for <span class="math" data-say="the ceiling of 200000 over 5200, equals the ceiling of 38.46, equals 39">⌈200 000/5 200⌉ = ⌈38.46⌉ = 39</span>, storage still asks for 36, and load binds by 3. Hold the load figures and take the dataset to 20 TB: storage asks for <span class="math" data-say="the ceiling of 60 over 4, equals 15">⌈60/4⌉ = 15</span> and load binds by 9. Nothing about the method changed; which constraint won changed twice.</p></div><h3>What the slack tells you, and what no slack tells you</h3><p>At 36 shards each node serves <span class="math" data-say="120000 over 36 equals 3333 per second">120 000/36 = 3 333 /s</span> against a capacity of <span class="math" data-say="8000 per second">8 000 /s</span>, which is 41.67% — well under the 65% target that produced the load ceiling. Request traffic could grow by more than half before load starts to bind, and that is a real answer to “when do we reshard?”.</p><p>Storage at the same count has no slack at all. Each node holds <span class="math" data-say="144 terabytes over 36 equals 4.00 terabytes">144 TB/36 = 4.00 TB</span> of a 4 TB node, because the storage ceiling happened to land on a whole number. A dataset that grows by one byte adds a shard, and the lab shows this by moving the dataset slider a single terabyte. A ceiling that comes out exact is the least comfortable answer this arithmetic can give.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>How many shards</h2></div><p>Load gives one count, storage gives another, and you build the larger</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Two constraints, one count</strong><span>load gives one number, storage gives another, and the answer is the larger</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>from load</span><span class="tone-purple"><i class="legend-swatch"></i>from storage</span><span class="tone-amber"><i class="legend-swatch"></i>the binding one</span></div>
@@ -1413,10 +1456,10 @@ N         = max(24, 36) = 36</div><p>The <span class="math" data-say="RF">RF</sp
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="scBars" viewBox="0 0 520 200" role="img" aria-label="Two bars, the shard count from load and the shard count from storage, with the binding one marked."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="scTable"></table></div>
       <div class="status-banner" id="scStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Size it on both constraints at once</h3>
-          <p>Move the load sliders until load binds, then move the storage sliders until storage binds again. The point of the exercise is not either number: it is watching which of them is the answer change hands while both are on the screen.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Size it on both constraints at once</h3>
+            <p>Move the load sliders until load binds, then move the storage sliders until storage binds again. The point of the exercise is not either number: it is watching which of them is the answer change hands while both are on the screen.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="scLam">Peak load (requests a second)</label><span class="range-value" id="scLamOut">120000</span></div>
           <input id="scLam" type="range" min="10000" max="400000" step="5000" value="120000" />
@@ -1450,12 +1493,15 @@ N         = max(24, 36) = 36</div><p>The <span class="math" data-say="RF">RF</sp
           <div class="kpi"><span>Bytes a node then holds</span><strong id="scBytes">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="scHint" style="margin:0;">Both counts are ceilings of exact fractions &mdash; &lceil;&lambda;/(c&middot;&rho;)&rceil; and &lceil;D&middot;RF/per-node&rceil; &mdash; because 23.08 shards is 24 shards. <em>c</em> here is one node's capacity in requests a second, never a count of servers. A terabyte is 10&#185;&#178; bytes, which is how a disk is sold.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Where the load ceiling came from</h3><p>The load line is not new. “From a Request's Cost to a Machine Count” derives it from one request's cost and one machine's capacity, and everything this lesson adds is the second constraint and the maximum. If the utilisation target in it looks arbitrary, “The Knee: Response Time vs Utilisation” is where the number comes from: the wait rises without bound as <span class="math" data-say="rho">ρ</span> approaches 1, so the target is chosen on the flat part of that curve and then divided into.</p><p>Both ceilings are computed as exact fractions in the lab and rounded only at the ceiling itself, which matters more than it sounds: <span class="math" data-say="300 over 13">300/13</span> is <span class="math" data-say="23.076923 and so on">23.076923…</span>, and a calculation that rounds to 23.1 before taking the ceiling still gives 24, while one that rounds to 23 gives 23 and under-provisions the fleet by a node.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sizing a fleet on two constraints</h2></div><p>Four lines. Only the third and fourth are arithmetic; the first two are what stop the arithmetic being done on the wrong quantity.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the peak rate, not the average</h3><p>The count is sized on <span class="math" data-say="lambda sub peak">λ_peak</span>. An average rate with a peak-to-average ratio of three in front of it will size a fleet that falls over daily, and “Peak to Average” is where that ratio comes from.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Divide by one node&#x27;s capacity and by the utilisation target</h3><p><span class="math" data-say="c times rho sub target">c · ρ_target</span> is the rate you are actually willing to take from one node. Divide the peak by it and take the ceiling. Carrying the division as an exact fraction until the ceiling is what keeps <span class="math" data-say="23.08">23.08</span> from becoming 23.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply the dataset by the replication factor first</h3><p><span class="math" data-say="D times RF">D · RF</span> is the bytes that exist, and that is what has to fit on the nodes you buy. Divide by one node's usable capacity and take the ceiling again. Usable, not nominal: whatever the filesystem, the index and the compaction headroom take is not available to store the data.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Take the maximum, and report the slack in the other one</h3><p>One number is the answer and the other is headroom. Say both: “36 shards, sized by storage; load then runs at 41.67% of capacity” is an answer someone can plan against, and “36 shards” alone is not.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sizing a fleet on two constraints</h2>
+      <p class="lead-in">Four lines. Only the third and fourth are arithmetic; the first two are what stop the arithmetic being done on the wrong quantity.</p>
+      <ol class="key-ideas method"><li><strong>Write the peak rate, not the average.</strong> The count is sized on <span class="math" data-say="lambda sub peak">λ_peak</span>. An average rate with a peak-to-average ratio of three in front of it will size a fleet that falls over daily, and “Peak to Average” is where that ratio comes from.</li><li><strong>Divide by one node&#x27;s capacity and by the utilisation target.</strong> <span class="math" data-say="c times rho sub target">c · ρ_target</span> is the rate you are actually willing to take from one node. Divide the peak by it and take the ceiling. Carrying the division as an exact fraction until the ceiling is what keeps <span class="math" data-say="23.08">23.08</span> from becoming 23.</li><li><strong>Multiply the dataset by the replication factor first.</strong> <span class="math" data-say="D times RF">D · RF</span> is the bytes that exist, and that is what has to fit on the nodes you buy. Divide by one node's usable capacity and take the ceiling again. Usable, not nominal: whatever the filesystem, the index and the compaction headroom take is not available to store the data.</li><li><strong>Take the maximum, and report the slack in the other one.</strong> One number is the answer and the other is headroom. Say both: “36 shards, sized by storage; load then runs at 41.67% of capacity” is an answer someone can plan against, and “36 shards” alone is not.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1482,17 +1528,16 @@ what the fleet then looks like
   each node holds  144/36     = 4.00 TB of 4 TB        = 100%</div><p>The last two lines are the ones worth keeping. The fleet was sized by storage, so storage is full and load is half idle, and those two facts together say which way this system will break: not under a traffic spike, but on the day the dataset grows.</p><p>For a faded rehearsal, hold <span class="math" data-say="c equals 8000 per second">c = 8 000 /s</span>, <span class="math" data-say="rho sub target equals 0.65">ρ_target = 0.65</span>, <span class="math" data-say="per-node equals 4 terabytes">per-node = 4 TB</span> and <span class="math" data-say="RF equals 3">RF = 3</span>, and take the peak to <span class="math" data-say="260000 per second">260 000 /s</span> with the dataset at 60 TB. The supplied first move is the usable rate a node, which is unchanged at <span class="math" data-say="5200 per second">5 200 /s</span>. Produce both ceilings, say which binds and by how much, and then state the utilisation each node runs at under the count you chose. Check all three in the lab before opening the quiz.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Sizing on one constraint and meeting the other in production</strong><span>A fleet sized on load alone runs out of disk and a fleet sized on storage alone runs out of throughput, and in both cases the number that was computed was correct. Compute both, always, and write the loser down beside the winner — it is the only record of how much room you have.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dropping the replication factor from the storage line</strong><span>The bytes that have to fit are <span class="math" data-say="D times RF">D · RF</span>, not <span class="math" data-say="D">D</span>. At three copies the difference is a factor of three in the fleet size, and the error is easy to make because the dataset is the number everybody quotes and the replication factor lives in a different team's configuration.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Rounding before the ceiling instead of at it</strong><span><span class="math" data-say="300 over 13">300/13</span> is <span class="math" data-say="23.0769 and so on">23.0769…</span>; rounded to 23 it under-provisions, and rounded to 23.1 it does not, because the ceiling comes last. Carry the division exact and apply <span class="math" data-say="the ceiling of times">⌈·⌉</span> once, at the end. The lab keeps both constraints as fractions for exactly this reason.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “how many shards?” is two questions to you rather than one.</strong><p>You should be able to produce both ceilings from a description of a workload, say which binds, state the utilisation and the bytes per node that the chosen count implies, and name what the slack in the other constraint buys.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Having chosen <span class="math" data-say="N">N</span>, the next question is what happens when it changes, and the answer is worse than most people expect: under a plain <span class="math" data-say="mod N">mod N</span> assignment, going from <span class="math" data-say="N">N</span> to <span class="math" data-say="N plus 1">N + 1</span> relocates nearly every key in the system. “Rehashing When N Changes” counts exactly how many.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Sizing on one constraint and meeting the other in production</strong><span>A fleet sized on load alone runs out of disk and a fleet sized on storage alone runs out of throughput, and in both cases the number that was computed was correct. Compute both, always, and write the loser down beside the winner — it is the only record of how much room you have.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dropping the replication factor from the storage line</strong><span>The bytes that have to fit are <span class="math" data-say="D times RF">D · RF</span>, not <span class="math" data-say="D">D</span>. At three copies the difference is a factor of three in the fleet size, and the error is easy to make because the dataset is the number everybody quotes and the replication factor lives in a different team's configuration.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Rounding before the ceiling instead of at it</strong><span><span class="math" data-say="300 over 13">300/13</span> is <span class="math" data-say="23.0769 and so on">23.0769…</span>; rounded to 23 it under-provisions, and rounded to 23.1 it does not, because the ceiling comes last. Carry the division exact and apply <span class="math" data-say="the ceiling of times">⌈·⌉</span> once, at the end. The lab keeps both constraints as fractions for exactly this reason.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “how many shards?” is two questions to you rather than one.</strong><p>You should be able to produce both ceilings from a description of a workload, say which binds, state the utilisation and the bytes per node that the chosen count implies, and name what the slack in the other constraint buys.</p></div></div><div class="note"><strong>Note:</strong> Having chosen <span class="math" data-say="N">N</span>, the next question is what happens when it changes, and the answer is worse than most people expect: under a plain <span class="math" data-say="mod N">mod N</span> assignment, going from <span class="math" data-say="N">N</span> to <span class="math" data-say="N plus 1">N + 1</span> relocates nearly every key in the system. “Rehashing When N Changes” counts exactly how many.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Each constraint is a ceiling, not a division</summary><p><span class="math" data-say="120000 over the quantity 8000 times 0.65, equals 23.08">120 000/(8 000 × 0.65) = 23.08</span> shards is not an answer, because a system cannot run 0.08 of a node. The ceiling is what makes the count buildable, and it is the reason a target utilisation of 65% produces a fleet that actually runs at 41.67% once the other constraint has had its say.</p></details><details class="recall"><summary><span class="math" data-say="c">c</span> is one node&#x27;s capacity, never a count of nodes</summary><p>In <span class="math" data-say="the ceiling of lambda sub peak over the quantity c times rho sub target">⌈λ_peak/(c · ρ_target)⌉</span> the symbol <span class="math" data-say="c">c</span> is requests a second that a single node can serve, and <span class="math" data-say="rho sub target">ρ_target</span> is the fraction of that you are willing to use. Reading <span class="math" data-say="c">c</span> as a machine count inverts the whole expression and gives an answer in the wrong units, which is a mistake that survives review because the number it produces still looks like a count.</p></details><details class="recall"><summary>The constraint that does not bind is your headroom</summary><p>Two ceilings give two numbers and you build the larger, so one of them is always slack. That slack is worth reporting: at the defaults the fleet is sized by storage and each node is then running at 41.67% of its request capacity, which says exactly how much traffic growth the shard count already absorbs before anyone has to reshard.</p></details></div>
+      <h3>Summary</h3>
       <p>There is no single formula for a shard count, because there are two constraints and each of them is a ceiling. Load asks for enough nodes that the peak rate divided among them sits under a target utilisation; storage asks for enough nodes that the dataset, multiplied by its replication factor, fits. You build the larger number, and the smaller one is the headroom you have in that dimension.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Each constraint is a ceiling, not a division.</strong> <span class="math" data-say="120000 over the quantity 8000 times 0.65, equals 23.08">120 000/(8 000 × 0.65) = 23.08</span> shards is not an answer, because a system cannot run 0.08 of a node. The ceiling is what makes the count buildable, and it is the reason a target utilisation of 65% produces a fleet that actually runs at 41.67% once the other constraint has had its say.</li><li><strong><span class="math" data-say="c">c</span> is one node&#x27;s capacity, never a count of nodes.</strong> In <span class="math" data-say="the ceiling of lambda sub peak over the quantity c times rho sub target">⌈λ_peak/(c · ρ_target)⌉</span> the symbol <span class="math" data-say="c">c</span> is requests a second that a single node can serve, and <span class="math" data-say="rho sub target">ρ_target</span> is the fraction of that you are willing to use. Reading <span class="math" data-say="c">c</span> as a machine count inverts the whole expression and gives an answer in the wrong units, which is a mistake that survives review because the number it produces still looks like a count.</li><li><strong>The constraint that does not bind is your headroom.</strong> Two ceilings give two numbers and you build the larger, so one of them is always slack. That slack is worth reporting: at the defaults the fleet is sized by storage and each node is then running at 41.67% of its request capacity, which says exactly how much traffic growth the shard count already absorbs before anyone has to reshard.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="N sub load, equals the ceiling of lambda sub peak over the quantity c times rho sub target, c is ONE node&#x27;s capacity. N sub storage equals the ceiling of D times RF over per-node, RF copies, not one. N, equals the max of N sub load and N sub storage, the other one is slack. 120000 over the quantity 8000 times 0.65, equals 23.08 goes to 24, 48 terabytes times 3 over 4 terabytes equals 36.00 goes to 36" tabindex="0" role="region" aria-label="Mathematical notation">N_load    = ⌈λ_peak / (c · ρ_target)⌉    c is ONE node&#x27;s capacity
 N_storage = ⌈D · RF / per-node⌉          RF copies, not one
 N         = max(N_load, N_storage)       the other one is slack
@@ -2919,11 +2964,42 @@ N         = max(N_load, N_storage)       the other one is slack
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2991,7 +3067,7 @@ N         = max(N_load, N_storage)       the other one is slack
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Measuring Systems</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Sizing samples and alerts</p>
       <h1>Sampling and Rare Events</h1>
       <p class="lesson-lede">Compute the chance a sampling rate catches at least one event of a rare problem, and the rate a stated confidence requires.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A rate is a per-event probability, and a problem is many events</li><li>Confidence in a rare event costs far more rate than it looks</li><li>Sampling the tail is a good sample and a dishonest average</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The capture probability, the rate it takes, and the mean sampling ruins</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Sampling rate, and capture</span><p>Under <strong>uniform sampling</strong> at rate <span class="math" data-say="s">s</span>, each event is retained independently with probability <span class="math" data-say="s">s</span>. A problem that produces <span class="math" data-say="k">k</span> events is <strong>captured</strong> if at least one of them is retained. The capture probability is</p><p><span class="math" data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span>,</p><p>which depends on <span class="math" data-say="k">k</span> as strongly as it depends on <span class="math" data-say="s">s</span> &mdash; a fact the phrase &ldquo;one per cent sampling&rdquo; hides completely, because it names only one of the two.</p></div><div class="mathblock" data-say="s equals 1 over 100, k equals 10. missed, the quantity 1 minus s, to the power k equals the quantity 99 over 100, to the power 10 equals 0.904382075 and so on, 90.44 percent. caught, 1 minus that, equals 0.095617925 and so on, 9.56 percent. expected captures, s times k equals 0.1. the rule of thumb 1 minus e to the power the quantity negative s times k, equals 1 minus e to the power the quantity negative 0.1, equals 9.516 percent. differs from the exact 9.562 percent by 0.045 percentage points" tabindex="0" role="region" aria-label="Mathematical notation">s = 1/100,  k = 10
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The capture probability, the rate it takes, and the mean sampling ruins</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Sampling rate, and capture</span><p>Under <strong>uniform sampling</strong> at rate <span class="math" data-say="s">s</span>, each event is retained independently with probability <span class="math" data-say="s">s</span>. A problem that produces <span class="math" data-say="k">k</span> events is <strong>captured</strong> if at least one of them is retained. The capture probability is</p><p><span class="math" data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span>,</p><p>which depends on <span class="math" data-say="k">k</span> as strongly as it depends on <span class="math" data-say="s">s</span> &mdash; a fact the phrase &ldquo;one per cent sampling&rdquo; hides completely, because it names only one of the two.</p></div><div class="mathblock" data-say="s equals 1 over 100, k equals 10. missed, the quantity 1 minus s, to the power k equals the quantity 99 over 100, to the power 10 equals 0.904382075 and so on, 90.44 percent. caught, 1 minus that, equals 0.095617925 and so on, 9.56 percent. expected captures, s times k equals 0.1. the rule of thumb 1 minus e to the power the quantity negative s times k, equals 1 minus e to the power the quantity negative 0.1, equals 9.516 percent. differs from the exact 9.562 percent by 0.045 percentage points" tabindex="0" role="region" aria-label="Mathematical notation">s = 1/100,  k = 10
 
 missed   (1 − s)ᵏ = (99/100)¹⁰ = 0.904382075…      90.44%
 caught   1 − that                = 0.095617925…      9.56%
@@ -1399,31 +1443,11 @@ caught   1 − that                = 0.095617925…      9.56%
 expected captures   s·k = 0.1
 
 the rule of thumb 1 − e^(−s·k) = 1 − e^(−0.1) = 9.516%
-differs from the exact 9.562% by 0.045 percentage points</div><p>The last two lines are a small lesson of their own. The <span class="math" data-say="1 minus e to the power the quantity negative s k">1 − e^(−sk)</span> form is an approximation, and the lab computes it by a series that rounds at about <span class="math" data-say="10 to the power negative 13">10⁻¹³</span>; the gap between the two columns is <span class="math" data-say="4.5 times 10 to the power negative 4">4.5 × 10⁻⁴</span>, nine orders of magnitude larger. An approximation and a rounded approximation are different kinds of wrong, and only one of them gets smaller if you compute harder.</p><h3>The rate a stated confidence needs</h3><p>Turn it round: given <span class="math" data-say="k">k</span> and a target confidence <span class="math" data-say="c">c</span>, find the smallest <span class="math" data-say="s">s</span> with <span class="math" data-say="1 minus the quantity 1 minus s, to the power k is at least c">1 − (1 − s)ᵏ ≥ c</span>. The lab scans the thousandths and reports the first that clears the bar, which avoids a logarithm and gives an exact fraction.</p><div class="mathblock" data-say="want, 1 minus the quantity 1 minus s, to the power 10 is at least 95 over 100. the quantity 1 minus s, to the power 10, is at most, 5 over 100. scan s equals 1 over 1000, 2 over 1000, and so on. s equals 250 over 1000, the quantity 3 over 4, to the power 10, equals 0.0563, goes to 94.37 percent, short. s equals 259 over 1000, equals 0.0499 and so on, goes to 95.01 percent, first to clear. so 25.9 percent sampling, against 1 percent, a factor of 26 for a factor of 10. in confidence" tabindex="0" role="region" aria-label="Mathematical notation">want   1 − (1 − s)¹⁰ ≥ 95/100
-       (1 − s)¹⁰      ≤  5/100
-
-scan s = 1/1000, 2/1000, … :
-   s = 250/1000   (3/4)¹⁰  = 0.0563   → 94.37%, short
-   s = 259/1000            = 0.0499…  → 95.01%, first to clear
-
-so 25.9% sampling, against 1% — a factor of 26 for a factor of 10
-in confidence</div><p>Ten per cent sampling, the obvious compromise, gives <span class="math" data-say="1 minus 0.9 to the power 10 equals 65.13 percent">1 − 0.9¹⁰ = 65.13%</span> &mdash; better than a coin toss and not a guarantee of anything. If a problem must be visible whenever it occurs, uniform sampling is the wrong instrument at any rate you can afford, and the answer is to stop sampling uniformly.</p><h3>Tail-biased sampling, and the average it breaks</h3><p>Keep every request slower than a threshold and sample the rest. Now every slow request survives, which is what you wanted, and the retained set over-represents the tail by a factor of <span class="math" data-say="1 over s">1/s</span>. Any statistic computed naively on the retained set is a statistic of a population that does not exist.</p><div class="mathblock" data-say="true traffic, 5 milliseconds times 900, 8 milliseconds times 60, 12 milliseconds times 30, 400 milliseconds times 10. n equals 1000. true mean, the quantity 4500 plus 480 plus 360 plus 4000, over 1000 equals 9340 over 1000. equals 9.34 milliseconds. keep all at least 100 milliseconds, sample the rest at s equals 1 over 100. retained, 10 slow, plus, 990 over 100 equals 9.9 of the fast. naive mean, the quantity 4000 plus 53.4, over 19.9 equals 4053.4 over 19.9 equals 203.69 milliseconds. reweight, divide each retained request by its own keep probability. slow counted times 1, fast counted times 100. the quantity 4000 plus 5340, over the quantity 10 plus 990, equals 9340 over 1000 equals 9.34 milliseconds, exactly" tabindex="0" role="region" aria-label="Mathematical notation">true traffic    5 ms × 900    8 ms × 60    12 ms × 30    400 ms × 10
-                                                        n = 1 000
-true mean       (4 500 + 480 + 360 + 4 000)/1 000 = 9 340/1 000
-                                                  = 9.34 ms
-
-keep all ≥ 100 ms, sample the rest at s = 1/100:
-  retained        10 slow  +  990/100 = 9.9 of the fast
-  naive mean      (4 000 + 53.4)/19.9 = 4 053.4/19.9 = 203.69 ms
-
-reweight: divide each retained request by its own keep probability
-  slow counted ×1        fast counted ×100
-  (4 000 + 5 340)/(10 + 990) = 9 340/1 000 = 9.34 ms     exactly</div><p>The reweighted figure is not an approximation of the true mean: it is the true mean, recovered exactly, because the weights are the reciprocals of known inclusion probabilities. This is the Horvitz&ndash;Thompson estimator, and it is the whole content of &ldquo;remember to divide by the sampling rate&rdquo;.</p><p>It does not rescue everything. A weighted mean is easy; a weighted percentile needs the weights carried into the rank, and a naive percentile of a tail-biased sample is far worse than a naive mean because it is the tail that was over-kept. If your pipeline samples non-uniformly, every statistic downstream of it needs to know the rate, and the rate has to travel with the data.</p><div class="example"><span class="label">Example &middot; Two teams, one trace pipeline</span><p>The platform team samples traces at 1% uniformly, so the trace store holds one request in a hundred and its averages are honest. A customer reports ten slow requests; the probability any of them is in the store is 9.56%, and nobody finds anything.</p><p>They switch to keeping every request over 100 ms plus 1% of the rest. Now all ten are there. A week later a dashboard built on the same store reports a mean latency of 203.69 ms and an incident is declared about a service whose true mean is 9.34 ms. Both problems are the same decision seen from two ends, and the fix is to store the rate alongside the request rather than to choose between the two failures.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>One per cent sampling does not see one per cent of a problem</h2></div><p>The capture probability, the rate it takes, and the mean it ruins</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+differs from the exact 9.562% by 0.045 percentage points</div><p>The last two lines are a small lesson of their own. The <span class="math" data-say="1 minus e to the power the quantity negative s k">1 − e^(−sk)</span> form is an approximation, and the lab computes it by a series that rounds at about <span class="math" data-say="10 to the power negative 13">10⁻¹³</span>; the gap between the two columns is <span class="math" data-say="4.5 times 10 to the power negative 4">4.5 × 10⁻⁴</span>, nine orders of magnitude larger. An approximation and a rounded approximation are different kinds of wrong, and only one of them gets smaller if you compute harder.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>One per cent sampling does not see one per cent of a problem</h2></div><p>The capture probability, the rate it takes, and the mean it ruins</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Sampling and rare events</strong><span>1 &minus; (1&minus;s)&#7503;, the rate a rare event needs, and what tail bias does to a mean</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>capture probability</span><span class="tone-amber"><i class="legend-swatch"></i>your rate</span><span class="tone-purple"><i class="legend-swatch"></i>the rate needed</span></div>
@@ -1431,10 +1455,10 @@ reweight: divide each retained request by its own keep probability
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="saPlot" viewBox="0 0 660 180" role="img" aria-label="Capture probability against sampling rate, with the chosen rate and the rate the target needs both marked."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="saTable"></table></div>
       <div class="status-banner" id="saStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the rate and the problem</h3>
-          <p>The capture probability is exact, printed as a fraction beside the percentage, and the rate needed for a stated confidence is found by scanning the thousandths rather than by a logarithm. The table&rsquo;s third column is the <span class="math" data-say="1 minus e to the power the quantity negative s k">1 − e^(−sk)</span> rule of thumb, kept beside the exact answer so the gap between an approximation and a rounding is visible rather than asserted.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the rate and the problem</h3>
+            <p>The capture probability is exact, printed as a fraction beside the percentage, and the rate needed for a stated confidence is found by scanning the thousandths rather than by a logarithm. The table&rsquo;s third column is the <span class="math" data-say="1 minus e to the power the quantity negative s k">1 − e^(−sk)</span> rule of thumb, kept beside the exact answer so the gap between an approximation and a rounding is visible rather than asserted.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="saRate">Sampling rate s (per mille)</label><span class="range-value" id="saRateOut">10</span></div>
           <input id="saRate" type="range" min="1" max="1000" step="1" value="10" />
@@ -1464,12 +1488,34 @@ reweight: divide each retained request by its own keep probability
           <div class="kpi"><span>True mean of the traffic</span><strong id="saTrue">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="saHint" style="margin:0;">One per cent sampling does not see one per cent of every problem &mdash; it sees a problem of k requests with probability 1 &minus; (1&minus;s)&#7503;, which for small k is almost nothing. Keeping every slow request instead fixes that and breaks the mean, unless each sampled request is counted 1/s times when the mean is taken.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>The rate a stated confidence needs</h3><p>Turn it round: given <span class="math" data-say="k">k</span> and a target confidence <span class="math" data-say="c">c</span>, find the smallest <span class="math" data-say="s">s</span> with <span class="math" data-say="1 minus the quantity 1 minus s, to the power k is at least c">1 − (1 − s)ᵏ ≥ c</span>. The lab scans the thousandths and reports the first that clears the bar, which avoids a logarithm and gives an exact fraction.</p><div class="mathblock" data-say="want, 1 minus the quantity 1 minus s, to the power 10 is at least 95 over 100. the quantity 1 minus s, to the power 10, is at most, 5 over 100. scan s equals 1 over 1000, 2 over 1000, and so on. s equals 250 over 1000, the quantity 3 over 4, to the power 10, equals 0.0563, goes to 94.37 percent, short. s equals 259 over 1000, equals 0.0499 and so on, goes to 95.01 percent, first to clear. so 25.9 percent sampling, against 1 percent, a factor of 26 for a factor of 10. in confidence" tabindex="0" role="region" aria-label="Mathematical notation">want   1 − (1 − s)¹⁰ ≥ 95/100
+       (1 − s)¹⁰      ≤  5/100
+
+scan s = 1/1000, 2/1000, … :
+   s = 250/1000   (3/4)¹⁰  = 0.0563   → 94.37%, short
+   s = 259/1000            = 0.0499…  → 95.01%, first to clear
+
+so 25.9% sampling, against 1% — a factor of 26 for a factor of 10
+in confidence</div><p>Ten per cent sampling, the obvious compromise, gives <span class="math" data-say="1 minus 0.9 to the power 10 equals 65.13 percent">1 − 0.9¹⁰ = 65.13%</span> &mdash; better than a coin toss and not a guarantee of anything. If a problem must be visible whenever it occurs, uniform sampling is the wrong instrument at any rate you can afford, and the answer is to stop sampling uniformly.</p><h3>Tail-biased sampling, and the average it breaks</h3><p>Keep every request slower than a threshold and sample the rest. Now every slow request survives, which is what you wanted, and the retained set over-represents the tail by a factor of <span class="math" data-say="1 over s">1/s</span>. Any statistic computed naively on the retained set is a statistic of a population that does not exist.</p><div class="mathblock" data-say="true traffic, 5 milliseconds times 900, 8 milliseconds times 60, 12 milliseconds times 30, 400 milliseconds times 10. n equals 1000. true mean, the quantity 4500 plus 480 plus 360 plus 4000, over 1000 equals 9340 over 1000. equals 9.34 milliseconds. keep all at least 100 milliseconds, sample the rest at s equals 1 over 100. retained, 10 slow, plus, 990 over 100 equals 9.9 of the fast. naive mean, the quantity 4000 plus 53.4, over 19.9 equals 4053.4 over 19.9 equals 203.69 milliseconds. reweight, divide each retained request by its own keep probability. slow counted times 1, fast counted times 100. the quantity 4000 plus 5340, over the quantity 10 plus 990, equals 9340 over 1000 equals 9.34 milliseconds, exactly" tabindex="0" role="region" aria-label="Mathematical notation">true traffic    5 ms × 900    8 ms × 60    12 ms × 30    400 ms × 10
+                                                        n = 1 000
+true mean       (4 500 + 480 + 360 + 4 000)/1 000 = 9 340/1 000
+                                                  = 9.34 ms
+
+keep all ≥ 100 ms, sample the rest at s = 1/100:
+  retained        10 slow  +  990/100 = 9.9 of the fast
+  naive mean      (4 000 + 53.4)/19.9 = 4 053.4/19.9 = 203.69 ms
+
+reweight: divide each retained request by its own keep probability
+  slow counted ×1        fast counted ×100
+  (4 000 + 5 340)/(10 + 990) = 9 340/1 000 = 9.34 ms     exactly</div><p>The reweighted figure is not an approximation of the true mean: it is the true mean, recovered exactly, because the weights are the reciprocals of known inclusion probabilities. This is the Horvitz&ndash;Thompson estimator, and it is the whole content of &ldquo;remember to divide by the sampling rate&rdquo;.</p><p>It does not rescue everything. A weighted mean is easy; a weighted percentile needs the weights carried into the rank, and a naive percentile of a tail-biased sample is far worse than a naive mean because it is the tail that was over-kept. If your pipeline samples non-uniformly, every statistic downstream of it needs to know the rate, and the rate has to travel with the data.</p><div class="example"><span class="label">Example &middot; Two teams, one trace pipeline</span><p>The platform team samples traces at 1% uniformly, so the trace store holds one request in a hundred and its averages are honest. A customer reports ten slow requests; the probability any of them is in the store is 9.56%, and nobody finds anything.</p><p>They switch to keeping every request over 100 ms plus 1% of the rest. Now all ten are there. A week later a dashboard built on the same store reports a mean latency of 203.69 ms and an incident is declared about a service whose true mean is 9.34 ms. Both problems are the same decision seen from two ends, and the fix is to store the rate alongside the request rather than to choose between the two failures.</p></div></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Choosing a sampling rate for something you must not miss</h2></div><p>The rate is a consequence of two numbers: how many events the problem makes, and how sure you need to be.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Say how many events the problem produces</h3><p><span class="math" data-say="k">k</span> is the number of requests, traces or log lines the thing you are hunting will generate. A ten-request problem and a ten-thousand-request problem need completely different rates, and &ldquo;rare&rdquo; without a number cannot be sized.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute <span data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span> at the rate you have</h3><p>If the answer is under a half, your current pipeline is a coin toss you lose. Quote it as a probability of capture rather than as a sampling percentage, because the two numbers are wildly different and only one of them answers the question.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Solve for the rate your confidence needs</h3><p>Scan <span class="math" data-say="s">s</span> upward until <span class="math" data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span> clears the target. Then price it: the rate multiplies storage and ingest directly, and 25.9% sampling is a quarter of full volume.</p></article><article class="card concept-card"><div class="icon">4</div><h3>If the price is impossible, sample non-uniformly instead of lowering the bar</h3><p>Keep everything that is already interesting &mdash; errors, slow requests, a named customer &mdash; and sample the rest. Capture becomes certain for the events you selected on, at a fraction of the volume.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Carry the rate with the data</h3><p>Every record needs to know the probability it was kept with, or no downstream statistic can be corrected. Reweighting recovers a mean exactly; it can only do so if the weight survived the trip.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Choosing a sampling rate for something you must not miss</h2>
+      <p class="lead-in">The rate is a consequence of two numbers: how many events the problem makes, and how sure you need to be.</p>
+      <ol class="key-ideas method"><li><strong>Say how many events the problem produces.</strong> <span class="math" data-say="k">k</span> is the number of requests, traces or log lines the thing you are hunting will generate. A ten-request problem and a ten-thousand-request problem need completely different rates, and &ldquo;rare&rdquo; without a number cannot be sized.</li><li><strong>Compute <span data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span> at the rate you have.</strong> If the answer is under a half, your current pipeline is a coin toss you lose. Quote it as a probability of capture rather than as a sampling percentage, because the two numbers are wildly different and only one of them answers the question.</li><li><strong>Solve for the rate your confidence needs.</strong> Scan <span class="math" data-say="s">s</span> upward until <span class="math" data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span> clears the target. Then price it: the rate multiplies storage and ingest directly, and 25.9% sampling is a quarter of full volume.</li><li><strong>If the price is impossible, sample non-uniformly instead of lowering the bar.</strong> Keep everything that is already interesting &mdash; errors, slow requests, a named customer &mdash; and sample the rest. Capture becomes certain for the events you selected on, at a fraction of the volume.</li><li><strong>Carry the rate with the data.</strong> Every record needs to know the probability it was kept with, or no downstream statistic can be corrected. Reweighting recovers a mean exactly; it can only do so if the weight survived the trip.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1509,17 +1555,16 @@ PART TWO — THE MEAN
     (4 000 + 5 340) / (10 + 990) = 9 340/1 000 = 9.34 ms</div><p>The two halves pull in opposite directions and that is the shape of the problem. Uniform sampling gives an honest average and cannot find a rare event; tail-biased sampling finds every rare event and gives a dishonest average. Reweighting is what lets you have both, and it costs nothing except carrying one number per record.</p><p>The factor of 21.8 is worth remembering as an order of magnitude rather than a constant: it is roughly the ratio of the tail value to the true mean, scaled by how much of the body was thrown away. Push the sampling rate down and it grows.</p><p>For faded practice, take a problem of <span class="math" data-say="k equals 40">k = 40</span> requests at <span class="math" data-say="s equals 1 percent">s = 1%</span>. The supplied first move is <span class="math" data-say="the quantity 99 over 100, to the power 40">(99/100)⁴⁰</span>. Compute the capture probability, then find the rate that reaches 95% for this larger <span class="math" data-say="k">k</span>, and say in one sentence why the answer is so much smaller than 25.9% even though the confidence target did not change.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the sampling rate as the fraction of a problem you will see</strong><span>&ldquo;One per cent sampling sees one per cent of every problem&rdquo; is true of totals over millions of requests and false of any individual incident. What a rate gives you for a <span class="math" data-say="k">k</span>-event problem is <span class="math" data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span>, and at small <span class="math" data-say="s times k">s·k</span> that is close to <span class="math" data-say="s times k">s·k</span> &mdash; a tenth of one capture, meaning almost always none at all.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Scaling the rate linearly with the confidence you want</strong><span>Going from 9.56% to 95% confidence takes twenty-six times the rate, not ten. The reason is that the confidence is <span class="math" data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span> and the quantity that scales cleanly is <span class="math" data-say="the quantity 1 minus s, to the power k">(1 − s)ᵏ</span>, the probability of missing. Halving the miss probability is what costs a fixed amount of rate, and you need to halve it four times over.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Averaging a deliberately biased sample</strong><span>The moment a pipeline keeps &ldquo;all errors plus 1% of successes&rdquo; or &ldquo;everything over 100 ms&rdquo;, every plain mean and every plain percentile computed downstream describes a population that was never served. The repair is one division per record and it must happen before the aggregation, not after it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a sampling rate is quoted with the capture probability it implies for a stated k.</strong><p>You should be able to compute <span class="math" data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span>, solve it for the rate a confidence requires, say why the answer is nothing like linear, and reweight a non-uniform sample so that its mean is the population mean again.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Keeping everything is the alternative to sampling, and it has its own arithmetic: every distinct combination of label values is a separate series, stored for ever. &ldquo;Metric Cardinality&rdquo; multiplies five ordinary labels into 3 456 000 series and 39.81 GB a day, and then adds one more label that multiplies it by ten thousand.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the sampling rate as the fraction of a problem you will see</strong><span>&ldquo;One per cent sampling sees one per cent of every problem&rdquo; is true of totals over millions of requests and false of any individual incident. What a rate gives you for a <span class="math" data-say="k">k</span>-event problem is <span class="math" data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span>, and at small <span class="math" data-say="s times k">s·k</span> that is close to <span class="math" data-say="s times k">s·k</span> &mdash; a tenth of one capture, meaning almost always none at all.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Scaling the rate linearly with the confidence you want</strong><span>Going from 9.56% to 95% confidence takes twenty-six times the rate, not ten. The reason is that the confidence is <span class="math" data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span> and the quantity that scales cleanly is <span class="math" data-say="the quantity 1 minus s, to the power k">(1 − s)ᵏ</span>, the probability of missing. Halving the miss probability is what costs a fixed amount of rate, and you need to halve it four times over.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Averaging a deliberately biased sample</strong><span>The moment a pipeline keeps &ldquo;all errors plus 1% of successes&rdquo; or &ldquo;everything over 100 ms&rdquo;, every plain mean and every plain percentile computed downstream describes a population that was never served. The repair is one division per record and it must happen before the aggregation, not after it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a sampling rate is quoted with the capture probability it implies for a stated k.</strong><p>You should be able to compute <span class="math" data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span>, solve it for the rate a confidence requires, say why the answer is nothing like linear, and reweight a non-uniform sample so that its mean is the population mean again.</p></div></div><div class="note"><strong>Note:</strong> Keeping everything is the alternative to sampling, and it has its own arithmetic: every distinct combination of label values is a separate series, stored for ever. &ldquo;Metric Cardinality&rdquo; multiplies five ordinary labels into 3 456 000 series and 39.81 GB a day, and then adds one more label that multiplies it by ten thousand.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A rate is a per-event probability, and a problem is many events</summary><p>Sampling at <span class="math" data-say="s">s</span> keeps each request independently with probability <span class="math" data-say="s">s</span>, so a problem that manifests in <span class="math" data-say="k">k</span> requests is missed entirely with probability <span class="math" data-say="the quantity 1 minus s, to the power k">(1 − s)ᵏ</span> and seen at all with probability <span class="math" data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span>. The intuition that a one per cent sample shows one per cent of everything is right about totals and wrong about existence: it gives <span class="math" data-say="s times k equals 0.1">s·k = 0.1</span> expected captures, and the expected number of captures being a tenth is exactly why the probability of any capture is small.</p></details><details class="recall"><summary>Confidence in a rare event costs far more rate than it looks</summary><p>Solving <span class="math" data-say="1 minus the quantity 1 minus s, to the power 10 is at least 0.95">1 − (1 − s)¹⁰ ≥ 0.95</span> gives <span class="math" data-say="s is at least 25.9 percent">s ≥ 25.9%</span>: to move from 9.56% confidence to 95% takes twenty-six times the sampling rate, not ten times. The relationship is exponential in <span class="math" data-say="k">k</span> and nothing like linear in <span class="math" data-say="s">s</span>, which is why &ldquo;let us raise sampling from 1% to 10% and see&rdquo; is a decision that buys 65% confidence and feels like it should buy more.</p></details><details class="recall"><summary>Sampling the tail is a good sample and a dishonest average</summary><p>Keep every request over a threshold and sample the rest at <span class="math" data-say="s">s</span>, and you capture every slow request while shrinking the volume &mdash; the right trade for finding problems. The sampled set is then not representative, so its plain mean is meaningless: on the lab&rsquo;s traffic it reads 203.69 ms against a true 9.34. Dividing each kept request by its own inclusion probability before averaging recovers the true mean exactly.</p></details></div>
+      <h3>Summary</h3>
       <p>Sampling one request in a hundred does not show you one per cent of a problem. A problem made of ten requests is caught with probability <span class="math" data-say="1 minus the quantity 1 minus s, to the power 10">1 − (1 − s)¹⁰</span>, which at one per cent is 9.56% &mdash; so it is missed nine times in ten, and reaching ninety-five per cent confidence takes a rate of 25.9%, not 10%. Sampling the tail instead fixes the capture problem and breaks the average, and the repair is to count each sampled request <span class="math" data-say="1 over s">1/s</span> times.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A rate is a per-event probability, and a problem is many events.</strong> Sampling at <span class="math" data-say="s">s</span> keeps each request independently with probability <span class="math" data-say="s">s</span>, so a problem that manifests in <span class="math" data-say="k">k</span> requests is missed entirely with probability <span class="math" data-say="the quantity 1 minus s, to the power k">(1 − s)ᵏ</span> and seen at all with probability <span class="math" data-say="1 minus the quantity 1 minus s, to the power k">1 − (1 − s)ᵏ</span>. The intuition that a one per cent sample shows one per cent of everything is right about totals and wrong about existence: it gives <span class="math" data-say="s times k equals 0.1">s·k = 0.1</span> expected captures, and the expected number of captures being a tenth is exactly why the probability of any capture is small.</li><li><strong>Confidence in a rare event costs far more rate than it looks.</strong> Solving <span class="math" data-say="1 minus the quantity 1 minus s, to the power 10 is at least 0.95">1 − (1 − s)¹⁰ ≥ 0.95</span> gives <span class="math" data-say="s is at least 25.9 percent">s ≥ 25.9%</span>: to move from 9.56% confidence to 95% takes twenty-six times the sampling rate, not ten times. The relationship is exponential in <span class="math" data-say="k">k</span> and nothing like linear in <span class="math" data-say="s">s</span>, which is why &ldquo;let us raise sampling from 1% to 10% and see&rdquo; is a decision that buys 65% confidence and feels like it should buy more.</li><li><strong>Sampling the tail is a good sample and a dishonest average.</strong> Keep every request over a threshold and sample the rest at <span class="math" data-say="s">s</span>, and you capture every slow request while shrinking the volume &mdash; the right trade for finding problems. The sampled set is then not representative, so its plain mean is meaningless: on the lab&rsquo;s traffic it reads 203.69 ms against a true 9.34. Dividing each kept request by its own inclusion probability before averaging recovers the true mean exactly.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="P of capture is at least 1 of k at rate s equals 1 minus the quantity 1 minus s, to the power k. s equals 1 percent, k equals 10, goes to, 9.56 percent caught, 90.44 percent missed entirely. 95 percent confidence on k equals 10 needs s equals 259 over 1000, 26 times the rate, not 10 times. keep everything over 100 milliseconds and the mean reads 203.69 milliseconds. count each sampled request 1 per second times and it returns to 9.34 milliseconds exactly" tabindex="0" role="region" aria-label="Mathematical notation">P(capture ≥ 1 of k at rate s) = 1 − (1−s)ᵏ
 s = 1%, k = 10   →  9.56% caught,  90.44% missed entirely
 95% confidence on k = 10 needs s = 259/1000 — 26× the rate, not 10×
@@ -2910,11 +2955,42 @@ count each sampled request 1/s times and it returns to 9.34 ms exactly</div><fig
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2982,7 +3058,7 @@ count each sampled request 1/s times and it returns to 9.34 ms exactly</div><fig
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Rational and Radical Expressions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Rational expressions</p>
       <h1>Complex Fractions</h1>
       <p class="lesson-lede">Clear a complex fraction by two methods and preserve restrictions from every level.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The main bar is a division</li><li>Multiplying top and bottom by the LCD is legal</li><li>Exclusions come from every level</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two methods, and why they agree</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Complex fraction</span><p>A <strong>complex fraction</strong> is a rational expression in which the numerator, the denominator, or both, themselves contain fractions. <span class="math" data-say="the quantity 1 over x minus 1 over 3, over the quantity x minus 3">(1/x − 1/3)/(x − 3)</span> and <span class="math" data-say="the quantity 1 over x plus 1 over y, over the quantity 1 over x minus 1 over y">(1/x + 1/y)/(1/x − 1/y)</span> are typical.</p></div><p><strong>Method 1</strong> treats the bar as what it is. Combine the numerator into a single fraction using “Adding and Subtracting Rational Expressions”, do the same to the denominator, and then divide the one by the other using “Multiplying and Dividing Rational Expressions”. It always works and it is often long.</p><p><strong>Method 2</strong> removes the small fractions before they can cause trouble. Find the LCD of every small denominator that appears anywhere in the expression, and multiply both the whole numerator and the whole denominator by it.</p><div class="thm"><span class="label">Theorem &middot; Why method 2 is legal</span><p>For any non-zero expression <span class="math" data-say="M">M</span>, <span class="math" data-say="A over B equals AM over BM">(A)/(B) = (AM)/(BM)</span>. Choosing <span class="math" data-say="M">M</span> to be the LCD of the small denominators makes <span class="math" data-say="AM">AM</span> and <span class="math" data-say="BM">BM</span> free of fractions, because each small denominator divides <span class="math" data-say="M">M</span>.</p></div><div class="example"><span class="label">Example &middot; The same expression, both ways</span><p>Take <span class="math" data-say="the quantity 1 over x minus 1 over 3, over the quantity x minus 3">(1/x − 1/3)/(x − 3)</span>. Method 1: the top is <span class="math" data-say="the quantity 3 minus x, over 3 x">(3 − x)/(3x)</span>, so the whole thing is <span class="math" data-say="the quantity 3 minus x, over 3 x divided by the quantity x minus 3, equals the quantity 3 minus x, over the quantity 3 x times the quantity x minus 3">(3 − x)/(3x) ÷ (x − 3) = (3 − x)/(3x(x − 3))</span>. Method 2: multiply top and bottom by <span class="math" data-say="3 x">3x</span> to get <span class="math" data-say="the quantity 3 minus x, over the quantity 3 x times the quantity x minus 3">(3 − x)/(3x(x − 3))</span> directly. Same expression, one step fewer.</p></div><p>Either way the finish is the sign observation from “Simplifying Rational Expressions”: <span class="math" data-say="3 minus x equals negative the quantity x minus 3">3 − x = −(x − 3)</span>, so the quotient is <span class="math" data-say="negative the quantity x minus 3, over the quantity 3 x times the quantity x minus 3">−(x − 3)/(3x(x − 3))</span>, which reduces to <span class="math" data-say="negative 1 over 3 x">−1/(3x)</span>.</p><p>That answer is startlingly simple, and it is where the domain discipline pays. <span class="math" data-say="negative 1 over 3 x">−1/(3x)</span> looks like it excludes only <span class="math" data-say="x equals 0">x = 0</span>. The original excluded <span class="math" data-say="x equals 0">x = 0</span>, because of <span class="math" data-say="1 over x">1/x</span>, and <span class="math" data-say="x equals 3">x = 3</span>, because the main denominator <span class="math" data-say="x minus 3">x − 3</span> was zero there. Both conditions belong to the answer.</p><div class="example"><span class="label">Example &middot; Two variables</span><p><span class="math" data-say="the quantity 1 over x plus 1 over y, over the quantity 1 over x minus 1 over y">(1/x + 1/y)/(1/x − 1/y)</span>. The LCD of the small denominators is <span class="math" data-say="xy">xy</span>. Multiplying top and bottom by it gives <span class="math" data-say="the quantity y plus x, over the quantity y minus x">(y + x)/(y − x)</span>, valid when <span class="math" data-say="x is not equal to 0">x ≠ 0</span>, <span class="math" data-say="y is not equal to 0">y ≠ 0</span> and <span class="math" data-say="x is not equal to y">x ≠ y</span> &mdash; the last because the original lower half is zero when <span class="math" data-say="1 over x equals 1 over y">1/x = 1/y</span>.</p></div><p>That third condition is the one worth pausing on. It does not come from a denominator at all; it comes from the requirement that the thing you are dividing by is not zero. In a complex fraction the divisor is an expression, so you have to ask when that expression vanishes.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Complex fractions</h2></div><p>Two methods, computed separately, meeting at the same answer</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two methods, and why they agree</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Complex fraction</span><p>A <strong>complex fraction</strong> is a rational expression in which the numerator, the denominator, or both, themselves contain fractions. <span class="math" data-say="the quantity 1 over x minus 1 over 3, over the quantity x minus 3">(1/x − 1/3)/(x − 3)</span> and <span class="math" data-say="the quantity 1 over x plus 1 over y, over the quantity 1 over x minus 1 over y">(1/x + 1/y)/(1/x − 1/y)</span> are typical.</p></div><p><strong>Method 1</strong> treats the bar as what it is. Combine the numerator into a single fraction using “Adding and Subtracting Rational Expressions”, do the same to the denominator, and then divide the one by the other using “Multiplying and Dividing Rational Expressions”. It always works and it is often long.</p><p><strong>Method 2</strong> removes the small fractions before they can cause trouble. Find the LCD of every small denominator that appears anywhere in the expression, and multiply both the whole numerator and the whole denominator by it.</p><div class="thm"><span class="label">Theorem &middot; Why method 2 is legal</span><p>For any non-zero expression <span class="math" data-say="M">M</span>, <span class="math" data-say="A over B equals AM over BM">(A)/(B) = (AM)/(BM)</span>. Choosing <span class="math" data-say="M">M</span> to be the LCD of the small denominators makes <span class="math" data-say="AM">AM</span> and <span class="math" data-say="BM">BM</span> free of fractions, because each small denominator divides <span class="math" data-say="M">M</span>.</p></div><div class="example"><span class="label">Example &middot; The same expression, both ways</span><p>Take <span class="math" data-say="the quantity 1 over x minus 1 over 3, over the quantity x minus 3">(1/x − 1/3)/(x − 3)</span>. Method 1: the top is <span class="math" data-say="the quantity 3 minus x, over 3 x">(3 − x)/(3x)</span>, so the whole thing is <span class="math" data-say="the quantity 3 minus x, over 3 x divided by the quantity x minus 3, equals the quantity 3 minus x, over the quantity 3 x times the quantity x minus 3">(3 − x)/(3x) ÷ (x − 3) = (3 − x)/(3x(x − 3))</span>. Method 2: multiply top and bottom by <span class="math" data-say="3 x">3x</span> to get <span class="math" data-say="the quantity 3 minus x, over the quantity 3 x times the quantity x minus 3">(3 − x)/(3x(x − 3))</span> directly. Same expression, one step fewer.</p></div><p>Either way the finish is the sign observation from “Simplifying Rational Expressions”: <span class="math" data-say="3 minus x equals negative the quantity x minus 3">3 − x = −(x − 3)</span>, so the quotient is <span class="math" data-say="negative the quantity x minus 3, over the quantity 3 x times the quantity x minus 3">−(x − 3)/(3x(x − 3))</span>, which reduces to <span class="math" data-say="negative 1 over 3 x">−1/(3x)</span>.</p><p>That answer is startlingly simple, and it is where the domain discipline pays. <span class="math" data-say="negative 1 over 3 x">−1/(3x)</span> looks like it excludes only <span class="math" data-say="x equals 0">x = 0</span>. The original excluded <span class="math" data-say="x equals 0">x = 0</span>, because of <span class="math" data-say="1 over x">1/x</span>, and <span class="math" data-say="x equals 3">x = 3</span>, because the main denominator <span class="math" data-say="x minus 3">x − 3</span> was zero there. Both conditions belong to the answer.</p><div class="example"><span class="label">Example &middot; Two variables</span><p><span class="math" data-say="the quantity 1 over x plus 1 over y, over the quantity 1 over x minus 1 over y">(1/x + 1/y)/(1/x − 1/y)</span>. The LCD of the small denominators is <span class="math" data-say="xy">xy</span>. Multiplying top and bottom by it gives <span class="math" data-say="the quantity y plus x, over the quantity y minus x">(y + x)/(y − x)</span>, valid when <span class="math" data-say="x is not equal to 0">x ≠ 0</span>, <span class="math" data-say="y is not equal to 0">y ≠ 0</span> and <span class="math" data-say="x is not equal to y">x ≠ y</span> &mdash; the last because the original lower half is zero when <span class="math" data-say="1 over x equals 1 over y">1/x = 1/y</span>.</p></div><p>That third condition is the one worth pausing on. It does not come from a denominator at all; it comes from the requirement that the thing you are dividing by is not zero. In a complex fraction the divisor is an expression, so you have to ask when that expression vanishes.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Complex fractions</h2></div><p>Two methods, computed separately, meeting at the same answer</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="rfTitle">Rational expression</strong><span id="rfSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>exact rational arithmetic</span><span class="tone-amber"><i class="legend-swatch"></i>what the answer hides</span></div>
       </div>
       <div id="rfWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="rfStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Both methods, side by side</h3>
-          <p>The lab clears the same complex fraction twice &mdash; combine-then-divide, and multiply-through-by-the-LCD &mdash; and prints the two results for comparison.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Both methods, side by side</h3>
+            <p>The lab clears the same complex fraction twice &mdash; combine-then-divide, and multiply-through-by-the-LCD &mdash; and prints the two results for comparison.</p>
         <div class="field" id="rfFieldPreset">
           <label for="rfPreset">Worked example</label>
           <select id="rfPreset"><option value="(1 + 2/x)/(1 - 4/x^2)||mul">(1 + 2/x)/(1 - 4/x^2)</option><option value="(1/x - 1/2)/(x - 2)||mul">(1/x - 1/2)/(x - 2)</option><option value="(1/(x + 1) + 1)/(1/(x + 1) - 1)||mul">(1/(x + 1) + 1)/(1/(x + 1) - 1)</option><option value="(1/x)/(1/x - 1/2)||mul">(1/x)/(1/x - 1/2)</option><option value="(1 + 1/x)/(1 + 1/x)||mul">(1 + 1/x)/(1 + 1/x)        equal to 1, and undefined twice</option><option value="(1/2 + 1/3)/(1/4)||mul">(1/2 + 1/3)/(1/4)          the same method, on numbers</option></select>
@@ -1421,12 +1464,14 @@
           <div class="kpi"><span id="rfK3Lab">&mdash;</span><strong id="rfK3">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="rfHint" style="margin:0;">Type any rational expression in <code>x</code>: <code>2x</code>, <code>(x+1)(x-2)</code> and <code>1/x + 1/2</code> all parse. Every coefficient below is an exact fraction, and every excluded value is found from the denominators as you wrote them.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Clearing a complex fraction</h2></div><p>Method 2, which is the one to reach for by default.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find every small denominator</h3><p>Look in the numerator and the denominator both. In <span class="math" data-say="the quantity 1 over x minus 1 over 3, over the quantity x minus 3">(1/x − 1/3)/(x − 3)</span> they are <span class="math" data-say="x">x</span> and <span class="math" data-say="3">3</span>; the <span class="math" data-say="x minus 3">x − 3</span> is the main denominator, not a small one.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Take their LCD and record the exclusions</h3><p>Here the LCD is <span class="math" data-say="3 x">3x</span>. Every small denominator's zeros are excluded, and so are the zeros of the whole lower half.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply the whole top and the whole bottom by it</h3><p>Both halves, in their entirety &mdash; brackets around each before you distribute. Every small fraction disappears in this one step.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Simplify what is left</h3><p>You now have an ordinary rational expression. Factor, cancel, and attach the exclusions from step two.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Clearing a complex fraction</h2>
+      <p class="lead-in">Method 2, which is the one to reach for by default.</p>
+      <ol class="key-ideas method"><li><strong>Find every small denominator.</strong> Look in the numerator and the denominator both. In <span class="math" data-say="the quantity 1 over x minus 1 over 3, over the quantity x minus 3">(1/x − 1/3)/(x − 3)</span> they are <span class="math" data-say="x">x</span> and <span class="math" data-say="3">3</span>; the <span class="math" data-say="x minus 3">x − 3</span> is the main denominator, not a small one.</li><li><strong>Take their LCD and record the exclusions.</strong> Here the LCD is <span class="math" data-say="3 x">3x</span>. Every small denominator's zeros are excluded, and so are the zeros of the whole lower half.</li><li><strong>Multiply the whole top and the whole bottom by it.</strong> Both halves, in their entirety &mdash; brackets around each before you distribute. Every small fraction disappears in this one step.</li><li><strong>Simplify what is left.</strong> You now have an ordinary rational expression. Factor, cancel, and attach the exclusions from step two.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1454,17 +1499,16 @@ check at x = 1 :   (1 − 1/3)/(1 − 3)  =  (2/3)/(−2)  =  −1/3
                    −1/(3·1)  =  −1/3       ✓</div><p>The answer is a single small fraction with no memory of where it came from. Nothing in <span class="math" data-say="negative 1 over 3 x">−1/(3x)</span> suggests that <span class="math" data-say="x equals 3">x = 3</span> is forbidden, and it is: at <span class="math" data-say="x equals 3">x = 3</span> the original asks you to divide by <span class="math" data-say="0">0</span>.</p><p>For a faded two-method check, simplify <span class="math" data-say="the quantity 1 over x plus 1 over 2, over the quantity 1 over x minus 1 over 2">(1/x + 1/2)/(1/x − 1/2)</span>. The supplied LCD of the small denominators is <span class="math" data-say="2 x">2x</span>. First multiply the whole top and bottom by it; then restart by combining each half and dividing. Both routes should give <span class="math" data-say="the quantity x plus 2, over the quantity 2 minus x">(x + 2)/(2 − x)</span>, with <span class="math" data-say="x is not equal to 0, 2">x ≠ 0, 2</span>. If <span class="math" data-say="2">2</span> is missing, you checked the small denominators but never asked when the entire lower half equals zero.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Multiplying only part of the numerator by the LCD</strong><span>The LCD multiplies the whole of the top and the whole of the bottom. Bracket each half first; <span class="math" data-say="3 x times the quantity 1 over x minus 1 over 3">3x·(1/x − 1/3)</span> is <span class="math" data-say="3 minus x">3 − x</span>, not <span class="math" data-say="3 minus 1 over 3">3 − 1/3</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Losing the main denominator&#x27;s exclusion</strong><span>In <span class="math" data-say="the quantity 1 over x minus 1 over 3, over the quantity x minus 3">(1/x − 1/3)/(x − 3)</span> the value <span class="math" data-say="x equals 3">x = 3</span> is excluded even though <span class="math" data-say="x minus 3">x − 3</span> never appears in the final <span class="math" data-say="negative 1 over 3 x">−1/(3x)</span>. It was the divisor.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting that the lower half can be zero without a denominator being zero</strong><span><span class="math" data-say="1 over x minus 1 over y">1/x − 1/y</span> is zero when <span class="math" data-say="x equals y">x = y</span>, and dividing by it is undefined there. The rule is about the divisor's value, not about its denominators.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can do one both ways and get the same thing twice.</strong><p>Take any complex fraction, clear it by combining and dividing, then clear it again by multiplying through by the LCD, and confirm the two answers agree. Being able to check yourself without a solution key is the point; the two methods are independent.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab runs both methods on whatever you type and prints the results side by side. They were computed separately, so agreement is evidence rather than decoration &mdash; and where the answers look different, they are the same expression written two ways, which is itself worth seeing.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Multiplying only part of the numerator by the LCD</strong><span>The LCD multiplies the whole of the top and the whole of the bottom. Bracket each half first; <span class="math" data-say="3 x times the quantity 1 over x minus 1 over 3">3x·(1/x − 1/3)</span> is <span class="math" data-say="3 minus x">3 − x</span>, not <span class="math" data-say="3 minus 1 over 3">3 − 1/3</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Losing the main denominator&#x27;s exclusion</strong><span>In <span class="math" data-say="the quantity 1 over x minus 1 over 3, over the quantity x minus 3">(1/x − 1/3)/(x − 3)</span> the value <span class="math" data-say="x equals 3">x = 3</span> is excluded even though <span class="math" data-say="x minus 3">x − 3</span> never appears in the final <span class="math" data-say="negative 1 over 3 x">−1/(3x)</span>. It was the divisor.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting that the lower half can be zero without a denominator being zero</strong><span><span class="math" data-say="1 over x minus 1 over y">1/x − 1/y</span> is zero when <span class="math" data-say="x equals y">x = y</span>, and dividing by it is undefined there. The rule is about the divisor's value, not about its denominators.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can do one both ways and get the same thing twice.</strong><p>Take any complex fraction, clear it by combining and dividing, then clear it again by multiplying through by the LCD, and confirm the two answers agree. Being able to check yourself without a solution key is the point; the two methods are independent.</p></div></div><div class="note"><strong>Note:</strong> The lab runs both methods on whatever you type and prints the results side by side. They were computed separately, so agreement is evidence rather than decoration &mdash; and where the answers look different, they are the same expression written two ways, which is itself worth seeing.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The main bar is a division</summary><p><span class="math" data-say="A over B">(A)/(B)</span> means <span class="math" data-say="A divided by B">A ÷ B</span> no matter how complicated <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> are. Once each is a single fraction, “Multiplying and Dividing Rational Expressions” finishes the job by flipping <span class="math" data-say="B">B</span>.</p></details><details class="recall"><summary>Multiplying top and bottom by the LCD is legal</summary><p>It is the fundamental principle of “Simplifying Rational Expressions” again: multiplying both parts by the same non-zero expression leaves the value unchanged, and choosing the LCD clears every small denominator at once.</p></details><details class="recall"><summary>Exclusions come from every level</summary><p>The small denominators, the main denominator, and any value making the whole lower half zero are all excluded. The simplified answer typically shows none of them.</p></details></div>
+      <h3>Summary</h3>
       <p>Nothing new is needed here &mdash; only “Multiplying and Dividing Rational Expressions” and “Adding and Subtracting Rational Expressions” applied in one of two orders. The second order, multiplying through by the LCD of the small denominators, is usually much shorter, and both must agree.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The main bar is a division.</strong> <span class="math" data-say="A over B">(A)/(B)</span> means <span class="math" data-say="A divided by B">A ÷ B</span> no matter how complicated <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> are. Once each is a single fraction, “Multiplying and Dividing Rational Expressions” finishes the job by flipping <span class="math" data-say="B">B</span>.</li><li><strong>Multiplying top and bottom by the LCD is legal.</strong> It is the fundamental principle of “Simplifying Rational Expressions” again: multiplying both parts by the same non-zero expression leaves the value unchanged, and choosing the LCD clears every small denominator at once.</li><li><strong>Exclusions come from every level.</strong> The small denominators, the main denominator, and any value making the whole lower half zero are all excluded. The simplified answer typically shows none of them.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="method 1, combine the top, combine the bottom, then divide. method 2, multiply top and bottom by the LCD of the small parts. the quantity 1 over x minus 1 over 3, over the quantity x minus 3, equals, negative 1 over 3 x. every small denominator contributes its own exclusion" tabindex="0" role="region" aria-label="Mathematical notation">method 1:  combine the top, combine the bottom, then divide
 method 2:  multiply top and bottom by the LCD of the small parts
 (1/x − 1/3)/(x − 3)  =  −1/(3x)
@@ -3901,11 +3945,42 @@ every small denominator contributes its own exclusion</div><figcaption>One expre
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3973,7 +4048,7 @@ every small denominator contributes its own exclusion</div><figcaption>One expre
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Integer Programming</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Modelling with binaries</p>
       <h1>Knapsack and Set Covering</h1>
       <p class="lesson-lede">Build both atoms from data, solve both relaxations, and say what each one made fractional.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>One capacity, chosen items</li><li>Every requirement covered by some chosen set</li><li>Each relaxation goes fractional in its own way</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The two atoms, and the shape of each relaxation</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; The 0/1 knapsack model</span><p>Items <span class="math" data-say="1, and so on, n">1, …, n</span> with values <span class="math" data-say="v sub j">v_j</span> and weights <span class="math" data-say="w sub j">w_j</span>, and a capacity <span class="math" data-say="W">W</span>. Choose <span class="math" data-say="y sub j in the set 0, 1">y_j ∈ {0, 1}</span> to maximise <span class="math" data-say="the sum of v sub j y sub j">Σ v_j y_j</span> subject to <span class="math" data-say="the sum of w sub j y sub j is at most W">Σ w_j y_j ≤ W</span>. The name is the picture: one bag, a weight limit, and each item either in or out.</p></div><div class="defbox"><span class="label">Definition &middot; The set-covering model</span><p>Requirements <span class="math" data-say="1, and so on, m">1, …, m</span> and sets <span class="math" data-say="1, and so on, n">1, …, n</span> with costs <span class="math" data-say="c sub j">c_j</span>, where set <span class="math" data-say="j">j</span> covers some of the requirements. Choose <span class="math" data-say="y sub j in the set 0, 1">y_j ∈ {0, 1}</span> to minimise <span class="math" data-say="the sum of c sub j y sub j">Σ c_j y_j</span> subject to, for each requirement <span class="math" data-say="i">i</span>, the row <span class="math" data-say="the sum of y sub j is at least 1">Σ y_j ≥ 1</span> taken over the sets that cover <span class="math" data-say="i">i</span>. Replacing that <span class="math" data-say="greater-than-or-equal">≥</span> by <span class="math" data-say="equals sign">=</span> gives <strong>set partitioning</strong>, which is a different problem.</p></div><p>Take three items worth <span class="math" data-say="60">60</span>, <span class="math" data-say="100">100</span> and <span class="math" data-say="120">120</span> weighing <span class="math" data-say="10">10</span>, <span class="math" data-say="20">20</span> and <span class="math" data-say="30">30</span>, with a capacity of <span class="math" data-say="50">50</span>. Their values per unit weight are <span class="math" data-say="6">6</span>, <span class="math" data-say="5">5</span> and <span class="math" data-say="4">4</span>, so the relaxation loads the first two whole &mdash; thirty units of weight, <span class="math" data-say="160">160</span> of value &mdash; and then takes <span class="math" data-say="2 over 3">2/3</span> of the third to fill the bag, for <span class="math" data-say="240">240</span>. That is the bound.</p><div class="example"><span class="label">Example &middot; Three answers on one instance</span><p>The relaxation is worth <span class="math" data-say="240">240</span> and gets there by splitting the third item. Greed by value per weight takes the first two, cannot fit the third in the remaining twenty units, and stops at <span class="math" data-say="160">160</span>. The best whole choice, found by trying all eight subsets, is the second and third items together: weight exactly <span class="math" data-say="50">50</span>, value <span class="math" data-say="220">220</span>. So <span class="math" data-say="240 is at least 220 is at least 160">240 ≥ 220 ≥ 160</span>, and the middle number is the only one that is an answer.</p></div><p>Discrete Mathematics&rsquo; &ldquo;Greedy Algorithms&rdquo; closes by showing the value-per-weight rule optimal for the fractional problem and defeated by the 0/1 version, which is precisely the gap between <span class="math" data-say="240">240</span> and <span class="math" data-say="160">160</span> here. The rule is not a heuristic for this model; it is the exact solution to the relaxation, and the two facts are easy to confuse because the arithmetic is the same.</p><h3>The covering relaxation spreads halves</h3><p>Five districts in a ring, each reachable from two of five depots, every depot costing <span class="math" data-say="2">2</span>. Each row says “at least one of these two depots”. The relaxation satisfies all five rows by opening every depot to the extent of <span class="math" data-say="1 over 2">1/2</span>, and pays <span class="math" data-say="5">5</span>. No whole choice does: three depots are needed, costing <span class="math" data-say="6">6</span>. The <span class="math" data-say="1">1</span> between them is the price of not being able to open half a depot.</p><div class="example"><span class="label">Example &middot; Covering is not partitioning</span><p>On that same ring, require each district to be covered <em>exactly</em> once instead of at least once. Nothing in the data changed and only the relation did, and now there is no feasible choice of depots at all: an odd ring cannot be partitioned by adjacent pairs. The relaxation of the partitioning version is still solvable and still worth <span class="math" data-say="5">5</span>, which is the cruellest part &mdash; a relaxation being feasible says nothing about whether the integer problem is.</p></div><p>Both atoms above were solved exactly by enumerating every subset, and that is where this lesson's method ends: <span class="math" data-say="2 to the power 12">2¹²</span> is <span class="math" data-say="4096">4096</span>, which is instant, and <span class="math" data-say="2 to the power 50">2⁵⁰</span> is not a number of subsets anybody enumerates. What is this lesson's own is the pair of models and the shape of their relaxations. Four results about them are used here and proved elsewhere, each by its owner.</p><ul><li>The exact method for 0/1 knapsack beyond enumeration is a pseudo-polynomial dynamic programme &mdash; the Algorithms path, &ldquo;0/1 Knapsack and Pseudo-Polynomial Time&rdquo;.</li><li>The approximation with a proved ratio is the fully polynomial scheme of &ldquo;A Fully Polynomial Approximation for Knapsack&rdquo;, in the same subject.</li><li>The <span class="math" data-say="the natural log of n">ln n</span> ratio for greedy set cover is &ldquo;Greedy Set Cover and the ln n Ratio&rdquo;, which proves what greed costs in the worst case rather than measuring it on one instance.</li><li>Why both problems are hard in the technical sense belongs to Discrete Mathematics&rsquo; &ldquo;P, NP and NP-Completeness&rdquo;, which is also where the word “hard” acquires its meaning.</li></ul><p>None of those four is derived here, and none of them is needed to write the models down. What is needed is the reflex of solving the relaxation first and looking at what it made fractional, because the split item and the spread halves each point at the row doing the work &mdash; which is the variable to branch on when the search lesson arrives.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Knapsack and set covering</h2></div><p>Two atoms of binary modelling, and the characteristic shape of each relaxation</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The two atoms, and the shape of each relaxation</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The 0/1 knapsack model</span><p>Items <span class="math" data-say="1, and so on, n">1, …, n</span> with values <span class="math" data-say="v sub j">v_j</span> and weights <span class="math" data-say="w sub j">w_j</span>, and a capacity <span class="math" data-say="W">W</span>. Choose <span class="math" data-say="y sub j in the set 0, 1">y_j ∈ {0, 1}</span> to maximise <span class="math" data-say="the sum of v sub j y sub j">Σ v_j y_j</span> subject to <span class="math" data-say="the sum of w sub j y sub j is at most W">Σ w_j y_j ≤ W</span>. The name is the picture: one bag, a weight limit, and each item either in or out.</p></div><div class="defbox"><span class="label">Definition &middot; The set-covering model</span><p>Requirements <span class="math" data-say="1, and so on, m">1, …, m</span> and sets <span class="math" data-say="1, and so on, n">1, …, n</span> with costs <span class="math" data-say="c sub j">c_j</span>, where set <span class="math" data-say="j">j</span> covers some of the requirements. Choose <span class="math" data-say="y sub j in the set 0, 1">y_j ∈ {0, 1}</span> to minimise <span class="math" data-say="the sum of c sub j y sub j">Σ c_j y_j</span> subject to, for each requirement <span class="math" data-say="i">i</span>, the row <span class="math" data-say="the sum of y sub j is at least 1">Σ y_j ≥ 1</span> taken over the sets that cover <span class="math" data-say="i">i</span>. Replacing that <span class="math" data-say="greater-than-or-equal">≥</span> by <span class="math" data-say="equals sign">=</span> gives <strong>set partitioning</strong>, which is a different problem.</p></div><p>Take three items worth <span class="math" data-say="60">60</span>, <span class="math" data-say="100">100</span> and <span class="math" data-say="120">120</span> weighing <span class="math" data-say="10">10</span>, <span class="math" data-say="20">20</span> and <span class="math" data-say="30">30</span>, with a capacity of <span class="math" data-say="50">50</span>. Their values per unit weight are <span class="math" data-say="6">6</span>, <span class="math" data-say="5">5</span> and <span class="math" data-say="4">4</span>, so the relaxation loads the first two whole &mdash; thirty units of weight, <span class="math" data-say="160">160</span> of value &mdash; and then takes <span class="math" data-say="2 over 3">2/3</span> of the third to fill the bag, for <span class="math" data-say="240">240</span>. That is the bound.</p><div class="example"><span class="label">Example &middot; Three answers on one instance</span><p>The relaxation is worth <span class="math" data-say="240">240</span> and gets there by splitting the third item. Greed by value per weight takes the first two, cannot fit the third in the remaining twenty units, and stops at <span class="math" data-say="160">160</span>. The best whole choice, found by trying all eight subsets, is the second and third items together: weight exactly <span class="math" data-say="50">50</span>, value <span class="math" data-say="220">220</span>. So <span class="math" data-say="240 is at least 220 is at least 160">240 ≥ 220 ≥ 160</span>, and the middle number is the only one that is an answer.</p></div><p>Discrete Mathematics&rsquo; &ldquo;Greedy Algorithms&rdquo; closes by showing the value-per-weight rule optimal for the fractional problem and defeated by the 0/1 version, which is precisely the gap between <span class="math" data-say="240">240</span> and <span class="math" data-say="160">160</span> here. The rule is not a heuristic for this model; it is the exact solution to the relaxation, and the two facts are easy to confuse because the arithmetic is the same.</p><h3>The covering relaxation spreads halves</h3><p>Five districts in a ring, each reachable from two of five depots, every depot costing <span class="math" data-say="2">2</span>. Each row says “at least one of these two depots”. The relaxation satisfies all five rows by opening every depot to the extent of <span class="math" data-say="1 over 2">1/2</span>, and pays <span class="math" data-say="5">5</span>. No whole choice does: three depots are needed, costing <span class="math" data-say="6">6</span>. The <span class="math" data-say="1">1</span> between them is the price of not being able to open half a depot.</p><div class="example"><span class="label">Example &middot; Covering is not partitioning</span><p>On that same ring, require each district to be covered <em>exactly</em> once instead of at least once. Nothing in the data changed and only the relation did, and now there is no feasible choice of depots at all: an odd ring cannot be partitioned by adjacent pairs. The relaxation of the partitioning version is still solvable and still worth <span class="math" data-say="5">5</span>, which is the cruellest part &mdash; a relaxation being feasible says nothing about whether the integer problem is.</p></div><p>Both atoms above were solved exactly by enumerating every subset, and that is where this lesson's method ends: <span class="math" data-say="2 to the power 12">2¹²</span> is <span class="math" data-say="4096">4096</span>, which is instant, and <span class="math" data-say="2 to the power 50">2⁵⁰</span> is not a number of subsets anybody enumerates. What is this lesson's own is the pair of models and the shape of their relaxations. Four results about them are used here and proved elsewhere, each by its owner.</p><ul><li>The exact method for 0/1 knapsack beyond enumeration is a pseudo-polynomial dynamic programme &mdash; the Algorithms path, &ldquo;0/1 Knapsack and Pseudo-Polynomial Time&rdquo;.</li><li>The approximation with a proved ratio is the fully polynomial scheme of &ldquo;A Fully Polynomial Approximation for Knapsack&rdquo;, in the same subject.</li><li>The <span class="math" data-say="the natural log of n">ln n</span> ratio for greedy set cover is &ldquo;Greedy Set Cover and the ln n Ratio&rdquo;, which proves what greed costs in the worst case rather than measuring it on one instance.</li><li>Why both problems are hard in the technical sense belongs to Discrete Mathematics&rsquo; &ldquo;P, NP and NP-Completeness&rdquo;, which is also where the word “hard” acquires its meaning.</li></ul><p>None of those four is derived here, and none of them is needed to write the models down. What is needed is the reflex of solving the relaxation first and looking at what it made fractional, because the split item and the spread halves each point at the row doing the work &mdash; which is the variable to branch on when the search lesson arrives.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Knapsack and set covering</h2></div><p>Two atoms of binary modelling, and the characteristic shape of each relaxation</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>One capacity, three answers</strong><span>a relaxation is a bound, greed is a guess, and only one of the three is the optimum</span></div>
         <div class="inline-legend"><span class="tone-amber"><i class="legend-swatch"></i>the relaxation</span><span class="tone-cyan"><i class="legend-swatch"></i>greed</span><span class="tone-green"><i class="legend-swatch"></i>the exact optimum</span></div>
@@ -1404,10 +1447,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="knBars" viewBox="0 0 660 130" role="img" aria-label="The relaxation, the greedy answer and the exact optimum drawn against each other."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="knTable"></table></div>
       <div class="status-banner" id="knStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Edit the instance; the bound, the guess and the optimum all move</h3>
-          <p>Every number is recomputed from the items or the incidence rows as typed: the relaxation by simplex, greed by the density rule, the optimum by enumerating every subset. Switch the model to the covering instance and then change “at least once” to “exactly once”.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Edit the instance; the bound, the guess and the optimum all move</h3>
+            <p>Every number is recomputed from the items or the incidence rows as typed: the relaxation by simplex, greed by the density rule, the optimum by enumerating every subset. Switch the model to the covering instance and then change “at least once” to “exactly once”.</p>
         <div class="field">
           <label for="knView">Model</label>
           <select id="knView"><option value="knapsack" selected>one capacity, chosen items</option><option value="cover">every requirement covered by a chosen set</option></select>
@@ -1441,12 +1484,14 @@
           <div class="kpi"><span>Subsets enumerated</span><strong id="knCount">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="knHint" style="margin:0;">Edit the items as value,weight pairs separated by semicolons, or the incidence rows as 0/1 lists. The relaxation, greed and the exact optimum are all recomputed from what is typed; nothing here is a stored answer.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Building either atom from data</h2></div><p>The same five steps for both models. The fourth is where a relaxation earns its keep.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide what one binary stands for</h3><p>An item taken, or a set opened. If the answer is “how many of them”, this is not one of these two models and a binary is the wrong variable.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the rows, one per constraint you actually have</h3><p>A knapsack has exactly one row, and a second row means a second model. A covering problem has one row per requirement, and each row lists the sets that cover it &mdash; which is read straight off the incidence table.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Solve the relaxation and look at what is fractional</h3><p>One split item, or a scatter of halves. This is the diagnostic step: it tells you which row is binding and, later, which variable to branch on.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Get a whole answer, and a second whole answer</h3><p>Greed by value per weight, or greed by cost per newly covered requirement, gives one. Enumeration at this size gives the best one. Two whole numbers are worth more than one, because their difference is what greed cost.</p></article><article class="card concept-card"><div class="icon">5</div><h3>State the bound relation</h3><p><span class="math" data-say="z sub LP is at least z sub IP is at least z sub greedy">z_LP ≥ z_IP ≥ z_greedy</span> for a maximisation, reversed for a minimisation. Write all three and label them; a covering result reported as one number cannot be told apart from a guess.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Building either atom from data</h2>
+      <p class="lead-in">The same five steps for both models. The fourth is where a relaxation earns its keep.</p>
+      <ol class="key-ideas method"><li><strong>Decide what one binary stands for.</strong> An item taken, or a set opened. If the answer is “how many of them”, this is not one of these two models and a binary is the wrong variable.</li><li><strong>Write the rows, one per constraint you actually have.</strong> A knapsack has exactly one row, and a second row means a second model. A covering problem has one row per requirement, and each row lists the sets that cover it &mdash; which is read straight off the incidence table.</li><li><strong>Solve the relaxation and look at what is fractional.</strong> One split item, or a scatter of halves. This is the diagnostic step: it tells you which row is binding and, later, which variable to branch on.</li><li><strong>Get a whole answer, and a second whole answer.</strong> Greed by value per weight, or greed by cost per newly covered requirement, gives one. Enumeration at this size gives the best one. Two whole numbers are worth more than one, because their difference is what greed cost.</li><li><strong>State the bound relation.</strong> <span class="math" data-say="z sub LP is at least z sub IP is at least z sub greedy">z_LP ≥ z_IP ≥ z_greedy</span> for a maximisation, reversed for a minimisation. Write all three and label them; a covering result reported as one number cannot be told apart from a guess.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1484,17 +1529,16 @@ COVERING      5 districts in a ring, 5 depots, each cost 2
   its relaxation:                still 5</div><p>The knapsack's two gaps say different things. The <span class="math" data-say="20">20</span> above is what integrality costs on this instance; the <span class="math" data-say="60">60</span> below is what greed costs. Only the first is a property of the model &mdash; the second would change if greed were replaced by anything better, and the bound would not.</p><p>The covering relaxation's halves are worth a second look. Every one of the five rows is satisfied with nothing to spare, and the total is <span class="math" data-say="5">5</span> against an answer of <span class="math" data-say="6">6</span>. That is the characteristic shape: a covering relaxation pays for the rows and not for the indivisibility, and on an odd ring the indivisibility is the whole cost.</p><p>For a faded rehearsal, drop the knapsack capacity to <span class="math" data-say="40">40</span> and redo all three numbers. The supplied first move is that the density order does not change, because the items did not &mdash; so the relaxation is still items 1 and 2 whole and then a fraction of item 3, and only the fraction moves. Work out the fraction, then the exact optimum, and say what happened to each of the two gaps.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using the density rule as though it solved the 0/1 problem</strong><span>Value per weight is exactly optimal when items may be split and merely plausible when they may not. Here it returns <span class="math" data-say="160">160</span> against an optimum of <span class="math" data-say="220">220</span>, because it commits the capacity to two light items and then cannot fit the third. The rule is how you solve the relaxation, not how you solve the model.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Turning <span data-say="is at least 1">≥ 1</span> into = 1 to tidy the model</strong><span>It looks like the same requirement stated more precisely and it is a different problem: the ring instance loses every feasible solution. If double coverage is genuinely forbidden, the equality is right and the infeasibility is real information; if it is merely untidy, the <span class="math" data-say="greater-than-or-equal">≥</span> was correct.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the relaxation&#x27;s fractional take as a plan</strong><span>“Two-thirds of the third crate” and “half a depot” are arithmetic, not instructions. The value of such a solution is a bound and the solution itself is not a solution &mdash; which is the same lesson as the first lesson of this course, arriving in a model where it is harder to see.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can write either atom from a table of data and predict what its relaxation will make fractional.</strong><p>You should be able to formulate a knapsack and a covering instance from data, solve both relaxations, name the single split item in one and the spread halves in the other, produce a greedy answer and an exact one by enumeration at this size, state both gaps, and say what changes when a covering row becomes an equality.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Enumeration stops being an option somewhere around a dozen binaries, and the two lessons that close this course are what replaces it. Before that, &ldquo;Fixed Charges, Facility Location and Big-M&rdquo; adds the one piece these two atoms are missing: a cost that is paid only if an activity happens at all, which needs a binary tied to a continuous quantity rather than standing alone.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using the density rule as though it solved the 0/1 problem</strong><span>Value per weight is exactly optimal when items may be split and merely plausible when they may not. Here it returns <span class="math" data-say="160">160</span> against an optimum of <span class="math" data-say="220">220</span>, because it commits the capacity to two light items and then cannot fit the third. The rule is how you solve the relaxation, not how you solve the model.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Turning <span data-say="is at least 1">≥ 1</span> into = 1 to tidy the model</strong><span>It looks like the same requirement stated more precisely and it is a different problem: the ring instance loses every feasible solution. If double coverage is genuinely forbidden, the equality is right and the infeasibility is real information; if it is merely untidy, the <span class="math" data-say="greater-than-or-equal">≥</span> was correct.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the relaxation&#x27;s fractional take as a plan</strong><span>“Two-thirds of the third crate” and “half a depot” are arithmetic, not instructions. The value of such a solution is a bound and the solution itself is not a solution &mdash; which is the same lesson as the first lesson of this course, arriving in a model where it is harder to see.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can write either atom from a table of data and predict what its relaxation will make fractional.</strong><p>You should be able to formulate a knapsack and a covering instance from data, solve both relaxations, name the single split item in one and the spread halves in the other, produce a greedy answer and an exact one by enumeration at this size, state both gaps, and say what changes when a covering row becomes an equality.</p></div></div><div class="note"><strong>Note:</strong> Enumeration stops being an option somewhere around a dozen binaries, and the two lessons that close this course are what replaces it. Before that, &ldquo;Fixed Charges, Facility Location and Big-M&rdquo; adds the one piece these two atoms are missing: a cost that is paid only if an activity happens at all, which needs a binary tied to a continuous quantity rather than standing alone.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>One capacity, chosen items</summary><p>Maximise <span class="math" data-say="the sum of v sub j y sub j">Σ v_j y_j</span> subject to one row <span class="math" data-say="the sum of w sub j y sub j is at most W">Σ w_j y_j ≤ W</span>. Every selection problem with a single budget is this model: which features to ship in a release, which repairs to fund this year, which crates to load. The binaries make it hard; the single row makes it the smallest hard model there is.</p></details><details class="recall"><summary>Every requirement covered by some chosen set</summary><p>Minimise <span class="math" data-say="the sum of c sub j y sub j">Σ c_j y_j</span> subject to one row per requirement saying that at least one set containing it is chosen. Depots covering districts, shifts covering hours, tests covering code paths. The rows outnumber the variables and each one is an “at least one of these” from the previous lesson.</p></details><details class="recall"><summary>Each relaxation goes fractional in its own way</summary><p>The relaxed knapsack fills in value-per-weight order and splits exactly one item, because one row can only be tight in one place. The relaxed covering problem does something else entirely: on a ring of overlapping sets it puts <span class="math" data-say="1 over 2">1/2</span> on every one of them, satisfying each row with two halves and paying half the price.</p></details></div>
+      <h3>Summary</h3>
       <p>One capacity with chosen items, and every requirement covered by at least one chosen set: these are the two models most practical binary programmes are assembled from. Their relaxations are fractional in characteristic ways &mdash; one splits a single item, the other spreads halves across overlapping sets &mdash; and that is exactly why a relaxation's value is a bound rather than an answer.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>One capacity, chosen items.</strong> Maximise <span class="math" data-say="the sum of v sub j y sub j">Σ v_j y_j</span> subject to one row <span class="math" data-say="the sum of w sub j y sub j is at most W">Σ w_j y_j ≤ W</span>. Every selection problem with a single budget is this model: which features to ship in a release, which repairs to fund this year, which crates to load. The binaries make it hard; the single row makes it the smallest hard model there is.</li><li><strong>Every requirement covered by some chosen set.</strong> Minimise <span class="math" data-say="the sum of c sub j y sub j">Σ c_j y_j</span> subject to one row per requirement saying that at least one set containing it is chosen. Depots covering districts, shifts covering hours, tests covering code paths. The rows outnumber the variables and each one is an “at least one of these” from the previous lesson.</li><li><strong>Each relaxation goes fractional in its own way.</strong> The relaxed knapsack fills in value-per-weight order and splits exactly one item, because one row can only be tight in one place. The relaxed covering problem does something else entirely: on a ring of overlapping sets it puts <span class="math" data-say="1 over 2">1/2</span> on every one of them, satisfying each row with two halves and paying half the price.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="knapsack, max the sum of v sub j y sub j, s, t, the sum of w sub j y sub j is at most W, y sub j in the set 0, 1. covering, min the sum of c sub j y sub j, s, t, the sum of y sub j is at least 1 over the sets covering i. relaxed knapsack, take in v over w order and split exactly one item. relaxed covering, spread halves over a ring of overlapping sets. 240 is at least 220 is at least 160, bound is at least optimum is at least what greed got. covering is at least 1, is not, partitioning equals 1, one instance, two answers" tabindex="0" role="region" aria-label="Mathematical notation">knapsack    max Σ v_j y_j    s.t.  Σ w_j y_j ≤ W,   y_j ∈ {0, 1}
 covering    min Σ c_j y_j    s.t.  Σ y_j ≥ 1 over the sets covering i
 relaxed knapsack  take in v/w order and split exactly one item
@@ -3461,11 +3505,42 @@ covering ≥ 1  is not  partitioning = 1:  one instance, two answers</div><figca
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3533,7 +3608,7 @@ covering ≥ 1  is not  partitioning = 1:  one instance, two answers</div><figca
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

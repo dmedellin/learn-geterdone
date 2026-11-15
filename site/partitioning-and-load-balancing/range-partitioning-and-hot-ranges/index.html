@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Partitioning and Load Balancing</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Skew</p>
       <h1>Range Partitioning and Hot Ranges</h1>
       <p class="lesson-lede">Compute the hottest range&#x27;s share of the writes happening now, for a monotonic key and for a hashed one, and say what each costs a scan.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A range partition keeps order, and order is what a scan wants</li><li>A monotonic key is perfectly balanced over all time and completely unbalanced at every instant</li><li>The dial between them is how much of the key you hash</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two histograms of the same writes</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Range partitioning</span><p>Under <strong>range partitioning</strong> the key space is cut into contiguous intervals and each interval is a shard. The shard of a key is found by locating the interval that contains it, so ordering is preserved: a scan over an interval of keys touches only the shards whose ranges overlap it. Hash partitioning destroys this property deliberately; range partitioning is chosen when it is needed.</p></div><p>The workload that breaks it is the most common workload there is. Events keyed by arrival time, rows keyed by an auto-increment id, documents keyed by a monotonically increasing version — in all of them the key of the next write is larger than the key of the last one, so the next write goes to whichever range holds the top of the key space.</p><div class="mathblock" data-say="8 ranges, 2400 writes, monotonic key. window 1, 300 times times times times times times times, hottest 100.0 percent. window 2, times 300 times times times times times times, hottest 100.0 percent. window 3, times times 300 times times times times times, hottest 100.0 percent. and so on. window 8, times times times times times times times 300, hottest 100.0 percent. over the whole run, every range 300 of 2400 equals 12.50 percent. ranges taking any writes right now, 1 of 8" tabindex="0" role="region" aria-label="Mathematical notation">8 ranges, 2 400 writes, monotonic key
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two histograms of the same writes</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Range partitioning</span><p>Under <strong>range partitioning</strong> the key space is cut into contiguous intervals and each interval is a shard. The shard of a key is found by locating the interval that contains it, so ordering is preserved: a scan over an interval of keys touches only the shards whose ranges overlap it. Hash partitioning destroys this property deliberately; range partitioning is chosen when it is needed.</p></div><p>The workload that breaks it is the most common workload there is. Events keyed by arrival time, rows keyed by an auto-increment id, documents keyed by a monotonically increasing version — in all of them the key of the next write is larger than the key of the last one, so the next write goes to whichever range holds the top of the key space.</p><div class="mathblock" data-say="8 ranges, 2400 writes, monotonic key. window 1, 300 times times times times times times times, hottest 100.0 percent. window 2, times 300 times times times times times times, hottest 100.0 percent. window 3, times times 300 times times times times times, hottest 100.0 percent. and so on. window 8, times times times times times times times 300, hottest 100.0 percent. over the whole run, every range 300 of 2400 equals 12.50 percent. ranges taking any writes right now, 1 of 8" tabindex="0" role="region" aria-label="Mathematical notation">8 ranges, 2 400 writes, monotonic key
 
   window 1   300 · · · · · · ·     hottest 100.0%
   window 2   · 300 · · · · · ·     hottest 100.0%
@@ -1400,12 +1444,11 @@
   window 8   · · · · · · · 300     hottest 100.0%
 
 over the whole run   every range 300 of 2 400 = 12.50%
-ranges taking any writes right now:  1 of 8</div><p>There is no <span class="math" data-say="N">N</span> in the first column of that table. Doubling the shard count gives sixteen ranges of which one is taking every write, and halving it gives four ranges of which one is taking every write. Splitting the hot range is the same: the write pointer moves into one of the halves immediately and that half is then taking everything. This is the first of the three skews on this course that resharding does not touch.</p><h3>Why nobody notices until it is in production</h3><p>The lifetime histogram is flat. Every range ends the run with 12.50% of the writes, which is exactly an equal share, so a dashboard that plots writes-per-shard over a long window reports a perfectly balanced cluster. The measurement that shows the problem is writes-per-shard over the last few minutes, and it reports one shard at 100% and seven idle.</p><div class="example"><span class="label">Example &middot; The same fact from the read side</span><p>The flip side is the reason to have done this at all. Under the monotonic key, “read everything from one window” touches 1 range of 8. Under a hashed key the writes spread — the hottest range takes 16.00% of a window against an equal 12.50%, which is <span class="math" data-say="1.28">1.28</span> times a fair share rather than <span class="math" data-say="8.00">8.00</span> times it — and the same read now touches 8 of 8. The write hotspot and the scan cost are the same property seen from two directions.</p></div><h3>The middle setting, and what it is a dial on</h3><p>Put a hashed bucket in front of the timestamp and the current writes spread over as many ranges as there are buckets. At four buckets the lab measures the hottest range at 30.33% of the current writes instead of 100%, and a one-window scan reads 4 ranges instead of 1 or 8. Increasing the bucket count moves both numbers in the directions you would expect, and the bucket count is the only thing being chosen.</p><p>Notice that even hashing does not deliver the equal share. 16.00% against 12.50% is the imbalance of “Hash Partitioning and Imbalance” showing up in a different measurement, on 300 writes a window rather than 1 200 keys. Hashing moves the problem from a factor of eight to a factor of 1.28; it does not move it to one.</p><p>One more caution about the word “hot”. A hot <em>range</em> is a region of the key space that is busy, and splitting the range or hashing the key addresses it. A hot <em>key</em> is a single key that is busy, and neither of those helps at all, because a single key lands in one place under every partitioning function there is. That is the next lesson.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Range partitioning and hot ranges</h2></div><p>The hottest range&#x27;s share of the writes happening now, not of the writes ever</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+ranges taking any writes right now:  1 of 8</div><p>There is no <span class="math" data-say="N">N</span> in the first column of that table. Doubling the shard count gives sixteen ranges of which one is taking every write, and halving it gives four ranges of which one is taking every write. Splitting the hot range is the same: the write pointer moves into one of the halves immediately and that half is then taking everything. This is the first of the three skews on this course that resharding does not touch.</p><h3>Why nobody notices until it is in production</h3><p>The lifetime histogram is flat. Every range ends the run with 12.50% of the writes, which is exactly an equal share, so a dashboard that plots writes-per-shard over a long window reports a perfectly balanced cluster. The measurement that shows the problem is writes-per-shard over the last few minutes, and it reports one shard at 100% and seven idle.</p><div class="example"><span class="label">Example &middot; The same fact from the read side</span><p>The flip side is the reason to have done this at all. Under the monotonic key, “read everything from one window” touches 1 range of 8. Under a hashed key the writes spread — the hottest range takes 16.00% of a window against an equal 12.50%, which is <span class="math" data-say="1.28">1.28</span> times a fair share rather than <span class="math" data-say="8.00">8.00</span> times it — and the same read now touches 8 of 8. The write hotspot and the scan cost are the same property seen from two directions.</p></div><h3>The middle setting, and what it is a dial on</h3><p>Put a hashed bucket in front of the timestamp and the current writes spread over as many ranges as there are buckets. At four buckets the lab measures the hottest range at 30.33% of the current writes instead of 100%, and a one-window scan reads 4 ranges instead of 1 or 8. Increasing the bucket count moves both numbers in the directions you would expect, and the bucket count is the only thing being chosen.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Range partitioning and hot ranges</h2></div><p>The hottest range&#x27;s share of the writes happening now, not of the writes ever</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Ranges keep locality and lose balance</strong><span>a monotonic key is perfectly balanced over all time and completely unbalanced at every instant of it</span></div>
         <div class="inline-legend"><span class="tone-red"><i class="legend-swatch"></i>the hottest range now</span><span class="tone-cyan"><i class="legend-swatch"></i>the others</span><span class="tone-muted"><i class="legend-swatch"></i>an equal share</span></div>
@@ -1413,10 +1456,10 @@ ranges taking any writes right now:  1 of 8</div><p>There is no <span class="mat
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="sgGrid" viewBox="0 0 660 240" role="img" aria-label="The write distribution across ranges in each of several time windows, for the chosen key pattern."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="sgTable"></table></div>
       <div class="status-banner" id="sgStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Choose what the key is</h3>
-          <p>Start on the monotonic key and read the two hottest-range figures — the one for the current window and the one for the whole run — before changing anything. Then switch the pattern and watch both figures and the scan cost move together, which is the trade this lesson is about.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Choose what the key is</h3>
+            <p>Start on the monotonic key and read the two hottest-range figures — the one for the current window and the one for the whole run — before changing anything. Then switch the pattern and watch both figures and the scan cost move together, which is the trade this lesson is about.</p>
         <div class="field">
           <label for="sgPattern">Key pattern</label>
           <select id="sgPattern"><option value="monotonic" selected>a timestamp or an auto-increment id</option><option value="hashed">the hash of the id</option><option value="prefixed">a hashed bucket, then the timestamp</option></select>
@@ -1446,12 +1489,15 @@ ranges taking any writes right now:  1 of 8</div><p>There is no <span class="mat
           <div class="kpi"><span>Ranges taking writes now</span><strong id="sgLive">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="sgHint" style="margin:0;">Every cell is a count of writes that pattern actually put in that range in that window. The trap is the second figure: over the whole run a monotonic key is spread perfectly evenly across the ranges, and at no instant during it was more than one range taking anything. The bucket prefix is the remedy and it costs the scan: one window of time is one range under a timestamp, all N under a hash, and as many as there are buckets under the prefix. The placement is drawn from an LCG with multiplier 16&nbsp;807, increment 0 and modulus 2&#179;&#185;&nbsp;&minus;&nbsp;1, which is prime &mdash; the generator the rest of this path uses has modulus 2&#179;&#185;, and the low bits of a power-of-two modulus are a cycle, so keys taken modulo 8 or 16 from it come out perfectly level. The seed is mixed before it becomes a state, so seed 4 is not seed 3 rescaled. The same seed draws the same placement every time this page is opened.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Notice that even hashing does not deliver the equal share. 16.00% against 12.50% is the imbalance of “Hash Partitioning and Imbalance” showing up in a different measurement, on 300 writes a window rather than 1 200 keys. Hashing moves the problem from a factor of eight to a factor of 1.28; it does not move it to one.</p><p>One more caution about the word “hot”. A hot <em>range</em> is a region of the key space that is busy, and splitting the range or hashing the key addresses it. A hot <em>key</em> is a single key that is busy, and neither of those helps at all, because a single key lands in one place under every partitioning function there is. That is the next lesson.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Diagnosing a hot range</h2></div><p>The first step is the one that is usually skipped, and skipping it is what makes the rest of the diagnosis impossible.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Measure writes per shard over a short window, not over the run</h3><p>A lifetime histogram of a monotonic key is flat at <span class="math" data-say="1 over N">1/N</span> per shard and tells you nothing. Take the window down to minutes. If one shard is at or near 100% and the identity of that shard changes over the day, the key is monotonic and you have found it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Look at the key, and ask whether the next one is larger</h3><p>Timestamps, auto-increment ids, sequence numbers and version counters all answer yes. A key that answers yes will concentrate current writes on one range under any range partitioning and under any shard count.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Price the scan you would lose</h3><p>Before hashing the key, find out what reads it in order. If the answer is “a time-range scan, constantly”, hashing turns every one of those into a read of all <span class="math" data-say="N">N</span> shards, and “Scatter-Gather Cost” is what that costs. If nothing scans it, hash it and stop.</p></article><article class="card concept-card"><div class="icon">4</div><h3>If both matter, choose the bucket count deliberately</h3><p>A hashed prefix over <span class="math" data-say="b">b</span> buckets spreads current writes over <span class="math" data-say="b">b</span> ranges and makes a scan read <span class="math" data-say="b">b</span> of them. At <span class="math" data-say="b equals 4">b = 4</span> the lab measures a hottest range of 30.33% and a scan of 4 of 8. Pick <span class="math" data-say="b">b</span> from the fan-out you can afford on the read side, then check the write balance it leaves.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Diagnosing a hot range</h2>
+      <p class="lead-in">The first step is the one that is usually skipped, and skipping it is what makes the rest of the diagnosis impossible.</p>
+      <ol class="key-ideas method"><li><strong>Measure writes per shard over a short window, not over the run.</strong> A lifetime histogram of a monotonic key is flat at <span class="math" data-say="1 over N">1/N</span> per shard and tells you nothing. Take the window down to minutes. If one shard is at or near 100% and the identity of that shard changes over the day, the key is monotonic and you have found it.</li><li><strong>Look at the key, and ask whether the next one is larger.</strong> Timestamps, auto-increment ids, sequence numbers and version counters all answer yes. A key that answers yes will concentrate current writes on one range under any range partitioning and under any shard count.</li><li><strong>Price the scan you would lose.</strong> Before hashing the key, find out what reads it in order. If the answer is “a time-range scan, constantly”, hashing turns every one of those into a read of all <span class="math" data-say="N">N</span> shards, and “Scatter-Gather Cost” is what that costs. If nothing scans it, hash it and stop.</li><li><strong>If both matter, choose the bucket count deliberately.</strong> A hashed prefix over <span class="math" data-say="b">b</span> buckets spreads current writes over <span class="math" data-say="b">b</span> ranges and makes a scan read <span class="math" data-say="b">b</span> of them. At <span class="math" data-say="b equals 4">b = 4</span> the lab measures a hottest range of 30.33% and a scan of 4 of 8. Pick <span class="math" data-say="b">b</span> from the fan-out you can afford on the read side, then check the write balance it leaves.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1481,17 +1527,16 @@ hashed bucket, then timestamp — 4 buckets
   a one-window scan reads           4 of 8</div><p>Read the table down the “whole run” column and all three designs look the same, within a point or two of an equal 12.50%. That column is the one most monitoring reports. Every fact in this lesson is in the other columns.</p><p>For a faded rehearsal, keep the monotonic key and take the range count from 8 to 32. The supplied first move is the equal share, which is now <span class="math" data-say="1 over 32 equals 3.125 percent">1/32 = 3.125%</span>. Predict the hottest range's share of the current window, predict its share over the whole run, and then predict the multiple of an equal share the first figure represents. Check all three in the lab and say which of the three moved when <span class="math" data-say="N">N</span> did.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Diagnosing a hot range from a lifetime histogram</strong><span>A monotonic key gives every range exactly <span class="math" data-say="1 over N">1/N</span> of the writes over a long enough window, so the chart most teams look at is flat while one shard is saturated. The measurement that finds this is writes per shard over minutes, and the tell is that the busy shard keeps changing identity.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting more shards, or a split, to fix it</strong><span>There is no <span class="math" data-say="N">N</span> in “100% of current writes”. Sixteen ranges give one range at 100%, and splitting the hot range hands the whole load to whichever half contains the top of the key space. Range skew from a monotonic key is a property of the key, and it is fixed on the key.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Hashing the key without pricing the scans</strong><span>Hashing brings the hottest range to <span class="math" data-say="1.28">1.28</span> times a fair share and turns every ordered read into a request to all <span class="math" data-say="N">N</span> shards. If the reason for range partitioning was the scans, that trade can be much worse than the hotspot — check what reads the table before changing how it is keyed.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would ask “over what window?” before accepting any writes-per-shard chart.</strong><p>You should be able to compute the hottest range's share both instantaneously and over a run, explain why they differ for a monotonic key, and state what hashing the key or a hashed prefix does to each of them and to the cost of an ordered scan.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A hot range is a busy region of the key space and can be split, hashed or bucketed. A single key that is busy can be none of those things: it lands in one place under every partitioning function, and “Hot Keys and Salting” shows that the hottest shard's load has a floor no shard count reaches under.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Diagnosing a hot range from a lifetime histogram</strong><span>A monotonic key gives every range exactly <span class="math" data-say="1 over N">1/N</span> of the writes over a long enough window, so the chart most teams look at is flat while one shard is saturated. The measurement that finds this is writes per shard over minutes, and the tell is that the busy shard keeps changing identity.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting more shards, or a split, to fix it</strong><span>There is no <span class="math" data-say="N">N</span> in “100% of current writes”. Sixteen ranges give one range at 100%, and splitting the hot range hands the whole load to whichever half contains the top of the key space. Range skew from a monotonic key is a property of the key, and it is fixed on the key.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Hashing the key without pricing the scans</strong><span>Hashing brings the hottest range to <span class="math" data-say="1.28">1.28</span> times a fair share and turns every ordered read into a request to all <span class="math" data-say="N">N</span> shards. If the reason for range partitioning was the scans, that trade can be much worse than the hotspot — check what reads the table before changing how it is keyed.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would ask “over what window?” before accepting any writes-per-shard chart.</strong><p>You should be able to compute the hottest range's share both instantaneously and over a run, explain why they differ for a monotonic key, and state what hashing the key or a hashed prefix does to each of them and to the cost of an ordered scan.</p></div></div><div class="note"><strong>Note:</strong> A hot range is a busy region of the key space and can be split, hashed or bucketed. A single key that is busy can be none of those things: it lands in one place under every partitioning function, and “Hot Keys and Salting” shows that the hottest shard's load has a floor no shard count reaches under.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A range partition keeps order, and order is what a scan wants</summary><p>Under range partitioning shard boundaries are key values, so keys that are adjacent stay adjacent. “Everything written in the last hour” is then a read of one range rather than a question asked of every shard. That is the property being bought, and “Scatter-Gather Cost” is the price of not having it.</p></details><details class="recall"><summary>A monotonic key is perfectly balanced over all time and completely unbalanced at every instant</summary><p>Both sentences are true of the same run. Every write in a window lands in the one range that currently contains the largest key, so the hottest range takes 100.00% of the current writes. The hot range moves on as the key space advances, and by the end of the run each of the eight ranges has taken 12.50% — a perfect lifetime histogram over a workload that never used more than one shard at a time.</p></details><details class="recall"><summary>The dial between them is how much of the key you hash</summary><p>Hash the whole key and the current writes spread over all 8 ranges, at 16.00% for the hottest against an equal 12.50% — but a one-window scan now reads all 8. Hash only a small prefix into 4 buckets and put the timestamp after it: the hottest range takes 30.33% and a scan reads 4. The bucket count is a continuous choice between write balance and read fan-out, and nothing makes both free.</p></details></div>
+      <h3>Summary</h3>
       <p>A range partition keeps keys in order, which is what makes a scan read one shard instead of all of them. The cost arrives when the key is monotonic: a timestamp or an auto-increment id sends every write happening now to exactly one range, whatever <span class="math" data-say="N">N</span> is. Over the whole run that range holds its fair share, which is why a lifetime histogram makes the problem invisible.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A range partition keeps order, and order is what a scan wants.</strong> Under range partitioning shard boundaries are key values, so keys that are adjacent stay adjacent. “Everything written in the last hour” is then a read of one range rather than a question asked of every shard. That is the property being bought, and “Scatter-Gather Cost” is the price of not having it.</li><li><strong>A monotonic key is perfectly balanced over all time and completely unbalanced at every instant.</strong> Both sentences are true of the same run. Every write in a window lands in the one range that currently contains the largest key, so the hottest range takes 100.00% of the current writes. The hot range moves on as the key space advances, and by the end of the run each of the eight ranges has taken 12.50% — a perfect lifetime histogram over a workload that never used more than one shard at a time.</li><li><strong>The dial between them is how much of the key you hash.</strong> Hash the whole key and the current writes spread over all 8 ranges, at 16.00% for the hottest against an equal 12.50% — but a one-window scan now reads all 8. Hash only a small prefix into 4 buckets and put the timestamp after it: the hottest range takes 30.33% and a scan reads 4. The bucket count is a continuous choice between write balance and read fan-out, and nothing makes both free.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="monotonic key, hottest range takes 100.00 percent of the writes happening NOW. and 12.50 percent of the writes over the whole run. hashed key, hottest 16.00 percent now equals 1.28 times an equal share. but a one-window scan reads 8 of 8 ranges, not 1. hashed bucket, then timestamp, 4 buckets. hottest 30.33 percent now, and a scan reads 4 of 8" tabindex="0" role="region" aria-label="Mathematical notation">monotonic key      hottest range takes 100.00% of the writes happening NOW
                    and 12.50% of the writes over the whole run
 hashed key         hottest 16.00% now = 1.28 × an equal share
@@ -2937,11 +2982,42 @@ hashed bucket, then timestamp, 4 buckets
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3009,7 +3085,7 @@ hashed bucket, then timestamp, 4 buckets
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

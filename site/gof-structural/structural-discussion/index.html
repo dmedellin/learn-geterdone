@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Structural Patterns</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 4 · Structural Patterns</p>
       <h1>Discussion of Structural Patterns</h1>
       <p class="lesson-lede">Why patterns built from the same few mechanisms are still different patterns: each answers a different problem at a different point in a design&#x27;s life.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Shared mechanisms</li><li>Intent</li><li>Point in the life cycle</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The comparison, pair by pair, then the count</h2>
-      <article class="prose reading"><p>&ldquo;The Adapter pattern makes things work after they're designed; Bridge makes them work before they are.&rdquo; That sentence is the centre of the Discussion of Structural Patterns, the two pages that close Chapter 4. The section begins by admitting what a reader has probably noticed by now: the structural patterns have similar participants and collaborations, because they are built from the same few mechanisms, inheritance for the class patterns and composition for the object ones. The similarities, the authors say, hide different intents, and the rest of the section compares two groups to show them.</p><p>Adapter versus Bridge first. Both put an extra step between a client and another object, and both forward requests to it from an interface that is not its own. Adapter is about resolving a mismatch between two interfaces that already exist; it is not concerned with how they are implemented or how they might change. Bridge joins an abstraction to its possibly many implementations, keeps the clients' interface steady while those vary, and makes room for new ones. So they come at different times: an adapter when you find that two independently designed classes ought to work together, a coupling nobody foresaw; a bridge when you know from the start that an abstraction will have several implementations. The authors add at once that this does not make Adapter the lesser pattern; the two simply solve different problems. And a facade is not an adapter for many objects, since a facade invents an interface of its own where an adapter serves one that already exists.</p><p>Composite, Decorator and Proxy next. Composite and Decorator both rely on recursive composition, and their structures look alike, so it is tempting to call a decorator a composite with one child. That misses Decorator's intent, which is adding responsibilities without subclassing, so as to avoid a subclass for every combination; Composite's is representation, letting many related objects be treated as one. The intents complement each other, and the two are often used together, under one abstract class: to Decorator a composite is a ConcreteComponent, and to Composite a decorator is a Leaf. Proxy also keeps a reference and forwards, with the subject's own interface, but it does not attach or remove properties and is not built for recursive composition. Its subject supplies the functionality and the proxy grants or refuses access to it, where a decorator supplies part of the functionality itself; and a proxy's one relationship can be fixed at compile time, while a decorator's stack cannot be known in advance. Hybrids are possible, the authors allow, though they admit to having no real examples.</p><pre class="codeblock" data-say="line 1, final class vendor tiles implements tile source, comment, Adapter. line 2, private final geo kit kit, comment, a vendor class. line 3, vendor tiles of geo kit kit this dot kit is set to kit. line 4, public tile tile of tile key k return kit dot fetch of k dot z, k dot x, k dot y dot to tile. line 6, final class cached tiles implements tile source, comment, Proxy. line 7, private final tile source remote. line 8, private final map of tile key and tile seen is set to new hash map. line 9, cached tiles of tile source remote this dot remote is set to remote. line 10, public tile tile of tile key k. line 11, return seen dot compute if absent of k, remote method tile, comment, fetch once. line 14, final class grid overlay implements tile source, comment, Decorator. line 15, private final tile source inner. line 16, grid overlay of tile source inner this dot inner is set to inner. line 17, public tile tile of tile key k return inner dot tile of k dot with grid" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">final class VendorTiles implements TileSource {       // Adapter</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The comparison, pair by pair, then the count</h2><div class="prose reading"><p>&ldquo;The Adapter pattern makes things work after they're designed; Bridge makes them work before they are.&rdquo; That sentence is the centre of the Discussion of Structural Patterns, the two pages that close Chapter 4. The section begins by admitting what a reader has probably noticed by now: the structural patterns have similar participants and collaborations, because they are built from the same few mechanisms, inheritance for the class patterns and composition for the object ones. The similarities, the authors say, hide different intents, and the rest of the section compares two groups to show them.</p><p>Adapter versus Bridge first. Both put an extra step between a client and another object, and both forward requests to it from an interface that is not its own. Adapter is about resolving a mismatch between two interfaces that already exist; it is not concerned with how they are implemented or how they might change. Bridge joins an abstraction to its possibly many implementations, keeps the clients' interface steady while those vary, and makes room for new ones. So they come at different times: an adapter when you find that two independently designed classes ought to work together, a coupling nobody foresaw; a bridge when you know from the start that an abstraction will have several implementations. The authors add at once that this does not make Adapter the lesser pattern; the two simply solve different problems. And a facade is not an adapter for many objects, since a facade invents an interface of its own where an adapter serves one that already exists.</p><p>Composite, Decorator and Proxy next. Composite and Decorator both rely on recursive composition, and their structures look alike, so it is tempting to call a decorator a composite with one child. That misses Decorator's intent, which is adding responsibilities without subclassing, so as to avoid a subclass for every combination; Composite's is representation, letting many related objects be treated as one. The intents complement each other, and the two are often used together, under one abstract class: to Decorator a composite is a ConcreteComponent, and to Composite a decorator is a Leaf. Proxy also keeps a reference and forwards, with the subject's own interface, but it does not attach or remove properties and is not built for recursive composition. Its subject supplies the functionality and the proxy grants or refuses access to it, where a decorator supplies part of the functionality itself; and a proxy's one relationship can be fixed at compile time, while a decorator's stack cannot be known in advance. Hybrids are possible, the authors allow, though they admit to having no real examples.</p><pre class="codeblock" data-say="line 1, final class vendor tiles implements tile source, comment, Adapter. line 2, private final geo kit kit, comment, a vendor class. line 3, vendor tiles of geo kit kit this dot kit is set to kit. line 4, public tile tile of tile key k return kit dot fetch of k dot z, k dot x, k dot y dot to tile. line 6, final class cached tiles implements tile source, comment, Proxy. line 7, private final tile source remote. line 8, private final map of tile key and tile seen is set to new hash map. line 9, cached tiles of tile source remote this dot remote is set to remote. line 10, public tile tile of tile key k. line 11, return seen dot compute if absent of k, remote method tile, comment, fetch once. line 14, final class grid overlay implements tile source, comment, Decorator. line 15, private final tile source inner. line 16, grid overlay of tile source inner this dot inner is set to inner. line 17, public tile tile of tile key k return inner dot tile of k dot with grid" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">final class VendorTiles implements TileSource {       // Adapter</span>
 <span class="cl">    private final GeoKit kit;                          // a vendor class</span>
 <span class="cl">    VendorTiles(GeoKit kit) { this.kit = kit; }</span>
 <span class="cl">    public Tile tile(TileKey k) { return kit.fetch(k.z, k.x, k.y).toTile(); }</span>
@@ -1462,14 +1506,11 @@
 <span class="cl">    private final TileSource inner;</span>
 <span class="cl">    GridOverlay(TileSource inner) { this.inner = inner; }</span>
 <span class="cl">    public Tile tile(TileKey k) { return inner.tile(k).withGrid(); }</span>
-<span class="cl">}</span></code></pre><p>The sketch makes the section's point in code. The three classes have one shape: each implements <code>TileSource</code>, holds another object, and forwards. Nothing in the structure says which is which. <code>VendorTiles</code> is an adapter because <code>GeoKit</code> existed with an interface of its own; <code>CachedTiles</code> is a proxy because it stands in for a remote source and controls when it is reached; <code>GridOverlay</code> is a decorator because it adds a responsibility and could be stacked with others. Swap the reasons and the code could stay the same.</p><p>Now the lab, on a map tile viewer. Three views of the map (street, satellite, terrain) are drawn by two renderers (screen and print). On the preset <code>bridge-split</code> the lab counts <span data-say="3 times 2 equals 6">3 × 2 = 6</span> pairings, 6 + 1 = 7 classes with one subclass for each, and (3 + 1) + (2 + 1) = 7 with a view hierarchy holding a renderer: a ratio of 1, so at this size the second hierarchy saves nothing. A third renderer adds 3 classes under subclassing and 1 under the split. Read the split as Bridge if the renderers were planned; read the same records as Adapter if the renderers were a library you found later and wrapped; the two concrete renderers are then adapters, the library's own classes sit outside the count, and the viewer's classes are the same seven.</p><p>The preset <code>plus-frames</code> adds a third aspect, a frame round each tile: plain, a shadow or a border. Now there are <span data-say="3 times 2 times 3 equals 18">3 × 2 × 3 = 18</span> pairings, 19 classes as subclasses against (3 + 1) + (2 + 1) + (3 + 1) = 11, a ratio of about 1.7, and each view holds 2 references, to a renderer and a frame. A fourth frame adds 6 subclasses against 1. Held as an object the view delegates to, the frame is a strategy, the guts; wrapped round the view and stacked, it would be a decorator, the skin, and the Decorator lesson's count would apply instead. The preset <code>frame-held</code> lists the frame first, so that the client holds a frame and the frame holds a view and a renderer: the class counts are identical, 19 and 11; only the references change, and a new renderer now adds 9 subclasses, one per frame and view. Which object the client holds is a design decision the count records but does not make.</p><p>That is the section's lesson in one number: the class counts are the same under every reading. The structure follows from the mechanisms; the choice between patterns follows from what the design is for, and when.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, view, street, satellite, terrain, transit. line 2, renderer, screen, print. line 3, frame, plain, shadow, border" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">view, street, satellite, terrain, transit;</span>
-<span class="cl">renderer, screen, print;</span>
-<span class="cl">frame, plain, shadow, border</span></code></pre><p>The viewer gains a fourth view, transit. By hand, give the pairings, the classes as subclasses and as three hierarchies, and what one more view would add to each. Type the records into the lab, with the view as the aspect that gains a variant, to check.</p><p>That ends the structural patterns. The next course, Behavioral Patterns I: Requests, Languages and Traversal, begins Chapter 5 with Chain of Responsibility.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Classes</h2></div><p>every combination a subclass, or one hierarchy per aspect</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The sketch makes the section's point in code. The three classes have one shape: each implements <code>TileSource</code>, holds another object, and forwards. Nothing in the structure says which is which. <code>VendorTiles</code> is an adapter because <code>GeoKit</code> existed with an interface of its own; <code>CachedTiles</code> is a proxy because it stands in for a remote source and controls when it is reached; <code>GridOverlay</code> is a decorator because it adds a responsibility and could be stacked with others. Swap the reasons and the code could stay the same.</p><p>Now the lab, on a map tile viewer. Three views of the map (street, satellite, terrain) are drawn by two renderers (screen and print). On the preset <code>bridge-split</code> the lab counts <span data-say="3 times 2 equals 6">3 × 2 = 6</span> pairings, 6 + 1 = 7 classes with one subclass for each, and (3 + 1) + (2 + 1) = 7 with a view hierarchy holding a renderer: a ratio of 1, so at this size the second hierarchy saves nothing. A third renderer adds 3 classes under subclassing and 1 under the split. Read the split as Bridge if the renderers were planned; read the same records as Adapter if the renderers were a library you found later and wrapped; the two concrete renderers are then adapters, the library's own classes sit outside the count, and the viewer's classes are the same seven.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Classes</h2></div><p>every combination a subclass, or one hierarchy per aspect</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Classes</strong><span>every combination a subclass, or one hierarchy per aspect</span></div>
       </div>
@@ -1477,10 +1518,10 @@
       <div class="table-wrap" id="gclTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gclTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is one aspect that varies, then its variants (2 to 4 aspects, 1 to 8 variants each); every name is a class and is used once. Combinations = the product of the variant counts. With one subclass per combination the design has that product + 1 classes (one abstract base). With one hierarchy per aspect, joined by composition, each aspect has 1 abstract class + 1 concrete class per variant, so the design has the sum of the variant counts + the number of aspects; the client holds the first aspect's abstract class, and each of its objects holds one reference per other aspect. The ratio is the first count over the second. One new variant of the added aspect adds the product of the other aspects' counts under subclassing and 1 class under composition; neither design edits an existing class for it.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>One design&#x27;s classes, read three ways</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>One design&#x27;s classes, read three ways</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gclPreset">Worked example</label>
           <select id="gclPreset"><option value="bridge-split" selected>Three map views on two renderers; a third renderer arrives</option><option value="plus-frames">The same with three frames round a tile; a fourth frame arrives</option><option value="frame-held">The same three aspects with the frame held first; a renderer arrives</option></select>
@@ -1503,12 +1544,17 @@
           <div class="kpi"><span>A new variant: classes added by composition</span><strong id="gclAddCompose">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>plus-frames</code> adds a third aspect, a frame round each tile: plain, a shadow or a border. Now there are <span data-say="3 times 2 times 3 equals 18">3 × 2 × 3 = 18</span> pairings, 19 classes as subclasses against (3 + 1) + (2 + 1) + (3 + 1) = 11, a ratio of about 1.7, and each view holds 2 references, to a renderer and a frame. A fourth frame adds 6 subclasses against 1. Held as an object the view delegates to, the frame is a strategy, the guts; wrapped round the view and stacked, it would be a decorator, the skin, and the Decorator lesson's count would apply instead. The preset <code>frame-held</code> lists the frame first, so that the client holds a frame and the frame holds a view and a renderer: the class counts are identical, 19 and 11; only the references change, and a new renderer now adds 9 subclasses, one per frame and view. Which object the client holds is a design decision the count records but does not make.</p><p>That is the section's lesson in one number: the class counts are the same under every reading. The structure follows from the mechanisms; the choice between patterns follows from what the design is for, and when.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, view, street, satellite, terrain, transit. line 2, renderer, screen, print. line 3, frame, plain, shadow, border" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">view, street, satellite, terrain, transit;</span>
+<span class="cl">renderer, screen, print;</span>
+<span class="cl">frame, plain, shadow, border</span></code></pre><p>The viewer gains a fourth view, transit. By hand, give the pairings, the classes as subclasses and as three hierarchies, and what one more view would add to each. Type the records into the lab, with the view as the aspect that gains a variant, to check.</p><p>That ends the structural patterns. The next course, Behavioral Patterns I: Requests, Languages and Traversal, begins Chapter 5 with Chain of Responsibility.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Telling look-alike patterns apart</h2></div><p>Four steps, the last of them on a design of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Describe the structure</h3><p>Write down what holds a reference to what and which interfaces match. That is what the patterns share, and it will not settle the question.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Ask when the second class appeared</h3><p>If the class being forwarded to existed first with its own interface, the wrapper is fitting it, Adapter's case; if both sides were planned to vary, Bridge's.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Ask what the wrapper adds</h3><p>Responsibilities that stack, Decorator; control over reaching an object that does the real work, Proxy; many children treated as one, Composite.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a design of your own</h3><p>Find a class in your code that holds another and forwards to it. Say which pattern's intent it serves, count the classes with and without it, and say whether the count would change if its intent were another pattern's.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Telling look-alike patterns apart</h2>
+      <p class="lead-in">Four steps, the last of them on a design of your own.</p>
+      <ol class="key-ideas method"><li><strong>Describe the structure.</strong> Write down what holds a reference to what and which interfaces match. That is what the patterns share, and it will not settle the question.</li><li><strong>Ask when the second class appeared.</strong> If the class being forwarded to existed first with its own interface, the wrapper is fitting it, Adapter's case; if both sides were planned to vary, Bridge's.</li><li><strong>Ask what the wrapper adds.</strong> Responsibilities that stack, Decorator; control over reaching an object that does the real work, Proxy; many children treated as one, Composite.</li><li><strong>Do it on a design of your own.</strong> Find a class in your code that holds another and forwards to it. Say which pattern's intent it serves, count the classes with and without it, and say whether the count would change if its intent were another pattern's.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1526,17 +1572,16 @@ a fourth frame, subclassing: 3 × 2 = 6
 a fourth frame, hierarchies: 1</div><p>Listing the frame first, as <code>frame-held</code> does, changes which object the client holds and nothing in these lines.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Identifying a pattern by its structure</strong><span>The structural patterns share their mechanisms, so a class that holds another and forwards may be an adapter, a bridge, a decorator or a proxy. On the lesson's illustration the class counts are identical however the design is read; the authors separate the patterns by intent.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Ranking Adapter below Bridge</strong><span>Fitting an adapter later is not a failure to plan a bridge. The authors say so directly: each addresses a different problem, one found after design and one foreseen before it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling a decorator a degenerate composite</strong><span>The structures are alike, and the authors grant the temptation. But a decorator adds responsibilities and a composite represents a whole made of parts; used together, each sees the other as a component of its own kind.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which look-alike pattern a design is applying, and why.</strong><p>Given a class that holds and forwards to another, state its structure, the classes it saves or costs, and which pattern's intent and point in the life cycle it matches, in the terms of the Discussion.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts classes, and the same classes serve several patterns. It cannot see intent, or when in a design's life a class was added, which is what the authors use to tell the patterns apart; that judgement stays with you.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Identifying a pattern by its structure</strong><span>The structural patterns share their mechanisms, so a class that holds another and forwards may be an adapter, a bridge, a decorator or a proxy. On the lesson's illustration the class counts are identical however the design is read; the authors separate the patterns by intent.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Ranking Adapter below Bridge</strong><span>Fitting an adapter later is not a failure to plan a bridge. The authors say so directly: each addresses a different problem, one found after design and one foreseen before it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling a decorator a degenerate composite</strong><span>The structures are alike, and the authors grant the temptation. But a decorator adds responsibilities and a composite represents a whole made of parts; used together, each sees the other as a component of its own kind.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which look-alike pattern a design is applying, and why.</strong><p>Given a class that holds and forwards to another, state its structure, the classes it saves or costs, and which pattern's intent and point in the life cycle it matches, in the terms of the Discussion.</p></div></div><div class="note"><strong>Note:</strong> The lab counts classes, and the same classes serve several patterns. It cannot see intent, or when in a design's life a class was added, which is what the authors use to tell the patterns apart; that judgement stays with you.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Shared mechanisms</summary><p>Inheritance, single or multiple, for the class patterns, and object composition for the object patterns. The structural patterns use the same few, which is why their participants and collaborations look so alike.</p></details><details class="recall"><summary>Intent</summary><p>What a pattern is for: the problem it addresses. The authors' comparisons all turn on it, since the structures alone do not separate Adapter from Bridge or Decorator from Proxy.</p></details><details class="recall"><summary>Point in the life cycle</summary><p>When in a design's life a pattern is applied. An adapter is usually fitted after two classes turn out to need each other; a bridge is planned before either hierarchy grows.</p></details></div>
+      <h3>Summary</h3>
       <p>The chapter closes by comparing the structural patterns that look most alike: Adapter against Bridge, and Composite, Decorator and Proxy against each other. Read the comparison, then count the classes of a map tile viewer's design three ways and see that the counts are the same whichever pattern you have in mind, which is the authors' point: the difference is in the intent.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Shared mechanisms.</strong> Inheritance, single or multiple, for the class patterns, and object composition for the object patterns. The structural patterns use the same few, which is why their participants and collaborations look so alike.</li><li><strong>Intent.</strong> What a pattern is for: the problem it addresses. The authors' comparisons all turn on it, since the structures alone do not separate Adapter from Bridge or Decorator from Proxy.</li><li><strong>Point in the life cycle.</strong> When in a design's life a pattern is applied. An adapter is usually fitted after two classes turn out to need each other; a bridge is planned before either hierarchy grows.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="same mechanisms, different intents. adapter, two existing interfaces meet. bridge, planned for many implementations. decorator, responsibilities, stacked. composite, many treated as one. proxy, one surrogate, access controlled. the class count cannot tell them apart" tabindex="0" role="region" aria-label="Mathematical notation">same mechanisms, different intents
 Adapter: two existing interfaces meet
 Bridge: planned for many implementations
@@ -2313,11 +2358,42 @@ the class count cannot tell them apart</div><figcaption>The comparison in seven 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2385,7 +2461,7 @@ the class count cannot tell them apart</div><figcaption>The comparison in seven 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

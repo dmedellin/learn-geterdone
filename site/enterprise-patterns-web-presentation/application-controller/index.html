@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Web Presentation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 14 · Web Presentation Patterns</p>
       <h1>Application Controller</h1>
       <p class="lesson-lede">An Application Controller holds an application&#x27;s rules about which screen comes next in one place, so that the input controllers stop repeating them.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Screen flow</li><li>Application controller</li><li>Mediating layer</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s test and the pattern, then the count</h2>
-      <article class="prose reading"><p>&ldquo;A good signal to use an Application Controller is if you find yourself having to make similar changes in lots of different places when your application's flow changes.&rdquo; That is the whole of the signal Fowler gives in Chapter 14. Who decides which screen comes next, and where is that decision written down? This lesson reads his answer, in the opening of Chapter 4 and in the last pattern of Chapter 14. Read them in your own copy first.</p><p>Chapter 4's opening introduced the pattern as a second use of the word controller. Many user-interface designs, Fowler says, put a layer of Application Controller objects between the presentation and the domain, to handle the flow of the application, deciding which screens appear in which order. It can be part of the presentation or a separate layer that mediates between presentation and domain, and written independently of any one presentation it can be reused across several, though different presentations are often best given different flows.</p><p>Not every system needs one, the chapter goes on. It earns its place where much of the code is about which screen follows which, or where pages do not line up simply with actions on the domain; where a user may open the screens in nearly any order, there is little for it to do. Fowler's test fits in a line: when the application decides which screen the user sees next, you want an Application Controller; when the user decides, you do not.</p><p>Application Controller, read as a pattern, starts from the wizard: the user led through screens in a set order, screens shown only under conditions, a choice of screen that depends on earlier input. Input controllers can make those decisions, but as the application grows, several of them come to need the same knowledge, and the code is duplicated. The pattern puts all the flow logic in one object, which the input controllers ask for the command to run against the model and the view to show. It has two jobs, choosing the domain logic to run and choosing the view for the response, and typically holds two collections of references, one of domain commands and one of views: command objects, references to functions, names for reflection, or server page names.</p><p>Fowler's preference is for an Application Controller with no links to the user-interface machinery: it neither reads the HTTP session, nor forwards to a server page, nor calls a rich-client class. That makes it testable without the interface and reusable across presentations, and it is why many people think of it as an intermediate layer. Chapter 8's Other Layering Schemes, read in the last course, gives it exactly that place in one of the layering schemes it compares. An application may have several, one for each broad area of the interface, and a flow often thought of as a state machine can be held as metadata.</p><p>He comes down hard, he says, against putting domain logic in it, and then admits the boundary is murky. His case is an insurance application that shows an extra screen of questions only to smokers: is that application logic or domain logic? A few such cases can live in the Application Controller; if they occur in many places, the Domain Model should be designed to drive them. The pattern's ideas, he writes, came mostly from Knight and Dai, as the book cites them (IEEE Software, 2002), whose explanations he found unusually clear; Chapter 4's Further Reading credits them with the vocabulary that separates input controllers from application controllers. The pattern's example, a controller driven by a state model, is worth reading in the book.</p><p>Now the code, written for the lesson. Two input controllers of a checkout each decide where to send the customer after their step: after the address, and after the cart.</p><pre class="codeblock" data-say="line 1, void after address of order o, response res throws IO exception. line 2, if o dot needs customs form res dot redirect of customs, return. line 3, if o dot total is greater than limit res dot redirect of approval, return. line 4, res dot redirect of payment. line 7, void after cart of order o, response res throws IO exception. line 8, if not o dot has address res dot redirect of address, return. line 9, if o dot needs customs form res dot redirect of customs, return. line 10, if o dot total is greater than limit res dot redirect of approval, return. line 11, res dot redirect of payment" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void afterAddress(Order o, Response res) throws IOException {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s test and the pattern, then the count</h2><div class="prose reading"><p>&ldquo;A good signal to use an Application Controller is if you find yourself having to make similar changes in lots of different places when your application's flow changes.&rdquo; That is the whole of the signal Fowler gives in Chapter 14. Who decides which screen comes next, and where is that decision written down? This lesson reads his answer, in the opening of Chapter 4 and in the last pattern of Chapter 14. Read them in your own copy first.</p><p>Chapter 4's opening introduced the pattern as a second use of the word controller. Many user-interface designs, Fowler says, put a layer of Application Controller objects between the presentation and the domain, to handle the flow of the application, deciding which screens appear in which order. It can be part of the presentation or a separate layer that mediates between presentation and domain, and written independently of any one presentation it can be reused across several, though different presentations are often best given different flows.</p><p>Not every system needs one, the chapter goes on. It earns its place where much of the code is about which screen follows which, or where pages do not line up simply with actions on the domain; where a user may open the screens in nearly any order, there is little for it to do. Fowler's test fits in a line: when the application decides which screen the user sees next, you want an Application Controller; when the user decides, you do not.</p><p>Application Controller, read as a pattern, starts from the wizard: the user led through screens in a set order, screens shown only under conditions, a choice of screen that depends on earlier input. Input controllers can make those decisions, but as the application grows, several of them come to need the same knowledge, and the code is duplicated. The pattern puts all the flow logic in one object, which the input controllers ask for the command to run against the model and the view to show. It has two jobs, choosing the domain logic to run and choosing the view for the response, and typically holds two collections of references, one of domain commands and one of views: command objects, references to functions, names for reflection, or server page names.</p><p>Fowler's preference is for an Application Controller with no links to the user-interface machinery: it neither reads the HTTP session, nor forwards to a server page, nor calls a rich-client class. That makes it testable without the interface and reusable across presentations, and it is why many people think of it as an intermediate layer. Chapter 8's Other Layering Schemes, read in the last course, gives it exactly that place in one of the layering schemes it compares. An application may have several, one for each broad area of the interface, and a flow often thought of as a state machine can be held as metadata.</p><p>He comes down hard, he says, against putting domain logic in it, and then admits the boundary is murky. His case is an insurance application that shows an extra screen of questions only to smokers: is that application logic or domain logic? A few such cases can live in the Application Controller; if they occur in many places, the Domain Model should be designed to drive them. The pattern's ideas, he writes, came mostly from Knight and Dai, as the book cites them (IEEE Software, 2002), whose explanations he found unusually clear; Chapter 4's Further Reading credits them with the vocabulary that separates input controllers from application controllers. The pattern's example, a controller driven by a state model, is worth reading in the book.</p><p>Now the code, written for the lesson. Two input controllers of a checkout each decide where to send the customer after their step: after the address, and after the cart.</p><pre class="codeblock" data-say="line 1, void after address of order o, response res throws IO exception. line 2, if o dot needs customs form res dot redirect of customs, return. line 3, if o dot total is greater than limit res dot redirect of approval, return. line 4, res dot redirect of payment. line 7, void after cart of order o, response res throws IO exception. line 8, if not o dot has address res dot redirect of address, return. line 9, if o dot needs customs form res dot redirect of customs, return. line 10, if o dot total is greater than limit res dot redirect of approval, return. line 11, res dot redirect of payment" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void afterAddress(Order o, Response res) throws IOException {</span>
 <span class="cl">    if (o.needsCustomsForm()) { res.redirect(&quot;/customs&quot;); return; }</span>
 <span class="cl">    if (o.total() &gt; LIMIT) { res.redirect(&quot;/approval&quot;); return; }</span>
 <span class="cl">    res.redirect(&quot;/payment&quot;);</span>
@@ -1456,30 +1500,11 @@
 <span class="cl">    if (o.needsCustomsForm()) { res.redirect(&quot;/customs&quot;); return; }</span>
 <span class="cl">    if (o.total() &gt; LIMIT) { res.redirect(&quot;/approval&quot;); return; }</span>
 <span class="cl">    res.redirect(&quot;/payment&quot;);</span>
-<span class="cl">}</span></code></pre><p>The lab is the repeated-lines view of Front Controller, with the same rule: identical statement lines, spacing collapsed, in runs of two or more. On <code>flow-repeat</code> it prints 1 block, 6 lines, at lines 2–4 and lines 9–11: the customs form, the approval and the payment, written in both controllers in the same order. That is Fowler's signal as a count. Add a screen to the flow, a gift message before payment, say, and the change must be made in both places, and in every other controller that knows the order.</p><p><code>next-screen</code> holds the flow in one method, and the lab prints 0 blocks, 0 lines, none. Each input controller would call <span class="math" data-say="next screen">nextScreen</span> and redirect to what it returns. The method returns a path rather than redirecting, so it has no link to the request or the response, Fowler's preference, and a test can call it with an order and check the answer.</p><pre class="codeblock" data-say="line 1, comment, The flow in one place which screen comes next.. line 2, string next screen of order o. line 3, if not o dot has address return address. line 4, if o dot needs customs form return customs. line 5, if o dot total is greater than limit return approval. line 6, return payment" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The flow in one place: which screen comes next.</span>
-<span class="cl">String nextScreen(Order o) {</span>
-<span class="cl">    if (!o.hasAddress()) { return &quot;/address&quot;; }</span>
-<span class="cl">    if (o.needsCustomsForm()) { return &quot;/customs&quot;; }</span>
-<span class="cl">    if (o.total() &gt; LIMIT) { return &quot;/approval&quot;; }</span>
-<span class="cl">    return &quot;/payment&quot;;</span>
-<span class="cl">}</span></code></pre><p>One check is needed before the move is safe. The two controllers were not identical: <span class="math" data-say="after cart">afterCart</span> first sends a customer with no address to the address screen, and <span class="math" data-say="after address">afterAddress</span> does not, because its step has just taken the address. <span class="math" data-say="next screen">nextScreen</span> asks the address question every time, which gives the same answer after the address step, since <span class="math" data-say="has address">hasAddress</span> is then true. The conditions themselves, <span class="math" data-say="needs customs form">needsCustomsForm</span> and the total against a limit, are questions the order answers; the order in which they are asked is the flow, and that is what moved.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, void after details of claim c, response res throws IO exception. line 2, if c dot amount is greater than 10000 res dot redirect of assessor, return. line 3, if c dot has injury res dot redirect of medical, return. line 4, res dot redirect of bank. line 7, void after photos of claim c, response res throws IO exception. line 8, if c dot photos equals 0 res dot redirect of photos, return. line 9, if c dot photos too large res dot redirect of resize, return. line 10, if c dot amount is greater than 10000 res dot redirect of assessor, return. line 11, if c dot has injury res dot redirect of medical, return. line 12, res dot redirect of bank" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void afterDetails(Claim c, Response res) throws IOException {</span>
-<span class="cl">    if (c.amount() &gt; 10000) { res.redirect(&quot;/assessor&quot;); return; }</span>
-<span class="cl">    if (c.hasInjury()) { res.redirect(&quot;/medical&quot;); return; }</span>
-<span class="cl">    res.redirect(&quot;/bank&quot;);</span>
-<span class="cl">}</span>
-<span class="cl"></span>
-<span class="cl">void afterPhotos(Claim c, Response res) throws IOException {</span>
-<span class="cl">    if (c.photos() == 0) { res.redirect(&quot;/photos&quot;); return; }</span>
-<span class="cl">    if (c.photosTooLarge()) { res.redirect(&quot;/resize&quot;); return; }</span>
-<span class="cl">    if (c.amount() &gt; 10000) { res.redirect(&quot;/assessor&quot;); return; }</span>
-<span class="cl">    if (c.hasInjury()) { res.redirect(&quot;/medical&quot;); return; }</span>
-<span class="cl">    res.redirect(&quot;/bank&quot;);</span>
-<span class="cl">}</span></code></pre><p>Two input controllers of an insurance claim form. Mark by hand the lines that repeat, by the lab's rule, with their line numbers and how many lines the copies hold. Then write the one method that replaces them, <span class="math" data-say="next step of claim c">nextStep(Claim c)</span>, returning the path of the next screen.</p><p>This ends the course. The next course, Concurrency and Session State, reads what happens when many people use these pages at once.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>repeated runs of statements, matched as text</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The lab is the repeated-lines view of Front Controller, with the same rule: identical statement lines, spacing collapsed, in runs of two or more. On <code>flow-repeat</code> it prints 1 block, 6 lines, at lines 2–4 and lines 9–11: the customs form, the approval and the payment, written in both controllers in the same order. That is Fowler's signal as a count. Add a screen to the flow, a gift message before payment, say, and the change must be made in both places, and in every other controller that knows the order.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>repeated runs of statements, matched as text</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Reading the code</strong><span>repeated runs of statements, matched as text</span></div>
       </div>
@@ -1499,10 +1524,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
       <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Flow written in more than one place</h3>
-          <p>A count over code, by the rules stated below the listing. The lab compares statement lines as text, with spacing collapsed, and reports each run of two or more lines that appears more than once. Lines that differ only in a name are not the same text, so the lab does not see them. The listings are the lesson's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Flow written in more than one place</h3>
+            <p>A count over code, by the rules stated below the listing. The lab compares statement lines as text, with spacing collapsed, and reports each run of two or more lines that appears more than once. Lines that differ only in a name are not the same text, so the lab does not see them. The listings are the lesson's.</p>
         <div class="field">
           <label for="coPreset">Worked example</label>
           <select id="coPreset"><option value="flow-repeat" selected>Two checkout controllers, each deciding the next screen</option><option value="next-screen">The checkout's flow in one method</option></select>
@@ -1513,12 +1538,33 @@
           <div class="kpi"><span>Where</span><strong id="coDupWhere">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p><code>next-screen</code> holds the flow in one method, and the lab prints 0 blocks, 0 lines, none. Each input controller would call <span class="math" data-say="next screen">nextScreen</span> and redirect to what it returns. The method returns a path rather than redirecting, so it has no link to the request or the response, Fowler's preference, and a test can call it with an order and check the answer.</p><pre class="codeblock" data-say="line 1, comment, The flow in one place which screen comes next.. line 2, string next screen of order o. line 3, if not o dot has address return address. line 4, if o dot needs customs form return customs. line 5, if o dot total is greater than limit return approval. line 6, return payment" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The flow in one place: which screen comes next.</span>
+<span class="cl">String nextScreen(Order o) {</span>
+<span class="cl">    if (!o.hasAddress()) { return &quot;/address&quot;; }</span>
+<span class="cl">    if (o.needsCustomsForm()) { return &quot;/customs&quot;; }</span>
+<span class="cl">    if (o.total() &gt; LIMIT) { return &quot;/approval&quot;; }</span>
+<span class="cl">    return &quot;/payment&quot;;</span>
+<span class="cl">}</span></code></pre><p>One check is needed before the move is safe. The two controllers were not identical: <span class="math" data-say="after cart">afterCart</span> first sends a customer with no address to the address screen, and <span class="math" data-say="after address">afterAddress</span> does not, because its step has just taken the address. <span class="math" data-say="next screen">nextScreen</span> asks the address question every time, which gives the same answer after the address step, since <span class="math" data-say="has address">hasAddress</span> is then true. The conditions themselves, <span class="math" data-say="needs customs form">needsCustomsForm</span> and the total against a limit, are questions the order answers; the order in which they are asked is the flow, and that is what moved.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, void after details of claim c, response res throws IO exception. line 2, if c dot amount is greater than 10000 res dot redirect of assessor, return. line 3, if c dot has injury res dot redirect of medical, return. line 4, res dot redirect of bank. line 7, void after photos of claim c, response res throws IO exception. line 8, if c dot photos equals 0 res dot redirect of photos, return. line 9, if c dot photos too large res dot redirect of resize, return. line 10, if c dot amount is greater than 10000 res dot redirect of assessor, return. line 11, if c dot has injury res dot redirect of medical, return. line 12, res dot redirect of bank" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void afterDetails(Claim c, Response res) throws IOException {</span>
+<span class="cl">    if (c.amount() &gt; 10000) { res.redirect(&quot;/assessor&quot;); return; }</span>
+<span class="cl">    if (c.hasInjury()) { res.redirect(&quot;/medical&quot;); return; }</span>
+<span class="cl">    res.redirect(&quot;/bank&quot;);</span>
+<span class="cl">}</span>
+<span class="cl"></span>
+<span class="cl">void afterPhotos(Claim c, Response res) throws IOException {</span>
+<span class="cl">    if (c.photos() == 0) { res.redirect(&quot;/photos&quot;); return; }</span>
+<span class="cl">    if (c.photosTooLarge()) { res.redirect(&quot;/resize&quot;); return; }</span>
+<span class="cl">    if (c.amount() &gt; 10000) { res.redirect(&quot;/assessor&quot;); return; }</span>
+<span class="cl">    if (c.hasInjury()) { res.redirect(&quot;/medical&quot;); return; }</span>
+<span class="cl">    res.redirect(&quot;/bank&quot;);</span>
+<span class="cl">}</span></code></pre><p>Two input controllers of an insurance claim form. Mark by hand the lines that repeat, by the lab's rule, with their line numbers and how many lines the copies hold. Then write the one method that replaces them, <span class="math" data-say="next step of claim c">nextStep(Claim c)</span>, returning the path of the next screen.</p><p>This ends the course. The next course, Concurrency and Session State, reads what happens when many people use these pages at once.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding the flow and putting it in one place</h2></div><p>Four steps, the last of them on a flow of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Ask who controls the flow</h3><p>If the user can open the screens in nearly any order, stop: there are no rules for an Application Controller to hold. If the application leads, go on.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Mark the repeated rules</h3><p>Line up the input controllers and mark every run of lines that decides the next screen in the same way in more than one of them.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write one method</h3><p>Write a method that takes the domain object and returns the next screen, asking the questions in the flow's order, and check that it gives each controller's old answer.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count a flow of your own</h3><p>Take one wizard or checkout in a system you know. Count the places its order of screens is written down, write the figure, and say which one should hold it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding the flow and putting it in one place</h2>
+      <p class="lead-in">Four steps, the last of them on a flow of your own.</p>
+      <ol class="key-ideas method"><li><strong>Ask who controls the flow.</strong> If the user can open the screens in nearly any order, stop: there are no rules for an Application Controller to hold. If the application leads, go on.</li><li><strong>Mark the repeated rules.</strong> Line up the input controllers and mark every run of lines that decides the next screen in the same way in more than one of them.</li><li><strong>Write one method.</strong> Write a method that takes the domain object and returns the next screen, asking the questions in the flow's order, and check that it gives each controller's old answer.</li><li><strong>Count a flow of your own.</strong> Take one wizard or checkout in a system you know. Count the places its order of screens is written down, write the figure, and say which one should hold it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1536,17 +1582,16 @@ line 8: the address check, after the cart only
 one block of 3 lines, in 2 copies: 6 lines</div><p>The flow is written twice, in the same order. <code>next-screen</code> writes it once, with the address check first, and the lab finds nothing repeated.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking every web application needs an Application Controller</strong><span>Any application has an order of screens, so it seems any application needs something to hold it. Fowler's signal is the quotation: similar changes in many places when the flow changes. Where a user may open the screens in nearly any order there are no rules for it to hold, and it adds little; if the user is in control of the flow, you do not need one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking the application controller does the work</strong><span>It sits in the middle of every request, so it looks like the place for the work. It decides what comes next: which command to run and which view to show. The domain commands do the work, and Fowler comes down hard against putting domain logic in it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Sharing one flow across every presentation</strong><span>An Application Controller free of the interface can serve a browser, a desktop program and a handheld device at once, and that seems the point of making it free. Fowler says not to be too eager: different interfaces often need different flows to be usable, though one shared controller may be worth a more awkward interface for the effort it saves.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find a flow written twice and write it once.</strong><p>Given two input controllers, mark the repeated flow lines with their line numbers, and write the application controller's method that returns the next screen.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab sees identical lines only, so a flow rule written two ways is not counted, and it cannot check that one method gives the answers each controller gave; that check is the reader's, done above for the address step. Nor can it say whether a rule is flow or domain logic, which Fowler admits is murky.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking every web application needs an Application Controller</strong><span>Any application has an order of screens, so it seems any application needs something to hold it. Fowler's signal is the quotation: similar changes in many places when the flow changes. Where a user may open the screens in nearly any order there are no rules for it to hold, and it adds little; if the user is in control of the flow, you do not need one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking the application controller does the work</strong><span>It sits in the middle of every request, so it looks like the place for the work. It decides what comes next: which command to run and which view to show. The domain commands do the work, and Fowler comes down hard against putting domain logic in it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Sharing one flow across every presentation</strong><span>An Application Controller free of the interface can serve a browser, a desktop program and a handheld device at once, and that seems the point of making it free. Fowler says not to be too eager: different interfaces often need different flows to be usable, though one shared controller may be worth a more awkward interface for the effort it saves.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find a flow written twice and write it once.</strong><p>Given two input controllers, mark the repeated flow lines with their line numbers, and write the application controller's method that returns the next screen.</p></div></div><div class="note"><strong>Note:</strong> The lab sees identical lines only, so a flow rule written two ways is not counted, and it cannot check that one method gives the answers each controller gave; that check is the reader's, done above for the address step. Nor can it say whether a rule is flow or domain logic, which Fowler admits is murky.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Screen flow</summary><p>The order in which an application shows its screens, and the rules that decide it: a wizard that leads through steps, a screen shown only under a condition, a choice of screen that depends on earlier input.</p></details><details class="recall"><summary>Application controller</summary><p>An object that holds those rules in one place. Input controllers ask it which domain command to run and which view to show next. It is a different thing from the controller of Model View Controller, which handles one request.</p></details><details class="recall"><summary>Mediating layer</summary><p>A layer between two others that both talk to, so that neither needs to know the other. An Application Controller with no links to the user-interface machinery can be thought of as one, between the presentation and the domain; Chapter 8 places it so, in the last course.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 4's opening and Chapter 14's Application Controller: a central point for screen navigation and flow, which input controllers ask for the command to run and the view to show next. Count the flow decisions two controllers repeat, move them to one method, and read Fowler's test for when the pattern earns its place.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Screen flow.</strong> The order in which an application shows its screens, and the rules that decide it: a wizard that leads through steps, a screen shown only under a condition, a choice of screen that depends on earlier input.</li><li><strong>Application controller.</strong> An object that holds those rules in one place. Input controllers ask it which domain command to run and which view to show next. It is a different thing from the controller of Model View Controller, which handles one request.</li><li><strong>Mediating layer.</strong> A layer between two others that both talk to, so that neither needs to know the other. An Application Controller with no links to the user-interface machinery can be thought of as one, between the presentation and the domain; Chapter 8 places it so, in the last course.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="flow, which screen comes next. input controllers ask, it decides. it picks a command and a view. machine leads the flow, use one. user leads the flow, you need none" tabindex="0" role="region" aria-label="Mathematical notation">flow: which screen comes next
 input controllers ask; it decides
 it picks a command and a view
@@ -2550,11 +2595,42 @@ user leads the flow: you need none</div><figcaption>Application Controller in fi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2622,7 +2698,7 @@ user leads the flow: you need none</div><figcaption>Application Controller in fi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

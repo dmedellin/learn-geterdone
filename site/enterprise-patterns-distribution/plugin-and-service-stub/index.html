@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Distribution and Putting It Together</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 18 · Base Patterns</p>
       <h1>Plugin and Service Stub</h1>
       <p class="lesson-lede">Choose an interface&#x27;s implementation in one place at configuration time, and give the tests a small, fast stand-in for a service they should not depend on.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Separated Interface</li><li>Plugin</li><li>Service Stub</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The two patterns first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Use Service Stub whenever you find that dependence on a particular service is hindering your development and testing.&rdquo; The words are David Rice's, in his Service Stub, one of Chapter 18's Base Patterns. This lesson reads it with Plugin, which Rice wrote with Matt Foemmel, both as patterns, tools to look up and use, because each needs the other: a stub is no use unless something chooses it for the tests and the real service for production.</p><p>Plugin starts from Separated Interface, where code running in several environments needs a different implementation in each: files on a local disk for unit tests and a shared document store in production, say. The usual answer is a factory method with a conditional on the environment, and once there are a few such factories, Rice and Foemmel say, you have a mess: a new deployment configuration means editing conditionals in several factories, rebuilding and redeploying. The configuration belongs in one place, and changing it should not mean building again.</p><p>So the Plugin factory states its linking instructions at a single, external point, such as a text file mapping each interface to an implementation, and links them at run time. It works best with reflection, because the factory can then build an implementation without depending on it at compile time. Without reflection a central point of configuration is still worth having, with a conditional in the factory for each implementation, and the authors suggest putting that factory in its own package so that layer dependencies can still be checked. Use it whenever behaviour needs different implementations in different runtime environments.</p><p>Service Stub starts from the services an enterprise system leans on and does not control, such as credit scoring and pricing engines. Their features arrive unpredictably, and being remote they can be slow and unreliable. Developers wait, or hack around them, and worse, tests cannot run, which Rice says breaks the development process. A stand-in that runs locally, fast and in memory fixes that.</p><p>The steps are the two earlier patterns. Reach the service through a Gateway, and make the Gateway a Separated Interface, not a class, so that one implementation calls the real service and another is the stub. Load the right one with a Plugin. Then keep the stub as simple as possible, a few lines, since a complicated stub defeats the point; a stub that tests can configure may need a setup method on the interface, which Rice accepts for the sake of the tests. He notes that many practitioners of Extreme Programming call this a Mock Object, and that he kept Service Stub because the name is older.</p><pre class="codeblock" data-say="line 1, comment, The interface the signup depends on, and a stub for its tests.. line 2, interface address check. line 3, boolean deliverable of string postcode. line 5, class address check stub implements address check. line 6, public boolean deliverable of string postcode. line 7, return not postcode dot starts with of ZZ. line 11, comment, The plugin one switch on the environment, read once at startup.. line 12, class address checks. line 13, static address check for environment of string environment. line 14, switch environment. line 15, case test, return new address check stub. line 16, case live, return new post office check. line 17, default, throw new illegal argument exception of environment" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The interface the signup depends on, and a stub for its tests.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The two patterns first, then the count</h2><div class="prose reading"><p>&ldquo;Use Service Stub whenever you find that dependence on a particular service is hindering your development and testing.&rdquo; The words are David Rice's, in his Service Stub, one of Chapter 18's Base Patterns. This lesson reads it with Plugin, which Rice wrote with Matt Foemmel, both as patterns, tools to look up and use, because each needs the other: a stub is no use unless something chooses it for the tests and the real service for production.</p><p>Plugin starts from Separated Interface, where code running in several environments needs a different implementation in each: files on a local disk for unit tests and a shared document store in production, say. The usual answer is a factory method with a conditional on the environment, and once there are a few such factories, Rice and Foemmel say, you have a mess: a new deployment configuration means editing conditionals in several factories, rebuilding and redeploying. The configuration belongs in one place, and changing it should not mean building again.</p><p>So the Plugin factory states its linking instructions at a single, external point, such as a text file mapping each interface to an implementation, and links them at run time. It works best with reflection, because the factory can then build an implementation without depending on it at compile time. Without reflection a central point of configuration is still worth having, with a conditional in the factory for each implementation, and the authors suggest putting that factory in its own package so that layer dependencies can still be checked. Use it whenever behaviour needs different implementations in different runtime environments.</p><p>Service Stub starts from the services an enterprise system leans on and does not control, such as credit scoring and pricing engines. Their features arrive unpredictably, and being remote they can be slow and unreliable. Developers wait, or hack around them, and worse, tests cannot run, which Rice says breaks the development process. A stand-in that runs locally, fast and in memory fixes that.</p><p>The steps are the two earlier patterns. Reach the service through a Gateway, and make the Gateway a Separated Interface, not a class, so that one implementation calls the real service and another is the stub. Load the right one with a Plugin. Then keep the stub as simple as possible, a few lines, since a complicated stub defeats the point; a stub that tests can configure may need a setup method on the interface, which Rice accepts for the sake of the tests. He notes that many practitioners of Extreme Programming call this a Mock Object, and that he kept Service Stub because the name is older.</p><pre class="codeblock" data-say="line 1, comment, The interface the signup depends on, and a stub for its tests.. line 2, interface address check. line 3, boolean deliverable of string postcode. line 5, class address check stub implements address check. line 6, public boolean deliverable of string postcode. line 7, return not postcode dot starts with of ZZ. line 11, comment, The plugin one switch on the environment, read once at startup.. line 12, class address checks. line 13, static address check for environment of string environment. line 14, switch environment. line 15, case test, return new address check stub. line 16, case live, return new post office check. line 17, default, throw new illegal argument exception of environment" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The interface the signup depends on, and a stub for its tests.</span>
 <span class="cl">interface AddressCheck {</span>
 <span class="cl">    boolean deliverable(String postcode);</span>
 <span class="cl">}</span>
@@ -1464,22 +1508,21 @@
 <span class="cl">            default: throw new IllegalArgumentException(environment);</span>
 <span class="cl">        }</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The snippet has all three parts. Lines 2 to 4 are the Separated Interface the signup depends on: is this postcode deliverable? Lines 5 to 9 are the stub, which says yes to every postcode except those beginning <span class="math" data-say="zz">ZZ</span>, so a test can ask for either answer. Lines 12 to 20 are the plugin in its simplest form, one <span class="math" data-say="switch">switch</span> on the environment's name, read once at startup: the stub for <span class="math" data-say="test">test</span>, the real post office check for <span class="math" data-say="live">live</span>. It is the one place that knows both implementations. It solves the scattering and not the rebuild: a new environment, say a staging setup that uses the stub, is still a change to this code, which a configuration file read at startup, or reflection, would remove.</p><p>Now the count. The lab reads records <span class="math" data-say="dependent, then what it depends on">dependent, dependency</span> and the name of the class that changes, and walks the dependencies backwards from it. Its tiles list what depends on the changed class directly and everything the change reaches, the changed class itself left out. In the preset <code>real-service</code> the signup calls <span class="math" data-say="postoffice">postoffice</span>, which uses the <span class="math" data-say="network">network</span> library, and the signup's test calls the signup. Change <span class="math" data-say="network">network</span> and it reaches 1 directly, <span class="math" data-say="postoffice">postoffice</span>, and 3 in all, <span class="math" data-say="postoffice, signup, signuptest">postoffice, signup, signuptest</span>: the test depends on the network.</p><p>The preset <code>plugin-and-stub</code> is the snippet's design, wired from the edge. The signup depends on <span class="math" data-say="addresscheck">addresscheck</span>; <span class="math" data-say="postofficecheck">postofficecheck</span> and <span class="math" data-say="addresscheckstub">addresscheckstub</span> implement it; the test uses the signup and the stub; and <span class="math" data-say="main">main</span>, the startup code that calls the plugin and hands the result to the signup, depends on <span class="math" data-say="postofficecheck">postofficecheck</span>. Change <span class="math" data-say="network">network</span> and it reaches 1 directly, <span class="math" data-say="postofficecheck">postofficecheck</span>, and 2 in all, <span class="math" data-say="main, postofficecheck">main, postofficecheck</span>. Neither the signup nor its test is reached.</p><p>That depends on who calls the switch. If the signup called <span class="math" data-say="address checks dot for environment">AddressChecks.forEnvironment</span> itself, it would depend on the plugin, which names <span class="math" data-say="post office check">PostOfficeCheck</span>; add <span class="math" data-say="signup, main">signup, main</span> to the records and a change to <span class="math" data-say="network">network</span> reaches 4 again, <span class="math" data-say="main, postofficecheck, signup, signuptest">main, postofficecheck, signup, signuptest</span>. That is the compile-time dependency Rice and Foemmel's reflection removes, and one reason to read the configuration at one point at the edge of the system, as the lesson's <span class="math" data-say="main">main</span> does, not inside the code that uses the interface. That edge is the lesson's choice: the book's own examples call the factory from the interface, which reflection makes harmless.</p><h3>Exercise</h3><ul><li>An invoice priced from an exchange-rate feed: <span class="math" data-say="invoice, ratesfeed, ratesfeed, http, invoicetest, invoice">invoice, ratesfeed; ratesfeed, http; invoicetest, invoice</span>, with <span class="math" data-say="http">http</span> changed.</li><li>The same invoice redesigned: an interface <span class="math" data-say="rates">rates</span>, implemented by <span class="math" data-say="httprates">httprates</span>, which uses <span class="math" data-say="http">http</span>, and by <span class="math" data-say="ratesstub">ratesstub</span>; the invoice and its test as in the preset plugin-and-stub; <span class="math" data-say="main">main</span> wiring <span class="math" data-say="httprates">httprates</span>.</li></ul><p>For each design, list by hand what depends on <span class="math" data-say="http">http</span> directly and everything a change to it reaches, and say in one sentence whether the invoice's test still depends on the network. Write the second design's records first.</p><p>That ends the Subject where it began. Plugin and Service Stub both rest on the Separated Interface of the first course's Layer Supertype and Separated Interface, and the First Law of this course's first lesson is one more case of what the first course said about layers: decide where the boundaries are, and keep them few.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Counting dependencies</h2></div><p>what a change reaches</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The snippet has all three parts. Lines 2 to 4 are the Separated Interface the signup depends on: is this postcode deliverable? Lines 5 to 9 are the stub, which says yes to every postcode except those beginning <span class="math" data-say="zz">ZZ</span>, so a test can ask for either answer. Lines 12 to 20 are the plugin in its simplest form, one <span class="math" data-say="switch">switch</span> on the environment's name, read once at startup: the stub for <span class="math" data-say="test">test</span>, the real post office check for <span class="math" data-say="live">live</span>. It is the one place that knows both implementations. It solves the scattering and not the rebuild: a new environment, say a staging setup that uses the stub, is still a change to this code, which a configuration file read at startup, or reflection, would remove.</p><p>Now the count. The lab reads records <span class="math" data-say="dependent, then what it depends on">dependent, dependency</span> and the name of the class that changes, and walks the dependencies backwards from it. Its tiles list what depends on the changed class directly and everything the change reaches, the changed class itself left out. In the preset <code>real-service</code> the signup calls <span class="math" data-say="postoffice">postoffice</span>, which uses the <span class="math" data-say="network">network</span> library, and the signup's test calls the signup. Change <span class="math" data-say="network">network</span> and it reaches 1 directly, <span class="math" data-say="postoffice">postoffice</span>, and 3 in all, <span class="math" data-say="postoffice, signup, signuptest">postoffice, signup, signuptest</span>: the test depends on the network.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Counting dependencies</h2></div><p>what a change reaches</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Counting dependencies</strong><span>what a change reaches</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgTable"></table></div>
       <div class="status-banner" id="dgStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What a change to the network reaches</h3>
-          <p>A count over the structure the lesson states. Each record is one dependency, written dependent, dependency. Name the class that changes; the lab lists what depends on it directly and everything the change reaches. The designs are the lesson's, and the tests are listed as classes like any other.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What a change to the network reaches</h3>
+            <p>A count over the structure the lesson states. Each record is one dependency, written dependent, dependency. Name the class that changes; the lab lists what depends on it directly and everything the change reaches. The designs are the lesson's, and the tests are listed as classes like any other.</p>
         <div class="field">
           <label for="dgPreset">Worked example</label>
           <select id="dgPreset"><option value="real-service" selected>The signup calls the post office directly (illustrative)</option><option value="plugin-and-stub">An AddressCheck interface, a stub, and main choosing the real one</option></select>
@@ -1497,12 +1540,15 @@
           <div class="kpi"><span>Reached in all</span><strong id="dgAffected">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>plugin-and-stub</code> is the snippet's design, wired from the edge. The signup depends on <span class="math" data-say="addresscheck">addresscheck</span>; <span class="math" data-say="postofficecheck">postofficecheck</span> and <span class="math" data-say="addresscheckstub">addresscheckstub</span> implement it; the test uses the signup and the stub; and <span class="math" data-say="main">main</span>, the startup code that calls the plugin and hands the result to the signup, depends on <span class="math" data-say="postofficecheck">postofficecheck</span>. Change <span class="math" data-say="network">network</span> and it reaches 1 directly, <span class="math" data-say="postofficecheck">postofficecheck</span>, and 2 in all, <span class="math" data-say="main, postofficecheck">main, postofficecheck</span>. Neither the signup nor its test is reached.</p><p>That depends on who calls the switch. If the signup called <span class="math" data-say="address checks dot for environment">AddressChecks.forEnvironment</span> itself, it would depend on the plugin, which names <span class="math" data-say="post office check">PostOfficeCheck</span>; add <span class="math" data-say="signup, main">signup, main</span> to the records and a change to <span class="math" data-say="network">network</span> reaches 4 again, <span class="math" data-say="main, postofficecheck, signup, signuptest">main, postofficecheck, signup, signuptest</span>. That is the compile-time dependency Rice and Foemmel's reflection removes, and one reason to read the configuration at one point at the edge of the system, as the lesson's <span class="math" data-say="main">main</span> does, not inside the code that uses the interface. That edge is the lesson's choice: the book's own examples call the factory from the interface, which reflection makes harmless.</p><h3>Exercise</h3><ul><li>An invoice priced from an exchange-rate feed: <span class="math" data-say="invoice, ratesfeed, ratesfeed, http, invoicetest, invoice">invoice, ratesfeed; ratesfeed, http; invoicetest, invoice</span>, with <span class="math" data-say="http">http</span> changed.</li><li>The same invoice redesigned: an interface <span class="math" data-say="rates">rates</span>, implemented by <span class="math" data-say="httprates">httprates</span>, which uses <span class="math" data-say="http">http</span>, and by <span class="math" data-say="ratesstub">ratesstub</span>; the invoice and its test as in the preset plugin-and-stub; <span class="math" data-say="main">main</span> wiring <span class="math" data-say="httprates">httprates</span>.</li></ul><p>For each design, list by hand what depends on <span class="math" data-say="http">http</span> directly and everything a change to it reaches, and say in one sentence whether the invoice's test still depends on the network. Write the second design's records first.</p><p>That ends the Subject where it began. Plugin and Service Stub both rest on the Separated Interface of the first course's Layer Supertype and Separated Interface, and the First Law of this course's first lesson is one more case of what the first course said about layers: decide where the boundaries are, and keep them few.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Keeping a test off the network</h2></div><p>Four steps, the last of them on a test of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the dependencies, tests included</h3><p>Write each class and what it uses, as dependent, dependency, and include each test as a class that uses what it tests.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Walk back from the change</h3><p>From the network library, list what uses it directly, then what uses those, until nothing new is reached. Check whether a test is on the list.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Redesign with an interface, a stub and a plugin</h3><p>Put a Separated Interface in front of the service, give it a real implementation and a stub, let the test use the stub, let one startup class choose the real one, and walk back again.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a test you know</h3><p>Take one test in a system you know that calls a real external service. Write the interface that would let it use a stub, in a few lines, and list what a change to the service's client library would then reach.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Keeping a test off the network</h2>
+      <p class="lead-in">Four steps, the last of them on a test of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the dependencies, tests included.</strong> Write each class and what it uses, as dependent, dependency, and include each test as a class that uses what it tests.</li><li><strong>Walk back from the change.</strong> From the network library, list what uses it directly, then what uses those, until nothing new is reached. Check whether a test is on the list.</li><li><strong>Redesign with an interface, a stub and a plugin.</strong> Put a Separated Interface in front of the service, give it a real implementation and a stub, let the test use the stub, let one startup class choose the real one, and walk back again.</li><li><strong>Do it on a test you know.</strong> Take one test in a system you know that calls a real external service. Write the interface that would let it use a stub, in a few lines, and list what a change to the service's client library would then reach.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1521,17 +1567,16 @@ signuptest uses signup and the stub
 neither of those reaches network</div><p>The test depends on <span class="math" data-say="signup">signup</span> and <span class="math" data-say="addresscheckstub">addresscheckstub</span>, and both depend only on the interface. A change to the network reaches the startup code that chose the real check, and nothing the tests run.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a stub tests the service</strong><span>A test that passes against the stub says nothing about the post office: the stub answers yes to every postcode not beginning <span class="math" data-say="zz">ZZ</span>, whatever the real service would say. What it tests is the code that uses the service, without it, which is what Rice wrote it for. The service, and the class that calls it, need tests of their own.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a plugin needs a framework</strong><span>The book's example reads a properties file and builds classes by reflection, and it is easy to conclude that Plugin means a configuration framework. Rice and Foemmel ask for less: one place, stated outside the code that uses the interface and read at configuration time, that chooses the implementation for the environment. Without reflection that can be a conditional, and the snippet does it with one <span class="math" data-say="switch">switch</span>, though a new environment then still means a rebuild, which the book's text file of linking rules avoids.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Making the stub faithful to the service</strong><span>A stub that reproduces the service's rules seems more useful the more it copies. Rice says the opposite: keep it as simple as possible, because a complicated stub defeats the point of having one. A few lines that give the answers the tests need, such as one postcode prefix that is refused, are the pattern; a second implementation of the service is another thing to test and keep in step.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can list what a change to a service reaches, with and without a stub.</strong><p>Given dependencies including tests, list what a change to the network library reaches with a direct dependency and with a Separated Interface, a Service Stub and a Plugin, and say whether the tests are reached.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab walks the dependencies you type; it cannot find them in code, and it cannot tell whether the stub's answers resemble the service's. It also counts a test reached or not, when what matters to Rice is whether the test can run without the service: a design where the test is not reached can still fail because the stub's setup is wrong, and only running the tests shows that.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a stub tests the service</strong><span>A test that passes against the stub says nothing about the post office: the stub answers yes to every postcode not beginning <span class="math" data-say="zz">ZZ</span>, whatever the real service would say. What it tests is the code that uses the service, without it, which is what Rice wrote it for. The service, and the class that calls it, need tests of their own.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a plugin needs a framework</strong><span>The book's example reads a properties file and builds classes by reflection, and it is easy to conclude that Plugin means a configuration framework. Rice and Foemmel ask for less: one place, stated outside the code that uses the interface and read at configuration time, that chooses the implementation for the environment. Without reflection that can be a conditional, and the snippet does it with one <span class="math" data-say="switch">switch</span>, though a new environment then still means a rebuild, which the book's text file of linking rules avoids.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Making the stub faithful to the service</strong><span>A stub that reproduces the service's rules seems more useful the more it copies. Rice says the opposite: keep it as simple as possible, because a complicated stub defeats the point of having one. A few lines that give the answers the tests need, such as one postcode prefix that is refused, are the pattern; a second implementation of the service is another thing to test and keep in step.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can list what a change to a service reaches, with and without a stub.</strong><p>Given dependencies including tests, list what a change to the network library reaches with a direct dependency and with a Separated Interface, a Service Stub and a Plugin, and say whether the tests are reached.</p></div></div><div class="note"><strong>Note:</strong> The lab walks the dependencies you type; it cannot find them in code, and it cannot tell whether the stub's answers resemble the service's. It also counts a test reached or not, when what matters to Rice is whether the test can run without the service: a design where the test is not reached can still fail because the stub's setup is wrong, and only running the tests shows that.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Separated Interface</summary><p>An interface declared apart from its implementation, so that the code that uses it depends on the interface alone. Read in the first course; both patterns here build on it.</p></details><details class="recall"><summary>Plugin</summary><p>By David Rice and Matt Foemmel: a factory that links each Separated Interface to its implementation from instructions stated at one external point and read at run time, so that a new configuration needs no rebuild.</p></details><details class="recall"><summary>Service Stub</summary><p>By David Rice: a local, fast, in-memory stand-in for a service the system depends on, such as a credit check, used during development and testing and kept as simple as possible.</p></details></div>
+      <h3>Summary</h3>
       <p>Rice and Foemmel's Plugin links a Separated Interface to its implementation during configuration rather than compilation, in one place; Rice's Service Stub is the simplest implementation that lets development and tests go on without a slow or unavailable service. List what a change to a network library reaches with a direct dependency, and with an interface, a stub and a plugin.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Separated Interface.</strong> An interface declared apart from its implementation, so that the code that uses it depends on the interface alone. Read in the first course; both patterns here build on it.</li><li><strong>Plugin.</strong> By David Rice and Matt Foemmel: a factory that links each Separated Interface to its implementation from instructions stated at one external point and read at run time, so that a new configuration needs no rebuild.</li><li><strong>Service Stub.</strong> By David Rice: a local, fast, in-memory stand-in for a service the system depends on, such as a credit check, used during development and testing and kept as simple as possible.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="plugin, link at configuration, not build. one place chooses each implementation. a stub stands in for a service in tests. keep the stub as simple as possible. a stub tests the caller, not the service" tabindex="0" role="region" aria-label="Mathematical notation">plugin: link at configuration, not build
 one place chooses each implementation
 a stub stands in for a service in tests
@@ -2252,11 +2297,42 @@ a stub tests the caller, not the service</div><figcaption>Plugin and Service Stu
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2324,7 +2400,7 @@ a stub tests the caller, not the service</div><figcaption>Plugin and Service Stu
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

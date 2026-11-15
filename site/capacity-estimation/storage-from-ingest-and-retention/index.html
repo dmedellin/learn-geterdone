@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Capacity Estimation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Storage and bandwidth</p>
       <h1>Storage from Ingest and Retention</h1>
       <p class="lesson-lede">Size storage after a retention window with a stated monthly growth rate and a stated number of copies.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Storage is a sum over a window, not a product</li><li>Growth makes the series geometric</li><li>Replication multiplies the sum, and comes last</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>A rate over a window, under growth, times the copies</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Retention window</span><p>The <strong>retention window</strong> <span class="math" data-say="R">R</span> is how long data is kept before it is deleted. Steady state is reached once the system is older than <span class="math" data-say="R">R</span>: each day&rsquo;s arrivals are matched by one day&rsquo;s deletions, and the total held stops growing for that reason and starts growing again for any other.</p></div><p>So the quantity to size is what accumulates across <span class="math" data-say="R">R</span> days of arrivals. Write <span class="math" data-say="i sub m">iₘ</span> for the ingest per day during block <span class="math" data-say="m">m</span>; the unique data held is <span class="math" data-say="the sum of i sub m times days in block m">Σ iₘ · (days in block m)</span>, and everything that follows is about what the terms of that sum look like.</p><p>If the ingest never changes, every term is the same and the sum is <span class="math" data-say="rate times days">rate × days</span>. That is an arithmetic series with common difference zero, and it is the only case in which storage is a product. It is also the case everyone has in mind when they multiply, which is why the product feels like a definition rather than a special case.</p><div class="defbox"><span class="label">Definition &middot; Monthly compounded growth</span><p>An ingest <strong>growing at <span class="math" data-say="g">g</span> a month</strong> is multiplied by <span class="math" data-say="1 plus g">(1 + g)</span> once per month, so during month <span class="math" data-say="m">m</span> &mdash; counting from <span class="math" data-say="m equals 0">m = 0</span> &mdash; the daily ingest is <span class="math" data-say="i sub 0 times the quantity 1 plus g, to the power m">i₀ · (1 + g)ᵐ</span>. The window is a run of 30-day blocks, each with its own constant rate, and the total is a geometric sum. Growth here steps once a month rather than compounding continuously, which keeps every term an exact fraction.</p></div><div class="mathblock" data-say="i sub 0 equals 500 gigabytes per day, R equals 90 days, g equals 5 percent over month, copies equals 3. block, days, ingest over day, bytes added, held one copy. a table, shown on the page. one copy, 47.29 terabytes. times 3 copies, 141.86 terabytes. if the ingest never grew, 500 gigabytes times 90 times 3, equals 135 terabytes. growth costs, 141.86 over 135, equals 1.0508 times" tabindex="0" role="region" aria-label="Mathematical notation">i₀ = 500 GB/day     R = 90 days     g = 5%/month     copies = 3
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>A rate over a window, under growth, times the copies</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Retention window</span><p>The <strong>retention window</strong> <span class="math" data-say="R">R</span> is how long data is kept before it is deleted. Steady state is reached once the system is older than <span class="math" data-say="R">R</span>: each day&rsquo;s arrivals are matched by one day&rsquo;s deletions, and the total held stops growing for that reason and starts growing again for any other.</p></div><p>So the quantity to size is what accumulates across <span class="math" data-say="R">R</span> days of arrivals. Write <span class="math" data-say="i sub m">iₘ</span> for the ingest per day during block <span class="math" data-say="m">m</span>; the unique data held is <span class="math" data-say="the sum of i sub m times days in block m">Σ iₘ · (days in block m)</span>, and everything that follows is about what the terms of that sum look like.</p><p>If the ingest never changes, every term is the same and the sum is <span class="math" data-say="rate times days">rate × days</span>. That is an arithmetic series with common difference zero, and it is the only case in which storage is a product. It is also the case everyone has in mind when they multiply, which is why the product feels like a definition rather than a special case.</p><div class="defbox"><span class="label">Definition &middot; Monthly compounded growth</span><p>An ingest <strong>growing at <span class="math" data-say="g">g</span> a month</strong> is multiplied by <span class="math" data-say="1 plus g">(1 + g)</span> once per month, so during month <span class="math" data-say="m">m</span> &mdash; counting from <span class="math" data-say="m equals 0">m = 0</span> &mdash; the daily ingest is <span class="math" data-say="i sub 0 times the quantity 1 plus g, to the power m">i₀ · (1 + g)ᵐ</span>. The window is a run of 30-day blocks, each with its own constant rate, and the total is a geometric sum. Growth here steps once a month rather than compounding continuously, which keeps every term an exact fraction.</p></div><div class="mathblock" data-say="i sub 0 equals 500 gigabytes per day, R equals 90 days, g equals 5 percent over month, copies equals 3. block, days, ingest over day, bytes added, held one copy. a table, shown on the page. one copy, 47.29 terabytes. times 3 copies, 141.86 terabytes. if the ingest never grew, 500 gigabytes times 90 times 3, equals 135 terabytes. growth costs, 141.86 over 135, equals 1.0508 times" tabindex="0" role="region" aria-label="Mathematical notation">i₀ = 500 GB/day     R = 90 days     g = 5%/month     copies = 3
 
 block  days   ingest/day     bytes added    held (one copy)
    1     30     500.00 GB       15.00 TB        15.00 TB
@@ -1402,12 +1446,11 @@ one copy                                        47.29 TB
 × 3 copies                                     141.86 TB
 
 if the ingest never grew   500 GB · 90 · 3   = 135 TB
-growth costs               141.86 / 135      = 1.0508×</div><p>Each block&rsquo;s rate is an exact power: month <span class="math" data-say="m">m</span> runs at <span class="math" data-say="i sub 0 times the quantity 21 over 20, to the power m">i₀ · (21/20)ᵐ</span>, with both ends integers, so the lab never prints a figure it had to round on the way. The table in the lab is the series term by term, and the total underneath it is the sum &mdash; which is worth watching once, because it is the only way to see that the curve pulls away from the straight line gradually rather than at a point.</p><div class="example"><span class="label">Example &middot; Half a terabyte a day, kept ninety days, in triplicate</span><p>The unique data is <span class="math" data-say="47.29 terabytes">47.29 TB</span> and the storage is <span class="math" data-say="141.86 terabytes">141.86 TB</span>. The quick calculation &mdash; half a terabyte times ninety days &mdash; gives <span class="math" data-say="45 terabytes">45 TB</span>, which is short by the growth and short again by the copies. Both factors are recoverable: the growth costs <span class="math" data-say="1.0508 times">1.0508×</span> against the flat case and the copies cost exactly <span class="math" data-say="3 times">3×</span>.</p></div><h3>Growth is not a correction you add at the end</h3><p>Over ninety days at <span class="math" data-say="5 percent">5%</span> a month the growth is worth <span class="math" data-say="1.0508 times">1.0508×</span>, which is small enough to feel like a rounding. That feeling is about the window, not about growth. Take the lab&rsquo;s fast-growth example &mdash; <span class="math" data-say="100 gigabytes">100 GB</span> a day, kept two years, growing <span class="math" data-say="15 percent">15%</span> a month &mdash; and the same arithmetic gives <span class="math" data-say="581.13 terabytes">581.13 TB</span> of unique data against <span class="math" data-say="73 terabytes">73 TB</span> if it had stayed flat. Growth is worth <span class="math" data-say="7.9607 times">7.9607×</span> there, and the daily ingest in the last month has reached <span class="math" data-say="2.86 terabytes">2.86 TB</span>.</p><p>The reason is the one the two prerequisite algebra courses make: a geometric sum is dominated by its last terms, and how much it is dominated by them depends on how many terms there are. Ninety days is three terms and two years is twenty-five, which is the whole difference between a <span class="math" data-say="5 percent">5%</span> correction and a factor of eight.</p><h3>What this model does not say</h3><p>The growth here steps once a month and is flat within the month, which is a modelling choice and is visible in the lab as a staircase rather than a curve. It keeps every term exact, and it means a figure read off for day forty-five is the second block&rsquo;s rate rather than something interpolated. Nothing on this course needs finer resolution than that, and the alternative &mdash; a continuously compounded day &mdash; would make every term irrational for no gain in what the estimate can tell you.</p><p>The units are decimal throughout: a kilobyte is <span class="math" data-say="1000">1000</span> bytes and a terabyte is <span class="math" data-say="10 to the power 12">10¹²</span>, which is what a disk is sold in. Mixing in <span class="math" data-say="1024">1024</span>-based units partway through a chain produces an error that grows with every thousand-step and looks like nothing at all, because both numbers are plausible.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Storage from ingest and retention</h2></div><p>An arithmetic series at constant ingest, a geometric one under growth</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+growth costs               141.86 / 135      = 1.0508×</div><p>Each block&rsquo;s rate is an exact power: month <span class="math" data-say="m">m</span> runs at <span class="math" data-say="i sub 0 times the quantity 21 over 20, to the power m">i₀ · (21/20)ᵐ</span>, with both ends integers, so the lab never prints a figure it had to round on the way. The table in the lab is the series term by term, and the total underneath it is the sum &mdash; which is worth watching once, because it is the only way to see that the curve pulls away from the straight line gradually rather than at a point.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Storage from ingest and retention</h2></div><p>An arithmetic series at constant ingest, a geometric one under growth</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Storage over a retention window</strong><span>a sum of a rate, term by term, then multiplied by the copies</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>constant ingest</span><span class="tone-amber"><i class="legend-swatch"></i>with growth</span></div>
@@ -1415,10 +1458,10 @@ growth costs               141.86 / 135      = 1.0508×</div><p>Each block&rsquo
       <div class="lab-stage" id="acStage" tabindex="0" role="region" aria-label="Cumulative bytes held, constant ingest against compounded growth."><svg id="acCurve" style="min-width:520px" viewBox="0 0 520 192" role="img" aria-label="Two cumulative storage curves over the retention window."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="acTable"></table></div>
       <div class="status-banner" id="acStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the ingest, the window, the growth and the copies</h3>
-          <p>The table is the series, term by term, and the total underneath it is the sum times the copies. Drag the growth to zero and the terms become equal; drag the window out to two years and watch the last terms take over the total.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the ingest, the window, the growth and the copies</h3>
+            <p>The table is the series, term by term, and the total underneath it is the sum times the copies. Drag the growth to zero and the terms become equal; drag the window out to two years and watch the last terms take over the total.</p>
         <div class="field" id="acPresetField">
           <label for="acPreset">Worked example</label>
           <select id="acPreset"><option value="event-log" selected>500 GB a day, kept 90 days, growing 5% a month, 3 copies</option><option value="flat-archive">2 TB a day, kept a year, no growth, 2 copies</option><option value="fast-growth">100 GB a day, kept two years, growing 15% a month, 3 copies</option></select>
@@ -1448,12 +1491,15 @@ growth costs               141.86 / 135      = 1.0508×</div><p>Each block&rsquo
           <div class="kpi"><span>Monthly blocks</span><strong id="acMonths">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="example"><span class="label">Example &middot; Half a terabyte a day, kept ninety days, in triplicate</span><p>The unique data is <span class="math" data-say="47.29 terabytes">47.29 TB</span> and the storage is <span class="math" data-say="141.86 terabytes">141.86 TB</span>. The quick calculation &mdash; half a terabyte times ninety days &mdash; gives <span class="math" data-say="45 terabytes">45 TB</span>, which is short by the growth and short again by the copies. Both factors are recoverable: the growth costs <span class="math" data-say="1.0508 times">1.0508×</span> against the flat case and the copies cost exactly <span class="math" data-say="3 times">3×</span>.</p></div><h3>Growth is not a correction you add at the end</h3><p>Over ninety days at <span class="math" data-say="5 percent">5%</span> a month the growth is worth <span class="math" data-say="1.0508 times">1.0508×</span>, which is small enough to feel like a rounding. That feeling is about the window, not about growth. Take the lab&rsquo;s fast-growth example &mdash; <span class="math" data-say="100 gigabytes">100 GB</span> a day, kept two years, growing <span class="math" data-say="15 percent">15%</span> a month &mdash; and the same arithmetic gives <span class="math" data-say="581.13 terabytes">581.13 TB</span> of unique data against <span class="math" data-say="73 terabytes">73 TB</span> if it had stayed flat. Growth is worth <span class="math" data-say="7.9607 times">7.9607×</span> there, and the daily ingest in the last month has reached <span class="math" data-say="2.86 terabytes">2.86 TB</span>.</p><p>The reason is the one the two prerequisite algebra courses make: a geometric sum is dominated by its last terms, and how much it is dominated by them depends on how many terms there are. Ninety days is three terms and two years is twenty-five, which is the whole difference between a <span class="math" data-say="5 percent">5%</span> correction and a factor of eight.</p><h3>What this model does not say</h3><p>The growth here steps once a month and is flat within the month, which is a modelling choice and is visible in the lab as a staircase rather than a curve. It keeps every term exact, and it means a figure read off for day forty-five is the second block&rsquo;s rate rather than something interpolated. Nothing on this course needs finer resolution than that, and the alternative &mdash; a continuously compounded day &mdash; would make every term irrational for no gain in what the estimate can tell you.</p><p>The units are decimal throughout: a kilobyte is <span class="math" data-say="1000">1000</span> bytes and a terabyte is <span class="math" data-say="10 to the power 12">10¹²</span>, which is what a disk is sold in. Mixing in <span class="math" data-say="1024">1024</span>-based units partway through a chain produces an error that grows with every thousand-step and looks like nothing at all, because both numbers are plausible.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sizing a store from an ingest rate</h2></div><p>A rate per day, a window, a growth rate, a replication factor, in that order.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Get the ingest to bytes per day</h3><p>Usually this is the write rate from &ldquo;Read/Write Ratio&rdquo; times the bytes a write carries, converted from per-second to per-day. Do the conversion once, at the start, so the retention window can be in days and the arithmetic can be a sum of daily terms.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the window as a run of blocks, one per growth step</h3><p>Ninety days at monthly growth is three blocks of thirty. Within a block the rate is constant, so each term is a rate times a count of days; across blocks the rate is multiplied by <span class="math" data-say="1 plus g">(1+g)</span> each time.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Sum the blocks, and keep the unique-data figure</h3><p>The sum is what one copy of the data occupies, and it is the number a retention policy is about. Write it down separately before multiplying by anything, because it is the figure you will be asked to justify.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Multiply by the replication factor last</h3><p>Copies multiply the accumulated total. Three copies of <span class="math" data-say="47.29 terabytes">47.29 TB</span> is <span class="math" data-say="141.86 terabytes">141.86 TB</span>; the replication factor is a count of complete copies and belongs at the end of the chain, where it is visible and easy to change.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Compare against the flat answer, and quote the ratio</h3><p><span class="math" data-say="rate times days times copies">rate × days × copies</span> is the estimate somebody else will do in their head, so quoting the ratio between your answer and theirs &mdash; <span class="math" data-say="1.0508 times">1.0508×</span> here, from growth alone &mdash; is the fastest way to explain where the difference came from.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sizing a store from an ingest rate</h2>
+      <p class="lead-in">A rate per day, a window, a growth rate, a replication factor, in that order.</p>
+      <ol class="key-ideas method"><li><strong>Get the ingest to bytes per day.</strong> Usually this is the write rate from &ldquo;Read/Write Ratio&rdquo; times the bytes a write carries, converted from per-second to per-day. Do the conversion once, at the start, so the retention window can be in days and the arithmetic can be a sum of daily terms.</li><li><strong>Write the window as a run of blocks, one per growth step.</strong> Ninety days at monthly growth is three blocks of thirty. Within a block the rate is constant, so each term is a rate times a count of days; across blocks the rate is multiplied by <span class="math" data-say="1 plus g">(1+g)</span> each time.</li><li><strong>Sum the blocks, and keep the unique-data figure.</strong> The sum is what one copy of the data occupies, and it is the number a retention policy is about. Write it down separately before multiplying by anything, because it is the figure you will be asked to justify.</li><li><strong>Multiply by the replication factor last.</strong> Copies multiply the accumulated total. Three copies of <span class="math" data-say="47.29 terabytes">47.29 TB</span> is <span class="math" data-say="141.86 terabytes">141.86 TB</span>; the replication factor is a count of complete copies and belongs at the end of the chain, where it is visible and easy to change.</li><li><strong>Compare against the flat answer, and quote the ratio.</strong> <span class="math" data-say="rate times days times copies">rate × days × copies</span> is the estimate somebody else will do in their head, so quoting the ratio between your answer and theirs &mdash; <span class="math" data-say="1.0508 times">1.0508×</span> here, from growth alone &mdash; is the fastest way to explain where the difference came from.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1482,17 +1528,16 @@ growth costs      141.86 / 135                      = 1.0508×
 last block runs at 551.25 / 500                     = 1.103× the first</div><p>The three block totals are not equal, and that is the entire difference between this and <span class="math" data-say="rate times days">rate × days</span>. They are also not very unequal, because ninety days is only three terms &mdash; which is why growth looks like a rounding error at short windows and stops looking like one at long ones.</p><p>Switch the lab to its fast-growth example to see the other end of that: <span class="math" data-say="100 gigabytes">100 GB</span> a day kept two years at <span class="math" data-say="15 percent">15%</span> a month is twenty-five blocks, <span class="math" data-say="581.13 terabytes">581.13 TB</span> of unique data, <span class="math" data-say="1.74 PB">1.74 PB</span> across three copies, and a growth factor of <span class="math" data-say="7.9607 times">7.9607×</span> against the flat answer. Same arithmetic, same three inputs, an answer that is nothing like a product.</p><p>For a faded rehearsal, take <span class="math" data-say="2 terabytes">2 TB</span> a day kept a year with no growth and two copies. The supplied first move: with <span class="math" data-say="g equals 0">g = 0</span> every term is equal, so the sum really is <span class="math" data-say="rate times days">rate × days</span>. Predict the unique data and the total, then check them in the lab &mdash; and then turn the growth up to <span class="math" data-say="5 percent">5%</span> and say, before you look, roughly what factor the twelve blocks will cost you.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Multiplying the rate by the window and stopping</strong><span><span class="math" data-say="500 gigabytes times 90 days">500 GB × 90 days</span> is <span class="math" data-say="45 terabytes">45 TB</span>, and the answer is <span class="math" data-say="141.86 terabytes">141.86 TB</span> &mdash; short by the growth and short again by the copies. The product is the sum of the daily terms only when every term is equal, which requires a flat ingest, and the copies were never in the calculation at all. Both omissions are multiplicative, so they compound rather than partly cancelling.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Applying the final month&#x27;s rate to the whole window</strong><span>The ingest reaches <span class="math" data-say="551.25 gigabytes">551.25 GB</span> a day by the third block, and multiplying that by all ninety days treats the fastest rate as if it had held from the start. It is the same error as the flat calculation with the sign reversed: one uses the first term for every term and the other uses the last. The sum has a different rate in every block, and the lab lists them so the difference is on the page.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Filing growth as a second-order correction</strong><span>At <span class="math" data-say="5 percent">5%</span> a month over ninety days growth is worth <span class="math" data-say="1.0508 times">1.0508×</span>, which genuinely is small &mdash; and the conclusion &ldquo;growth is a rounding&rdquo; does not follow, because the size of the correction depends on the number of terms. The lab&rsquo;s two-year, <span class="math" data-say="15 percent">15%</span>-a-month example is <span class="math" data-say="7.9607 times">7.9607×</span> from the same arithmetic. The question to ask is never &ldquo;is the growth rate large&rdquo; but &ldquo;how many growth steps does the window contain&rdquo;.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when storage reads as a sum over a window, with rate times time as the flat special case of it.</strong><p>You should be able to turn an ingest rate, a retention window, a monthly growth rate and a replication factor into a storage figure, state the unique-data total separately from the replicated one, and say what factor the growth was worth and why that factor depends on the length of the window.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The same write rate that filled the disk also has to cross a wire, and the wire is sold in different units from the payload. &ldquo;Bandwidth: Bits, Bytes and Overhead&rdquo; takes a request rate to megabits a second, which is where a factor of eight hides, and then asks what per-request headers do to the total &mdash; a question with a surprisingly clean answer about which payload sizes are mostly header.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Multiplying the rate by the window and stopping</strong><span><span class="math" data-say="500 gigabytes times 90 days">500 GB × 90 days</span> is <span class="math" data-say="45 terabytes">45 TB</span>, and the answer is <span class="math" data-say="141.86 terabytes">141.86 TB</span> &mdash; short by the growth and short again by the copies. The product is the sum of the daily terms only when every term is equal, which requires a flat ingest, and the copies were never in the calculation at all. Both omissions are multiplicative, so they compound rather than partly cancelling.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Applying the final month&#x27;s rate to the whole window</strong><span>The ingest reaches <span class="math" data-say="551.25 gigabytes">551.25 GB</span> a day by the third block, and multiplying that by all ninety days treats the fastest rate as if it had held from the start. It is the same error as the flat calculation with the sign reversed: one uses the first term for every term and the other uses the last. The sum has a different rate in every block, and the lab lists them so the difference is on the page.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Filing growth as a second-order correction</strong><span>At <span class="math" data-say="5 percent">5%</span> a month over ninety days growth is worth <span class="math" data-say="1.0508 times">1.0508×</span>, which genuinely is small &mdash; and the conclusion &ldquo;growth is a rounding&rdquo; does not follow, because the size of the correction depends on the number of terms. The lab&rsquo;s two-year, <span class="math" data-say="15 percent">15%</span>-a-month example is <span class="math" data-say="7.9607 times">7.9607×</span> from the same arithmetic. The question to ask is never &ldquo;is the growth rate large&rdquo; but &ldquo;how many growth steps does the window contain&rdquo;.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when storage reads as a sum over a window, with rate times time as the flat special case of it.</strong><p>You should be able to turn an ingest rate, a retention window, a monthly growth rate and a replication factor into a storage figure, state the unique-data total separately from the replicated one, and say what factor the growth was worth and why that factor depends on the length of the window.</p></div></div><div class="note"><strong>Note:</strong> The same write rate that filled the disk also has to cross a wire, and the wire is sold in different units from the payload. &ldquo;Bandwidth: Bits, Bytes and Overhead&rdquo; takes a request rate to megabits a second, which is where a factor of eight hides, and then asks what per-request headers do to the total &mdash; a question with a surprisingly clean answer about which payload sizes are mostly header.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Storage is a sum over a window, not a product</summary><p>What is on disk after <span class="math" data-say="R">R</span> days is the total of what arrived on each of those days. While the daily ingest is constant, all the terms are equal and the sum collapses to <span class="math" data-say="rate times days">rate × days</span> &mdash; an arithmetic series with common difference zero, which is why the product ever works. It is a special case, and treating it as the definition is what breaks the moment anything grows.</p></details><details class="recall"><summary>Growth makes the series geometric</summary><p>At <span class="math" data-say="5 percent">5%</span> a month the ingest is <span class="math" data-say="1.05 to the power m">1.05ᵐ</span> times its starting value in month <span class="math" data-say="m">m</span>, so the window is a run of monthly blocks each at its own constant rate and the total is a geometric sum. Over ninety days the blocks add <span class="math" data-say="15 terabytes">15 TB</span>, <span class="math" data-say="15.75 terabytes">15.75 TB</span> and <span class="math" data-say="16.54 terabytes">16.54 TB</span> for a total of <span class="math" data-say="47.29 terabytes">47.29 TB</span>, against <span class="math" data-say="45 terabytes">45 TB</span> if the ingest had stayed flat. The last block runs at <span class="math" data-say="551.25 gigabytes">551.25 GB</span> a day, <span class="math" data-say="1.103 times">1.103×</span> where it started.</p></details><details class="recall"><summary>Replication multiplies the sum, and comes last</summary><p>Three copies of <span class="math" data-say="47.29 terabytes">47.29 TB</span> is <span class="math" data-say="141.86 terabytes">141.86 TB</span>. The copies multiply the accumulated total rather than the ingest rate, which gives the same answer here and stops giving it as soon as anything else in the chain is not linear. Keeping replication as the final step also keeps the unique-data figure visible, and that is the figure a retention policy is actually about.</p></details></div>
+      <h3>Summary</h3>
       <p>Storage is not a rate times a time. It is a sum of a rate over a window, which happens to equal rate times time only while the rate is constant. Let the ingest grow and the sum becomes geometric, and the answer pulls away from the product. Then the replication factor multiplies everything, and the three-line calculation that everyone does in their head has two missing factors in it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Storage is a sum over a window, not a product.</strong> What is on disk after <span class="math" data-say="R">R</span> days is the total of what arrived on each of those days. While the daily ingest is constant, all the terms are equal and the sum collapses to <span class="math" data-say="rate times days">rate × days</span> &mdash; an arithmetic series with common difference zero, which is why the product ever works. It is a special case, and treating it as the definition is what breaks the moment anything grows.</li><li><strong>Growth makes the series geometric.</strong> At <span class="math" data-say="5 percent">5%</span> a month the ingest is <span class="math" data-say="1.05 to the power m">1.05ᵐ</span> times its starting value in month <span class="math" data-say="m">m</span>, so the window is a run of monthly blocks each at its own constant rate and the total is a geometric sum. Over ninety days the blocks add <span class="math" data-say="15 terabytes">15 TB</span>, <span class="math" data-say="15.75 terabytes">15.75 TB</span> and <span class="math" data-say="16.54 terabytes">16.54 TB</span> for a total of <span class="math" data-say="47.29 terabytes">47.29 TB</span>, against <span class="math" data-say="45 terabytes">45 TB</span> if the ingest had stayed flat. The last block runs at <span class="math" data-say="551.25 gigabytes">551.25 GB</span> a day, <span class="math" data-say="1.103 times">1.103×</span> where it started.</li><li><strong>Replication multiplies the sum, and comes last.</strong> Three copies of <span class="math" data-say="47.29 terabytes">47.29 TB</span> is <span class="math" data-say="141.86 terabytes">141.86 TB</span>. The copies multiply the accumulated total rather than the ingest rate, which gives the same answer here and stops giving it as soon as anything else in the chain is not linear. Keeping replication as the final step also keeps the unique-data figure visible, and that is the figure a retention policy is actually about.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="constant ingest, S equals rate times days, an arithmetic series. growth g a month, S equals 30 times rate times the sum of the quantity 1 plus g, to the power m, a geometric one. m equals 0 and so on blocks minus 1. then, times copies, the last step. 500 gigabytes per day, 90 days, plus 5 percent over month, 3 copies. one copy 47.29 terabytes, all copies 141.86 terabytes. if it never grew 135 terabytes, growth costs 1.0508 times" tabindex="0" role="region" aria-label="Mathematical notation">constant ingest   S = rate · days                  an arithmetic series
 growth g a month  S = 30 · rate · Σ (1+g)ᵐ         a geometric one
                   m = 0 … blocks − 1
@@ -2508,11 +2553,42 @@ then              × copies                         the last step
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2580,7 +2656,7 @@ then              × copies                         the last step
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

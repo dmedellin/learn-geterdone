@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Lines, Functions and Graphs</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Functions</p>
       <h1>Composition of Functions</h1>
       <p class="lesson-lede">Feeding one function into another, in a fixed order.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The inner function runs first</li><li>Order changes the answer</li><li>The domain is decided in two stages</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Building a composite and finding where it is defined</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Composition</span><p>Given functions <span class="math" data-say="f">f</span> and <span class="math" data-say="g">g</span>, the <strong>composite</strong> <span class="math" data-say="f composed with g">f ∘ g</span> is defined by <span class="math" data-say="f composed with g times x equals f of g of x">(f ∘ g)(x) = f(g(x))</span>. Its domain is the set of inputs <span class="math" data-say="x">x</span> in the domain of <span class="math" data-say="g">g</span> for which <span class="math" data-say="g of x">g(x)</span> lies in the domain of <span class="math" data-say="f">f</span>. The symbol is read "f circle g" or "f after g".</p><p>"After" is the reading worth adopting, because it says the order out loud. <span class="math" data-say="f composed with g">f ∘ g</span> is <span class="math" data-say="f">f</span> after <span class="math" data-say="g">g</span>: <span class="math" data-say="g">g</span> happens, then <span class="math" data-say="f">f</span> happens to the result. The alternative reading, "f of g", is also correct but is easier to say without thinking about which one moves first.</p></div><h3>Computing a composite</h3><p>Substitution again, exactly as in “Function Notation”, with a whole function in the slot. Take <span class="math" data-say="f of x equals 2 x plus 3">f(x) = 2x + 3</span> and <span class="math" data-say="g of x equals x minus 4">g(x) = x − 4</span>.</p><div class="mathblock" data-say="f o g times x equals f of g of x equals f of the quantity x minus 4. equals 2 times the quantity x minus 4, plus 3. equals 2 x minus 8 plus 3, equals, 2 x minus 5. g o f times x equals g of f of x equals g of the quantity 2 x plus 3. equals 2 x plus 3 minus 4. equals 2 x minus 1. at x equals 2, g of 2 equals negative 2, f of negative 2 equals negative 1, f o g times 2 equals negative 1. f of 2 equals 7, g of 7 equals 3, g o f times 2 equals 3" tabindex="0" role="region" aria-label="Mathematical notation">(f o g)(x) = f(g(x)) = f(x - 4)
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Building a composite and finding where it is defined</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Composition</span><p>Given functions <span class="math" data-say="f">f</span> and <span class="math" data-say="g">g</span>, the <strong>composite</strong> <span class="math" data-say="f composed with g">f ∘ g</span> is defined by <span class="math" data-say="f composed with g times x equals f of g of x">(f ∘ g)(x) = f(g(x))</span>. Its domain is the set of inputs <span class="math" data-say="x">x</span> in the domain of <span class="math" data-say="g">g</span> for which <span class="math" data-say="g of x">g(x)</span> lies in the domain of <span class="math" data-say="f">f</span>. The symbol is read "f circle g" or "f after g".</p><p>"After" is the reading worth adopting, because it says the order out loud. <span class="math" data-say="f composed with g">f ∘ g</span> is <span class="math" data-say="f">f</span> after <span class="math" data-say="g">g</span>: <span class="math" data-say="g">g</span> happens, then <span class="math" data-say="f">f</span> happens to the result. The alternative reading, "f of g", is also correct but is easier to say without thinking about which one moves first.</p></div><h3>Computing a composite</h3><p>Substitution again, exactly as in “Function Notation”, with a whole function in the slot. Take <span class="math" data-say="f of x equals 2 x plus 3">f(x) = 2x + 3</span> and <span class="math" data-say="g of x equals x minus 4">g(x) = x − 4</span>.</p><div class="mathblock" data-say="f o g times x equals f of g of x equals f of the quantity x minus 4. equals 2 times the quantity x minus 4, plus 3. equals 2 x minus 8 plus 3, equals, 2 x minus 5. g o f times x equals g of f of x equals g of the quantity 2 x plus 3. equals 2 x plus 3 minus 4. equals 2 x minus 1. at x equals 2, g of 2 equals negative 2, f of negative 2 equals negative 1, f o g times 2 equals negative 1. f of 2 equals 7, g of 7 equals 3, g o f times 2 equals 3" tabindex="0" role="region" aria-label="Mathematical notation">(f o g)(x) = f(g(x)) = f(x - 4)
            = 2(x - 4) + 3
            = 2x - 8 + 3   =   2x - 5
 
@@ -1412,12 +1456,11 @@ stage 2:  f accepts every output from g
 
 domain of f o g:  [0, inf), even though the final formula is x
 
-the other order:  (g o f)(x) = sqrt(x^2) = |x|, domain (-inf, inf)</div><p>The simplified formula <span class="math" data-say="x">x</span> accepts negative inputs, but the composite does not: <span class="math" data-say="g of negative 1">g(−1)</span> never produces a real number, so <span class="math" data-say="f">f</span> is never reached. This needs no cancellation or rational-function technique. It follows directly from the two stages: find the domain before simplifying, and carry it beside the simplified rule.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Composition, both ways round</h2></div><p>f(g(x)) and g(f(x)), computed separately</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+the other order:  (g o f)(x) = sqrt(x^2) = |x|, domain (-inf, inf)</div><p>The simplified formula <span class="math" data-say="x">x</span> accepts negative inputs, but the composite does not: <span class="math" data-say="g of negative 1">g(−1)</span> never produces a real number, so <span class="math" data-say="f">f</span> is never reached. This needs no cancellation or rational-function technique. It follows directly from the two stages: find the domain before simplifying, and carry it beside the simplified rule.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Composition, both ways round</h2></div><p>f(g(x)) and g(f(x)), computed separately</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="foTitle">A function</strong><span id="foSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>f</span><span class="tone-purple"><i class="legend-swatch"></i>the second curve</span><span class="tone-muted"><i class="legend-swatch"></i>dashed: y = x, or a discarded half</span><span class="tone-red"><i class="legend-swatch"></i>where it fails</span></div>
@@ -1425,10 +1468,10 @@ the other order:  (g o f)(x) = sqrt(x^2) = |x|, domain (-inf, inf)</div><p>The s
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="foPlot"></svg></div>
       <div id="foWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="foStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Both orders, side by side</h3>
-          <p>Predict both orders before choosing a preset. The lab substitutes each whole inner rule, compares the outputs at sample inputs, and carries the composite domain beside any simplified formula.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Both orders, side by side</h3>
+            <p>Predict both orders before choosing a preset. The lab substitutes each whole inner rule, compares the outputs at sample inputs, and carries the composite domain beside any simplified formula.</p>
         <div class="field">
           <label for="foPreset">Example</label>
           <select id="foPreset"><option value="2x + 3|x - 4">Two lines: order changes the intercept</option><option value="x + 1|x + 2">Two shifts: this pair commutes</option><option value="sqrt(x)|x - 5">A root after a shift</option><option value="x^2|sqrt(x)">A square after a root: hidden domain</option></select>
@@ -1448,12 +1491,14 @@ the other order:  (g o f)(x) = sqrt(x^2) = |x|, domain (-inf, inf)</div><p>The s
         </div>
         <p class="small-copy" id="foHint" style="margin:0;">Two formulas. Both compositions are worked out, and the lab checks whether they are the same function rather than assuming they are not.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Building a composite safely</h2></div><p>Four steps. The domain step comes before the simplifying step, and that ordering is the point.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the composite with the inner function in brackets</h3><p><span class="math" data-say="f of g of x">f(g(x))</span> first, on its own line, before any substitution. For <span class="math" data-say="f composed with g">(f ∘ g)</span> with <span class="math" data-say="g of x equals x minus 4">g(x) = x − 4</span>, that is <span class="math" data-say="f of the quantity x minus 4">f(x − 4)</span>. Seeing the inner expression sitting in the slot prevents the order from flipping.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Substitute into every occurrence of the variable</h3><p>Same discipline as “Function Notation”: brackets around the whole inner expression, in every slot. <span class="math" data-say="2 times the quantity x minus 4, plus 3">2(x − 4) + 3</span>, not <span class="math" data-say="2 x minus 4 plus 3">2x − 4 + 3</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the domain from the unsimplified form</h3><p>Ask which inputs <span class="math" data-say="g">g</span> rejects, then which of <span class="math" data-say="g">g</span>'s outputs <span class="math" data-say="f">f</span> rejects. For <span class="math" data-say="f of x equals x squared">f(x) = x²</span> after <span class="math" data-say="g of x equals the square root of x">g(x) = √x</span>, the inner root requires <span class="math" data-say="x is at least 0">x ≥ 0</span>; the outer square adds no restriction.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Simplify, then check one input end to end</h3><p>Now expand and collect. Then pick an input, run it through <span class="math" data-say="g">g</span> and <span class="math" data-say="f">f</span> separately, and compare with the simplified formula. Disagreement means the expansion is wrong; agreement at one point is not a proof, but it catches nearly every algebra slip.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Building a composite safely</h2>
+      <p class="lead-in">Four steps. The domain step comes before the simplifying step, and that ordering is the point.</p>
+      <ol class="key-ideas method"><li><strong>Write the composite with the inner function in brackets.</strong> <span class="math" data-say="f of g of x">f(g(x))</span> first, on its own line, before any substitution. For <span class="math" data-say="f composed with g">(f ∘ g)</span> with <span class="math" data-say="g of x equals x minus 4">g(x) = x − 4</span>, that is <span class="math" data-say="f of the quantity x minus 4">f(x − 4)</span>. Seeing the inner expression sitting in the slot prevents the order from flipping.</li><li><strong>Substitute into every occurrence of the variable.</strong> Same discipline as “Function Notation”: brackets around the whole inner expression, in every slot. <span class="math" data-say="2 times the quantity x minus 4, plus 3">2(x − 4) + 3</span>, not <span class="math" data-say="2 x minus 4 plus 3">2x − 4 + 3</span>.</li><li><strong>Find the domain from the unsimplified form.</strong> Ask which inputs <span class="math" data-say="g">g</span> rejects, then which of <span class="math" data-say="g">g</span>'s outputs <span class="math" data-say="f">f</span> rejects. For <span class="math" data-say="f of x equals x squared">f(x) = x²</span> after <span class="math" data-say="g of x equals the square root of x">g(x) = √x</span>, the inner root requires <span class="math" data-say="x is at least 0">x ≥ 0</span>; the outer square adds no restriction.</li><li><strong>Simplify, then check one input end to end.</strong> Now expand and collect. Then pick an input, run it through <span class="math" data-say="g">g</span> and <span class="math" data-say="f">f</span> separately, and compare with the simplified formula. Disagreement means the expansion is wrong; agreement at one point is not a proof, but it catches nearly every algebra slip.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1493,17 +1538,16 @@ the other order:   (r o p)(x) = sqrt(x^2) = |x|
 domain:            every real x</div><p>The table is the honest way to show that order matters. Both results are lines with the same slope, so a quick glance could mistake them; the intermediate values reveal which constant was applied first.</p><p>In the second example the simplified formula <span class="math" data-say="x">x</span> is perfectly happy at <span class="math" data-say="x equals negative 1">x = −1</span>, but the composite is not defined there because <span class="math" data-say="the square root of the quantity negative 1">√(−1)</span> is not real and the outer square is never reached. This is why stage 1 of the domain test is not optional.</p><p>Both checks were done by running an input through the two functions in sequence. That is slower than trusting the algebra and it is the only verification that tests the order as well as the simplification.</p><p>For a faded composite, take <span class="math" data-say="u of x equals 3 x minus 1">u(x) = 3x − 1</span> and <span class="math" data-say="v of x equals x plus 2">v(x) = x + 2</span>. The first line <span class="math" data-say="the composition of u and v, applied to x, equals u of the quantity x plus 2">(u ∘ v)(x) = u(x + 2)</span> is supplied. Finish both orders, find each domain, and run <span class="math" data-say="x equals negative 1">x = −1</span> through each chain before checking the two simplified formulas.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Composing in the written order</strong><span><span class="math" data-say="f composed with g">(f ∘ g)</span> applies <span class="math" data-say="g">g</span> first, even though <span class="math" data-say="f">f</span> is written first. The notation reads right to left. Saying "f after g" out loud before computing puts the order back the right way.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the circle as multiplication</strong><span><span class="math" data-say="f composed with g times 1">(f ∘ g)(1)</span> is <span class="math" data-say="8">8</span> for <span class="math" data-say="f of x equals 3 x minus 1">f(x) = 3x − 1</span>, <span class="math" data-say="g of x equals x plus 2">g(x) = x + 2</span>, while <span class="math" data-say="f of 1 times g of 1">f(1)·g(1)</span> is <span class="math" data-say="6">6</span>. The circle is a small raised ring and the multiplication dot is a small raised dot, which does not help; the difference is in what the symbol does, not how it looks.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the composite&#x27;s domain off the simplified formula</strong><span>Simplifying can erase the operation that recorded a restriction. <span class="math" data-say="the square root of x squared">(√x)²</span> simplifies to <span class="math" data-say="x">x</span>, but negative inputs never pass through the inner root. Test the two stages on the original expressions.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build either composite, state its domain from the two-stage test rather than from the simplified formula, and verify the order at a chosen input.</strong><p>Given two functions you should produce <span class="math" data-say="f composed with g">f ∘ g</span> and <span class="math" data-say="g composed with f">g ∘ f</span>, show they differ by evaluating both at a specific input, and give each domain with the excluded values justified by which stage rejected them. One independent pair should be linear; a second should include a square root whose restriction survives simplification.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Composition is the machinery “Inverse Functions” needs. An inverse is defined by what it does under composition &mdash; <span class="math" data-say="f inverse composed with f">f⁻¹ ∘ f</span> and <span class="math" data-say="f composed with f inverse">f ∘ f⁻¹</span> both have to be the function that leaves its input alone &mdash; so the order sensitivity established here is what makes that definition say something.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Composing in the written order</strong><span><span class="math" data-say="f composed with g">(f ∘ g)</span> applies <span class="math" data-say="g">g</span> first, even though <span class="math" data-say="f">f</span> is written first. The notation reads right to left. Saying "f after g" out loud before computing puts the order back the right way.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the circle as multiplication</strong><span><span class="math" data-say="f composed with g times 1">(f ∘ g)(1)</span> is <span class="math" data-say="8">8</span> for <span class="math" data-say="f of x equals 3 x minus 1">f(x) = 3x − 1</span>, <span class="math" data-say="g of x equals x plus 2">g(x) = x + 2</span>, while <span class="math" data-say="f of 1 times g of 1">f(1)·g(1)</span> is <span class="math" data-say="6">6</span>. The circle is a small raised ring and the multiplication dot is a small raised dot, which does not help; the difference is in what the symbol does, not how it looks.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the composite&#x27;s domain off the simplified formula</strong><span>Simplifying can erase the operation that recorded a restriction. <span class="math" data-say="the square root of x squared">(√x)²</span> simplifies to <span class="math" data-say="x">x</span>, but negative inputs never pass through the inner root. Test the two stages on the original expressions.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build either composite, state its domain from the two-stage test rather than from the simplified formula, and verify the order at a chosen input.</strong><p>Given two functions you should produce <span class="math" data-say="f composed with g">f ∘ g</span> and <span class="math" data-say="g composed with f">g ∘ f</span>, show they differ by evaluating both at a specific input, and give each domain with the excluded values justified by which stage rejected them. One independent pair should be linear; a second should include a square root whose restriction survives simplification.</p></div></div><div class="note"><strong>Note:</strong> Composition is the machinery “Inverse Functions” needs. An inverse is defined by what it does under composition &mdash; <span class="math" data-say="f inverse composed with f">f⁻¹ ∘ f</span> and <span class="math" data-say="f composed with f inverse">f ∘ f⁻¹</span> both have to be the function that leaves its input alone &mdash; so the order sensitivity established here is what makes that definition say something.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The inner function runs first</summary><p>In <span class="math" data-say="f composed with g times x">(f ∘ g)(x)</span> the function nearest the input is <span class="math" data-say="g">g</span>, and it goes first. The notation reads right to left, which is the reverse of English reading order, and that mismatch is the whole difficulty. <span class="math" data-say="f of g of x">f(g(x))</span> is the same statement with the order visible.</p></details><details class="recall"><summary>Order changes the answer</summary><p>With <span class="math" data-say="f of x equals 2 x plus 3">f(x) = 2x + 3</span> and <span class="math" data-say="g of x equals x minus 4">g(x) = x − 4</span>, <span class="math" data-say="f composed with g times x equals 2 x minus 5">(f ∘ g)(x) = 2x − 5</span> and <span class="math" data-say="g composed with f times x equals 2 x minus 1">(g ∘ f)(x) = 2x − 1</span>. At <span class="math" data-say="x equals 2">x = 2</span> they give <span class="math" data-say="negative 1">−1</span> and <span class="math" data-say="3">3</span>. Composition is not commutative even when both functions and both composites are lines.</p></details><details class="recall"><summary>The domain is decided in two stages</summary><p>An input must first be acceptable to <span class="math" data-say="g">g</span>, and then <span class="math" data-say="g of x">g(x)</span> must be acceptable to <span class="math" data-say="f">f</span>. Both tests happen on the original expression, before any simplification, because simplifying can erase the evidence of the first stage.</p></details></div>
+      <h3>Summary</h3>
       <p>Composition runs one function on the output of another: <span class="math" data-say="f composed with g times x">(f ∘ g)(x)</span> means <span class="math" data-say="f of g of x">f(g(x))</span>, with <span class="math" data-say="g">g</span> first. The order is not a convention that can be swapped, and the composite's domain can be smaller than either function's.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The inner function runs first.</strong> In <span class="math" data-say="f composed with g times x">(f ∘ g)(x)</span> the function nearest the input is <span class="math" data-say="g">g</span>, and it goes first. The notation reads right to left, which is the reverse of English reading order, and that mismatch is the whole difficulty. <span class="math" data-say="f of g of x">f(g(x))</span> is the same statement with the order visible.</li><li><strong>Order changes the answer.</strong> With <span class="math" data-say="f of x equals 2 x plus 3">f(x) = 2x + 3</span> and <span class="math" data-say="g of x equals x minus 4">g(x) = x − 4</span>, <span class="math" data-say="f composed with g times x equals 2 x minus 5">(f ∘ g)(x) = 2x − 5</span> and <span class="math" data-say="g composed with f times x equals 2 x minus 1">(g ∘ f)(x) = 2x − 1</span>. At <span class="math" data-say="x equals 2">x = 2</span> they give <span class="math" data-say="negative 1">−1</span> and <span class="math" data-say="3">3</span>. Composition is not commutative even when both functions and both composites are lines.</li><li><strong>The domain is decided in two stages.</strong> An input must first be acceptable to <span class="math" data-say="g">g</span>, and then <span class="math" data-say="g of x">g(x)</span> must be acceptable to <span class="math" data-say="f">f</span>. Both tests happen on the original expression, before any simplification, because simplifying can erase the evidence of the first stage.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="f o g times x equals f of g of x, g runs FIRST. f o g and g o f are different functions. domain, x must suit g, AND g of x must suit f. the circle is not multiplication" tabindex="0" role="region" aria-label="Mathematical notation">(f o g)(x) = f(g(x))          g runs FIRST
 (f o g) and (g o f) are different functions
 domain: x must suit g, AND g(x) must suit f
@@ -4211,11 +4255,42 @@ the circle is not multiplication</div><figcaption>The definition and its three c
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -4283,7 +4358,7 @@ the circle is not multiplication</div><figcaption>The definition and its three c
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

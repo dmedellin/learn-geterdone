@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Differential Equations and Euler&#x27;s Method</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; What a differential equation is</p>
       <h1>What a Differential Equation Is</h1>
       <p class="lesson-lede">An equation whose unknown is a whole function, stated through its rate of change, and answered by a function that makes the residual zero.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The unknown is a function, not a number</li><li>The order is the highest derivative that appears</li><li>A solution is checked by substituting it and reading the residual</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>An equation about a rate, and what counts as an answer</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Differential equation, order, solution</span><p>A <strong>differential equation</strong> is an equation whose unknown is a function and which involves one or more of that function's derivatives. Its <strong>order</strong> is the highest derivative that appears. A <strong>solution</strong> is a function that makes the equation true for every <span class="math" data-say="t">t</span> in some interval.</p><p>The word &ldquo;every&rdquo; carries the weight. A function that fits the equation at a few values of <span class="math" data-say="t">t</span> has satisfied a few instances of it, and no more.</p></div><p>Start with the smallest example. The equation <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> says that the rate of change of <span class="math" data-say="y">y</span> at time <span class="math" data-say="t">t</span> is <span class="math" data-say="2 t">2t</span>: zero at the start, 2 at time 1, 4 at time 2. In Accumulation and the Integral you met this question the other way up, as &ldquo;which function has this rate&rdquo;, and the answer was an antiderivative. A differential equation is that question asked of a rate that may also depend on the unknown itself, as in <span class="math" data-say="y prime equals y">y′ = y</span>, and then the antiderivative alone no longer answers it.</p><p>The lab below takes an equation and a candidate and does the substitution for you, symbolically. It differentiates the candidate exactly, forms <span class="math" data-say="y prime minus 2 t">y′ − 2t</span>, simplifies, and prints the result in the tile named Residual. Nothing is evaluated at sample points; the verdict is about every <span class="math" data-say="t">t</span>.</p><div class="mathblock" data-say="equation, y prime equals 2 t. candidate, its y prime, residual y prime minus 2 t, verdict. a table, shown on the page. t cubed, 3 t squared, 3 t squared minus 2 t, not a solution" tabindex="0" role="region" aria-label="Mathematical notation">equation   y′ = 2t
-
-candidate     its y′     residual y′ − 2t     verdict
-t²            2t         0                    a solution
-t² + 3        2t         0                    a solution
-t³            3t²        3t² − 2t             not a solution</div><p>Read the three rows. The candidate <span class="math" data-say="t squared">t²</span> has derivative <span class="math" data-say="2 t">2t</span>, so the residual <span class="math" data-say="2 t minus 2 t">2t − 2t</span> is <span class="math" data-say="0">0</span>. The candidate <span class="math" data-say="t squared plus 3">t² + 3</span> has the same derivative, because a constant has rate zero, so it is a solution as well. The candidate <span class="math" data-say="t cubed">t³</span> has derivative <span class="math" data-say="3 t squared">3t²</span>, and the residual <span class="math" data-say="3 t squared minus 2 t">3t² − 2t</span> is not zero. It does vanish at <span class="math" data-say="t equals 0">t = 0</span> and at <span class="math" data-say="t equals 2 over 3">t = 2/3</span>, and that does not rescue it: a solution needs the residual to be zero at every <span class="math" data-say="t">t</span>.</p><h3>One equation, many answers</h3><p>That <span class="math" data-say="t squared">t²</span> and <span class="math" data-say="t squared plus 3">t² + 3</span> are both solutions is the first fact to absorb, and the one the misconception below gets wrong. Adding any constant <span class="math" data-say="C">C</span> to <span class="math" data-say="t squared">t²</span> leaves the derivative at <span class="math" data-say="2 t">2t</span>, so <span class="math" data-say="t squared plus C">t² + C</span> is a solution for every <span class="math" data-say="C">C</span>. A differential equation of this kind has a whole family of solutions, one curve for each constant, and each is the same shape shifted up or down.</p><div class="example"><span class="label">Example &middot; The same check on a candidate that does not work</span><p>Take <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> and the candidate <span class="math" data-say="y equals 2 t">y = 2t</span>. Its derivative is <span class="math" data-say="2">2</span>, so the residual is <span class="math" data-say="2 minus 2 t">2 − 2t</span>, which the lab writes as <span class="math" data-say="negative 2 t plus 2">−2t + 2</span>.</p><p>That is zero at <span class="math" data-say="t equals 1">t = 1</span> and nowhere else. At <span class="math" data-say="t equals 1">t = 1</span> the candidate and the equation agree, and one instance of agreement is exactly what the residual test refuses to accept. “Checking a Proposed Solution” meets the same trap in a harder equation.</p></div><h3>What the lab does and does not claim</h3><p>The residual tile is exact: it is the symbolic left side minus right side, and it prints <span class="math" data-say="0">0</span> only when the simplified expression is identically zero. The curve in the plot is a drawing made with ordinary floating-point numbers, and it is there to be looked at, not to be trusted for a digit.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Checking a solution</h2></div><p>Substitute, simplify, compare with zero</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>An equation about a rate, and what counts as an answer</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Differential equation, order, solution</span><p>A <strong>differential equation</strong> is an equation whose unknown is a function and which involves one or more of that function's derivatives. Its <strong>order</strong> is the highest derivative that appears. A <strong>solution</strong> is a function that makes the equation true for every <span class="math" data-say="t">t</span> in some interval.</p><p>The word &ldquo;every&rdquo; carries the weight. A function that fits the equation at a few values of <span class="math" data-say="t">t</span> has satisfied a few instances of it, and no more.</p></div><p>Start with the smallest example. The equation <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> says that the rate of change of <span class="math" data-say="y">y</span> at time <span class="math" data-say="t">t</span> is <span class="math" data-say="2 t">2t</span>: zero at the start, 2 at time 1, 4 at time 2. In Accumulation and the Integral you met this question the other way up, as &ldquo;which function has this rate&rdquo;, and the answer was an antiderivative. A differential equation is that question asked of a rate that may also depend on the unknown itself, as in <span class="math" data-say="y prime equals y">y′ = y</span>, and then the antiderivative alone no longer answers it.</p><p>The lab below takes an equation and a candidate and does the substitution for you, symbolically. It differentiates the candidate exactly, forms <span class="math" data-say="y prime minus 2 t">y′ − 2t</span>, simplifies, and prints the result in the tile named Residual. Nothing is evaluated at sample points; the verdict is about every <span class="math" data-say="t">t</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Checking a solution</h2></div><p>Substitute, simplify, compare with zero</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Substitute and check</strong><span>the residual is simplified symbolically, never evaluated</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the candidate, drawn</span><span class="tone-muted"><i class="legend-swatch"></i>slope field (first order)</span></div>
@@ -1409,10 +1447,10 @@ t³            3t²        3t² − 2t             not a solution</div><p>Read t
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="vfPlot" viewBox="0 0 660 420" role="img" aria-label="the candidate solution"></svg></div>
       <div class="status-banner" id="vfStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Substitute a candidate and read the residual</h3>
-          <p>Choose each preset in turn. The order tile reads the equation, the residual tile is the left side minus the right after substitution, and the verdict follows from whether that is zero for every t. Then type your own candidate for y&prime; = 2t, such as <span data-say="t squared plus 5">t^2 + 5</span> or 2t, and predict the residual before you look.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Substitute a candidate and read the residual</h3>
+            <p>Choose each preset in turn. The order tile reads the equation, the residual tile is the left side minus the right after substitution, and the verdict follows from whether that is zero for every t. Then type your own candidate for y&prime; = 2t, such as <span data-say="t squared plus 5">t^2 + 5</span> or 2t, and predict the residual before you look.</p>
         <div class="field">
           <label for="vfPreset">Equation and candidate</label>
           <select id="vfPreset"><option value="square" selected>y' = 2t with the candidate t^2</option><option value="shifted">y' = 2t with the candidate t^2 + 3</option><option value="cube">y' = 2t with the candidate t^3</option></select>
@@ -1439,12 +1477,20 @@ t³            3t²        3t² − 2t             not a solution</div><p>Read t
         </div>
         <p class="small-copy" style="margin:0;">Candidates: a ratio of polynomials in t, such as 1/(1 - t), or sums of terms such as 3t^2, 2e^(-t), t cos(2t) and C e^(3t), with the constants C and D.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="equation, y prime equals 2 t. candidate, its y prime, residual y prime minus 2 t, verdict. a table, shown on the page. t cubed, 3 t squared, 3 t squared minus 2 t, not a solution" tabindex="0" role="region" aria-label="Mathematical notation">equation   y′ = 2t
+
+candidate     its y′     residual y′ − 2t     verdict
+t²            2t         0                    a solution
+t² + 3        2t         0                    a solution
+t³            3t²        3t² − 2t             not a solution</div><p>Read the three rows. The candidate <span class="math" data-say="t squared">t²</span> has derivative <span class="math" data-say="2 t">2t</span>, so the residual <span class="math" data-say="2 t minus 2 t">2t − 2t</span> is <span class="math" data-say="0">0</span>. The candidate <span class="math" data-say="t squared plus 3">t² + 3</span> has the same derivative, because a constant has rate zero, so it is a solution as well. The candidate <span class="math" data-say="t cubed">t³</span> has derivative <span class="math" data-say="3 t squared">3t²</span>, and the residual <span class="math" data-say="3 t squared minus 2 t">3t² − 2t</span> is not zero. It does vanish at <span class="math" data-say="t equals 0">t = 0</span> and at <span class="math" data-say="t equals 2 over 3">t = 2/3</span>, and that does not rescue it: a solution needs the residual to be zero at every <span class="math" data-say="t">t</span>.</p><h3>One equation, many answers</h3><p>That <span class="math" data-say="t squared">t²</span> and <span class="math" data-say="t squared plus 3">t² + 3</span> are both solutions is the first fact to absorb, and the one the misconception below gets wrong. Adding any constant <span class="math" data-say="C">C</span> to <span class="math" data-say="t squared">t²</span> leaves the derivative at <span class="math" data-say="2 t">2t</span>, so <span class="math" data-say="t squared plus C">t² + C</span> is a solution for every <span class="math" data-say="C">C</span>. A differential equation of this kind has a whole family of solutions, one curve for each constant, and each is the same shape shifted up or down.</p><div class="example"><span class="label">Example &middot; The same check on a candidate that does not work</span><p>Take <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> and the candidate <span class="math" data-say="y equals 2 t">y = 2t</span>. Its derivative is <span class="math" data-say="2">2</span>, so the residual is <span class="math" data-say="2 minus 2 t">2 − 2t</span>, which the lab writes as <span class="math" data-say="negative 2 t plus 2">−2t + 2</span>.</p><p>That is zero at <span class="math" data-say="t equals 1">t = 1</span> and nowhere else. At <span class="math" data-say="t equals 1">t = 1</span> the candidate and the equation agree, and one instance of agreement is exactly what the residual test refuses to accept. “Checking a Proposed Solution” meets the same trap in a harder equation.</p></div><h3>What the lab does and does not claim</h3><p>The residual tile is exact: it is the symbolic left side minus right side, and it prints <span class="math" data-say="0">0</span> only when the simplified expression is identically zero. The curve in the plot is a drawing made with ordinary floating-point numbers, and it is there to be looked at, not to be trusted for a digit.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing a candidate against an equation</h2></div><p>The same four moves for every equation on this course, in the same order.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the unknown and read the order</h3><p>Find the unknown function and the highest derivative of it in the equation. That is the order, and it is all the order is.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Move everything to one side</h3><p>Write the equation as left side minus right side. For <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> that is <span class="math" data-say="y prime minus 2 t">y′ − 2t</span>. The candidate will be tested against zero, so the zero has to be on the right.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Differentiate the candidate and substitute</h3><p>Compute every derivative the equation mentions, exactly, and put the candidate and those derivatives where <span class="math" data-say="y">y</span> and its derivatives stand.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Simplify and read the residual</h3><p>If it simplifies to <span class="math" data-say="0">0</span> for all <span class="math" data-say="t">t</span>, the candidate is a solution. If any <span class="math" data-say="t">t</span> remains in it, it is not, and the residual tells you what is left over.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing a candidate against an equation</h2>
+      <p class="lead-in">The same four moves for every equation on this course, in the same order.</p>
+      <ol class="key-ideas method"><li><strong>Name the unknown and read the order.</strong> Find the unknown function and the highest derivative of it in the equation. That is the order, and it is all the order is.</li><li><strong>Move everything to one side.</strong> Write the equation as left side minus right side. For <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> that is <span class="math" data-say="y prime minus 2 t">y′ − 2t</span>. The candidate will be tested against zero, so the zero has to be on the right.</li><li><strong>Differentiate the candidate and substitute.</strong> Compute every derivative the equation mentions, exactly, and put the candidate and those derivatives where <span class="math" data-say="y">y</span> and its derivatives stand.</li><li><strong>Simplify and read the residual.</strong> If it simplifies to <span class="math" data-say="0">0</span> for all <span class="math" data-say="t">t</span>, the candidate is a solution. If any <span class="math" data-say="t">t</span> remains in it, it is not, and the residual tells you what is left over.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1469,17 +1515,16 @@ y = t² + C, for any constant C:
    y′ = 2t, residual 0, so a solution for every C</div><p>The third candidate is the one to keep. The constant <span class="math" data-say="3">3</span> dropped out of the derivative, and so would any other constant, which is why the equation has one solution for every <span class="math" data-say="C">C</span> and not a single answer. A single curve will appear only when something fixes <span class="math" data-say="C">C</span>, and “Initial Value Problems” is where that happens.</p><p>The factored residual <span class="math" data-say="t times the quantity 3 t minus 2">t·(3t − 2)</span> shows why <span class="math" data-say="t cubed">t³</span> is no solution even though the equation holds at two points: it is zero at <span class="math" data-say="t equals 0">t = 0</span> and <span class="math" data-say="t equals 2 over 3">t = 2/3</span> and nonzero between and beyond them.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting a differential equation to have a number for an answer</strong><span>The unknown is a function, and <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> is satisfied by <span class="math" data-say="t squared">t²</span> and by <span class="math" data-say="t squared plus 3">t² + 3</span> and by <span class="math" data-say="t squared minus 7">t² − 7</span>, each with residual zero in the lab. There is no single value to find and no single curve. A number comes out only if you are asked for one value of a particular solution, after something has chosen which curve.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the order from the exponent or the number of terms</strong><span>The order is the highest derivative and nothing else. <span class="math" data-say="y prime equals y squared">y′ = y²</span> is first order even though it has a square in it, and <span class="math" data-say="y double prime equals 0">y″ = 0</span> is second order even though it is short.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Testing a candidate at one value of t and stopping</strong><span>The residual of <span class="math" data-say="t cubed">t³</span> in <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> is zero at <span class="math" data-say="t equals 0">t = 0</span>, so a check there passes and the candidate is wrong. The test is the simplified residual for every <span class="math" data-say="t">t</span>, which is exactly what the lab prints.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a differential equation is, name its order, and decide a candidate.</strong><p>You should be able to state in a sentence that the unknown is a function, read the order of an equation from its highest derivative, substitute a candidate and simplify the residual by hand on a first-order equation, and decide whether it is a solution from whether that residual is zero for every <span class="math" data-say="t">t</span>. You should also be able to say why <span class="math" data-say="t squared">t²</span> and <span class="math" data-say="t squared plus 3">t² + 3</span> are both answers to the same equation.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This lesson tested candidates that were handed over. The next uses the same residual on harder equations, a second-order one with an exponential, one with a coefficient that depends on <em>t</em>, and one that is not linear, and learns to tell which kind it is. &ldquo;Checking a Proposed Solution&rdquo; is where.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting a differential equation to have a number for an answer</strong><span>The unknown is a function, and <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> is satisfied by <span class="math" data-say="t squared">t²</span> and by <span class="math" data-say="t squared plus 3">t² + 3</span> and by <span class="math" data-say="t squared minus 7">t² − 7</span>, each with residual zero in the lab. There is no single value to find and no single curve. A number comes out only if you are asked for one value of a particular solution, after something has chosen which curve.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the order from the exponent or the number of terms</strong><span>The order is the highest derivative and nothing else. <span class="math" data-say="y prime equals y squared">y′ = y²</span> is first order even though it has a square in it, and <span class="math" data-say="y double prime equals 0">y″ = 0</span> is second order even though it is short.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Testing a candidate at one value of t and stopping</strong><span>The residual of <span class="math" data-say="t cubed">t³</span> in <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> is zero at <span class="math" data-say="t equals 0">t = 0</span>, so a check there passes and the candidate is wrong. The test is the simplified residual for every <span class="math" data-say="t">t</span>, which is exactly what the lab prints.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a differential equation is, name its order, and decide a candidate.</strong><p>You should be able to state in a sentence that the unknown is a function, read the order of an equation from its highest derivative, substitute a candidate and simplify the residual by hand on a first-order equation, and decide whether it is a solution from whether that residual is zero for every <span class="math" data-say="t">t</span>. You should also be able to say why <span class="math" data-say="t squared">t²</span> and <span class="math" data-say="t squared plus 3">t² + 3</span> are both answers to the same equation.</p></div></div><div class="note"><strong>Note:</strong> This lesson tested candidates that were handed over. The next uses the same residual on harder equations, a second-order one with an exponential, one with a coefficient that depends on <em>t</em>, and one that is not linear, and learns to tell which kind it is. &ldquo;Checking a Proposed Solution&rdquo; is where.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The unknown is a function, not a number</summary><p>In <span class="math" data-say="3 x plus 1 equals 7">3x + 1 = 7</span> the unknown is a number and there is one right value. In <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> the unknown is a function <span class="math" data-say="y">y</span> of <span class="math" data-say="t">t</span>, and the equation does not say what <span class="math" data-say="y">y</span> is. It says what <span class="math" data-say="y">y</span> does: at every <span class="math" data-say="t">t</span>, the rate of change of <span class="math" data-say="y">y</span> is <span class="math" data-say="2 t">2t</span>. To answer it you must produce a whole function, and to check an answer you must check it at every <span class="math" data-say="t">t</span> at once.</p></details><details class="recall"><summary>The order is the highest derivative that appears</summary><p><span class="math" data-say="y prime equals 2 t">y′ = 2t</span> is first order, because only the first derivative appears. <span class="math" data-say="y double prime plus y equals 0">y″ + y = 0</span> is second order, because <span class="math" data-say="y double prime">y″</span> does. The order tells you how much extra information a single answer will need, which “Initial Value Problems” makes exact. It is read from the equation and nothing else: the powers of <span class="math" data-say="y">y</span> and the other terms do not change it.</p></details><details class="recall"><summary>A solution is checked by substituting it and reading the residual</summary><p>Differentiate the candidate, put it and its derivatives into the equation, and subtract the right side from the left. That difference is the <strong>residual</strong>. If it is <span class="math" data-say="0">0</span> for every <span class="math" data-say="t">t</span>, the candidate is a solution. If it is anything else, it is not, and the residual says by how much and where it fails. The check is algebra on a formula, not a trial at a few values.</p></details></div>
+      <h3>Summary</h3>
       <p>An equation in algebra asks for a number. A differential equation asks for a function: it says how fast the unknown changes and leaves you to find what the unknown is. Its order is the highest derivative it mentions, and a proposed solution is tested by substituting it and reading the residual, the left side minus the right. The first surprise is that a solvable equation usually has infinitely many answers, not one.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The unknown is a function, not a number.</strong> In <span class="math" data-say="3 x plus 1 equals 7">3x + 1 = 7</span> the unknown is a number and there is one right value. In <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> the unknown is a function <span class="math" data-say="y">y</span> of <span class="math" data-say="t">t</span>, and the equation does not say what <span class="math" data-say="y">y</span> is. It says what <span class="math" data-say="y">y</span> does: at every <span class="math" data-say="t">t</span>, the rate of change of <span class="math" data-say="y">y</span> is <span class="math" data-say="2 t">2t</span>. To answer it you must produce a whole function, and to check an answer you must check it at every <span class="math" data-say="t">t</span> at once.</li><li><strong>The order is the highest derivative that appears.</strong> <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> is first order, because only the first derivative appears. <span class="math" data-say="y double prime plus y equals 0">y″ + y = 0</span> is second order, because <span class="math" data-say="y double prime">y″</span> does. The order tells you how much extra information a single answer will need, which “Initial Value Problems” makes exact. It is read from the equation and nothing else: the powers of <span class="math" data-say="y">y</span> and the other terms do not change it.</li><li><strong>A solution is checked by substituting it and reading the residual.</strong> Differentiate the candidate, put it and its derivatives into the equation, and subtract the right side from the left. That difference is the <strong>residual</strong>. If it is <span class="math" data-say="0">0</span> for every <span class="math" data-say="t">t</span>, the candidate is a solution. If it is anything else, it is not, and the residual says by how much and where it fails. The check is algebra on a formula, not a trial at a few values.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="y prime equals 2 t, the unknown is the function y. order equals the highest derivative present. residual equals left side minus right side. residual 0 for every t, a solution. y equals t squared and y equals t squared plus 3 both work" tabindex="0" role="region" aria-label="Mathematical notation">y′ = 2t     the unknown is the function y
 order = the highest derivative present
 residual = left side − right side
@@ -3848,11 +3893,42 @@ y = t² and y = t² + 3 both work</div><figcaption>A differential equation, its 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3920,7 +3996,7 @@ y = t² and y = t² + 3 both work</div><figcaption>A differential equation, its 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

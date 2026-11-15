@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Graph Algorithms</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Searching a graph</p>
       <h1>Topological Order</h1>
       <p class="lesson-lede">Produce an order in which every task follows its prerequisites, two different ways, and count how many such orders exist.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The order exists exactly when there is no cycle</li><li>Two algorithms, two answers, both correct</li><li>Uniqueness is a count, and the lab produces it</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two orders, both valid, and a number for how many there are</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Topological order</span><p>A <strong>topological order</strong> of a digraph is a listing of all its vertices such that for every arc <span class="math" data-say="u, v">(u, v)</span>, <span class="math" data-say="u">u</span> appears before <span class="math" data-say="v">v</span>. A digraph with such a listing is often drawn left to right, which makes the condition visible: no arc points leftwards.</p></div><div class="thm"><span class="label">Theorem &middot; Existence</span><p>A digraph has a topological order if and only if it is acyclic.</p></div><div class="proof"><p>If a topological order exists and <span class="math" data-say="v 1, v 2, vk, v 1">v1, v2, ..., vk, v1</span> is a cycle, then each arc of the cycle forces its tail earlier than its head in the listing, so <span class="math" data-say="v 1">v1</span> appears strictly before itself. That is impossible, so there is no cycle.</p><p>If the digraph is acyclic, run one depth-first walk. It has no back arc, so for every arc <span class="math" data-say="u, v">(u, v)</span> the head <span class="math" data-say="v">v</span> is either discovered inside <span class="math" data-say="u">u</span> and finished before it, or already finished when the arc is examined. Either way <span class="math" data-say="f at v is less than f at u">f[v] &lt; f[u]</span>. Listing the vertices by decreasing <span class="math" data-say="f">f</span> therefore puts every tail before its head.</p><p><span class="qed">&#9633;</span></p></div><p>The proof is also the algorithm, which is why the first method costs nothing beyond the walk: sort by finish time, or equivalently push each vertex onto a stack as it closes and read the stack off. The lab reports 6 vertex visits and 6 arc reads on the opening graph, the same <span class="math" data-say="theta of the quantity V plus E">Θ(V + E)</span> the walk itself costs.</p><h3>Kahn&#x27;s method, which never mentions a finish time</h3><ol><li>Compute the in-degree of every vertex, and put every vertex of in-degree 0 into a queue.</li><li>Remove a vertex from the queue, emit it, and decrement the in-degree of each of its successors.</li><li>Any successor whose in-degree has just reached 0 joins the queue.</li><li>Stop when the queue is empty. If fewer than <span class="math" data-say="V">V</span> vertices were emitted, the remaining ones lie on or below a cycle and no order exists.</li></ol><p>On the opening graph <span class="math" data-say="1 is greater than 3, 2 is greater than 3, 3 is greater than 4, 3 is greater than 5, 4 is greater than 6, 5 is greater than 6">1>3, 2>3, 3>4, 3>5, 4>6, 5>6</span> the starting in-degrees are <span class="math" data-say="0, 0, 2, 1, 1, 2">0, 0, 2, 1, 1, 2</span>, two vertices are in the queue at once, and the method emits <span class="math" data-say="1 2 3 4 5 6">1 2 3 4 5 6</span> with 4 queue pushes, 6 pops and 6 arc reads. The walk's answer on the same graph is <span class="math" data-say="2 1 3 5 4 6">2 1 3 5 4 6</span>. Both are checked arc by arc in the panel and both pass, and the disagreement is not a defect in either.</p><div class="example"><span class="label">Example &middot; Four valid orders, enumerated</span><p>For that graph the lab enumerates every valid order and finds 4: <span class="math" data-say="1 2 3 4 5 6">1 2 3 4 5 6</span>, <span class="math" data-say="1 2 3 5 4 6">1 2 3 5 4 6</span>, <span class="math" data-say="2 1 3 4 5 6">2 1 3 4 5 6</span> and <span class="math" data-say="2 1 3 5 4 6">2 1 3 5 4 6</span>. Kahn's answer is the first and the walk's answer is the last. The freedom is exactly the two independent starts and the two independent middles, and 2 times 2 is 4.</p></div><p>The enumeration is a real search over all orders, not a formula, so it is refused rather than run slowly above the size it can finish: nine vertices is declined with a message naming the cap, and the reason is that eight vertices with no arcs already have <span class="math" data-say="8 factorial equals 40320">8! = 40 320</span> orders. Where it does run, the number it prints is a fact about every order rather than about the one produced.</p><h3>Uniqueness, and what it takes</h3><p>A chain of five vertices has exactly 1 valid order; a diamond has 2; five vertices with no arcs have <span class="math" data-say="5 factorial equals 120">5! = 120</span>. The chain is the shape uniqueness needs: there must be an arc between each consecutive pair in the order, because two vertices with no path between them can always be swapped. So uniqueness is equivalent to the order being a Hamiltonian path of the digraph, which is a much stronger condition than acyclicity.</p><p>A cycle shows up twice, by two different mechanisms, and the lab prints both. On <span class="math" data-say="1 is greater than 2, 2 is greater than 3, 3 is greater than 1, 3 is greater than 4">1>2, 2>3, 3>1, 3>4</span> the depth-first walk finds a back arc and returns no order; Kahn's queue starts empty, because every one of the first three vertices has in-degree 1, and it emits nothing at all. The enumeration independently returns a count of 0. Three witnesses, one cause.</p><p>The measured counts are worth putting beside the bound. Kahn's method on the opening graph did 4 pushes, 6 pops and 6 arc reads, which is <span class="math" data-say="V">V</span> pops and <span class="math" data-say="E">E</span> reads. That is <span class="math" data-say="theta of the quantity V plus E">Θ(V + E)</span> for this graph. The bound is the claim that it is <span class="math" data-say="theta of the quantity V plus E">Θ(V + E)</span> for every graph, and the argument is that each vertex enters the queue at most once &mdash; it enters when its in-degree reaches 0, and the in-degree only ever decreases &mdash; and each arc is read exactly once, when its tail is emitted.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Topological order, two ways, and how many there are</h2></div><p>A reverse postorder and an in-degree queue; on a cycle, neither exists and both say so</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two orders, both valid, and a number for how many there are</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Topological order</span><p>A <strong>topological order</strong> of a digraph is a listing of all its vertices such that for every arc <span class="math" data-say="u, v">(u, v)</span>, <span class="math" data-say="u">u</span> appears before <span class="math" data-say="v">v</span>. A digraph with such a listing is often drawn left to right, which makes the condition visible: no arc points leftwards.</p></div><div class="thm"><span class="label">Theorem &middot; Existence</span><p>A digraph has a topological order if and only if it is acyclic.</p></div><div class="proof"><p>If a topological order exists and <span class="math" data-say="v 1, v 2, vk, v 1">v1, v2, ..., vk, v1</span> is a cycle, then each arc of the cycle forces its tail earlier than its head in the listing, so <span class="math" data-say="v 1">v1</span> appears strictly before itself. That is impossible, so there is no cycle.</p><p>If the digraph is acyclic, run one depth-first walk. It has no back arc, so for every arc <span class="math" data-say="u, v">(u, v)</span> the head <span class="math" data-say="v">v</span> is either discovered inside <span class="math" data-say="u">u</span> and finished before it, or already finished when the arc is examined. Either way <span class="math" data-say="f at v is less than f at u">f[v] &lt; f[u]</span>. Listing the vertices by decreasing <span class="math" data-say="f">f</span> therefore puts every tail before its head.</p><p><span class="qed">&#9633;</span></p></div><p>The proof is also the algorithm, which is why the first method costs nothing beyond the walk: sort by finish time, or equivalently push each vertex onto a stack as it closes and read the stack off. The lab reports 6 vertex visits and 6 arc reads on the opening graph, the same <span class="math" data-say="theta of the quantity V plus E">Θ(V + E)</span> the walk itself costs.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Topological order, two ways, and how many there are</h2></div><p>A reverse postorder and an in-degree queue; on a cycle, neither exists and both say so</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Reverse postorder, Kahn's queue, and how many orders there are</strong><span>two methods, two orders, both valid when either is</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>placed in order</span><span class="tone-red"><i class="legend-swatch"></i>the back arc, when there is one</span><span class="tone-muted"><i class="legend-swatch"></i>still waiting on something</span></div>
@@ -1405,10 +1448,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tpSteps"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tpOrders"></table></div>
       <div class="status-banner" id="tpStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Type the dependencies and compare the two orders</h3>
-          <p>Both orders are produced in your browser and both are checked arc by arc, so a disagreement between them is visible as two valid answers rather than as an error. The count of valid orders is an enumeration, not an estimate, and it is refused rather than run slowly above the size it states.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Type the dependencies and compare the two orders</h3>
+            <p>Both orders are produced in your browser and both are checked arc by arc, so a disagreement between them is visible as two valid answers rather than as an error. The count of valid orders is an enumeration, not an estimate, and it is refused rather than run slowly above the size it states.</p>
         <div class="field">
           <label for="tpPreset">Worked example</label>
           <select id="tpPreset"><option value="twoways" selected>six tasks, two of them with nothing before them</option><option value="chain">a chain of five tasks</option><option value="diamond">a diamond of four tasks</option><option value="cycle">four tasks, three of them in a cycle</option></select>
@@ -1430,12 +1473,15 @@
           <div class="kpi"><span>Every arc points forward</span><strong id="tpValid">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="tpHint" style="margin:0;">The two methods are not two implementations of one order. Reverse finishing order comes out of a depth-first walk; Kahn's comes out of repeatedly taking a vertex nothing points at. Both are valid orders when the graph is acyclic, and they are usually different &mdash; which is the answer to whether the order is unique, and the count beside it is the same answer as a number.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Kahn&#x27;s method, which never mentions a finish time</h3><ol><li>Compute the in-degree of every vertex, and put every vertex of in-degree 0 into a queue.</li><li>Remove a vertex from the queue, emit it, and decrement the in-degree of each of its successors.</li><li>Any successor whose in-degree has just reached 0 joins the queue.</li><li>Stop when the queue is empty. If fewer than <span class="math" data-say="V">V</span> vertices were emitted, the remaining ones lie on or below a cycle and no order exists.</li></ol><p>On the opening graph <span class="math" data-say="1 is greater than 3, 2 is greater than 3, 3 is greater than 4, 3 is greater than 5, 4 is greater than 6, 5 is greater than 6">1>3, 2>3, 3>4, 3>5, 4>6, 5>6</span> the starting in-degrees are <span class="math" data-say="0, 0, 2, 1, 1, 2">0, 0, 2, 1, 1, 2</span>, two vertices are in the queue at once, and the method emits <span class="math" data-say="1 2 3 4 5 6">1 2 3 4 5 6</span> with 4 queue pushes, 6 pops and 6 arc reads. The walk's answer on the same graph is <span class="math" data-say="2 1 3 5 4 6">2 1 3 5 4 6</span>. Both are checked arc by arc in the panel and both pass, and the disagreement is not a defect in either.</p><div class="example"><span class="label">Example &middot; Four valid orders, enumerated</span><p>For that graph the lab enumerates every valid order and finds 4: <span class="math" data-say="1 2 3 4 5 6">1 2 3 4 5 6</span>, <span class="math" data-say="1 2 3 5 4 6">1 2 3 5 4 6</span>, <span class="math" data-say="2 1 3 4 5 6">2 1 3 4 5 6</span> and <span class="math" data-say="2 1 3 5 4 6">2 1 3 5 4 6</span>. Kahn's answer is the first and the walk's answer is the last. The freedom is exactly the two independent starts and the two independent middles, and 2 times 2 is 4.</p></div><p>The enumeration is a real search over all orders, not a formula, so it is refused rather than run slowly above the size it can finish: nine vertices is declined with a message naming the cap, and the reason is that eight vertices with no arcs already have <span class="math" data-say="8 factorial equals 40320">8! = 40 320</span> orders. Where it does run, the number it prints is a fact about every order rather than about the one produced.</p><h3>Uniqueness, and what it takes</h3><p>A chain of five vertices has exactly 1 valid order; a diamond has 2; five vertices with no arcs have <span class="math" data-say="5 factorial equals 120">5! = 120</span>. The chain is the shape uniqueness needs: there must be an arc between each consecutive pair in the order, because two vertices with no path between them can always be swapped. So uniqueness is equivalent to the order being a Hamiltonian path of the digraph, which is a much stronger condition than acyclicity.</p><p>A cycle shows up twice, by two different mechanisms, and the lab prints both. On <span class="math" data-say="1 is greater than 2, 2 is greater than 3, 3 is greater than 1, 3 is greater than 4">1>2, 2>3, 3>1, 3>4</span> the depth-first walk finds a back arc and returns no order; Kahn's queue starts empty, because every one of the first three vertices has in-degree 1, and it emits nothing at all. The enumeration independently returns a count of 0. Three witnesses, one cause.</p><p>The measured counts are worth putting beside the bound. Kahn's method on the opening graph did 4 pushes, 6 pops and 6 arc reads, which is <span class="math" data-say="V">V</span> pops and <span class="math" data-say="E">E</span> reads. That is <span class="math" data-say="theta of the quantity V plus E">Θ(V + E)</span> for this graph. The bound is the claim that it is <span class="math" data-say="theta of the quantity V plus E">Θ(V + E)</span> for every graph, and the argument is that each vertex enters the queue at most once &mdash; it enters when its in-degree reaches 0, and the in-degree only ever decreases &mdash; and each arc is read exactly once, when its tail is emitted.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Getting an order, and knowing what you have</h2></div><p>Produce one, check it, and only then ask whether it was the only one.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide which algorithm you are already paying for</h3><p>If a depth-first walk is being run anyway, the order is free: push each vertex as it closes. If the in-degrees are already maintained, Kahn's method is free instead. Neither is better; they cost the same and produce different answers.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Check the order arc by arc, not by eye</h3><p>For every arc, confirm the tail's position is lower than the head's. This is <span class="math" data-say="E">E</span> comparisons and it catches an off-by-one in the emission order that a drawing will not. The lab does exactly this and reports a verdict per algorithm.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read a missing order as a cycle, and find it</h3><p>Neither algorithm should be made to fail silently. A walk that stops with a back arc has the cycle in hand: it is the tree path from the head down to the tail plus that arc. Kahn's method instead leaves you the set of vertices never emitted, which is everything on or downstream of a cycle.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Ask for the count before you promise uniqueness</h3><p>Two correct algorithms agreeing is not uniqueness; on the diamond they can agree and there are still two orders. Enumerate where the graph is small enough, and where it is not, check the much simpler equivalent condition: is there an arc between every consecutive pair of the order you produced?</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Getting an order, and knowing what you have</h2>
+      <p class="lead-in">Produce one, check it, and only then ask whether it was the only one.</p>
+      <ol class="key-ideas method"><li><strong>Decide which algorithm you are already paying for.</strong> If a depth-first walk is being run anyway, the order is free: push each vertex as it closes. If the in-degrees are already maintained, Kahn's method is free instead. Neither is better; they cost the same and produce different answers.</li><li><strong>Check the order arc by arc, not by eye.</strong> For every arc, confirm the tail's position is lower than the head's. This is <span class="math" data-say="E">E</span> comparisons and it catches an off-by-one in the emission order that a drawing will not. The lab does exactly this and reports a verdict per algorithm.</li><li><strong>Read a missing order as a cycle, and find it.</strong> Neither algorithm should be made to fail silently. A walk that stops with a back arc has the cycle in hand: it is the tree path from the head down to the tail plus that arc. Kahn's method instead leaves you the set of vertices never emitted, which is everything on or downstream of a cycle.</li><li><strong>Ask for the count before you promise uniqueness.</strong> Two correct algorithms agreeing is not uniqueness; on the diamond they can agree and there are still two orders. Enumerate where the graph is small enough, and where it is not, check the much simpler equivalent condition: is there an arc between every consecutive pair of the order you produced?</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1467,17 +1513,16 @@ every valid order, enumerated:  4
   1 2 3 4 5 6     1 2 3 5 4 6     2 1 3 4 5 6     2 1 3 5 4 6</div><p>The two answers differ in both places the graph allows them to. Kahn's emitted 1 before 2 because 1 was pushed first; the walk finished 2 last because it restarted there. Neither choice is forced by an arc, which is precisely why the enumeration finds four orders and not one.</p><p>Notice what the enumeration is being used for. It is not a third algorithm for producing an order &mdash; it is far too expensive for that. It is the only way on this page to turn &ldquo;the order is not unique&rdquo; from an impression into a number, and the number is what the lesson's third concept is about.</p><p>For a faded rehearsal, add the arc <span class="math" data-say="4 is greater than 5">4>5</span> and predict the new count before running it. The supplied first move is this: the only freedom left between 4 and 5 is removed, so the two middle choices collapse to one while the two starting choices survive. Say what the count becomes, then add <span class="math" data-say="2 is greater than 1">2>1</span> as well and say what it becomes then.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling the output the topological order, with the definite article</strong><span>It is one of them. On the lab's opening graph there are four, and two correct algorithms produce two different ones. Any downstream code that depends on which order came back is depending on an implementation detail; the lab's count is the cheapest way to find out whether you are relying on something real.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sorting the vertices by finish time and calling it free</strong><span>The vertices close in increasing finish time already, so the order is obtained by pushing at each close and reading the stack. Actually sorting a <span class="math" data-say="V">V</span>-element array adds a <span class="math" data-say="log V">log V</span> factor to a linear algorithm for nothing. The mistake is common because the proof is naturally phrased as &ldquo;list them by decreasing <span class="math" data-say="f">f</span>&rdquo;.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a missing order as an error rather than as a result</strong><span>It is the answer to a real question: this dependency graph cannot be scheduled because something must precede itself. Both algorithms hand back the evidence &mdash; a back arc that closes a cycle, or the set of vertices never emitted &mdash; and discarding that evidence in favour of a boolean throws away the diagnosis that makes the result actionable.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can produce both orders on a graph you have not seen, and say how many orders it has.</strong><p>You should be able to run Kahn's method with the in-degree table by hand, read a topological order off one walk's closings, check a candidate order arc by arc, and say what uniqueness would require of the graph rather than inferring it from two algorithms agreeing.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The two algorithms here are used again separately. &ldquo;Strongly Connected Components&rdquo; needs the finishing order and not the in-degrees, because the order it wants is a schedule for a second walk; &ldquo;Shortest and Longest Paths in a DAG&rdquo; needs the order itself, and is the one place on this course where a shortest-path problem is solved in a single pass over the arcs.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling the output the topological order, with the definite article</strong><span>It is one of them. On the lab's opening graph there are four, and two correct algorithms produce two different ones. Any downstream code that depends on which order came back is depending on an implementation detail; the lab's count is the cheapest way to find out whether you are relying on something real.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sorting the vertices by finish time and calling it free</strong><span>The vertices close in increasing finish time already, so the order is obtained by pushing at each close and reading the stack. Actually sorting a <span class="math" data-say="V">V</span>-element array adds a <span class="math" data-say="log V">log V</span> factor to a linear algorithm for nothing. The mistake is common because the proof is naturally phrased as &ldquo;list them by decreasing <span class="math" data-say="f">f</span>&rdquo;.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a missing order as an error rather than as a result</strong><span>It is the answer to a real question: this dependency graph cannot be scheduled because something must precede itself. Both algorithms hand back the evidence &mdash; a back arc that closes a cycle, or the set of vertices never emitted &mdash; and discarding that evidence in favour of a boolean throws away the diagnosis that makes the result actionable.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can produce both orders on a graph you have not seen, and say how many orders it has.</strong><p>You should be able to run Kahn's method with the in-degree table by hand, read a topological order off one walk's closings, check a candidate order arc by arc, and say what uniqueness would require of the graph rather than inferring it from two algorithms agreeing.</p></div></div><div class="note"><strong>Note:</strong> The two algorithms here are used again separately. &ldquo;Strongly Connected Components&rdquo; needs the finishing order and not the in-degrees, because the order it wants is a schedule for a second walk; &ldquo;Shortest and Longest Paths in a DAG&rdquo; needs the order itself, and is the one place on this course where a shortest-path problem is solved in a single pass over the arcs.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The order exists exactly when there is no cycle</summary><p>If the vertices can be lined up with every arc pointing forwards then a cycle would have to return to a vertex already passed, which would need an arc pointing backwards. Conversely, if there is no cycle then one depth-first walk has no back arc, and listing the vertices by decreasing finish time is a valid order. So existence is not a separate question from acyclicity: it is the same question.</p></details><details class="recall"><summary>Two algorithms, two answers, both correct</summary><p>Reverse finishing order comes out of the depth-first walk at no extra cost. Kahn's method instead keeps the in-degrees, emits any vertex whose in-degree has reached 0, and decrements its successors. On the lab's opening task graph the first returns <span class="math" data-say="2 1 3 5 4 6">2 1 3 5 4 6</span> and the second returns <span class="math" data-say="1 2 3 4 5 6">1 2 3 4 5 6</span>. The panel checks each one arc by arc, and both pass.</p></details><details class="recall"><summary>Uniqueness is a count, and the lab produces it</summary><p>&ldquo;Is the order unique?&rdquo; has a numerical answer: how many valid orders are there. The lab enumerates them all. The opening graph has 4; a chain of five vertices has 1, which is what uniqueness looks like; a diamond has 2; five vertices with no arcs at all have 120. A graph with a cycle has 0, and the enumeration reports that as the same fact the walk reports as a back arc.</p></details></div>
+      <h3>Summary</h3>
       <p>An acyclic digraph can be laid out in a line so that every arc points forwards. Two algorithms produce such a line: reverse finishing order from one depth-first walk, and repeatedly removing a vertex nothing points into. They generally disagree, and both are right, because the order is usually not unique. The lab answers uniqueness with a number by enumerating every valid order there is.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The order exists exactly when there is no cycle.</strong> If the vertices can be lined up with every arc pointing forwards then a cycle would have to return to a vertex already passed, which would need an arc pointing backwards. Conversely, if there is no cycle then one depth-first walk has no back arc, and listing the vertices by decreasing finish time is a valid order. So existence is not a separate question from acyclicity: it is the same question.</li><li><strong>Two algorithms, two answers, both correct.</strong> Reverse finishing order comes out of the depth-first walk at no extra cost. Kahn's method instead keeps the in-degrees, emits any vertex whose in-degree has reached 0, and decrements its successors. On the lab's opening task graph the first returns <span class="math" data-say="2 1 3 5 4 6">2 1 3 5 4 6</span> and the second returns <span class="math" data-say="1 2 3 4 5 6">1 2 3 4 5 6</span>. The panel checks each one arc by arc, and both pass.</li><li><strong>Uniqueness is a count, and the lab produces it.</strong> &ldquo;Is the order unique?&rdquo; has a numerical answer: how many valid orders are there. The lab enumerates them all. The opening graph has 4; a chain of five vertices has 1, which is what uniqueness looks like; a diamond has 2; five vertices with no arcs at all have 120. A graph with a cycle has 0, and the enumeration reports that as the same fact the walk reports as a back arc.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="topological order, every arc u to v has u before v in the line. exists, the digraph is acyclic. reverse finishing order of one DFS, is one valid order. Kahn, repeatedly take a vertex of in-degree 0, is another. unique, exactly one valid order, which is a COUNT and not a feeling" tabindex="0" role="region" aria-label="Mathematical notation">topological order: every arc u to v has u before v in the line
 exists  &lt;=&gt;  the digraph is acyclic
 reverse finishing order of one DFS      is one valid order
@@ -3463,11 +3508,42 @@ unique  &lt;=&gt;  exactly one valid order, which is a COUNT and not a feeling</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3535,7 +3611,7 @@ unique  &lt;=&gt;  exactly one valid order, which is a COUNT and not a feeling</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

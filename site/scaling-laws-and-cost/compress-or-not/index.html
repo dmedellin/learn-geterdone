@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Scaling Laws and Cost</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; What bytes cost</p>
       <h1>Compress or Not</h1>
       <p class="lesson-lede">Time a transfer with and without compression, and compute the link speed at which compressing stops paying.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The compressed plan has two stages and the raw plan has one</li><li>The size cancels out of the break-even</li><li>A fast enough link outruns every compressor</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two plans, the equality between them, and what falls out of it</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; The two transfer times</span><p>For a payload of <span class="math" data-say="size">size</span> bytes, a link of <span class="math" data-say="bw">bw</span> bytes a second, a compressor running at <span class="math" data-say="rate">rate</span> bytes of input a second and a compression ratio <span class="math" data-say="k">k</span> (so the output is <span class="math" data-say="size over k">size/k</span>):</p><p><strong>raw</strong> takes <span class="math" data-say="size over b w">size/bw</span>;</p><p><strong>compressed</strong> takes <span class="math" data-say="size over rate plus size over the quantity k times b w">size/rate + size/(k·bw)</span>.</p><p>Decompression at the far end is counted only when it is on the critical path; here the receiver stores the compressed form, so it is not.</p></div><div class="mathblock" data-say="size equals 10 gigabytes equals 10000 megabytes, b w equals 1000 Mbit over s equals 125 megabytes per second. k equals 4, rate equals 250 megabytes per second. raw, 10000 divided by 125, equals, 80 seconds. compressed, squeeze, 10000 divided by 250, equals, 40 seconds, 66.7 percent. send, 2500 divided by 125, equals, 20 seconds, 33.3 percent. 60 seconds. verdict, compress, by 80 over 60 equals 1.33 times. on the wire, 2.5 gigabytes instead of 10 gigabytes" tabindex="0" role="region" aria-label="Mathematical notation">size = 10 GB = 10 000 MB     bw = 1 000 Mbit/s = 125 MB/s
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two plans, the equality between them, and what falls out of it</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The two transfer times</span><p>For a payload of <span class="math" data-say="size">size</span> bytes, a link of <span class="math" data-say="bw">bw</span> bytes a second, a compressor running at <span class="math" data-say="rate">rate</span> bytes of input a second and a compression ratio <span class="math" data-say="k">k</span> (so the output is <span class="math" data-say="size over k">size/k</span>):</p><p><strong>raw</strong> takes <span class="math" data-say="size over b w">size/bw</span>;</p><p><strong>compressed</strong> takes <span class="math" data-say="size over rate plus size over the quantity k times b w">size/rate + size/(k·bw)</span>.</p><p>Decompression at the far end is counted only when it is on the critical path; here the receiver stores the compressed form, so it is not.</p></div><div class="mathblock" data-say="size equals 10 gigabytes equals 10000 megabytes, b w equals 1000 Mbit over s equals 125 megabytes per second. k equals 4, rate equals 250 megabytes per second. raw, 10000 divided by 125, equals, 80 seconds. compressed, squeeze, 10000 divided by 250, equals, 40 seconds, 66.7 percent. send, 2500 divided by 125, equals, 20 seconds, 33.3 percent. 60 seconds. verdict, compress, by 80 over 60 equals 1.33 times. on the wire, 2.5 gigabytes instead of 10 gigabytes" tabindex="0" role="region" aria-label="Mathematical notation">size = 10 GB = 10 000 MB     bw = 1 000 Mbit/s = 125 MB/s
 k = 4                        rate = 250 MB/s
 
 raw           10 000 ÷ 125            =  80 s
@@ -1411,12 +1455,11 @@ divide by size:
               (1/bw)(1 − 1/k)  =  1/rate
 
               bw*  =  rate·(k − 1)/k        = 250 × 3/4 = 187.5 MB/s
-              rate* = bw·k/(k − 1)          = 125 × 4/3 = 166.67 MB/s</div><p>Two readings of one equality. Fix the compressor and you get a bandwidth: above <span class="math" data-say="187.5 megabytes per second">187.5 MB/s</span> &mdash; <span class="math" data-say="1500 Mbit over s">1 500 Mbit/s</span> &mdash; raw is faster, so a datacentre link defeats this compressor and a wide-area link does not. Fix the link and you get a throughput: on <span class="math" data-say="125 megabytes per second">125 MB/s</span> the compressor must beat <span class="math" data-say="166.67 megabytes per second">166.67 MB/s</span>, and many do not.</p><div class="example"><span class="label">Example &middot; Why the same file gets a different answer on two links</span><p>Send the same <span class="math" data-say="10 gigabytes">10 GB</span> over a <span class="math" data-say="10 Gbit over s">10 Gbit/s</span> link, which is <span class="math" data-say="1250 megabytes per second">1 250 MB/s</span>. Raw: <span class="math" data-say="8 seconds">8 s</span>. Compressed: <span class="math" data-say="40 seconds">40 s</span> to squeeze plus <span class="math" data-say="2 seconds">2 s</span> to send, which is <span class="math" data-say="42 seconds">42 s</span>. Compression is now more than five times slower, and nothing about the file changed. The file never mattered: <span class="math" data-say="1250 megabytes per second">1 250 MB/s</span> is above <span class="math" data-say="bw star equals 187.5">bw* = 187.5</span>, and <span class="math" data-say="125 megabytes per second">125 MB/s</span> is below it.</p></div><h3>Where the ratio helps, and where it does not</h3><p><span class="math" data-say="the quantity k minus 1, over k">(k − 1)/k</span> is <span class="math" data-say="1 over 2">1/2</span> at <span class="math" data-say="k equals 2">k = 2</span>, <span class="math" data-say="3 over 4">3/4</span> at <span class="math" data-say="k equals 4">k = 4</span> and <span class="math" data-say="9 over 10">9/10</span> at <span class="math" data-say="k equals 10">k = 10</span>, so it saturates fast. Doubling the ratio from four to eight moves the break-even bandwidth from <span class="math" data-say="187.5">187.5</span> to <span class="math" data-say="218.75 megabytes per second">218.75 MB/s</span>, a gain of <span class="math" data-say="17 percent">17%</span>; doubling the compressor&rsquo;s throughput moves it from <span class="math" data-say="187.5">187.5</span> to <span class="math" data-say="375 megabytes per second">375 MB/s</span>. When both are on offer, the faster compressor is nearly always the better trade.</p><p>That is the arithmetic behind a decade of compression libraries choosing speed over ratio. Past <span class="math" data-say="k equals 4">k = 4</span> or so, extra ratio buys very little on the wire and is usually paid for with a great deal of processor time, which enters the plan at full weight.</p><h3>When decompression counts</h3><p>If the receiver has to expand the payload before doing anything with it, the far end&rsquo;s time is on the critical path and the compressed plan gains a third term, <span class="math" data-say="size over the quantity k times drate">size/(k·drate)</span> in the compressed domain. The equality is the same shape with that term added to the per-byte cost, and it moves the break-even against compression. Whether it applies is a question about what the receiver does, and it should be answered before the arithmetic rather than after.</p><p>One units caution, because it causes more wrong answers here than the algebra does. Links are quoted in bits a second and payloads in bytes, so a <span class="math" data-say="1000 Mbit over s">1 000 Mbit/s</span> link is <span class="math" data-say="125 megabytes per second">125 MB/s</span> and a factor of eight separates them. On this course <span class="math" data-say="MB per second">MB/s</span> is <span class="math" data-say="10 to the power 6">10⁶</span> bytes a second and <span class="math" data-say="Mbit over s">Mbit/s</span> is <span class="math" data-say="10 to the power 6">10⁶</span> bits a second, and the lab divides by eight rather than leaving it to be remembered.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Compress or not</h2></div><p>A fast enough link outruns every compressor</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+              rate* = bw·k/(k − 1)          = 125 × 4/3 = 166.67 MB/s</div><p>Two readings of one equality. Fix the compressor and you get a bandwidth: above <span class="math" data-say="187.5 megabytes per second">187.5 MB/s</span> &mdash; <span class="math" data-say="1500 Mbit over s">1 500 Mbit/s</span> &mdash; raw is faster, so a datacentre link defeats this compressor and a wide-area link does not. Fix the link and you get a throughput: on <span class="math" data-say="125 megabytes per second">125 MB/s</span> the compressor must beat <span class="math" data-say="166.67 megabytes per second">166.67 MB/s</span>, and many do not.</p><div class="example"><span class="label">Example &middot; Why the same file gets a different answer on two links</span><p>Send the same <span class="math" data-say="10 gigabytes">10 GB</span> over a <span class="math" data-say="10 Gbit over s">10 Gbit/s</span> link, which is <span class="math" data-say="1250 megabytes per second">1 250 MB/s</span>. Raw: <span class="math" data-say="8 seconds">8 s</span>. Compressed: <span class="math" data-say="40 seconds">40 s</span> to squeeze plus <span class="math" data-say="2 seconds">2 s</span> to send, which is <span class="math" data-say="42 seconds">42 s</span>. Compression is now more than five times slower, and nothing about the file changed. The file never mattered: <span class="math" data-say="1250 megabytes per second">1 250 MB/s</span> is above <span class="math" data-say="bw star equals 187.5">bw* = 187.5</span>, and <span class="math" data-say="125 megabytes per second">125 MB/s</span> is below it.</p></div><h3>Where the ratio helps, and where it does not</h3><p><span class="math" data-say="the quantity k minus 1, over k">(k − 1)/k</span> is <span class="math" data-say="1 over 2">1/2</span> at <span class="math" data-say="k equals 2">k = 2</span>, <span class="math" data-say="3 over 4">3/4</span> at <span class="math" data-say="k equals 4">k = 4</span> and <span class="math" data-say="9 over 10">9/10</span> at <span class="math" data-say="k equals 10">k = 10</span>, so it saturates fast. Doubling the ratio from four to eight moves the break-even bandwidth from <span class="math" data-say="187.5">187.5</span> to <span class="math" data-say="218.75 megabytes per second">218.75 MB/s</span>, a gain of <span class="math" data-say="17 percent">17%</span>; doubling the compressor&rsquo;s throughput moves it from <span class="math" data-say="187.5">187.5</span> to <span class="math" data-say="375 megabytes per second">375 MB/s</span>. When both are on offer, the faster compressor is nearly always the better trade.</p><p>That is the arithmetic behind a decade of compression libraries choosing speed over ratio. Past <span class="math" data-say="k equals 4">k = 4</span> or so, extra ratio buys very little on the wire and is usually paid for with a great deal of processor time, which enters the plan at full weight.</p><h3>When decompression counts</h3><p>If the receiver has to expand the payload before doing anything with it, the far end&rsquo;s time is on the critical path and the compressed plan gains a third term, <span class="math" data-say="size over the quantity k times drate">size/(k·drate)</span> in the compressed domain. The equality is the same shape with that term added to the per-byte cost, and it moves the break-even against compression. Whether it applies is a question about what the receiver does, and it should be answered before the arithmetic rather than after.</p><p>One units caution, because it causes more wrong answers here than the algebra does. Links are quoted in bits a second and payloads in bytes, so a <span class="math" data-say="1000 Mbit over s">1 000 Mbit/s</span> link is <span class="math" data-say="125 megabytes per second">125 MB/s</span> and a factor of eight separates them. On this course <span class="math" data-say="MB per second">MB/s</span> is <span class="math" data-say="10 to the power 6">10⁶</span> bytes a second and <span class="math" data-say="Mbit over s">Mbit/s</span> is <span class="math" data-say="10 to the power 6">10⁶</span> bits a second, and the lab divides by eight rather than leaving it to be remembered.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Compress or not</h2></div><p>A fast enough link outruns every compressor</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Compress or not</strong><span>the size cancels out; the link speed decides</span></div>
         <div class="inline-legend"><span class="tone-red"><i class="legend-swatch"></i>sent raw</span><span class="tone-purple"><i class="legend-swatch"></i>squeeze</span><span class="tone-cyan"><i class="legend-swatch"></i>send</span><span class="tone-green"><i class="legend-swatch"></i>expand, and the break-even</span></div>
@@ -1424,10 +1467,10 @@ divide by size:
       <div class="lab-stage" id="cpStage" tabindex="0" role="region" aria-label="Raw transfer time against the compressed plan's three steps, and where this link sits against the break-even."><svg id="cpBars" style="min-width:520px" viewBox="0 0 520 168" role="img" aria-label="Two horizontal time bars and a bandwidth axis split at the break-even."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cpTable"></table></div>
       <div class="status-banner" id="cpStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the file, the ratio, the compressor and the link</h3>
-          <p>Both times are exact fractions. The break-even bandwidth is the equality solved rather than a curve read off: the size cancels out of it completely, so how much you are moving decides how long both plans take and nothing at all about which one wins. Change the file size and watch the verdict stay exactly where it was.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the file, the ratio, the compressor and the link</h3>
+            <p>Both times are exact fractions. The break-even bandwidth is the equality solved rather than a curve read off: the size cancels out of it completely, so how much you are moving decides how long both plans take and nothing at all about which one wins. Change the file size and watch the verdict stay exactly where it was.</p>
         <div class="field" id="cpPresetField">
           <label for="cpPreset">Worked example</label>
           <select id="cpPreset"><option value="gigabit-link" selected>10 GB over a 1 Gbit/s link, 4× at 250 MB/s — compression wins</option><option value="fast-link">the same file over 25 Gbit/s — no compressor here is fast enough</option><option value="slow-wan">a 100 Mbit/s WAN — even a slow compressor pays</option><option value="counting-the-far-end">the same gigabit link with decompression on the critical path</option></select>
@@ -1465,12 +1508,14 @@ divide by size:
           <div class="kpi"><span>Bytes actually sent</span><strong id="cpBytes">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding whether to compress a transfer</h2></div><p>Times first so the sizes are concrete, then the break-even so the answer generalises.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Put the link and the compressor in the same units</h3><p>Bytes a second for both. A <span class="math" data-say="1000 Mbit over s">1 000 Mbit/s</span> link is <span class="math" data-say="125 megabytes per second">125 MB/s</span>, and a compressor quoted in MB/s is already there. Most wrong answers on this page are a factor of eight.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Time both plans at the size you actually have</h3><p><span class="math" data-say="size over b w">size/bw</span> against <span class="math" data-say="size over rate plus size over the quantity k times b w">size/rate + size/(k·bw)</span>. Keep the two stages of the compressed plan separate, because their shares tell you which of the two inputs to improve.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Solve the equality and report <span class="math" data-say="bw star">bw*</span></h3><p><span class="math" data-say="rate times the quantity k minus 1, over k">rate·(k − 1)/k</span>. This is the number worth carrying away, because it is about the link and the compressor rather than about the file, and it answers the question for every transfer over that link.</p></article><article class="card concept-card"><div class="icon">4</div><h3>State the same break-even as a compressor throughput</h3><p><span class="math" data-say="b w times k over the quantity k minus 1">bw·k/(k − 1)</span>. It is the form a library is chosen against: on a <span class="math" data-say="125 megabytes per second">125 MB/s</span> link, anything slower than <span class="math" data-say="166.67 megabytes per second">166.67 MB/s</span> is making the transfer worse however good its ratio is.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Decide whether the far end is on the critical path</h3><p>If the receiver must expand before it can act, add its time and redo the comparison. If it stores or forwards the compressed bytes, do not &mdash; and say which of the two you assumed.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Deciding whether to compress a transfer</h2>
+      <p class="lead-in">Times first so the sizes are concrete, then the break-even so the answer generalises.</p>
+      <ol class="key-ideas method"><li><strong>Put the link and the compressor in the same units.</strong> Bytes a second for both. A <span class="math" data-say="1000 Mbit over s">1 000 Mbit/s</span> link is <span class="math" data-say="125 megabytes per second">125 MB/s</span>, and a compressor quoted in MB/s is already there. Most wrong answers on this page are a factor of eight.</li><li><strong>Time both plans at the size you actually have.</strong> <span class="math" data-say="size over b w">size/bw</span> against <span class="math" data-say="size over rate plus size over the quantity k times b w">size/rate + size/(k·bw)</span>. Keep the two stages of the compressed plan separate, because their shares tell you which of the two inputs to improve.</li><li><strong>Solve the equality and report <span class="math" data-say="bw star">bw*</span>.</strong> <span class="math" data-say="rate times the quantity k minus 1, over k">rate·(k − 1)/k</span>. This is the number worth carrying away, because it is about the link and the compressor rather than about the file, and it answers the question for every transfer over that link.</li><li><strong>State the same break-even as a compressor throughput.</strong> <span class="math" data-say="b w times k over the quantity k minus 1">bw·k/(k − 1)</span>. It is the form a library is chosen against: on a <span class="math" data-say="125 megabytes per second">125 MB/s</span> link, anything slower than <span class="math" data-say="166.67 megabytes per second">166.67 MB/s</span> is making the transfer worse however good its ratio is.</li><li><strong>Decide whether the far end is on the critical path.</strong> If the receiver must expand before it can act, add its time and redo the comparison. If it stores or forwards the compressed bytes, do not &mdash; and say which of the two you assumed.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1505,17 +1550,16 @@ the same file on a 10 Gbit/s link (1 250 MB/s):
                verdict    send it raw, by 5.25×</div><p>The line where <span class="math" data-say="size">size</span> disappears is the whole lesson. It means the two blocks at the top and bottom did not need to be computed twice: <span class="math" data-say="125 megabytes per second">125 MB/s</span> is below <span class="math" data-say="bw star equals 187.5">bw* = 187.5</span> and <span class="math" data-say="1250 megabytes per second">1 250 MB/s</span> is above it, and that single comparison decides both cases for every file of every size.</p><p>The <span class="math" data-say="66.7 percent">66.7%</span> share of the compressed plan that is the compressor is why <span class="math" data-say="rate star">rate*</span> is the more actionable form. Ratio is easy to shop for and throughput is the thing that actually moves the break-even: doubling <span class="math" data-say="k">k</span> from four to eight raises <span class="math" data-say="bw star">bw*</span> by <span class="math" data-say="17 percent">17%</span>, and doubling <span class="math" data-say="rate">rate</span> doubles it.</p><p>For a faded attempt, keep the gigabit link and take a slower, stronger compressor: <span class="math" data-say="k equals 10">k = 10</span> at <span class="math" data-say="60 megabytes per second">60 MB/s</span>. Predict from <span class="math" data-say="rate star">rate*</span> alone which way the verdict goes before timing anything, then compute both times and check against the lab.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Always compressing</strong><span>It is a habit from slow links and it inverts on fast ones: the same <span class="math" data-say="10 gigabytes">10 GB</span> that gains <span class="math" data-say="1.33 times">1.33×</span> on a gigabit link loses by <span class="math" data-say="5.25 times">5.25×</span> on a ten-gigabit one. The test is one comparison &mdash; is the link above <span class="math" data-say="rate times the quantity k minus 1, over k">rate·(k − 1)/k</span>? &mdash; and it is answered once per link rather than once per transfer.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Shopping for ratio instead of throughput</strong><span><span class="math" data-say="the quantity k minus 1, over k">(k − 1)/k</span> saturates: going from <span class="math" data-say="k equals 4">k = 4</span> to <span class="math" data-say="k equals 8">k = 8</span> moves the break-even bandwidth by <span class="math" data-say="17 percent">17%</span>, while doubling the compressor&rsquo;s speed doubles it. Since the squeeze is two thirds of the compressed plan here, throughput is where the time actually is.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Leaving the far end out when it is on the critical path</strong><span>If the receiver must expand the payload before it can act, its time belongs in the comparison and it pushes the answer toward sending raw. Omitting it is correct when the receiver stores or forwards the compressed bytes, and wrong otherwise &mdash; so the assumption has to be stated rather than inherited.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the compress-or-not question is answered for a link rather than for a file.</strong><p>You should be able to time both plans in matching units, derive <span class="math" data-say="1 over b w equals 1 over rate plus 1 over the quantity k times b w">1/bw = 1/rate + 1/(k·bw)</span> and show the size cancelling, and report the break-even both as a bandwidth and as a compressor throughput.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Shrinking the bytes is one way to make a transfer cheaper. Not transferring them is the other, and it is usually worth far more. &ldquo;Move the Data or the Compute&rdquo; compares shipping a dataset against shipping the job that reads it, and the comparison turns out not to contain the bandwidth at all.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Always compressing</strong><span>It is a habit from slow links and it inverts on fast ones: the same <span class="math" data-say="10 gigabytes">10 GB</span> that gains <span class="math" data-say="1.33 times">1.33×</span> on a gigabit link loses by <span class="math" data-say="5.25 times">5.25×</span> on a ten-gigabit one. The test is one comparison &mdash; is the link above <span class="math" data-say="rate times the quantity k minus 1, over k">rate·(k − 1)/k</span>? &mdash; and it is answered once per link rather than once per transfer.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Shopping for ratio instead of throughput</strong><span><span class="math" data-say="the quantity k minus 1, over k">(k − 1)/k</span> saturates: going from <span class="math" data-say="k equals 4">k = 4</span> to <span class="math" data-say="k equals 8">k = 8</span> moves the break-even bandwidth by <span class="math" data-say="17 percent">17%</span>, while doubling the compressor&rsquo;s speed doubles it. Since the squeeze is two thirds of the compressed plan here, throughput is where the time actually is.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Leaving the far end out when it is on the critical path</strong><span>If the receiver must expand the payload before it can act, its time belongs in the comparison and it pushes the answer toward sending raw. Omitting it is correct when the receiver stores or forwards the compressed bytes, and wrong otherwise &mdash; so the assumption has to be stated rather than inherited.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the compress-or-not question is answered for a link rather than for a file.</strong><p>You should be able to time both plans in matching units, derive <span class="math" data-say="1 over b w equals 1 over rate plus 1 over the quantity k times b w">1/bw = 1/rate + 1/(k·bw)</span> and show the size cancelling, and report the break-even both as a bandwidth and as a compressor throughput.</p></div></div><div class="note"><strong>Note:</strong> Shrinking the bytes is one way to make a transfer cheaper. Not transferring them is the other, and it is usually worth far more. &ldquo;Move the Data or the Compute&rdquo; compares shipping a dataset against shipping the job that reads it, and the comparison turns out not to contain the bandwidth at all.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The compressed plan has two stages and the raw plan has one</summary><p>Raw: <span class="math" data-say="size over b w">size/bw</span>. Compressed: <span class="math" data-say="size over rate">size/rate</span> to squeeze, then <span class="math" data-say="size over the quantity k times b w">size/(k·bw)</span> to send <span class="math" data-say="k">k</span> times fewer bytes. At <span class="math" data-say="10 gigabytes">10 GB</span>, <span class="math" data-say="k equals 4">k = 4</span>, a <span class="math" data-say="250 megabytes per second">250 MB/s</span> compressor and a <span class="math" data-say="125 megabytes per second">125 MB/s</span> link that is <span class="math" data-say="80 seconds">80 s</span> against <span class="math" data-say="40 plus 20 equals 60 seconds">40 + 20 = 60 s</span>, so compressing wins by <span class="math" data-say="1.33 times">1.33×</span>. Both stages are on the critical path, which is why a fast compressor matters as much as a good ratio.</p></details><details class="recall"><summary>The size cancels out of the break-even</summary><p>Set the two times equal and every term carries one factor of <span class="math" data-say="size">size</span>, so it divides away: <span class="math" data-say="1 over b w equals 1 over rate plus 1 over the quantity k times b w">1/bw = 1/rate + 1/(k·bw)</span>. How much you are moving decides how long both plans take and nothing whatever about which of them is faster. That is the single most useful thing on this page, because it means the decision can be made once for a link rather than per file.</p></details><details class="recall"><summary>A fast enough link outruns every compressor</summary><p>Rearranged, the break-even bandwidth is <span class="math" data-say="rate times the quantity k minus 1, over k equals 187.5 megabytes per second">rate·(k − 1)/k = 187.5 MB/s</span>, or <span class="math" data-say="1500 Mbit over s">1 500 Mbit/s</span>. Above that the wire is quicker than the processor and compression costs time. Read the other way round, on a <span class="math" data-say="125 megabytes per second">125 MB/s</span> link you would need a compressor faster than <span class="math" data-say="166.67 megabytes per second">166.67 MB/s</span> for it to be worth doing at all.</p></details></div>
+      <h3>Summary</h3>
       <p>Compressing before sending trades processor time for wire time. Setting the two total times equal cancels the size of the file completely and leaves a relation between three numbers: the link, the compressor and the ratio. Above a bandwidth of <span class="math" data-say="rate times the quantity k minus 1, over k">rate·(k − 1)/k</span>, sending it raw is faster.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The compressed plan has two stages and the raw plan has one.</strong> Raw: <span class="math" data-say="size over b w">size/bw</span>. Compressed: <span class="math" data-say="size over rate">size/rate</span> to squeeze, then <span class="math" data-say="size over the quantity k times b w">size/(k·bw)</span> to send <span class="math" data-say="k">k</span> times fewer bytes. At <span class="math" data-say="10 gigabytes">10 GB</span>, <span class="math" data-say="k equals 4">k = 4</span>, a <span class="math" data-say="250 megabytes per second">250 MB/s</span> compressor and a <span class="math" data-say="125 megabytes per second">125 MB/s</span> link that is <span class="math" data-say="80 seconds">80 s</span> against <span class="math" data-say="40 plus 20 equals 60 seconds">40 + 20 = 60 s</span>, so compressing wins by <span class="math" data-say="1.33 times">1.33×</span>. Both stages are on the critical path, which is why a fast compressor matters as much as a good ratio.</li><li><strong>The size cancels out of the break-even.</strong> Set the two times equal and every term carries one factor of <span class="math" data-say="size">size</span>, so it divides away: <span class="math" data-say="1 over b w equals 1 over rate plus 1 over the quantity k times b w">1/bw = 1/rate + 1/(k·bw)</span>. How much you are moving decides how long both plans take and nothing whatever about which of them is faster. That is the single most useful thing on this page, because it means the decision can be made once for a link rather than per file.</li><li><strong>A fast enough link outruns every compressor.</strong> Rearranged, the break-even bandwidth is <span class="math" data-say="rate times the quantity k minus 1, over k equals 187.5 megabytes per second">rate·(k − 1)/k = 187.5 MB/s</span>, or <span class="math" data-say="1500 Mbit over s">1 500 Mbit/s</span>. Above that the wire is quicker than the processor and compression costs time. Read the other way round, on a <span class="math" data-say="125 megabytes per second">125 MB/s</span> link you would need a compressor faster than <span class="math" data-say="166.67 megabytes per second">166.67 MB/s</span> for it to be worth doing at all.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="raw, size over b w, equals, 10 gigabytes divided by 125 megabytes per second, equals, 80 seconds. compressed, size over rate plus size over the quantity k times b w, equals, 40 seconds plus 20 seconds, equals, 60 seconds. 1 over b w equals 1 over rate plus 1 over the quantity k times b w, the size cancels out entirely. bw star equals rate times the quantity k minus 1, over k equals 187.5 megabytes per second equals 1500 Mbit over s, faster links send raw. rate star equals b w times k over the quantity k minus 1, equals 166.67 megabytes per second, slower compressors lose" tabindex="0" role="region" aria-label="Mathematical notation">raw          size/bw  =  10 GB ÷ 125 MB/s  =  80 s
 compressed   size/rate + size/(k·bw)  =  40 s + 20 s  =  60 s
 1/bw = 1/rate + 1/(k·bw)          the size cancels out entirely
@@ -3000,11 +3044,42 @@ rate* = bw·k/(k − 1) = 166.67 MB/s                 slower compressors lose</d
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3072,7 +3147,7 @@ rate* = bw·k/(k − 1) = 166.67 MB/s                 slower compressors lose</d
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

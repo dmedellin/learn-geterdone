@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Taxes and Public Debts</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Book V, Chapter 2, Part 2 · Of Taxes: the four maxims</p>
       <h1>The Four Maxims of Taxation</h1>
       <p class="lesson-lede">Before he examines a single tax, Smith lays down four rules: equality, certainty, convenience and economy, and he puts certainty above equality.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Equality</li><li>Certainty, and convenience</li><li>Economy</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The maxims first, then the English land tax</h2>
-      <article class="prose reading"><p><strong>Book V, Chapter 2, Part II.</strong> &ldquo;Many of these taxes, it will appear from the following review, are not finally paid from the fund, or source of revenue, upon which it is intended they should fall.&rdquo;</p><p>That sentence is the agenda for the whole Part. Smith starts from Book I: the private revenue of individuals arises from rent, profit and wages, so every tax must finally come from one of them or from all indifferently. He will go through taxes that are meant to fall on rent, then profit, then wages, then on all of them, and at each he asks the question the sentence poses: is the person who hands the money over the person who finally loses it? The lessons that follow do that, and this one is the yardstick.</p><p>The first maxim is equality. Taxation should be in proportion to ability, which Smith glosses as the revenue each person enjoys under the protection of the state; and he gives the picture: &ldquo;The expense of government to the individuals of a great nation, is like the expense of management to the joint tenants of a great estate, who are all obliged to contribute in proportion to their respective interests in the estate&rdquo;. It is a rule of proportion, not of equal sums. He adds an easily missed corollary: &ldquo;Every tax, it must be observed once for all, which falls finally upon one only of the three sorts of revenue above mentioned, is necessarily unequal&rdquo;, and he will seldom return to it.</p><p>The second maxim is certainty: the tax &ldquo;ought to be certain and not arbitrary&rdquo;. Where it is not, every person subject to it is put more or less in the power of the tax-gatherer, who can aggravate the tax on any obnoxious contributor or extort a present by threatening to. The sentence people remember is the ranking: &ldquo;a very considerable degree of inequality, it appears, I believe, from the experience of all nations, is not near so great an evil as a very small degree of uncertainty&rdquo;. Smith puts a tax's predictability above its fairness, which is not what a reader expects from a list that begins with equality.</p><p>The third is convenience. A tax on the rent of land or houses payable at the term when rents are paid is levied &ldquo;when he is most likely to have wherewithall to pay&rdquo;. Taxes on luxuries are paid by the consumer, and &ldquo;He pays them by little and little, as he has occasion to buy the goods&rdquo;; as he may buy or not as he pleases, &ldquo;it must be his own fault if he ever suffers any considerable inconveniency from such taxes&rdquo;.</p><p>The fourth is economy: &ldquo;Every tax ought to be so contrived, as both to take out and to keep out of the pockets of the people as little as possible, over and above what it brings into the public treasury of the state.&rdquo; The four ways he lists are worth reading as a set. A great number of officers whose salaries and perquisites eat up the produce; a tax that obstructs industry and so dries up the funds that would have paid it; penalties on unsuccessful evaders, which ruin them and the use of their capital; and the &ldquo;odious examination&rdquo; of the tax-gatherers, which is not strictly expense but is equivalent to what a man would pay to be rid of it. In the third he puts a point bluntly: &ldquo;The law, contrary to all the ordinary principles of justice, first creates the temptation, and then punishes those who yield to it&rdquo;.</p><p>Now a tax to try them on. Smith's first example is the land tax of Great Britain, assessed on each district at a fixed valuation, one that &ldquo;is not afterwards to be altered&rdquo;. He gives it a report on each maxim. It is perfectly certain. It is paid with the rent, &ldquo;the tax is commonly advanced by the tenant&rdquo; although the landlord is the real contributor, and collected by fewer officers than any other tax affording nearly the same revenue. As it does not rise with the rent the sovereign does not share in the landlord's improvements, so it cannot discourage them. It fails the first maxim, because a fixed valuation, &ldquo;though it should be equal at the time of its first establishment, necessarily becomes unequal in process of time&rdquo;, as some districts improve and others decline.</p><p>The lab shows the sum. The valuation is £1,000 and the rate is a fifth, four shillings in the pound, so the tax is £200 a year as long as the assessment stands. In the steady preset the rent is also £1,000 for five years and the tax is a fifth of it every year; fixed and variable assessment agree. In the rising preset the rent goes £1,000, £1,100, £1,250, £1,500, £1,800. The tax stays at £200, which is 20 per cent of the rent in the first year and <span class="math" data-say="1 over 9">1/9</span> or about 11 per cent by the fifth. A tax at the same rate on the actual rent would have been £200, £220, £250, £300 and £360, and the five years differ by £330. That sum is what the landlords kept, and Smith says so: &ldquo;In the state of things which has happened to take place since the revolution, the constancy of the valuation has been advantageous to the landlord and hurtful to the sovereign.&rdquo; He adds that it was luck, because had rents been falling it would have gone the other way.</p><p>This is the shape of the whole Part. A tax is judged by each maxim in turn, and it rarely passes all four. Two comments from later writers belong here. John Stuart Mill, writing in 1848, took the first maxim to mean equality of sacrifice; later writers took that rule to justify a heavier rate on the rich, though Mill himself asked only that a minimum income go untaxed and the rest pay in proportion; Smith himself says of house-rent that it is not unreasonable for the rich to pay &ldquo;something more than in that proportion&rdquo;. Others, who start from what people receive from the state and not what they can bear, take the sentence's second clause, &ldquo;under the protection of the state&rdquo;, as a benefit rule instead. The maxims leave both readings open, and the lab computes only the proportion.</p><p>The next lesson, <em>Taxes upon Rent and Profit</em>, applies the maxims to the taxes that are meant to fall on land, houses and stock, and asks, for each, who finally pays.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Taxes</h2></div><p>a land tax on a fixed valuation against one that follows the rent</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The maxims first, then the English land tax</h2><div class="prose reading"><p><strong>Book V, Chapter 2, Part II.</strong> &ldquo;Many of these taxes, it will appear from the following review, are not finally paid from the fund, or source of revenue, upon which it is intended they should fall.&rdquo;</p><p>That sentence is the agenda for the whole Part. Smith starts from Book I: the private revenue of individuals arises from rent, profit and wages, so every tax must finally come from one of them or from all indifferently. He will go through taxes that are meant to fall on rent, then profit, then wages, then on all of them, and at each he asks the question the sentence poses: is the person who hands the money over the person who finally loses it? The lessons that follow do that, and this one is the yardstick.</p><p>The first maxim is equality. Taxation should be in proportion to ability, which Smith glosses as the revenue each person enjoys under the protection of the state; and he gives the picture: &ldquo;The expense of government to the individuals of a great nation, is like the expense of management to the joint tenants of a great estate, who are all obliged to contribute in proportion to their respective interests in the estate&rdquo;. It is a rule of proportion, not of equal sums. He adds an easily missed corollary: &ldquo;Every tax, it must be observed once for all, which falls finally upon one only of the three sorts of revenue above mentioned, is necessarily unequal&rdquo;, and he will seldom return to it.</p><p>The second maxim is certainty: the tax &ldquo;ought to be certain and not arbitrary&rdquo;. Where it is not, every person subject to it is put more or less in the power of the tax-gatherer, who can aggravate the tax on any obnoxious contributor or extort a present by threatening to. The sentence people remember is the ranking: &ldquo;a very considerable degree of inequality, it appears, I believe, from the experience of all nations, is not near so great an evil as a very small degree of uncertainty&rdquo;. Smith puts a tax's predictability above its fairness, which is not what a reader expects from a list that begins with equality.</p><p>The third is convenience. A tax on the rent of land or houses payable at the term when rents are paid is levied &ldquo;when he is most likely to have wherewithall to pay&rdquo;. Taxes on luxuries are paid by the consumer, and &ldquo;He pays them by little and little, as he has occasion to buy the goods&rdquo;; as he may buy or not as he pleases, &ldquo;it must be his own fault if he ever suffers any considerable inconveniency from such taxes&rdquo;.</p><p>The fourth is economy: &ldquo;Every tax ought to be so contrived, as both to take out and to keep out of the pockets of the people as little as possible, over and above what it brings into the public treasury of the state.&rdquo; The four ways he lists are worth reading as a set. A great number of officers whose salaries and perquisites eat up the produce; a tax that obstructs industry and so dries up the funds that would have paid it; penalties on unsuccessful evaders, which ruin them and the use of their capital; and the &ldquo;odious examination&rdquo; of the tax-gatherers, which is not strictly expense but is equivalent to what a man would pay to be rid of it. In the third he puts a point bluntly: &ldquo;The law, contrary to all the ordinary principles of justice, first creates the temptation, and then punishes those who yield to it&rdquo;.</p><p>Now a tax to try them on. Smith's first example is the land tax of Great Britain, assessed on each district at a fixed valuation, one that &ldquo;is not afterwards to be altered&rdquo;. He gives it a report on each maxim. It is perfectly certain. It is paid with the rent, &ldquo;the tax is commonly advanced by the tenant&rdquo; although the landlord is the real contributor, and collected by fewer officers than any other tax affording nearly the same revenue. As it does not rise with the rent the sovereign does not share in the landlord's improvements, so it cannot discourage them. It fails the first maxim, because a fixed valuation, &ldquo;though it should be equal at the time of its first establishment, necessarily becomes unequal in process of time&rdquo;, as some districts improve and others decline.</p><p>The lab shows the sum. The valuation is £1,000 and the rate is a fifth, four shillings in the pound, so the tax is £200 a year as long as the assessment stands. In the steady preset the rent is also £1,000 for five years and the tax is a fifth of it every year; fixed and variable assessment agree. In the rising preset the rent goes £1,000, £1,100, £1,250, £1,500, £1,800. The tax stays at £200, which is 20 per cent of the rent in the first year and <span class="math" data-say="1 over 9">1/9</span> or about 11 per cent by the fifth. A tax at the same rate on the actual rent would have been £200, £220, £250, £300 and £360, and the five years differ by £330. That sum is what the landlords kept, and Smith says so: &ldquo;In the state of things which has happened to take place since the revolution, the constancy of the valuation has been advantageous to the landlord and hurtful to the sovereign.&rdquo; He adds that it was luck, because had rents been falling it would have gone the other way.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Taxes</h2></div><p>a land tax on a fixed valuation against one that follows the rent</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Taxes</strong><span>a land tax on a fixed valuation against one that follows the rent</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="wtxTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="wtxTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Tax on the valuation = valuation × rate, the same every year, as England's land tax on its fixed valuation (Book V, chapter 2); as a share of each year's actual rent it is that tax ÷ the rent. A tax at the same rate on the actual rent is rent × rate. The totals add the years listed, and the difference is the tax on the rent less the tax on the valuation. Years must be listed earliest first; the lab does not fill in years between them. Amounts are in the lesson's money unit, typed as decimals (at most 6 places) or fractions such as 5/2, and computed exactly; one without a finite decimal is printed as its fraction and its value to 2 places after ≈. A percentage is exact when it has at most 2 decimal places and is otherwise rounded to 2 places on the exact value and marked ≈. </p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A tax fixed at a valuation, beside one that follows the rent</h3>
-          <p>A figure computed from the quantities the lesson states. A valuation, a rate and five years' rents go in; the lab gives the tax in each year, what share of the rent it is, and what a tax at the same rate on the actual rent would have been. Run the steady preset, then the rising one, and watch the share fall while the tax stands still.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A tax fixed at a valuation, beside one that follows the rent</h3>
+            <p>A figure computed from the quantities the lesson states. A valuation, a rate and five years' rents go in; the lab gives the tax in each year, what share of the rent it is, and what a tax at the same rate on the actual rent would have been. Run the steady preset, then the rising one, and watch the share fall while the tax stands still.</p>
         <div class="field">
           <label for="wtxPreset">Worked example</label>
           <select id="wtxPreset"><option value="steady">A valuation of £1,000 at a fifth, rents steady at £1,000, written for this lesson</option><option value="rising" selected>The same valuation with rents rising from £1,000 to £1,800, written for this lesson</option></select>
@@ -1432,12 +1475,15 @@
           <div class="kpi"><span>On the rent against on the valuation</span><strong id="wtxDifference">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>This is the shape of the whole Part. A tax is judged by each maxim in turn, and it rarely passes all four. Two comments from later writers belong here. John Stuart Mill, writing in 1848, took the first maxim to mean equality of sacrifice; later writers took that rule to justify a heavier rate on the rich, though Mill himself asked only that a minimum income go untaxed and the rest pay in proportion; Smith himself says of house-rent that it is not unreasonable for the rich to pay &ldquo;something more than in that proportion&rdquo;. Others, who start from what people receive from the state and not what they can bear, take the sentence's second clause, &ldquo;under the protection of the state&rdquo;, as a benefit rule instead. The maxims leave both readings open, and the lab computes only the proportion.</p><p>The next lesson, <em>Taxes upon Rent and Profit</em>, applies the maxims to the taxes that are meant to fall on land, houses and stock, and asks, for each, who finally pays.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing one tax against the four maxims</h2></div><p>Four steps, the same for any tax in the review.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the fund it is meant to fall on</h3><p>Say whether the tax is aimed at rent, profit, wages or consumption, and then ask who finally pays it. The two may differ, and the following lessons go through the cases.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute equality as proportion</h3><p>Divide the tax by the revenue it falls on, year by year and person by person. A tax that is a smaller share for one person than another, at the same revenue, is unequal.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check certainty and convenience</h3><p>Ask whether the time, manner and amount are plain to the person who pays, and whether payment falls when he has the means.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count what it costs beyond the treasury</h3><p>List the officers, any discouragement to industry, the penalties for evasion and the vexation. A tax that fails here costs the people more than the sovereign gets.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing one tax against the four maxims</h2>
+      <p class="lead-in">Four steps, the same for any tax in the review.</p>
+      <ol class="key-ideas method"><li><strong>Find the fund it is meant to fall on.</strong> Say whether the tax is aimed at rent, profit, wages or consumption, and then ask who finally pays it. The two may differ, and the following lessons go through the cases.</li><li><strong>Compute equality as proportion.</strong> Divide the tax by the revenue it falls on, year by year and person by person. A tax that is a smaller share for one person than another, at the same revenue, is unequal.</li><li><strong>Check certainty and convenience.</strong> Ask whether the time, manner and amount are plain to the person who pays, and whether payment falls when he has the means.</li><li><strong>Count what it costs beyond the treasury.</strong> List the officers, any discouragement to industry, the penalties for evasion and the vexation. A tax that fails here costs the people more than the sovereign gets.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1455,17 +1501,16 @@ tax actually paid:  5 · 200 = £1,000
 saved by the landlords:  1,330 − 1,000 = £330</div><p>The tax has stayed the same, and the share of the rent it takes has fallen from a fifth to a ninth. That is the first maxim failing while the other three hold. With rents falling the same assessment would have been heavier than a fifth, which is the next lesson's case.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading equality as everyone paying the same sum</strong><span>The first maxim says &ldquo;in proportion to their respective abilities&rdquo;, and Smith glosses ability as revenue under the state's protection. Equal shares of the revenue are equality; equal sums from unequal revenues are not. The land tax in the lab is equal at the first valuation because it is a fifth of every district's rent.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming Smith puts equality first in importance</strong><span>He lists it first, and then ranks certainty above it in a sentence of its own. A tax everyone can predict and that is somewhat unequal does less harm than an equal one that nobody can predict, because uncertainty puts people in the tax-gatherer's power.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the fourth maxim as only collection cost</strong><span>Collection cost is the first of four ways. The others are a tax that obstructs industry, penalties that ruin evaders, and vexation. A tax can be cheap to collect and still fail the fourth maxim if it drives people out of a trade.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can test a tax against the four maxims in figures.</strong><p>Given a valuation, a rate and a run of rents, compute the tax and its share of the rent each year, compare it with a tax at the same rate on the actual rent, and say which maxim the fixed valuation fails and which it passes.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab computes the first maxim only, as a proportion of rent. The other three are judgements about officers, penalties and convenience that no sum settles, and the rents are written for the lesson: Smith says only that rents had been &ldquo;continually rising&rdquo; since the valuation was fixed. Whether proportion or sacrifice, ability or benefit, is the right idea of equality is the oldest argument in the subject and the maxims do not decide it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading equality as everyone paying the same sum</strong><span>The first maxim says &ldquo;in proportion to their respective abilities&rdquo;, and Smith glosses ability as revenue under the state's protection. Equal shares of the revenue are equality; equal sums from unequal revenues are not. The land tax in the lab is equal at the first valuation because it is a fifth of every district's rent.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming Smith puts equality first in importance</strong><span>He lists it first, and then ranks certainty above it in a sentence of its own. A tax everyone can predict and that is somewhat unequal does less harm than an equal one that nobody can predict, because uncertainty puts people in the tax-gatherer's power.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the fourth maxim as only collection cost</strong><span>Collection cost is the first of four ways. The others are a tax that obstructs industry, penalties that ruin evaders, and vexation. A tax can be cheap to collect and still fail the fourth maxim if it drives people out of a trade.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can test a tax against the four maxims in figures.</strong><p>Given a valuation, a rate and a run of rents, compute the tax and its share of the rent each year, compare it with a tax at the same rate on the actual rent, and say which maxim the fixed valuation fails and which it passes.</p></div></div><div class="note"><strong>Note:</strong> The lab computes the first maxim only, as a proportion of rent. The other three are judgements about officers, penalties and convenience that no sum settles, and the rents are written for the lesson: Smith says only that rents had been &ldquo;continually rising&rdquo; since the valuation was fixed. Whether proportion or sacrifice, ability or benefit, is the right idea of equality is the oldest argument in the subject and the maxims do not decide it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Equality</summary><p>People should contribute &ldquo;in proportion to their respective abilities; that is, in proportion to the revenue which they respectively enjoy under the protection of the state&rdquo;. Smith's picture is joint tenants of a great estate who share the cost of managing it in proportion to their interests. A tax that falls on one of the three sorts of revenue only is necessarily unequal, he says, so far as it leaves the other two alone.</p></details><details class="recall"><summary>Certainty, and convenience</summary><p>The time, the manner and the amount of payment should be clear to the contributor and everyone else, or he is put in the power of the tax-gatherer. And it should be levied when and how the contributor can most easily pay: a tax on rent at the rent day, a tax on luxuries paid by little and little as he buys.</p></details><details class="recall"><summary>Economy</summary><p>A tax should take out of the people's pockets, and keep out of them, as little as possible beyond what goes into the treasury. Smith names four ways it can take more: a crowd of officers, a discouragement to industry, penalties that ruin evaders, and the vexation of tax-gatherers' visits.</p></details></div>
+      <h3>Summary</h3>
       <p>Every tax is finally paid out of rent, profit or wages, and the maxims say how to judge one. Smith's example is the English land tax on a fixed valuation, which scores well on three maxims and fails the first. Run a five-year case with rents rising and compare a fixed tax with one that follows the rent.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Equality.</strong> People should contribute &ldquo;in proportion to their respective abilities; that is, in proportion to the revenue which they respectively enjoy under the protection of the state&rdquo;. Smith's picture is joint tenants of a great estate who share the cost of managing it in proportion to their interests. A tax that falls on one of the three sorts of revenue only is necessarily unequal, he says, so far as it leaves the other two alone.</li><li><strong>Certainty, and convenience.</strong> The time, the manner and the amount of payment should be clear to the contributor and everyone else, or he is put in the power of the tax-gatherer. And it should be levied when and how the contributor can most easily pay: a tax on rent at the rent day, a tax on luxuries paid by little and little as he buys.</li><li><strong>Economy.</strong> A tax should take out of the people's pockets, and keep out of them, as little as possible beyond what goes into the treasury. Smith names four ways it can take more: a crowd of officers, a discouragement to industry, penalties that ruin evaders, and the vexation of tax-gatherers' visits.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="every tax is paid from rent, profit or wages. 1 equality, by ability, as revenue. 2 certainty, time, manner, amount plain. 3 convenience, when payment is easy. 4 economy, take out little more than comes in. fixed valuation, tax stays, rent moves" tabindex="0" role="region" aria-label="Mathematical notation">every tax is paid from rent, profit or wages
 1 equality: by ability, as revenue
 2 certainty: time, manner, amount plain
@@ -2344,11 +2389,42 @@ fixed valuation: tax stays, rent moves</div><figcaption>The four maxims in six l
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2416,7 +2492,7 @@ fixed valuation: tax stays, rent moves</div><figcaption>The four maxims in six l
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

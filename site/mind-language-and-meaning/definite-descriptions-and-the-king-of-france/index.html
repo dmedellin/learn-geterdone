@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Mind, Language and Meaning</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Language</p>
       <h1>Definite Descriptions and the Present King of France</h1>
       <p class="lesson-lede">Expand “the F is G” in Russell&#x27;s way, and read the three cases of one thing, nothing, and too many.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A description asserts three things</li><li>Three cases</li><li>Russell and Strawson read the second case differently</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Expanding a description</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Definite description</span><p>A <strong>definite description</strong> is a phrase of the form &ldquo;the F&rdquo;, such as &ldquo;the author of Waverley&rdquo; or &ldquo;the present King of France&rdquo;. It is used to speak of one thing by saying what that thing is like.</p></div><p>On the surface a description behaves like a name: &ldquo;the King of France is bald&rdquo; has a subject and a predicate and seems to be about the king. The trouble is that there is no king, and a sentence cannot be about a thing that is not there. If it is meaningful, as it plainly is, then either there is some such thing, or the surface form misleads.</p><p>Russell's analysis holds that the surface misleads. &ldquo;The F is G&rdquo; is a quantified sentence with three clauses.</p><div class="mathblock" data-say="there exists x F of x, and, for every y the quantity F of y implies y equals x, and, G of x" tabindex="0" role="region" aria-label="Mathematical notation">∃x ( F(x)  ∧  ∀y ( F(y) → y = x )  ∧  G(x) )</div><p>Read it as: there is an <span class="math" data-say="x">x</span> that is an <span class="math" data-say="F">F</span>, any <span class="math" data-say="y">y</span> that is an <span class="math" data-say="F">F</span> is that <span class="math" data-say="x">x</span>, and that <span class="math" data-say="x">x</span> is <span class="math" data-say="G">G</span>. The first clause says there is an F, the second that there is no more than one, and the third says what the one is like. The lab takes a phrase of the form &ldquo;the x such that F holds of x&rdquo;, followed by the predicate G, and expands it this way.</p><p>Three models cover the cases. In the first, the domain has individuals <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span> and <span class="math" data-say="c">c</span>; <span class="math" data-say="Author">Author</span> holds of <span class="math" data-say="b">b</span> alone, and <span class="math" data-say="Scot">Scot</span> holds of <span class="math" data-say="b">b</span> and <span class="math" data-say="c">c</span>. The description picks out <span class="math" data-say="b">b</span>, the one and only author. <span class="math" data-say="b">b</span> is a Scot, and the sentence is True, with the description denoting <span class="math" data-say="b">b</span>.</p><p>In the second, <span class="math" data-say="King">King</span> holds of nobody, and <span class="math" data-say="Bald">Bald</span> holds of <span class="math" data-say="A">a</span>. The first clause fails: no <span class="math" data-say="x">x</span> is a king. Whatever the third clause says, the conjunction cannot hold, and the lab prints False. It also reports that the description denotes nothing, which is the fact Strawson builds on.</p><p>In the third, <span class="math" data-say="King">King</span> holds of <span class="math" data-say="A">a</span> and of <span class="math" data-say="b">b</span>, and both are bald. The first clause is met. The second is not, since <span class="math" data-say="b">b</span> is a king and is not <span class="math" data-say="A">a</span>, and the lab prints False, reporting that the description is not unique, and naming <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span>. That both kings are bald does not help, because the sentence claims there is just one.</p><p>Now the dispute. Strawson's observation is about what people say. Asked whether the present King of France is bald, almost no one answers &ldquo;no&rdquo;; they say there is no such king. The sentence, he held, presupposes that there is a king, and when the presupposition fails the sentence is neither true nor false. Russell's reply is that the sentence does say that there is a king, so it is false, as &ldquo;there is a king who is bald&rdquo; is false. The lab computes only the expansion, so it prints Russell's False in the value tile, and in the tile for the description it prints the fact on which Strawson relies. Which tile to treat as the sentence's status is the philosophical choice, and it is not one the arithmetic makes for you.</p><p>What the expansion buys is a way to say that the sentence is meaningful although nothing is denoted: the description was never a name, only a bundle of claims. Its price is a complication for the grammar, since &ldquo;the King of France&rdquo; no longer behaves as a single phrase. The next lesson turns that complication into a second reading.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Truth in a model</h2></div><p>A first-order sentence evaluated over a domain you can edit</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Expanding a description</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Definite description</span><p>A <strong>definite description</strong> is a phrase of the form &ldquo;the F&rdquo;, such as &ldquo;the author of Waverley&rdquo; or &ldquo;the present King of France&rdquo;. It is used to speak of one thing by saying what that thing is like.</p></div><p>On the surface a description behaves like a name: &ldquo;the King of France is bald&rdquo; has a subject and a predicate and seems to be about the king. The trouble is that there is no king, and a sentence cannot be about a thing that is not there. If it is meaningful, as it plainly is, then either there is some such thing, or the surface form misleads.</p><p>Russell's analysis holds that the surface misleads. &ldquo;The F is G&rdquo; is a quantified sentence with three clauses.</p><div class="mathblock" data-say="there exists x F of x, and, for every y the quantity F of y implies y equals x, and, G of x" tabindex="0" role="region" aria-label="Mathematical notation">∃x ( F(x)  ∧  ∀y ( F(y) → y = x )  ∧  G(x) )</div><p>Read it as: there is an <span class="math" data-say="x">x</span> that is an <span class="math" data-say="F">F</span>, any <span class="math" data-say="y">y</span> that is an <span class="math" data-say="F">F</span> is that <span class="math" data-say="x">x</span>, and that <span class="math" data-say="x">x</span> is <span class="math" data-say="G">G</span>. The first clause says there is an F, the second that there is no more than one, and the third says what the one is like. The lab takes a phrase of the form &ldquo;the x such that F holds of x&rdquo;, followed by the predicate G, and expands it this way.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Truth in a model</h2></div><p>A first-order sentence evaluated over a domain you can edit</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A finite model</strong><span>every quantifier checked against every individual</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>satisfies the outermost matrix</span><span class="tone-red"><i class="legend-swatch"></i>does not</span></div>
@@ -1404,10 +1447,10 @@
       <div class="lab-stage"><div class="table-wrap" id="seTable" tabindex="0" role="region" aria-label="Data table"></div></div>
       <div class="status-banner" id="seStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>One thing, nothing, or too many</h3>
-          <p>The description tile reports what the restrictor picks out in the model: one individual, nobody, or several. Read it with the value for each preset. Then edit the extension of King in the first preset: put a in it and watch the value change, then put b in it as well.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>One thing, nothing, or too many</h3>
+            <p>The description tile reports what the restrictor picks out in the model: one individual, nobody, or several. Read it with the value for each preset. Then edit the extension of King in the first preset: put a in it and watch the value change, then put b in it as well.</p>
         <div class="field">
           <label for="sePreset">Model and sentence</label>
           <select id="sePreset"><option value="king" selected>no king of France, and one bald man</option><option value="author">one author, and he is a Scot</option><option value="two-kings">two kings, both bald</option></select>
@@ -1436,12 +1479,15 @@
         </div>
         <p class="small-copy" style="margin:0;">Quantifiers are Ax and Ex (or the symbols), variables x y z; a description is [the x: King(x)] Bald(x); connectives ~ &amp; | -&gt; &lt;-&gt;.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Three models cover the cases. In the first, the domain has individuals <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span> and <span class="math" data-say="c">c</span>; <span class="math" data-say="Author">Author</span> holds of <span class="math" data-say="b">b</span> alone, and <span class="math" data-say="Scot">Scot</span> holds of <span class="math" data-say="b">b</span> and <span class="math" data-say="c">c</span>. The description picks out <span class="math" data-say="b">b</span>, the one and only author. <span class="math" data-say="b">b</span> is a Scot, and the sentence is True, with the description denoting <span class="math" data-say="b">b</span>.</p><p>In the second, <span class="math" data-say="King">King</span> holds of nobody, and <span class="math" data-say="Bald">Bald</span> holds of <span class="math" data-say="A">a</span>. The first clause fails: no <span class="math" data-say="x">x</span> is a king. Whatever the third clause says, the conjunction cannot hold, and the lab prints False. It also reports that the description denotes nothing, which is the fact Strawson builds on.</p><p>In the third, <span class="math" data-say="King">King</span> holds of <span class="math" data-say="A">a</span> and of <span class="math" data-say="b">b</span>, and both are bald. The first clause is met. The second is not, since <span class="math" data-say="b">b</span> is a king and is not <span class="math" data-say="A">a</span>, and the lab prints False, reporting that the description is not unique, and naming <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span>. That both kings are bald does not help, because the sentence claims there is just one.</p><p>Now the dispute. Strawson's observation is about what people say. Asked whether the present King of France is bald, almost no one answers &ldquo;no&rdquo;; they say there is no such king. The sentence, he held, presupposes that there is a king, and when the presupposition fails the sentence is neither true nor false. Russell's reply is that the sentence does say that there is a king, so it is false, as &ldquo;there is a king who is bald&rdquo; is false. The lab computes only the expansion, so it prints Russell's False in the value tile, and in the tile for the description it prints the fact on which Strawson relies. Which tile to treat as the sentence's status is the philosophical choice, and it is not one the arithmetic makes for you.</p><p>What the expansion buys is a way to say that the sentence is meaningful although nothing is denoted: the description was never a name, only a bundle of claims. Its price is a complication for the grammar, since &ldquo;the King of France&rdquo; no longer behaves as a single phrase. The next lesson turns that complication into a second reading.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Evaluating a description</h2></div><p>Five steps. The description tile is the one to read first.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Pick out the restrictor</h3><p>In “the F is G” the F is the descriptive part. List the individuals of the model that satisfy it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count them</h3><p>None, one or several. This is the case, and it decides which clause of the expansion can fail.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Apply the three clauses</h3><p>There is an F; there is no more than one; it is G. All three are needed for True.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the value as Russell does</h3><p>A missing F and a doubled F both make the expansion False, by different clauses. Say which.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Say what Strawson would say</h3><p>For an empty description, the presupposition has failed. State the disagreement as one about what to call the result, not about the model.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Evaluating a description</h2>
+      <p class="lead-in">Five steps. The description tile is the one to read first.</p>
+      <ol class="key-ideas method"><li><strong>Pick out the restrictor.</strong> In “the F is G” the F is the descriptive part. List the individuals of the model that satisfy it.</li><li><strong>Count them.</strong> None, one or several. This is the case, and it decides which clause of the expansion can fail.</li><li><strong>Apply the three clauses.</strong> There is an F; there is no more than one; it is G. All three are needed for True.</li><li><strong>Read the value as Russell does.</strong> A missing F and a doubled F both make the expansion False, by different clauses. Say which.</li><li><strong>Say what Strawson would say.</strong> For an empty description, the presupposition has failed. State the disagreement as one about what to call the result, not about the model.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1460,17 +1506,16 @@ description tile:  denotes nothing
 Russell:  False.  Strawson:  presupposition fails</div><p>Both readings of the same fact are available at once. The expansion gives False because its first clause is false, and the description tile says the same thing in Strawson's words. The lab does not choose between them.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Saying the sentence has no truth value on Russell&#x27;s account</strong><span>In the model with no king the lab prints False for Russell's expansion, because its first clause asserts a king. It is Strawson who withholds a value, and the description tile shows the fact he does so on. The mistake mixes up the two positions, and is common because the sentence still strikes most people as odd to call false.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking that a doubled description is true if every F is G</strong><span>With two kings, both bald, the lab prints False and lists both. The expansion has a uniqueness clause, and &ldquo;the&rdquo; is what puts it there. Every king being bald is a different sentence.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a description as a name that happens to fail</strong><span>A name points at an individual of the model, and a name with no individual is a model error. A description is evaluated by looking at the extension of its restrictor, which may be empty, and an empty one makes the sentence false rather than making it unparseable.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can expand a description and name the clause that fails.</strong><p>Given a sentence of the form &ldquo;the F is G&rdquo; and a model, you should be able to write Russell's three clauses, evaluate them, say whether the description denotes one thing, nothing or several, and state what Strawson would call the empty case.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Whether ordinary speakers use descriptions as Russell says is a question about language use that this lesson does not settle; Strawson and later writers argued it does not fit. What the lesson teaches is the analysis as something with a checkable value.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Saying the sentence has no truth value on Russell&#x27;s account</strong><span>In the model with no king the lab prints False for Russell's expansion, because its first clause asserts a king. It is Strawson who withholds a value, and the description tile shows the fact he does so on. The mistake mixes up the two positions, and is common because the sentence still strikes most people as odd to call false.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking that a doubled description is true if every F is G</strong><span>With two kings, both bald, the lab prints False and lists both. The expansion has a uniqueness clause, and &ldquo;the&rdquo; is what puts it there. Every king being bald is a different sentence.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a description as a name that happens to fail</strong><span>A name points at an individual of the model, and a name with no individual is a model error. A description is evaluated by looking at the extension of its restrictor, which may be empty, and an empty one makes the sentence false rather than making it unparseable.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can expand a description and name the clause that fails.</strong><p>Given a sentence of the form &ldquo;the F is G&rdquo; and a model, you should be able to write Russell's three clauses, evaluate them, say whether the description denotes one thing, nothing or several, and state what Strawson would call the empty case.</p></div></div><div class="note"><strong>Note:</strong> Whether ordinary speakers use descriptions as Russell says is a question about language use that this lesson does not settle; Strawson and later writers argued it does not fit. What the lesson teaches is the analysis as something with a checkable value.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A description asserts three things</summary><p>&ldquo;The F is G&rdquo; says that something is an F, that nothing else is an F, and that the one thing that is an F is G. All three are part of what is said, and each can fail.</p></details><details class="recall"><summary>Three cases</summary><p>The F can be there once, not at all, or more than once. Only the first can make the sentence true, and the other two make the expansion false by different clauses.</p></details><details class="recall"><summary>Russell and Strawson read the second case differently</summary><p>Russell calls the sentence false, because its existence clause is false. Strawson says the sentence presupposes a king, and if there is none the question of truth does not arise. They agree about the model, and differ on the name for the result.</p></details></div>
+      <h3>Summary</h3>
       <p>&ldquo;The present King of France is bald&rdquo; looks like a sentence about a king, and there is none. Russell reads it as a claim that there is exactly one king and that he is bald. Evaluate that expansion in a model for the three cases, and see where Strawson disagrees about what to call the result.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A description asserts three things.</strong> &ldquo;The F is G&rdquo; says that something is an F, that nothing else is an F, and that the one thing that is an F is G. All three are part of what is said, and each can fail.</li><li><strong>Three cases.</strong> The F can be there once, not at all, or more than once. Only the first can make the sentence true, and the other two make the expansion false by different clauses.</li><li><strong>Russell and Strawson read the second case differently.</strong> Russell calls the sentence false, because its existence clause is false. Strawson says the sentence presupposes a king, and if there is none the question of truth does not arise. They agree about the model, and differ on the name for the result.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the F is G, equals, one F, and it is G. there is an F, at most one F, and G. no F, Russell says false. two Fs, false, even if both are G. Strawson, a failed presupposition" tabindex="0" role="region" aria-label="Mathematical notation">the F is G  =  one F, and it is G
 there is an F, at most one F, and G
 no F: Russell says false
@@ -2161,11 +2206,42 @@ Strawson: a failed presupposition</div><figcaption>A description is a claim, not
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2233,7 +2309,7 @@ Strawson: a failed presupposition</div><figcaption>A description is a claim, not
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

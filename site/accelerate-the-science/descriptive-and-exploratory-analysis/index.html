@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Science Behind the Book</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 12 · The Science Behind This Book</p>
       <h1>Descriptive and Exploratory Analysis</h1>
       <p class="lesson-lede">Correlation says how closely two measures move together, and two measures can do that for no reason that connects them.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Exploratory analysis</li><li>Pearson&#x27;s r</li><li>Spurious correlation</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Looking for relationships, and why that is not the end</h2>
-      <article class="prose reading"><p>&ldquo;Two variables moving together can always be due to a third variable or, sometimes, just chance.&rdquo; That is the second rung of Chapter 12's ladder in a sentence. Exploratory Analysis, the section it comes from, follows Descriptive Analysis and precedes the inferential rung, and it is where a team first asks whether anything in its data goes with anything else.</p><p>The authors call it a broad category: looking for relationships among the data, perhaps with visualisations to show patterns, and spotting outliers. They add a caution about the last of those; a researcher has to be careful that an outlier really is one, and not a legitimate member of the group. They also say this is the enjoyable stage, where divergent thinkers generate new ideas, new hypotheses and new projects, and in the next breath that a team which wants to say anything about prediction or causation has to go further.</p><p>The tool of the stage is correlation. The chapter says correlation shows how closely two variables rise and fall together, or against each other, and not why. The measure the authors report everywhere in the book is Pearson's r, which their footnote describes as the strength of a linear relationship, running from −1 through 0 to 1. The value is not a percentage of anything, although the book itself writes the 0.9471 below as 94.71 percent. A scatter of points close to a rising line gives r near 1, close to a falling line gives r near −1, and a shapeless cloud gives r near 0.</p><div class="mathblock" data-say="r equals the sum, over all rows, of x minus the mean of x, times y minus the mean of y. divided by the square root of the sum of the squared x distances, times the sum of the squared y distances" tabindex="0" role="region" aria-label="Mathematical notation">r  =  Σ(x − mean of x)·(y − mean of y)
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Looking for relationships, and why that is not the end</h2><div class="prose reading"><p>&ldquo;Two variables moving together can always be due to a third variable or, sometimes, just chance.&rdquo; That is the second rung of Chapter 12's ladder in a sentence. Exploratory Analysis, the section it comes from, follows Descriptive Analysis and precedes the inferential rung, and it is where a team first asks whether anything in its data goes with anything else.</p><p>The authors call it a broad category: looking for relationships among the data, perhaps with visualisations to show patterns, and spotting outliers. They add a caution about the last of those; a researcher has to be careful that an outlier really is one, and not a legitimate member of the group. They also say this is the enjoyable stage, where divergent thinkers generate new ideas, new hypotheses and new projects, and in the next breath that a team which wants to say anything about prediction or causation has to go further.</p><p>The tool of the stage is correlation. The chapter says correlation shows how closely two variables rise and fall together, or against each other, and not why. The measure the authors report everywhere in the book is Pearson's r, which their footnote describes as the strength of a linear relationship, running from −1 through 0 to 1. The value is not a percentage of anything, although the book itself writes the 0.9471 below as 94.71 percent. A scatter of points close to a rising line gives r near 1, close to a falling line gives r near −1, and a shapeless cloud gives r near 0.</p><div class="mathblock" data-say="r equals the sum, over all rows, of x minus the mean of x, times y minus the mean of y. divided by the square root of the sum of the squared x distances, times the sum of the squared y distances" tabindex="0" role="region" aria-label="Mathematical notation">r  =  Σ(x − mean of x)·(y − mean of y)
       ÷ √( Σ(x − mean of x)²  ·  Σ(y − mean of y)² )</div><p>The chapter prints no formula, so the one above is standard statistics. Read it as three sums over the pairs: how the two measures vary together on top, and how each varies on its own underneath, so that the result is the same whatever units each is measured in. If both measures are above their means together and below together, the top sum is large and positive.</p><p>The chapter then makes its point with a joke that is also serious. Tyler Vigen's website of spurious correlations, the authors say, lists pairs of measures that correlate highly and that common sense tells us are neither predictive nor causal. Their Figure 12.1 shows per capita cheese consumption against deaths by tangling in bedsheets, with r = 0.9471. Nobody believes the one drives the other. Yet the authors warn that a reader who goes looking through data for patterns will find a story to tell about whatever turns up. Hence the chapter's conclusion for this rung: report the correlations, then go on to analyses that ask more.</p><p>You can see one way such a correlation arises on a sample written for this lesson. Eight years of an invented company, a growing one: the number of deploys it makes per week, and the cups of coffee its office café sells per day. Both rise with the head count, and neither is connected to the other in any way you would defend.</p><div class="mathblock" data-say="a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">year             1    2    3    4    5    6    7    8
 deploys/week     13   19   25   28   33   37   43   48
 coffees/day      60   65   68   71   73   79   83   86
 change in deploys     6    6    3    5    4    6    5
-change in coffees     5    3    3    2    6    4    3</div><p>On the preset <code>shared-growth</code> the lab reports r = 0.994 for the levels, the figures as they stand. Nearly a perfect line, and no reason to think the coffee has anything to do with the deploys. The lab then differences the series: each year's figure minus the year before, so that the steady climb drops out and only the year-to-year movement is left. The changes in the table are 6, 6, 3, 5, 4, 6, 5 against 5, 3, 3, 2, 6, 4, 3, and their r is exactly 0. Once the shared climb is taken away, nothing is left that moves together. Differencing is a standard device for series that trend with time; the book does not use it, and it is here only to show where the 0.994 came from. The lab's last tile does the comparing for you: the changes' r is smaller in size than the levels', and one of the two is 0.</p><p>The device does not always empty a correlation, and it should not be read as a test of cause. On the preset <code>moving-together</code> the deploys are the same but the second series is merged pull requests per week, 30, 33, 36, 37, 39, 41, 44, 46. The levels give r = 0.999, and the changes, 6, 6, 3, 5, 4, 6, 5 against 3, 3, 1, 2, 2, 3, 2, still give r = 0.955. The two really do rise and fall together year to year. That is a stronger sort of correlation, and it is still only one: a larger team may well produce both, which is the third variable of the chapter's sentence, and the lab cannot show whether it does.</p><h3>Exercise</h3><ul><li>Five years of an invented company's test suite, in hundreds of tests, and its meeting-room bookings per week: <span class="math" data-say="1, 10, 4, 2, 14, 7, 3, 17, 11, 4, 21, 14, 5, 24, 18">1, 10, 4; 2, 14, 7; 3, 17, 11; 4, 21, 14; 5, 24, 18</span>.</li><li>Find r for the levels. Then write the four year-on-year changes of each and find r for those.</li></ul><p>Use the lab to check your arithmetic after you have done it by hand. Say what the two answers tell you about the climb and about the year-to-year movement, and what neither can tell you about why the bookings follow the tests.</p><p>Exploration finds the pattern; it cannot say what lies behind it. The next lesson, Inferential Predictive Analysis, reads how the authors go further without leaving the survey, by deciding what they expect before they look.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Describing and relating measures</h2></div><p>two trending series: r of the levels and of the changes</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+change in coffees     5    3    3    2    6    4    3</div><p>On the preset <code>shared-growth</code> the lab reports r = 0.994 for the levels, the figures as they stand. Nearly a perfect line, and no reason to think the coffee has anything to do with the deploys. The lab then differences the series: each year's figure minus the year before, so that the steady climb drops out and only the year-to-year movement is left. The changes in the table are 6, 6, 3, 5, 4, 6, 5 against 5, 3, 3, 2, 6, 4, 3, and their r is exactly 0. Once the shared climb is taken away, nothing is left that moves together. Differencing is a standard device for series that trend with time; the book does not use it, and it is here only to show where the 0.994 came from. The lab's last tile does the comparing for you: the changes' r is smaller in size than the levels', and one of the two is 0.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Describing and relating measures</h2></div><p>two trending series: r of the levels and of the changes</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Describing and relating measures</strong><span>two trending series: r of the levels and of the changes</span></div>
       </div>
@@ -1409,10 +1452,10 @@ change in coffees     5    3    3    2    6    4    3</div><p>On the preset <cod
       <div class="table-wrap" id="astTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="astTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> r = Sxy ÷ √(Sxx × Syy), where Sxx and Syy are the sums of squared deviations from the means and Sxy the sum of their products; r² = Sxy² ÷ (Sxx × Syy) is exact. The first differences are each value less the one before (n − 1 of them, x and y alike). The comparison is of size (|r|, on the squares, exactly) and of sign. An r is not defined when every x (or y) is the same, as the differences of a straight-line trend are. A square root is printed to 3 places from the exact rational under it by an integer square root, rounded half up, so the digits depend on the inputs alone; it is shown without ≈ only when it is exact. </p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Correlation of the levels and of the changes</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Correlation of the levels and of the changes</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="astPreset">Worked example</label>
           <select id="astPreset"><option value="shared-growth" selected>Eight invented years: deploys per week and café coffees per day</option><option value="moving-together">Deploys beside merged pull requests, whose changes also keep step</option></select>
@@ -1428,12 +1471,15 @@ change in coffees     5    3    3    2    6    4    3</div><p>On the preset <cod
           <div class="kpi"><span>The differences' r against the levels'</span><strong id="astCompare">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The device does not always empty a correlation, and it should not be read as a test of cause. On the preset <code>moving-together</code> the deploys are the same but the second series is merged pull requests per week, 30, 33, 36, 37, 39, 41, 44, 46. The levels give r = 0.999, and the changes, 6, 6, 3, 5, 4, 6, 5 against 3, 3, 1, 2, 2, 3, 2, still give r = 0.955. The two really do rise and fall together year to year. That is a stronger sort of correlation, and it is still only one: a larger team may well produce both, which is the third variable of the chapter's sentence, and the lab cannot show whether it does.</p><h3>Exercise</h3><ul><li>Five years of an invented company's test suite, in hundreds of tests, and its meeting-room bookings per week: <span class="math" data-say="1, 10, 4, 2, 14, 7, 3, 17, 11, 4, 21, 14, 5, 24, 18">1, 10, 4; 2, 14, 7; 3, 17, 11; 4, 21, 14; 5, 24, 18</span>.</li><li>Find r for the levels. Then write the four year-on-year changes of each and find r for those.</li></ul><p>Use the lab to check your arithmetic after you have done it by hand. Say what the two answers tell you about the climb and about the year-to-year movement, and what neither can tell you about why the bookings follow the tests.</p><p>Exploration finds the pattern; it cannot say what lies behind it. The next lesson, Inferential Predictive Analysis, reads how the authors go further without leaving the survey, by deciding what they expect before they look.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Checking a correlation for a shared trend</h2></div><p>Five steps, the last of them on two series of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Line the pairs up</h3><p>Write the two measures side by side, one pair per row, in time order. Check that every row is the same period for both.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find r for the levels</h3><p>Find each mean, each distance from its mean, and the three sums. Divide the cross sum by the square root of the product of the other two.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find r for the changes</h3><p>Subtract each figure from the next one, in both series, and find r again for the two lists of changes.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare the two, and name what is missing</h3><p>A large r of the levels and a small r of the changes means the series shared a trend. A large r of both means they also move together from year to year. Either way, write one candidate third variable.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on series of your own</h3><p>Take two monthly counts from systems you know, such as deploys and tickets, type eight or more months into the lab, and read the two figures.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Checking a correlation for a shared trend</h2>
+      <p class="lead-in">Five steps, the last of them on two series of your own.</p>
+      <ol class="key-ideas method"><li><strong>Line the pairs up.</strong> Write the two measures side by side, one pair per row, in time order. Check that every row is the same period for both.</li><li><strong>Find r for the levels.</strong> Find each mean, each distance from its mean, and the three sums. Divide the cross sum by the square root of the product of the other two.</li><li><strong>Find r for the changes.</strong> Subtract each figure from the next one, in both series, and find r again for the two lists of changes.</li><li><strong>Compare the two, and name what is missing.</strong> A large r of the levels and a small r of the changes means the series shared a trend. A large r of both means they also move together from year to year. Either way, write one candidate third variable.</li><li><strong>Do it on series of your own.</strong> Take two monthly counts from systems you know, such as deploys and tickets, type eight or more months into the lab, and read the two figures.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1454,17 +1500,16 @@ r = 5946 / √(7884·4535) = 5946 / √35753940
 √35753940 ≈ 5979.5, so r ≈ 0.994</div><p>The same three sums on the changes, with n = 7, give a top of <span data-say="7 times 130 minus 35 times 26 equals 0">7·130 − 35·26 = 0</span>, so r is exactly 0 and the square root never matters. A top of zero is what the table of changes looks like when they have nothing in common.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a high correlation as a connection</strong><span>Chapter 12 says a third variable, or sometimes plain chance, can always lie behind a pair that moves together, and illustrates it with a pair of measures nobody connects. The lab shows one route: two series that both climb with time correlate at 0.994 with nothing between them.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating r as a percentage</strong><span>Pearson's r is a coefficient between −1 and 1, not a share of anything. An r of 0.5 is not half of a perfect relationship in any sense you can act on. Squaring it gives the share of variance a straight line accounts for, which the last lesson of Surveys, Data and Statistical Methods takes up.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a zero correlation to mean nothing is going on</strong><span>Pearson's r measures a linear relationship only. A pair that moves in a curve can have r near 0, and a zero r of the changes, as on the first preset, shows only that no common movement is left once the climb is removed from this sample.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a correlation does and does not show.</strong><p>Given two series, find r for the levels and for the year-on-year changes, say whether they share a trend, and name one third variable that could account for the match.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab computes r of the levels and of the changes for the series you type. It cannot tell you whether a third variable exists, whether the relationship is a straight line, or whether eight years is enough to say anything about the next eight.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a high correlation as a connection</strong><span>Chapter 12 says a third variable, or sometimes plain chance, can always lie behind a pair that moves together, and illustrates it with a pair of measures nobody connects. The lab shows one route: two series that both climb with time correlate at 0.994 with nothing between them.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating r as a percentage</strong><span>Pearson's r is a coefficient between −1 and 1, not a share of anything. An r of 0.5 is not half of a perfect relationship in any sense you can act on. Squaring it gives the share of variance a straight line accounts for, which the last lesson of Surveys, Data and Statistical Methods takes up.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a zero correlation to mean nothing is going on</strong><span>Pearson's r measures a linear relationship only. A pair that moves in a curve can have r near 0, and a zero r of the changes, as on the first preset, shows only that no common movement is left once the climb is removed from this sample.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a correlation does and does not show.</strong><p>Given two series, find r for the levels and for the year-on-year changes, say whether they share a trend, and name one third variable that could account for the match.</p></div></div><div class="note"><strong>Note:</strong> The lab computes r of the levels and of the changes for the series you type. It cannot tell you whether a third variable exists, whether the relationship is a straight line, or whether eight years is enough to say anything about the next eight.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Exploratory analysis</summary><p>The second type of analysis in Leek's ladder. It looks for relationships among the variables, often with charts, and may find outliers, though the researcher must check that an outlier is not a legitimate member of the group. The authors call it where new hypotheses come from, and say that anyone who wants to speak of prediction or causation has to go further.</p></details><details class="recall"><summary>Pearson&#x27;s r</summary><p>The correlation the authors report throughout. It rates how strongly two variables follow a straight line together, on a scale from −1 to 1: 1 when they move together exactly, −1 when they move in exactly opposite directions, 0 when they are not correlated at all.</p></details><details class="recall"><summary>Spurious correlation</summary><p>A strong correlation with nothing connecting the two measures but chance or a third variable. In the lab the third variable is time: two series that both grow every year correlate strongly whether or not either has anything to do with the other.</p></details></div>
+      <h3>Summary</h3>
       <p>The second rung of Chapter 12's ladder looks for relationships in the data, and its main tool is correlation. Read what exploratory analysis is for, what Pearson's r measures, and why the authors insist that it is only the exploratory stage; then compute r for two invented series that both climb with time, and again for their year-on-year changes.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Exploratory analysis.</strong> The second type of analysis in Leek's ladder. It looks for relationships among the variables, often with charts, and may find outliers, though the researcher must check that an outlier is not a legitimate member of the group. The authors call it where new hypotheses come from, and say that anyone who wants to speak of prediction or causation has to go further.</li><li><strong>Pearson&#x27;s r.</strong> The correlation the authors report throughout. It rates how strongly two variables follow a straight line together, on a scale from −1 to 1: 1 when they move together exactly, −1 when they move in exactly opposite directions, 0 when they are not correlated at all.</li><li><strong>Spurious correlation.</strong> A strong correlation with nothing connecting the two measures but chance or a third variable. In the lab the third variable is time: two series that both grow every year correlate strongly whether or not either has anything to do with the other.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="exploratory, look for relationships. correlation, how two variables move together. r runs from minus 1 to 1, 0 is none. a third variable or chance can do it. shared growth gives r by itself. correlation is the exploratory stage only" tabindex="0" role="region" aria-label="Mathematical notation">exploratory: look for relationships
 correlation: how two variables move together
 r runs from −1 to 1; 0 is none
@@ -2330,11 +2375,42 @@ correlation is the exploratory stage only</div><figcaption>Exploratory analysis 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2402,7 +2478,7 @@ correlation is the exploratory stage only</div><figcaption>Exploratory analysis 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

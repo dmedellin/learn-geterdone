@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,41 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Life Cycle of a Domain Object</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 6 · The Life Cycle of a Domain Object</p>
       <h1>Aggregate Invariants and Concurrent Change</h1>
       <p class="lesson-lede">Locking single objects lets two correct edits break a rule that spans the group; locking the aggregate keeps the rule, at a price in waiting.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Invariant</li><li>Object lock</li><li>Aggregate lock</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The example&#x27;s argument, then the two schemes counted</h2>
-      <article class="prose reading"><p>&ldquo;We need to find a model that leaves high-contention points looser and strict invariants tighter.&rdquo; Evans sets this as the goal before the Aggregates pattern's rules, and the pattern's extended example shows what it means. This lesson reads that example, in which every step is a reasonable locking scheme and every step but the last goes wrong.</p><p>The example is a purchase order broken into line items, each for a quantity of a catalogue part, under one rule: the items' total may not pass the order's approval limit. The first scheme locks only the object a user starts to edit. Two buyers then change two different lines of the same order; each checks the total against the limit in their own copy and is within it; neither line is locked by the other; both commit, and the stored order is over its limit with no one aware. Locking the whole order would have refused the second save.</p><p>Evans then pushes further. A part's price can change too, which would break the rule from another direction, so he tries locking the parts as well, and the users begin to wait on one another over popular parts and finally deadlock. The way out is not a cleverer lock but more knowledge of the business: parts appear in many orders, parts change less often than orders, and a price change need not reach orders already placed. So the price is copied into each line when it is added, the line no longer depends on the part's current price, and the order and its lines become one aggregate whose limit can be enforced.</p><p>Two things are worth noticing in that last step. The rule that stays strict, the limit, is now wholly inside one boundary. The rule that was loosened, keeping old orders in step with new prices, did not vanish; Evans suggests a daily list of items with outdated prices for users to update or let stand. And the ownership matches the business, since an order and its lines are created and deleted together while parts come and go on their own.</p><p>The Enterprise Application Patterns lesson Pessimistic and Coarse-Grained Locks reads the mechanism of a lock on a group, with its version counters and shared locks. Evans's emphasis is earlier: which objects form the group is a decision about the model, and once the aggregate is drawn the lock follows it.</p><p>The lab's instance is a cookery school's Saturday class with 12 places, booked by three parties: the Walshes with 4, the Okafors with 3 and the Lins with 2, 9 places in all. The class is the root, and its <span class="math" data-say="resize">resize</span> method checks the rule in memory. Two staff members, Pat and Sam, each read the class at minute 0. Pat makes the Okafors 5 at minute 1 and 6 at minute 4, and Sam makes the Lins 4 at minute 2. In Pat's copy the sum is 12; in Sam's it is 11. Each passes the check.</p><pre class="codeblock" data-say="line 1, comment, One class session the parties booked into it are inside its boundary.. line 2, public class cookery class. line 3, private final class id id. line 4, private final int places. line 5, private final map of party name and integer parties is set to new hash map. line 7, public void resize of party name party, int people. line 8, int others is set to taken minus parties dot get or default of party, 0. line 9, if others plus people is greater than places. line 10, throw new illegal argument exception of over plus places plus places. line 12, parties dot put of party, people. line 15, int taken. line 16, return parties dot values dot stream dot map to int of integer method int value dot sum" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One class session; the parties booked into it are inside its boundary.</span>
-<span class="cl">public class CookeryClass {</span>
-<span class="cl">    private final ClassId id;</span>
-<span class="cl">    private final int places;</span>
-<span class="cl">    private final Map&lt;PartyName, Integer&gt; parties = new HashMap&lt;&gt;();</span>
-<span class="cl"></span>
-<span class="cl">    public void resize(PartyName party, int people) {</span>
-<span class="cl">        int others = taken() - parties.getOrDefault(party, 0);</span>
-<span class="cl">        if (others + people &gt; places) {</span>
-<span class="cl">            throw new IllegalArgumentException(&quot;over &quot; + places + &quot; places&quot;);</span>
-<span class="cl">        }</span>
-<span class="cl">        parties.put(party, people);</span>
-<span class="cl">    }</span>
-<span class="cl"></span>
-<span class="cl">    int taken() {</span>
-<span class="cl">        return parties.values().stream().mapToInt(Integer::intValue).sum();</span>
-<span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>On <code>object-locks</code> Pat locks the Okafors' line and Sam the Lins', so neither waits: 2 users commit and 0 are refused. The final values are 4, 6 and 4, and the lab reports a final sum of 14 against a limit of 12, so the invariant does not hold. Neither user did anything wrong, and the root's check ran both times, each time on a copy that did not contain the other edit. The last tile, edits lost, counts committed values that a later commit overwrote: 0, because the two changed different parties.</p><p>On <code>aggregate-lock</code> Pat's first edit at minute 1 takes the whole class. Sam's edit at minute 2 is refused, so 1 user commits and 1 is refused, and Sam's edit is discarded until Sam reads the class again. The final values are 4, 6 and 2, the sum is 12, and the invariant holds. The price is the refusal itself: Sam was changing a different party and still had to wait.</p><p>The preset <code>same-party</code> is the case object locks do catch. Both staff edit the Okafors, so under object locks the second to edit is refused on the same line: Pat alone commits and the sum stays at 12. Object locks protect a rule about one object; the trouble starts when the rule is about the sum of several.</p><h3>Exercise</h3><ul><li>A guided walk with a limit of 15 walkers. Parties: ana 6, ben 5, cho 2.</li><li>Edits (minute, user, party, new size): 1, kim, cho, 3; 2, lee, ben, 6; 3, kim, cho, 4.</li></ul><p>Each user reads at minute 0 and commits at their last minute. Work out, under object locks and then under an aggregate lock, who commits, the final sizes, the final sum, and whether the limit holds. Then set the scheme in the lab and check both.</p><p>An aggregate tells you what must be consistent; something still has to build one consistent in the first place. The next lesson, Factories, reads the chapter's answer.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Aggregates</h2></div><p>concurrent edits, an invariant that spans objects</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The example&#x27;s argument, then the two schemes counted</h2><div class="prose reading"><p>&ldquo;We need to find a model that leaves high-contention points looser and strict invariants tighter.&rdquo; Evans sets this as the goal before the Aggregates pattern's rules, and the pattern's extended example shows what it means. This lesson reads that example, in which every step is a reasonable locking scheme and every step but the last goes wrong.</p><p>The example is a purchase order broken into line items, each for a quantity of a catalogue part, under one rule: the items' total may not pass the order's approval limit. The first scheme locks only the object a user starts to edit. Two buyers then change two different lines of the same order; each checks the total against the limit in their own copy and is within it; neither line is locked by the other; both commit, and the stored order is over its limit with no one aware. Locking the whole order would have refused the second save.</p><p>Evans then pushes further. A part's price can change too, which would break the rule from another direction, so he tries locking the parts as well, and the users begin to wait on one another over popular parts and finally deadlock. The way out is not a cleverer lock but more knowledge of the business: parts appear in many orders, parts change less often than orders, and a price change need not reach orders already placed. So the price is copied into each line when it is added, the line no longer depends on the part's current price, and the order and its lines become one aggregate whose limit can be enforced.</p><p>Two things are worth noticing in that last step. The rule that stays strict, the limit, is now wholly inside one boundary. The rule that was loosened, keeping old orders in step with new prices, did not vanish; Evans suggests a daily list of items with outdated prices for users to update or let stand. And the ownership matches the business, since an order and its lines are created and deleted together while parts come and go on their own.</p><p>The Enterprise Application Patterns lesson Pessimistic and Coarse-Grained Locks reads the mechanism of a lock on a group, with its version counters and shared locks. Evans's emphasis is earlier: which objects form the group is a decision about the model, and once the aggregate is drawn the lock follows it.</p><p>The lab's instance is a cookery school's Saturday class with 12 places, booked by three parties: the Walshes with 4, the Okafors with 3 and the Lins with 2, 9 places in all. The class is the root, and its <span class="math" data-say="resize">resize</span> method checks the rule in memory. Two staff members, Pat and Sam, each read the class at minute 0. Pat makes the Okafors 5 at minute 1 and 6 at minute 4, and Sam makes the Lins 4 at minute 2. In Pat's copy the sum is 12; in Sam's it is 11. Each passes the check.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Aggregates</h2></div><p>concurrent edits, an invariant that spans objects</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Aggregates</strong><span>concurrent edits, an invariant that spans objects</span></div>
       </div>
@@ -1475,10 +1501,10 @@
       <div class="table-wrap" id="dgrTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgrTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Every user reads the aggregate at minute 0, edits items at the minutes given (an edit sets the item's new value) and commits at their last edit's minute. Locks are pessimistic, taken at an edit and held to the end of the user's commit minute. Object scheme: an edit locks only its item, so two users conflict only on the same item. Aggregate scheme: an edit locks the whole aggregate. An edit of what another user holds refuses its user outright: all their edits are discarded and their locks released. Edits are taken in minute order, ties in record order; commits apply in commit-minute order, ties in order of first appearance. An edit lost is a committed value overwritten by a later commit. The invariant is that the sum of the values is at most the limit.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Two users, one class, two locking schemes</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Two users, one class, two locking schemes</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
         <div class="field">
           <label for="dgrPreset">Worked example</label>
           <select id="dgrPreset"><option value="object-locks" selected>Pat and Sam edit different parties, object locks</option><option value="aggregate-lock">The same edits, one lock on the class</option><option value="same-party">Both edit the same party, object locks</option></select>
@@ -1508,12 +1534,32 @@
           <div class="kpi"><span>Edits lost (overwritten by a later commit)</span><strong id="dgrLost">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, One class session the parties booked into it are inside its boundary.. line 2, public class cookery class. line 3, private final class id id. line 4, private final int places. line 5, private final map of party name and integer parties is set to new hash map. line 7, public void resize of party name party, int people. line 8, int others is set to taken minus parties dot get or default of party, 0. line 9, if others plus people is greater than places. line 10, throw new illegal argument exception of over plus places plus places. line 12, parties dot put of party, people. line 15, int taken. line 16, return parties dot values dot stream dot map to int of integer method int value dot sum" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One class session; the parties booked into it are inside its boundary.</span>
+<span class="cl">public class CookeryClass {</span>
+<span class="cl">    private final ClassId id;</span>
+<span class="cl">    private final int places;</span>
+<span class="cl">    private final Map&lt;PartyName, Integer&gt; parties = new HashMap&lt;&gt;();</span>
+<span class="cl"></span>
+<span class="cl">    public void resize(PartyName party, int people) {</span>
+<span class="cl">        int others = taken() - parties.getOrDefault(party, 0);</span>
+<span class="cl">        if (others + people &gt; places) {</span>
+<span class="cl">            throw new IllegalArgumentException(&quot;over &quot; + places + &quot; places&quot;);</span>
+<span class="cl">        }</span>
+<span class="cl">        parties.put(party, people);</span>
+<span class="cl">    }</span>
+<span class="cl"></span>
+<span class="cl">    int taken() {</span>
+<span class="cl">        return parties.values().stream().mapToInt(Integer::intValue).sum();</span>
+<span class="cl">    }</span>
+<span class="cl">}</span></code></pre><p>On <code>object-locks</code> Pat locks the Okafors' line and Sam the Lins', so neither waits: 2 users commit and 0 are refused. The final values are 4, 6 and 4, and the lab reports a final sum of 14 against a limit of 12, so the invariant does not hold. Neither user did anything wrong, and the root's check ran both times, each time on a copy that did not contain the other edit. The last tile, edits lost, counts committed values that a later commit overwrote: 0, because the two changed different parties.</p><p>On <code>aggregate-lock</code> Pat's first edit at minute 1 takes the whole class. Sam's edit at minute 2 is refused, so 1 user commits and 1 is refused, and Sam's edit is discarded until Sam reads the class again. The final values are 4, 6 and 2, the sum is 12, and the invariant holds. The price is the refusal itself: Sam was changing a different party and still had to wait.</p><p>The preset <code>same-party</code> is the case object locks do catch. Both staff edit the Okafors, so under object locks the second to edit is refused on the same line: Pat alone commits and the sum stays at 12. Object locks protect a rule about one object; the trouble starts when the rule is about the sum of several.</p><h3>Exercise</h3><ul><li>A guided walk with a limit of 15 walkers. Parties: ana 6, ben 5, cho 2.</li><li>Edits (minute, user, party, new size): 1, kim, cho, 3; 2, lee, ben, 6; 3, kim, cho, 4.</li></ul><p>Each user reads at minute 0 and commits at their last minute. Work out, under object locks and then under an aggregate lock, who commits, the final sizes, the final sum, and whether the limit holds. Then set the scheme in the lab and check both.</p><p>An aggregate tells you what must be consistent; something still has to build one consistent in the first place. The next lesson, Factories, reads the chapter's answer.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running concurrent edits by hand</h2></div><p>Four steps, the last of them on a rule of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Give each user a copy</h3><p>Write down what each user reads at the start. Every check that user makes is against that copy plus their own edits, not the others'.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Apply the locking scheme</h3><p>Under object locks, refuse a user only on an object another user is already editing. Under an aggregate lock, the first user to edit anything holds the whole aggregate, and every other editor is refused.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Combine what commits</h3><p>Apply every committed edit to the stored values, then check the invariant on the result, not on any one user's copy.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own rule</h3><p>Find a rule in a system you know that sums or compares several records, such as a budget or a capacity. Write two edits that each keep it and together break it, and say which object the lock should be on.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running concurrent edits by hand</h2>
+      <p class="lead-in">Four steps, the last of them on a rule of your own.</p>
+      <ol class="key-ideas method"><li><strong>Give each user a copy.</strong> Write down what each user reads at the start. Every check that user makes is against that copy plus their own edits, not the others'.</li><li><strong>Apply the locking scheme.</strong> Under object locks, refuse a user only on an object another user is already editing. Under an aggregate lock, the first user to edit anything holds the whole aggregate, and every other editor is refused.</li><li><strong>Combine what commits.</strong> Apply every committed edit to the stored values, then check the invariant on the result, not on any one user's copy.</li><li><strong>Do it on your own rule.</strong> Find a rule in a system you know that sums or compares several records, such as a budget or a capacity. Write two edits that each keep it and together break it, and say which object the lock should be on.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1532,17 +1578,16 @@ both commit: walsh 4, okafor 6, lin 4
 sum 14 against 12: broken</div><p>Each check was correct for the copy it saw. The scheme, not the code, let the two copies be combined unchecked. With one lock on the class, Sam's edit is refused at minute 2 and the stored sum stays at 12.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that if every edit checks the rule, the rule is safe</strong><span>In the example each user's check passes and the stored order still breaks the limit, because each check sees only that user's copy. The rule spans several objects, so it is only as safe as the scope of the lock. On the lesson's illustration, two passing checks under object locks give a stored sum of 14 against 12.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Concluding that the safest design locks everything the rule touches</strong><span>Evans tries exactly that, locking the parts as well as the order, and it ends in contention and deadlock. His answer is to change the model, copying the price so the parts fall outside the boundary, not to widen the lock.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating an aggregate lock as free</strong><span>Evans says a lock on the whole order may suit work spread across many small orders and become cumbersome when many people edit lines of one large order. On the lesson's illustration Sam is refused although Sam was changing a different party.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run concurrent edits under both schemes.</strong><p>Given an aggregate's values, a sum limit and timed edits, state who commits, the final values and sum, and whether the invariant holds, under object locks and under an aggregate lock.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's model of locking is the example's simplest one: each user reads at the start, locks on first edit and commits at the end. It does not model waiting, retries, version checks or deadlock, and it cannot weigh refused edits against broken rules. That weighing is the business knowledge Evans asks for.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that if every edit checks the rule, the rule is safe</strong><span>In the example each user's check passes and the stored order still breaks the limit, because each check sees only that user's copy. The rule spans several objects, so it is only as safe as the scope of the lock. On the lesson's illustration, two passing checks under object locks give a stored sum of 14 against 12.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Concluding that the safest design locks everything the rule touches</strong><span>Evans tries exactly that, locking the parts as well as the order, and it ends in contention and deadlock. His answer is to change the model, copying the price so the parts fall outside the boundary, not to widen the lock.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating an aggregate lock as free</strong><span>Evans says a lock on the whole order may suit work spread across many small orders and become cumbersome when many people edit lines of one large order. On the lesson's illustration Sam is refused although Sam was changing a different party.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run concurrent edits under both schemes.</strong><p>Given an aggregate's values, a sum limit and timed edits, state who commits, the final values and sum, and whether the invariant holds, under object locks and under an aggregate lock.</p></div></div><div class="note"><strong>Note:</strong> The lab's model of locking is the example's simplest one: each user reads at the start, locks on first edit and commits at the end. It does not model waiting, retries, version checks or deadlock, and it cannot weigh refused edits against broken rules. That weighing is the business knowledge Evans asks for.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Invariant</summary><p>A consistency rule that must hold whenever the data changes. The lesson's is a sum: the places taken by the parties in a class may not exceed the places it has.</p></details><details class="recall"><summary>Object lock</summary><p>A scheme that locks only the object a user is editing. Two users editing different objects never wait for each other, and never see each other's edit before they commit.</p></details><details class="recall"><summary>Aggregate lock</summary><p>A scheme that locks the whole aggregate, through its root, as soon as one user begins to edit anything inside it. A second user who tries to edit the same aggregate is refused until the first is done.</p></details></div>
+      <h3>Summary</h3>
       <p>The Aggregates pattern's own example: two users edit different parts of one order, each keeps the order's limit, and together they break it. Read how Evans moves from object locks to a lock on the whole aggregate and then to a better model, and run concurrent edits to a class booking under both schemes.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Invariant.</strong> A consistency rule that must hold whenever the data changes. The lesson's is a sum: the places taken by the parties in a class may not exceed the places it has.</li><li><strong>Object lock.</strong> A scheme that locks only the object a user is editing. Two users editing different objects never wait for each other, and never see each other's edit before they commit.</li><li><strong>Aggregate lock.</strong> A scheme that locks the whole aggregate, through its root, as soon as one user begins to edit anything inside it. A second user who tries to edit the same aggregate is refused until the first is done.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="each edit can keep the rule. two together can break it. lock the aggregate, not the item. a coarser lock costs waiting. loosen ties where contention is high. copy what need not stay current" tabindex="0" role="region" aria-label="Mathematical notation">each edit can keep the rule
 two together can break it
 lock the aggregate, not the item
@@ -2331,11 +2376,42 @@ copy what need not stay current</div><figcaption>Invariants and locks in six lin
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2403,7 +2479,7 @@ copy what need not stay current</div><figcaption>Invariants and locks in six lin
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

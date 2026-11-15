@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Availability and Failure</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Composing availability</p>
       <h1>Series: Availability Multiplies</h1>
       <p class="lesson-lede">Compute the availability of a chain of dependencies and show it falls below the weakest of them.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A serial dependency is an AND</li><li>The product is below every factor</li><li>Independence is an assumption, and it is stated here</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The product, and why it is worse than the worst component</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Series availability</span><p>Components are <strong>in series</strong> for a request when the request needs all of them. If they fail independently, the availability of the whole is the product of the parts: <span class="math" data-say="A equals the product over i of A sub i">A = ∏ᵢ Aᵢ</span>. The unavailability is <span class="math" data-say="1 minus the product over i of A sub i">1 − ∏ᵢ Aᵢ</span>, which for small unavailabilities is close to <span class="math" data-say="the sum over i of 1 minus A sub i">Σᵢ (1 − Aᵢ)</span> &mdash; the outages add up.</p></div><p>The approximation is worth carrying separately from the formula, because it is how the number is estimated in a meeting. Ten dependencies each down one part in a thousand are down roughly ten parts in a thousand altogether, so the chain is about 99%. The exact answer is <span class="math" data-say="99.00449 percent">99.00449%</span>, and the estimate was reached without a calculator.</p><div class="mathblock" data-say="ten links, each 999 over 1000. A equals the quantity 999 over 1000, to the power 10. equals 990044880209748209880044990001 over 10 to the power 30. equals 0.9900449 equals 99.00449 percent, two nines, not three. downtime a month equals the quantity 1 minus A, times 2628000 seconds equals 7 h 16 minutes 2.05 seconds. the weakest link alone, equals, 43 minutes 48 seconds. ratio, equals 9.96 times" tabindex="0" role="region" aria-label="Mathematical notation">ten links, each 999/1000
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The product, and why it is worse than the worst component</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Series availability</span><p>Components are <strong>in series</strong> for a request when the request needs all of them. If they fail independently, the availability of the whole is the product of the parts: <span class="math" data-say="A equals the product over i of A sub i">A = ∏ᵢ Aᵢ</span>. The unavailability is <span class="math" data-say="1 minus the product over i of A sub i">1 − ∏ᵢ Aᵢ</span>, which for small unavailabilities is close to <span class="math" data-say="the sum over i of 1 minus A sub i">Σᵢ (1 − Aᵢ)</span> &mdash; the outages add up.</p></div><p>The approximation is worth carrying separately from the formula, because it is how the number is estimated in a meeting. Ten dependencies each down one part in a thousand are down roughly ten parts in a thousand altogether, so the chain is about 99%. The exact answer is <span class="math" data-say="99.00449 percent">99.00449%</span>, and the estimate was reached without a calculator.</p><div class="mathblock" data-say="ten links, each 999 over 1000. A equals the quantity 999 over 1000, to the power 10. equals 990044880209748209880044990001 over 10 to the power 30. equals 0.9900449 equals 99.00449 percent, two nines, not three. downtime a month equals the quantity 1 minus A, times 2628000 seconds equals 7 h 16 minutes 2.05 seconds. the weakest link alone, equals, 43 minutes 48 seconds. ratio, equals 9.96 times" tabindex="0" role="region" aria-label="Mathematical notation">ten links, each 999/1000
 
 A = (999/1000)¹⁰
   = 990 044 880 209 748 209 880 044 990 001 / 10³⁰
@@ -1399,12 +1443,11 @@ A = (999/1000)¹⁰
 
 downtime a month = (1 − A) × 2 628 000 s = 7 h 16 min 2.05 s
 the weakest link alone                   =      43 min 48 s
-ratio                                    = 9.96 ×</div><p>The product is exact. Ten fractions of <span class="math" data-say="999 over 1000">999/1000</span> multiply to <span class="math" data-say="999 to the power 10">999¹⁰</span> over <span class="math" data-say="1000 to the power 10">1000¹⁰</span>, a thirty-digit rational, and the lab carries it as one rather than as a double that has already lost the digits the lesson is about. The percentage appears once, at the end.</p><h3>Adding a better service still makes it worse</h3><p>This is the consequence people resist. A chain at <span class="math" data-say="99.00449 percent">99.00449%</span> gains a new dependency at 99.99% &mdash; a service ten times better than any link already in it. The chain becomes <span class="math" data-say="98.99459 percent">98.99459%</span>, which is one nine. Multiplying by <span class="math" data-say="0.9999">0.9999</span> is still multiplying by something less than one, and there is no availability, short of exactly <span class="math" data-say="1">1</span>, that a chain can absorb for free.</p><div class="example"><span class="label">Example &middot; Eleven links, ten of them the same</span><p><span class="math" data-say="the quantity 999 over 1000, to the power 10 times the quantity 9999 over 10000, equals 98.99459 percent">(999/1000)¹⁰ × (9999/10000) = 98.99459%</span>, <span class="math" data-say="7 h 20 minutes 22.24 seconds">7 h 20 min 22.24 s</span> a month against the <span class="math" data-say="7 h 16 minutes 2.05 seconds">7 h 16 min 2.05 s</span> before it, and the nines count drops from two to one. Type the eleventh dependency into the lab's chain and watch the running product step down rather than hold still. Every architecture review that adds &ldquo;just one more service, and it's a very reliable one&rdquo; is this calculation.</p></div><h3>Which way to read the number</h3><p>Two readings of the same fact are useful in different rooms. The first: a chain is a budget and each dependency spends part of it, so a three-nines promise cannot be built from three-nines parts. The second: the cheapest way to raise a chain is usually to shorten it, because removing a link multiplies the product by more than any plausible improvement to a link that stays.</p><div class="example"><span class="label">Example &middot; What three nines costs in a chain of ten</span><p>For the whole chain to reach <span class="math" data-say="999 over 1000">999/1000</span>, ten equal links must each satisfy <span class="math" data-say="A to the power 10 equals 0.999">A¹⁰ = 0.999</span>, which is <span class="math" data-say="A is approximately 0.9998999">A ≈ 0.9998999</span> &mdash; about four nines each. Set the lab's chain to ten entries of <span class="math" data-say="99.99">99.99</span> and the product is <span class="math" data-say="99.90004 percent">99.90004%</span>: ten four-nines services, assembled in series, are worth three nines. That is the arithmetic behind every complaint that the platform team's SLOs are stricter than the product's.</p></div><p>One caution before the lab. Everything above assumes each dependency is genuinely required. A service called on a cache miss, or only for one endpoint, is not in series with every request and does not belong in the product at its full weight; putting it there produces a pessimistic number that the next argument will rightly dismiss.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Series: availability multiplies</h2></div><p>Ten dependencies at 99.9% are 99.0%, which is worse than any one of them</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+ratio                                    = 9.96 ×</div><p>The product is exact. Ten fractions of <span class="math" data-say="999 over 1000">999/1000</span> multiply to <span class="math" data-say="999 to the power 10">999¹⁰</span> over <span class="math" data-say="1000 to the power 10">1000¹⁰</span>, a thirty-digit rational, and the lab carries it as one rather than as a double that has already lost the digits the lesson is about. The percentage appears once, at the end.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Series: availability multiplies</h2></div><p>Ten dependencies at 99.9% are 99.0%, which is worse than any one of them</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A chain multiplies down</strong><span>every dependency you add makes the whole thing worse than its weakest link</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>running product</span><span class="tone-amber"><i class="legend-swatch"></i>the weakest link</span><span class="tone-red"><i class="legend-swatch"></i>what the chain costs</span></div>
@@ -1412,10 +1455,10 @@ ratio                                    = 9.96 ×</div><p>The product is exact.
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="seChainPlot" viewBox="0 0 520 190" role="img" aria-label="The running product of a chain of dependencies, falling with each one added."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="seTable"></table></div>
       <div class="status-banner" id="seStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Build the chain</h3>
-          <p>Ten dependencies at 99.9% are loaded. Read the running product down the table, then bolt on extras at 99.99% and watch the line fall below the dashed one that marks the weakest link. Every entry is an exact fraction and the product is taken as one.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Build the chain</h3>
+            <p>Ten dependencies at 99.9% are loaded. Read the running product down the table, then bolt on extras at 99.99% and watch the line fall below the dashed one that marks the weakest link. Every entry is an exact fraction and the product is taken as one.</p>
         <div class="field">
           <label for="seChain">Dependency availabilities (percentages, comma separated)</label>
           <input id="seChain" type="text" value="99.9, 99.9, 99.9, 99.9, 99.9, 99.9, 99.9, 99.9, 99.9, 99.9" inputmode="text" autocomplete="off">
@@ -1437,12 +1480,15 @@ ratio                                    = 9.96 ×</div><p>The product is exact.
           <div class="kpi"><span>Worse than the weakest by</span><strong id="seFactor">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="seHint" style="margin:0;">The product is exact: ten fractions of 999/1000 multiply to 999<sup>10</sup> over 1000<sup>10</sup>, and no decimal is taken until the last digit is printed. Every dependency is a serial one &mdash; the request needs all of them.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Adding a better service still makes it worse</h3><p>This is the consequence people resist. A chain at <span class="math" data-say="99.00449 percent">99.00449%</span> gains a new dependency at 99.99% &mdash; a service ten times better than any link already in it. The chain becomes <span class="math" data-say="98.99459 percent">98.99459%</span>, which is one nine. Multiplying by <span class="math" data-say="0.9999">0.9999</span> is still multiplying by something less than one, and there is no availability, short of exactly <span class="math" data-say="1">1</span>, that a chain can absorb for free.</p><div class="example"><span class="label">Example &middot; Eleven links, ten of them the same</span><p><span class="math" data-say="the quantity 999 over 1000, to the power 10 times the quantity 9999 over 10000, equals 98.99459 percent">(999/1000)¹⁰ × (9999/10000) = 98.99459%</span>, <span class="math" data-say="7 h 20 minutes 22.24 seconds">7 h 20 min 22.24 s</span> a month against the <span class="math" data-say="7 h 16 minutes 2.05 seconds">7 h 16 min 2.05 s</span> before it, and the nines count drops from two to one. Type the eleventh dependency into the lab's chain and watch the running product step down rather than hold still. Every architecture review that adds &ldquo;just one more service, and it's a very reliable one&rdquo; is this calculation.</p></div><h3>Which way to read the number</h3><p>Two readings of the same fact are useful in different rooms. The first: a chain is a budget and each dependency spends part of it, so a three-nines promise cannot be built from three-nines parts. The second: the cheapest way to raise a chain is usually to shorten it, because removing a link multiplies the product by more than any plausible improvement to a link that stays.</p><div class="example"><span class="label">Example &middot; What three nines costs in a chain of ten</span><p>For the whole chain to reach <span class="math" data-say="999 over 1000">999/1000</span>, ten equal links must each satisfy <span class="math" data-say="A to the power 10 equals 0.999">A¹⁰ = 0.999</span>, which is <span class="math" data-say="A is approximately 0.9998999">A ≈ 0.9998999</span> &mdash; about four nines each. Set the lab's chain to ten entries of <span class="math" data-say="99.99">99.99</span> and the product is <span class="math" data-say="99.90004 percent">99.90004%</span>: ten four-nines services, assembled in series, are worth three nines. That is the arithmetic behind every complaint that the platform team's SLOs are stricter than the product's.</p></div><p>One caution before the lab. Everything above assumes each dependency is genuinely required. A service called on a cache miss, or only for one endpoint, is not in series with every request and does not belong in the product at its full weight; putting it there produces a pessimistic number that the next argument will rightly dismiss.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing a chain, and reporting it honestly</h2></div><p>The multiplication is trivial. Deciding what belongs in the list, and saying what you assumed about it, is the work.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List what the request genuinely cannot do without</h3><p>Walk one request end to end and write down every component whose failure fails it. Anything consulted optionally, behind a cache or on one endpoint only, is not in series at full weight and should be left out or weighted down.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Multiply the availabilities, not the percentages</h3><p>Carry each as a fraction and take the product. Ten links at <span class="math" data-say="999 over 1000">999/1000</span> are <span class="math" data-say="999 to the power 10 over 1000 to the power 10">999¹⁰/1000¹⁰</span>; convert to a percentage once, at the end, and keep enough digits that the nines are still visible.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Convert to downtime and compare with the weakest link</h3><p>Turn <span class="math" data-say="1 minus A">1 − A</span> into minutes over a stated period and put it beside the downtime of the worst single component. The ratio should be close to the number of links; if it is not, either a link is dominating or something is in the list that does not belong.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Say out loud that you assumed independence</h3><p>The product is exactly right under independence and optimistic under a shared cause. Name what the components share &mdash; rack, power feed, deploy pipeline, certificate authority &mdash; and record the product as an upper bound where they share something that matters.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing a chain, and reporting it honestly</h2>
+      <p class="lead-in">The multiplication is trivial. Deciding what belongs in the list, and saying what you assumed about it, is the work.</p>
+      <ol class="key-ideas method"><li><strong>List what the request genuinely cannot do without.</strong> Walk one request end to end and write down every component whose failure fails it. Anything consulted optionally, behind a cache or on one endpoint only, is not in series at full weight and should be left out or weighted down.</li><li><strong>Multiply the availabilities, not the percentages.</strong> Carry each as a fraction and take the product. Ten links at <span class="math" data-say="999 over 1000">999/1000</span> are <span class="math" data-say="999 to the power 10 over 1000 to the power 10">999¹⁰/1000¹⁰</span>; convert to a percentage once, at the end, and keep enough digits that the nines are still visible.</li><li><strong>Convert to downtime and compare with the weakest link.</strong> Turn <span class="math" data-say="1 minus A">1 − A</span> into minutes over a stated period and put it beside the downtime of the worst single component. The ratio should be close to the number of links; if it is not, either a link is dominating or something is in the list that does not belong.</li><li><strong>Say out loud that you assumed independence.</strong> The product is exactly right under independence and optimistic under a shared cause. Name what the components share &mdash; rack, power feed, deploy pipeline, certificate authority &mdash; and record the product as an upper bound where they share something that matters.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1472,17 +1518,16 @@ edge      0.0001      ledger    0.0001
 sum       0.0027      and 1 − A = 0.0026975        ✓</div><p>The last block is the one to keep. The unavailabilities sum to <span class="math" data-say="0.0027">0.0027</span> and the exact <span class="math" data-say="1 minus A">1 − A</span> is <span class="math" data-say="0.0026975">0.0026975</span>; the sum is a good estimate and a better explanation, because it says immediately that auth and payments are three quarters of the outage and that improving the edge cannot matter. Two nines, and the ratio of <span class="math" data-say="2.70">2.70</span> against the weakest link says the chain behaves like about three equal links.</p><p>For a faded rehearsal, the team proposes adding a fraud-check service at 99.995% to this path. The supplied first move is that its unavailability, <span class="math" data-say="0.00005">0.00005</span>, joins the sum above. Predict the new chain availability and its monthly downtime before computing them, then type the six values into the lab and check. Then answer the question the number raises: is the new chain still inside a two-nines promise, and what would have to be removed to keep it inside a three-nines one?</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reporting a chain as being as good as its weakest link</strong><span>It is worse, and by roughly the number of links: ten at 99.9% give <span class="math" data-say="99.00449 percent">99.00449%</span>, whose downtime is <span class="math" data-say="9.96">9.96</span> times the weakest link's own. The phrase is borrowed from load-bearing metaphors where the chain breaks at one point; here every link has its own outages and they accumulate.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding a very available service and expecting the path to improve</strong><span>Attaching a 99.99% dependency to a 99.00449% path gives <span class="math" data-say="98.99459 percent">98.99459%</span>. The new service is not helping the others &mdash; it is another thing that can fail. Redundancy improves a path; a dependency, however good, only ever costs it something.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Multiplying without saying that independence was assumed</strong><span><span class="math" data-say="A equals the product of A sub i">A = ∏Aᵢ</span> is a theorem about independent events. Components in one rack, behind one certificate or shipped by one pipeline are not independent, and the product then reports a confident number about a system it does not describe. The multiplication is not wrong; the silence about its premise is.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we added a dependency” reads as “we lowered the availability”.</strong><p>You should be able to multiply a chain exactly, estimate it by summing unavailabilities, say how far under the weakest link it lands and why, work out what per-component availability a target demands, and name the independence assumption unprompted.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A chain multiplies availability down, which raises the obvious question of what multiplies it up. The answer is the same probability read through its complement: if a request needs any one of several paths, it fails only when all of them do. &ldquo;Parallel: Redundancy&rdquo; does that arithmetic, and then charges for the thing the formula quietly leaves out.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reporting a chain as being as good as its weakest link</strong><span>It is worse, and by roughly the number of links: ten at 99.9% give <span class="math" data-say="99.00449 percent">99.00449%</span>, whose downtime is <span class="math" data-say="9.96">9.96</span> times the weakest link's own. The phrase is borrowed from load-bearing metaphors where the chain breaks at one point; here every link has its own outages and they accumulate.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding a very available service and expecting the path to improve</strong><span>Attaching a 99.99% dependency to a 99.00449% path gives <span class="math" data-say="98.99459 percent">98.99459%</span>. The new service is not helping the others &mdash; it is another thing that can fail. Redundancy improves a path; a dependency, however good, only ever costs it something.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Multiplying without saying that independence was assumed</strong><span><span class="math" data-say="A equals the product of A sub i">A = ∏Aᵢ</span> is a theorem about independent events. Components in one rack, behind one certificate or shipped by one pipeline are not independent, and the product then reports a confident number about a system it does not describe. The multiplication is not wrong; the silence about its premise is.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we added a dependency” reads as “we lowered the availability”.</strong><p>You should be able to multiply a chain exactly, estimate it by summing unavailabilities, say how far under the weakest link it lands and why, work out what per-component availability a target demands, and name the independence assumption unprompted.</p></div></div><div class="note"><strong>Note:</strong> A chain multiplies availability down, which raises the obvious question of what multiplies it up. The answer is the same probability read through its complement: if a request needs any one of several paths, it fails only when all of them do. &ldquo;Parallel: Redundancy&rdquo; does that arithmetic, and then charges for the thing the formula quietly leaves out.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A serial dependency is an AND</summary><p>If a request needs the auth service and the database and the cache and the network between them, it succeeds only when every one of them is up. The probability of an AND of independent events is the product of their probabilities, so <span class="math" data-say="A equals A sub 1 A sub 2 and so on A sub n">A = A₁A₂…Aₙ</span>. Nothing in that argument is about software; it is the definition of independence applied to the list of things a request cannot do without.</p></details><details class="recall"><summary>The product is below every factor</summary><p>Each <span class="math" data-say="A sub i">Aᵢ</span> is at most <span class="math" data-say="1">1</span>, so multiplying by it cannot raise the running total. The chain is therefore worse than its weakest link, not equal to it: ten links at 99.9% give <span class="math" data-say="99.00449 percent">99.00449%</span>, whose downtime is <span class="math" data-say="9.96">9.96</span> times the <span class="math" data-say="43 minutes 48 seconds">43 min 48 s</span> a single link permits. The unavailabilities add, near enough, and that is the useful way to hold it.</p></details><details class="recall"><summary>Independence is an assumption, and it is stated here</summary><p><span class="math" data-say="A equals the product of A sub i">A = ∏Aᵢ</span> is exactly right when the components fail independently and merely plausible otherwise. Two services in the same rack, behind the same certificate or shipped by the same deploy are not independent, and the product will read optimistically for one shape of correlation and pessimistically for another. &ldquo;Correlated Failure&rdquo; measures the gap.</p></details></div>
+      <h3>Summary</h3>
       <p>A request that needs every one of its dependencies succeeds only if all of them do, so under independence the availabilities multiply: <span class="math" data-say="A equals the product of A sub i">A = ∏Aᵢ</span>. Ten dependencies at 99.9% each give <span class="math" data-say="99.00449 percent">99.00449%</span>, which is two nines rather than three and nearly ten times the downtime of any single link. The phrase &ldquo;as available as the weakest link&rdquo; describes the wrong shape entirely.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A serial dependency is an AND.</strong> If a request needs the auth service and the database and the cache and the network between them, it succeeds only when every one of them is up. The probability of an AND of independent events is the product of their probabilities, so <span class="math" data-say="A equals A sub 1 A sub 2 and so on A sub n">A = A₁A₂…Aₙ</span>. Nothing in that argument is about software; it is the definition of independence applied to the list of things a request cannot do without.</li><li><strong>The product is below every factor.</strong> Each <span class="math" data-say="A sub i">Aᵢ</span> is at most <span class="math" data-say="1">1</span>, so multiplying by it cannot raise the running total. The chain is therefore worse than its weakest link, not equal to it: ten links at 99.9% give <span class="math" data-say="99.00449 percent">99.00449%</span>, whose downtime is <span class="math" data-say="9.96">9.96</span> times the <span class="math" data-say="43 minutes 48 seconds">43 min 48 s</span> a single link permits. The unavailabilities add, near enough, and that is the useful way to hold it.</li><li><strong>Independence is an assumption, and it is stated here.</strong> <span class="math" data-say="A equals the product of A sub i">A = ∏Aᵢ</span> is exactly right when the components fail independently and merely plausible otherwise. Two services in the same rack, behind the same certificate or shipped by the same deploy are not independent, and the product will read optimistically for one shape of correlation and pessimistically for another. &ldquo;Correlated Failure&rdquo; measures the gap.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="A equals the product of A sub i, given independence, and a request that needs them all. ten links at 99.9 percent, goes to, 99.00449 percent, 7 h 16 minutes 2.05 seconds a month. that is 9.96 times the downtime of the weakest link alone. adding a 99.99 percent service to that chain lowers it to 98.99459 percent" tabindex="0" role="region" aria-label="Mathematical notation">A = ∏Aᵢ            given independence, and a request that needs them all
 ten links at 99.9%  →  99.00449%,  7 h 16 min 2.05 s a month
 that is 9.96 × the downtime of the weakest link alone
@@ -2664,11 +2709,42 @@ adding a 99.99% service to that chain lowers it to 98.99459%</div><figcaption>A 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2736,7 +2812,7 @@ adding a 99.99% service to that chain lowers it to 98.99459%</div><figcaption>A 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

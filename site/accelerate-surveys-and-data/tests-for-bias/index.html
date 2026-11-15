@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,26 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Surveys, Data and Statistical Methods</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Appendix C · Statistical Methods Used in Our Research</p>
       <h1>Tests for Bias</h1>
       <p class="lesson-lede">Before the authors analyse the data they test it for bias, comparing people who answered early with people who answered late, and checking that the survey&#x27;s method is not producing the pattern.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Early and late responders</li><li>Common method bias</li><li>Critical value</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The appendix&#x27;s order of work, then the count</h2>
-      <article class="prose reading"><p>&ldquo;We did not see bias between early and late responders.&rdquo; That is the result Forsgren, Humble and Kim report in Appendix C, Statistical Methods Used in Our Research, and the lesson reads the sections that lead to it: Survey Preparation, Data Collection and Tests for Bias. The appendix describes itself as a brief reference to the methods, not a statistics text, and follows the authors' path from research design to analysis.</p><p>Survey preparation comes first. Each year the authors fix the constructs and hypotheses they will test, from the literature, their own earlier findings and debate, and then design the survey. Where they can, they use items that other researchers have already validated, for example for organizational performance and for noncommercial performance; items of their own follow commonly accepted procedures from Dillman's 1978 work. Data collection is snowball sampling, which Chapter 15 defends and the last lesson read.</p><p>The first analysis, once there are data, is a test for bias, and the appendix names three families. Chi-square tests compare answers that fall into categories, gender being its example. T-tests compare answers on a scale, Likert values being its example, and the authors used them to compare early and late responders. The lab applies the chi-square test, which the appendix lists for categorical answers, to the early and late split; that pairing is the lesson's. Common method bias is checked with two tests. Harman's single-factor test looks to see whether one factor loads significantly on all the items, which would suggest the method and not the constructs is behind the pattern. The marker variable test adjusts the correlations between constructs by the second-lowest positive correlation among them, and asks whether the correlations that were significant before still are. The result was no bias between early and late responders and no sign that common method bias is a problem in these samples.</p><p>The reasoning behind the early and late comparison is the usual one in survey methods and the appendix does not spell it out. The assumption is that people who answer late are, a little, more like the people who never answered. If early and late respondents give the same picture, the missing respondents are less likely to change it. The check has limits, since it cannot see the people who were never reached or never answered, and a snowball sample is not drawn at random to begin with.</p><p>The chi-square test is arithmetic you can do. Take a table of counts, with a row for each category of an answer and a column each for early and late respondents. If the order of answering had nothing to do with the category, each cell's expected count would be its row's total times its column's total, over the grand total N. The statistic adds up, over every cell, the squared gap between the observed count O and the expected count E, divided by E. The degrees of freedom of a table are its rows minus one, times its columns minus one.</p><div class="mathblock" data-say="E equals, open bracket, row total times column total, close bracket, divided by N. chi squared equals the sum over the cells of the quantity O minus E, squared, divided by E. degrees of freedom equals, open bracket, rows minus 1, close bracket, times, open bracket, columns minus 1, close bracket" tabindex="0" role="region" aria-label="Mathematical notation">E = (row total · column total) / N
-χ² = sum over the cells of (O − E)² / E
-degrees of freedom = (rows − 1) · (columns − 1)</div><p>A statistic is read against a critical value for its degrees of freedom. The lesson states a level of 0.05, which is its own choice and not the book's, and the values for it: 3.841 for 1 degree of freedom and 5.991 for 2. A statistic above the critical value means that if early and late respondents had come from one population with the same mix, a statistic that large would arise in fewer than 5 samples in 100. It is a yardstick for a gap, not a cause for it, and it assumes the groups behave like random draws. The lab prints no p-value.</p><p>Now the count, on invented respondents. The lab's bias view takes a table of counts by category, early and late, and the critical value. The answer is the size of the respondent's organization, a categorical answer. On the preset <code>no-difference</code> there are 60 early and 40 late respondents, 30 small, 50 medium and 20 large organizations. The expected counts are 18 and 12 for small, 30 and 20 for medium, 12 and 8 for large. The statistic is 1/18 + 1/12 + 1/30 + 1/20 + 0 + 0, which is 2/9, about 0.222, with 2 degrees of freedom; it is not above 5.991.</p><p>The preset <code>difference</code> keeps the same totals and the same expected counts and moves the observed counts: small 12 early and 18 late, medium 30 and 20, large 18 and 2. The terms are 2, 3, 0, 0, 3 and 4.5, which sum to 12.5, above 5.991. The cell that contributes most is large, late: 2 observed against 8 expected. That is a reason to ask whether late respondents come from smaller organizations. It does not say why, and it does not say that either group is wrong.</p><p>The preset <code>small-late-group</code> is a two-by-two table of 40 respondents who do or do not use a hotfix path: 9 early and 1 late for yes, 21 and 9 for no. The expected counts are 7.5, 2.5, 22.5 and 7.5, the statistic is 0.3 + 0.9 + 0.1 + 0.3, or 1.6, with 1 degree of freedom, below 3.841. One expected count, 2.5, is under 5, and the lab flags it. Statistics texts give a rule of thumb, not the book's, that the chi-square approximation is unreliable when expected counts are that small, so the lab does not treat 1.6 as a verdict.</p><p>Read the figures the way the authors do, as a screen before the analysis. A statistic below the critical value is the absence of a detected difference on that variable in that sample, and not proof that there is no bias. The appendix reports what the authors saw, and a reader can weigh it with the foreword's caution about the sample.</p><h3>Exercise</h3><ul><li>A table of 80 respondents, <span class="math" data-say="category, early, late">category, early, late</span>: <span class="math" data-say="yes, 30, 10, no, 20, 20">yes, 30, 10; no, 20, 20</span>. The answer is whether the team deploys from a pipeline.</li><li>The critical value for this table, at the lesson's 0.05, is 3.841.</li></ul><p>By hand, find the four expected counts, the statistic and the degrees of freedom, and say whether the statistic is above 3.841. Then type the table into the lab and compare. Say which cells contribute least to the statistic.</p><p>Bias is only the first screen. Once it is passed, the authors test whether their measures are valid and reliable, and the next lesson, Tests of the Measurement Model, computes those.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Groups and shares</h2></div><p>a chi-square test of early against late respondents</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The appendix&#x27;s order of work, then the count</h2><div class="prose reading"><p>&ldquo;We did not see bias between early and late responders.&rdquo; That is the result Forsgren, Humble and Kim report in Appendix C, Statistical Methods Used in Our Research, and the lesson reads the sections that lead to it: Survey Preparation, Data Collection and Tests for Bias. The appendix describes itself as a brief reference to the methods, not a statistics text, and follows the authors' path from research design to analysis.</p><p>Survey preparation comes first. Each year the authors fix the constructs and hypotheses they will test, from the literature, their own earlier findings and debate, and then design the survey. Where they can, they use items that other researchers have already validated, for example for organizational performance and for noncommercial performance; items of their own follow commonly accepted procedures from Dillman's 1978 work. Data collection is snowball sampling, which Chapter 15 defends and the last lesson read.</p><p>The first analysis, once there are data, is a test for bias, and the appendix names three families. Chi-square tests compare answers that fall into categories, gender being its example. T-tests compare answers on a scale, Likert values being its example, and the authors used them to compare early and late responders. The lab applies the chi-square test, which the appendix lists for categorical answers, to the early and late split; that pairing is the lesson's. Common method bias is checked with two tests. Harman's single-factor test looks to see whether one factor loads significantly on all the items, which would suggest the method and not the constructs is behind the pattern. The marker variable test adjusts the correlations between constructs by the second-lowest positive correlation among them, and asks whether the correlations that were significant before still are. The result was no bias between early and late responders and no sign that common method bias is a problem in these samples.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Groups and shares</h2></div><p>a chi-square test of early against late respondents</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Groups and shares</strong><span>a chi-square test of early against late respondents</span></div>
       </div>
@@ -1406,10 +1447,10 @@ degrees of freedom = (rows − 1) · (columns − 1)</div><p>A statistic is read
       <div class="table-wrap" id="agrTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="agrTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A cell's expected count is its row total × its column total ÷ all respondents. χ² = Σ (observed − expected)² ÷ expected over every cell, exact, shown to 3 places; degrees of freedom = (categories − 1) × (2 − 1). χ² is compared, exactly, with the critical value the lesson states for those degrees of freedom and its level: the lab gives no p-value. Cells expected below 5 are listed, in the order of the table, early before late.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Early against late respondents: a chi-square statistic</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Early against late respondents: a chi-square statistic</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="agrPreset">Worked example</label>
           <select id="agrPreset"><option value="no-difference" selected>Early and late respondents with nearly the same mix of sizes</option><option value="difference">The same totals with late respondents from smaller organizations</option><option value="small-late-group">A two-by-two table with one small expected count</option></select>
@@ -1430,12 +1471,17 @@ degrees of freedom = (rows − 1) · (columns − 1)</div><p>A statistic is read
           <div class="kpi"><span>Cells with an expected count below 5</span><strong id="agrSmall">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The reasoning behind the early and late comparison is the usual one in survey methods and the appendix does not spell it out. The assumption is that people who answer late are, a little, more like the people who never answered. If early and late respondents give the same picture, the missing respondents are less likely to change it. The check has limits, since it cannot see the people who were never reached or never answered, and a snowball sample is not drawn at random to begin with.</p><p>The chi-square test is arithmetic you can do. Take a table of counts, with a row for each category of an answer and a column each for early and late respondents. If the order of answering had nothing to do with the category, each cell's expected count would be its row's total times its column's total, over the grand total N. The statistic adds up, over every cell, the squared gap between the observed count O and the expected count E, divided by E. The degrees of freedom of a table are its rows minus one, times its columns minus one.</p><div class="mathblock" data-say="E equals, open bracket, row total times column total, close bracket, divided by N. chi squared equals the sum over the cells of the quantity O minus E, squared, divided by E. degrees of freedom equals, open bracket, rows minus 1, close bracket, times, open bracket, columns minus 1, close bracket" tabindex="0" role="region" aria-label="Mathematical notation">E = (row total · column total) / N
+χ² = sum over the cells of (O − E)² / E
+degrees of freedom = (rows − 1) · (columns − 1)</div><p>A statistic is read against a critical value for its degrees of freedom. The lesson states a level of 0.05, which is its own choice and not the book's, and the values for it: 3.841 for 1 degree of freedom and 5.991 for 2. A statistic above the critical value means that if early and late respondents had come from one population with the same mix, a statistic that large would arise in fewer than 5 samples in 100. It is a yardstick for a gap, not a cause for it, and it assumes the groups behave like random draws. The lab prints no p-value.</p><p>Now the count, on invented respondents. The lab's bias view takes a table of counts by category, early and late, and the critical value. The answer is the size of the respondent's organization, a categorical answer. On the preset <code>no-difference</code> there are 60 early and 40 late respondents, 30 small, 50 medium and 20 large organizations. The expected counts are 18 and 12 for small, 30 and 20 for medium, 12 and 8 for large. The statistic is 1/18 + 1/12 + 1/30 + 1/20 + 0 + 0, which is 2/9, about 0.222, with 2 degrees of freedom; it is not above 5.991.</p><p>The preset <code>difference</code> keeps the same totals and the same expected counts and moves the observed counts: small 12 early and 18 late, medium 30 and 20, large 18 and 2. The terms are 2, 3, 0, 0, 3 and 4.5, which sum to 12.5, above 5.991. The cell that contributes most is large, late: 2 observed against 8 expected. That is a reason to ask whether late respondents come from smaller organizations. It does not say why, and it does not say that either group is wrong.</p><p>The preset <code>small-late-group</code> is a two-by-two table of 40 respondents who do or do not use a hotfix path: 9 early and 1 late for yes, 21 and 9 for no. The expected counts are 7.5, 2.5, 22.5 and 7.5, the statistic is 0.3 + 0.9 + 0.1 + 0.3, or 1.6, with 1 degree of freedom, below 3.841. One expected count, 2.5, is under 5, and the lab flags it. Statistics texts give a rule of thumb, not the book's, that the chi-square approximation is unreliable when expected counts are that small, so the lab does not treat 1.6 as a verdict.</p><p>Read the figures the way the authors do, as a screen before the analysis. A statistic below the critical value is the absence of a detected difference on that variable in that sample, and not proof that there is no bias. The appendix reports what the authors saw, and a reader can weigh it with the foreword's caution about the sample.</p><h3>Exercise</h3><ul><li>A table of 80 respondents, <span class="math" data-say="category, early, late">category, early, late</span>: <span class="math" data-say="yes, 30, 10, no, 20, 20">yes, 30, 10; no, 20, 20</span>. The answer is whether the team deploys from a pipeline.</li><li>The critical value for this table, at the lesson's 0.05, is 3.841.</li></ul><p>By hand, find the four expected counts, the statistic and the degrees of freedom, and say whether the statistic is above 3.841. Then type the table into the lab and compare. Say which cells contribute least to the statistic.</p><p>Bias is only the first screen. Once it is passed, the authors test whether their measures are valid and reliable, and the next lesson, Tests of the Measurement Model, computes those.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing early against late</h2></div><p>Five steps, the last of them on a survey of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Tabulate the answer</h3><p>Count the respondents in each category of one categorical answer, separately for those who answered early and those who answered late.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the expected counts</h3><p>For each cell, multiply its row total by its column total and divide by the grand total.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Sum the gaps</h3><p>For each cell take observed minus expected, square it, divide by the expected count, and add up all the cells.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare with the critical value</h3><p>Take the degrees of freedom as rows minus one times columns minus one, and compare the sum with the critical value for it. Flag any expected count under 5.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on a survey you ran</h3><p>Split a survey's respondents at the median time of answering, pick one categorical answer, and compute the statistic. Write down the cell that contributes most and what it would mean.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing early against late</h2>
+      <p class="lead-in">Five steps, the last of them on a survey of your own.</p>
+      <ol class="key-ideas method"><li><strong>Tabulate the answer.</strong> Count the respondents in each category of one categorical answer, separately for those who answered early and those who answered late.</li><li><strong>Find the expected counts.</strong> For each cell, multiply its row total by its column total and divide by the grand total.</li><li><strong>Sum the gaps.</strong> For each cell take observed minus expected, square it, divide by the expected count, and add up all the cells.</li><li><strong>Compare with the critical value.</strong> Take the degrees of freedom as rows minus one times columns minus one, and compare the sum with the critical value for it. Flag any expected count under 5.</li><li><strong>Do it on a survey you ran.</strong> Split a survey's respondents at the median time of answering, pick one categorical answer, and compute the statistic. Write down the cell that contributes most and what it would mean.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1458,17 +1504,16 @@ large late: gap 6, 36 / 8 = 4.5
 sum 2 + 3 + 0 + 0 + 3 + 4.5 = 12.5; 12.5 &gt; 5.991</div><p>Each term is a gap squared over what was expected. Large organizations among late respondents give the largest term, 4.5. Degrees of freedom are <span data-say="the quantity 3 minus 1, times the quantity 2 minus 1, equals 2">(3 − 1) · (2 − 1) = 2</span>.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a statistic below the critical value as proof of no bias</strong><span>The authors report that they did not see bias, which is what the tests showed on the variables they tested. The lab's <code>no-difference</code> preset gives about 0.222 against 5.991, and the preset <code>small-late-group</code> gives 1.6 against 3.841, with an expected count of 2.5 that makes the statistic unreliable. A test can fail to detect a difference that is there, particularly in small tables, and cannot see people who never answered.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the early and late comparison as a test of honesty</strong><span>It compares the mix of two groups of respondents. A difference, as in <code>difference</code>, says that late respondents come from smaller organizations in this sample; it does not say that anyone misreported. The reason to look is that the people who answer late may resemble those who never answered.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Confusing the chi-square test with the t-test</strong><span>The appendix gives each a kind of variable: chi-square for categories such as gender or the size band of an organization, t-tests for scale values such as Likert answers. Both are tests for differences. Which one fits depends on what kind of answer was collected, not on the topic.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute a chi-square statistic for early against late.</strong><p>Given a table of counts by category for early and late respondents, compute the expected counts, the statistic and the degrees of freedom, compare the statistic with a stated critical value, and flag small expected counts.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab compares a statistic with a critical value the lesson states, and prints no p-value. It treats the early and late groups as if they were random draws, which a snowball sample is not, and it cannot see the people who never answered.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a statistic below the critical value as proof of no bias</strong><span>The authors report that they did not see bias, which is what the tests showed on the variables they tested. The lab's <code>no-difference</code> preset gives about 0.222 against 5.991, and the preset <code>small-late-group</code> gives 1.6 against 3.841, with an expected count of 2.5 that makes the statistic unreliable. A test can fail to detect a difference that is there, particularly in small tables, and cannot see people who never answered.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the early and late comparison as a test of honesty</strong><span>It compares the mix of two groups of respondents. A difference, as in <code>difference</code>, says that late respondents come from smaller organizations in this sample; it does not say that anyone misreported. The reason to look is that the people who answer late may resemble those who never answered.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Confusing the chi-square test with the t-test</strong><span>The appendix gives each a kind of variable: chi-square for categories such as gender or the size band of an organization, t-tests for scale values such as Likert answers. Both are tests for differences. Which one fits depends on what kind of answer was collected, not on the topic.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute a chi-square statistic for early against late.</strong><p>Given a table of counts by category for early and late respondents, compute the expected counts, the statistic and the degrees of freedom, compare the statistic with a stated critical value, and flag small expected counts.</p></div></div><div class="note"><strong>Note:</strong> The lab compares a statistic with a critical value the lesson states, and prints no p-value. It treats the early and late groups as if they were random draws, which a snowball sample is not, and it cannot see the people who never answered.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Early and late responders</summary><p>The people who answered soon after the invitation and those who answered after a reminder or later. The authors compare the two on what they can measure, to see whether the order of answering goes with a difference in the answers.</p></details><details class="recall"><summary>Common method bias</summary><p>A pattern in the data that comes from the way the data were collected, such as everything being asked in one survey, and not from the things asked about. The appendix names two tests for it, Harman's single-factor test and the marker variable test.</p></details><details class="recall"><summary>Critical value</summary><p>The size the chi-square statistic must exceed, for a table of a given shape and a chosen level of chance, before the lab says the groups differ by more than chance usually produces. The lesson states its own; the book gives none for these tests.</p></details></div>
+      <h3>Summary</h3>
       <p>Appendix C is a reference, and it opens its tests with bias. Read its survey preparation, its data collection and its three families of bias tests, then compute a chi-square statistic for early and late respondents by hand and in the lab, and compare it with a critical value the lesson states.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Early and late responders.</strong> The people who answered soon after the invitation and those who answered after a reminder or later. The authors compare the two on what they can measure, to see whether the order of answering goes with a difference in the answers.</li><li><strong>Common method bias.</strong> A pattern in the data that comes from the way the data were collected, such as everything being asked in one survey, and not from the things asked about. The appendix names two tests for it, Harman's single-factor test and the marker variable test.</li><li><strong>Critical value.</strong> The size the chi-square statistic must exceed, for a table of a given shape and a chosen level of chance, before the lab says the groups differ by more than chance usually produces. The lesson states its own; the book gives none for these tests.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="test for bias before any analysis. chi square for categories, t test for scales. expected count, row times column over total. chi square, sum of gap squared over expected. compare with a critical value, not a verdict" tabindex="0" role="region" aria-label="Mathematical notation">test for bias before any analysis
 chi square for categories, t test for scales
 expected count: row times column over total
@@ -2324,11 +2369,42 @@ compare with a critical value, not a verdict</div><figcaption>Tests for bias in 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2396,7 +2472,7 @@ compare with a critical value, not a verdict</div><figcaption>Tests for bias in 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

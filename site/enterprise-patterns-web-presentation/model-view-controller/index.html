@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Web Presentation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 14 · Web Presentation Patterns</p>
       <h1>Model View Controller</h1>
       <p class="lesson-lede">Model View Controller makes two separations, and the one that matters most is that the presentation depends on the model while the model knows nothing of the presentation.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Model, view and controller</li><li>Input controller</li><li>The direction of a dependency</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s opening and the pattern, then the count</h2>
-      <article class="prose reading"><p>&ldquo;the separation of presentation and model is one of the most important design principles in software&rdquo;: that is Fowler's verdict in Model View Controller's When to Use It, in Chapter 14, and the only exception he allows is a very simple system whose model has no real behaviour in it. This lesson reads the opening of Chapter 4, Web Presentation, as the argument that leads there, and then the pattern itself. Read both in your own copy first.</p><p>Chapter 4 starts from the web server. A server is configured to hand each URL to a program, and Fowler finds two ways to write that program. A script, such as a CGI script or a Java servlet, reads the request and writes the response as a stream of text. A server page, as in PHP, ASP or JSP, is written as the HTML page it returns, with small pieces of code, called scriptlets, inserted where something has to be computed. Scripts, he observes, are best at interpreting a request and server pages at formatting a response, so the obvious move is to use one for each. That move, he says, is an old idea, and its name is Model View Controller.</p><p>He then warns about a word. Before web applications, he says, most presentations of the pattern he sat through got it wrong, largely because controller means several things, so he calls this one the input controller. His picture of a request is a round trip: the input controller pulls information off the request and hands the business logic to a model object; the model talks to the data source and gathers what the response needs; then the input controller gets control back, reads what came of it, picks a view and hands it the data. The first and most important reason for all this, Chapter 4 says, is that the models are kept entirely apart from the web presentation, which makes the presentation easier to change, a second presentation easier to add, and the domain logic easier to test.</p><p>Model View Controller, in Chapter 14, is read as a pattern: a tool with its own description, to look up. Its history is short and has one name in it. Trygve Reenskaug built it as a framework for Smalltalk in the late 1970s, and it has shaped most user-interface frameworks since. The pattern has three roles: a model that is nonvisual and holds everything but the user interface, a view that only displays, and a controller that takes input, works on the model and has the view updated. Fowler sees two principal separations in it: presentation from model, and controller from view.</p><p>The first, he argues, matters for three reasons. Presentation and model are different concerns, written with different libraries and often by people who prefer one side. Users want the same model shown in different ways, in a desktop program, a web page, a service other programs call, or a terminal, and the separation lets all of them share the model's code. And nonvisual objects are easier to test. The key point, he says, is which way the dependencies run: the presentation uses the model, and the model never uses the presentation, so the people writing the model need not know which presentation is in use, and the presentation can change freely.</p><p>The second separation, of view from controller, Fowler calls less important. The irony he points out is that almost every version of Smalltalk did not make it. Most systems have one controller for each view, so the separation is usually skipped in rich clients; it came back on the web, where the input controller is a separate object, and most of Chapter 14's patterns are built on it. He adds that the controller is often misplaced between the model and the view, which is where an Application Controller sits, and that this is a very different thing.</p><p>Now the code. The listing below is the lesson's, not the book's: a <span class="math" data-say="concert">Concert</span> with an act and a venue, and a <span class="math" data-say="concert view">ConcertView</span> that renders it as a heading. <span class="math" data-say="escape">escape</span> stands for some routine of the HTML library that makes text safe to put in a page. Read the imports the listing would need: <span class="math" data-say="concert view">ConcertView</span> needs the HTML library and <span class="math" data-say="concert">Concert</span>; <span class="math" data-say="concert">Concert</span> needs neither.</p><pre class="codeblock" data-say="line 1, comment, The model knows nothing of pages the view asks the model.. line 2, class concert. line 3, private final string act. line 4, private final string venue. line 5, concert of string act, string venue. line 6, this dot act is set to act. line 7, this dot venue is set to venue. line 9, string act return act. line 10, string venue return venue. line 13, class concert view. line 14, string render of concert c. line 15, return the string less than h 1 greater than plus escape of c dot act plus at plus escape of c dot venue. line 16, plus the string less than slash h 1 greater than" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The model knows nothing of pages; the view asks the model.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s opening and the pattern, then the count</h2><div class="prose reading"><p>&ldquo;the separation of presentation and model is one of the most important design principles in software&rdquo;: that is Fowler's verdict in Model View Controller's When to Use It, in Chapter 14, and the only exception he allows is a very simple system whose model has no real behaviour in it. This lesson reads the opening of Chapter 4, Web Presentation, as the argument that leads there, and then the pattern itself. Read both in your own copy first.</p><p>Chapter 4 starts from the web server. A server is configured to hand each URL to a program, and Fowler finds two ways to write that program. A script, such as a CGI script or a Java servlet, reads the request and writes the response as a stream of text. A server page, as in PHP, ASP or JSP, is written as the HTML page it returns, with small pieces of code, called scriptlets, inserted where something has to be computed. Scripts, he observes, are best at interpreting a request and server pages at formatting a response, so the obvious move is to use one for each. That move, he says, is an old idea, and its name is Model View Controller.</p><p>He then warns about a word. Before web applications, he says, most presentations of the pattern he sat through got it wrong, largely because controller means several things, so he calls this one the input controller. His picture of a request is a round trip: the input controller pulls information off the request and hands the business logic to a model object; the model talks to the data source and gathers what the response needs; then the input controller gets control back, reads what came of it, picks a view and hands it the data. The first and most important reason for all this, Chapter 4 says, is that the models are kept entirely apart from the web presentation, which makes the presentation easier to change, a second presentation easier to add, and the domain logic easier to test.</p><p>Model View Controller, in Chapter 14, is read as a pattern: a tool with its own description, to look up. Its history is short and has one name in it. Trygve Reenskaug built it as a framework for Smalltalk in the late 1970s, and it has shaped most user-interface frameworks since. The pattern has three roles: a model that is nonvisual and holds everything but the user interface, a view that only displays, and a controller that takes input, works on the model and has the view updated. Fowler sees two principal separations in it: presentation from model, and controller from view.</p><p>The first, he argues, matters for three reasons. Presentation and model are different concerns, written with different libraries and often by people who prefer one side. Users want the same model shown in different ways, in a desktop program, a web page, a service other programs call, or a terminal, and the separation lets all of them share the model's code. And nonvisual objects are easier to test. The key point, he says, is which way the dependencies run: the presentation uses the model, and the model never uses the presentation, so the people writing the model need not know which presentation is in use, and the presentation can change freely.</p><p>The second separation, of view from controller, Fowler calls less important. The irony he points out is that almost every version of Smalltalk did not make it. Most systems have one controller for each view, so the separation is usually skipped in rich clients; it came back on the web, where the input controller is a separate object, and most of Chapter 14's patterns are built on it. He adds that the controller is often misplaced between the model and the view, which is where an Application Controller sits, and that this is a very different thing.</p><p>Now the code. The listing below is the lesson's, not the book's: a <span class="math" data-say="concert">Concert</span> with an act and a venue, and a <span class="math" data-say="concert view">ConcertView</span> that renders it as a heading. <span class="math" data-say="escape">escape</span> stands for some routine of the HTML library that makes text safe to put in a page. Read the imports the listing would need: <span class="math" data-say="concert view">ConcertView</span> needs the HTML library and <span class="math" data-say="concert">Concert</span>; <span class="math" data-say="concert">Concert</span> needs neither.</p><pre class="codeblock" data-say="line 1, comment, The model knows nothing of pages the view asks the model.. line 2, class concert. line 3, private final string act. line 4, private final string venue. line 5, concert of string act, string venue. line 6, this dot act is set to act. line 7, this dot venue is set to venue. line 9, string act return act. line 10, string venue return venue. line 13, class concert view. line 14, string render of concert c. line 15, return the string less than h 1 greater than plus escape of c dot act plus at plus escape of c dot venue. line 16, plus the string less than slash h 1 greater than" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The model knows nothing of pages; the view asks the model.</span>
 <span class="cl">class Concert {</span>
 <span class="cl">    private final String act;</span>
 <span class="cl">    private final String venue;</span>
@@ -1462,25 +1506,21 @@
 <span class="cl">        return &quot;&lt;h1&gt;&quot; + escape(c.act()) + &quot; at &quot; + escape(c.venue())</span>
 <span class="cl">            + &quot;&lt;/h1&gt;&quot;;</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The lab reads a design as dependency records, written <span class="math" data-say="dependent, then what it depends on">dependent, dependency</span>, and a class that changes. It lists the classes that depend on the changed class directly, then every class the change reaches by following those records backwards, step after step; the changed class itself is never in either list. In the preset <code>model-knows-html</code>, <span class="math" data-say="concert">concert</span> has been given a method that formats itself with the HTML library, so the records are <span class="math" data-say="concert, html">concert, html</span>, <span class="math" data-say="concertpage, concert">concertpage, concert</span> and <span class="math" data-say="concertreport, concert">concertreport, concert</span>. Change <span class="math" data-say="html">html</span> and the lab prints 1: concert directly and 3: concert, concertpage, concertreport in all. The report, which has nothing to do with HTML, is reached only because the model knew about HTML.</p><p>In <code>separated</code> the design is the listing's (<span class="math" data-say="concertpage">concertpage</span> is the listing's <span class="math" data-say="concert view">ConcertView</span>): <span class="math" data-say="concertpage">concertpage</span> uses <span class="math" data-say="concert">concert</span> and <span class="math" data-say="html">html</span>, and <span class="math" data-say="concertreport">concertreport</span> uses <span class="math" data-say="concert">concert</span>. The same change prints 1: concertpage directly and 1: concertpage in all. Only the class that renders HTML is reached, which is Fowler's direction of dependencies as a count. Being reached does not mean being edited: it means the class must at least be looked at, rebuilt and tested again. The count says where to look.</p><p>The count says nothing about whether a dependency is needed. Fowler's separation is a design rule, not a measurement: he applies it as soon as a model has any nonvisual logic, and the lab cannot tell you that yours does. What it can show is the shape the rule produces. A change below the presentation stops at the presentation.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, basket, widgets. line 2, checkoutpage, basket. line 3, basketapi, basket. line 4, checkoutpage, widgets" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">basket, widgets;</span>
-<span class="cl">checkoutpage, basket;</span>
-<span class="cl">basketapi, basket;</span>
-<span class="cl">checkoutpage, widgets</span></code></pre><p>Each line is one dependency of a small shop, <span class="math" data-say="dependent, then what it depends on">dependent, dependency</span>. The <span class="math" data-say="widgets">widgets</span> library draws form controls. Say by hand which classes a change to <span class="math" data-say="widgets">widgets</span> reaches directly and which it reaches in all. Then remove the first record, so that <span class="math" data-say="basket">basket</span> no longer knows about widgets, and count again. You can paste the records into the lab afterwards to check.</p><p>Chapter 4 has two ways to write the input controller. The next lesson, Page Controller, reads the first of them, one controller for each page.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Counting dependencies</h2></div><p>what a change reaches</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The lab reads a design as dependency records, written <span class="math" data-say="dependent, then what it depends on">dependent, dependency</span>, and a class that changes. It lists the classes that depend on the changed class directly, then every class the change reaches by following those records backwards, step after step; the changed class itself is never in either list. In the preset <code>model-knows-html</code>, <span class="math" data-say="concert">concert</span> has been given a method that formats itself with the HTML library, so the records are <span class="math" data-say="concert, html">concert, html</span>, <span class="math" data-say="concertpage, concert">concertpage, concert</span> and <span class="math" data-say="concertreport, concert">concertreport, concert</span>. Change <span class="math" data-say="html">html</span> and the lab prints 1: concert directly and 3: concert, concertpage, concertreport in all. The report, which has nothing to do with HTML, is reached only because the model knew about HTML.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Counting dependencies</h2></div><p>what a change reaches</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Counting dependencies</strong><span>what a change reaches</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgTable"></table></div>
       <div class="status-banner" id="dgStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What a change to the HTML library reaches</h3>
-          <p>A count over the structure the lesson states. Each record is one dependency, written dependent, dependency. Name the class that changes; the lab lists what depends on it directly and everything the change reaches. The designs are the lesson's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What a change to the HTML library reaches</h3>
+            <p>A count over the structure the lesson states. Each record is one dependency, written dependent, dependency. Name the class that changes; the lab lists what depends on it directly and everything the change reaches. The designs are the lesson's.</p>
         <div class="field">
           <label for="dgPreset">Worked example</label>
           <select id="dgPreset"><option value="model-knows-html" selected>The model formats itself with the HTML library (illustrative)</option><option value="separated">Only the page uses the HTML library</option></select>
@@ -1498,12 +1538,18 @@
           <div class="kpi"><span>Reached in all</span><strong id="dgAffected">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>In <code>separated</code> the design is the listing's (<span class="math" data-say="concertpage">concertpage</span> is the listing's <span class="math" data-say="concert view">ConcertView</span>): <span class="math" data-say="concertpage">concertpage</span> uses <span class="math" data-say="concert">concert</span> and <span class="math" data-say="html">html</span>, and <span class="math" data-say="concertreport">concertreport</span> uses <span class="math" data-say="concert">concert</span>. The same change prints 1: concertpage directly and 1: concertpage in all. Only the class that renders HTML is reached, which is Fowler's direction of dependencies as a count. Being reached does not mean being edited: it means the class must at least be looked at, rebuilt and tested again. The count says where to look.</p><p>The count says nothing about whether a dependency is needed. Fowler's separation is a design rule, not a measurement: he applies it as soon as a model has any nonvisual logic, and the lab cannot tell you that yours does. What it can show is the shape the rule produces. A change below the presentation stops at the presentation.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, basket, widgets. line 2, checkoutpage, basket. line 3, basketapi, basket. line 4, checkoutpage, widgets" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">basket, widgets;</span>
+<span class="cl">checkoutpage, basket;</span>
+<span class="cl">basketapi, basket;</span>
+<span class="cl">checkoutpage, widgets</span></code></pre><p>Each line is one dependency of a small shop, <span class="math" data-say="dependent, then what it depends on">dependent, dependency</span>. The <span class="math" data-say="widgets">widgets</span> library draws form controls. Say by hand which classes a change to <span class="math" data-say="widgets">widgets</span> reaches directly and which it reaches in all. Then remove the first record, so that <span class="math" data-say="basket">basket</span> no longer knows about widgets, and count again. You can paste the records into the lab afterwards to check.</p><p>Chapter 4 has two ways to write the input controller. The next lesson, Page Controller, reads the first of them, one controller for each page.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Tracing what a presentation change reaches</h2></div><p>Four steps, the last of them on a class of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the dependencies down</h3><p>For each class, write one record for each class it uses, dependent first. A model that calls an HTML routine gets a record for the HTML library.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the direct dependents</h3><p>Name the class that changes and list every class with a record pointing at it. Those are reached directly.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Follow the records backwards</h3><p>For each class reached, list the classes that depend on it, and repeat until nothing new appears. Do not count the changed class itself.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check a model of your own</h3><p>Take one model class in a system you know and read its imports. Write down anything from the presentation layer it uses, such as an HTML, template or widget library, and name the one class that should hold that use instead.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Tracing what a presentation change reaches</h2>
+      <p class="lead-in">Four steps, the last of them on a class of your own.</p>
+      <ol class="key-ideas method"><li><strong>Write the dependencies down.</strong> For each class, write one record for each class it uses, dependent first. A model that calls an HTML routine gets a record for the HTML library.</li><li><strong>Find the direct dependents.</strong> Name the class that changes and list every class with a record pointing at it. Those are reached directly.</li><li><strong>Follow the records backwards.</strong> For each class reached, list the classes that depend on it, and repeat until nothing new appears. Do not count the changed class itself.</li><li><strong>Check a model of your own.</strong> Take one model class in a system you know and read its imports. Write down anything from the presentation layer it uses, such as an HTML, template or widget library, and name the one class that should hold that use instead.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1522,17 +1568,16 @@ who uses concertpage? nobody
 reached in all: 1, concertpage</div><p>The model and the report are untouched because neither uses the library. Add the record <span class="math" data-say="concert, html">concert, html</span> and both come into the count, which is what <code>model-knows-html</code> shows.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking Model View Controller to be three folders</strong><span>On this reading the pattern is satisfied once the code is filed as models, views and controllers. Fowler's point is which way the dependencies run: the presentation uses the model, and the model never uses the presentation. A model in the models folder that calls an HTML routine breaks the pattern however it is filed. On the lesson's illustration, the report, which has nothing to do with HTML, is reached by an HTML change only because the model knew about HTML: 3 classes reached instead of 1.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting the business logic in the controller</strong><span>The controller is the part people write first, so the rules end up there. In Chapter 4's round trip the input controller handles the request, hands the business logic to the model and picks the view; where the decisions get complicated, Fowler gives them to helper objects. The logic belongs in the model, a Domain Model or a Transaction Script, so that it can be tested and shared by every presentation.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the view-controller split is the point</strong><span>It is the separation people notice, because web frameworks make it. Fowler ranks it second and calls it less important; the separation he will not give up, except in a very simple system, is the model's from the presentation.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace what a presentation change reaches.</strong><p>Given the dependencies of a model, two presentations and an HTML library, list what a change to the library reaches directly and in all; then redraw the design with the model independent of the library and list it again.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab follows the dependencies you state; it cannot find them in code, and it counts a class reached through one call the same as one reached through forty. It does not model the rich-client case Fowler raises, where several views of one model must refresh together and an observer keeps the model free of them. Whether a dependency belongs is the design question; the count shows how far a change travels if it does.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking Model View Controller to be three folders</strong><span>On this reading the pattern is satisfied once the code is filed as models, views and controllers. Fowler's point is which way the dependencies run: the presentation uses the model, and the model never uses the presentation. A model in the models folder that calls an HTML routine breaks the pattern however it is filed. On the lesson's illustration, the report, which has nothing to do with HTML, is reached by an HTML change only because the model knew about HTML: 3 classes reached instead of 1.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting the business logic in the controller</strong><span>The controller is the part people write first, so the rules end up there. In Chapter 4's round trip the input controller handles the request, hands the business logic to the model and picks the view; where the decisions get complicated, Fowler gives them to helper objects. The logic belongs in the model, a Domain Model or a Transaction Script, so that it can be tested and shared by every presentation.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the view-controller split is the point</strong><span>It is the separation people notice, because web frameworks make it. Fowler ranks it second and calls it less important; the separation he will not give up, except in a very simple system, is the model's from the presentation.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace what a presentation change reaches.</strong><p>Given the dependencies of a model, two presentations and an HTML library, list what a change to the library reaches directly and in all; then redraw the design with the model independent of the library and list it again.</p></div></div><div class="note"><strong>Note:</strong> The lab follows the dependencies you state; it cannot find them in code, and it counts a class reached through one call the same as one reached through forty. It does not model the rich-client case Fowler raises, where several views of one model must refresh together and an observer keeps the model free of them. Whether a dependency belongs is the design question; the count shows how far a change travels if it does.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Model, view and controller</summary><p>The three roles of Model View Controller. The model is a nonvisual object holding the domain's data and behaviour. The view displays the model and does nothing else. The controller takes the user's input, works on the model and has the view updated. View and controller together are the user interface.</p></details><details class="recall"><summary>Input controller</summary><p>Fowler's name, in Chapter 4, for the controller of Model View Controller on the web: the object that receives a request, pulls information off it, hands the work to the model and picks the view. He uses the longer name because the word controller is used for other things, among them the Application Controller of the last lesson in this course.</p></details><details class="recall"><summary>The direction of a dependency</summary><p>Class A depends on class B when A uses B, so that a change to B can force a change to A. Model View Controller asks for the dependency in one direction only: the presentation depends on the model, and the model does not depend on the presentation.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 4 opens the book's web presentation with scripts, server pages and the input controller, and Chapter 14's Model View Controller names the two separations underneath: presentation from model, which Fowler ranks among the most important principles in software, and view from controller, which matters much less. Count what a change to an HTML library reaches when the model knows about HTML, and when it does not.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Model, view and controller.</strong> The three roles of Model View Controller. The model is a nonvisual object holding the domain's data and behaviour. The view displays the model and does nothing else. The controller takes the user's input, works on the model and has the view updated. View and controller together are the user interface.</li><li><strong>Input controller.</strong> Fowler's name, in Chapter 4, for the controller of Model View Controller on the web: the object that receives a request, pulls information off it, hands the work to the model and picks the view. He uses the longer name because the word controller is used for other things, among them the Application Controller of the last lesson in this course.</li><li><strong>The direction of a dependency.</strong> Class A depends on class B when A uses B, so that a change to B can force a change to A. Model View Controller asks for the dependency in one direction only: the presentation depends on the model, and the model does not depend on the presentation.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="presentation depends on the model. the model never depends on the page. view from controller matters less. input controller, reads the request. direct, who uses the changed class. reached, who uses those, and so on" tabindex="0" role="region" aria-label="Mathematical notation">presentation depends on the model
 the model never depends on the page
 view from controller matters less
@@ -2253,11 +2298,42 @@ reached: who uses those, and so on</div><figcaption>Model View Controller in six
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2325,7 +2401,7 @@ reached: who uses those, and so on</div><figcaption>Model View Controller in six
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

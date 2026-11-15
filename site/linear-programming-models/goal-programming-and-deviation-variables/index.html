@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,30 +1424,28 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Linear Programming Models</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Keeping it linear</p>
       <h1>Goal Programming and Deviation Variables</h1>
       <p class="lesson-lede">Turn conflicting targets into a sequence of linear programmes and name the goal that pays.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A target is an equation with two deviations, and you penalise one of them</li><li>Priorities are levels, and each level hands the next an equality</li><li>The order is the answer</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Targets, deviations and priority levels</h2>
-      <article class="prose reading"><p>A cabinet shop builds standard and deluxe units, <span class="math" data-say="S">S</span> and <span class="math" data-say="D">D</span>, both counted in units a week. Its one hard constraint is 60 machine hours: <span class="math" data-say="2 S plus 3 D is at most 60">2S + 3D ≤ 60</span>. It also has three things it would like: 60 pounds of profit at 3 and 4 a unit, no more than 30 hours of overtime at 3 and 6 a unit, and 12 deluxe units built.</p><p>Written as constraints, those three are infeasible together, and “infeasible” is a much worse answer than “missed by 12 units” when the numbers were aspirations in the first place. The point of a goal programme is to keep the model answerable and make the compromise visible.</p><div class="defbox"><span class="label">Definition &middot; Deviation variables</span><p>A target <span class="math" data-say="A times x equals b">a·x = b</span> is written <span class="math" data-say="A times x plus u minus o equals b">a·x + u − o = b</span> with <span class="math" data-say="u is at least 0">u ≥ 0</span> and <span class="math" data-say="o is at least 0">o ≥ 0</span>, where <span class="math" data-say="u">u</span> is the amount by which the plan falls short and <span class="math" data-say="o">o</span> the amount by which it overshoots. The objective penalises whichever of the two the situation minds.</p><p>At most one of <span class="math" data-say="u">u</span> and <span class="math" data-say="o">o</span> is positive at an optimum: the penalised one is pushed to zero if it can be, and the unpenalised one only grows when the row forces it. That is the same direction argument the rewrites lesson made, which is why this lesson sits beside it.</p></div><div class="mathblock" data-say="2 S plus 3 D, is at most 60, machine hours, a hard constraint. 3 S plus 4 D plus u sub 1 minus o sub 1, equals 60, pounds of profit, u sub 1 is minded. 3 S plus 6 D plus u sub 2 minus o sub 2, equals 30, hours of overtime, o sub 2 is minded. D plus u sub 3 minus o sub 3, equals 12, deluxe units, u sub 3 is minded. S, D, and every u and o is at least, 0" tabindex="0" role="region" aria-label="Mathematical notation">  2S + 3D                 ≤ 60      machine hours, a hard constraint
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Targets, deviations and priority levels</h2><div class="prose reading"><p>A cabinet shop builds standard and deluxe units, <span class="math" data-say="S">S</span> and <span class="math" data-say="D">D</span>, both counted in units a week. Its one hard constraint is 60 machine hours: <span class="math" data-say="2 S plus 3 D is at most 60">2S + 3D ≤ 60</span>. It also has three things it would like: 60 pounds of profit at 3 and 4 a unit, no more than 30 hours of overtime at 3 and 6 a unit, and 12 deluxe units built.</p><p>Written as constraints, those three are infeasible together, and “infeasible” is a much worse answer than “missed by 12 units” when the numbers were aspirations in the first place. The point of a goal programme is to keep the model answerable and make the compromise visible.</p><div class="defbox"><span class="label">Definition &middot; Deviation variables</span><p>A target <span class="math" data-say="A times x equals b">a·x = b</span> is written <span class="math" data-say="A times x plus u minus o equals b">a·x + u − o = b</span> with <span class="math" data-say="u is at least 0">u ≥ 0</span> and <span class="math" data-say="o is at least 0">o ≥ 0</span>, where <span class="math" data-say="u">u</span> is the amount by which the plan falls short and <span class="math" data-say="o">o</span> the amount by which it overshoots. The objective penalises whichever of the two the situation minds.</p><p>At most one of <span class="math" data-say="u">u</span> and <span class="math" data-say="o">o</span> is positive at an optimum: the penalised one is pushed to zero if it can be, and the unpenalised one only grows when the row forces it. That is the same direction argument the rewrites lesson made, which is why this lesson sits beside it.</p></div><div class="mathblock" data-say="2 S plus 3 D, is at most 60, machine hours, a hard constraint. 3 S plus 4 D plus u sub 1 minus o sub 1, equals 60, pounds of profit, u sub 1 is minded. 3 S plus 6 D plus u sub 2 minus o sub 2, equals 30, hours of overtime, o sub 2 is minded. D plus u sub 3 minus o sub 3, equals 12, deluxe units, u sub 3 is minded. S, D, and every u and o is at least, 0" tabindex="0" role="region" aria-label="Mathematical notation">  2S + 3D                 ≤ 60      machine hours, a hard constraint
 
   3S + 4D + u₁ − o₁        = 60      pounds of profit;  u₁ is minded
   3S + 6D + u₂ − o₂        = 30      hours of overtime; o₂ is minded
         D + u₃ − o₃        = 12      deluxe units;      u₃ is minded
 
-  S, D, and every u and o ≥  0</div><h3>One programme per level</h3><p>Take the goals in the order profit, overtime, deluxe run. Level one minimises <span class="math" data-say="u sub 1">u₁</span> and achieves 0: a plan of no standard units and 15 deluxe ones reaches the profit target exactly. Level two adds the row <span class="math" data-say="u sub 1 equals 0">u₁ = 0</span> and minimises <span class="math" data-say="o sub 2">o₂</span>, which comes out at 30 hours &mdash; the profit target, now frozen, is what makes that overtime unavoidable. Level three adds <span class="math" data-say="o sub 2 equals 30">o₂ = 30</span> and minimises <span class="math" data-say="u sub 3">u₃</span>, which comes out at 12: the deluxe run is what pays.</p><p>Reorder and everything moves. Overtime first: <span class="math" data-say="o sub 2 equals 0">o₂ = 0</span> with a plan of five deluxe units, then profit misses by 30 and the deluxe run still misses by 12. Deluxe run first: it is met, profit is met as well, and overtime is 54 hours over its limit. Three orderings, three different sacrifices, all of them optimal for the priorities they were given.</p><div class="example"><span class="label">Example &middot; The frozen row is what makes it a sequence</span><p>At level two of the profit-first ordering the model contains <span class="math" data-say="u sub 1 equals 0">u₁ = 0</span> as an equality. Without it, minimising <span class="math" data-say="o sub 2">o₂</span> would simply abandon the profit target &mdash; the second level would undo the first. With it, the second level searches only among the plans that already achieve what the first level achieved, which is what “preemptive” means.</p></div><h3>The other way this goes wrong, and it is silent</h3><p>The tempting alternative is one objective: minimise <span class="math" data-say="u sub 1 plus o sub 2 plus u sub 3">u₁ + o₂ + u₃</span>. It solves, and it reports a total of 42. But <span class="math" data-say="u sub 1">u₁</span> is in pounds, <span class="math" data-say="o sub 2">o₂</span> is in hours and <span class="math" data-say="u sub 3">u₃</span> is in units, and nothing in the arithmetic objects to adding pounds to hours. The plan it returns is 10 standard units and no deluxe ones, with a profit shortfall of 30, no overtime and a deluxe shortfall of 12 &mdash; which is the answer to the overtime-first ordering, arrived at without anyone choosing that ordering.</p><p>That is the failure mode to watch: a weighted objective always produces a number, and the number encodes an exchange rate between pounds and hours that nobody wrote down. Weights can be made to work, but only by scaling each deviation into a common currency on purpose. Raise the weight on a pound of profit to 4 and the weighted answer switches to the profit-first plan, which shows how little the unscaled version was saying.</p><p>None of this leaves the linear class. Every row is linear, the deviations are ordinary non-negative variables, and each level is an ordinary linear programme. What is new is that the answer is a sequence of solves and a sentence: which goal was sacrificed, at which level, and by how much in its own unit.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Targets, deviations, and one programme per priority</h2></div><p>A preemptive goal programme is a sequence of linear programmes</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  S, D, and every u and o ≥  0</div><h3>One programme per level</h3><p>Take the goals in the order profit, overtime, deluxe run. Level one minimises <span class="math" data-say="u sub 1">u₁</span> and achieves 0: a plan of no standard units and 15 deluxe ones reaches the profit target exactly. Level two adds the row <span class="math" data-say="u sub 1 equals 0">u₁ = 0</span> and minimises <span class="math" data-say="o sub 2">o₂</span>, which comes out at 30 hours &mdash; the profit target, now frozen, is what makes that overtime unavoidable. Level three adds <span class="math" data-say="o sub 2 equals 30">o₂ = 30</span> and minimises <span class="math" data-say="u sub 3">u₃</span>, which comes out at 12: the deluxe run is what pays.</p><p>Reorder and everything moves. Overtime first: <span class="math" data-say="o sub 2 equals 0">o₂ = 0</span> with a plan of five deluxe units, then profit misses by 30 and the deluxe run still misses by 12. Deluxe run first: it is met, profit is met as well, and overtime is 54 hours over its limit. Three orderings, three different sacrifices, all of them optimal for the priorities they were given.</p><div class="example"><span class="label">Example &middot; The frozen row is what makes it a sequence</span><p>At level two of the profit-first ordering the model contains <span class="math" data-say="u sub 1 equals 0">u₁ = 0</span> as an equality. Without it, minimising <span class="math" data-say="o sub 2">o₂</span> would simply abandon the profit target &mdash; the second level would undo the first. With it, the second level searches only among the plans that already achieve what the first level achieved, which is what “preemptive” means.</p></div><h3>The other way this goes wrong, and it is silent</h3><p>The tempting alternative is one objective: minimise <span class="math" data-say="u sub 1 plus o sub 2 plus u sub 3">u₁ + o₂ + u₃</span>. It solves, and it reports a total of 42. But <span class="math" data-say="u sub 1">u₁</span> is in pounds, <span class="math" data-say="o sub 2">o₂</span> is in hours and <span class="math" data-say="u sub 3">u₃</span> is in units, and nothing in the arithmetic objects to adding pounds to hours. The plan it returns is 10 standard units and no deluxe ones, with a profit shortfall of 30, no overtime and a deluxe shortfall of 12 &mdash; which is the answer to the overtime-first ordering, arrived at without anyone choosing that ordering.</p><p>That is the failure mode to watch: a weighted objective always produces a number, and the number encodes an exchange rate between pounds and hours that nobody wrote down. Weights can be made to work, but only by scaling each deviation into a common currency on purpose. Raise the weight on a pound of profit to 4 and the weighted answer switches to the profit-first plan, which shows how little the unscaled version was saying.</p><p>None of this leaves the linear class. Every row is linear, the deviations are ordinary non-negative variables, and each level is an ordinary linear programme. What is new is that the answer is a sequence of solves and a sentence: which goal was sacrificed, at which level, and by how much in its own unit.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Targets, deviations, and one programme per priority</h2></div><p>A preemptive goal programme is a sequence of linear programmes</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Targets, deviations, and one programme per priority</strong><span>Each level freezes what the level above it achieved</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>met exactly</span><span class="tone-amber"><i class="legend-swatch"></i>missed, and by how much</span><span class="tone-muted"><i class="legend-swatch"></i>nothing frozen yet</span></div>
@@ -1411,10 +1454,10 @@
       <div id="glLevels" style="margin-top:12px;"></div>
       <div id="glWeighted" style="margin-top:12px;"></div>
       <div class="status-banner" id="glStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Reorder the priorities and watch which goal pays</h3>
-          <p>Each target carries two deviation variables and only the one the shop minds is penalised. The levels are solved in the order you choose, and each freezes the deviation it achieved as an equality before the next begins. Beside it, the same three goals added into one weighted objective in three different units, with the answer that produces.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Reorder the priorities and watch which goal pays</h3>
+            <p>Each target carries two deviation variables and only the one the shop minds is penalised. The levels are solved in the order you choose, and each freezes the deviation it achieved as an equality before the next begins. Beside it, the same three goals added into one weighted objective in three different units, with the answer that produces.</p>
         <div class="field" id="glOrderField">
           <label for="glOrder">Which goal comes first</label>
           <select id="glOrder"><option value="012" selected>profit, then overtime, then the deluxe run</option><option value="021">profit, then the deluxe run, then overtime</option><option value="102">overtime, then profit, then the deluxe run</option><option value="120">overtime, then the deluxe run, then profit</option><option value="201">the deluxe run, then profit, then overtime</option><option value="210">the deluxe run, then overtime, then profit</option></select>
@@ -1446,12 +1489,14 @@
           <div class="kpi"><span id="glK4Lab">&mdash;</span><strong id="glK4">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Building a preemptive goal programme</h2></div><p>Hard constraints first, then one target at a time, then the order &mdash; which is a decision from the situation and not from the model.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Separate the hard constraints from the aspirations</h3><p>The machine hours are hard: no plan may exceed them. The profit, the overtime and the deluxe run are aspirations. Anything in the second list that goes into the first can make the model infeasible, and infeasible is not an answer.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Give each target two deviations and penalise only the one you mind</h3><p><span class="math" data-say="u">u</span> for the shortfall, <span class="math" data-say="o">o</span> for the overshoot, both at or above zero. Beating a profit target is not a defect, so <span class="math" data-say="o sub 1">o₁</span> is not penalised; exceeding an overtime limit is, so <span class="math" data-say="o sub 2">o₂</span> is.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Put the goals in priority order, from the situation</h3><p>The ordering is the substance of the answer and it comes from whoever owns the problem. Record it explicitly: a goal programme with an accidental order is a model that has made somebody's decision for them.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Solve one level at a time, freezing each achieved deviation</h3><p>After each level, add the row “this deviation equals what was just achieved” and move on. Report every level's deviation in its own unit, and name the goal that paid for the rest.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Building a preemptive goal programme</h2>
+      <p class="lead-in">Hard constraints first, then one target at a time, then the order &mdash; which is a decision from the situation and not from the model.</p>
+      <ol class="key-ideas method"><li><strong>Separate the hard constraints from the aspirations.</strong> The machine hours are hard: no plan may exceed them. The profit, the overtime and the deluxe run are aspirations. Anything in the second list that goes into the first can make the model infeasible, and infeasible is not an answer.</li><li><strong>Give each target two deviations and penalise only the one you mind.</strong> <span class="math" data-say="u">u</span> for the shortfall, <span class="math" data-say="o">o</span> for the overshoot, both at or above zero. Beating a profit target is not a defect, so <span class="math" data-say="o sub 1">o₁</span> is not penalised; exceeding an overtime limit is, so <span class="math" data-say="o sub 2">o₂</span> is.</li><li><strong>Put the goals in priority order, from the situation.</strong> The ordering is the substance of the answer and it comes from whoever owns the problem. Record it explicitly: a goal programme with an accidental order is a model that has made somebody's decision for them.</li><li><strong>Solve one level at a time, freezing each achieved deviation.</strong> After each level, add the row “this deviation equals what was just achieved” and move on. Report every level's deviation in its own unit, and name the goal that paid for the rest.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1484,17 +1529,16 @@ one weighted objective:  minimise u₁ + o₂ + u₃
   which is the overtime-first answer, chosen by nobody</div><p>The two orderings sacrifice different goals and neither is wrong. What is wrong is the third block: the weighted objective adds 30 pounds to 0 hours to 12 units, calls the total 42, and silently commits to the second ordering. Nothing in the arithmetic complains, which is why this way of writing it fails quietly rather than loudly.</p><p>For a faded rehearsal, put the deluxe run first, then profit, then overtime. The supplied first move is level one: minimising <span class="math" data-say="u sub 3">u₃</span> needs <span class="math" data-say="D equals 12">D = 12</span>, which uses 36 of the 60 machine hours. Work out what the next two levels achieve and which goal ends up paying &mdash; then reorder in the lab and check both numbers, including the overtime figure, which is larger than in either ordering above.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Making a target a hard constraint</strong><span>Three aspirations promoted to rows here have no common solution, and the model returns “infeasible” &mdash; which tells whoever asked nothing about which target to relax or by how much. A deviation variable converts an unanswerable model into a report that names the shortfall in its own unit.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding deviations in different units into one objective</strong><span>Pounds, hours and units summed with equal weights produce a number and a plan, and the plan encodes an exchange rate nobody chose: here it quietly solves the overtime-first ordering. If weights are wanted, each deviation has to be scaled into a common currency deliberately.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Penalising both deviations of a target</strong><span>Minimising <span class="math" data-say="u sub 1 plus o sub 1">u₁ + o₁</span> says a plan is punished for beating the profit target as well as for missing it, which turns an aspiration into a demand for exactly 60. Choose the one the situation minds, and let the other absorb whatever the row forces on it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which goal paid, at which level, and in what unit.</strong><p>You should be able to separate hard constraints from targets, write each target with two deviations and penalise the right one, solve the levels in a stated order freezing each achieved deviation, and say what a single weighted objective would have hidden.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both lessons so far in this part have added variables to keep a model linear. The next one adds variables to a model that was already linear, for a different reason: every solver wants equalities, and turning inequalities into equalities is a modelling act whose new variables measure something real.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Making a target a hard constraint</strong><span>Three aspirations promoted to rows here have no common solution, and the model returns “infeasible” &mdash; which tells whoever asked nothing about which target to relax or by how much. A deviation variable converts an unanswerable model into a report that names the shortfall in its own unit.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding deviations in different units into one objective</strong><span>Pounds, hours and units summed with equal weights produce a number and a plan, and the plan encodes an exchange rate nobody chose: here it quietly solves the overtime-first ordering. If weights are wanted, each deviation has to be scaled into a common currency deliberately.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Penalising both deviations of a target</strong><span>Minimising <span class="math" data-say="u sub 1 plus o sub 1">u₁ + o₁</span> says a plan is punished for beating the profit target as well as for missing it, which turns an aspiration into a demand for exactly 60. Choose the one the situation minds, and let the other absorb whatever the row forces on it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which goal paid, at which level, and in what unit.</strong><p>You should be able to separate hard constraints from targets, write each target with two deviations and penalise the right one, solve the levels in a stated order freezing each achieved deviation, and say what a single weighted objective would have hidden.</p></div></div><div class="note"><strong>Note:</strong> Both lessons so far in this part have added variables to keep a model linear. The next one adds variables to a model that was already linear, for a different reason: every solver wants equalities, and turning inequalities into equalities is a modelling act whose new variables measure something real.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A target is an equation with two deviations, and you penalise one of them</summary><p><span class="math" data-say="3 S plus 4 D plus u sub 1 minus o sub 1 equals 60">3S + 4D + u₁ − o₁ = 60</span> holds at every feasible plan, whatever the plan is: <span class="math" data-say="u sub 1">u₁</span> takes up a shortfall and <span class="math" data-say="o sub 1">o₁</span> an overshoot. Minimising <span class="math" data-say="u sub 1">u₁</span> alone says “I mind missing 60, I do not mind beating it”, which is what an aspiration means.</p></details><details class="recall"><summary>Priorities are levels, and each level hands the next an equality</summary><p>Level one minimises the first goal's minded deviation. Level two adds the row “that deviation equals what level one achieved” and then minimises the second goal's. The frozen row is not a suggestion: it is what stops the second level from spending the first level's achievement.</p></details><details class="recall"><summary>The order is the answer</summary><p>The same three goals, reordered, give different plans. Profit first meets the profit target and pays 30 hours of overtime; overtime first meets the overtime limit and misses profit by 30; the deluxe run first meets two goals and pays 54 hours of overtime. None of these is more correct than the others, and choosing between them is not a mathematical act.</p></details></div>
+      <h3>Summary</h3>
       <p>A target is not a constraint. It is an equation carrying two deviation variables, one for falling short and one for overshooting, of which you penalise only the one you mind. Priorities are then handled lexicographically: one linear programme per level, each freezing the deviation the level above it achieved. A preemptive goal programme is a sequence of programmes rather than one programme with weights.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A target is an equation with two deviations, and you penalise one of them.</strong> <span class="math" data-say="3 S plus 4 D plus u sub 1 minus o sub 1 equals 60">3S + 4D + u₁ − o₁ = 60</span> holds at every feasible plan, whatever the plan is: <span class="math" data-say="u sub 1">u₁</span> takes up a shortfall and <span class="math" data-say="o sub 1">o₁</span> an overshoot. Minimising <span class="math" data-say="u sub 1">u₁</span> alone says “I mind missing 60, I do not mind beating it”, which is what an aspiration means.</li><li><strong>Priorities are levels, and each level hands the next an equality.</strong> Level one minimises the first goal's minded deviation. Level two adds the row “that deviation equals what level one achieved” and then minimises the second goal's. The frozen row is not a suggestion: it is what stops the second level from spending the first level's achievement.</li><li><strong>The order is the answer.</strong> The same three goals, reordered, give different plans. Profit first meets the profit target and pays 30 hours of overtime; overtime first meets the overtime limit and misses profit by 30; the deluxe run first meets two goals and pays 54 hours of overtime. None of these is more correct than the others, and choosing between them is not a mathematical act.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="3 S plus 4 D plus u sub 1 minus o sub 1 equals 60, the profit target, u sub 1 is minded. 3 S plus 6 D plus u sub 2 minus o sub 2 equals 30, the overtime limit, o sub 2 is minded. D plus u sub 3 minus o sub 3 equals 12, the deluxe run, u sub 3 is minded. every u and o is at least 0. level 1, minimise the minded deviation of the first goal. level 2, freeze what level 1 achieved as an equality, then the next goal" tabindex="0" role="region" aria-label="Mathematical notation">3S + 4D + u₁ − o₁ = 60     the profit target,   u₁ is minded
 3S + 6D + u₂ − o₂ = 30     the overtime limit,  o₂ is minded
       D + u₃ − o₃ = 12     the deluxe run,      u₃ is minded
@@ -3325,11 +3369,42 @@ level 2:  freeze what level 1 achieved as an equality, then the next goal</div><
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3397,7 +3472,7 @@ level 2:  freeze what level 1 achieved as an equality, then the next goal</div><
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

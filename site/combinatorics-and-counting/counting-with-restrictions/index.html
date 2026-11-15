@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Combinatorics and Counting</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Basic counting</p>
       <h1>Counting with Restrictions</h1>
       <p class="lesson-lede">Cases, complements, and the order in which constraints are applied.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Handle the constrained choice first</li><li>Split into cases when the count varies</li><li>Complement when the restriction says &quot;at least&quot;</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Working with restrictions</h2>
-      <article class="prose reading"><h3>Constrain first</h3><div class="example"><span class="label">Example &middot; Leading digit</span><p>How many 4-digit numbers are there? The first digit cannot be 0, so choose it first: 9 ways, then <span class="math" data-say="10 times 10 times 10">10 · 10 · 10</span> for the rest, giving 9000. Working left to right without noticing the restriction gives <span class="math" data-say="10 to the power 4">10⁴</span> and counts <span class="math" data-say="0123">0123</span> as a four-digit number.</p></div><div class="example"><span class="label">Example &middot; Two constraints at once</span><p>Four-digit numbers, first digit nonzero and last digit even. Constrain both ends first: 9 choices for the first, 5 for the last, then <span class="math" data-say="10 times 10">10 · 10</span> in the middle &mdash; <span class="math" data-say="9 times 10 times 10 times 5 equals 4500">9 · 10 · 10 · 5 = 4500</span>. Order of consideration is free; order of positions is not.</p></div><h3>Split into cases</h3><div class="example"><span class="label">Example &middot; A constraint that interacts</span><p>Four-digit numbers with first digit nonzero and all digits distinct. Constrain first: 9 choices for the leading digit. The second digit may be anything except the first, including 0, so 9 choices; then 8; then 7. Total <span class="math" data-say="9 times 9 times 8 times 7 equals 4536">9 · 9 · 8 · 7 = 4536</span>. Note the second count is 9 and not 8 &mdash; 0 becomes available exactly because it was excluded from the first position.</p></div><p>Where two restrictions genuinely interact, cases are unavoidable. To count the strings of length 4 over <span class="math" data-say="the set A, b, c">{a, b, c}</span> with at least two <span class="math" data-say="A">a</span>s, split by the number of <span class="math" data-say="A">a</span>s &mdash; exactly two, exactly three, exactly four &mdash; count each, and add. The cases are disjoint because a string has one definite number of <span class="math" data-say="A">a</span>s. The worked example below does it, and then does it again by complement.</p><h3>Complement</h3><div class="example"><span class="label">Example &middot; At least one repeat</span><p>How many 5-digit PINs have at least one repeated digit? All PINs: <span class="math" data-say="10 to the power 5 equals 100000">10⁵ = 100000</span>. All-distinct PINs: <span class="math" data-say="10 times 9 times 8 times 7 times 6 equals 30240">10 · 9 · 8 · 7 · 6 = 30240</span>. Answer <span class="math" data-say="69760">69760</span>. The direct count would need cases for one pair, two pairs, a triple, and so on &mdash; overlapping and easy to get wrong.</p></div><p>The general signal: if the condition is "at least" something, or "not all", or "some", the complement is usually a single clean count. If it is "exactly", cases are usually right.</p><h3>Checking the answer</h3><ul><li><strong>Do the cases overlap?</strong> If an object satisfies two, it was counted twice.</li><li><strong>Do the cases cover everything?</strong> A missing case is an undercount that never announces itself.</li><li><strong>Does a small instance check out?</strong> Shrink <span class="math" data-say="n">n</span> until you can enumerate by hand and compare with the formula. The lab does this to 400 objects.</li></ul></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The four counting rules</h2></div><p>Enumerated while enumeration is possible</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Working with restrictions</h2><div class="prose reading"><h3>Constrain first</h3><div class="example"><span class="label">Example &middot; Leading digit</span><p>How many 4-digit numbers are there? The first digit cannot be 0, so choose it first: 9 ways, then <span class="math" data-say="10 times 10 times 10">10 · 10 · 10</span> for the rest, giving 9000. Working left to right without noticing the restriction gives <span class="math" data-say="10 to the power 4">10⁴</span> and counts <span class="math" data-say="0123">0123</span> as a four-digit number.</p></div><div class="example"><span class="label">Example &middot; Two constraints at once</span><p>Four-digit numbers, first digit nonzero and last digit even. Constrain both ends first: 9 choices for the first, 5 for the last, then <span class="math" data-say="10 times 10">10 · 10</span> in the middle &mdash; <span class="math" data-say="9 times 10 times 10 times 5 equals 4500">9 · 10 · 10 · 5 = 4500</span>. Order of consideration is free; order of positions is not.</p></div><h3>Split into cases</h3><div class="example"><span class="label">Example &middot; A constraint that interacts</span><p>Four-digit numbers with first digit nonzero and all digits distinct. Constrain first: 9 choices for the leading digit. The second digit may be anything except the first, including 0, so 9 choices; then 8; then 7. Total <span class="math" data-say="9 times 9 times 8 times 7 equals 4536">9 · 9 · 8 · 7 = 4536</span>. Note the second count is 9 and not 8 &mdash; 0 becomes available exactly because it was excluded from the first position.</p></div><p>Where two restrictions genuinely interact, cases are unavoidable. To count the strings of length 4 over <span class="math" data-say="the set A, b, c">{a, b, c}</span> with at least two <span class="math" data-say="A">a</span>s, split by the number of <span class="math" data-say="A">a</span>s &mdash; exactly two, exactly three, exactly four &mdash; count each, and add. The cases are disjoint because a string has one definite number of <span class="math" data-say="A">a</span>s. The worked example below does it, and then does it again by complement.</p><h3>Complement</h3><div class="example"><span class="label">Example &middot; At least one repeat</span><p>How many 5-digit PINs have at least one repeated digit? All PINs: <span class="math" data-say="10 to the power 5 equals 100000">10⁵ = 100000</span>. All-distinct PINs: <span class="math" data-say="10 times 9 times 8 times 7 times 6 equals 30240">10 · 9 · 8 · 7 · 6 = 30240</span>. Answer <span class="math" data-say="69760">69760</span>. The direct count would need cases for one pair, two pairs, a triple, and so on &mdash; overlapping and easy to get wrong.</p></div><p>The general signal: if the condition is "at least" something, or "not all", or "some", the complement is usually a single clean count. If it is "exactly", cases are usually right.</p><h3>Checking the answer</h3><ul><li><strong>Do the cases overlap?</strong> If an object satisfies two, it was counted twice.</li><li><strong>Do the cases cover everything?</strong> A missing case is an undercount that never announces itself.</li><li><strong>Does a small instance check out?</strong> Shrink <span class="math" data-say="n">n</span> until you can enumerate by hand and compare with the formula. The lab does this to 400 objects.</li></ul></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The four counting rules</h2></div><p>Enumerated while enumeration is possible</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Choosing r from n</strong><span>Order matters or not; repetition allowed or not</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>selected rule</span></div>
@@ -1405,10 +1448,10 @@
         <div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cntTable"></table></div>
         <div id="cntList" class="small-copy" style="margin-top:10px;"></div>
       </div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Distinct selections, listed</h3>
-          <p>The <span class="math" data-say="P of n and r">P(n, r)</span> row counts ordered selections without repetition &mdash; the "all digits distinct" pattern. The enumeration below is what a restriction count should be checked against.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Distinct selections, listed</h3>
+            <p>The <span class="math" data-say="P of n and r">P(n, r)</span> row counts ordered selections without repetition &mdash; the "all digits distinct" pattern. The enumeration below is what a restriction count should be checked against.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="cntN">n (things to choose from)</label><span class="range-value" id="cntNOut">5</span></div>
           <input id="cntN" type="range" min="1" max="24" value="5" />
@@ -1427,12 +1470,14 @@
           </select>
         </div>
         <div class="status-banner" id="cntStatus">Every total is computed in exact integer arithmetic.</div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Handling a restriction</h2></div><p>Identify what the restriction breaks, then choose the repair.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Locate the constrained positions</h3><p>Deal with them first so the remaining choices are uniform. This alone handles most restrictions.</p></article><article class="card concept-card"><div class="icon">2</div><h3>If the counts still vary, split into cases</h3><p>Choose the case variable so that within each case the product rule applies cleanly.</p></article><article class="card concept-card"><div class="icon">3</div><h3>If the condition is &quot;at least&quot;, complement</h3><p>Total minus the objects failing the condition. One subtraction, no overlap.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Verify on a small instance</h3><p>Shrink the parameters until enumeration is possible and compare. A formula that disagrees with a list is wrong.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Handling a restriction</h2>
+      <p class="lead-in">Identify what the restriction breaks, then choose the repair.</p>
+      <ol class="key-ideas method"><li><strong>Locate the constrained positions.</strong> Deal with them first so the remaining choices are uniform. This alone handles most restrictions.</li><li><strong>If the counts still vary, split into cases.</strong> Choose the case variable so that within each case the product rule applies cleanly.</li><li><strong>If the condition is &quot;at least&quot;, complement.</strong> Total minus the objects failing the condition. One subtraction, no overlap.</li><li><strong>Verify on a small instance.</strong> Shrink the parameters until enumeration is possible and compare. A formula that disagrees with a list is wrong.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1464,17 +1509,16 @@ BY COMPLEMENT: the strings that FAIL have zero or one a.
    81 − 16 − 32 = 33                                    agree</div><p>Two independent routes to 33. That agreement is the real check: a single method producing a plausible number is not evidence that the classification was right, and the case method is where a missing case would show up. The six position pairs were listed by hand; “Combinations” gives them a name and a formula, <span class="math" data-say="4 choose 2 equals 6">C(4, 2) = 6</span>, and from then on they need not be listed.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Ignoring the leading-digit restriction</strong><span><span class="math" data-say="10 to the power 4">10⁴</span> counts <span class="math" data-say="0123">0123</span> as a four-digit number. Constrained positions get chosen first for exactly this reason.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Forgetting that excluding a value from one position frees it for another</strong><span>After choosing a nonzero first digit, the second digit has 9 options, not 8: 0 has become available.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Cases that overlap or leave a gap</strong><span>Both errors are silent. Check the cases sum to the unrestricted total when the restriction is removed.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you check a restricted count two ways.</strong><p>Count the 4-digit numbers (leading digit nonzero) that contain at least one 7, by complement and by cases on the position of the <em>first</em> 7 &mdash; a classification that is disjoint and exhaustive because every such number has exactly one first 7. Constrain the leading digit first in every case. If the two totals agree you have both the arithmetic and the classification right.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The instinct to count what you want directly is usually the expensive one. Complementary counting, and inclusion and exclusion, both amount to counting something easier and correcting &mdash; which is the dominant strategy in this course.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Ignoring the leading-digit restriction</strong><span><span class="math" data-say="10 to the power 4">10⁴</span> counts <span class="math" data-say="0123">0123</span> as a four-digit number. Constrained positions get chosen first for exactly this reason.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Forgetting that excluding a value from one position frees it for another</strong><span>After choosing a nonzero first digit, the second digit has 9 options, not 8: 0 has become available.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Cases that overlap or leave a gap</strong><span>Both errors are silent. Check the cases sum to the unrestricted total when the restriction is removed.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you check a restricted count two ways.</strong><p>Count the 4-digit numbers (leading digit nonzero) that contain at least one 7, by complement and by cases on the position of the <em>first</em> 7 &mdash; a classification that is disjoint and exhaustive because every such number has exactly one first 7. Constrain the leading digit first in every case. If the two totals agree you have both the arithmetic and the classification right.</p></div></div><div class="note"><strong>Note:</strong> The instinct to count what you want directly is usually the expensive one. Complementary counting, and inclusion and exclusion, both amount to counting something easier and correcting &mdash; which is the dominant strategy in this course.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Handle the constrained choice first</summary><p>If the first digit cannot be 0, choose it first (9 ways) and then the rest freely. Choosing left to right regardless is what creates the difficulty.</p></details><details class="recall"><summary>Split into cases when the count varies</summary><p>Cases must be disjoint and exhaustive &mdash; the same discipline as a proof by cases in “Cases, Counterexamples, and Writing a Proof” in Logic and Proof.</p></details><details class="recall"><summary>Complement when the restriction says &quot;at least&quot;</summary><p>The complement of "at least one" is "none", which is a single unrestricted count.</p></details></div>
+      <h3>Summary</h3>
       <p>Restrictions make counting harder in a specific way: they break the product rule's uniformity. Three techniques repair it &mdash; apply the constraint first, split into cases, or count the complement.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Handle the constrained choice first.</strong> If the first digit cannot be 0, choose it first (9 ways) and then the rest freely. Choosing left to right regardless is what creates the difficulty.</li><li><strong>Split into cases when the count varies.</strong> Cases must be disjoint and exhaustive &mdash; the same discipline as a proof by cases in “Cases, Counterexamples, and Writing a Proof” in Logic and Proof.</li><li><strong>Complement when the restriction says &quot;at least&quot;.</strong> The complement of "at least one" is "none", which is a single unrestricted count.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="Place the CONSTRAINED positions first. Split into cases where the counts are uniform, then add. at least one goes to count the complement. Check, do the cases overlap ? do they cover everything ?" tabindex="0" role="region" aria-label="Mathematical notation">Place the CONSTRAINED positions first.
 Split into cases where the counts are uniform, then add.
 &quot;at least one&quot; → count the complement
@@ -1928,11 +1972,42 @@ Check: do the cases overlap? do they cover everything?</div><figcaption>Three re
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2000,7 +2075,7 @@ Check: do the cases overlap? do they cover everything?</div><figcaption>Three re
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

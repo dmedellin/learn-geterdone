@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Graph Algorithms</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 26 · Maximum Flow</p>
       <h1>Maximum Bipartite Matching</h1>
       <p class="lesson-lede">Give every edge of a bipartite graph capacity 1, add a source and a sink, and a maximum flow is a maximum matching, because Ford-Fulkerson&#x27;s flows are whole numbers.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A maximum matching</li><li>The corresponding flow network</li><li>The integrality theorem</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The section&#x27;s argument first, then the pairing</h2>
-      <article class="prose reading"><p>&ldquo;Some other combinatorial problems seem on the surface to have little to do with flow networks, but can in fact be reduced to maximum-flow problems.&rdquo; Section 26.3 of CLRS takes one such problem, matching in a bipartite graph, and reduces it to the flow of the lesson before. The authors' example is machines and tasks: an edge says a machine can do a task, and a maximum matching keeps as many machines busy as possible at once.</p><p>First the definitions. A matching is a set of edges in which no vertex appears twice; a vertex in one of its edges is matched. A maximum matching has the largest number of edges any matching can have. The section restricts attention to bipartite graphs, whose vertices split into two sides L and R with every edge running between them, and assumes every vertex has at least one edge.</p><p>Then the network. Add a source <span class="math" data-say="s">s</span> with an arc to every vertex in L and a sink <span class="math" data-say="t">t</span> with an arc from every vertex in R, direct each edge from L to R, and give every arc capacity 1. Lemma 26.9 shows that a matching of size <span class="math" data-say="k">k</span> gives an integer-valued flow of value <span class="math" data-say="k">k</span>, one unit along each matched edge, and that an integer-valued flow of value <span class="math" data-say="k">k</span> gives a matching of size <span class="math" data-say="k">k</span>: each vertex of L receives at most one unit from <span class="math" data-say="s">s</span>, so it sends at most one unit on, and each vertex of R passes at most one unit to <span class="math" data-say="t">t</span>.</p><p>The gap is that a maximum flow could in principle split units in half. Theorem 26.10, the integrality theorem, closes it: with integer capacities the Ford-Fulkerson method only ever pushes whole bottlenecks, so the flow it returns is integer-valued on every arc. Corollary 26.11 concludes that the size of a maximum matching equals the value of a maximum flow in the network, and the method finds both.</p><p>The running time is the method's own bound with a small maximum. A matching has at most <span data-say="the min of the size of L, and the size of R">min(|L|, |R|)</span> edges, which is O(V), so there are O(V) augmentations, each found in O(E) time: O(VE) in all. Section 26.4, which follows, develops push-relabel algorithms, which push excess flow from vertex to vertex guided by a height function instead of following whole paths, and bounds the generic version at <span data-say="big O of V squared E">O(V²E)</span>; Section 26.5's relabel-to-front algorithm runs in <span data-say="big O of V cubed">O(V³)</span>. Both sections are starred, and their proofs are left to the book.</p><p>The lab builds the network from the pairs you type, finds a maximum flow, and reads the matching off the middle arcs. It also checks the answer three other ways that make good evidence: every subset of the pairs is tried; the cut is read back as a vertex cover, a set of vertices touching every pair, which can never be smaller than a matching; and Hall's condition, that every set of left vertices has at least as many neighbours, is tested (the section's text never uses it; it appears only in Exercise 26.3-4). Beside them it runs a greedy pass that takes pairs in typed order whenever both ends are free.</p><p>It opens on its preset <code>maximal</code>, two vertices a side and three pairs: a matching of 2, while the greedy pass stops at 1, maximal and not maximum. The preset <code>perfect</code>, three a side and six pairs, matches all three left vertices, with a cover of 3 and Hall's condition holding; <code>hall</code> puts three left vertices against two and reports the condition failing at {1, 2}; <code>star</code> has one popular right vertex, a matching of 2 of 5 pairs, and the condition failing at {1, 2, 3}.</p><p>This lesson's graph has four machines on the left, four tasks on the right, and seven allowed pairs. Set both sides to 4 and type <code>1-1, 1-2, 2-1, 3-2, 3-3, 4-3, 4-4</code>. The lab finds a matching of 4 of the 7 pairs, L1 with R2, L2 with R1, L3 with R3 and L4 with R4: every machine busy. The cover read from the cut has 4 vertices, all 128 subsets of the pairs agree on 4, every flow value is a whole number, and Hall's condition holds.</p><p>The greedy pass takes L1 with R1, then L3 with R2, then L4 with R3, and stops at 3, because L2's only task is taken. Nothing can be added to its three pairs, yet one more is possible. The flow finds it along an augmenting path from L2: to R1, back from R1 to L1, on to R2, back to L3, on to R3, back to L4, and on to R4. Three greedy pairs are undone and four new ones made. The network for this graph has 10 vertices, with <span class="math" data-say="s">s</span> and <span class="math" data-say="t">t</span>, and 4 + 7 + 4 = 15 arcs. The Algorithms Subject's lesson Bipartite Matching runs the same lab.</p><h3>Exercise</h3><p>Take three people and four shifts with the pairs <code>1-1, 1-2, 2-2, 3-2, 3-3, 3-4</code>. Draw the flow network, find a maximum matching by hand with augmenting paths, and check whether a greedy pass in that order finds it. Then set the lab to 3 on the left and 4 on the right and compare.</p><p>This lesson ends Part VI. The next course, Parallel, Matrix, Linear and Number Algorithms, reads the first chapters of Part VII, beginning with multithreaded algorithms.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Bipartite matching as a flow, and the cover the cut names</h2></div><p>Unit capacities make the answer whole, and the minimum cut is a vertex cover of the same size</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The section&#x27;s argument first, then the pairing</h2><div class="prose reading"><p>&ldquo;Some other combinatorial problems seem on the surface to have little to do with flow networks, but can in fact be reduced to maximum-flow problems.&rdquo; Section 26.3 of CLRS takes one such problem, matching in a bipartite graph, and reduces it to the flow of the lesson before. The authors' example is machines and tasks: an edge says a machine can do a task, and a maximum matching keeps as many machines busy as possible at once.</p><p>First the definitions. A matching is a set of edges in which no vertex appears twice; a vertex in one of its edges is matched. A maximum matching has the largest number of edges any matching can have. The section restricts attention to bipartite graphs, whose vertices split into two sides L and R with every edge running between them, and assumes every vertex has at least one edge.</p><p>Then the network. Add a source <span class="math" data-say="s">s</span> with an arc to every vertex in L and a sink <span class="math" data-say="t">t</span> with an arc from every vertex in R, direct each edge from L to R, and give every arc capacity 1. Lemma 26.9 shows that a matching of size <span class="math" data-say="k">k</span> gives an integer-valued flow of value <span class="math" data-say="k">k</span>, one unit along each matched edge, and that an integer-valued flow of value <span class="math" data-say="k">k</span> gives a matching of size <span class="math" data-say="k">k</span>: each vertex of L receives at most one unit from <span class="math" data-say="s">s</span>, so it sends at most one unit on, and each vertex of R passes at most one unit to <span class="math" data-say="t">t</span>.</p><p>The gap is that a maximum flow could in principle split units in half. Theorem 26.10, the integrality theorem, closes it: with integer capacities the Ford-Fulkerson method only ever pushes whole bottlenecks, so the flow it returns is integer-valued on every arc. Corollary 26.11 concludes that the size of a maximum matching equals the value of a maximum flow in the network, and the method finds both.</p><p>The running time is the method's own bound with a small maximum. A matching has at most <span data-say="the min of the size of L, and the size of R">min(|L|, |R|)</span> edges, which is O(V), so there are O(V) augmentations, each found in O(E) time: O(VE) in all. Section 26.4, which follows, develops push-relabel algorithms, which push excess flow from vertex to vertex guided by a height function instead of following whole paths, and bounds the generic version at <span data-say="big O of V squared E">O(V²E)</span>; Section 26.5's relabel-to-front algorithm runs in <span data-say="big O of V cubed">O(V³)</span>. Both sections are starred, and their proofs are left to the book.</p><p>The lab builds the network from the pairs you type, finds a maximum flow, and reads the matching off the middle arcs. It also checks the answer three other ways that make good evidence: every subset of the pairs is tried; the cut is read back as a vertex cover, a set of vertices touching every pair, which can never be smaller than a matching; and Hall's condition, that every set of left vertices has at least as many neighbours, is tested (the section's text never uses it; it appears only in Exercise 26.3-4). Beside them it runs a greedy pass that takes pairs in typed order whenever both ends are free.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Bipartite matching as a flow, and the cover the cut names</h2></div><p>Unit capacities make the answer whole, and the minimum cut is a vertex cover of the same size</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Matching as a flow, and the cut as a cover</strong><span>unit capacities make the flow whole, and the cut names the cover</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>matched</span><span class="tone-red"><i class="legend-swatch"></i>in the vertex cover</span><span class="tone-purple"><i class="legend-swatch"></i>a pair left unmatched</span></div>
@@ -1405,10 +1448,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mtRows"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mtCompare"></table></div>
       <div class="status-banner" id="mtStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Pair the two sides through a unit-capacity flow</h3>
-          <p>Choose the number of vertices on each side and type the allowed pairs as left-right. The lab builds the unit-capacity network, reads the matching off a maximum flow, and checks it by trying every subset of the pairs. Paste the lesson's pairs with 4 on each side.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Pair the two sides through a unit-capacity flow</h3>
+            <p>Choose the number of vertices on each side and type the allowed pairs as left-right. The lab builds the unit-capacity network, reads the matching off a maximum flow, and checks it by trying every subset of the pairs. Paste the lesson's pairs with 4 on each side.</p>
         <div class="field">
           <label for="mtPreset">Worked example</label>
           <select id="mtPreset"><option value="maximal" selected>two on each side, three pairs</option><option value="perfect">three on each side, six pairs</option><option value="hall">three on the left competing for two</option><option value="star">one popular right vertex</option></select>
@@ -1434,12 +1477,15 @@
           <div class="kpi"><span>Hall's condition</span><strong id="mtHall">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="mtHint" style="margin:0;">A pair is <span class="tt">2&minus;1</span>: the second vertex on the left with the first on the right. Every arc of the network gets capacity one, so an augmenting path has a bottleneck of one and moves a whole unit &mdash; which is why the answer is a matching and not a fraction of one. The minimum cut is then read back as a set of vertices covering every pair, and the two sizes agree; that is a theorem, checked here on your own instance.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>It opens on its preset <code>maximal</code>, two vertices a side and three pairs: a matching of 2, while the greedy pass stops at 1, maximal and not maximum. The preset <code>perfect</code>, three a side and six pairs, matches all three left vertices, with a cover of 3 and Hall's condition holding; <code>hall</code> puts three left vertices against two and reports the condition failing at {1, 2}; <code>star</code> has one popular right vertex, a matching of 2 of 5 pairs, and the condition failing at {1, 2, 3}.</p><p>This lesson's graph has four machines on the left, four tasks on the right, and seven allowed pairs. Set both sides to 4 and type <code>1-1, 1-2, 2-1, 3-2, 3-3, 4-3, 4-4</code>. The lab finds a matching of 4 of the 7 pairs, L1 with R2, L2 with R1, L3 with R3 and L4 with R4: every machine busy. The cover read from the cut has 4 vertices, all 128 subsets of the pairs agree on 4, every flow value is a whole number, and Hall's condition holds.</p><p>The greedy pass takes L1 with R1, then L3 with R2, then L4 with R3, and stops at 3, because L2's only task is taken. Nothing can be added to its three pairs, yet one more is possible. The flow finds it along an augmenting path from L2: to R1, back from R1 to L1, on to R2, back to L3, on to R3, back to L4, and on to R4. Three greedy pairs are undone and four new ones made. The network for this graph has 10 vertices, with <span class="math" data-say="s">s</span> and <span class="math" data-say="t">t</span>, and 4 + 7 + 4 = 15 arcs. The Algorithms Subject's lesson Bipartite Matching runs the same lab.</p><h3>Exercise</h3><p>Take three people and four shifts with the pairs <code>1-1, 1-2, 2-2, 3-2, 3-3, 3-4</code>. Draw the flow network, find a maximum matching by hand with augmenting paths, and check whether a greedy pass in that order finds it. Then set the lab to 3 on the left and 4 on the right and compare.</p><p>This lesson ends Part VI. The next course, Parallel, Matrix, Linear and Number Algorithms, reads the first chapters of Part VII, beginning with multithreaded algorithms.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Solving a matching as a flow</h2></div><p>Five steps, the last on a pairing of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Build the network</h3><p>Add a source with an arc to every left vertex and a sink with an arc from every right vertex, direct each pair from left to right, and give every arc capacity 1.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Augment from a free left vertex</h3><p>Find a path from the source through a free left vertex, alternating between unused pairs forward and matched pairs backward, to a free right vertex and the sink.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Flip the path</h3><p>Each unused pair on the path joins the matching and each matched pair on it leaves. The matching grows by exactly one.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Stop when no path remains</h3><p>When no augmenting path exists, the matching is maximum by the max-flow min-cut theorem, and its size is the flow's value.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on a pairing of your own</h3><p>Write who on a small team can cover which of four duties as pairs and type them into the lab. Note the maximum matching and whether a greedy pass in your order found it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Solving a matching as a flow</h2>
+      <p class="lead-in">Five steps, the last on a pairing of your own.</p>
+      <ol class="key-ideas method"><li><strong>Build the network.</strong> Add a source with an arc to every left vertex and a sink with an arc from every right vertex, direct each pair from left to right, and give every arc capacity 1.</li><li><strong>Augment from a free left vertex.</strong> Find a path from the source through a free left vertex, alternating between unused pairs forward and matched pairs backward, to a free right vertex and the sink.</li><li><strong>Flip the path.</strong> Each unused pair on the path joins the matching and each matched pair on it leaves. The matching grows by exactly one.</li><li><strong>Stop when no path remains.</strong> When no augmenting path exists, the matching is maximum by the max-flow min-cut theorem, and its size is the flow's value.</li><li><strong>Do it on a pairing of your own.</strong> Write who on a small team can cover which of four duties as pairs and type them into the lab. Note the maximum matching and whether a greedy pass in your order found it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1460,17 +1506,16 @@ now L2 with R1, L1 with R2, L3 with R3,
   and L4 with R4</div><p>One augmenting path undid three greedy pairs and made four, raising the matching from 3 to 4, which is the maximum the lab reports. No vertex can be in two pairs, so 4 on four machines is also the most possible.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a matching nothing can be added to is maximum</strong><span>A maximal matching only says no edge can be added as it stands. On the lesson's graph the greedy pass stops at 3 pairs, maximal, while 4 are possible. Reaching 4 requires undoing all three greedy choices along one augmenting path, which is what the residual network's backward arcs make possible.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing every maximum flow in the network is a matching</strong><span>The reduction relies on the flow being integral, and Theorem 26.10 promises that for the flow Ford-Fulkerson returns, not for every maximum flow. If L1 and L2 are both joined to R1 and R2, half a unit on each of the four middle arcs is a maximum flow of value 2 that is no matching. The lab checks the whole-number property on its own flow: yes, every one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting push-relabel to be needed for matching</strong><span>The push-relabel methods of Sections 26.4 and 26.5 give better bounds for general flow, <span data-say="big O of V squared E">O(V²E)</span> and <span data-say="big O of V cubed">O(V³)</span>, but matching already has O(VE) from Ford-Fulkerson because its maximum is at most O(V). The book presents push-relabel as the route to faster flow algorithms, not as a requirement for matching.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can solve a bipartite matching as a flow by hand.</strong><p>For a bipartite graph of three or four vertices a side, build the unit-capacity network, find a maximum matching by augmenting paths, and explain with the integrality theorem why the flow is a matching.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab solves one bipartite graph of up to four vertices a side and checks the matching by trying every subset of pairs, so its answer is complete for that graph. The cover and Hall's condition it reports go beyond Section 26.3. That the method finds a maximum matching on every bipartite graph is Corollary 26.11.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a matching nothing can be added to is maximum</strong><span>A maximal matching only says no edge can be added as it stands. On the lesson's graph the greedy pass stops at 3 pairs, maximal, while 4 are possible. Reaching 4 requires undoing all three greedy choices along one augmenting path, which is what the residual network's backward arcs make possible.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing every maximum flow in the network is a matching</strong><span>The reduction relies on the flow being integral, and Theorem 26.10 promises that for the flow Ford-Fulkerson returns, not for every maximum flow. If L1 and L2 are both joined to R1 and R2, half a unit on each of the four middle arcs is a maximum flow of value 2 that is no matching. The lab checks the whole-number property on its own flow: yes, every one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting push-relabel to be needed for matching</strong><span>The push-relabel methods of Sections 26.4 and 26.5 give better bounds for general flow, <span data-say="big O of V squared E">O(V²E)</span> and <span data-say="big O of V cubed">O(V³)</span>, but matching already has O(VE) from Ford-Fulkerson because its maximum is at most O(V). The book presents push-relabel as the route to faster flow algorithms, not as a requirement for matching.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can solve a bipartite matching as a flow by hand.</strong><p>For a bipartite graph of three or four vertices a side, build the unit-capacity network, find a maximum matching by augmenting paths, and explain with the integrality theorem why the flow is a matching.</p></div></div><div class="note"><strong>Note:</strong> The lab solves one bipartite graph of up to four vertices a side and checks the matching by trying every subset of pairs, so its answer is complete for that graph. The cover and Hall's condition it reports go beyond Section 26.3. That the method finds a maximum matching on every bipartite graph is Corollary 26.11.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A maximum matching</summary><p>A matching is a set of edges with no vertex in two of them. A maximum matching has as many edges as any matching can. A matching that cannot be extended by adding an edge is maximal, which is weaker: it may still be smaller than the maximum.</p></details><details class="recall"><summary>The corresponding flow network</summary><p>For a bipartite graph with sides L and R, add a source with an arc to every vertex of L and a sink with an arc from every vertex of R, direct every edge from L to R, and give every arc capacity 1. A matching of size k gives a flow of value k, and an integer flow of value k gives a matching of size k (Lemma 26.9).</p></details><details class="recall"><summary>The integrality theorem</summary><p>Theorem 26.10: when every capacity is an integer, the Ford-Fulkerson method produces a maximum flow whose value and every arc's flow are integers. With unit capacities each arc then carries 0 or 1, so the arcs from L to R carrying 1 are a matching.</p></details></div>
+      <h3>Summary</h3>
       <p>Section 26.3 solves a problem that looks nothing like flow: pair as many vertices on one side of a bipartite graph with vertices on the other as possible. Unit capacities and the integrality theorem turn a maximum flow into a maximum matching in O(VE). Run it on four machines and four tasks written for the lesson, beside a greedy pairing that gets stuck.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A maximum matching.</strong> A matching is a set of edges with no vertex in two of them. A maximum matching has as many edges as any matching can. A matching that cannot be extended by adding an edge is maximal, which is weaker: it may still be smaller than the maximum.</li><li><strong>The corresponding flow network.</strong> For a bipartite graph with sides L and R, add a source with an arc to every vertex of L and a sink with an arc from every vertex of R, direct every edge from L to R, and give every arc capacity 1. A matching of size k gives a flow of value k, and an integer flow of value k gives a matching of size k (Lemma 26.9).</li><li><strong>The integrality theorem.</strong> Theorem 26.10: when every capacity is an integer, the Ford-Fulkerson method produces a maximum flow whose value and every arc's flow are integers. With unit capacities each arc then carries 0 or 1, so the arcs from L to R carrying 1 are a matching.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="matching, no vertex in two edges. source to L, L to R, R to sink. every capacity 1. integer capacities give integer flow. flow value equals matching size. big O of V augmentations, big O of the quantity V times E" tabindex="0" role="region" aria-label="Mathematical notation">matching: no vertex in two edges
 source to L, L to R, R to sink
 every capacity 1
@@ -3121,11 +3166,42 @@ O(V) augmentations: O(V·E)</div><figcaption>Section 26.3 in six lines</figcapti
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3193,7 +3269,7 @@ O(V) augmentations: O(V·E)</div><figcaption>Section 26.3 in six lines</figcapti
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

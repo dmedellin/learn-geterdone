@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">A Case Study: Designing a Document Editor</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 2 · A Case Study: Designing a Document Editor</p>
       <h1>Formatting</h1>
       <p class="lesson-lede">The line-breaking algorithm taken out of the document classes and made an object, so that structures and algorithms can each be added without the other.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Compositor</li><li>Composition</li><li>Strategy</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Why formatting gets its own object</h2>
-      <article class="prose reading"><p>&ldquo;We can isolate the algorithm and make it easily replaceable at the same time by encapsulating it in an object.&rdquo; That is the move Section 2.3, Formatting, makes for Lexi's second problem. Read the section in your own copy first; it is four pages, and the shortest route in the chapter from a problem to a pattern.</p><p>The section begins by separating two things. Recursive composition says how a formatted document is held, but not how to get from a stream of letters and pictures to the right lines and columns. That is formatting, which the authors narrow for the section to line breaking, noting that breaking lines into columns and columns into pages works the same way. It is hard to do well, and there is no one right algorithm: an interactive editor trades the quality of its lines against the speed of its response, a user may accept slower typing for better pages, and caching more can buy speed with memory. Not all of that can be decided when the program is compiled.</p><p>So the authors want two kinds of independence. A new kind of glyph should not have to know about the formatting algorithm, and a new algorithm should not require editing the existing glyphs. Their answer is a separate class hierarchy for algorithms. Compositor's interface says what to format and when; a Composition, a special glyph, holds the unformatted content and a compositor, and asks it to compose whenever the document changes. The compositor walks the composition's children and inserts the row and column glyphs the lines need. One subclass might make a quick pass; another might run Knuth's TeX algorithm, which weighs the evenness of the text's colour and takes longer. Add a single operation to set the compositor, and the algorithm can be changed while Lexi runs.</p><p>The pattern is Strategy: the compositor is the strategy, the composition its context. The authors put the weight on one point, that the two interfaces must be general enough for any algorithm in the family; here the glyph's child operations already let any compositor rebuild the lines, and the compositor's interface gives the composition all it needs to ask. The pattern's own consequences, in the catalog, add the costs: a client must know how the strategies differ in order to choose one, the context and strategy may pass each other more than a given algorithm uses, and there are more objects. Strategy reappears as a concept of the domain in the Domain-Driven Design lesson Strategy and Composite in the Model.</p><pre class="codeblock" data-say="line 1, comment, The ordering algorithm is an object the playlist holds.. line 2, interface ordering. line 3, list of track arrange of list of track tracks. line 5, final class by tempo implements ordering. line 6, public list of track arrange of list of track tracks. line 7, list of track out is set to new array list of tracks. line 8, collections dot sort of out, track dot by bpm. line 9, return out. line 12, abstract class playlist. line 13, private final list of track tracks is set to new array list. line 14, private ordering ordering. line 15, playlist of ordering ordering this dot ordering is set to ordering. line 16, void set ordering of ordering o this dot ordering is set to o, comment, at run time. line 17, list of track play order return ordering dot arrange of tracks" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The ordering algorithm is an object the playlist holds.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Why formatting gets its own object</h2><div class="prose reading"><p>&ldquo;We can isolate the algorithm and make it easily replaceable at the same time by encapsulating it in an object.&rdquo; That is the move Section 2.3, Formatting, makes for Lexi's second problem. Read the section in your own copy first; it is four pages, and the shortest route in the chapter from a problem to a pattern.</p><p>The section begins by separating two things. Recursive composition says how a formatted document is held, but not how to get from a stream of letters and pictures to the right lines and columns. That is formatting, which the authors narrow for the section to line breaking, noting that breaking lines into columns and columns into pages works the same way. It is hard to do well, and there is no one right algorithm: an interactive editor trades the quality of its lines against the speed of its response, a user may accept slower typing for better pages, and caching more can buy speed with memory. Not all of that can be decided when the program is compiled.</p><p>So the authors want two kinds of independence. A new kind of glyph should not have to know about the formatting algorithm, and a new algorithm should not require editing the existing glyphs. Their answer is a separate class hierarchy for algorithms. Compositor's interface says what to format and when; a Composition, a special glyph, holds the unformatted content and a compositor, and asks it to compose whenever the document changes. The compositor walks the composition's children and inserts the row and column glyphs the lines need. One subclass might make a quick pass; another might run Knuth's TeX algorithm, which weighs the evenness of the text's colour and takes longer. Add a single operation to set the compositor, and the algorithm can be changed while Lexi runs.</p><p>The pattern is Strategy: the compositor is the strategy, the composition its context. The authors put the weight on one point, that the two interfaces must be general enough for any algorithm in the family; here the glyph's child operations already let any compositor rebuild the lines, and the compositor's interface gives the composition all it needs to ask. The pattern's own consequences, in the catalog, add the costs: a client must know how the strategies differ in order to choose one, the context and strategy may pass each other more than a given algorithm uses, and there are more objects. Strategy reappears as a concept of the domain in the Domain-Driven Design lesson Strategy and Composite in the Model.</p><pre class="codeblock" data-say="line 1, comment, The ordering algorithm is an object the playlist holds.. line 2, interface ordering. line 3, list of track arrange of list of track tracks. line 5, final class by tempo implements ordering. line 6, public list of track arrange of list of track tracks. line 7, list of track out is set to new array list of tracks. line 8, collections dot sort of out, track dot by bpm. line 9, return out. line 12, abstract class playlist. line 13, private final list of track tracks is set to new array list. line 14, private ordering ordering. line 15, playlist of ordering ordering this dot ordering is set to ordering. line 16, void set ordering of ordering o this dot ordering is set to o, comment, at run time. line 17, list of track play order return ordering dot arrange of tracks" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The ordering algorithm is an object the playlist holds.</span>
 <span class="cl">interface Ordering {</span>
 <span class="cl">    List&lt;Track&gt; arrange(List&lt;Track&gt; tracks);</span>
 <span class="cl">}</span>
@@ -1462,12 +1506,11 @@
 <span class="cl">    Playlist(Ordering ordering) { this.ordering = ordering; }</span>
 <span class="cl">    void setOrdering(Ordering o) { this.ordering = o; }   // at run time</span>
 <span class="cl">    List&lt;Track&gt; playOrder() { return ordering.arrange(tracks); }</span>
-<span class="cl">}</span></code></pre><p>The sketch is a playlist app with the same shape: kinds of playlist, like kinds of composition, and ordering algorithms, like compositors. The lab compares it with the design Section 2.3 avoids, where each pairing is its own subclass. On the preset <code>playlist-orderings</code>, 3 kinds of playlist and 4 orderings make <span data-say="3 times 4 equals 12">3 × 4 = 12</span> combinations, so one subclass per combination needs 12 + 1 = 13 classes with the abstract base. Two hierarchies joined by a reference need (3 + 1) + (4 + 1) = 9: an abstract class and its concrete classes on each side. The ratio tile reads <span data-say="13 over 9 is approximately 1.4 times">13/9 ≈ 1.4×</span>, and the references tile says each playlist holds one reference, to its ordering. The preset adds a fifth ordering: 3 more subclasses, one for each kind of playlist <span data-say="13 goes to 16">(13 → 16)</span>, against 1 more class <span data-say="9 goes to 10">(9 → 10)</span>.</p><p>The preset <code>new-playlist-kind</code> adds a kind of playlist instead. Under subclassing that is 4 new classes, one per ordering <span data-say="13 goes to 17">(13 → 17)</span>; under composition, <span data-say="1 9 goes to 10">1 (9 → 10)</span>, and no ordering is touched. That is the section's two independences as counts: a new structure without regard to the algorithms, and the other way round. What the count leaves out is the run-time switch. A combined subclass cannot change its algorithm without becoming a different object; a playlist that holds an ordering is handed a new one.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, card, index, full minus page, layout, compact, spacious, two minus column" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">card, index, full-page; layout, compact, spacious, two-column</span></code></pre><p>A recipe-card printer, as the lab's aspects: two kinds of card and three layout algorithms. By hand, count the classes under each design and the classes a fourth layout adds to each, and say what the ratio shows. Then type the line into the lab, with layout as the aspect that gains a variant.</p><p>A playlist holds one ordering. The next lesson, Embellishing the User Interface, reads Section 2.4, where an object holds another of its own kind and adds to what it does.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Classes</h2></div><p>every combination a subclass, or one hierarchy per aspect</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The sketch is a playlist app with the same shape: kinds of playlist, like kinds of composition, and ordering algorithms, like compositors. The lab compares it with the design Section 2.3 avoids, where each pairing is its own subclass. On the preset <code>playlist-orderings</code>, 3 kinds of playlist and 4 orderings make <span data-say="3 times 4 equals 12">3 × 4 = 12</span> combinations, so one subclass per combination needs 12 + 1 = 13 classes with the abstract base. Two hierarchies joined by a reference need (3 + 1) + (4 + 1) = 9: an abstract class and its concrete classes on each side. The ratio tile reads <span data-say="13 over 9 is approximately 1.4 times">13/9 ≈ 1.4×</span>, and the references tile says each playlist holds one reference, to its ordering. The preset adds a fifth ordering: 3 more subclasses, one for each kind of playlist <span data-say="13 goes to 16">(13 → 16)</span>, against 1 more class <span data-say="9 goes to 10">(9 → 10)</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Classes</h2></div><p>every combination a subclass, or one hierarchy per aspect</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Classes</strong><span>every combination a subclass, or one hierarchy per aspect</span></div>
       </div>
@@ -1475,10 +1518,10 @@
       <div class="table-wrap" id="gclTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gclTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is one aspect that varies, then its variants (2 to 4 aspects, 1 to 8 variants each); every name is a class and is used once. Combinations = the product of the variant counts. With one subclass per combination the design has that product + 1 classes (one abstract base). With one hierarchy per aspect, joined by composition, each aspect has 1 abstract class + 1 concrete class per variant, so the design has the sum of the variant counts + the number of aspects; the client holds the first aspect's abstract class, and each of its objects holds one reference per other aspect. The ratio is the first count over the second. One new variant of the added aspect adds the product of the other aspects' counts under subclassing and 1 class under composition; neither design edits an existing class for it.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Structures and algorithms: subclasses against a held strategy</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Structures and algorithms: subclasses against a held strategy</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gclPreset">Worked example</label>
           <select id="gclPreset"><option value="playlist-orderings" selected>A playlist app: three playlists, four orderings, a fifth ordering</option><option value="new-playlist-kind">The same app, adding a kind of playlist</option></select>
@@ -1501,12 +1544,15 @@
           <div class="kpi"><span>A new variant: classes added by composition</span><strong id="gclAddCompose">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>new-playlist-kind</code> adds a kind of playlist instead. Under subclassing that is 4 new classes, one per ordering <span data-say="13 goes to 17">(13 → 17)</span>; under composition, <span data-say="1 9 goes to 10">1 (9 → 10)</span>, and no ordering is touched. That is the section's two independences as counts: a new structure without regard to the algorithms, and the other way round. What the count leaves out is the run-time switch. A combined subclass cannot change its algorithm without becoming a different object; a playlist that holds an ordering is handed a new one.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, card, index, full minus page, layout, compact, spacious, two minus column" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">card, index, full-page; layout, compact, spacious, two-column</span></code></pre><p>A recipe-card printer, as the lab's aspects: two kinds of card and three layout algorithms. By hand, count the classes under each design and the classes a fourth layout adds to each, and say what the ratio shows. Then type the line into the lab, with layout as the aspect that gains a variant.</p><p>A playlist holds one ordering. The next lesson, Embellishing the User Interface, reads Section 2.4, where an object holds another of its own kind and adds to what it does.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting the classes an algorithm costs</h2></div><p>Four steps, the last of them on a design of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the two things that vary</h3><p>Write the structure that does the work (the context) and the algorithm it uses, each with its variants.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count one subclass per pairing</h3><p>Multiply the variant counts and add 1 for the abstract base. That is the design in which each structure is hard-wired to one algorithm.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count two hierarchies</h3><p>Add the variant counts, and 1 abstract class for each side. A new variant on either side adds 1 class; under subclassing it adds one per variant of the other side.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a design of your own</h3><p>Find a class in your own code that chooses an algorithm by a flag or by being subclassed: a sort order, a pricing rule, a retry policy. Write its aspects, count both designs, and say whether the algorithm ever needs to change on a live object.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting the classes an algorithm costs</h2>
+      <p class="lead-in">Four steps, the last of them on a design of your own.</p>
+      <ol class="key-ideas method"><li><strong>Name the two things that vary.</strong> Write the structure that does the work (the context) and the algorithm it uses, each with its variants.</li><li><strong>Count one subclass per pairing.</strong> Multiply the variant counts and add 1 for the abstract base. That is the design in which each structure is hard-wired to one algorithm.</li><li><strong>Count two hierarchies.</strong> Add the variant counts, and 1 abstract class for each side. A new variant on either side adds 1 class; under subclassing it adds one per variant of the other side.</li><li><strong>Do it on a design of your own.</strong> Find a class in your own code that chooses an algorithm by a flag or by being subclassed: a sort order, a pricing rule, a retry policy. Write its aspects, count both designs, and say whether the algorithm ever needs to change on a live object.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1524,17 +1570,16 @@ a fifth ordering, subclassing: +3 (13 → 16)
 a fifth ordering, composition: +1 (9 → 10)</div><p>The subclass count is a product and the composed one a sum, so the gap grows with each variant. The playlist classes are untouched by the new ordering under either design; what differs is how many classes it takes to offer it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Putting the formatting algorithm inside the document classes</strong><span>Section 2.3 wants a new glyph to need no knowledge of formatting and a new algorithm to need no change to the glyphs; an algorithm written into the structure classes gives neither. On the lesson's playlist app the lab counts what it costs when each pairing is a subclass instead: 13 classes against 9, and 3 more for every new ordering against 1.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating Strategy as free</strong><span>The catalog lists its costs beside its benefits: the client has to know the strategies apart to pick one, a general interface may pass data a simple algorithm never uses, and there are more objects. With two kinds and three algorithms, as in the exercise, the class count does not fall at all.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Designing the strategy interface around the first algorithm</strong><span>The authors put the key to Strategy in interfaces general enough for the whole family, so that a new algorithm changes neither the strategy's nor the context's interface. Lexi's compositors can rebuild the lines because the glyph's child operations are general; an interface shaped by one algorithm would have to change for the next.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count what an algorithm costs as subclasses and as an object.</strong><p>Given a structure and an algorithm that vary, state the classes under one subclass per pairing and under two hierarchies, what one new variant of either adds, and what Strategy's catalog entry lists as its costs.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts classes on the aspects as stated, as if every pairing differs. It cannot say whether your algorithm will ever vary, or whether switching it at run time matters; the authors' case rests on what in Lexi is expected to change.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Putting the formatting algorithm inside the document classes</strong><span>Section 2.3 wants a new glyph to need no knowledge of formatting and a new algorithm to need no change to the glyphs; an algorithm written into the structure classes gives neither. On the lesson's playlist app the lab counts what it costs when each pairing is a subclass instead: 13 classes against 9, and 3 more for every new ordering against 1.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating Strategy as free</strong><span>The catalog lists its costs beside its benefits: the client has to know the strategies apart to pick one, a general interface may pass data a simple algorithm never uses, and there are more objects. With two kinds and three algorithms, as in the exercise, the class count does not fall at all.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Designing the strategy interface around the first algorithm</strong><span>The authors put the key to Strategy in interfaces general enough for the whole family, so that a new algorithm changes neither the strategy's nor the context's interface. Lexi's compositors can rebuild the lines because the glyph's child operations are general; an interface shaped by one algorithm would have to change for the next.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count what an algorithm costs as subclasses and as an object.</strong><p>Given a structure and an algorithm that vary, state the classes under one subclass per pairing and under two hierarchies, what one new variant of either adds, and what Strategy's catalog entry lists as its costs.</p></div></div><div class="note"><strong>Note:</strong> The lab counts classes on the aspects as stated, as if every pairing differs. It cannot say whether your algorithm will ever vary, or whether switching it at run time matters; the authors' case rests on what in Lexi is expected to change.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Compositor</summary><p>Lexi's class for an object that holds one line-breaking algorithm. It is told which glyphs to format and when, and each subclass breaks them into lines its own way: a quick pass, or a slower one that weighs how evenly text and space are spread.</p></details><details class="recall"><summary>Composition</summary><p>The glyph that holds a document's visible content and a compositor. When the content changes it asks its compositor to compose it, and the compositor inserts the row and column glyphs that make up the lines.</p></details><details class="recall"><summary>Strategy</summary><p>The pattern: several algorithms for one job, each in a ConcreteStrategy class behind one Strategy interface, used by a Context that holds one of them. It has a lesson of its own, Strategy, in Behavioral Patterns II.</p></details></div>
+      <h3>Summary</h3>
       <p>Section 2.3 separates how a document is represented from how it is broken into lines, and puts the algorithm in an object of its own: Compositor, held by a Composition. Read why, then count the classes a playlist app needs when every playlist and ordering pair is a subclass, against a playlist that holds its ordering.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Compositor.</strong> Lexi's class for an object that holds one line-breaking algorithm. It is told which glyphs to format and when, and each subclass breaks them into lines its own way: a quick pass, or a slower one that weighs how evenly text and space are spread.</li><li><strong>Composition.</strong> The glyph that holds a document's visible content and a compositor. When the content changes it asks its compositor to compose it, and the compositor inserts the row and column glyphs that make up the lines.</li><li><strong>Strategy.</strong> The pattern: several algorithms for one job, each in a ConcreteStrategy class behind one Strategy interface, used by a Context that holds one of them. It has a lesson of its own, Strategy, in Behavioral Patterns II.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="representing is not formatting. isolate the algorithm in an object. a context holds its strategy. new structures, old algorithms. a product of subclasses, a sum of classes. switch the algorithm while running" tabindex="0" role="region" aria-label="Mathematical notation">representing is not formatting
 isolate the algorithm in an object
 a context holds its strategy
@@ -2310,11 +2355,42 @@ switch the algorithm while running</div><figcaption>Formatting in six lines</fig
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2382,7 +2458,7 @@ switch the algorithm while running</div><figcaption>Formatting in six lines</fig
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

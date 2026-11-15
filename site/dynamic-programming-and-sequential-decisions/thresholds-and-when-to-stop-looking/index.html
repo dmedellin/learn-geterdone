@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,37 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Dynamic Programming and Sequential Decisions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; When to stop</p>
       <h1>Thresholds and When to Stop Looking</h1>
       <p class="lesson-lede">The value of carrying on is a threshold, it falls as the deadline nears, and its shape is measured against all 512 accept-sets rather than assumed.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The state is how many periods are left, and nothing else</li><li>The threshold is the value of carrying on, and it falls</li><li>The claim that the best rule is a threshold is a claim about SHAPE</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two lines of recursion, and a shape that is measured</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; The sell-or-wait problem</span><p>In each of <span class="math" data-say="T">T</span> periods one offer arrives, drawn independently from a known distribution over values. You may accept it and stop, or refuse it and pay a <strong>search cost</strong> <span class="math" data-say="c">c</span> to go on; a refused offer cannot be recalled. If you refuse the last one you get nothing.</p><p>Let <span class="math" data-say="V of t">V(t)</span> be the expected value of the whole remaining search with <span class="math" data-say="t">t</span> periods left, before the offer is seen. Then <span class="math" data-say="V of 0 equals 0">V(0) = 0</span> and <span class="math" data-say="V of t equals E of the max of x and V of the quantity t minus 1, minus c">V(t) = E[max(x, V(t−1))] − c</span>. The optimal rule with <span class="math" data-say="t">t</span> periods left is: accept <span class="math" data-say="x">x</span> if and only if <span class="math" data-say="x is greater than V of the quantity t minus 1">x > V(t−1)</span>.</p></div><p>The lab refuses a distribution whose probabilities do not sum to exactly 1, rather than renormalising it &mdash; the same discipline as the transition rows earlier on this course, and for the same reason. It also charges the search cost at every period including the last, so <span class="math" data-say="V of 1">V(1)</span> is the mean of the offers minus <span class="math" data-say="c">c</span> rather than the mean.</p><div class="mathblock" data-say="offers, 10, 20, 30, each with probability 1 over 3, c equals 1, T equals 3. V of 0 equals 0. V of 1 equals E of the max of x and 0 minus 1, threshold 0. equals the quantity 10 plus 20 plus 30, over 3 minus 1, equals, 20 minus 1, equals, 19, take anything. V of 2 equals E of the max of x and 19 minus 1, threshold 19. equals the quantity 19 plus 20 plus 30, over 3 minus 1, equals, 23 minus 1, equals, 22, take 20 or 30. V of 3 equals E of the max of x and 22 minus 1, threshold 22. equals the quantity 22 plus 22 plus 30, over 3 minus 1, equals, 74 over 3 minus 1, equals, 71 over 3, take 30 only. so with three periods left the search is worth, 71 over 3, about 23.67" tabindex="0" role="region" aria-label="Mathematical notation">offers  10, 20, 30  each with probability 1/3      c = 1      T = 3
-
-V(0) = 0
-
-V(1) = E[max(x, 0)] - 1                                threshold 0
-     = (10 + 20 + 30)/3 - 1  =  20 - 1  =  19          take anything
-
-V(2) = E[max(x, 19)] - 1                               threshold 19
-     = (19 + 20 + 30)/3 - 1  =  23 - 1  =  22          take 20 or 30
-
-V(3) = E[max(x, 22)] - 1                               threshold 22
-     = (22 + 22 + 30)/3 - 1  =  74/3 - 1  =  71/3      take 30 only
-
-so with three periods left the search is worth  71/3,  about 23.67</div><p>Read the accept-sets down the table. With three periods left only 30 is taken; with two, 20 and 30; with one, everything. The rule tightens as you look further ahead and relaxes as the deadline approaches, which is the opposite of the way impatience usually feels and is exactly what the arithmetic says: what you are comparing an offer against is the value of the chances that remain, and there are fewer of them each period.</p><h3>Proving the shape rather than assuming it</h3><p>A rule, in full generality, is a choice of which offers to accept in each period. With three distinct offer values and three periods that is nine independent yes-or-no decisions, so 512 rules. The lab constructs all 512, evaluates each of them exactly by working backwards over the distribution &mdash; a computation that asks what <em>this</em> rule is worth rather than what carrying on is worth &mdash; and reports the best.</p><p>The best is worth 71/3, which is what the recursion said; its accept-sets are exactly the ones the thresholds describe; and it passes the shape test, which is that in every period, accepting an offer implies accepting every larger one. So on this instance the threshold form is not an assumption that happened to be convenient. It is a measured property of the winner of an exhaustive search.</p><div class="example"><span class="label">Example &middot; A rare high offer</span><p>Offers of 8, 14 and 40 with probabilities 3/5, 3/10 and 1/10, four periods, a search cost of 1. The thresholds come out 399/25, 72/5, 12 and 0, so with three or four periods left only the 40 is accepted &mdash; even though it arrives one time in ten.</p><p>The whole search is worth 4341/250, about 17.36, against a mean offer of 13. Almost all of that is the tenth that pays 40: with the same shape of problem but the 40 removed the search is worth a little over 10. Waiting is worth doing here because of a tail, which is a real feature of real searches and the reason an average is a poor summary of one.</p></div><div class="example"><span class="label">Example &middot; Searching expensively</span><p>Two offers, 10 and 30, equally likely, four periods, and a look now costs 5. The thresholds are 75/4, 35/2, 15 and 0, and the accept-set is the same in every period but the last: take the 30, refuse the 10.</p><p>Compare that with the same offers at a cost of 1, where the thresholds are 103/4, 47/2, 19 and 0. The expensive search is worth 155/8 and the cheap one 215/8. At the high cost a second look adds 5/2, a third 5/4 and a fourth only 5/8: the cost eats the option value, and the rule stops changing long before the deadline does.</p></div><h3>What the model left out</h3><p>Offers are independent draws from a distribution you already know, which rules out the most interesting thing about real search: that the offers you have seen tell you something about the ones to come. It also rules out recall, since a refused offer is gone; rules out the offer arriving late or not at all; and treats the search cost as the same in every period. The recursion will produce a threshold for any of those situations if you hand it this model, and the threshold will be exactly right for the wrong problem.</p><p>One more, less obvious. The objective maximises the expected value of what you end up with, so a rule that occasionally ends with nothing is penalised only by the size of that nothing. In the instance here the optimal rule refuses everything but 30 in the first period; if the deadline matters more than the money, the rule you want is not this one, and no amount of exact arithmetic on the expectation will say so.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>When to stop looking</h2></div><p>The threshold is the value of carrying on, and its shape is measured rather than assumed</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two lines of recursion, and a shape that is measured</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The sell-or-wait problem</span><p>In each of <span class="math" data-say="T">T</span> periods one offer arrives, drawn independently from a known distribution over values. You may accept it and stop, or refuse it and pay a <strong>search cost</strong> <span class="math" data-say="c">c</span> to go on; a refused offer cannot be recalled. If you refuse the last one you get nothing.</p><p>Let <span class="math" data-say="V of t">V(t)</span> be the expected value of the whole remaining search with <span class="math" data-say="t">t</span> periods left, before the offer is seen. Then <span class="math" data-say="V of 0 equals 0">V(0) = 0</span> and <span class="math" data-say="V of t equals E of the max of x and V of the quantity t minus 1, minus c">V(t) = E[max(x, V(t−1))] − c</span>. The optimal rule with <span class="math" data-say="t">t</span> periods left is: accept <span class="math" data-say="x">x</span> if and only if <span class="math" data-say="x is greater than V of the quantity t minus 1">x > V(t−1)</span>.</p></div><p>The lab refuses a distribution whose probabilities do not sum to exactly 1, rather than renormalising it &mdash; the same discipline as the transition rows earlier on this course, and for the same reason. It also charges the search cost at every period including the last, so <span class="math" data-say="V of 1">V(1)</span> is the mean of the offers minus <span class="math" data-say="c">c</span> rather than the mean.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>When to stop looking</h2></div><p>The threshold is the value of carrying on, and its shape is measured rather than assumed</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>When to stop looking</strong><span>the threshold is what carrying on is worth, and it falls as the chances run out</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the threshold</span><span class="tone-green"><i class="legend-swatch"></i>an offer this period would accept</span><span class="tone-purple"><i class="legend-swatch"></i>the best rule of any shape</span><span class="tone-amber"><i class="legend-swatch"></i>the cost of one more look</span></div>
@@ -1418,10 +1448,10 @@ so with three periods left the search is worth  71/3,  about 23.67</div><p>Read 
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="spRows"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="spRules"></table></div>
       <div class="status-banner" id="spStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the offers and the search cost, and watch the rule change</h3>
-          <p>The recursion gives one threshold per period and the plot draws them against how many periods remain. Beside it, the shape is measured rather than assumed: every possible accept-set in every period is enumerated and each resulting rule evaluated exactly, and the winner is tested for whether accepting an offer implies accepting every larger one. Raise the search cost with the slider and watch the thresholds flatten.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the offers and the search cost, and watch the rule change</h3>
+            <p>The recursion gives one threshold per period and the plot draws them against how many periods remain. Beside it, the shape is measured rather than assumed: every possible accept-set in every period is enumerated and each resulting rule evaluated exactly, and the winner is tested for whether accepting an offer implies accepting every larger one. Raise the search cost with the slider and watch the thresholds flatten.</p>
         <div class="field">
           <label for="spPreset">Worked example</label>
           <select id="spPreset"><option value="three" selected>three offers, equally likely, and a cost to carry on</option><option value="skew">a rare high offer</option><option value="costly">searching is expensive</option></select>
@@ -1447,12 +1477,28 @@ so with three periods left the search is worth  71/3,  about 23.67</div><p>Read 
           <div class="kpi"><span>The threshold with one period left</span><strong id="spLast">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="spHint" style="margin:0;">That the best rule is a threshold is a claim about its SHAPE, and it is usually asserted. Here it is measured: every way of choosing which offers to accept in each period is enumerated and evaluated, and the winner is then tested for whether accepting an offer implies accepting every larger one.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="offers, 10, 20, 30, each with probability 1 over 3, c equals 1, T equals 3. V of 0 equals 0. V of 1 equals E of the max of x and 0 minus 1, threshold 0. equals the quantity 10 plus 20 plus 30, over 3 minus 1, equals, 20 minus 1, equals, 19, take anything. V of 2 equals E of the max of x and 19 minus 1, threshold 19. equals the quantity 19 plus 20 plus 30, over 3 minus 1, equals, 23 minus 1, equals, 22, take 20 or 30. V of 3 equals E of the max of x and 22 minus 1, threshold 22. equals the quantity 22 plus 22 plus 30, over 3 minus 1, equals, 74 over 3 minus 1, equals, 71 over 3, take 30 only. so with three periods left the search is worth, 71 over 3, about 23.67" tabindex="0" role="region" aria-label="Mathematical notation">offers  10, 20, 30  each with probability 1/3      c = 1      T = 3
+
+V(0) = 0
+
+V(1) = E[max(x, 0)] - 1                                threshold 0
+     = (10 + 20 + 30)/3 - 1  =  20 - 1  =  19          take anything
+
+V(2) = E[max(x, 19)] - 1                               threshold 19
+     = (19 + 20 + 30)/3 - 1  =  23 - 1  =  22          take 20 or 30
+
+V(3) = E[max(x, 22)] - 1                               threshold 22
+     = (22 + 22 + 30)/3 - 1  =  74/3 - 1  =  71/3      take 30 only
+
+so with three periods left the search is worth  71/3,  about 23.67</div><p>Read the accept-sets down the table. With three periods left only 30 is taken; with two, 20 and 30; with one, everything. The rule tightens as you look further ahead and relaxes as the deadline approaches, which is the opposite of the way impatience usually feels and is exactly what the arithmetic says: what you are comparing an offer against is the value of the chances that remain, and there are fewer of them each period.</p><h3>Proving the shape rather than assuming it</h3><p>A rule, in full generality, is a choice of which offers to accept in each period. With three distinct offer values and three periods that is nine independent yes-or-no decisions, so 512 rules. The lab constructs all 512, evaluates each of them exactly by working backwards over the distribution &mdash; a computation that asks what <em>this</em> rule is worth rather than what carrying on is worth &mdash; and reports the best.</p><p>The best is worth 71/3, which is what the recursion said; its accept-sets are exactly the ones the thresholds describe; and it passes the shape test, which is that in every period, accepting an offer implies accepting every larger one. So on this instance the threshold form is not an assumption that happened to be convenient. It is a measured property of the winner of an exhaustive search.</p><div class="example"><span class="label">Example &middot; A rare high offer</span><p>Offers of 8, 14 and 40 with probabilities 3/5, 3/10 and 1/10, four periods, a search cost of 1. The thresholds come out 399/25, 72/5, 12 and 0, so with three or four periods left only the 40 is accepted &mdash; even though it arrives one time in ten.</p><p>The whole search is worth 4341/250, about 17.36, against a mean offer of 13. Almost all of that is the tenth that pays 40: with the same shape of problem but the 40 removed the search is worth a little over 10. Waiting is worth doing here because of a tail, which is a real feature of real searches and the reason an average is a poor summary of one.</p></div><div class="example"><span class="label">Example &middot; Searching expensively</span><p>Two offers, 10 and 30, equally likely, four periods, and a look now costs 5. The thresholds are 75/4, 35/2, 15 and 0, and the accept-set is the same in every period but the last: take the 30, refuse the 10.</p><p>Compare that with the same offers at a cost of 1, where the thresholds are 103/4, 47/2, 19 and 0. The expensive search is worth 155/8 and the cheap one 215/8. At the high cost a second look adds 5/2, a third 5/4 and a fourth only 5/8: the cost eats the option value, and the rule stops changing long before the deadline does.</p></div><h3>What the model left out</h3><p>Offers are independent draws from a distribution you already know, which rules out the most interesting thing about real search: that the offers you have seen tell you something about the ones to come. It also rules out recall, since a refused offer is gone; rules out the offer arriving late or not at all; and treats the search cost as the same in every period. The recursion will produce a threshold for any of those situations if you hand it this model, and the threshold will be exactly right for the wrong problem.</p><p>One more, less obvious. The objective maximises the expected value of what you end up with, so a rule that occasionally ends with nothing is penalised only by the size of that nothing. In the instance here the optimal rule refuses everything but 30 in the first period; if the deadline matters more than the money, the rule you want is not this one, and no amount of exact arithmetic on the expectation will say so.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing a stopping rule</h2></div><p>Four steps, and the last of them is the one that separates a rule you can defend from a rule you have assumed.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Start from the end: with nothing left, the search is worth nothing</h3><p><span class="math" data-say="V of 0 equals 0">V(0) = 0</span>. Everything else is built on that, and it is where the recursion bottoms out &mdash; the same role the last stage played on a network.</p></article><article class="card concept-card"><div class="icon">2</div><h3>For each further period, average the better of the offer and carrying on</h3><p><span class="math" data-say="E of the max of x and V of the quantity t minus 1">E[max(x, V(t−1))]</span>, which means replacing every offer below <span class="math" data-say="V of the quantity t minus 1">V(t−1)</span> by <span class="math" data-say="V of the quantity t minus 1">V(t−1)</span> itself and then averaging. Doing it that way rather than by cases makes the threshold visible in the arithmetic instead of implied by it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Subtract the search cost, and record the threshold</h3><p><span class="math" data-say="V of t equals E of the max of x and V of the quantity t minus 1, minus c">V(t) = E[max(x, V(t−1))] − c</span>. The threshold with <span class="math" data-say="t">t</span> periods left is <span class="math" data-say="V of the quantity t minus 1">V(t−1)</span>, not <span class="math" data-say="V of t">V(t)</span>: it is what you are giving up by accepting, not what the search is worth.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the accept-set in each period and check the direction</h3><p>Offers strictly above the threshold are accepted. The thresholds should fall as the deadline nears; if they do not, either the search cost is large enough that the rule barely moves, or something in the setup is wrong.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Enumerate every accept-set if the instance is small enough to allow it</h3><p>With <span class="math" data-say="S">S</span> offer values and <span class="math" data-say="T">T</span> periods there are <span class="math" data-say="2 to the power the quantity S times T">2^(S×T)</span> rules, which is 512 at three and three. Evaluating all of them and checking that the winner is a threshold rule turns the shape from an assumption into a measurement, and it is affordable exactly at the size a page can show.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing a stopping rule</h2>
+      <p class="lead-in">Four steps, and the last of them is the one that separates a rule you can defend from a rule you have assumed.</p>
+      <ol class="key-ideas method"><li><strong>Start from the end: with nothing left, the search is worth nothing.</strong> <span class="math" data-say="V of 0 equals 0">V(0) = 0</span>. Everything else is built on that, and it is where the recursion bottoms out &mdash; the same role the last stage played on a network.</li><li><strong>For each further period, average the better of the offer and carrying on.</strong> <span class="math" data-say="E of the max of x and V of the quantity t minus 1">E[max(x, V(t−1))]</span>, which means replacing every offer below <span class="math" data-say="V of the quantity t minus 1">V(t−1)</span> by <span class="math" data-say="V of the quantity t minus 1">V(t−1)</span> itself and then averaging. Doing it that way rather than by cases makes the threshold visible in the arithmetic instead of implied by it.</li><li><strong>Subtract the search cost, and record the threshold.</strong> <span class="math" data-say="V of t equals E of the max of x and V of the quantity t minus 1, minus c">V(t) = E[max(x, V(t−1))] − c</span>. The threshold with <span class="math" data-say="t">t</span> periods left is <span class="math" data-say="V of the quantity t minus 1">V(t−1)</span>, not <span class="math" data-say="V of t">V(t)</span>: it is what you are giving up by accepting, not what the search is worth.</li><li><strong>Read the accept-set in each period and check the direction.</strong> Offers strictly above the threshold are accepted. The thresholds should fall as the deadline nears; if they do not, either the search cost is large enough that the rule barely moves, or something in the setup is wrong.</li><li><strong>Enumerate every accept-set if the instance is small enough to allow it.</strong> With <span class="math" data-say="S">S</span> offer values and <span class="math" data-say="T">T</span> periods there are <span class="math" data-say="2 to the power the quantity S times T">2^(S×T)</span> rules, which is 512 at three and three. Evaluating all of them and checking that the winner is a threshold rule turns the shape from an assumption into a measurement, and it is affordable exactly at the size a page can show.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1491,17 +1537,16 @@ EVERY RULE
       in every period, accepting an offer implies accepting every larger one</div><p>The two accept-set rows being identical is a stronger statement than the two values being equal. A rule worth the same as the optimum would be enough to confirm the number; matching set by set says the recursion found the same rule and not merely an equally good one, which is what makes the shape test meaningful.</p><p>For a rehearsal, set the search cost to 0 and recompute by hand. The thresholds become 0, 20 and 70/3, the whole search is worth 230/9, and with two periods left only the 30 is now accepted &mdash; a free look makes the rule fussier, not less. Then put the cost up to 6: the thresholds drop to 0, 14 and 46/3, and the 20 becomes acceptable again with two and with three left. So the accept-set with two periods left changes between a cost of 0 and a cost of 1, and confirming that is the exercise.</p><p>The harder rehearsal: construct offers on which the best of all accept-sets is <em>not</em> a threshold rule. You will not manage it with independent draws and a constant cost &mdash; there is a proof that it cannot happen &mdash; and the useful part is working out which of those two conditions your attempted counterexample keeps breaking.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Comparing the offer against the wrong period&#x27;s value</strong><span>Accepting ends the search and refusing leaves <span class="math" data-say="t minus 1">t−1</span> periods, so the comparison is with <span class="math" data-say="V of the quantity t minus 1">V(t−1)</span>. Using <span class="math" data-say="V of t">V(t)</span> makes every threshold one period too high and produces a rule that refuses offers it should take, including in the final period &mdash; where the correct threshold is zero and the mistaken one is the mean minus the cost.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the threshold to rise as the deadline approaches</strong><span>Impatience suggests it should: you are running out of time, so surely you should get pickier. The arithmetic says the reverse, and the reason is that the threshold is not a measure of urgency but of what you are giving up. With one period left you are giving up nothing, so the bar is on the floor.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the threshold form as something the recursion proved</strong><span>The recursion assumed it: it is built out of one comparison per period and cannot express any other kind of rule. What proves it on this page is the enumeration of all 512 accept-sets, which contains the non-threshold rules and finds them worse. That distinction is the lesson, and it disappears the moment the instance is too large to enumerate &mdash; at which point the shape is again an assumption, and should be named as one.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the thresholds for a three-period search by hand, say which offers are accepted in each period, and explain what an enumeration of accept-sets adds.</strong><p>You should be able to write <span class="math" data-say="V of t equals E of the max of x and V of the quantity t minus 1, minus c">V(t) = E[max(x, V(t−1))] − c</span>, compute it period by period in exact fractions, identify the threshold as <span class="math" data-say="V of the quantity t minus 1">V(t−1)</span> rather than <span class="math" data-say="V of t">V(t)</span>, explain why the thresholds fall as the deadline nears, and say precisely what the recursion assumes about the shape of a rule and how the page establishes it instead.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Here the offers had values, and comparing one with a threshold was straightforward. The next lesson, &ldquo;The Secretary Problem, Exactly&rdquo;, removes the values: candidates arrive one at a time and all you ever learn is whether this one is the best so far. The rule that survives is a different shape &mdash; look at a fixed number and then take the next record &mdash; and its probability of success comes out of a harmonic sum rather than a recursion over values. It is also the one place on this course where a textbook reaches for an irrational number, and the page prints the exact table beside it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Comparing the offer against the wrong period&#x27;s value</strong><span>Accepting ends the search and refusing leaves <span class="math" data-say="t minus 1">t−1</span> periods, so the comparison is with <span class="math" data-say="V of the quantity t minus 1">V(t−1)</span>. Using <span class="math" data-say="V of t">V(t)</span> makes every threshold one period too high and produces a rule that refuses offers it should take, including in the final period &mdash; where the correct threshold is zero and the mistaken one is the mean minus the cost.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the threshold to rise as the deadline approaches</strong><span>Impatience suggests it should: you are running out of time, so surely you should get pickier. The arithmetic says the reverse, and the reason is that the threshold is not a measure of urgency but of what you are giving up. With one period left you are giving up nothing, so the bar is on the floor.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the threshold form as something the recursion proved</strong><span>The recursion assumed it: it is built out of one comparison per period and cannot express any other kind of rule. What proves it on this page is the enumeration of all 512 accept-sets, which contains the non-threshold rules and finds them worse. That distinction is the lesson, and it disappears the moment the instance is too large to enumerate &mdash; at which point the shape is again an assumption, and should be named as one.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the thresholds for a three-period search by hand, say which offers are accepted in each period, and explain what an enumeration of accept-sets adds.</strong><p>You should be able to write <span class="math" data-say="V of t equals E of the max of x and V of the quantity t minus 1, minus c">V(t) = E[max(x, V(t−1))] − c</span>, compute it period by period in exact fractions, identify the threshold as <span class="math" data-say="V of the quantity t minus 1">V(t−1)</span> rather than <span class="math" data-say="V of t">V(t)</span>, explain why the thresholds fall as the deadline nears, and say precisely what the recursion assumes about the shape of a rule and how the page establishes it instead.</p></div></div><div class="note"><strong>Note:</strong> Here the offers had values, and comparing one with a threshold was straightforward. The next lesson, &ldquo;The Secretary Problem, Exactly&rdquo;, removes the values: candidates arrive one at a time and all you ever learn is whether this one is the best so far. The rule that survives is a different shape &mdash; look at a fixed number and then take the next record &mdash; and its probability of success comes out of a harmonic sum rather than a recursion over values. It is also the one place on this course where a textbook reaches for an irrational number, and the page prints the exact table beside it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The state is how many periods are left, and nothing else</summary><p>Not which offers have been seen, not their average, not how long you have been looking. Offers are independent draws from a known distribution, so the past is uninformative about the future and the only thing that matters is how many chances remain. That is the whole modelling content of the problem, and it is the assumption to interrogate first: it fails the moment offers are correlated or the distribution has to be learned.</p></details><details class="recall"><summary>The threshold is the value of carrying on, and it falls</summary><p><span class="math" data-say="V of t">V(t)</span> is what the whole remaining search is worth with <span class="math" data-say="t">t</span> periods to go, and an offer should be taken exactly when it beats <span class="math" data-say="V of the quantity t minus 1">V(t−1)</span> &mdash; what you would get by refusing. With fewer periods left there is less to wait for, so <span class="math" data-say="V">V</span> is smaller and the bar is lower. In the final period the bar is zero: there is nothing to carry on to, so any offer at all is taken.</p></details><details class="recall"><summary>The claim that the best rule is a threshold is a claim about SHAPE</summary><p>The recursion assumes it by construction: it compares each offer against one number. But a rule could in principle accept an offer of 20 and refuse one of 30, and nothing in the recursion rules that out &mdash; it simply never considers it. So the lab enumerates every accept-set in every period, evaluates each resulting rule exactly, and then asks whether the winner has the property that accepting an offer implies accepting every larger one.</p></details></div>
+      <h3>Summary</h3>
       <p>Offers arrive one per period, you may take one or wait, and waiting costs something and eventually runs out. The recursion is two lines and its answer has a shape: accept an offer exactly when it beats what carrying on is worth. That shape is almost always stated as though it were obvious. Here it is a measurement &mdash; every way of choosing which offers to accept in which period is enumerated and evaluated, and the winner is then tested for whether it is a threshold at all.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The state is how many periods are left, and nothing else.</strong> Not which offers have been seen, not their average, not how long you have been looking. Offers are independent draws from a known distribution, so the past is uninformative about the future and the only thing that matters is how many chances remain. That is the whole modelling content of the problem, and it is the assumption to interrogate first: it fails the moment offers are correlated or the distribution has to be learned.</li><li><strong>The threshold is the value of carrying on, and it falls.</strong> <span class="math" data-say="V of t">V(t)</span> is what the whole remaining search is worth with <span class="math" data-say="t">t</span> periods to go, and an offer should be taken exactly when it beats <span class="math" data-say="V of the quantity t minus 1">V(t−1)</span> &mdash; what you would get by refusing. With fewer periods left there is less to wait for, so <span class="math" data-say="V">V</span> is smaller and the bar is lower. In the final period the bar is zero: there is nothing to carry on to, so any offer at all is taken.</li><li><strong>The claim that the best rule is a threshold is a claim about SHAPE.</strong> The recursion assumes it by construction: it compares each offer against one number. But a rule could in principle accept an offer of 20 and refuse one of 30, and nothing in the recursion rules that out &mdash; it simply never considers it. So the lab enumerates every accept-set in every period, evaluates each resulting rule exactly, and then asks whether the winner has the property that accepting an offer implies accepting every larger one.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="V of 0 equals 0, V of t equals E of the max of x and V of the quantity t minus 1, minus c. accept an offer exactly when it beats V of the quantity t minus 1, the value of carrying on. offers 10, 20, 30 each with probability 1 over 3, three periods, a look costs 1. thresholds, 22 with three left, 19 with two, 0 with one. the whole search is worth 71 over 3, and in the last period anything is taken. 512 accept-sets enumerated, the best of them IS a threshold rule, measured" tabindex="0" role="region" aria-label="Mathematical notation">V(0) = 0,      V(t) = E[ max(x, V(t-1)) ] - c
 accept an offer exactly when it beats V(t-1), the value of carrying on
 offers 10, 20, 30 each with probability 1/3;  three periods;  a look costs 1
@@ -3142,11 +3187,42 @@ the whole search is worth 71/3, and in the last period anything is taken
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3214,7 +3290,7 @@ the whole search is worth 71/3, and in the last period anything is taken
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Differential Equations and Euler&#x27;s Method</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Stepping</p>
       <h1>The Improved Euler Method</h1>
       <p class="lesson-lede">Take a trial Euler step, average the slopes at both ends, and the error quarters when the step halves, exactly so on <span data-say="y prime equals t squared">y′ = t²</span>.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A trial step finds the slope at the other end</li><li>The average of the two slopes is a better rate for the step</li><li>The order is 2: halving the step quarters the error</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two slopes instead of one</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; The improved Euler method</span><p>From <span class="math" data-say="t sub n, y sub n">(tₙ, yₙ)</span> with step <span class="math" data-say="h">h</span>: <span class="math" data-say="k sub 1 equals f of t sub n and y sub n">k₁ = f(tₙ, yₙ)</span>, then <span class="math" data-say="k sub 2 equals f of t sub n plus h and y sub n plus h times k sub 1">k₂ = f(tₙ + h, yₙ + h·k₁)</span>, then <span class="math" data-say="y sub n plus 1 equals y sub n plus h times the quantity k sub 1 plus k sub 2, over 2">yₙ₊₁ = yₙ + h·(k₁ + k₂)/2</span>.</p><p>Two slopes are read per step, so each step costs twice what an Euler step costs. The method is also called Heun's method.</p></div><p>Do one step by hand on <span class="math" data-say="y prime equals y">y′ = y</span> from <span class="math" data-say="y of 0 equals 1">y(0) = 1</span> with <span class="math" data-say="h equals 1 over 4">h = 1/4</span>. The start slope is <span class="math" data-say="k sub 1 equals 1">k₁ = 1</span>. The trial value is <span class="math" data-say="1 plus the quantity 1 over 4, times 1 equals 5 over 4">1 + (1/4)·1 = 5/4</span>, so <span class="math" data-say="k sub 2 equals 5 over 4">k₂ = 5/4</span>. The average slope is <span class="math" data-say="the quantity 1 plus 5 over 4, over 2 equals 9 over 8">(1 + 5/4)/2 = 9/8</span>, and <span class="math" data-say="y sub 1 equals 1 plus the quantity 1 over 4, times the quantity 9 over 8, equals 41 over 32">y₁ = 1 + (1/4)·(9/8) = 41/32</span>. This is hand arithmetic from the formula; set <span class="math" data-say="T">T</span> to <span class="math" data-say="1 over 4">1/4</span> in the lab on <span class="math" data-say="y prime equals y">y′ = y</span> and the first row of its table reads <span class="math" data-say="41 over 32">41/32</span>. Plain Euler gave <span class="math" data-say="5 over 4 equals 40 over 32">5/4 = 40/32</span> for the same step, and <span class="math" data-say="e to the power the quantity 1 over 4, is approximately 1.28403">e^(1/4) ≈ 1.28403</span>, rounded, is nearer to <span class="math" data-say="41 over 32 equals 1.28125">41/32 = 1.28125</span>.</p><h3>The equation where the step is the trapezoid rule</h3><p>Take <span class="math" data-say="y prime equals t squared">y′ = t²</span>. The right side does not mention <span class="math" data-say="y">y</span>, so the trial value never matters: <span class="math" data-say="k sub 1 equals t sub n squared">k₁ = tₙ²</span> and <span class="math" data-say="k sub 2 equals the quantity t sub n plus h, squared">k₂ = (tₙ + h)²</span>, and the step adds <span class="math" data-say="h times the quantity t sub n squared plus the quantity t sub n plus h, squared, over 2">h·(tₙ² + (tₙ + h)²)/2</span>. That is the trapezoid rule on one piece. Its error on a quadratic is exactly proportional to <span class="math" data-say="h squared">h²</span>, because the rule's error is <span class="math" data-say="h squared times the quantity f prime of b minus f prime of A, over 12">h²·(f′(b) − f′(a))/12</span> and for <span class="math" data-say="f equals t squared">f = t²</span> that is <span class="math" data-say="h squared times 2 over 12 equals h squared over 6">h²·2/12 = h²/6</span>.</p><div class="mathblock" data-say="y prime equals t squared, y of 0 equals 0, exact y equals t cubed over 3, T equals 1. h, E of h equals h squared over 6, ratio to the next. a table, shown on the page. 1 over 16, 1 over 1536" tabindex="0" role="region" aria-label="Mathematical notation">y′ = t²,  y(0) = 0,  exact y = t³/3,  T = 1
-
-h       E(h) = h²/6    ratio to the next
-1/4     1/96           4
-1/8     1/384          4
-1/16    1/1536</div><p>The lab prints exactly these errors and the ratios <span class="math" data-say="4, 4">4, 4</span>, and names the order <span class="math" data-say="2">2</span>. Compare Euler on the same equation at the same <span class="math" data-say="h equals 1 over 4">h = 1/4</span>: its error is <span class="math" data-say="11 over 96">11/96</span>, eleven times larger. Switch the Method menu to Euler to see <span class="math" data-say="11 over 96, 23 over 384, 47 over 1536">11/96, 23/384, 47/1536</span> appear in place of these.</p><div class="thm"><span class="label">Theorem &middot; The improved method is second order</span><p>For a right-hand side with continuous second derivatives, the improved method's error at a fixed <span class="math" data-say="T">T</span> is approximately <span class="math" data-say="C times h squared">C·h²</span>, so halving <span class="math" data-say="h">h</span> divides it by about <span class="math" data-say="4">4</span>.</p></div><p>As with first order in the previous lesson, the lab demonstrates this on chosen equations by exact ratios and does not prove it in general.</p><h3>When the ratio is near 4 and is not 4</h3><p>Change the equation to <span class="math" data-say="y prime equals t to the power 4">y′ = t⁴</span>, with exact solution <span class="math" data-say="t to the power 5 over 5">t⁵/5</span>. The errors are <span class="math" data-say="53 over 2560">53/2560</span>, <span class="math" data-say="213 over 40960">213/40960</span> and <span class="math" data-say="853 over 655360">853/655360</span>, and the ratios are <span class="math" data-say="848 over 213 is approximately 3.98122">848/213 ≈ 3.98122</span> and <span class="math" data-say="3408 over 853 is approximately 3.99531">3408/853 ≈ 3.99531</span>, both rounded here. They climb towards <span class="math" data-say="4">4</span> and are not <span class="math" data-say="4">4</span>, because the trapezoid error has a smaller term in <span class="math" data-say="h to the power 4">h⁴</span> as well. On a cubic the exactness comes back: the error of the rule is <span class="math" data-say="h squared times the quantity f prime of b minus f prime of A, over 12">h²·(f′(b) − f′(a))/12</span> with no further terms, and for <span class="math" data-say="y prime equals t cubed">y′ = t³</span> that is <span class="math" data-say="h squared over 4">h²/4</span>, so typing <span class="math" data-say="t cubed">t^3</span> and <span class="math" data-say="t to the power 4 over 4">t^4/4</span> into the lab gives <span class="math" data-say="1 over 64, 1 over 256, 1 over 1024">1/64, 1/256, 1/1024</span>, with ratio <span class="math" data-say="4">4</span> twice.</p><div class="example"><span class="label">Example &middot; Second order is not half the error</span><p>At <span class="math" data-say="h equals 1 over 4">h = 1/4</span> on <span class="math" data-say="y prime equals t squared">y′ = t²</span> Euler's error is <span class="math" data-say="11 over 96">11/96</span> and the improved method's is <span class="math" data-say="1 over 96">1/96</span>: eleven times smaller, not half. For an equal number of slope readings Euler with <span class="math" data-say="h equals 1 over 8">h = 1/8</span> (eight readings) has error <span class="math" data-say="23 over 384">23/384</span>, and the improved method with <span class="math" data-say="h equals 1 over 4">h = 1/4</span> (four steps of two readings, eight in all) has <span class="math" data-say="1 over 96 equals 4 over 384">1/96 = 4/384</span>, nearly six times smaller.</p><p>The comparison keeps growing in the improved method's favour as the step shrinks, because its error falls by <span class="math" data-say="4">4</span> each halving and Euler's falls by <span class="math" data-say="2">2</span>.</p></div><p>The lab's third preset runs the improved method on <span class="math" data-say="y prime equals y">y′ = y</span>. The true value is irrational, so the errors, ratios and order are all rounded, and the lab marks them with <span class="math" data-say="is approximately">≈</span>.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Order of a method</h2></div><p>Errors at h, h/2 and h/4, and their ratios</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two slopes instead of one</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The improved Euler method</span><p>From <span class="math" data-say="t sub n, y sub n">(tₙ, yₙ)</span> with step <span class="math" data-say="h">h</span>: <span class="math" data-say="k sub 1 equals f of t sub n and y sub n">k₁ = f(tₙ, yₙ)</span>, then <span class="math" data-say="k sub 2 equals f of t sub n plus h and y sub n plus h times k sub 1">k₂ = f(tₙ + h, yₙ + h·k₁)</span>, then <span class="math" data-say="y sub n plus 1 equals y sub n plus h times the quantity k sub 1 plus k sub 2, over 2">yₙ₊₁ = yₙ + h·(k₁ + k₂)/2</span>.</p><p>Two slopes are read per step, so each step costs twice what an Euler step costs. The method is also called Heun's method.</p></div><p>Do one step by hand on <span class="math" data-say="y prime equals y">y′ = y</span> from <span class="math" data-say="y of 0 equals 1">y(0) = 1</span> with <span class="math" data-say="h equals 1 over 4">h = 1/4</span>. The start slope is <span class="math" data-say="k sub 1 equals 1">k₁ = 1</span>. The trial value is <span class="math" data-say="1 plus the quantity 1 over 4, times 1 equals 5 over 4">1 + (1/4)·1 = 5/4</span>, so <span class="math" data-say="k sub 2 equals 5 over 4">k₂ = 5/4</span>. The average slope is <span class="math" data-say="the quantity 1 plus 5 over 4, over 2 equals 9 over 8">(1 + 5/4)/2 = 9/8</span>, and <span class="math" data-say="y sub 1 equals 1 plus the quantity 1 over 4, times the quantity 9 over 8, equals 41 over 32">y₁ = 1 + (1/4)·(9/8) = 41/32</span>. This is hand arithmetic from the formula; set <span class="math" data-say="T">T</span> to <span class="math" data-say="1 over 4">1/4</span> in the lab on <span class="math" data-say="y prime equals y">y′ = y</span> and the first row of its table reads <span class="math" data-say="41 over 32">41/32</span>. Plain Euler gave <span class="math" data-say="5 over 4 equals 40 over 32">5/4 = 40/32</span> for the same step, and <span class="math" data-say="e to the power the quantity 1 over 4, is approximately 1.28403">e^(1/4) ≈ 1.28403</span>, rounded, is nearer to <span class="math" data-say="41 over 32 equals 1.28125">41/32 = 1.28125</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Order of a method</h2></div><p>Errors at h, h/2 and h/4, and their ratios</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The order of a method</strong><span>halve h and watch the error</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>log₂ error against log₂ h</span></div>
@@ -1410,10 +1448,10 @@ h       E(h) = h²/6    ratio to the next
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="odPlot" viewBox="0 0 660 420" role="img" aria-label="error against step size"></svg></div>
       <div class="status-banner" id="odStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Check that the error quarters</h3>
-          <p>The method menu is set to the improved method. Read the errors and the ratios for each preset, and say before you look which one will give exactly 4. Then switch the menu to Euler and compare the first error with the improved method's on the same equation.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Check that the error quarters</h3>
+            <p>The method menu is set to the improved method. Read the errors and the ratios for each preset, and say before you look which one will give exactly 4. Then switch the menu to Euler and compare the first error with the improved method's on the same equation.</p>
         <div class="field">
           <label for="odPreset">Equation</label>
           <select id="odPreset"><option value="square" selected>y' = t^2, exact t^3/3, to T = 1</option><option value="quartic">y' = t^4, exact t^5/5, to T = 1</option><option value="growth">y' = y, exact e^t, to T = 1</option></select>
@@ -1451,12 +1489,20 @@ h       E(h) = h²/6    ratio to the next
         </div>
         <p class="small-copy" style="margin:0;">Each h must divide T − t0 into a whole number of steps: at most 64, or 32 for RK4.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>The equation where the step is the trapezoid rule</h3><p>Take <span class="math" data-say="y prime equals t squared">y′ = t²</span>. The right side does not mention <span class="math" data-say="y">y</span>, so the trial value never matters: <span class="math" data-say="k sub 1 equals t sub n squared">k₁ = tₙ²</span> and <span class="math" data-say="k sub 2 equals the quantity t sub n plus h, squared">k₂ = (tₙ + h)²</span>, and the step adds <span class="math" data-say="h times the quantity t sub n squared plus the quantity t sub n plus h, squared, over 2">h·(tₙ² + (tₙ + h)²)/2</span>. That is the trapezoid rule on one piece. Its error on a quadratic is exactly proportional to <span class="math" data-say="h squared">h²</span>, because the rule's error is <span class="math" data-say="h squared times the quantity f prime of b minus f prime of A, over 12">h²·(f′(b) − f′(a))/12</span> and for <span class="math" data-say="f equals t squared">f = t²</span> that is <span class="math" data-say="h squared times 2 over 12 equals h squared over 6">h²·2/12 = h²/6</span>.</p><div class="mathblock" data-say="y prime equals t squared, y of 0 equals 0, exact y equals t cubed over 3, T equals 1. h, E of h equals h squared over 6, ratio to the next. a table, shown on the page. 1 over 16, 1 over 1536" tabindex="0" role="region" aria-label="Mathematical notation">y′ = t²,  y(0) = 0,  exact y = t³/3,  T = 1
+
+h       E(h) = h²/6    ratio to the next
+1/4     1/96           4
+1/8     1/384          4
+1/16    1/1536</div><p>The lab prints exactly these errors and the ratios <span class="math" data-say="4, 4">4, 4</span>, and names the order <span class="math" data-say="2">2</span>. Compare Euler on the same equation at the same <span class="math" data-say="h equals 1 over 4">h = 1/4</span>: its error is <span class="math" data-say="11 over 96">11/96</span>, eleven times larger. Switch the Method menu to Euler to see <span class="math" data-say="11 over 96, 23 over 384, 47 over 1536">11/96, 23/384, 47/1536</span> appear in place of these.</p><div class="thm"><span class="label">Theorem &middot; The improved method is second order</span><p>For a right-hand side with continuous second derivatives, the improved method's error at a fixed <span class="math" data-say="T">T</span> is approximately <span class="math" data-say="C times h squared">C·h²</span>, so halving <span class="math" data-say="h">h</span> divides it by about <span class="math" data-say="4">4</span>.</p></div><p>As with first order in the previous lesson, the lab demonstrates this on chosen equations by exact ratios and does not prove it in general.</p><h3>When the ratio is near 4 and is not 4</h3><p>Change the equation to <span class="math" data-say="y prime equals t to the power 4">y′ = t⁴</span>, with exact solution <span class="math" data-say="t to the power 5 over 5">t⁵/5</span>. The errors are <span class="math" data-say="53 over 2560">53/2560</span>, <span class="math" data-say="213 over 40960">213/40960</span> and <span class="math" data-say="853 over 655360">853/655360</span>, and the ratios are <span class="math" data-say="848 over 213 is approximately 3.98122">848/213 ≈ 3.98122</span> and <span class="math" data-say="3408 over 853 is approximately 3.99531">3408/853 ≈ 3.99531</span>, both rounded here. They climb towards <span class="math" data-say="4">4</span> and are not <span class="math" data-say="4">4</span>, because the trapezoid error has a smaller term in <span class="math" data-say="h to the power 4">h⁴</span> as well. On a cubic the exactness comes back: the error of the rule is <span class="math" data-say="h squared times the quantity f prime of b minus f prime of A, over 12">h²·(f′(b) − f′(a))/12</span> with no further terms, and for <span class="math" data-say="y prime equals t cubed">y′ = t³</span> that is <span class="math" data-say="h squared over 4">h²/4</span>, so typing <span class="math" data-say="t cubed">t^3</span> and <span class="math" data-say="t to the power 4 over 4">t^4/4</span> into the lab gives <span class="math" data-say="1 over 64, 1 over 256, 1 over 1024">1/64, 1/256, 1/1024</span>, with ratio <span class="math" data-say="4">4</span> twice.</p><div class="example"><span class="label">Example &middot; Second order is not half the error</span><p>At <span class="math" data-say="h equals 1 over 4">h = 1/4</span> on <span class="math" data-say="y prime equals t squared">y′ = t²</span> Euler's error is <span class="math" data-say="11 over 96">11/96</span> and the improved method's is <span class="math" data-say="1 over 96">1/96</span>: eleven times smaller, not half. For an equal number of slope readings Euler with <span class="math" data-say="h equals 1 over 8">h = 1/8</span> (eight readings) has error <span class="math" data-say="23 over 384">23/384</span>, and the improved method with <span class="math" data-say="h equals 1 over 4">h = 1/4</span> (four steps of two readings, eight in all) has <span class="math" data-say="1 over 96 equals 4 over 384">1/96 = 4/384</span>, nearly six times smaller.</p><p>The comparison keeps growing in the improved method's favour as the step shrinks, because its error falls by <span class="math" data-say="4">4</span> each halving and Euler's falls by <span class="math" data-say="2">2</span>.</p></div><p>The lab's third preset runs the improved method on <span class="math" data-say="y prime equals y">y′ = y</span>. The true value is irrational, so the errors, ratios and order are all rounded, and the lab marks them with <span class="math" data-say="is approximately">≈</span>.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>One improved step, and one check of its order</h2></div><p>Two slopes, an average, and then the usual measurement.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Read the start slope</h3><p><span class="math" data-say="k sub 1 equals f of t sub n and y sub n">k₁ = f(tₙ, yₙ)</span>, exactly as in Euler's method.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Take the trial step and read the slope there</h3><p>Move to <span class="math" data-say="t sub n plus h, y sub n plus h times k sub 1">(tₙ + h, yₙ + h·k₁)</span> and compute <span class="math" data-say="k sub 2 equals f">k₂ = f</span> at that point. The trial value is used only to get <span class="math" data-say="k sub 2">k₂</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Average the slopes and take the real step</h3><p><span class="math" data-say="y sub n plus 1 equals y sub n plus h times the quantity k sub 1 plus k sub 2, over 2">yₙ₊₁ = yₙ + h·(k₁ + k₂)/2</span>. Keep it as a fraction.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Measure the error at three step sizes</h3><p>Run to the same <span class="math" data-say="T">T</span> with <span class="math" data-say="h">h</span>, <span class="math" data-say="h over 2">h/2</span>, <span class="math" data-say="h over 4">h/4</span>, subtract the true value and divide successive errors.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Read the order from the ratio</h3><p>A ratio of <span class="math" data-say="4">4</span> is second order. State whether it is exactly <span class="math" data-say="4">4</span> or only approaching it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>One improved step, and one check of its order</h2>
+      <p class="lead-in">Two slopes, an average, and then the usual measurement.</p>
+      <ol class="key-ideas method"><li><strong>Read the start slope.</strong> <span class="math" data-say="k sub 1 equals f of t sub n and y sub n">k₁ = f(tₙ, yₙ)</span>, exactly as in Euler's method.</li><li><strong>Take the trial step and read the slope there.</strong> Move to <span class="math" data-say="t sub n plus h, y sub n plus h times k sub 1">(tₙ + h, yₙ + h·k₁)</span> and compute <span class="math" data-say="k sub 2 equals f">k₂ = f</span> at that point. The trial value is used only to get <span class="math" data-say="k sub 2">k₂</span>.</li><li><strong>Average the slopes and take the real step.</strong> <span class="math" data-say="y sub n plus 1 equals y sub n plus h times the quantity k sub 1 plus k sub 2, over 2">yₙ₊₁ = yₙ + h·(k₁ + k₂)/2</span>. Keep it as a fraction.</li><li><strong>Measure the error at three step sizes.</strong> Run to the same <span class="math" data-say="T">T</span> with <span class="math" data-say="h">h</span>, <span class="math" data-say="h over 2">h/2</span>, <span class="math" data-say="h over 4">h/4</span>, subtract the true value and divide successive errors.</li><li><strong>Read the order from the ratio.</strong> A ratio of <span class="math" data-say="4">4</span> is second order. State whether it is exactly <span class="math" data-say="4">4</span> or only approaching it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1480,17 +1526,16 @@ N steps with N·h = 1:  N·h³/6 = h²/6
 h = 1/4: 1/96;  h = 1/8: 1/384;  h = 1/16: 1/1536</div><p>Each step overshoots the true rise by exactly <span class="math" data-say="h cubed over 6">h³/6</span>, the same at every <span class="math" data-say="t">t</span>, because the quadratic leaves no <span class="math" data-say="t">t</span> in the difference. Adding <span class="math" data-say="1 over h">1/h</span> of them gives <span class="math" data-say="h squared over 6">h²/6</span>, and halving <span class="math" data-say="h">h</span> divides that by exactly <span class="math" data-say="4">4</span>.</p><p>The lab's errors <span class="math" data-say="1 over 96">1/96</span>, <span class="math" data-say="1 over 384">1/384</span>, <span class="math" data-say="1 over 1536">1/1536</span> match. The lab reports the size of the error, so the sign, an overshoot here, does not enter the ratio.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a second-order method has half the error of a first-order one</strong><span>Order is about how the error changes with <span class="math" data-say="h">h</span>, not how large it is at one <span class="math" data-say="h">h</span>. On <span class="math" data-say="y prime equals t squared">y′ = t²</span> the improved error at <span class="math" data-say="h equals 1 over 4">h = 1/4</span> is <span class="math" data-say="1 over 96">1/96</span> against Euler's <span class="math" data-say="11 over 96">11/96</span>, eleven times smaller, and halving <span class="math" data-say="h">h</span> quarters one error and halves the other.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using the trial value as the answer</strong><span>The trial point <span class="math" data-say="y sub n plus h times k sub 1">yₙ + h·k₁</span> is Euler's step, and it is used only to read <span class="math" data-say="k sub 2">k₂</span>. The value that is kept is <span class="math" data-say="y sub n plus h times the quantity k sub 1 plus k sub 2, over 2">yₙ + h·(k₁ + k₂)/2</span>. On <span class="math" data-say="y prime equals y">y′ = y</span> the trial value is <span class="math" data-say="5 over 4">5/4</span> and the kept value is <span class="math" data-say="41 over 32">41/32</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the ratio to be 4 on every equation</strong><span>It is exactly <span class="math" data-say="4">4</span> on <span class="math" data-say="y prime equals t squared">y′ = t²</span> and on a cubic, and only approaches <span class="math" data-say="4">4</span> on <span class="math" data-say="y prime equals t to the power 4">y′ = t⁴</span> and on <span class="math" data-say="y prime equals y">y′ = y</span>. The claim of second order is the approach, and the exactness on a quadratic is a feature of that equation.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can take an improved Euler step and show the error quarters when the step halves.</strong><p>You should be able to compute <span class="math" data-say="k sub 1">k₁</span>, the trial value, <span class="math" data-say="k sub 2">k₂</span> and the step for a given equation, run the lab at three step sizes, read the ratio of successive errors as <span class="math" data-say="4">4</span>, and say on which equations it is exactly <span class="math" data-say="4">4</span> and why.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Two slopes bought a power of <em>h</em>. More slopes buy more, and the classic choice uses four. &ldquo;Runge&ndash;Kutta: Four Slopes per Step&rdquo; shows the error divided by sixteen.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a second-order method has half the error of a first-order one</strong><span>Order is about how the error changes with <span class="math" data-say="h">h</span>, not how large it is at one <span class="math" data-say="h">h</span>. On <span class="math" data-say="y prime equals t squared">y′ = t²</span> the improved error at <span class="math" data-say="h equals 1 over 4">h = 1/4</span> is <span class="math" data-say="1 over 96">1/96</span> against Euler's <span class="math" data-say="11 over 96">11/96</span>, eleven times smaller, and halving <span class="math" data-say="h">h</span> quarters one error and halves the other.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using the trial value as the answer</strong><span>The trial point <span class="math" data-say="y sub n plus h times k sub 1">yₙ + h·k₁</span> is Euler's step, and it is used only to read <span class="math" data-say="k sub 2">k₂</span>. The value that is kept is <span class="math" data-say="y sub n plus h times the quantity k sub 1 plus k sub 2, over 2">yₙ + h·(k₁ + k₂)/2</span>. On <span class="math" data-say="y prime equals y">y′ = y</span> the trial value is <span class="math" data-say="5 over 4">5/4</span> and the kept value is <span class="math" data-say="41 over 32">41/32</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the ratio to be 4 on every equation</strong><span>It is exactly <span class="math" data-say="4">4</span> on <span class="math" data-say="y prime equals t squared">y′ = t²</span> and on a cubic, and only approaches <span class="math" data-say="4">4</span> on <span class="math" data-say="y prime equals t to the power 4">y′ = t⁴</span> and on <span class="math" data-say="y prime equals y">y′ = y</span>. The claim of second order is the approach, and the exactness on a quadratic is a feature of that equation.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can take an improved Euler step and show the error quarters when the step halves.</strong><p>You should be able to compute <span class="math" data-say="k sub 1">k₁</span>, the trial value, <span class="math" data-say="k sub 2">k₂</span> and the step for a given equation, run the lab at three step sizes, read the ratio of successive errors as <span class="math" data-say="4">4</span>, and say on which equations it is exactly <span class="math" data-say="4">4</span> and why.</p></div></div><div class="note"><strong>Note:</strong> Two slopes bought a power of <em>h</em>. More slopes buy more, and the classic choice uses four. &ldquo;Runge&ndash;Kutta: Four Slopes per Step&rdquo; shows the error divided by sixteen.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A trial step finds the slope at the other end</summary><p>Euler's method reads the slope only where the step begins. The improved method takes an ordinary Euler step first, to a trial point <span class="math" data-say="t sub n plus h, y sub n plus h times k sub 1">(tₙ + h, yₙ + h·k₁)</span>, and reads the slope <span class="math" data-say="k sub 2">k₂</span> there. The trial value is only a guess at where the step would end, and it is used for nothing except that slope.</p></details><details class="recall"><summary>The average of the two slopes is a better rate for the step</summary><p>The true slope changes through a step, and the start slope is too low where the rate rises and too high where it falls. The slope at the end is wrong the other way. Their average, <span class="math" data-say="the quantity k sub 1 plus k sub 2, over 2">(k₁ + k₂)/2</span>, is a better stand-in for the whole step. When <span class="math" data-say="f">f</span> depends on <span class="math" data-say="t">t</span> alone this is exactly the trapezoid rule from Accumulation and the Integral.</p></details><details class="recall"><summary>The order is 2: halving the step quarters the error</summary><p>The error at a fixed <span class="math" data-say="T">T</span> is about <span class="math" data-say="C times h squared">C·h²</span>, so halving <span class="math" data-say="h">h</span> divides it by <span class="math" data-say="4">4</span> and the ratio of successive errors is near <span class="math" data-say="4">4</span>. A ratio of <span class="math" data-say="4">4</span> names order <span class="math" data-say="2">2</span>. This is not a halved error: it is a different power of <span class="math" data-say="h">h</span>, and for a small step it is a much smaller error.</p></details></div>
+      <h3>Summary</h3>
       <p>Euler's method uses the slope at the start of a step. The improved method also asks what the slope would be at the end, using a trial Euler step to get there, and moves along the average of the two. That costs two slope readings per step and changes the order: halving <span class="math" data-say="h">h</span> now divides the error by about 4, and on <span class="math" data-say="y prime equals t squared">y′ = t²</span> by exactly 4.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A trial step finds the slope at the other end.</strong> Euler's method reads the slope only where the step begins. The improved method takes an ordinary Euler step first, to a trial point <span class="math" data-say="t sub n plus h, y sub n plus h times k sub 1">(tₙ + h, yₙ + h·k₁)</span>, and reads the slope <span class="math" data-say="k sub 2">k₂</span> there. The trial value is only a guess at where the step would end, and it is used for nothing except that slope.</li><li><strong>The average of the two slopes is a better rate for the step.</strong> The true slope changes through a step, and the start slope is too low where the rate rises and too high where it falls. The slope at the end is wrong the other way. Their average, <span class="math" data-say="the quantity k sub 1 plus k sub 2, over 2">(k₁ + k₂)/2</span>, is a better stand-in for the whole step. When <span class="math" data-say="f">f</span> depends on <span class="math" data-say="t">t</span> alone this is exactly the trapezoid rule from Accumulation and the Integral.</li><li><strong>The order is 2: halving the step quarters the error.</strong> The error at a fixed <span class="math" data-say="T">T</span> is about <span class="math" data-say="C times h squared">C·h²</span>, so halving <span class="math" data-say="h">h</span> divides it by <span class="math" data-say="4">4</span> and the ratio of successive errors is near <span class="math" data-say="4">4</span>. A ratio of <span class="math" data-say="4">4</span> names order <span class="math" data-say="2">2</span>. This is not a halved error: it is a different power of <span class="math" data-say="h">h</span>, and for a small step it is a much smaller error.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="k sub 1 equals f of t sub n and y sub n, slope at the start. k sub 2 equals f of t sub n plus h and y sub n plus h times k sub 1, trial slope. y sub n plus 1 equals y sub n plus h times the quantity k sub 1 plus k sub 2, over 2. y prime equals t squared, the step is the trapezoid rule. halve h, error divided by 4, here exactly 4" tabindex="0" role="region" aria-label="Mathematical notation">k₁ = f(tₙ, yₙ)   slope at the start
 k₂ = f(tₙ + h, yₙ + h·k₁)   trial slope
 yₙ₊₁ = yₙ + h·(k₁ + k₂)/2
@@ -3846,11 +3891,42 @@ halve h: error ÷ 4, here exactly 4</div><figcaption>A trial step, two slopes, o
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3918,7 +3994,7 @@ halve h: error ÷ 4, here exactly 4</div><figcaption>A trial step, two slopes, o
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

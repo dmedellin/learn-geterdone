@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Sustainable Work, Satisfaction and Leadership</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 10 · Employee Satisfaction, Identity, and Engagement</p>
       <h1>Identity and Job Satisfaction</h1>
       <p class="lesson-lede">Two constructs built from several survey items each, and the chapter&#x27;s case that technical practice reaches them both.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Identity</li><li>Job satisfaction</li><li>Construct</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument, then the two scores</h2>
-      <article class="prose reading"><p>&ldquo;[P]eople who feel supported by their employers, who have the tools and resources to do their work, and who feel their judgment is valued, turn out better work.&rdquo; The sentence is from the section of Chapter 10 on how job satisfaction affects organizational performance, and it is the chapter&rsquo;s argument in miniature: how people feel about their work and their organization is not a side effect of delivery; it joins a cycle with it. The chapter reaches this through two measures, identity and job satisfaction.</p><p>The authors added identity, they say, because they expected teams that practice continuous delivery and take an experimental approach to product development to build better products and to feel closer to the rest of the organization. They asked respondents how far they agreed with six statements adapted from Kankanhalli and colleagues (2005), on being glad to work there, sharing the organization's values and goals, and the like. They used Likert-type agreement scales, and the items passed the statistical conditions for measuring a construct, so a person&rsquo;s identity can be taken as the average of the item scores; the chapter points to Chapter 13 for those conditions. (The chapter lists six statements and says &lsquo;five item scores&rsquo;, so check the count in your own copy before borrowing the scale.)</p><p>Identity predicted both a generative culture and organizational performance (productivity, market share, profitability). The authors connect it back to burnout, since identity includes the matching of personal and organizational values that the last lesson saw is a risk factor, and set it against the way many companies still work, handing requirements to a team that then delivers large batches, which leaves people with little control and little connection. They tell a story: Netflix&rsquo;s cloud architect, Adrian Cockcroft, asked by a senior leader of a large company where he found his remarkable people, answered that he had hired them from that very company.</p><p>Job satisfaction is built differently. The authors say their measure looks at a few key things: whether you are satisfied with your work, whether you are given the tools and resources you need, and whether the job puts your skills to good use. Taken together, they say, these are what make the measure so impactful, and the second and third are how they connect it to DevOps. Good technical practices predicted job satisfaction. The chapter&rsquo;s reasoning is that automation gives the rote tasks to computers and leaves people the work of weighing evidence and deciding; practices such as proactive monitoring and test and deployment automation, which put people in a feedback loop, correlated strongly with it.</p><p>The chain, then, runs like this. Technical and Lean practices were found to predict identity and job satisfaction. For satisfaction the chapter argues that supported people turn out better work, which results in higher delivery performance and in turn higher organizational performance, and that faster delivery lets teams validate ideas sooner, which raises satisfaction again. The authors call it a virtuous circle. Chapter 12 will explain what &lsquo;predict&rsquo; means in their statistics: a prediction, not a proof of cause.</p><p>Now compute both constructs. The lab takes six invented items, <code>i1</code> to <code>i3</code> on identifying with the organization and <code>s1</code> to <code>s3</code> on satisfaction with the work, its tools and its use of skills. None of them is an item from the book. The preset <code>alder</code> has four respondents on a 7-point scale; the first answers 6, 6, 5 on identity, a sum of 17 and a mean of 5.667, and 5, 6, 6 on satisfaction, also 17. Over all four respondents the identity mean is 63 over 12 answers, which is 5.25, and the satisfaction mean is 60 over 12, which is 5.</p><p>The preset <code>birch</code> is a second invented team of four whose satisfaction answers also add to 60, a mean of 5; its identity answers add to 39, a mean of 3.25. Two teams are equally satisfied and one identifies much less. That is the reason the chapter treats them as two constructs, each with its own items, not as one feeling. The lab does not tell you which team is better off; it shows two columns that need different questions, and the lab&rsquo;s status line says again that the figures are of these eight invented people.</p><h3>Exercise</h3><ul><li>A third invented team, 7-point scale. Items <span class="math" data-say="i 1">i1</span>, <span class="math" data-say="i 2">i2</span> measure identity and <span class="math" data-say="s 1">s1</span>, <span class="math" data-say="s 2">s2</span> satisfaction.</li><li>Answers, written as respondent, <span class="math" data-say="i 1">i1</span>, <span class="math" data-say="i 2">i2</span>, <span class="math" data-say="s 1">s1</span>, <span class="math" data-say="s 2">s2</span>: <span class="math" data-say="c 1, 6, 6, 3, 4">c1, 6, 6, 3, 4</span>; <span class="math" data-say="c 2, 5, 7, 2, 3">c2, 5, 7, 2, 3</span>; <span class="math" data-say="c 3, 4, 4, 5, 6">c3, 4, 4, 5, 6</span>.</li></ul><p>Score each respondent on each construct, then find the team&rsquo;s mean for each, and the difference between them. Say in a sentence what a manager could do with the finding that the two differ, and what the lab cannot tell them.</p><p>The chapter ends its treatment of these two measures and turns to a harder subject, one in which numbers must be handled with particular care. The next lesson is Diversity in Tech.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Likert-type items</h2></div><p>a construct&#x27;s score from Likert-type items, reverse-coded where stated</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument, then the two scores</h2><div class="prose reading"><p>&ldquo;[P]eople who feel supported by their employers, who have the tools and resources to do their work, and who feel their judgment is valued, turn out better work.&rdquo; The sentence is from the section of Chapter 10 on how job satisfaction affects organizational performance, and it is the chapter&rsquo;s argument in miniature: how people feel about their work and their organization is not a side effect of delivery; it joins a cycle with it. The chapter reaches this through two measures, identity and job satisfaction.</p><p>The authors added identity, they say, because they expected teams that practice continuous delivery and take an experimental approach to product development to build better products and to feel closer to the rest of the organization. They asked respondents how far they agreed with six statements adapted from Kankanhalli and colleagues (2005), on being glad to work there, sharing the organization's values and goals, and the like. They used Likert-type agreement scales, and the items passed the statistical conditions for measuring a construct, so a person&rsquo;s identity can be taken as the average of the item scores; the chapter points to Chapter 13 for those conditions. (The chapter lists six statements and says &lsquo;five item scores&rsquo;, so check the count in your own copy before borrowing the scale.)</p><p>Identity predicted both a generative culture and organizational performance (productivity, market share, profitability). The authors connect it back to burnout, since identity includes the matching of personal and organizational values that the last lesson saw is a risk factor, and set it against the way many companies still work, handing requirements to a team that then delivers large batches, which leaves people with little control and little connection. They tell a story: Netflix&rsquo;s cloud architect, Adrian Cockcroft, asked by a senior leader of a large company where he found his remarkable people, answered that he had hired them from that very company.</p><p>Job satisfaction is built differently. The authors say their measure looks at a few key things: whether you are satisfied with your work, whether you are given the tools and resources you need, and whether the job puts your skills to good use. Taken together, they say, these are what make the measure so impactful, and the second and third are how they connect it to DevOps. Good technical practices predicted job satisfaction. The chapter&rsquo;s reasoning is that automation gives the rote tasks to computers and leaves people the work of weighing evidence and deciding; practices such as proactive monitoring and test and deployment automation, which put people in a feedback loop, correlated strongly with it.</p><p>The chain, then, runs like this. Technical and Lean practices were found to predict identity and job satisfaction. For satisfaction the chapter argues that supported people turn out better work, which results in higher delivery performance and in turn higher organizational performance, and that faster delivery lets teams validate ideas sooner, which raises satisfaction again. The authors call it a virtuous circle. Chapter 12 will explain what &lsquo;predict&rsquo; means in their statistics: a prediction, not a proof of cause.</p><p>Now compute both constructs. The lab takes six invented items, <code>i1</code> to <code>i3</code> on identifying with the organization and <code>s1</code> to <code>s3</code> on satisfaction with the work, its tools and its use of skills. None of them is an item from the book. The preset <code>alder</code> has four respondents on a 7-point scale; the first answers 6, 6, 5 on identity, a sum of 17 and a mean of 5.667, and 5, 6, 6 on satisfaction, also 17. Over all four respondents the identity mean is 63 over 12 answers, which is 5.25, and the satisfaction mean is 60 over 12, which is 5.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Likert-type items</h2></div><p>a construct&#x27;s score from Likert-type items, reverse-coded where stated</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Likert-type items</strong><span>a construct's score from Likert-type items, reverse-coded where stated</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="alkTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alkTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each answer is a whole number from 1 to the scale's points, one per item in the items' order. A reverse-coded item is scored points + 1 − the answer (on 7 points a 2 scores 6). A respondent's score on a construct is the mean of their scored answers on its items; a construct's mean is the mean of those scores over the respondents; an item's mean is over the respondents too, as scored. A respondent is above the line when their score is greater than it, at it when equal. The last tile scores every item as answered, the mistake of forgetting to reverse. Constructs and items go in the order given; means are exact, shown to 3 places when they do not end.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Two constructs, two means</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Two constructs, two means</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's.</p>
         <div class="field">
           <label for="alkPreset">Worked example</label>
           <select id="alkPreset"><option value="alder" selected>Team Alder: four respondents, identity and satisfaction items</option><option value="birch">Team Birch: the same satisfaction mean, a lower identity mean</option></select>
@@ -1437,12 +1480,15 @@
           <div class="kpi"><span>Construct means if nothing were reversed (the error)</span><strong id="alkUnreversed">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>birch</code> is a second invented team of four whose satisfaction answers also add to 60, a mean of 5; its identity answers add to 39, a mean of 3.25. Two teams are equally satisfied and one identifies much less. That is the reason the chapter treats them as two constructs, each with its own items, not as one feeling. The lab does not tell you which team is better off; it shows two columns that need different questions, and the lab&rsquo;s status line says again that the figures are of these eight invented people.</p><h3>Exercise</h3><ul><li>A third invented team, 7-point scale. Items <span class="math" data-say="i 1">i1</span>, <span class="math" data-say="i 2">i2</span> measure identity and <span class="math" data-say="s 1">s1</span>, <span class="math" data-say="s 2">s2</span> satisfaction.</li><li>Answers, written as respondent, <span class="math" data-say="i 1">i1</span>, <span class="math" data-say="i 2">i2</span>, <span class="math" data-say="s 1">s1</span>, <span class="math" data-say="s 2">s2</span>: <span class="math" data-say="c 1, 6, 6, 3, 4">c1, 6, 6, 3, 4</span>; <span class="math" data-say="c 2, 5, 7, 2, 3">c2, 5, 7, 2, 3</span>; <span class="math" data-say="c 3, 4, 4, 5, 6">c3, 4, 4, 5, 6</span>.</li></ul><p>Score each respondent on each construct, then find the team&rsquo;s mean for each, and the difference between them. Say in a sentence what a manager could do with the finding that the two differ, and what the lab cannot tell them.</p><p>The chapter ends its treatment of these two measures and turns to a harder subject, one in which numbers must be handled with particular care. The next lesson is Diversity in Tech.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Scoring two constructs</h2></div><p>Four steps, the last of them on a survey of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Assign each item to a construct</h3><p>Write down which items measure identity and which satisfaction. An item belongs to one construct only.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Average within each construct</h3><p>For each respondent add up their answers to the construct&rsquo;s items and divide by the number of items. Do the other construct separately.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Average across respondents</h3><p>A construct&rsquo;s team mean is the mean of the respondents&rsquo; scores. Compare the two constructs&rsquo; means for the same team.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare two groups on your own survey</h3><p>Score two teams of yours on both constructs, type them in, and note any construct where they are alike and any where they differ.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Scoring two constructs</h2>
+      <p class="lead-in">Four steps, the last of them on a survey of your own.</p>
+      <ol class="key-ideas method"><li><strong>Assign each item to a construct.</strong> Write down which items measure identity and which satisfaction. An item belongs to one construct only.</li><li><strong>Average within each construct.</strong> For each respondent add up their answers to the construct&rsquo;s items and divide by the number of items. Do the other construct separately.</li><li><strong>Average across respondents.</strong> A construct&rsquo;s team mean is the mean of the respondents&rsquo; scores. Compare the two constructs&rsquo; means for the same team.</li><li><strong>Compare two groups on your own survey.</strong> Score two teams of yours on both constructs, type them in, and note any construct where they are alike and any where they differ.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1459,17 +1505,16 @@ Birch identity sums: 10, 8, 13, 8; total 39; 39/12 = 3.25
 Birch satisfaction sums: 16, 13, 17, 14; total 60; 60/12 = 5</div><p>Every figure is a sum of the answers divided by their count. The lab prints the respondents&rsquo; means as thirds, to three decimals.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking identity and job satisfaction are one measure</strong><span>They are built from different items and answer different questions. On the lab&rsquo;s two invented teams the satisfaction means are the same and the identity means are 5.25 and 3.25.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading &#x27;predicts&#x27; as &#x27;causes&#x27;</strong><span>The authors report that identity and good technical practices predicted outcomes. Their statistics are about prediction in a survey, and they call the result a virtuous circle, a reading they argue from several years of data.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating satisfaction as only about how much you like the work</strong><span>The chapter&rsquo;s measure includes the tools and resources you are given and whether your job uses your skills, which is why it can be connected to automation and monitoring.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can score two constructs and say how they differ.</strong><p>Given items assigned to two constructs and each respondent&rsquo;s answers, compute every respondent&rsquo;s two scores and each team&rsquo;s two means by hand.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab averages the items you assign. It cannot say whether the items form a good construct (Surveys, Data and Statistical Methods reads the checks), whether either mean is high or low in general, or what produced it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking identity and job satisfaction are one measure</strong><span>They are built from different items and answer different questions. On the lab&rsquo;s two invented teams the satisfaction means are the same and the identity means are 5.25 and 3.25.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading &#x27;predicts&#x27; as &#x27;causes&#x27;</strong><span>The authors report that identity and good technical practices predicted outcomes. Their statistics are about prediction in a survey, and they call the result a virtuous circle, a reading they argue from several years of data.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating satisfaction as only about how much you like the work</strong><span>The chapter&rsquo;s measure includes the tools and resources you are given and whether your job uses your skills, which is why it can be connected to automation and monitoring.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can score two constructs and say how they differ.</strong><p>Given items assigned to two constructs and each respondent&rsquo;s answers, compute every respondent&rsquo;s two scores and each team&rsquo;s two means by hand.</p></div></div><div class="note"><strong>Note:</strong> The lab averages the items you assign. It cannot say whether the items form a good construct (Surveys, Data and Statistical Methods reads the checks), whether either mean is high or low in general, or what produced it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Identity</summary><p>The extent to which people identify with the organization they work for: whether they are glad to work there, speak well of it, give extra effort for it and share its values and goals. The authors measure it with several agree-disagree statements.</p></details><details class="recall"><summary>Job satisfaction</summary><p>In the chapter's measure, three things: being satisfied in your work, being given the tools and resources to do it, and having a job that puts your skills to good use.</p></details><details class="recall"><summary>Construct</summary><p>A quantity, such as identity, that cannot be observed directly and is measured by several items taken together. A person&rsquo;s score is the mean of their answers to the construct&rsquo;s items.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 10 adds two measures built from several answers: how far people identify with their organization, and how satisfied they are with their work, their tools and the use made of their skills. Read how the authors built them and what they found them to predict; then compute both from invented answers for two teams and see that one can be high while the other is not.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Identity.</strong> The extent to which people identify with the organization they work for: whether they are glad to work there, speak well of it, give extra effort for it and share its values and goals. The authors measure it with several agree-disagree statements.</li><li><strong>Job satisfaction.</strong> In the chapter's measure, three things: being satisfied in your work, being given the tools and resources to do it, and having a job that puts your skills to good use.</li><li><strong>Construct.</strong> A quantity, such as identity, that cannot be observed directly and is measured by several items taken together. A person&rsquo;s score is the mean of their answers to the construct&rsquo;s items.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="identity, how far you identify with the firm. satisfaction, work, tools and your skills. each is the mean of several items. identity predicted organizational performance. tools and automation go with satisfaction. two constructs can come apart" tabindex="0" role="region" aria-label="Mathematical notation">identity: how far you identify with the firm
 satisfaction: work, tools and your skills
 each is the mean of several items
@@ -2349,11 +2394,42 @@ two constructs can come apart</div><figcaption>Identity and job satisfaction in 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2421,7 +2497,7 @@ two constructs can come apart</div><figcaption>Identity and job satisfaction in 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

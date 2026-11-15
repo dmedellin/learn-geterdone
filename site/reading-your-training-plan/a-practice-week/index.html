@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Your Training Plan</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The plan</p>
       <h1>A Practice Week</h1>
       <p class="lesson-lede">Plan next week&#x27;s practice under a time budget so that it keeps the routine and contains a test.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Practice and test are different jobs</li><li>A session is limited by attention</li><li>Most days, not one day</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Reviewing the routine, then planning the week</h2>
-      <article class="prose reading"><p>Begin with the warm-up above the lab: a test reading of a passage about salt, at natural pace with no pacer, then its six questions. It goes into your log as a test, so this week begins with a measurement, and the next lesson reads it beside your earlier ones.</p><p>Then look back. Since The Daily Drill the routine has been: ten to fifteen minutes a day; one pool passage with the pacer at your hold target; every fifth session a test at natural pace; the target raised by about 5% after three holds in a row and lowered by the same after two misses; at most two timed readings in a sitting; and, when your attention left the text, a shorter session rather than a slower pacer. Open your log and count last week's days with a session, and the sessions that were tests.</p><p>A week worth doing meets four rules. The first three are the routine's; the fourth is the clock's.</p><ul><li>Sessions of ten to fifteen minutes, with at most two timed readings in each.</li><li>A session on most days: five or more in the week.</li><li>A test reading at least every fifth session, at natural pace with no pacer.</li><li>A total inside the time you actually have.</li></ul><p>The lab takes the week as rows, each a kind of session with how many and how long, and adds them up: the minutes in the week, the share of those minutes that is the test session, and whether the total fits your budget. It checks the arithmetic and the fourth rule only. The other three are yours to check, and the presets are chosen so that the tiles look fine on weeks that break them.</p><p>The preset fifteen-a-day keeps all four: five fifteen-minute sessions of pacer practice and two fifteen-minute sessions that are tests. That is <span data-say="5 times 15 plus 2 times 15 equals 105">5 × 15 + 2 × 15 = 105</span> minutes against a budget of 120, so it fits with 15 to spare. The test sessions are 30 of the 105 minutes, and because every session is the same length the share of minutes is the share of sessions: 2/7, about 28.6%.</p><p>The preset weekend-only spends more: two sixty-minute sittings, one of them opening with a test, <span data-say="2 times 60 equals 120">2 × 60 = 120</span> minutes, exactly the budget, and half of it the test session. Every tile looks generous. It breaks two rules all the same. An hour is four to six times the routine's session, so most of each sitting comes after attention has started to leave the text; and five days of the seven are empty, so the week's readings share two days' conditions, not five.</p><p>The preset all-sprints is seven fifteen-minute sessions of sprints above comfort: <span data-say="7 times 15 equals 105">7 × 15 = 105</span> minutes, the same total as fifteen-a-day, and the test-share tile reads no test in the week. At the end of it you will know how the sprints felt and nothing about whether your reading changed, because the verdict uses test readings and there are none. Sprints Above Comfort showed that a sprint's after-effect is one reading in any case.</p><p>The idea under the routine has a name. Ericsson, Krampe and Tesch-Römer (1993), in a study of musicians, called it deliberate practice: practice designed to improve one thing, at the edge of what you can do, with knowledge of the result after each attempt. The pacer at your hold target is the edge and the six questions are the result. How much of expert performance such practice explains is contested, and their study was of music, not reading; the routine borrows its shape, not a promise.</p><p>What a week of practice can be expected to give is modest. Rayner and colleagues (2016) concluded that doubling or tripling a rate with comprehension held is unlikely; the large savings are in Skimming, Scanning and Previewing and in Words, Knowledge and Difficulty. A good week can therefore include a deliberate skim of something you would otherwise have read through, written as its own row.</p><p>When your week is written, the button under the lab saves it to your log as an entry of its own, so that next week's review starts from what you planned as well as what you did. The next lesson, Reading Your Curve, takes the tests that week produces and asks the question the plan exists for: has anything changed?</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A practice week</h2></div><p>your own numbers, compared with themselves</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Reviewing the routine, then planning the week</h2><div class="prose reading"><p>Begin with the warm-up above the lab: a test reading of a passage about salt, at natural pace with no pacer, then its six questions. It goes into your log as a test, so this week begins with a measurement, and the next lesson reads it beside your earlier ones.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A practice week</h2></div><p>your own numbers, compared with themselves</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A practice week</strong><span>your own numbers, compared with themselves</span></div>
       </div>
@@ -1417,10 +1460,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="lgTable"></table></div>
       <div class="status-banner" id="lgStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A week of practice, added up</h3>
-          <p>A stated plan: the week as you type it, one row per kind of session. The tiles add up its minutes, the share that is the test session, and whether it fits your budget. Session length, spacing and what a session holds are for you to check against the routine's rules.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A week of practice, added up</h3>
+            <p>A stated plan: the week as you type it, one row per kind of session. The tiles add up its minutes, the share that is the test session, and whether it fits your budget. Session length, spacing and what a session holds are for you to check against the routine's rules.</p>
         <div class="field">
           <label for="lgPreset">Worked example</label>
           <select id="lgPreset"><option value="fifteen-a-day" selected>Fifteen a day, two tests</option><option value="weekend-only">Two hours at the weekend</option><option value="all-sprints">Sprints every day, no test</option></select>
@@ -1443,12 +1486,15 @@
           <div class="kpi"><span>Against your time</span><strong id="lgFits">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Then look back. Since The Daily Drill the routine has been: ten to fifteen minutes a day; one pool passage with the pacer at your hold target; every fifth session a test at natural pace; the target raised by about 5% after three holds in a row and lowered by the same after two misses; at most two timed readings in a sitting; and, when your attention left the text, a shorter session rather than a slower pacer. Open your log and count last week's days with a session, and the sessions that were tests.</p><p>A week worth doing meets four rules. The first three are the routine's; the fourth is the clock's.</p><ul><li>Sessions of ten to fifteen minutes, with at most two timed readings in each.</li><li>A session on most days: five or more in the week.</li><li>A test reading at least every fifth session, at natural pace with no pacer.</li><li>A total inside the time you actually have.</li></ul><p>The lab takes the week as rows, each a kind of session with how many and how long, and adds them up: the minutes in the week, the share of those minutes that is the test session, and whether the total fits your budget. It checks the arithmetic and the fourth rule only. The other three are yours to check, and the presets are chosen so that the tiles look fine on weeks that break them.</p><p>The preset fifteen-a-day keeps all four: five fifteen-minute sessions of pacer practice and two fifteen-minute sessions that are tests. That is <span data-say="5 times 15 plus 2 times 15 equals 105">5 × 15 + 2 × 15 = 105</span> minutes against a budget of 120, so it fits with 15 to spare. The test sessions are 30 of the 105 minutes, and because every session is the same length the share of minutes is the share of sessions: 2/7, about 28.6%.</p><p>The preset weekend-only spends more: two sixty-minute sittings, one of them opening with a test, <span data-say="2 times 60 equals 120">2 × 60 = 120</span> minutes, exactly the budget, and half of it the test session. Every tile looks generous. It breaks two rules all the same. An hour is four to six times the routine's session, so most of each sitting comes after attention has started to leave the text; and five days of the seven are empty, so the week's readings share two days' conditions, not five.</p><p>The preset all-sprints is seven fifteen-minute sessions of sprints above comfort: <span data-say="7 times 15 equals 105">7 × 15 = 105</span> minutes, the same total as fifteen-a-day, and the test-share tile reads no test in the week. At the end of it you will know how the sprints felt and nothing about whether your reading changed, because the verdict uses test readings and there are none. Sprints Above Comfort showed that a sprint's after-effect is one reading in any case.</p><p>The idea under the routine has a name. Ericsson, Krampe and Tesch-Römer (1993), in a study of musicians, called it deliberate practice: practice designed to improve one thing, at the edge of what you can do, with knowledge of the result after each attempt. The pacer at your hold target is the edge and the six questions are the result. How much of expert performance such practice explains is contested, and their study was of music, not reading; the routine borrows its shape, not a promise.</p><p>What a week of practice can be expected to give is modest. Rayner and colleagues (2016) concluded that doubling or tripling a rate with comprehension held is unlikely; the large savings are in Skimming, Scanning and Previewing and in Words, Knowledge and Difficulty. A good week can therefore include a deliberate skim of something you would otherwise have read through, written as its own row.</p><p>When your week is written, the button under the lab saves it to your log as an entry of its own, so that next week's review starts from what you planned as well as what you did. The next lesson, Reading Your Curve, takes the tests that week produces and asks the question the plan exists for: has anything changed?</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Planning a week</h2></div><p>Do this at the start of each week, in this order.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Begin with a test reading</h3><p>Take a test at natural pace with no pacer, from the Daily Drill's test box, so that the week starts from a measurement.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Review last week against the rules</h3><p>From your log, count the days with a session, the sessions that were tests, and the practice readings where your attention left the text.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write the week as rows</h3><p>One row per kind of session: what it is, how many, how many minutes each. Type as the budget the minutes you truly have, not the minutes you would like to have.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the three rules the lab cannot</h3><p>Sessions of ten to fifteen minutes with at most two timed readings; five or more days; a test at least every fifth session. Then save the plan to your log.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Do today's session on The Daily Drill page: the next pool passage with the pacer at your hold target, or a test at natural pace if one is due.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Planning a week</h2>
+      <p class="lead-in">Do this at the start of each week, in this order.</p>
+      <ol class="key-ideas method"><li><strong>Begin with a test reading.</strong> Take a test at natural pace with no pacer, from the Daily Drill's test box, so that the week starts from a measurement.</li><li><strong>Review last week against the rules.</strong> From your log, count the days with a session, the sessions that were tests, and the practice readings where your attention left the text.</li><li><strong>Write the week as rows.</strong> One row per kind of session: what it is, how many, how many minutes each. Type as the budget the minutes you truly have, not the minutes you would like to have.</li><li><strong>Check the three rules the lab cannot.</strong> Sessions of ten to fifteen minutes with at most two timed readings; five or more days; a test at least every fifth session. Then save the plan to your log.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Do today's session on The Daily Drill page: the next pool passage with the pacer at your hold target, or a test at natural pace if one is due.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1466,17 +1512,16 @@ test share   30 / 105 = 2/7, about 28.6%
 budget       120 − 105 = 15 min to spare</div><p>The arithmetic says the week fits. The rules say more: every session is within the routine's ten to fifteen minutes, there are seven days with a session, and two of the seven are tests, more often than the routine's one in five, which costs nothing but a little practice.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>More drills means more progress</strong><span>A week of seven sprint sessions has the same 105 minutes as fifteen-a-day and no test in it, so at its end nothing has been measured; a week of two hour-long sittings has more minutes and spends most of them after attention has gone, practising drifting. Progress is what the tests show, and they can show it only when there are tests and the practice between them is at a pace you understand.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the budget as a target</strong><span>The budget is the most time you have, not the amount to use. Weekend-only fills its 120 minutes exactly and breaks the session rule; fifteen-a-day leaves 15 minutes spare and breaks nothing. Spare minutes are not a failure of the plan.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a test with the pacer on</strong><span>A test is a reading at natural pace with no pacer. With the pacer on, the rate is the pacer's setting, and the reading measures how well you followed it rather than how you read, which is why the Daily Drill's test box turns the pacer off.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can plan a week and find the rule a bad one breaks.</strong><p>Given a budget, write a week of rows that meets the four rules: sessions of ten to fifteen minutes with at most two timed readings, five or more days, a test at least every fifth session, and a total inside the budget. Given an unbalanced week, name the rule it breaks and the figure that shows it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab adds up a plan. It cannot tell whether you will keep it, and it cannot see how long a session really is, how the days are spread, or what a row holds beyond its name. The routine's numbers are the Subject's choices, borrowed in shape from the research on deliberate practice, not measured for reading.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>More drills means more progress</strong><span>A week of seven sprint sessions has the same 105 minutes as fifteen-a-day and no test in it, so at its end nothing has been measured; a week of two hour-long sittings has more minutes and spends most of them after attention has gone, practising drifting. Progress is what the tests show, and they can show it only when there are tests and the practice between them is at a pace you understand.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the budget as a target</strong><span>The budget is the most time you have, not the amount to use. Weekend-only fills its 120 minutes exactly and breaks the session rule; fifteen-a-day leaves 15 minutes spare and breaks nothing. Spare minutes are not a failure of the plan.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a test with the pacer on</strong><span>A test is a reading at natural pace with no pacer. With the pacer on, the rate is the pacer's setting, and the reading measures how well you followed it rather than how you read, which is why the Daily Drill's test box turns the pacer off.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can plan a week and find the rule a bad one breaks.</strong><p>Given a budget, write a week of rows that meets the four rules: sessions of ten to fifteen minutes with at most two timed readings, five or more days, a test at least every fifth session, and a total inside the budget. Given an unbalanced week, name the rule it breaks and the figure that shows it.</p></div></div><div class="note"><strong>Note:</strong> The lab adds up a plan. It cannot tell whether you will keep it, and it cannot see how long a session really is, how the days are spread, or what a row holds beyond its name. The routine's numbers are the Subject's choices, borrowed in shape from the research on deliberate practice, not measured for reading.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Practice and test are different jobs</summary><p>A practice reading with the pacer at your hold target trains. A test reading at natural pace, with no pacer, measures. Only tests go into the verdict, so a week of practice alone, however long, ends with nothing new known about your reading.</p></details><details class="recall"><summary>A session is limited by attention</summary><p>The routine's ten to fifteen minutes is not a minimum to beat. Past the point where attention holds, a reading practises drifting, and the attention tick after each practice reading is how you find that point for yourself.</p></details><details class="recall"><summary>Most days, not one day</summary><p>Readings taken in one sitting share that sitting's conditions: the same tiredness, the same hour, the same mood. Five short sessions give the log five days and five chances to adjust the target; one long Saturday gives it one day, measured five times.</p></details></div>
+      <h3>Summary</h3>
       <p>Since The Daily Drill you have kept a routine; this lesson reviews it and plans the next week. The lab adds up a week of sessions, the share of it that is a test, and whether it fits the time you have. The rules that make a week worth doing are yours to check: short sessions, most days, and a test at least every fifth session.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Practice and test are different jobs.</strong> A practice reading with the pacer at your hold target trains. A test reading at natural pace, with no pacer, measures. Only tests go into the verdict, so a week of practice alone, however long, ends with nothing new known about your reading.</li><li><strong>A session is limited by attention.</strong> The routine's ten to fifteen minutes is not a minimum to beat. Past the point where attention holds, a reading practises drifting, and the attention tick after each practice reading is how you find that point for yourself.</li><li><strong>Most days, not one day.</strong> Readings taken in one sitting share that sitting's conditions: the same tiredness, the same hour, the same mood. Five short sessions give the log five days and five chances to adjust the target; one long Saturday gives it one day, measured five times.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="week equals sessions times minutes, summed. test share equals test minutes over week. a session, 10 to 15 minutes. at most two timed readings a sitting. a test at least every fifth session. no test in the week, nothing measured" tabindex="0" role="region" aria-label="Mathematical notation">week = sessions × minutes, summed
 test share = test minutes / week
 a session: 10 to 15 minutes
@@ -2612,11 +2657,42 @@ no test in the week: nothing measured</div><figcaption>A week in six lines</figc
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2684,7 +2760,7 @@ no test in the week: nothing measured</div><figcaption>A week in six lines</figc
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

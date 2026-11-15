@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,27 +1424,25 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Systems and Matrices</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Systems</p>
       <h1>Systems of Two Linear Equations</h1>
       <p class="lesson-lede">Classify two lines as meeting once, never or everywhere, then verify a candidate in both equations.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A solution satisfies every equation</li><li>There are exactly three possibilities</li><li>A graph names the case; it does not give the answer</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Systems, solutions, and the three cases</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; System of two linear equations</span><p>A <strong>linear equation</strong> in <span class="math" data-say="x">x</span> and <span class="math" data-say="y">y</span> is one that can be written <span class="math" data-say="A x plus b y equals c">ax + by = c</span> with <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span> not both zero. A <strong>system</strong> is two or more such equations considered together, and a <strong>solution</strong> of the system is an ordered pair <span class="math" data-say="x, y">(x, y)</span> that satisfies every equation in it.</p><p>The <strong>solution set</strong> is the set of all such pairs. Solving the system means describing that set, which is not always a matter of naming one pair.</p></div><p>"Considered together" is where the content is. On its own, <span class="math" data-say="2 x plus y equals 4">2x + y = 4</span> has infinitely many solutions &mdash; one for every value of <span class="math" data-say="x">x</span>. The system asks for the pairs the two equations have in common, so the solution set of the system is the <em>intersection</em> of the two solution sets, never their union.</p><p>Lines, Functions and Graphs established that the graph of <span class="math" data-say="A x plus b y equals c">ax + by = c</span> is a line. So the solution set of a two-equation system is the set of points lying on both lines, and the question "how many solutions" becomes the question "how do two lines meet".</p><div class="thm"><span class="label">Theorem &middot; Two lines meet in nothing, one point, or a whole line</span><p>Two lines in the plane share no point, exactly one point, or every point of the line. No other count is possible &mdash; in particular no system of two linear equations has exactly two solutions.</p></div><div class="proof"><p>Suppose the two lines share two distinct points <span class="math" data-say="P">P</span> and <span class="math" data-say="Q">Q</span>. There is exactly one line through <span class="math" data-say="P">P</span> and <span class="math" data-say="Q">Q</span>, so the two lines are the same line, and then every point of one lies on the other.</p><p>So if the lines share more than one point they share all of them. The remaining possibilities are one shared point and none.</p><p><span class="qed">&#9633;</span></p></div><p>The three cases carry names. A system with at least one solution is <strong>consistent</strong>; one with none is <strong>inconsistent</strong>. A consistent system whose equations describe the same line is <strong>dependent</strong>; one with exactly one solution is <strong>independent</strong>.</p><h3>Telling the cases apart without drawing</h3><p>Put both equations in slope-intercept form. Different slopes means the lines cross once. Equal slopes with different intercepts means parallel and distinct, so no solution. Equal slopes and equal intercepts means one line written two ways, so infinitely many.</p><div class="mathblock" data-say="2 x plus 3 y equals 6, y equals negative the quantity 2 over 3, times x plus 2, slope negative 2 over 3, intercept 2. 4 x plus 6 y equals 7, y equals negative the quantity 2 over 3, times x plus 7 over 6, slope negative 2 over 3, intercept 7 over 6. same slope, different intercept, goes to, parallel, distinct, goes to, none" tabindex="0" role="region" aria-label="Mathematical notation">2x + 3y = 6      y = −(2/3)x + 2       slope −2/3,  intercept 2
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Systems, solutions, and the three cases</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; System of two linear equations</span><p>A <strong>linear equation</strong> in <span class="math" data-say="x">x</span> and <span class="math" data-say="y">y</span> is one that can be written <span class="math" data-say="A x plus b y equals c">ax + by = c</span> with <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span> not both zero. A <strong>system</strong> is two or more such equations considered together, and a <strong>solution</strong> of the system is an ordered pair <span class="math" data-say="x, y">(x, y)</span> that satisfies every equation in it.</p><p>The <strong>solution set</strong> is the set of all such pairs. Solving the system means describing that set, which is not always a matter of naming one pair.</p></div><p>"Considered together" is where the content is. On its own, <span class="math" data-say="2 x plus y equals 4">2x + y = 4</span> has infinitely many solutions &mdash; one for every value of <span class="math" data-say="x">x</span>. The system asks for the pairs the two equations have in common, so the solution set of the system is the <em>intersection</em> of the two solution sets, never their union.</p><p>Lines, Functions and Graphs established that the graph of <span class="math" data-say="A x plus b y equals c">ax + by = c</span> is a line. So the solution set of a two-equation system is the set of points lying on both lines, and the question "how many solutions" becomes the question "how do two lines meet".</p><div class="thm"><span class="label">Theorem &middot; Two lines meet in nothing, one point, or a whole line</span><p>Two lines in the plane share no point, exactly one point, or every point of the line. No other count is possible &mdash; in particular no system of two linear equations has exactly two solutions.</p></div><div class="proof"><p>Suppose the two lines share two distinct points <span class="math" data-say="P">P</span> and <span class="math" data-say="Q">Q</span>. There is exactly one line through <span class="math" data-say="P">P</span> and <span class="math" data-say="Q">Q</span>, so the two lines are the same line, and then every point of one lies on the other.</p><p>So if the lines share more than one point they share all of them. The remaining possibilities are one shared point and none.</p><p><span class="qed">&#9633;</span></p></div><p>The three cases carry names. A system with at least one solution is <strong>consistent</strong>; one with none is <strong>inconsistent</strong>. A consistent system whose equations describe the same line is <strong>dependent</strong>; one with exactly one solution is <strong>independent</strong>.</p><h3>Telling the cases apart without drawing</h3><p>Put both equations in slope-intercept form. Different slopes means the lines cross once. Equal slopes with different intercepts means parallel and distinct, so no solution. Equal slopes and equal intercepts means one line written two ways, so infinitely many.</p><div class="mathblock" data-say="2 x plus 3 y equals 6, y equals negative the quantity 2 over 3, times x plus 2, slope negative 2 over 3, intercept 2. 4 x plus 6 y equals 7, y equals negative the quantity 2 over 3, times x plus 7 over 6, slope negative 2 over 3, intercept 7 over 6. same slope, different intercept, goes to, parallel, distinct, goes to, none" tabindex="0" role="region" aria-label="Mathematical notation">2x + 3y = 6      y = −(2/3)x + 2       slope −2/3,  intercept 2
 4x + 6y = 7      y = −(2/3)x + 7/6     slope −2/3,  intercept 7/6
 
-same slope, different intercept   →   parallel, distinct   →   none</div><p>Vertical lines do not have slopes, so slope-intercept form is not always the right comparison. In standard form, ask whether one equation's two variable coefficients are a common multiple of the other's. If not, the lines cross once. If they are, the constants decide whether the equations are the same multiple or a contradiction. “Determinants and Cramer's Rule” packages that coefficient comparison into one number, the determinant.</p><div class="example"><span class="label">Example &middot; The same line, written twice</span><p><span class="math" data-say="x minus 2 y equals 4">x − 2y = 4</span> and <span class="math" data-say="negative 3 x plus 6 y equals negative 12">−3x + 6y = −12</span>. The second equation is <span class="math" data-say="negative 3">−3</span> times the first, so every pair satisfying one satisfies the other and the solution set is the whole line <span class="math" data-say="the set x, y such that x minus 2 y equals 4">{(x, y) : x − 2y = 4}</span>.</p><p>Infinitely many is not the same as "all pairs". <span class="math" data-say="0, 0">(0, 0)</span> fails both equations, and so does most of the plane.</p></div><p>Checking a candidate is not optional and takes ten seconds: substitute the pair into <em>every</em> original equation. A pair produced by an error usually satisfies the last equation you touched, which is exactly the one that will not catch it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Two lines, and where they meet</h2></div><p>One solution, none, or infinitely many -- decided by rank, drawn by sampling</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+same slope, different intercept   →   parallel, distinct   →   none</div><p>Vertical lines do not have slopes, so slope-intercept form is not always the right comparison. In standard form, ask whether one equation's two variable coefficients are a common multiple of the other's. If not, the lines cross once. If they are, the constants decide whether the equations are the same multiple or a contradiction. “Determinants and Cramer's Rule” packages that coefficient comparison into one number, the determinant.</p><div class="example"><span class="label">Example &middot; The same line, written twice</span><p><span class="math" data-say="x minus 2 y equals 4">x − 2y = 4</span> and <span class="math" data-say="negative 3 x plus 6 y equals negative 12">−3x + 6y = −12</span>. The second equation is <span class="math" data-say="negative 3">−3</span> times the first, so every pair satisfying one satisfies the other and the solution set is the whole line <span class="math" data-say="the set x, y such that x minus 2 y equals 4">{(x, y) : x − 2y = 4}</span>.</p><p>Infinitely many is not the same as "all pairs". <span class="math" data-say="0, 0">(0, 0)</span> fails both equations, and so does most of the plane.</p></div><p>Checking a candidate is not optional and takes ten seconds: substitute the pair into <em>every</em> original equation. A pair produced by an error usually satisfies the last equation you touched, which is exactly the one that will not catch it.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Two lines, and where they meet</h2></div><p>One solution, none, or infinitely many -- decided by rank, drawn by sampling</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="syTitle">System</strong><span id="sySub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>equation 1</span><span class="tone-purple"><i class="legend-swatch"></i>equation 2</span><span class="tone-green"><i class="legend-swatch"></i>the solution</span></div>
@@ -1407,10 +1450,10 @@ same slope, different intercept   →   parallel, distinct   →   none</div><p>
       <div class="lab-stage" id="syStage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="syPlot"></svg></div>
       <div id="syWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="syStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Two lines at once</h3>
-          <p>Move the coefficients and watch the crossing point. Set the second line's slope equal to the first: the intersection leaves the plane entirely, and that is what an inconsistent system looks like before any algebra.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Two lines at once</h3>
+            <p>Move the coefficients and watch the crossing point. Set the second line's slope equal to the first: the intersection leaves the plane entirely, and that is what an inconsistent system looks like before any algebra.</p>
         <div class="field" id="syFieldPreset">
           <label for="syPreset">Worked example</label>
           <select id="syPreset"><option value="0">one solution: the lines cross exactly once</option><option value="1">no solution: the same slope, a different intercept</option><option value="2">infinitely many: the second line IS the first</option><option value="3">the crossing point is not a lattice point</option><option value="4">a vertical line and a horizontal one</option><option value="5">both lines through the origin</option></select>
@@ -1429,12 +1472,14 @@ same slope, different intercept   →   parallel, distinct   →   none</div><p>
           <div class="kpi"><span id="syK3Lab">&mdash;</span><strong id="syK3">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="syHint" style="margin:0;">Type equations the way you would write them: <code>2x + 3y = 12</code>, <code>y = 2x - 1</code>, <code>x/2 + y/3 = 1</code>. Brackets and implicit multiplication are understood, and every coefficient becomes an exact fraction.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a system before solving it</h2></div><p>Four questions, in this order. The first three often finish the job.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write both equations the same way</h3><p>Either both as <span class="math" data-say="A x plus b y equals c">ax + by = c</span> or both as <span class="math" data-say="y equals m x plus b">y = mx + b</span>, with the terms in the same order. Two equations written in different shapes cannot be compared, and comparing them is the next three steps.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compare the slopes</h3><p>Different slopes means exactly one solution: stop classifying and go and find it. Equal slopes means the system is one of the two degenerate cases.</p></article><article class="card concept-card"><div class="icon">3</div><h3>If the slopes agree, compare the intercepts</h3><p>Different intercepts: parallel and distinct, no solution. Same intercept: the two equations describe one line, and the solution set is that line.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Solve, then substitute into both originals</h3><p>The pair must be tested in every equation of the system, including the ones you stopped using early. A solution that satisfies one equation is not a solution.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a system before solving it</h2>
+      <p class="lead-in">Four questions, in this order. The first three often finish the job.</p>
+      <ol class="key-ideas method"><li><strong>Write both equations the same way.</strong> Either both as <span class="math" data-say="A x plus b y equals c">ax + by = c</span> or both as <span class="math" data-say="y equals m x plus b">y = mx + b</span>, with the terms in the same order. Two equations written in different shapes cannot be compared, and comparing them is the next three steps.</li><li><strong>Compare the slopes.</strong> Different slopes means exactly one solution: stop classifying and go and find it. Equal slopes means the system is one of the two degenerate cases.</li><li><strong>If the slopes agree, compare the intercepts.</strong> Different intercepts: parallel and distinct, no solution. Same intercept: the two equations describe one line, and the solution set is that line.</li><li><strong>Solve, then substitute into both originals.</strong> The pair must be tested in every equation of the system, including the ones you stopped using early. A solution that satisfies one equation is not a solution.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1460,17 +1505,16 @@ same slope, different intercept   →   parallel, distinct   →   none</div><p>
       the same line   →   infinitely many:  {(x, y) : x − 2y = 4}</div><p>System (b) has no solution, and that is a complete answer. Pushing on with algebra produces a false statement &mdash; doubling the first equation gives <span class="math" data-say="4 x plus 6 y equals 12">4x + 6y = 12</span> against <span class="math" data-say="4 x plus 6 y equals 7">4x + 6y = 7</span>, so <span class="math" data-say="0 equals 5">0 = 5</span> &mdash; which is the signature “Solving by Substitution” and “Solving by Elimination” teach you to read rather than to fear.</p><p>System (c) is the one that gets reported wrongly. The answer is a line, and it has to be written as a line &mdash; either as the equation <span class="math" data-say="x minus 2 y equals 4">x − 2y = 4</span> or in the parameter form <span class="math" data-say="2 t plus 4, t">(2t + 4, t)</span>. "Infinitely many" on its own says how many and not which.</p><p>Faded rehearsal: classify <span class="math" data-say="x equals 3">x = 3</span> with <span class="math" data-say="2 x plus y equals 7">2x + y = 7</span>. The first line is vertical, so do not force a slope comparison: substitute its fixed <span class="math" data-say="x">x</span> into the other equation, finish the ordered pair, and check it in both originals. Then change the second equation to <span class="math" data-say="2 x equals 8">2x = 8</span> and explain the different classification before doing any solving.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reporting x and stopping</strong><span>The solution of a two-variable system is a pair. <span class="math" data-say="x equals 2">x = 2</span> is half an answer, and the missing half is where the sign errors live.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Checking the answer in one equation only</strong><span>If <span class="math" data-say="y">y</span> was found by substituting into the second equation, that equation will check out however badly the first step went. The equation you have not used since the beginning is the one that catches the error.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling a dependent system&#x27;s solution set everything</strong><span><span class="math" data-say="x minus 2 y equals 4">x − 2y = 4</span> and <span class="math" data-say="negative 3 x plus 6 y equals negative 12">−3x + 6y = −12</span> are satisfied by infinitely many pairs, but <span class="math" data-say="0, 0">(0, 0)</span> is not one of them. The solution set is a line, not the plane, and it has to be described.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can name the case before you solve.</strong><p>From the coefficients alone you should be able to say whether a system has one solution, none, or infinitely many, and only then produce the pair and check it in both equations. Naming the case first is what turns an inconsistent system into a two-line answer instead of a page of algebra ending in <span class="math" data-say="0 equals 14">0 = 14</span>.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The three cases survive every enlargement of the problem. “Systems in Three Variables” has three variables and the same three answers; “Gaussian Elimination” reads them straight off a row-reduced matrix without any geometry at all. The determinant in “Determinants and Cramer's Rule” will compress the coefficient comparison into a single test for the first case.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reporting x and stopping</strong><span>The solution of a two-variable system is a pair. <span class="math" data-say="x equals 2">x = 2</span> is half an answer, and the missing half is where the sign errors live.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Checking the answer in one equation only</strong><span>If <span class="math" data-say="y">y</span> was found by substituting into the second equation, that equation will check out however badly the first step went. The equation you have not used since the beginning is the one that catches the error.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling a dependent system&#x27;s solution set everything</strong><span><span class="math" data-say="x minus 2 y equals 4">x − 2y = 4</span> and <span class="math" data-say="negative 3 x plus 6 y equals negative 12">−3x + 6y = −12</span> are satisfied by infinitely many pairs, but <span class="math" data-say="0, 0">(0, 0)</span> is not one of them. The solution set is a line, not the plane, and it has to be described.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can name the case before you solve.</strong><p>From the coefficients alone you should be able to say whether a system has one solution, none, or infinitely many, and only then produce the pair and check it in both equations. Naming the case first is what turns an inconsistent system into a two-line answer instead of a page of algebra ending in <span class="math" data-say="0 equals 14">0 = 14</span>.</p></div></div><div class="note"><strong>Note:</strong> The three cases survive every enlargement of the problem. “Systems in Three Variables” has three variables and the same three answers; “Gaussian Elimination” reads them straight off a row-reduced matrix without any geometry at all. The determinant in “Determinants and Cramer's Rule” will compress the coefficient comparison into a single test for the first case.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A solution satisfies every equation</summary><p>An ordered pair <span class="math" data-say="x, y">(x, y)</span> solves the system only if substituting it makes both equations true. Satisfying one of them is not partial credit; it is not a solution at all.</p></details><details class="recall"><summary>There are exactly three possibilities</summary><p>One, none, or infinitely many. Two lines cannot cross in exactly two points, because two distinct points already determine a single line &mdash; so sharing two points means sharing all of them.</p></details><details class="recall"><summary>A graph names the case; it does not give the answer</summary><p>The lines <span class="math" data-say="2 x plus y equals 4">2x + y = 4</span> and <span class="math" data-say="x minus y equals 1">x − y = 1</span> cross at <span class="math" data-say="5 over 3, 2 over 3">(5/3, 2/3)</span>. A careful drawing puts the crossing near <span class="math" data-say="1.7, 0.7">(1.7, 0.7)</span>, and no drawing distinguishes <span class="math" data-say="5 over 3">5/3</span> from <span class="math" data-say="1.7">1.7</span>.</p></details></div>
+      <h3>Summary</h3>
       <p>A system asks which pairs satisfy several equations at once, and a solution has to satisfy every one of them. Two lines cross once, never, or everywhere &mdash; and those three cases are the whole classification.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A solution satisfies every equation.</strong> An ordered pair <span class="math" data-say="x, y">(x, y)</span> solves the system only if substituting it makes both equations true. Satisfying one of them is not partial credit; it is not a solution at all.</li><li><strong>There are exactly three possibilities.</strong> One, none, or infinitely many. Two lines cannot cross in exactly two points, because two distinct points already determine a single line &mdash; so sharing two points means sharing all of them.</li><li><strong>A graph names the case; it does not give the answer.</strong> The lines <span class="math" data-say="2 x plus y equals 4">2x + y = 4</span> and <span class="math" data-say="x minus y equals 1">x − y = 1</span> cross at <span class="math" data-say="5 over 3, 2 over 3">(5/3, 2/3)</span>. A careful drawing puts the crossing near <span class="math" data-say="1.7, 0.7">(1.7, 0.7)</span>, and no drawing distinguishes <span class="math" data-say="5 over 3">5/3</span> from <span class="math" data-say="1.7">1.7</span>.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="one solution, the lines cross once, consistent, independent. no solution, parallel and distinct, inconsistent. infinitely many, one line written twice, consistent, dependent" tabindex="0" role="region" aria-label="Mathematical notation">one solution      the lines cross once     consistent, independent
 no solution       parallel and distinct    inconsistent
 infinitely many   one line written twice   consistent, dependent</div><figcaption>Three cases, and nothing else</figcaption></figure>
@@ -3974,11 +4018,42 @@ infinitely many   one line written twice   consistent, dependent</div><figcaptio
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -4046,7 +4121,7 @@ infinitely many   one line written twice   consistent, dependent</div><figcaptio
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

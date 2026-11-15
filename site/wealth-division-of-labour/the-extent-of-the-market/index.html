@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Division of Labour</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Book I, Chapter 3 · That the Division of Labour Is Limited by the Extent of the Market</p>
       <h1>The Extent of the Market</h1>
       <p class="lesson-lede">A trade can exist only where there is enough demand to keep one man at it, and water carriage widens the market more than any road.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The limit</li><li>How many a place can keep</li><li>Water carriage</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>A limit stated, then shown on the map</h2>
-      <article class="prose reading"><p><strong>Book I, Chapter 3.</strong> The chapter's first sentence is its thesis. The power of exchanging gives occasion to the division of labour, so the extent of this division &ldquo;must always be limited by the extent of that power, or, in other words, by the extent of the market.&rdquo; Smith opens with the thing the previous chapter left open: if exchange makes the division of labour, then the division can go only as far as exchange can.</p><p>Then the reason. When the market is very small, &ldquo;no person can have any encouragement to dedicate himself entirely to one employment, for want of the power to exchange all that surplus part of the produce of his own labour, which is over and above his own consumption, for such parts of the produce of other men's labour as he has occasion for.&rdquo; Some trades, even of the lowest kind, can be carried on nowhere but in a great town. A porter can find employment and subsistence in no other place; a village is by much too narrow a sphere for him. The scattered Highland houses have the opposite case: &ldquo;every farmer must be butcher, baker, and brewer, for his own family&rdquo;.</p><p>Then Smith gives the figure that makes it arithmetic. A nailer at the rate of a thousand nails a day, and three hundred working days in a year, will make three hundred thousand nails. But in a remote Highland district, &ldquo;it would be impossible to dispose of one thousand, that is, of one day's work in the year.&rdquo; The district would not take even a thousand, so the lab's first preset, <code>highlands</code>, gives it Smith's bound as its demand: 1,000 nails a year, against a nailer who makes 300,000. Even at the bound the place keeps no whole nailer, <span class="math" data-say="1000 over 300000 equals 1 over 300">1000/300000 = 1/300</span> of one man's year, and a nailer who tried to live there would be idle on all but a day in three hundred.</p><div class="defbox"><span class="label">Definition &middot; Specialists a demand keeps</span><p>The number of whole men a place's yearly demand for a good can keep at it, taking each man's yearly output as given: the demand divided by one man's output, rounded down. A place that keeps none can still have the trade done, by a man who does it in a few days of the year alongside other work.</p></div><p>Now let the demand grow. In the preset <code>ladder</code> the Highlands keep 1,000; a village, with figures written for the lesson, 30,000; a market town 150,000; a port 900,000; a city 3,000,000. With a nailer making 300,000 nails a year, the village takes a tenth of a nailer, the market town a half, the port three nailers, the city ten. Only in the port does the trade first stand on its own. Smith's remark that a country smith's trade is &ldquo;still more various&rdquo; than the carpenter's is what the first three places look like in practice: the man who cannot live by nails alone makes everything iron.</p><p>The third preset, <code>by-water</code>, written for the lesson, is the same sum with a river. An inland village that can reach only its neighbours takes 20,000 nails a year, a fifteenth of one nailer's year and no living for him. A village on a navigable river, whose trade can travel as far as the water does, takes 600,000, and keeps two nailers. Nothing about the villagers has changed except how far their trade can go.</p><p>Then he turns to what widens a market. &ldquo;A broad-wheeled waggon, attended by two men, and drawn by eight horses, in about six weeks time, carries and brings back between London and Edinburgh near four ton weight of goods. In about the same time a ship navigated by six or eight men, and sailing between the ports of London and Leith, frequently carries and brings back two hundred ton weight of goods.&rdquo; The ratio is easy to work. Two hundred tons is fifty wagon-loads of four, and fifty wagons mean a hundred men and four hundred horses, which are Smith's figures. By land that is two tons a man; by sea it is between twenty-five and thirty-three, so a man on the ship does roughly the work of twelve to seventeen on the road. By land alone, Smith says, only goods whose price was very considerable in proportion to their weight could bear the carriage, and he asks what goods could bear the expense of land carriage between London and Calcutta.</p><p>Hence his geography. Because water carriage opens a wider market, &ldquo;it is upon the sea-coast, and along the banks of navigable rivers, that industry of every kind naturally begins to subdivide and improve itself&rdquo;, and only much later in the inland parts. The nations that were first civilized dwelt round the Mediterranean, a sea without tides and with many islands, so that sailors who dared not lose sight of the coast could still cross it. Egypt seems to him the first improved, and the Nile and its canals, which gave water carriage to nearly every village, &ldquo;probably one of the principal causes&rdquo;; he says the like of Bengal and the eastern provinces of China, though he says the great extent of their antiquity is &ldquo;not authenticated by any histories of whose authority we, in this part of the world, are well assured&rdquo;. And where there is no water carriage, in the interior of Africa and in what he calls Tartary and Siberia, he finds none of the improvement.</p><p>That last sweep is the weakest part of the chapter, and Smith's readers have said so. It rests on what a European knew in 1776, it says nothing of the overland caravan trade across Asia and Africa, and it takes the coast as the cause of the civilisation when the coast might be a consequence of it. The core of the chapter does not stand or fall with it. The economist Allyn Young added a point in 1928 that Smith's sentence does not contain: the division of labour does not only wait for the market but widens it, because each new specialist is a customer for others, so that the limit and the thing limited feed on one another. Smith's own first chapter says that every workman has a great quantity of his own work to dispose of, and exchanges it for a great quantity of theirs, which is half of Young's point.</p><p>This is the end of Smith's first account of the division of labour: what it does, why it arises and what limits it. In the next course the exchange it depends on gets its instrument. Chapter 4 asks what happens when the butcher has more meat than he can eat and the baker has no need for any, and why people settled at last on a metal.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The division of labour</h2></div><p>how many specialists a market of a given size can keep</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>A limit stated, then shown on the map</h2><div class="prose reading"><p><strong>Book I, Chapter 3.</strong> The chapter's first sentence is its thesis. The power of exchanging gives occasion to the division of labour, so the extent of this division &ldquo;must always be limited by the extent of that power, or, in other words, by the extent of the market.&rdquo; Smith opens with the thing the previous chapter left open: if exchange makes the division of labour, then the division can go only as far as exchange can.</p><p>Then the reason. When the market is very small, &ldquo;no person can have any encouragement to dedicate himself entirely to one employment, for want of the power to exchange all that surplus part of the produce of his own labour, which is over and above his own consumption, for such parts of the produce of other men's labour as he has occasion for.&rdquo; Some trades, even of the lowest kind, can be carried on nowhere but in a great town. A porter can find employment and subsistence in no other place; a village is by much too narrow a sphere for him. The scattered Highland houses have the opposite case: &ldquo;every farmer must be butcher, baker, and brewer, for his own family&rdquo;.</p><p>Then Smith gives the figure that makes it arithmetic. A nailer at the rate of a thousand nails a day, and three hundred working days in a year, will make three hundred thousand nails. But in a remote Highland district, &ldquo;it would be impossible to dispose of one thousand, that is, of one day's work in the year.&rdquo; The district would not take even a thousand, so the lab's first preset, <code>highlands</code>, gives it Smith's bound as its demand: 1,000 nails a year, against a nailer who makes 300,000. Even at the bound the place keeps no whole nailer, <span class="math" data-say="1000 over 300000 equals 1 over 300">1000/300000 = 1/300</span> of one man's year, and a nailer who tried to live there would be idle on all but a day in three hundred.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The division of labour</h2></div><p>how many specialists a market of a given size can keep</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The division of labour</strong><span>how many specialists a market of a given size can keep</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="wdvTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="wdvTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> The specialists a place keeps is its demand a year over one specialist's output a year, rounded down to a whole number (the lab's rule: a part of a year's work does not keep a person at the trade). The share is the same quotient, exact, and may pass 100%. A full-time trade can live where it keeps at least one specialist; Smith's rule (I.3) is that the division of labour is limited by the extent of the market. Output a day is the output a year over the working days. Places are listed in the order given.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>How many nailers a place can keep</h3>
-          <p>A figure computed from the quantities the lesson states. Each place's yearly demand and what one specialist makes in a year go in. The lab divides, floors, and says whether a full-time trade can live there. Smith's own figures are the 1,000, the 1,000 a day and the 300 days.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>How many nailers a place can keep</h3>
+            <p>A figure computed from the quantities the lesson states. Each place's yearly demand and what one specialist makes in a year go in. The lab divides, floors, and says whether a full-time trade can live there. Smith's own figures are the 1,000, the 1,000 a day and the 300 days.</p>
         <div class="field">
           <label for="wdvPreset">Worked example</label>
           <select id="wdvPreset"><option value="highlands" selected>Smith's Highland nailer: 1,000 nails a year against 300,000</option><option value="ladder">The Highlands, then larger places, written for this lesson (the Highlands are Smith's)</option><option value="by-water">An inland village and the same village on a navigable river, written for this lesson</option></select>
@@ -1431,12 +1474,15 @@
           <div class="kpi"><span>One specialist's output a day</span><strong id="wdvPerDay">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Specialists a demand keeps</span><p>The number of whole men a place's yearly demand for a good can keep at it, taking each man's yearly output as given: the demand divided by one man's output, rounded down. A place that keeps none can still have the trade done, by a man who does it in a few days of the year alongside other work.</p></div><p>Now let the demand grow. In the preset <code>ladder</code> the Highlands keep 1,000; a village, with figures written for the lesson, 30,000; a market town 150,000; a port 900,000; a city 3,000,000. With a nailer making 300,000 nails a year, the village takes a tenth of a nailer, the market town a half, the port three nailers, the city ten. Only in the port does the trade first stand on its own. Smith's remark that a country smith's trade is &ldquo;still more various&rdquo; than the carpenter's is what the first three places look like in practice: the man who cannot live by nails alone makes everything iron.</p><p>The third preset, <code>by-water</code>, written for the lesson, is the same sum with a river. An inland village that can reach only its neighbours takes 20,000 nails a year, a fifteenth of one nailer's year and no living for him. A village on a navigable river, whose trade can travel as far as the water does, takes 600,000, and keeps two nailers. Nothing about the villagers has changed except how far their trade can go.</p><p>Then he turns to what widens a market. &ldquo;A broad-wheeled waggon, attended by two men, and drawn by eight horses, in about six weeks time, carries and brings back between London and Edinburgh near four ton weight of goods. In about the same time a ship navigated by six or eight men, and sailing between the ports of London and Leith, frequently carries and brings back two hundred ton weight of goods.&rdquo; The ratio is easy to work. Two hundred tons is fifty wagon-loads of four, and fifty wagons mean a hundred men and four hundred horses, which are Smith's figures. By land that is two tons a man; by sea it is between twenty-five and thirty-three, so a man on the ship does roughly the work of twelve to seventeen on the road. By land alone, Smith says, only goods whose price was very considerable in proportion to their weight could bear the carriage, and he asks what goods could bear the expense of land carriage between London and Calcutta.</p><p>Hence his geography. Because water carriage opens a wider market, &ldquo;it is upon the sea-coast, and along the banks of navigable rivers, that industry of every kind naturally begins to subdivide and improve itself&rdquo;, and only much later in the inland parts. The nations that were first civilized dwelt round the Mediterranean, a sea without tides and with many islands, so that sailors who dared not lose sight of the coast could still cross it. Egypt seems to him the first improved, and the Nile and its canals, which gave water carriage to nearly every village, &ldquo;probably one of the principal causes&rdquo;; he says the like of Bengal and the eastern provinces of China, though he says the great extent of their antiquity is &ldquo;not authenticated by any histories of whose authority we, in this part of the world, are well assured&rdquo;. And where there is no water carriage, in the interior of Africa and in what he calls Tartary and Siberia, he finds none of the improvement.</p><p>That last sweep is the weakest part of the chapter, and Smith's readers have said so. It rests on what a European knew in 1776, it says nothing of the overland caravan trade across Asia and Africa, and it takes the coast as the cause of the civilisation when the coast might be a consequence of it. The core of the chapter does not stand or fall with it. The economist Allyn Young added a point in 1928 that Smith's sentence does not contain: the division of labour does not only wait for the market but widens it, because each new specialist is a customer for others, so that the limit and the thing limited feed on one another. Smith's own first chapter says that every workman has a great quantity of his own work to dispose of, and exchanges it for a great quantity of theirs, which is half of Young's point.</p><p>This is the end of Smith's first account of the division of labour: what it does, why it arises and what limits it. In the next course the exchange it depends on gets its instrument. Chapter 4 asks what happens when the butcher has more meat than he can eat and the baker has no need for any, and why people settled at last on a metal.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting the specialists a place can keep</h2></div><p>Four steps, the same for any trade and any place.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find one specialist&#x27;s year</h3><p>Multiply what he makes in a day by the days he works: 1,000 nails a day and 300 days make 300,000 nails a year.</p></article><article class="card concept-card"><div class="icon">2</div><h3>State the place&#x27;s demand</h3><p>How many of the same good the place will take in a year, from every customer within reach. Smith says a Highland district would not take even a thousand, so a thousand is a bound.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Divide</h3><p>The demand over one man's yearly output is the share of a man's year the place takes. Anything under one is a part-time trade; the whole number below it is how many men the place can keep.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Change the market, not the man</h3><p>Widen the place's reach and repeat the division. The difference is the effect of the extent of the market and nothing else.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting the specialists a place can keep</h2>
+      <p class="lead-in">Four steps, the same for any trade and any place.</p>
+      <ol class="key-ideas method"><li><strong>Find one specialist&#x27;s year.</strong> Multiply what he makes in a day by the days he works: 1,000 nails a day and 300 days make 300,000 nails a year.</li><li><strong>State the place&#x27;s demand.</strong> How many of the same good the place will take in a year, from every customer within reach. Smith says a Highland district would not take even a thousand, so a thousand is a bound.</li><li><strong>Divide.</strong> The demand over one man's yearly output is the share of a man's year the place takes. Anything under one is a part-time trade; the whole number below it is how many men the place can keep.</li><li><strong>Change the market, not the man.</strong> Widen the place's reach and repeat the division. The difference is the effect of the extent of the market and nothing else.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1454,17 +1500,16 @@ port:  900000 / 300000 = 3 nailers
 ship against wagon:  200 / 4 = 50 wagons</div><p>Smith's one day in three hundred is <span class="math" data-say="1 over 300">1/300</span> of a year. The nailer's trade is impossible in the Highlands and takes three men in the port, and in neither place is the nailer any different. The ship against the wagon is the reason a port can be a market for places that cannot reach each other by road.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a trade needs a big town because its goods are special</strong><span>Smith's nailer is no different in the Highlands and in a port. What differs is how many nails a year are wanted. A trade fails where demand is below a man's year of work, whatever the goods.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the limit as a ceiling the market simply sets</strong><span>Smith says the market limits the division, which is a claim that it cannot go further. Later economists, Allyn Young among them, added that the division also enlarges the market, so that one does not simply wait for the other.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the geography for a proof</strong><span>The cases of Egypt, Bengal, China and Africa are illustrations with the evidence of 1776, and Smith himself says the great extent of the antiquity of Bengal and China is not authenticated. The nailer and the wagon are arithmetic, the coasts and rivers are history, and they differ in how much can be checked.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say how many specialists a place can keep from its demand and one man&#x27;s output.</strong><p>Given a place's yearly demand for a good and one specialist's yearly output, compute the share of a year and the number of whole specialists, and use Smith's wagon and ship figures to say why water carriage widens a market.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab divides demand by output, and the figure that matters is the demand, which Smith does not measure: the 1,000 nails is a bound he says the district would not reach, and the villages and towns of the <code>ladder</code> preset are the lesson's. The arithmetic cannot say whether the Highlands really lacked a nailer, whether demand grows with the market or the market with demand, or whether the carriage figures of 1776 hold for any other century. What it does show is the form of the claim: a division of labour that works at one scale fails below it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a trade needs a big town because its goods are special</strong><span>Smith's nailer is no different in the Highlands and in a port. What differs is how many nails a year are wanted. A trade fails where demand is below a man's year of work, whatever the goods.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the limit as a ceiling the market simply sets</strong><span>Smith says the market limits the division, which is a claim that it cannot go further. Later economists, Allyn Young among them, added that the division also enlarges the market, so that one does not simply wait for the other.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the geography for a proof</strong><span>The cases of Egypt, Bengal, China and Africa are illustrations with the evidence of 1776, and Smith himself says the great extent of the antiquity of Bengal and China is not authenticated. The nailer and the wagon are arithmetic, the coasts and rivers are history, and they differ in how much can be checked.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say how many specialists a place can keep from its demand and one man&#x27;s output.</strong><p>Given a place's yearly demand for a good and one specialist's yearly output, compute the share of a year and the number of whole specialists, and use Smith's wagon and ship figures to say why water carriage widens a market.</p></div></div><div class="note"><strong>Note:</strong> The lab divides demand by output, and the figure that matters is the demand, which Smith does not measure: the 1,000 nails is a bound he says the district would not reach, and the villages and towns of the <code>ladder</code> preset are the lesson's. The arithmetic cannot say whether the Highlands really lacked a nailer, whether demand grows with the market or the market with demand, or whether the carriage figures of 1776 hold for any other century. What it does show is the form of the claim: a division of labour that works at one scale fails below it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The limit</summary><p>The extent of the division of labour must be limited by the extent of the power of exchanging, or in other words by the extent of the market. When the market is very small, no one has encouragement to give himself to one employment, for want of the power to exchange his surplus.</p></details><details class="recall"><summary>How many a place can keep</summary><p>A trade needs enough demand to keep a man at it all year. Where it does not, his work is added to someone else's: the country carpenter is also joiner, cabinet-maker and cart-maker, the Highland farmer his own butcher, baker and brewer.</p></details><details class="recall"><summary>Water carriage</summary><p>A ship carrying two hundred tons with six or eight men does what fifty wagons, a hundred men and four hundred horses do by land. So the first improvements of art and industry begin on the sea-coast and along navigable rivers, and reach the inland parts much later.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 3 gives the division of labour its limit. Take Smith's nailer, who could make three hundred thousand nails a year but could not sell even a thousand in the Highlands, and compute how many specialists a place's demand can keep. Then weigh the wagon against the ship, in Smith's own figures, and see why he thought industry began on the coasts.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The limit.</strong> The extent of the division of labour must be limited by the extent of the power of exchanging, or in other words by the extent of the market. When the market is very small, no one has encouragement to give himself to one employment, for want of the power to exchange his surplus.</li><li><strong>How many a place can keep.</strong> A trade needs enough demand to keep a man at it all year. Where it does not, his work is added to someone else's: the country carpenter is also joiner, cabinet-maker and cart-maker, the Highland farmer his own butcher, baker and brewer.</li><li><strong>Water carriage.</strong> A ship carrying two hundred tons with six or eight men does what fifty wagons, a hundred men and four hundred horses do by land. So the first improvements of art and industry begin on the sea-coast and along navigable rivers, and reach the inland parts much later.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="specialists equals whole units of demand over output. share of a year equals demand over one&#x27;s output. a trade lives where demand fills a year. ship, 200 tons for 8 men at most. wagon, about 4 tons for 2 men" tabindex="0" role="region" aria-label="Mathematical notation">specialists = whole units of demand/output
 share of a year = demand / one&#x27;s output
 a trade lives where demand fills a year
@@ -2317,11 +2362,42 @@ wagon: about 4 tons for 2 men</div><figcaption>The limit in five lines</figcapti
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2389,7 +2465,7 @@ wagon: about 4 tons for 2 men</div><figcaption>The limit in five lines</figcapti
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

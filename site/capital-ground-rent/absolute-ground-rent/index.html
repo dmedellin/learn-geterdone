@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Ground Rent</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 45 · Absolute Ground-Rent</p>
       <h1>Absolute Ground Rent</h1>
       <p class="lesson-lede">Landed property can stop the surplus value of farming from being shared out in the average profit, and the part it keeps is absolute rent, paid even by the worst soil, without any price above value.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Absolute rent</li><li>Lower composition</li><li>A barrier to equalisation</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The nature of absolute rent first, then the arithmetic</h2>
-      <article class="prose reading"><p><strong>Volume III, Chapter 45.</strong> &ldquo;In industry these different masses of surplus-value are leveled into an average profit and distributed among the individual capitals uniformly and as aliquot parts of the social capital. Private property in land prevents such an equalization among capitals invested in the soil, whenever production requires real estate, either for agriculture or for the extraction of raw materials, and catches a portion of the surplus value which would otherwise assist in the formation of the average rate of profits.&rdquo;</p><p>Ricardo's theory says the worst land in use pays no rent. Marx asks a landlord's question: why would anyone lend land for nothing? If the price of corn just covers a tenant's capital and the average profit on the worst soil, &ldquo;will the landlord rent such lands for nothing&rdquo;? &ldquo;By no means.&rdquo; The market price must rise a little above the price of production, to P + r in Marx's letters, before the land is let. So the worst soil pays a rent, and the next question is what it is a share of.</p><p>The obvious answer is that it is a monopoly price, a tax the landlord levies on bread. Marx says it need not be, and his reason comes from Average Profit and Its Fall. A capital that employs more labour per pound than the average produces more surplus value than the average profit it receives; its value is above its price of production. If farming is such a capital, corn can sell above its price of production and still at or below its value.</p><p>Here are Marx's figures, which the marx preset uses. Non-agricultural capital is 85c + 15v; agricultural capital is 75c + 25v; the rate of surplus value is 100% in both. Industry's product is worth 115, agriculture's 125. Equalise the two, each with a capital of 100, and the 40 of surplus value is 20% on 200: both sell at 120. Agriculture's product sells 5 below its value, industry's 5 above. Landed property, by refusing to let land below a rent, can hold farming's price up toward its value, and the gap is the room for absolute rent. The lab prints agriculture's price of production of £120 and an absolute rent of up to £5.</p><div class="defbox"><span class="label">Definition &middot; Absolute ground rent</span><p>Rent paid even on the worst cultivated soil, which on Marx's account is part or all of the excess of agricultural value over price of production, kept from the general equalisation of profit by landed property.</p></div><p>&ldquo;Up to&rdquo;, because how much of the 5 becomes rent &ldquo;will depend wholly upon the relation between supply and demand&rdquo;. The market-limited preset sets the highest price the market bears at 122: the absolute rent is then up to 2. Either way the corn sells at what Marx still calls &ldquo;a monopoly price, not because their price would exceed their value, but because their price would be equal to their value, or because their price would be lower than their value but higher than their price of production&rdquo;. And the causal order is the opposite of the last lessons': here &ldquo;the rent is the cause of the increase in the price of the product&rdquo;.</p><p>The whole construction hangs on one assumption, and Marx says so twice. Whether farming's composition is in fact lower than the average &ldquo;is a question which can be decided only by statistics&rdquo;. And if it is not, absolute rent in this sense &ldquo;would disappear&rdquo;. The average-composition preset gives agriculture industry's 85c + 15v: value and price of production are both 115, and the tile reads up to £0. Marx adds that the same would follow if farming's composition &ldquo;would gradually become the same as that of the average social capital with the progress of civilization&rdquo;.</p><p>Ricardo comes in for one more criticism. He set out to study the effect of the appropriation of land, Marx says, and then took his examples from colonies, where land is not yet appropriated and anyone may farm new land. Where land is owned, the owner's power to withhold it is the point. Marx notes, citing Fourier, that in every civilised country &ldquo;a comparatively considerable portion of the land always remains uncultivated&rdquo;.</p><p>This is the most disputed chapter of the Part. Economists after Marx, following Ricardo, mostly hold that the marginal land pays no rent, or only the rent its best alternative use would pay, and treat what it does pay as reward for scarcity, not as a share of surplus value. Others dispute the construction from inside Marx's own terms: it depends on reading values and prices of production as Chapter 9 does, inputs at value, which is the assumption the transformation debate after Bortkiewicz questions. What the chapter itself supplies is the assumption, named, and the case in which it fails.</p><p>Absolute and differential rent are, Marx says, &ldquo;the only normal ones&rdquo;. The next lesson, “Building Rent, Mining Rent, the Price of Land”, carries both off the farm, to building plots and mines, and returns to the price of land.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Ground rent</h2></div><p>surplus profit fixed on land, and land priced at the rate of interest</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The nature of absolute rent first, then the arithmetic</h2><div class="prose reading"><p><strong>Volume III, Chapter 45.</strong> &ldquo;In industry these different masses of surplus-value are leveled into an average profit and distributed among the individual capitals uniformly and as aliquot parts of the social capital. Private property in land prevents such an equalization among capitals invested in the soil, whenever production requires real estate, either for agriculture or for the extraction of raw materials, and catches a portion of the surplus value which would otherwise assist in the formation of the average rate of profits.&rdquo;</p><p>Ricardo's theory says the worst land in use pays no rent. Marx asks a landlord's question: why would anyone lend land for nothing? If the price of corn just covers a tenant's capital and the average profit on the worst soil, &ldquo;will the landlord rent such lands for nothing&rdquo;? &ldquo;By no means.&rdquo; The market price must rise a little above the price of production, to P + r in Marx's letters, before the land is let. So the worst soil pays a rent, and the next question is what it is a share of.</p><p>The obvious answer is that it is a monopoly price, a tax the landlord levies on bread. Marx says it need not be, and his reason comes from Average Profit and Its Fall. A capital that employs more labour per pound than the average produces more surplus value than the average profit it receives; its value is above its price of production. If farming is such a capital, corn can sell above its price of production and still at or below its value.</p><p>Here are Marx's figures, which the marx preset uses. Non-agricultural capital is 85c + 15v; agricultural capital is 75c + 25v; the rate of surplus value is 100% in both. Industry's product is worth 115, agriculture's 125. Equalise the two, each with a capital of 100, and the 40 of surplus value is 20% on 200: both sell at 120. Agriculture's product sells 5 below its value, industry's 5 above. Landed property, by refusing to let land below a rent, can hold farming's price up toward its value, and the gap is the room for absolute rent. The lab prints agriculture's price of production of £120 and an absolute rent of up to £5.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Ground rent</h2></div><p>surplus profit fixed on land, and land priced at the rate of interest</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Ground rent</strong><span>surplus profit fixed on land, and land priced at the rate of interest</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="rtTable"></table></div>
       <div class="status-banner" id="rtStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Value, price of production and absolute rent</h3>
-          <p>Agriculture's and industry's capitals go in, with the rate of surplus value. The lab equalises profit over the two and compares agriculture's price of production with its value. Choose average-composition: the gap, and the rent, are gone.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Value, price of production and absolute rent</h3>
+            <p>Agriculture's and industry's capitals go in, with the rate of surplus value. The lab equalises profit over the two and compares agriculture's price of production with its value. Choose average-composition: the gap, and the rent, are gone.</p>
         <div class="field">
           <label for="rtPreset">Worked example</label>
           <select id="rtPreset"><option value="marx" selected>Marx's figures: industry 85c + 15v, agriculture 75c + 25v, s/v 100%</option><option value="average-composition">Agriculture at industry's composition, 85c + 15v</option><option value="market-limited">Marx's figures; the market bears no more than 122</option></select>
@@ -1432,12 +1475,15 @@
           <div class="kpi"><span>Absolute rent</span><strong id="rtAbsolute">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Absolute ground rent</span><p>Rent paid even on the worst cultivated soil, which on Marx's account is part or all of the excess of agricultural value over price of production, kept from the general equalisation of profit by landed property.</p></div><p>&ldquo;Up to&rdquo;, because how much of the 5 becomes rent &ldquo;will depend wholly upon the relation between supply and demand&rdquo;. The market-limited preset sets the highest price the market bears at 122: the absolute rent is then up to 2. Either way the corn sells at what Marx still calls &ldquo;a monopoly price, not because their price would exceed their value, but because their price would be equal to their value, or because their price would be lower than their value but higher than their price of production&rdquo;. And the causal order is the opposite of the last lessons': here &ldquo;the rent is the cause of the increase in the price of the product&rdquo;.</p><p>The whole construction hangs on one assumption, and Marx says so twice. Whether farming's composition is in fact lower than the average &ldquo;is a question which can be decided only by statistics&rdquo;. And if it is not, absolute rent in this sense &ldquo;would disappear&rdquo;. The average-composition preset gives agriculture industry's 85c + 15v: value and price of production are both 115, and the tile reads up to £0. Marx adds that the same would follow if farming's composition &ldquo;would gradually become the same as that of the average social capital with the progress of civilization&rdquo;.</p><p>Ricardo comes in for one more criticism. He set out to study the effect of the appropriation of land, Marx says, and then took his examples from colonies, where land is not yet appropriated and anyone may farm new land. Where land is owned, the owner's power to withhold it is the point. Marx notes, citing Fourier, that in every civilised country &ldquo;a comparatively considerable portion of the land always remains uncultivated&rdquo;.</p><p>This is the most disputed chapter of the Part. Economists after Marx, following Ricardo, mostly hold that the marginal land pays no rent, or only the rent its best alternative use would pay, and treat what it does pay as reward for scarcity, not as a share of surplus value. Others dispute the construction from inside Marx's own terms: it depends on reading values and prices of production as Chapter 9 does, inputs at value, which is the assumption the transformation debate after Bortkiewicz questions. What the chapter itself supplies is the assumption, named, and the case in which it fails.</p><p>Absolute and differential rent are, Marx says, &ldquo;the only normal ones&rdquo;. The next lesson, “Building Rent, Mining Rent, the Price of Land”, carries both off the farm, to building plots and mines, and returns to the price of land.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing absolute rent</h2></div><p>Four steps, for one agricultural and one non-agricultural capital.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Value each product</h3><p>Each capital's c + v plus its surplus value, the rate of surplus value times v.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Equalise the profit</h3><p>Add the two surplus values and divide by the two capitals for the average rate of profit.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Price agriculture&#x27;s product</h3><p>Agriculture's capital plus the average profit on it is its price of production.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Take the difference</h3><p>Agriculture's value less its price of production is the most absolute rent can be without a price above value; a lower market limit caps it there.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing absolute rent</h2>
+      <p class="lead-in">Four steps, for one agricultural and one non-agricultural capital.</p>
+      <ol class="key-ideas method"><li><strong>Value each product.</strong> Each capital's c + v plus its surplus value, the rate of surplus value times v.</li><li><strong>Equalise the profit.</strong> Add the two surplus values and divide by the two capitals for the average rate of profit.</li><li><strong>Price agriculture&#x27;s product.</strong> Agriculture's capital plus the average profit on it is its price of production.</li><li><strong>Take the difference.</strong> Agriculture's value less its price of production is the most absolute rent can be without a price above value; a lower market limit caps it there.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1455,17 +1501,16 @@ agriculture&#x27;s price:  100 + 20 = 120
 absolute rent:  at most 125 − 120 = 5</div><p>Give agriculture industry's composition and both values are 115, the price of production is 115, and absolute rent in this sense disappears.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking absolute rent is a monopoly price the landlord can set at will</strong><span>If the worst soil pays rent, it looks as if landlords simply add a charge to bread. On Marx's account the rent is limited from above by the value of the product: in the marx preset it is at most 5, and in the market-limited preset 2. Set agriculture at the average composition and there is nothing to take; the tile reads up to £0. A price fixed only by buyers' eagerness and means, apart from value and price of production, is what Marx calls an actual monopoly price, a different case.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking absolute rent contradicts differential rent</strong><span>Marx shows the differences are unchanged: if every price rises by the worst soil's rent r, each better soil's rent still exceeds A's by the same d, 2d, 3d. Absolute rent adds a constant to the series.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the lower composition as established</strong><span>Marx calls it a question for statistics and expects the gap to narrow. The lesson's figures follow his assumption; they do not show it holds.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the absolute rent a composition of capital allows.</strong><p>Given agriculture's and industry's constant and variable capital and the rate of surplus value, compute agriculture's value, its price of production equalised with industry, and the absolute rent, with and without a market limit.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab equalises two capitals of equal size, as Marx's example assumes; a real economy would weight them by size. Its values and prices of production are computed with inputs at value, the reading of Chapter 9 that the transformation debate questions. Whether agriculture's composition is lower than industry's is the empirical question Marx leaves to statistics, and the lab does not answer it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking absolute rent is a monopoly price the landlord can set at will</strong><span>If the worst soil pays rent, it looks as if landlords simply add a charge to bread. On Marx's account the rent is limited from above by the value of the product: in the marx preset it is at most 5, and in the market-limited preset 2. Set agriculture at the average composition and there is nothing to take; the tile reads up to £0. A price fixed only by buyers' eagerness and means, apart from value and price of production, is what Marx calls an actual monopoly price, a different case.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking absolute rent contradicts differential rent</strong><span>Marx shows the differences are unchanged: if every price rises by the worst soil's rent r, each better soil's rent still exceeds A's by the same d, 2d, 3d. Absolute rent adds a constant to the series.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the lower composition as established</strong><span>Marx calls it a question for statistics and expects the gap to narrow. The lesson's figures follow his assumption; they do not show it holds.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the absolute rent a composition of capital allows.</strong><p>Given agriculture's and industry's constant and variable capital and the rate of surplus value, compute agriculture's value, its price of production equalised with industry, and the absolute rent, with and without a market limit.</p></div></div><div class="note"><strong>Note:</strong> The lab equalises two capitals of equal size, as Marx's example assumes; a real economy would weight them by size. Its values and prices of production are computed with inputs at value, the reading of Chapter 9 that the transformation debate questions. Whether agriculture's composition is lower than industry's is the empirical question Marx leaves to statistics, and the lab does not answer it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Absolute rent</summary><p>Rent the worst soil pays, not from any difference in fertility, because a landowner will not let land be farmed for nothing. Marx locates it in the excess of agriculture's value over its price of production.</p></details><details class="recall"><summary>Lower composition</summary><p>A capital that spends more on wages and less on means of production than the social average. At the same rate of surplus value it produces more surplus value than it receives as average profit.</p></details><details class="recall"><summary>A barrier to equalisation</summary><p>Prices of production arise as capital moves between branches until profits are equal. Landed property stands in the way of that movement into agriculture and keeps part of farming's surplus value back from the average.</p></details></div>
+      <h3>Summary</h3>
       <p>Ricardo's worst soil paid no rent. Marx asks why any landowner would lend land for nothing, and answers with the gap between value and price of production. Compute agriculture's value and its price of production when its capital employs more labour than industry's, the absolute rent that gap allows, the case where the gap disappears, and a market that will not pay the whole of it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Absolute rent.</strong> Rent the worst soil pays, not from any difference in fertility, because a landowner will not let land be farmed for nothing. Marx locates it in the excess of agriculture's value over its price of production.</li><li><strong>Lower composition.</strong> A capital that spends more on wages and less on means of production than the social average. At the same rate of surplus value it produces more surplus value than it receives as average profit.</li><li><strong>A barrier to equalisation.</strong> Prices of production arise as capital moves between branches until profits are equal. Landed property stands in the way of that movement into agriculture and keeps part of farming's surplus value back from the average.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="industry 85 c plus 15 v, farming 75 c plus 25 v. s over v equals 100 percent, values 115 and 125. equalised, price of production 120. absolute rent is at most 125 minus 120 equals 5. same composition, no absolute rent" tabindex="0" role="region" aria-label="Mathematical notation">industry 85c + 15v, farming 75c + 25v
 s/v = 100%: values 115 and 125
 equalised: price of production 120
@@ -2371,11 +2416,42 @@ same composition: no absolute rent</div><figcaption>Absolute rent in five lines<
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2443,7 +2519,7 @@ same composition: no absolute rent</div><figcaption>Absolute rent in five lines<
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Scaling Laws and Cost</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; What a machine buys</p>
       <h1>Amdahl&#x27;s Law</h1>
       <p class="lesson-lede">Compute the speedup n machines give, the ceiling it never passes, and the n that reaches a stated fraction of that ceiling.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The serial part is a duration, not a share</li><li>The ceiling is an asymptote, so no table shows it</li><li>Efficiency is the half of the answer that gets dropped</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The speedup, the ceiling, and the machines it takes to approach one</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Amdahl&#x27;s Law</span><p>Let <span class="math" data-say="p">p</span> be the fraction of a job&rsquo;s single-machine runtime that can be executed in parallel, so <span class="math" data-say="1 minus p">1 − p</span> is the <strong>serial fraction</strong>. On <span class="math" data-say="n">n</span> machines the runtime becomes <span class="math" data-say="1 minus p plus p over n">(1 − p) + p/n</span> of the original, and the <strong>speedup</strong> is</p><p><span class="math" data-say="S of n equals 1 over the quantity 1 minus p plus p over n">S(n) = 1/((1 − p) + p/n)</span>.</p><p>The model assumes the parallel part divides perfectly, the machines are identical, and coordinating them is free. All three are optimistic, which is why this curve is an upper bound.</p></div><p>Normalise the one-machine runtime to <span class="math" data-say="1">1</span>. The serial part takes <span class="math" data-say="1 minus p">1 − p</span> no matter how many machines are present; the parallel part takes <span class="math" data-say="p">p</span> on one machine and <span class="math" data-say="p over n">p/n</span> on <span class="math" data-say="n">n</span>. Add them, and the speedup is the ratio of the old runtime to the new one.</p><div class="mathblock" data-say="one machine, 1 minus p, plus, p, equals, 1. n machines, 1 minus p, plus, p over n. S of n equals 1 over the quantity 1 minus p plus p over n. p equals 19 over 20, n equals 32. 1 over 20 plus the quantity 19 over 20, over 32, equals, 32 over 640 plus 19 over 640, equals, 51 over 640. S of 32 equals 640 over 51 equals 12.549 and so on times" tabindex="0" role="region" aria-label="Mathematical notation">one machine     (1 − p)  +  p        =  1
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The speedup, the ceiling, and the machines it takes to approach one</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Amdahl&#x27;s Law</span><p>Let <span class="math" data-say="p">p</span> be the fraction of a job&rsquo;s single-machine runtime that can be executed in parallel, so <span class="math" data-say="1 minus p">1 − p</span> is the <strong>serial fraction</strong>. On <span class="math" data-say="n">n</span> machines the runtime becomes <span class="math" data-say="1 minus p plus p over n">(1 − p) + p/n</span> of the original, and the <strong>speedup</strong> is</p><p><span class="math" data-say="S of n equals 1 over the quantity 1 minus p plus p over n">S(n) = 1/((1 − p) + p/n)</span>.</p><p>The model assumes the parallel part divides perfectly, the machines are identical, and coordinating them is free. All three are optimistic, which is why this curve is an upper bound.</p></div><p>Normalise the one-machine runtime to <span class="math" data-say="1">1</span>. The serial part takes <span class="math" data-say="1 minus p">1 − p</span> no matter how many machines are present; the parallel part takes <span class="math" data-say="p">p</span> on one machine and <span class="math" data-say="p over n">p/n</span> on <span class="math" data-say="n">n</span>. Add them, and the speedup is the ratio of the old runtime to the new one.</p><div class="mathblock" data-say="one machine, 1 minus p, plus, p, equals, 1. n machines, 1 minus p, plus, p over n. S of n equals 1 over the quantity 1 minus p plus p over n. p equals 19 over 20, n equals 32. 1 over 20 plus the quantity 19 over 20, over 32, equals, 32 over 640 plus 19 over 640, equals, 51 over 640. S of 32 equals 640 over 51 equals 12.549 and so on times" tabindex="0" role="region" aria-label="Mathematical notation">one machine     (1 − p)  +  p        =  1
 n machines      (1 − p)  +  p/n
 
 S(n) = 1 / ((1 − p) + p/n)
@@ -1407,12 +1451,11 @@ p = 19/20,  n = 32:
         n  ≥  (f/(1 − f)) · (p/(1 − p))
 
 f = 9/10, p = 19/20:   9 × 19 = 171 machines
-and S(171) = 1/(1/20 + 19/3420) = 1/(190/3420) = 18 = 0.9 × 20</div><p>The two factors are worth reading separately. <span class="math" data-say="f over the quantity 1 minus f">f/(1 − f)</span> is the odds of the target &mdash; nine for ninety per cent, ninety-nine for ninety-nine &mdash; and <span class="math" data-say="p over the quantity 1 minus p">p/(1 − p)</span> is the ratio of parallel work to serial work. The machine count is their product, so tightening the target from ninety to ninety-nine per cent costs eleven times as many machines against the same code.</p><p>The lab finds <span class="math" data-say="171">171</span> twice: once by scanning integer <span class="math" data-say="n">n</span> until the speedup clears the target, and once by evaluating the product above and rounding up. Two routes to one integer is the check, and the scan is the one that carries the claim &mdash; a closed form that happens to agree is a check on the algebra, not a substitute for it.</p><h3>What efficiency says about the same point</h3><p><span class="math" data-say="S of n over n">S(n)/n</span> is the fraction of a machine each machine contributes. It starts at <span class="math" data-say="1">1</span> and falls monotonically: <span class="math" data-say="95.2 percent">95.2%</span> at two machines, <span class="math" data-say="74.1 percent">74.1%</span> at eight, <span class="math" data-say="39.22 percent">39.22%</span> at thirty-two, <span class="math" data-say="10.5 percent">10.5%</span> at the one hundred and seventy-one that reach ninety per cent of the ceiling. Every one of those machines is paid for in full.</p><div class="example"><span class="label">Example &middot; What the second thirty-two machines buy</span><p>At <span class="math" data-say="p equals 19 over 20">p = 19/20</span>, thirty-two machines give <span class="math" data-say="640 over 51 equals 12.549 times">640/51 = 12.549×</span> and sixty-four give <span class="math" data-say="1280 over 83 equals 15.422 times">1280/83 = 15.422×</span>. The second block of thirty-two adds a factor of <span class="math" data-say="1.23">1.23</span>, and everything still unbought above it is the <span class="math" data-say="20 over 12.549 equals 1.59 times">20/12.549 = 1.59×</span> between here and the ceiling &mdash; which no purchase can close. That is the arithmetic a &ldquo;double the fleet, halve the runtime&rdquo; plan is up against.</p></div><p>One caution about <span class="math" data-say="p">p</span> itself. It is a share of <em>time</em> measured on one machine, not a share of code or of functions: a lock held for a tenth of the runtime is a tenth of the serial fraction even if it is two lines. This course takes <span class="math" data-say="p">p</span> as given. Measuring it is &ldquo;Measuring Systems&rdquo;, and it is harder than this lesson.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Amdahl&#x27;s Law</h2></div><p>What the next machine buys, and where it stops buying anything</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+and S(171) = 1/(1/20 + 19/3420) = 1/(190/3420) = 18 = 0.9 × 20</div><p>The two factors are worth reading separately. <span class="math" data-say="f over the quantity 1 minus f">f/(1 − f)</span> is the odds of the target &mdash; nine for ninety per cent, ninety-nine for ninety-nine &mdash; and <span class="math" data-say="p over the quantity 1 minus p">p/(1 − p)</span> is the ratio of parallel work to serial work. The machine count is their product, so tightening the target from ninety to ninety-nine per cent costs eleven times as many machines against the same code.</p><p>The lab finds <span class="math" data-say="171">171</span> twice: once by scanning integer <span class="math" data-say="n">n</span> until the speedup clears the target, and once by evaluating the product above and rounding up. Two routes to one integer is the check, and the scan is the one that carries the claim &mdash; a closed form that happens to agree is a check on the algebra, not a substitute for it.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Amdahl&#x27;s Law</h2></div><p>What the next machine buys, and where it stops buying anything</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Amdahl's ceiling</strong><span>the serial part does not shrink, so the speedup stops</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>S(n)</span><span class="tone-red"><i class="legend-swatch"></i>the ceiling 1/(1&minus;p)</span><span class="tone-muted"><i class="legend-swatch"></i>n machines, n&times; faster</span><span class="tone-green"><i class="legend-swatch"></i>the n that reaches the target</span></div>
@@ -1420,10 +1463,10 @@ and S(171) = 1/(1/20 + 19/3420) = 1/(190/3420) = 18 = 0.9 × 20</div><p>The two 
       <div class="lab-stage" id="amStage" tabindex="0" role="region" aria-label="Amdahl speedup against machine count, with its asymptote and the linear expectation."><svg id="amPlot" style="min-width:520px" viewBox="0 0 520 192" role="img" aria-label="The speedup curve flattening below a dashed ceiling, with the straight line a reader expects running off the top."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="amTable"></table></div>
       <div class="status-banner" id="amStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the parallel fraction and add machines</h3>
-          <p><span class="math" data-say="S of n">S(n)</span>, the ceiling and the machine count that reaches a stated fraction of it are exact fractions of the parallel fraction you set. Watch the grey line &mdash; <span class="math" data-say="n">n</span> machines, <span class="math" data-say="n">n</span> times faster &mdash; leave the curve behind, and watch the machine count that reaches the target come out the same by a scan over integers and by the product <span class="math" data-say="the quantity f over the quantity 1 minus f, times the quantity p over the quantity 1 minus p">(f/(1 − f))·(p/(1 − p))</span>.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the parallel fraction and add machines</h3>
+            <p><span class="math" data-say="S of n">S(n)</span>, the ceiling and the machine count that reaches a stated fraction of it are exact fractions of the parallel fraction you set. Watch the grey line &mdash; <span class="math" data-say="n">n</span> machines, <span class="math" data-say="n">n</span> times faster &mdash; leave the curve behind, and watch the machine count that reaches the target come out the same by a scan over integers and by the product <span class="math" data-say="the quantity f over the quantity 1 minus f, times the quantity p over the quantity 1 minus p">(f/(1 − f))·(p/(1 − p))</span>.</p>
         <div class="field" id="amPresetField">
           <label for="amPreset">Worked example</label>
           <select id="amPreset"><option value="five-per-cent-serial" selected>95% parallel — the lesson's own case, capped at 20×</option><option value="well-parallelised">99% parallel — a hundredfold ceiling, and 891 machines to reach 90% of it</option><option value="mostly-serial">70% parallel — the ceiling is 3.33× and the fourth machine is already wasted</option><option value="near-perfect">99.9% parallel — a thousandfold ceiling that still exists</option></select>
@@ -1449,12 +1492,15 @@ and S(171) = 1/(1/20 + 19/3420) = 1/(190/3420) = 18 = 0.9 × 20</div><p>The two 
           <div class="kpi"><span>Efficiency S(n)/n</span><strong id="amEff">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>What efficiency says about the same point</h3><p><span class="math" data-say="S of n over n">S(n)/n</span> is the fraction of a machine each machine contributes. It starts at <span class="math" data-say="1">1</span> and falls monotonically: <span class="math" data-say="95.2 percent">95.2%</span> at two machines, <span class="math" data-say="74.1 percent">74.1%</span> at eight, <span class="math" data-say="39.22 percent">39.22%</span> at thirty-two, <span class="math" data-say="10.5 percent">10.5%</span> at the one hundred and seventy-one that reach ninety per cent of the ceiling. Every one of those machines is paid for in full.</p><div class="example"><span class="label">Example &middot; What the second thirty-two machines buy</span><p>At <span class="math" data-say="p equals 19 over 20">p = 19/20</span>, thirty-two machines give <span class="math" data-say="640 over 51 equals 12.549 times">640/51 = 12.549×</span> and sixty-four give <span class="math" data-say="1280 over 83 equals 15.422 times">1280/83 = 15.422×</span>. The second block of thirty-two adds a factor of <span class="math" data-say="1.23">1.23</span>, and everything still unbought above it is the <span class="math" data-say="20 over 12.549 equals 1.59 times">20/12.549 = 1.59×</span> between here and the ceiling &mdash; which no purchase can close. That is the arithmetic a &ldquo;double the fleet, halve the runtime&rdquo; plan is up against.</p></div><p>One caution about <span class="math" data-say="p">p</span> itself. It is a share of <em>time</em> measured on one machine, not a share of code or of functions: a lock held for a tenth of the runtime is a tenth of the serial fraction even if it is two lines. This course takes <span class="math" data-say="p">p</span> as given. Measuring it is &ldquo;Measuring Systems&rdquo;, and it is harder than this lesson.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Costing a parallelisation before you buy it</h2></div><p>The ceiling first, because it decides whether the rest of the arithmetic is worth doing.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down the serial fraction and invert it</h3><p><span class="math" data-say="1 over the quantity 1 minus p">1/(1 − p)</span> is the most the job can ever go faster. If that number is below what the plan needs, no machine count rescues it and the next move is to shrink <span class="math" data-say="1 minus p">1 − p</span>, not to buy.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Evaluate <span class="math" data-say="S of n">S(n)</span> at the size you were actually going to buy</h3><p>Substitute into <span class="math" data-say="1 over the quantity 1 minus p plus p over n">1/((1 − p) + p/n)</span> and keep it as a fraction. Compare it to <span class="math" data-say="n">n</span> &mdash; the speedup people assume &mdash; and to the ceiling, and report the gaps to both.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Divide by <span class="math" data-say="n">n</span> and report the efficiency</h3><p><span class="math" data-say="S of n over n">S(n)/n</span> is the share of each machine you are using. It is the figure that turns a speedup into a bill, and quoting a speedup without it is how a <span class="math" data-say="12.5 times">12.5×</span> result on thirty-two machines gets called a success.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Solve for the machine count your target needs</h3><p><span class="math" data-say="n is at least the quantity f over the quantity 1 minus f, times the quantity p over the quantity 1 minus p">n ≥ (f/(1 − f))·(p/(1 − p))</span>, rounded up. Do it for two targets, not one: the jump from ninety to ninety-nine per cent of the ceiling multiplies the fleet by eleven, and seeing that pair is what makes the target a decision.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Say out loud what the model has assumed away</h3><p>Perfect division of the parallel part, identical machines, free coordination. Every one of those is generous, so <span class="math" data-say="S of n">S(n)</span> is an upper bound &mdash; and &ldquo;The Universal Scalability Law&rdquo; is the lesson that charges for the third one.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Costing a parallelisation before you buy it</h2>
+      <p class="lead-in">The ceiling first, because it decides whether the rest of the arithmetic is worth doing.</p>
+      <ol class="key-ideas method"><li><strong>Write down the serial fraction and invert it.</strong> <span class="math" data-say="1 over the quantity 1 minus p">1/(1 − p)</span> is the most the job can ever go faster. If that number is below what the plan needs, no machine count rescues it and the next move is to shrink <span class="math" data-say="1 minus p">1 − p</span>, not to buy.</li><li><strong>Evaluate <span class="math" data-say="S of n">S(n)</span> at the size you were actually going to buy.</strong> Substitute into <span class="math" data-say="1 over the quantity 1 minus p plus p over n">1/((1 − p) + p/n)</span> and keep it as a fraction. Compare it to <span class="math" data-say="n">n</span> &mdash; the speedup people assume &mdash; and to the ceiling, and report the gaps to both.</li><li><strong>Divide by <span class="math" data-say="n">n</span> and report the efficiency.</strong> <span class="math" data-say="S of n over n">S(n)/n</span> is the share of each machine you are using. It is the figure that turns a speedup into a bill, and quoting a speedup without it is how a <span class="math" data-say="12.5 times">12.5×</span> result on thirty-two machines gets called a success.</li><li><strong>Solve for the machine count your target needs.</strong> <span class="math" data-say="n is at least the quantity f over the quantity 1 minus f, times the quantity p over the quantity 1 minus p">n ≥ (f/(1 − f))·(p/(1 − p))</span>, rounded up. Do it for two targets, not one: the jump from ninety to ninety-nine per cent of the ceiling multiplies the fleet by eleven, and seeing that pair is what makes the target a decision.</li><li><strong>Say out loud what the model has assumed away.</strong> Perfect division of the parallel part, identical machines, free coordination. Every one of those is generous, so <span class="math" data-say="S of n">S(n)</span> is an upper bound &mdash; and &ldquo;The Universal Scalability Law&rdquo; is the lesson that charges for the third one.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1484,17 +1530,16 @@ the linear expectation    32× , which overstates by 32/(640/51) = 2.55
   efficiency at 171          18/171 = 10.5%</div><p>The <span class="math" data-say="S of 171 equals 18">S(171) = 18</span> line is the one doing the work. <span class="math" data-say="171">171</span> came out of an inequality, and substituting it back gives exactly <span class="math" data-say="18">18</span>, which is exactly nine tenths of <span class="math" data-say="20">20</span> &mdash; so the algebra and the definition of the target agree on the nose rather than to three decimal places.</p><p>Notice what <span class="math" data-say="171">171</span> machines bought: <span class="math" data-say="18 times">18×</span> where the honest linear expectation was <span class="math" data-say="171 times">171×</span>, at <span class="math" data-say="10.5 percent">10.5%</span> efficiency. Ninety per cent of the ceiling is a long way past the point where the fleet is mostly idle.</p><p>For a faded attempt, take <span class="math" data-say="p equals 4 over 5">p = 4/5</span>. Write down the ceiling, then <span class="math" data-say="S of 8">S(8)</span> and <span class="math" data-say="S of 64">S(64)</span> as fractions, then the efficiency at each, then the <span class="math" data-say="n">n</span> that reaches ninety per cent. Predict which of the two speedups is closer to half the ceiling before you compute either, and check your four answers against the lab with the parallel fraction set to 80%.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the ceiling off the largest <span class="math" data-say="n">n</span> you tried</strong><span>The curve is still climbing at every finite machine count, so a table stopping at thirty-two rows looks like slow growth rather than a bound. <span class="math" data-say="12.549 times">12.549×</span> at <span class="math" data-say="n equals 32">n = 32</span> is <span class="math" data-say="62.75 percent">62.75%</span> of a ceiling the table never displays. The ceiling comes from <span class="math" data-say="1 over the quantity 1 minus p">1/(1 − p)</span> before any row is computed, and the table is then read against it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating <span class="math" data-say="p">p</span> as a share of the code</strong><span><span class="math" data-say="p">p</span> is the share of the single-machine <em>runtime</em> that parallelises. A lock held for five per cent of the wall clock is a five per cent serial fraction and a <span class="math" data-say="20 times">20×</span> ceiling, whether it guards two lines or two thousand. Counting functions instead of milliseconds usually produces a <span class="math" data-say="p">p</span> that is far too high and a plan built on it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting a speedup with the efficiency left out</strong><span><span class="math" data-say="18 times">18×</span> sounds like a result until you see it took <span class="math" data-say="171">171</span> machines, which is <span class="math" data-say="10.5 percent">10.5%</span> of each of them. Both numbers are in every row of the lab&rsquo;s table for this reason: the speedup says what happened and the efficiency says what it was bought with.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a ceiling reads as a fact about the serial fraction rather than as a limit of the hardware.</strong><p>You should be able to write <span class="math" data-say="1 over the quantity 1 minus p">1/(1 − p)</span> down before evaluating anything, compute <span class="math" data-say="S of n">S(n)</span> and <span class="math" data-say="S of n over n">S(n)/n</span> as exact fractions at a stated <span class="math" data-say="n">n</span>, and produce the machine count for a target fraction of the ceiling both by the inequality and by a scan, getting the same integer twice.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Amdahl&rsquo;s curve rises to a plateau, which is already a disappointment. It is also the optimistic case: it charges nothing for the machines talking to each other. &ldquo;The Universal Scalability Law&rdquo; adds that charge, and the curve stops plateauing &mdash; it peaks and comes back down, so that past a certain fleet size the next machine makes throughput <em>worse</em>. If you take one shape away from this course, take that one.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the ceiling off the largest <span class="math" data-say="n">n</span> you tried</strong><span>The curve is still climbing at every finite machine count, so a table stopping at thirty-two rows looks like slow growth rather than a bound. <span class="math" data-say="12.549 times">12.549×</span> at <span class="math" data-say="n equals 32">n = 32</span> is <span class="math" data-say="62.75 percent">62.75%</span> of a ceiling the table never displays. The ceiling comes from <span class="math" data-say="1 over the quantity 1 minus p">1/(1 − p)</span> before any row is computed, and the table is then read against it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating <span class="math" data-say="p">p</span> as a share of the code</strong><span><span class="math" data-say="p">p</span> is the share of the single-machine <em>runtime</em> that parallelises. A lock held for five per cent of the wall clock is a five per cent serial fraction and a <span class="math" data-say="20 times">20×</span> ceiling, whether it guards two lines or two thousand. Counting functions instead of milliseconds usually produces a <span class="math" data-say="p">p</span> that is far too high and a plan built on it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting a speedup with the efficiency left out</strong><span><span class="math" data-say="18 times">18×</span> sounds like a result until you see it took <span class="math" data-say="171">171</span> machines, which is <span class="math" data-say="10.5 percent">10.5%</span> of each of them. Both numbers are in every row of the lab&rsquo;s table for this reason: the speedup says what happened and the efficiency says what it was bought with.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a ceiling reads as a fact about the serial fraction rather than as a limit of the hardware.</strong><p>You should be able to write <span class="math" data-say="1 over the quantity 1 minus p">1/(1 − p)</span> down before evaluating anything, compute <span class="math" data-say="S of n">S(n)</span> and <span class="math" data-say="S of n over n">S(n)/n</span> as exact fractions at a stated <span class="math" data-say="n">n</span>, and produce the machine count for a target fraction of the ceiling both by the inequality and by a scan, getting the same integer twice.</p></div></div><div class="note"><strong>Note:</strong> Amdahl&rsquo;s curve rises to a plateau, which is already a disappointment. It is also the optimistic case: it charges nothing for the machines talking to each other. &ldquo;The Universal Scalability Law&rdquo; adds that charge, and the curve stops plateauing &mdash; it peaks and comes back down, so that past a certain fleet size the next machine makes throughput <em>worse</em>. If you take one shape away from this course, take that one.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The serial part is a duration, not a share</summary><p>Split the runtime on one machine into <span class="math" data-say="p">p</span> that can be spread across machines and <span class="math" data-say="1 minus p">1 − p</span> that cannot. Adding machines divides the first by <span class="math" data-say="n">n</span> and does nothing whatever to the second, so the total time falls to <span class="math" data-say="1 minus p plus p over n">(1 − p) + p/n</span> of what it was and the speedup is the reciprocal. The serial piece is not a percentage that shrinks as the rest does &mdash; it is a fixed stretch of wall-clock time, and at large <span class="math" data-say="n">n</span> it is essentially the whole runtime.</p></details><details class="recall"><summary>The ceiling is an asymptote, so no table shows it</summary><p><span class="math" data-say="p over n">p/n</span> falls toward zero and never reaches it, so <span class="math" data-say="S of n">S(n)</span> rises toward <span class="math" data-say="1 over the quantity 1 minus p">1/(1 − p)</span> and never reaches that either. At <span class="math" data-say="p equals 19 over 20">p = 19/20</span> the ceiling is <span class="math" data-say="20 times">20×</span>: two machines give <span class="math" data-say="1.905 times">1.905×</span>, thirty-two give <span class="math" data-say="12.549 times">12.549×</span>, and five hundred and twelve give <span class="math" data-say="19.284 times">19.284×</span>. Reading a table of the first few rows tells you the curve is bending; only the asymptote tells you what it is bending toward.</p></details><details class="recall"><summary>Efficiency is the half of the answer that gets dropped</summary><p><span class="math" data-say="S of n over n">S(n)/n</span> is the share of each machine you are actually using. At <span class="math" data-say="n equals 32">n = 32</span> it is <span class="math" data-say="20 over 51">20/51</span>, or <span class="math" data-say="39.22 percent">39.22%</span> &mdash; three fifths of the fleet is waiting on the serial part. At the <span class="math" data-say="171">171</span> machines that reach ninety per cent of the ceiling it is <span class="math" data-say="10.5 percent">10.5%</span>. A speedup quoted without its efficiency hides what the speedup cost.</p></details></div>
+      <h3>Summary</h3>
       <p>A job splits into a part that can be shared out and a part that cannot. Machines shrink the first and leave the second exactly as it was, so the speedup climbs toward <span class="math" data-say="1 over the quantity 1 minus p">1/(1 − p)</span> and stops there. Five per cent of serial work caps the whole job at twenty times, and no machine count anywhere on the curve changes that number.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The serial part is a duration, not a share.</strong> Split the runtime on one machine into <span class="math" data-say="p">p</span> that can be spread across machines and <span class="math" data-say="1 minus p">1 − p</span> that cannot. Adding machines divides the first by <span class="math" data-say="n">n</span> and does nothing whatever to the second, so the total time falls to <span class="math" data-say="1 minus p plus p over n">(1 − p) + p/n</span> of what it was and the speedup is the reciprocal. The serial piece is not a percentage that shrinks as the rest does &mdash; it is a fixed stretch of wall-clock time, and at large <span class="math" data-say="n">n</span> it is essentially the whole runtime.</li><li><strong>The ceiling is an asymptote, so no table shows it.</strong> <span class="math" data-say="p over n">p/n</span> falls toward zero and never reaches it, so <span class="math" data-say="S of n">S(n)</span> rises toward <span class="math" data-say="1 over the quantity 1 minus p">1/(1 − p)</span> and never reaches that either. At <span class="math" data-say="p equals 19 over 20">p = 19/20</span> the ceiling is <span class="math" data-say="20 times">20×</span>: two machines give <span class="math" data-say="1.905 times">1.905×</span>, thirty-two give <span class="math" data-say="12.549 times">12.549×</span>, and five hundred and twelve give <span class="math" data-say="19.284 times">19.284×</span>. Reading a table of the first few rows tells you the curve is bending; only the asymptote tells you what it is bending toward.</li><li><strong>Efficiency is the half of the answer that gets dropped.</strong> <span class="math" data-say="S of n over n">S(n)/n</span> is the share of each machine you are actually using. At <span class="math" data-say="n equals 32">n = 32</span> it is <span class="math" data-say="20 over 51">20/51</span>, or <span class="math" data-say="39.22 percent">39.22%</span> &mdash; three fifths of the fleet is waiting on the serial part. At the <span class="math" data-say="171">171</span> machines that reach ninety per cent of the ceiling it is <span class="math" data-say="10.5 percent">10.5%</span>. A speedup quoted without its efficiency hides what the speedup cost.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="S of n equals 1 over the quantity 1 minus p plus p over n, p is the parallel share of the runtime. ceiling, S of infinity equals 1 over the quantity 1 minus p, p equals 19 over 20 goes to 20 times, for every n. S of 32 equals 640 over 51 equals 12.549 times, 62.75 percent of the ceiling. n is at least the quantity f over the quantity 1 minus f, times the quantity p over the quantity 1 minus p, f equals 9 over 10 goes to 9 times 19 equals 171 machines. efficiency, S of n over n equals 39.22 percent, at n equals 32, and 10.5 percent at n equals 171" tabindex="0" role="region" aria-label="Mathematical notation">S(n) = 1/((1 − p) + p/n)          p is the parallel share of the runtime
 ceiling  S(∞) = 1/(1 − p)         p = 19/20 → 20×, for every n
 S(32) = 640/51 = 12.549×          62.75% of the ceiling
@@ -2930,11 +2975,42 @@ efficiency  S(n)/n = 39.22%       at n = 32, and 10.5% at n = 171</div><figcapti
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3002,7 +3078,7 @@ efficiency  S(n)/n = 39.22%       at n = 32, and 10.5% at n = 171</div><figcapti
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

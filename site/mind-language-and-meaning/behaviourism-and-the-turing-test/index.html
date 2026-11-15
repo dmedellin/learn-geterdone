@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,37 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Mind, Language and Meaning</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Mind</p>
       <h1>Behaviourism and the Turing Test</h1>
       <p class="lesson-lede">Treat the judge as an updater, and compute what a perfect mimic and a single tell each do to the judge&#x27;s belief.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The judge updates on each answer</li><li>A perfect mimic gives a factor of 1</li><li>The hypotheses are about who, not whether</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The test as a Bayes factor</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Behaviourism</span><p><strong>Behaviourism</strong> about the mind is the claim that to be in a mental state is to be disposed to behave in certain ways. On its strongest version nothing is left over: there is no inner fact about whether a thing thinks beyond what it would say and do.</p></div><p>Turing's proposal replaces the question. A judge converses in writing with two parties, one human and one machine, and must say which is which. If the judge cannot do better than chance, the machine has passed, and the question whether it thinks has been swapped for one that can be answered. Turing himself set the original question aside as too ill-defined to discuss. Read as a test of thought rather than of imitation, his game is behaviourism put to work, and that reading is the one this lesson examines.</p><p>The lab models the judge as what the judge is, an updater. There are two hypotheses about the party behind the screen, <span class="math" data-say="human">human</span> and <span class="math" data-say="machine">machine</span>, and each answer is data. Each hypothesis assigns a probability to each kind of answer. Take the answers to be of two kinds, a plain answer and a tell, an answer the machine gives more often than a person would. A tell might be an arithmetic result too fast, or a reply too even in tone.</p><div class="mathblock" data-say="answer, P of answer given human, P of answer given machine. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">answer   P(answer | human)   P(answer | machine)
------------------------------------------------
-plain    9/10                1/10
-tell     1/10                9/10</div><p>That is a machine with a tell. The Bayes factor of one tell for the hypothesis <span class="math" data-say="human">human</span> is <span class="math" data-say="the quantity 1 over 10, over the quantity 9 over 10">(1/10) / (9/10)</span>, which is <span class="math" data-say="1 over 9">1/9</span>: the answer is nine times as probable if the party is a machine. Starting from a prior of one half, the lab reports a posterior of <span class="math" data-say="1 over 10">1/10</span> for human after the one tell.</p><p>Now the perfect mimic. Give the machine the human's row: a plain answer with probability <span class="math" data-say="9 over 10">9/10</span> and a tell with probability <span class="math" data-say="1 over 10">1/10</span>, whichever party it is. Every answer, plain or tell, is exactly as probable under one hypothesis as under the other, so every answer has a Bayes factor of 1, and ten answers together have a factor of 1. The posterior is the prior. The judge has learned nothing about who is behind the screen, and that is all that a pass is.</p><p>Prior matters too. A judge who starts at <span class="math" data-say="9 over 10">9/10</span> for human and meets one tell lands at one half: the factor of <span class="math" data-say="1 over 9">1/9</span> exactly cancels the odds of nine to one. A judge who starts at one half lands at <span class="math" data-say="1 over 10">1/10</span>. The same tell is the same evidence, and it moves different judges to different places.</p><p>Two consequences for the claim that the test measures thought. A pass is not a proof: a factor of 1 says the judge could not tell the parties apart, which is a fact about how well the machine imitates, and a very good imitation of a thinking person need not think. A failure is not a disproof either: a tell shows that the parties differ in style, and a person with an odd manner of answering would show one too. The behaviourist closes the gap by definition, because for the behaviourist there is nothing for the test to miss. “The Chinese Room and the Lookup Table” shows what that costs.</p><p>The limit: the probabilities in the lab are numbers someone chose. The lab computes what a judge holding those numbers should believe. It cannot say whether a real answer is a tell.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Exact Bayesian updating</h2></div><p>prior times likelihood, normalised; the Bayes factor is the weight of the data</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The test as a Bayes factor</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Behaviourism</span><p><strong>Behaviourism</strong> about the mind is the claim that to be in a mental state is to be disposed to behave in certain ways. On its strongest version nothing is left over: there is no inner fact about whether a thing thinks beyond what it would say and do.</p></div><p>Turing's proposal replaces the question. A judge converses in writing with two parties, one human and one machine, and must say which is which. If the judge cannot do better than chance, the machine has passed, and the question whether it thinks has been swapped for one that can be answered. Turing himself set the original question aside as too ill-defined to discuss. Read as a test of thought rather than of imitation, his game is behaviourism put to work, and that reading is the one this lesson examines.</p><p>The lab models the judge as what the judge is, an updater. There are two hypotheses about the party behind the screen, <span class="math" data-say="human">human</span> and <span class="math" data-say="machine">machine</span>, and each answer is data. Each hypothesis assigns a probability to each kind of answer. Take the answers to be of two kinds, a plain answer and a tell, an answer the machine gives more often than a person would. A tell might be an arithmetic result too fast, or a reply too even in tone.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Exact Bayesian updating</h2></div><p>prior times likelihood, normalised; the Bayes factor is the weight of the data</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Hypotheses, data, posterior</strong><span>every figure is an exact fraction</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="upTable"></table></div>
       <div class="status-banner" id="upStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What the judge should believe</h3>
-          <p>The tiles report the hypothesis human. In the first preset the two likelihood rows are the same, so change the answers heard and watch the posterior stay put. Then change one entry of the machine's row and see how far a single answer now moves the judge.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What the judge should believe</h3>
+            <p>The tiles report the hypothesis human. In the first preset the two likelihood rows are the same, so change the answers heard and watch the posterior stay put. Then change one entry of the machine's row and see how far a single answer now moves the judge.</p>
         <div class="field">
           <label for="upPreset">Worked example</label>
           <select id="upPreset"><option value="mimic" selected>A machine with the human's own answers, ten answers heard</option><option value="tell">A machine with a tell, one answer heard</option><option value="prior-heavy">A judge nine-tenths sure of a human, one tell heard</option></select>
@@ -1442,12 +1482,18 @@ tell     1/10                9/10</div><p>That is a machine with a tell. The Bay
           <div class="kpi"><span>Best act now</span><strong id="upBest">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="answer, P of answer given human, P of answer given machine. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">answer   P(answer | human)   P(answer | machine)
+-----------------------------------------------
+plain    9/10                1/10
+tell     1/10                9/10</div><p>That is a machine with a tell. The Bayes factor of one tell for the hypothesis <span class="math" data-say="human">human</span> is <span class="math" data-say="the quantity 1 over 10, over the quantity 9 over 10">(1/10) / (9/10)</span>, which is <span class="math" data-say="1 over 9">1/9</span>: the answer is nine times as probable if the party is a machine. Starting from a prior of one half, the lab reports a posterior of <span class="math" data-say="1 over 10">1/10</span> for human after the one tell.</p><p>Now the perfect mimic. Give the machine the human's row: a plain answer with probability <span class="math" data-say="9 over 10">9/10</span> and a tell with probability <span class="math" data-say="1 over 10">1/10</span>, whichever party it is. Every answer, plain or tell, is exactly as probable under one hypothesis as under the other, so every answer has a Bayes factor of 1, and ten answers together have a factor of 1. The posterior is the prior. The judge has learned nothing about who is behind the screen, and that is all that a pass is.</p><p>Prior matters too. A judge who starts at <span class="math" data-say="9 over 10">9/10</span> for human and meets one tell lands at one half: the factor of <span class="math" data-say="1 over 9">1/9</span> exactly cancels the odds of nine to one. A judge who starts at one half lands at <span class="math" data-say="1 over 10">1/10</span>. The same tell is the same evidence, and it moves different judges to different places.</p><p>Two consequences for the claim that the test measures thought. A pass is not a proof: a factor of 1 says the judge could not tell the parties apart, which is a fact about how well the machine imitates, and a very good imitation of a thinking person need not think. A failure is not a disproof either: a tell shows that the parties differ in style, and a person with an odd manner of answering would show one too. The behaviourist closes the gap by definition, because for the behaviourist there is nothing for the test to miss. “The Chinese Room and the Lookup Table” shows what that costs.</p><p>The limit: the probabilities in the lab are numbers someone chose. The lab computes what a judge holding those numbers should believe. It cannot say whether a real answer is a tell.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing what a test shows</h2></div><p>Five steps. The fourth is the one a quick reading skips.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the two hypotheses</h3><p>State them as who is behind the screen: human and machine. Do not state them as thinks and does not think. Those are different hypotheses, and the test only reaches the first pair.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Give each hypothesis a row of likelihoods</h3><p>For each kind of answer, say how probable it is if the party is human and how probable if a machine. Each row must sum to 1.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Enter the prior and the answers heard</h3><p>The prior is how likely the judge thinks a human before any answer. The data are the answers, in order.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare the rows before reading the posterior</h3><p>If every answer is equally probable under both hypotheses, the Bayes factor is 1 and the posterior is the prior whatever was heard.</p></article><article class="card concept-card"><div class="icon">5</div><h3>State what the number measures</h3><p>A factor away from 1 means the parties can be told apart. It says nothing about thought until a premise about behaviour and mind is added, and you should say which.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing what a test shows</h2>
+      <p class="lead-in">Five steps. The fourth is the one a quick reading skips.</p>
+      <ol class="key-ideas method"><li><strong>Name the two hypotheses.</strong> State them as who is behind the screen: human and machine. Do not state them as thinks and does not think. Those are different hypotheses, and the test only reaches the first pair.</li><li><strong>Give each hypothesis a row of likelihoods.</strong> For each kind of answer, say how probable it is if the party is human and how probable if a machine. Each row must sum to 1.</li><li><strong>Enter the prior and the answers heard.</strong> The prior is how likely the judge thinks a human before any answer. The data are the answers, in order.</li><li><strong>Compare the rows before reading the posterior.</strong> If every answer is equally probable under both hypotheses, the Bayes factor is 1 and the posterior is the prior whatever was heard.</li><li><strong>State what the number measures.</strong> A factor away from 1 means the parties can be told apart. It says nothing about thought until a premise about behaviour and mind is added, and you should say which.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1466,17 +1512,16 @@ tell:   human 1/10, machine 9/10 on a tell
         posterior human: 1/10</div><p>The mimic's ten answers are not weak evidence. They are no evidence, because the rows are the same. The tell is one answer and moves the odds on human from one to one down to one to nine, and the whole difference between the cases is a row of probabilities.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a pass as proof of thought and a failure as its disproof</strong><span>The mimic preset passes with a Bayes factor of exactly 1, and that is a statement about what the judge can tell, not about what is behind the screen. The tell preset fails the machine with a factor of <span class="math" data-say="1 over 9">1/9</span>, and a person with a distinctive manner would fail it in the same way. Only a bridge premise that identifies thinking with behaving turns either result into a verdict on thought.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting ten answers as ten pieces of evidence</strong><span>Evidence is a ratio of likelihoods, not a number of observations. Ten answers from a perfect mimic are ten factors of 1, and ten times 1 is 1.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking that one tell settles the question</strong><span>The prior-heavy preset shows a tell bringing a judge from <span class="math" data-say="9 over 10">9/10</span> only to <span class="math" data-say="1 over 2">1/2</span>. How far one answer moves a judge depends on where the judge began, and a confident judge needs more than one tell.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a pass shows and what it does not.</strong><p>Given two likelihood rows and an answer, you should be able to compute the Bayes factor and the posterior, say whether the answer separates the parties, and state the premise that would carry the result from who is behind the screen to whether it thinks.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The updating here is the same as in Knowledge and Evidence, with two hypotheses and two kinds of answer. What is new is the use made of the result.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a pass as proof of thought and a failure as its disproof</strong><span>The mimic preset passes with a Bayes factor of exactly 1, and that is a statement about what the judge can tell, not about what is behind the screen. The tell preset fails the machine with a factor of <span class="math" data-say="1 over 9">1/9</span>, and a person with a distinctive manner would fail it in the same way. Only a bridge premise that identifies thinking with behaving turns either result into a verdict on thought.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting ten answers as ten pieces of evidence</strong><span>Evidence is a ratio of likelihoods, not a number of observations. Ten answers from a perfect mimic are ten factors of 1, and ten times 1 is 1.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking that one tell settles the question</strong><span>The prior-heavy preset shows a tell bringing a judge from <span class="math" data-say="9 over 10">9/10</span> only to <span class="math" data-say="1 over 2">1/2</span>. How far one answer moves a judge depends on where the judge began, and a confident judge needs more than one tell.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a pass shows and what it does not.</strong><p>Given two likelihood rows and an answer, you should be able to compute the Bayes factor and the posterior, say whether the answer separates the parties, and state the premise that would carry the result from who is behind the screen to whether it thinks.</p></div></div><div class="note"><strong>Note:</strong> The updating here is the same as in Knowledge and Evidence, with two hypotheses and two kinds of answer. What is new is the use made of the result.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The judge updates on each answer</summary><p>The judge begins with some belief that the party behind the screen is human, and each answer moves it by the Bayes factor, the probability of that answer if the party is human divided by its probability if not. This is the updating of Knowledge and Evidence.</p></details><details class="recall"><summary>A perfect mimic gives a factor of 1</summary><p>If an answer is exactly as probable from the machine as from the human, it is no evidence either way. Ten such answers are ten factors of 1, and the belief ends where it began.</p></details><details class="recall"><summary>The hypotheses are about who, not whether</summary><p>The test compares &ldquo;human&rdquo; with &ldquo;machine&rdquo;. It does not compare &ldquo;thinks&rdquo; with &ldquo;does not think&rdquo;. To connect them takes a further premise, and that premise is behaviourism.</p></details></div>
+      <h3>Summary</h3>
       <p>The Turing test replaces the question whether a machine thinks with a question about what a judge can tell. Model the judge as an updater with two hypotheses, human and machine, show that a perfect mimic gives a Bayes factor of 1 on every answer, and compute what one tell does.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The judge updates on each answer.</strong> The judge begins with some belief that the party behind the screen is human, and each answer moves it by the Bayes factor, the probability of that answer if the party is human divided by its probability if not. This is the updating of Knowledge and Evidence.</li><li><strong>A perfect mimic gives a factor of 1.</strong> If an answer is exactly as probable from the machine as from the human, it is no evidence either way. Ten such answers are ten factors of 1, and the belief ends where it began.</li><li><strong>The hypotheses are about who, not whether.</strong> The test compares &ldquo;human&rdquo; with &ldquo;machine&rdquo;. It does not compare &ldquo;thinks&rdquo; with &ldquo;does not think&rdquo;. To connect them takes a further premise, and that premise is behaviourism.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="judge, prior times likelihood, normalised. Bayes factor equals P of A given H over P of A given not H. a perfect mimic, factor 1 on every answer. a tell, 1 over 10 under human, 9 over 10 under machine. one tell, factor 1 over 9" tabindex="0" role="region" aria-label="Mathematical notation">judge: prior × likelihood, normalised
 Bayes factor = P(a | H) / P(a | ¬H)
 a perfect mimic: factor 1 on every answer
@@ -2201,11 +2246,42 @@ one tell: factor 1/9</div><figcaption>A test is evidence about who, not whether<
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2273,7 +2349,7 @@ one tell: factor 1/9</div><figcaption>A test is evidence about who, not whether<
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

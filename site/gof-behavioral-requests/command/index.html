@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Behavioral Patterns I: Requests, Languages and Traversal</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · Behavioral Patterns</p>
       <h1>Command</h1>
       <p class="lesson-lede">A request turned into an object, so it can be handed around, queued, logged, and undone and redone from a history.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Receiver</li><li>Invoker</li><li>History list</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the undo it makes possible, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Commands are an object-oriented replacement for callbacks.&rdquo; The sentence is from Command's Applicability, and it is the quickest way into the pattern: where a procedural program registers a function to be called later, Command registers an object. This lesson reads the pattern section by section. Read it in your own copy first.</p><p>The motivation is a toolkit's problem. Buttons and menus must do something when chosen, yet the toolkit's authors cannot know what, or to which object: only the application that uses the toolkit knows. So the request itself becomes an object. An abstract Command declares an execute operation; each concrete subclass stores a receiver and a particular action on it. The book's menu items each hold a command, commands such as paste and open do different work behind the same interface, and a macro command runs a sequence of other commands and has no receiver of its own.</p><p>The participants, as you would apply them: the Command declares the interface; a ConcreteCommand binds a Receiver to an action and implements execute by calling the receiver; the Client creates the concrete command and gives it its receiver; the Invoker holds the command and calls execute when the time comes. The invoker and the receiver never meet. A menu and a toolbar button can share one command object, and the command can be swapped while the program runs.</p><pre class="codeblock" data-say="line 1, interface command. line 2, void execute. line 3, void undo. line 5, final class take places implements command. line 6, private final deck deck, comment, the receiver. line 7, private final int places. line 8, take places of deck d, int places this dot deck is set to d, this dot places is set to places. line 9, public void execute deck dot take of places. line 10, public void undo deck dot give of places. line 12, final class close deck implements command. line 13, private final deck deck. line 14, private int was free, comment, what execute replaced, kept for undo. line 15, close deck of deck d this dot deck is set to d. line 16, public void execute was free is set to deck dot free, deck dot set free of 0. line 17, public void undo deck dot set free of was free" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">interface Command {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the undo it makes possible, then the count</h2><div class="prose reading"><p>&ldquo;Commands are an object-oriented replacement for callbacks.&rdquo; The sentence is from Command's Applicability, and it is the quickest way into the pattern: where a procedural program registers a function to be called later, Command registers an object. This lesson reads the pattern section by section. Read it in your own copy first.</p><p>The motivation is a toolkit's problem. Buttons and menus must do something when chosen, yet the toolkit's authors cannot know what, or to which object: only the application that uses the toolkit knows. So the request itself becomes an object. An abstract Command declares an execute operation; each concrete subclass stores a receiver and a particular action on it. The book's menu items each hold a command, commands such as paste and open do different work behind the same interface, and a macro command runs a sequence of other commands and has no receiver of its own.</p><p>The participants, as you would apply them: the Command declares the interface; a ConcreteCommand binds a Receiver to an action and implements execute by calling the receiver; the Client creates the concrete command and gives it its receiver; the Invoker holds the command and calls execute when the time comes. The invoker and the receiver never meet. A menu and a toolbar button can share one command object, and the command can be swapped while the program runs.</p><pre class="codeblock" data-say="line 1, interface command. line 2, void execute. line 3, void undo. line 5, final class take places implements command. line 6, private final deck deck, comment, the receiver. line 7, private final int places. line 8, take places of deck d, int places this dot deck is set to d, this dot places is set to places. line 9, public void execute deck dot take of places. line 10, public void undo deck dot give of places. line 12, final class close deck implements command. line 13, private final deck deck. line 14, private int was free, comment, what execute replaced, kept for undo. line 15, close deck of deck d this dot deck is set to d. line 16, public void execute was free is set to deck dot free, deck dot set free of 0. line 17, public void undo deck dot set free of was free" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">interface Command {</span>
 <span class="cl">    void execute();</span>
 <span class="cl">    void undo();</span>
 <span class="cl">}</span>
@@ -1462,34 +1506,11 @@
 <span class="cl">    CloseDeck(Deck d) { this.deck = d; }</span>
 <span class="cl">    public void execute() { wasFree = deck.free(); deck.setFree(0); }</span>
 <span class="cl">    public void undo()    { deck.setFree(wasFree); }</span>
-<span class="cl">}</span></code></pre><p>The authors list five uses. A command lets you configure an object with what it should do, as the desk key below is configured. A command made now can run later, wait in a queue, or travel to another process. With a second operation that reverses the first, it can be undone. Written to disk and read back, a log of commands can be replayed after a crash. And a system's large operations can be composed of small ones, the way transactions are. Undo is where the pattern's details are, and it is what the lab counts: a history keeps two stacks, pushing each executed command on the first, moving it to the second when it is undone, and back when it is redone.</p><pre class="codeblock" data-say="line 1, comment, A macro runs its parts in order and undoes them in reverse order.. line 2, final class macro implements command. line 3, private final list of command parts. line 4, macro of list of command parts this dot parts is set to new array list of parts. line 5, public void execute. line 6, for command c in parts c dot execute. line 8, public void undo. line 9, for int i is set to parts dot size minus 1, i is at least 0, i is decremented parts dot get of i dot undo. line 12, comment, The invoker a key on the booking desk, given its command by the client.. line 13, final class desk key. line 14, private command command. line 15, void assign of command c command is set to c. line 16, void press command dot execute" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A macro runs its parts in order and undoes them in reverse order.</span>
-<span class="cl">final class Macro implements Command {</span>
-<span class="cl">    private final List&lt;Command&gt; parts;</span>
-<span class="cl">    Macro(List&lt;Command&gt; parts) { this.parts = new ArrayList&lt;&gt;(parts); }</span>
-<span class="cl">    public void execute() {</span>
-<span class="cl">        for (Command c : parts) { c.execute(); }</span>
-<span class="cl">    }</span>
-<span class="cl">    public void undo() {</span>
-<span class="cl">        for (int i = parts.size() - 1; i &gt;= 0; i--) { parts.get(i).undo(); }</span>
-<span class="cl">    }</span>
-<span class="cl">}</span>
-<span class="cl">// The invoker: a key on the booking desk, given its command by the client.</span>
-<span class="cl">final class DeskKey {</span>
-<span class="cl">    private Command command;</span>
-<span class="cl">    void assign(Command c) { command = c; }</span>
-<span class="cl">    void press() { command.execute(); }</span>
-<span class="cl">}</span></code></pre><p>The consequences are short in the book: the invoker is decoupled from the receiver; commands are objects like any other and can be extended and handled as such; they can be put together into composite commands, an instance of Composite; and a new command is a new class that changes no existing one. The costs are in the Implementation section. How much a command should know is a range: at one end it only binds a receiver to an action, at the other it does all the work itself, and in between it finds its receiver when it runs. To be undone, a command may need to keep the receiver, the arguments, and whatever values in the receiver execute replaces, as <code>CloseDeck</code> keeps <code>wasFree</code>. The macro shows the composite case: it has no receiver of its own, and it must undo its parts in the reverse of the order it ran them.</p><p>Two further issues bite in practice. A command whose state varies between runs, like <code>CloseDeck</code>, must be copied before it goes on the history list, or the next run of the same object overwrites the value an earlier undo needs; such a command acts as a Prototype. And repeated execute and undo can accumulate errors until the state drifts from where it started, which the authors call hysteresis; storing more in the command, through a Memento, is their remedy. The Sample Code builds open, paste, a C++ template for simple commands, and the macro command; the Known Uses run from Lieberman's 1985 paper and MacApp's undoable operations to InterViews and Unidraw. Related Patterns: Composite for macros, Memento for undo state, Prototype for copied commands. The case study's User Operations lesson met the same pattern in Lexi; this one reads the pattern itself.</p><p>Now the lab, on a ferry's booking desk with 30 free car spaces and 120 foot-passenger places on one sailing. Four commands: <code>car</code> takes 1 car space, <code>group</code> takes 6 foot places, <code>storm</code> sets the foot places to 0 and <code>reset</code> sets the car spaces back to 30. On the preset <code>ferry</code> the script runs two <code>car</code>s and a <code>group</code>, undoes two of them, and then runs <code>storm</code>. That new command discards the 2 entries on the redo stack, so the redo straight after it is refused. Three undos follow, the last refused with nothing left to undo, and a final redo re-runs <code>car</code>. The lab ends with cars 29 and foot 120, an undo stack of 1 (<code>car</code>), a redo stack of 1 (<code>storm</code>), one undo and one redo refused, and 2 entries discarded.</p><p>The preset <code>ferry-back</code> runs the same three commands, undoes two and redoes both, with no new command in between. Nothing is discarded and nothing refused: the state returns to cars 28, foot 114, with all 3 commands on the undo stack and the redo stack empty. Both presets also show what the history holds. Under the inverse scheme an <code>add</code> is undone by subtracting and stores nothing, while a <code>set</code> keeps the one value it replaced: 1 value at the end of <code>ferry</code>, none on <code>ferry-back</code>. The tile under the other scheme gives full snapshots for comparison, the subject of the lesson Memento.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, comment, state, as cell, value. line 2, target, 20. line 3, comment, commands, as command, op, cell, amount. line 4, warm, add, target, 1. line 5, eco, set, target, 16. line 6, comment, the script. line 7, warm warm eco undo warm redo undo" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// state, as cell, value</span>
-<span class="cl">target, 20</span>
-<span class="cl">// commands, as command, op, cell, amount</span>
-<span class="cl">warm, add, target, 1;</span>
-<span class="cl">eco, set, target, 16</span>
-<span class="cl">// the script</span>
-<span class="cl">warm warm eco undo warm redo undo</span></code></pre><p>A thermostat with two commands. By hand, step through the seven entries of the script, writing the target and both stacks after each, and note where the redo history is discarded and which entry is refused. Then type it into the lab to check, and say what the redo would have done had the <code>warm</code> after the undo not run.</p><p>A command here changes one number. The next lesson, Interpreter, turns to a whole small language whose sentences are trees of objects.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Commands, undo and redo</h2></div><p>the undo and redo stacks after a sequence of commands</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The authors list five uses. A command lets you configure an object with what it should do, as the desk key below is configured. A command made now can run later, wait in a queue, or travel to another process. With a second operation that reverses the first, it can be undone. Written to disk and read back, a log of commands can be replayed after a crash. And a system's large operations can be composed of small ones, the way transactions are. Undo is where the pattern's details are, and it is what the lab counts: a history keeps two stacks, pushing each executed command on the first, moving it to the second when it is undone, and back when it is redone.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Commands, undo and redo</h2></div><p>the undo and redo stacks after a sequence of commands</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Commands, undo and redo</strong><span>the undo and redo stacks after a sequence of commands</span></div>
       </div>
@@ -1497,10 +1518,10 @@
       <div class="table-wrap" id="ghiTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ghiTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A command name in the script runs it: set puts its amount in the cell, add adds it. Running a command pushes it on the undo stack and empties the redo stack, whose entries are discarded. Undo pops the undo stack, restores the state before that command and pushes it on the redo stack; redo pops the redo stack, runs the command again and pushes it back. An undo or redo with its stack empty does nothing and is counted. Stored values count what the history holds at the end, one entry per command on either stack: as inverse operations, one old value per set (an add is undone by subtracting its amount, which the command already holds); as snapshots, every cell of the state per entry. The states are the same under both.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Commands, undo and redo on a small state</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Commands, undo and redo on a small state</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="ghiPreset">Worked example</label>
           <select id="ghiPreset"><option value="ferry" selected>A ferry booking desk: a new command after two undos</option><option value="ferry-back">The same commands undone and redone, nothing new</option></select>
@@ -1531,12 +1552,37 @@
           <div class="kpi"><span>Under the other scheme</span><strong id="ghiOther">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, A macro runs its parts in order and undoes them in reverse order.. line 2, final class macro implements command. line 3, private final list of command parts. line 4, macro of list of command parts this dot parts is set to new array list of parts. line 5, public void execute. line 6, for command c in parts c dot execute. line 8, public void undo. line 9, for int i is set to parts dot size minus 1, i is at least 0, i is decremented parts dot get of i dot undo. line 12, comment, The invoker a key on the booking desk, given its command by the client.. line 13, final class desk key. line 14, private command command. line 15, void assign of command c command is set to c. line 16, void press command dot execute" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A macro runs its parts in order and undoes them in reverse order.</span>
+<span class="cl">final class Macro implements Command {</span>
+<span class="cl">    private final List&lt;Command&gt; parts;</span>
+<span class="cl">    Macro(List&lt;Command&gt; parts) { this.parts = new ArrayList&lt;&gt;(parts); }</span>
+<span class="cl">    public void execute() {</span>
+<span class="cl">        for (Command c : parts) { c.execute(); }</span>
+<span class="cl">    }</span>
+<span class="cl">    public void undo() {</span>
+<span class="cl">        for (int i = parts.size() - 1; i &gt;= 0; i--) { parts.get(i).undo(); }</span>
+<span class="cl">    }</span>
+<span class="cl">}</span>
+<span class="cl">// The invoker: a key on the booking desk, given its command by the client.</span>
+<span class="cl">final class DeskKey {</span>
+<span class="cl">    private Command command;</span>
+<span class="cl">    void assign(Command c) { command = c; }</span>
+<span class="cl">    void press() { command.execute(); }</span>
+<span class="cl">}</span></code></pre><p>The consequences are short in the book: the invoker is decoupled from the receiver; commands are objects like any other and can be extended and handled as such; they can be put together into composite commands, an instance of Composite; and a new command is a new class that changes no existing one. The costs are in the Implementation section. How much a command should know is a range: at one end it only binds a receiver to an action, at the other it does all the work itself, and in between it finds its receiver when it runs. To be undone, a command may need to keep the receiver, the arguments, and whatever values in the receiver execute replaces, as <code>CloseDeck</code> keeps <code>wasFree</code>. The macro shows the composite case: it has no receiver of its own, and it must undo its parts in the reverse of the order it ran them.</p><p>Two further issues bite in practice. A command whose state varies between runs, like <code>CloseDeck</code>, must be copied before it goes on the history list, or the next run of the same object overwrites the value an earlier undo needs; such a command acts as a Prototype. And repeated execute and undo can accumulate errors until the state drifts from where it started, which the authors call hysteresis; storing more in the command, through a Memento, is their remedy. The Sample Code builds open, paste, a C++ template for simple commands, and the macro command; the Known Uses run from Lieberman's 1985 paper and MacApp's undoable operations to InterViews and Unidraw. Related Patterns: Composite for macros, Memento for undo state, Prototype for copied commands. The case study's User Operations lesson met the same pattern in Lexi; this one reads the pattern itself.</p><p>Now the lab, on a ferry's booking desk with 30 free car spaces and 120 foot-passenger places on one sailing. Four commands: <code>car</code> takes 1 car space, <code>group</code> takes 6 foot places, <code>storm</code> sets the foot places to 0 and <code>reset</code> sets the car spaces back to 30. On the preset <code>ferry</code> the script runs two <code>car</code>s and a <code>group</code>, undoes two of them, and then runs <code>storm</code>. That new command discards the 2 entries on the redo stack, so the redo straight after it is refused. Three undos follow, the last refused with nothing left to undo, and a final redo re-runs <code>car</code>. The lab ends with cars 29 and foot 120, an undo stack of 1 (<code>car</code>), a redo stack of 1 (<code>storm</code>), one undo and one redo refused, and 2 entries discarded.</p><p>The preset <code>ferry-back</code> runs the same three commands, undoes two and redoes both, with no new command in between. Nothing is discarded and nothing refused: the state returns to cars 28, foot 114, with all 3 commands on the undo stack and the redo stack empty. Both presets also show what the history holds. Under the inverse scheme an <code>add</code> is undone by subtracting and stores nothing, while a <code>set</code> keeps the one value it replaced: 1 value at the end of <code>ferry</code>, none on <code>ferry-back</code>. The tile under the other scheme gives full snapshots for comparison, the subject of the lesson Memento.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, comment, state, as cell, value. line 2, target, 20. line 3, comment, commands, as command, op, cell, amount. line 4, warm, add, target, 1. line 5, eco, set, target, 16. line 6, comment, the script. line 7, warm warm eco undo warm redo undo" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// state, as cell, value</span>
+<span class="cl">target, 20</span>
+<span class="cl">// commands, as command, op, cell, amount</span>
+<span class="cl">warm, add, target, 1;</span>
+<span class="cl">eco, set, target, 16</span>
+<span class="cl">// the script</span>
+<span class="cl">warm warm eco undo warm redo undo</span></code></pre><p>A thermostat with two commands. By hand, step through the seven entries of the script, writing the target and both stacks after each, and note where the redo history is discarded and which entry is refused. Then type it into the lab to check, and say what the redo would have done had the <code>warm</code> after the undo not run.</p><p>A command here changes one number. The next lesson, Interpreter, turns to a whole small language whose sentences are trees of objects.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running a history by hand</h2></div><p>Four steps, the last of them on an application of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the state and the commands</h3><p>Write each cell's starting value, and each command with what it does to which cell. For a command that sets a value, note that undo needs the value it replaced.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Keep two stacks</h3><p>Executing a command pushes it on the undo stack. Undo pops the top, reverses it and pushes it on the redo stack; redo pops the redo stack, executes again and pushes back. An undo or redo on an empty stack does nothing.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Clear the redo stack on a new command</h3><p>When a command is executed after some undos, the redo stack is emptied: the undone commands belonged to a future that will not happen now. Count what is discarded.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on an application of your own</h3><p>Pick an editor or tool you use. Make three changes, undo two, make a new change, and try to redo. Say what the redo did, and whether that application keeps a branching history or discards the redo stack.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running a history by hand</h2>
+      <p class="lead-in">Four steps, the last of them on an application of your own.</p>
+      <ol class="key-ideas method"><li><strong>Write the state and the commands.</strong> Write each cell's starting value, and each command with what it does to which cell. For a command that sets a value, note that undo needs the value it replaced.</li><li><strong>Keep two stacks.</strong> Executing a command pushes it on the undo stack. Undo pops the top, reverses it and pushes it on the redo stack; redo pops the redo stack, executes again and pushes back. An undo or redo on an empty stack does nothing.</li><li><strong>Clear the redo stack on a new command.</strong> When a command is executed after some undos, the redo stack is emptied: the undone commands belonged to a future that will not happen now. Count what is discarded.</li><li><strong>Do it on an application of your own.</strong> Pick an editor or tool you use. Make three changes, undo two, make a new change, and try to redo. Say what the redo did, and whether that application keeps a branching history or discards the redo stack.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1557,17 +1603,16 @@ undo: refused, nothing to undo
 redo: cars 29; undo stack car, redo stack storm</div><p>The final state is cars 29, foot 120. The history holds one <code>add</code> and one <code>set</code>; only the <code>set</code> needs a stored value, so the inverse scheme keeps 1.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Keeping the redo stack after a new command</strong><span>Once you undo and then do something new, the undone commands describe changes made to a state that no longer exists; redoing them would apply them to the wrong state. The usual history list, the one the book describes and the lab counts, empties the redo stack on every new command. On the lesson's illustration <code>storm</code> discards two entries and the next redo is refused.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting the same command object on the history twice</strong><span>A command that remembers what it replaced, like <code>CloseDeck</code>, overwrites that memory each time it runs. If one instance is pushed twice, undoing the earlier run restores the wrong value. The authors' answer is to copy such a command before it goes on the list.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking an undo needs a full copy of the state</strong><span>A command can undo itself from much less: an addition by subtracting, a set from the one value it replaced. Full snapshots are an alternative with its own costs, which the lesson Memento counts; the authors suggest them where reversing is not exact.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run a history of commands by hand.</strong><p>Given a state, a set of commands and a script, give the state and both stacks after every step, the refused undos and redos and the discarded redo entries, and name the participants of the pattern in a design you know.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab runs commands on whole numbers whose undo is exact. It cannot show hysteresis, macro commands, a command queue or a log replayed after a crash, and it does not say which of the pattern's uses your design needs.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Keeping the redo stack after a new command</strong><span>Once you undo and then do something new, the undone commands describe changes made to a state that no longer exists; redoing them would apply them to the wrong state. The usual history list, the one the book describes and the lab counts, empties the redo stack on every new command. On the lesson's illustration <code>storm</code> discards two entries and the next redo is refused.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting the same command object on the history twice</strong><span>A command that remembers what it replaced, like <code>CloseDeck</code>, overwrites that memory each time it runs. If one instance is pushed twice, undoing the earlier run restores the wrong value. The authors' answer is to copy such a command before it goes on the list.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking an undo needs a full copy of the state</strong><span>A command can undo itself from much less: an addition by subtracting, a set from the one value it replaced. Full snapshots are an alternative with its own costs, which the lesson Memento counts; the authors suggest them where reversing is not exact.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run a history of commands by hand.</strong><p>Given a state, a set of commands and a script, give the state and both stacks after every step, the refused undos and redos and the discarded redo entries, and name the participants of the pattern in a design you know.</p></div></div><div class="note"><strong>Note:</strong> The lab runs commands on whole numbers whose undo is exact. It cannot show hysteresis, macro commands, a command queue or a log replayed after a crash, and it does not say which of the pattern's uses your design needs.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Receiver</summary><p>The object that knows how to carry out the work, such as the deck of a ferry whose free places change. Any class can be a receiver; a command holds a reference to it and calls it.</p></details><details class="recall"><summary>Invoker</summary><p>The object that asks a command to execute: a button, a menu item, a scheduler, a history. It knows the Command interface and nothing about what any particular command does or to whom.</p></details><details class="recall"><summary>History list</summary><p>The record of executed commands that makes multi-level undo and redo possible. Undo walks it backwards, reversing each command; redo walks it forwards, executing each again. Its length limits how far back you can go.</p></details></div>
+      <h3>Summary</h3>
       <p>Command wraps a request in an object with an execute operation, so the object that triggers it need not know what it does. Read the pattern's participants, its uses and the work undo takes, then run a ferry booking desk's commands, undos and redos, and count the two stacks, the state, and the redo history a new command throws away.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Receiver.</strong> The object that knows how to carry out the work, such as the deck of a ferry whose free places change. Any class can be a receiver; a command holds a reference to it and calls it.</li><li><strong>Invoker.</strong> The object that asks a command to execute: a button, a menu item, a scheduler, a history. It knows the Command interface and nothing about what any particular command does or to whom.</li><li><strong>History list.</strong> The record of executed commands that makes multi-level undo and redo possible. Undo walks it backwards, reversing each command; redo walks it forwards, executing each again. Its length limits how far back you can go.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a request becomes an object. the invoker knows only execute. the receiver knows how to do it. undo pops one stack, pushes the other. any new command clears the redo stack. a command may need its own copy" tabindex="0" role="region" aria-label="Mathematical notation">a request becomes an object
 the invoker knows only execute
 the receiver knows how to do it
@@ -2350,11 +2395,42 @@ a command may need its own copy</div><figcaption>Command in six lines</figcaptio
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2422,7 +2498,7 @@ a command may need its own copy</div><figcaption>Command in six lines</figcaptio
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

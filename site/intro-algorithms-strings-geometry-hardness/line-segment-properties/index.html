@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,25 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Strings, Geometry and Hardness</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 33 · Computational Geometry</p>
       <h1>Line-Segment Properties and Intersection</h1>
       <p class="lesson-lede">One cross product says which way three points turn; four of them, and a check for the boundary case, say whether two segments meet.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The cross product</li><li>Straddling</li><li>A sweep</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;We need neither division nor trigonometric functions, both of which can be computationally expensive and prone to problems with round-off error.&rdquo; That is the promise section 33.1 makes, and it keeps it: every question the section asks is answered with additions, subtractions, multiplications and comparisons. This lesson reads the opening of Chapter 33 and sections 33.1 and 33.2, and then does the arithmetic on segments of its own.</p><p>The chapter opens by saying what computational geometry is, with its inputs given as sets of points with real coordinates, and works in the plane throughout. Section 33.1 asks three questions: given two directed segments from a common point, is one clockwise from the other; given two consecutive segments, do they turn left or right where they join; and do two segments intersect. Each takes <span class="math" data-say="big O of 1">O(1)</span> time. The authors contrast their method with the obvious one, solving for the intersection of the two lines, which divides and is fragile when the segments are nearly parallel.</p><p>All three answers come from the cross product, which the section defines as the determinant <span data-say="x 1 times y 2 minus x 2 times y 1">x1·y2 − x2·y1</span> and reads as the signed area of a parallelogram. Positive means p1 is clockwise from p2 about the origin; negative, counterclockwise; zero, colinear. To ask about two segments from a common point p0, translate so that p0 is the origin and take the cross product of the differences. To ask which way the path p0, p1, p2 turns at p1, take <span data-say="the quantity p 2 minus p 0, times the quantity p 1 minus p 0">(p2 − p0) × (p1 − p0)</span>: negative is a left turn, positive a right turn, zero means the three points are colinear.</p><p>The intersection test combines four of these. SEGMENTS-INTERSECT computes, with a helper called DIRECTION, the orientation of each endpoint of one segment relative to the other segment. If the first pair of values have opposite signs and so do the second pair, each segment straddles the line through the other and they cross. If some value is zero, that endpoint is colinear with the other segment, and ON-SEGMENT finishes the case by checking whether the point lies within the segment's bounding box. Otherwise they do not meet.</p><p>Section 33.2 asks a larger question: do any two of n segments intersect? Testing every pair costs <span class="math" data-say="theta of n squared">Θ(n²)</span>. The sweep costs <span class="math" data-say="big O of n times log base 2 of n">O(n lg n)</span>. It assumes no segment is vertical and no three meet at one point, sorts the 2n endpoints from left to right, and keeps the segments the sweep line currently cuts in a total preorder by height, stored in a red-black tree. At a left endpoint it inserts the segment and tests it against the segments just above and below; at a right endpoint it tests those two neighbours against each other and deletes the segment. The correctness argument is that the leftmost intersection, if there is one, is between two segments that become neighbours at some event before the sweep passes it.</p><p>That procedure, ANY-SEGMENTS-INTERSECT, answers yes or no. It does not find every intersection, and the section says so; a report of all k crossings needs more work. The Algorithms lesson Do Two Segments Meet covers the pairwise test with the same lab used here, and The Sweep Line and the Work It Does Not Save runs a sweep.</p><p>Now the lab. Type four points, p1 and p2 for one segment and q1 and q2 for the other, and it prints the four orientations, whether the segments cross properly (in their interiors), whether they touch, whether their bounding boxes overlap, the verdict from the four signs, and a second verdict from solving the two parametric equations exactly, with whether the two routes agree. One thing to know before you read its table: the lab's orientation orient(a, b, c) is <span data-say="the quantity b minus A, times the quantity c minus A">(b − a) × (c − a)</span>, positive for a left turn, which is the negative of the book's DIRECTION(a, b, c). The verdicts do not care; the signs are reversed.</p><p>The lab's presets cover the cases the boundary rule exists for. <code>proper</code> is an ordinary crossing: proper yes, touching no, they meet. <code>touch</code> has one segment end on the other: proper no, touching yes. <code>overlap</code> is two colinear segments sharing a stretch, <code>shared</code> two segments with only an endpoint in common, and <code>point</code> a segment that is a single point lying on the other; all three touch and meet. <code>apart</code> is colinear with a gap and <code>parallel</code> never meets; in both the boxes do not overlap and the verdict is that they miss. The two routes agree on every preset.</p><p>Then type the lesson's segments: p1 = (1, 1), p2 = (7, 5), q1 = (2, 6), q2 = (6, 0). The lab prints orientations −26, 26, 26 and −26: each pair has opposite signs, so the crossing is proper. Now move q1 to (4, 3) and q2 to (4, 8). The third orientation becomes 0, because (4, 3) lies on the line through p1 and p2, halfway along. The sign test alone decides nothing; the boundary case finds the point inside the segment, and the lab reports touching yes, proper no, they meet.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, p 1 is set to, open bracket, 0, 0, close bracket, p 2 is set to, open bracket, 6, 0, close bracket. line 2, p 3 is set to, open bracket, 3, 1, close bracket, p 4 is set to, open bracket, 11, minus 1, close bracket" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">p1 = (0, 0)    p2 = (6, 0)</span>
-<span class="cl">p3 = (3, 1)    p4 = (11, −1)</span></code></pre><p>Compute the book's four values d1 to d4 for SEGMENTS-INTERSECT on these segments by hand, say which segment straddles which line, and decide whether they meet. Then type the points into the lab and check that its orientations are your values with the signs reversed.</p><p>Orientation is also the whole of the next lesson's machinery. Convex Hull and the Closest Pair uses the turn test to decide which points to keep.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Do two segments meet, including every case where one sign is zero</h2></div><p>Four orientations against an exact solve for the two parameters</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the count</h2><div class="prose reading"><p>&ldquo;We need neither division nor trigonometric functions, both of which can be computationally expensive and prone to problems with round-off error.&rdquo; That is the promise section 33.1 makes, and it keeps it: every question the section asks is answered with additions, subtractions, multiplications and comparisons. This lesson reads the opening of Chapter 33 and sections 33.1 and 33.2, and then does the arithmetic on segments of its own.</p><p>The chapter opens by saying what computational geometry is, with its inputs given as sets of points with real coordinates, and works in the plane throughout. Section 33.1 asks three questions: given two directed segments from a common point, is one clockwise from the other; given two consecutive segments, do they turn left or right where they join; and do two segments intersect. Each takes <span class="math" data-say="big O of 1">O(1)</span> time. The authors contrast their method with the obvious one, solving for the intersection of the two lines, which divides and is fragile when the segments are nearly parallel.</p><p>All three answers come from the cross product, which the section defines as the determinant <span data-say="x 1 times y 2 minus x 2 times y 1">x1·y2 − x2·y1</span> and reads as the signed area of a parallelogram. Positive means p1 is clockwise from p2 about the origin; negative, counterclockwise; zero, colinear. To ask about two segments from a common point p0, translate so that p0 is the origin and take the cross product of the differences. To ask which way the path p0, p1, p2 turns at p1, take <span data-say="the quantity p 2 minus p 0, times the quantity p 1 minus p 0">(p2 − p0) × (p1 − p0)</span>: negative is a left turn, positive a right turn, zero means the three points are colinear.</p><p>The intersection test combines four of these. SEGMENTS-INTERSECT computes, with a helper called DIRECTION, the orientation of each endpoint of one segment relative to the other segment. If the first pair of values have opposite signs and so do the second pair, each segment straddles the line through the other and they cross. If some value is zero, that endpoint is colinear with the other segment, and ON-SEGMENT finishes the case by checking whether the point lies within the segment's bounding box. Otherwise they do not meet.</p><p>Section 33.2 asks a larger question: do any two of n segments intersect? Testing every pair costs <span class="math" data-say="theta of n squared">Θ(n²)</span>. The sweep costs <span class="math" data-say="big O of n times log base 2 of n">O(n lg n)</span>. It assumes no segment is vertical and no three meet at one point, sorts the 2n endpoints from left to right, and keeps the segments the sweep line currently cuts in a total preorder by height, stored in a red-black tree. At a left endpoint it inserts the segment and tests it against the segments just above and below; at a right endpoint it tests those two neighbours against each other and deletes the segment. The correctness argument is that the leftmost intersection, if there is one, is between two segments that become neighbours at some event before the sweep passes it.</p><p>That procedure, ANY-SEGMENTS-INTERSECT, answers yes or no. It does not find every intersection, and the section says so; a report of all k crossings needs more work. The Algorithms lesson Do Two Segments Meet covers the pairwise test with the same lab used here, and The Sweep Line and the Work It Does Not Save runs a sweep.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Do two segments meet, including every case where one sign is zero</h2></div><p>Four orientations against an exact solve for the two parameters</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Do these two segments meet</strong><span>four orientation signs against an exact parametric solve</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the first segment</span><span class="tone-purple"><i class="legend-swatch"></i>the second</span><span class="tone-green"><i class="legend-swatch"></i>they meet</span><span class="tone-red"><i class="legend-swatch"></i>they do not</span></div>
@@ -1459,10 +1501,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="sgPlot" viewBox="0 0 520 260" role="img" aria-label="The two segments, drawn with their bounding boxes."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="sgSigns"></table></div>
       <div class="status-banner" id="sgStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Four orientations, and the boundary case when one is zero</h3>
-          <p>Type p1, p2 for one segment and q1, q2 for the other. The table prints each orientation the test uses, in the lab's convention: positive is a left turn, the opposite sign to the book's DIRECTION. A second route solves the two segments' equations exactly and must agree.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Four orientations, and the boundary case when one is zero</h3>
+            <p>Type p1, p2 for one segment and q1, q2 for the other. The table prints each orientation the test uses, in the lab's convention: positive is a left turn, the opposite sign to the book's DIRECTION. A second route solves the two segments' equations exactly and must agree.</p>
         <div class="field">
           <label for="sgPreset">Worked example</label>
           <select id="sgPreset"><option value="proper" selected>an ordinary crossing, interiors only</option><option value="touch">one segment ends on the other</option><option value="overlap">collinear and overlapping</option><option value="apart">collinear, with a gap between the boxes</option><option value="shared">a shared endpoint and nothing else</option><option value="parallel">parallel, never meeting</option><option value="point">a segment that is a single point</option></select>
@@ -1480,12 +1522,16 @@
           <div class="kpi"><span>The two routes agree</span><strong id="sgAgree">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="sgHint" style="margin:0;">Four points, each <span class="tt">x, y</span>: the first two are one segment and the last two are the other. The four signs decide a PROPER crossing, where each segment has the other's endpoints strictly on opposite sides. Every remaining case is a zero sign, and a zero sign means collinear, which is where the second test has to take over. The parametric route below never looks at a sign at all.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Now the lab. Type four points, p1 and p2 for one segment and q1 and q2 for the other, and it prints the four orientations, whether the segments cross properly (in their interiors), whether they touch, whether their bounding boxes overlap, the verdict from the four signs, and a second verdict from solving the two parametric equations exactly, with whether the two routes agree. One thing to know before you read its table: the lab's orientation orient(a, b, c) is <span data-say="the quantity b minus A, times the quantity c minus A">(b − a) × (c − a)</span>, positive for a left turn, which is the negative of the book's DIRECTION(a, b, c). The verdicts do not care; the signs are reversed.</p><p>The lab's presets cover the cases the boundary rule exists for. <code>proper</code> is an ordinary crossing: proper yes, touching no, they meet. <code>touch</code> has one segment end on the other: proper no, touching yes. <code>overlap</code> is two colinear segments sharing a stretch, <code>shared</code> two segments with only an endpoint in common, and <code>point</code> a segment that is a single point lying on the other; all three touch and meet. <code>apart</code> is colinear with a gap and <code>parallel</code> never meets; in both the boxes do not overlap and the verdict is that they miss. The two routes agree on every preset.</p><p>Then type the lesson's segments: p1 = (1, 1), p2 = (7, 5), q1 = (2, 6), q2 = (6, 0). The lab prints orientations −26, 26, 26 and −26: each pair has opposite signs, so the crossing is proper. Now move q1 to (4, 3) and q2 to (4, 8). The third orientation becomes 0, because (4, 3) lies on the line through p1 and p2, halfway along. The sign test alone decides nothing; the boundary case finds the point inside the segment, and the lab reports touching yes, proper no, they meet.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, p 1 is set to, open bracket, 0, 0, close bracket, p 2 is set to, open bracket, 6, 0, close bracket. line 2, p 3 is set to, open bracket, 3, 1, close bracket, p 4 is set to, open bracket, 11, minus 1, close bracket" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">p1 = (0, 0)    p2 = (6, 0)</span>
+<span class="cl">p3 = (3, 1)    p4 = (11, −1)</span></code></pre><p>Compute the book's four values d1 to d4 for SEGMENTS-INTERSECT on these segments by hand, say which segment straddles which line, and decide whether they meet. Then type the points into the lab and check that its orientations are your values with the signs reversed.</p><p>Orientation is also the whole of the next lesson's machinery. Convex Hull and the Closest Pair uses the turn test to decide which points to keep.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding whether two segments meet</h2></div><p>Four steps follow SEGMENTS-INTERSECT; the fifth is a pair of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Compute the two orientations against the second segment</h3><p>With the book's DIRECTION, <span data-say="d 1 equals the quantity p 1 minus p 3, times the quantity p 4 minus p 3">d1 = (p1 − p3) × (p4 − p3)</span> and <span data-say="d 2 equals the quantity p 2 minus p 3, times the quantity p 4 minus p 3">d2 = (p2 − p3) × (p4 − p3)</span>. Opposite signs mean p1p2 straddles the line through p3p4.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the two against the first segment</h3><p><span data-say="d 3 equals the quantity p 3 minus p 1, times the quantity p 2 minus p 1">d3 = (p3 − p1) × (p2 − p1)</span> and <span data-say="d 4 equals the quantity p 4 minus p 1, times the quantity p 2 minus p 1">d4 = (p4 − p1) × (p2 − p1)</span>. Opposite signs mean p3p4 straddles the line through p1p2.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Decide the general case</h3><p>If both pairs have opposite signs, the segments cross. If neither pair has a zero and either pair has equal signs, they do not.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Finish any zero with the bounding box</h3><p>For each zero, the endpoint is colinear with the other segment: it lies on that segment exactly when its coordinates fall between the segment's endpoints in both x and y.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Build a case of your own</h3><p>Choose two segments that share only an endpoint, compute the four values, and say which of them are zero. Type the points into the lab and check that it reports touching yes and proper no.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Deciding whether two segments meet</h2>
+      <p class="lead-in">Four steps follow SEGMENTS-INTERSECT; the fifth is a pair of your own.</p>
+      <ol class="key-ideas method"><li><strong>Compute the two orientations against the second segment.</strong> With the book's DIRECTION, <span data-say="d 1 equals the quantity p 1 minus p 3, times the quantity p 4 minus p 3">d1 = (p1 − p3) × (p4 − p3)</span> and <span data-say="d 2 equals the quantity p 2 minus p 3, times the quantity p 4 minus p 3">d2 = (p2 − p3) × (p4 − p3)</span>. Opposite signs mean p1p2 straddles the line through p3p4.</li><li><strong>Compute the two against the first segment.</strong> <span data-say="d 3 equals the quantity p 3 minus p 1, times the quantity p 2 minus p 1">d3 = (p3 − p1) × (p2 − p1)</span> and <span data-say="d 4 equals the quantity p 4 minus p 1, times the quantity p 2 minus p 1">d4 = (p4 − p1) × (p2 − p1)</span>. Opposite signs mean p3p4 straddles the line through p1p2.</li><li><strong>Decide the general case.</strong> If both pairs have opposite signs, the segments cross. If neither pair has a zero and either pair has equal signs, they do not.</li><li><strong>Finish any zero with the bounding box.</strong> For each zero, the endpoint is colinear with the other segment: it lies on that segment exactly when its coordinates fall between the segment's endpoints in both x and y.</li><li><strong>Build a case of your own.</strong> Choose two segments that share only an endpoint, compute the four values, and say which of them are zero. Type the points into the lab and check that it reports touching yes and proper no.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1505,17 +1551,16 @@ d1, d2 opposite; d3, d4 opposite
 each straddles the other&#x27;s line: they cross</div><p>The lab's table shows −26, 26, 26, −26 for the same four orientations, because its orient(a, b, c) is <span data-say="the quantity b minus A, times the quantity c minus A">(b − a) × (c − a)</span>, the book's value with the sign reversed. Every comparison the test makes is between two signs, so reversing all four changes no verdict. No division appeared anywhere, which is the section's point.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Testing only for straddling</strong><span>If the four values are all nonzero, the straddle test decides. When one is zero it decides nothing: on the lesson's second pair, (4, 3) lies on the line through (1, 1) and (7, 5) and the segments touch, while the lab's apart preset has every value zero and the segments miss. The boundary case is half of the procedure, not a footnote.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Mixing the two sign conventions</strong><span>The book's DIRECTION(a, b, c) is <span data-say="the quantity c minus A, times the quantity b minus A">(c − a) × (b − a)</span> and the lab's orient(a, b, c) is <span data-say="the quantity b minus A, times the quantity c minus A">(b − a) × (c − a)</span>; one is the negative of the other. A rule such as <em>positive is a left turn</em> is true in one convention and false in the other. Fix one convention before reading any sign, and note that the intersection verdict is unchanged because it compares signs in pairs.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Solving for the intersection point</strong><span>Writing each segment as <span data-say="y equals m times x plus b">y = m·x + b</span> and solving needs division and fails for vertical segments. Section 33.1 avoids it on purpose: the four cross products of integer coordinates are exact integers. The lab's second route does solve the equations, exactly and without dividing, and agrees.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can decide by hand whether two segments meet.</strong><p>For two segments with small integer endpoints, compute d1 to d4, say which segment straddles which line, finish any zero with the bounding-box check, and state the verdict; then say what the sweep of section 33.2 adds.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab tests one pair of segments with exact integer arithmetic; it does not run ANY-SEGMENTS-INTERSECT, and agreeing on the cases you type is not the section's proof that the four-sign test is right on every pair. Its sign convention is the opposite of the book's, which changes the signs it prints and none of its verdicts.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Testing only for straddling</strong><span>If the four values are all nonzero, the straddle test decides. When one is zero it decides nothing: on the lesson's second pair, (4, 3) lies on the line through (1, 1) and (7, 5) and the segments touch, while the lab's apart preset has every value zero and the segments miss. The boundary case is half of the procedure, not a footnote.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Mixing the two sign conventions</strong><span>The book's DIRECTION(a, b, c) is <span data-say="the quantity c minus A, times the quantity b minus A">(c − a) × (b − a)</span> and the lab's orient(a, b, c) is <span data-say="the quantity b minus A, times the quantity c minus A">(b − a) × (c − a)</span>; one is the negative of the other. A rule such as <em>positive is a left turn</em> is true in one convention and false in the other. Fix one convention before reading any sign, and note that the intersection verdict is unchanged because it compares signs in pairs.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Solving for the intersection point</strong><span>Writing each segment as <span data-say="y equals m times x plus b">y = m·x + b</span> and solving needs division and fails for vertical segments. Section 33.1 avoids it on purpose: the four cross products of integer coordinates are exact integers. The lab's second route does solve the equations, exactly and without dividing, and agrees.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can decide by hand whether two segments meet.</strong><p>For two segments with small integer endpoints, compute d1 to d4, say which segment straddles which line, finish any zero with the bounding-box check, and state the verdict; then say what the sweep of section 33.2 adds.</p></div></div><div class="note"><strong>Note:</strong> The lab tests one pair of segments with exact integer arithmetic; it does not run ANY-SEGMENTS-INTERSECT, and agreeing on the cases you type is not the section's proof that the four-sign test is right on every pair. Its sign convention is the opposite of the book's, which changes the signs it prints and none of its verdicts.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The cross product</summary><p>For vectors p1 = (x1, y1) and <span data-say="p 2 equals x 2, y 2, p 1 times p 2 equals x 1 times y 2 minus x 2 times y 1">p2 = (x2, y2), p1 × p2 = x1·y2 − x2·y1</span>, the signed area of the parallelogram they span. Its sign says whether p1 is clockwise or counterclockwise from p2 about the origin; zero means the two are colinear.</p></details><details class="recall"><summary>Straddling</summary><p>A segment straddles a line when its two endpoints lie strictly on opposite sides of it. Two segments meet exactly when each straddles the line through the other, or when an endpoint of one lies on the other, the boundary case.</p></details><details class="recall"><summary>A sweep</summary><p>An imaginary vertical line moves across the plane from left to right, stopping only at event points such as segment endpoints. The algorithm keeps, in a balanced search tree, the order of the segments the line currently cuts, and tests only segments that become neighbours in that order.</p></details></div>
+      <h3>Summary</h3>
       <p>Sections 33.1 and 33.2: the cross product as a signed area, the turn test, SEGMENTS-INTERSECT with its straddle test and its boundary case, and the sweep that decides whether any two of n segments intersect in O(n lg n) time. Compute the four orientations for segments written for the lesson, and see the lab use the opposite sign convention to the book's.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The cross product.</strong> For vectors p1 = (x1, y1) and <span data-say="p 2 equals x 2, y 2, p 1 times p 2 equals x 1 times y 2 minus x 2 times y 1">p2 = (x2, y2), p1 × p2 = x1·y2 − x2·y1</span>, the signed area of the parallelogram they span. Its sign says whether p1 is clockwise or counterclockwise from p2 about the origin; zero means the two are colinear.</li><li><strong>Straddling.</strong> A segment straddles a line when its two endpoints lie strictly on opposite sides of it. Two segments meet exactly when each straddles the line through the other, or when an endpoint of one lies on the other, the boundary case.</li><li><strong>A sweep.</strong> An imaginary vertical line moves across the plane from left to right, stopping only at event points such as segment endpoints. The algorithm keeps, in a balanced search tree, the order of the segments the line currently cuts, and tests only segments that become neighbours in that order.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="p 1 times p 2 equals x 1 times y 2 minus x 2 times y 1. the sign says the turn, zero, colinear. straddle, endpoints on opposite sides. meet, each straddles, or an end on the other. no division, no angles. sweep, events left to right, neighbours only" tabindex="0" role="region" aria-label="Mathematical notation">p1 × p2 = x1·y2 − x2·y1
 the sign says the turn, zero: colinear
 straddle: endpoints on opposite sides
@@ -2638,11 +2683,42 @@ sweep: events left to right, neighbours only</div><figcaption>Sections 33.1 and 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2710,7 +2786,7 @@ sweep: events left to right, neighbours only</div><figcaption>Sections 33.1 and 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

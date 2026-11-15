@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Concurrency and Session State</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · Concurrency</p>
       <h1>Optimistic and Pessimistic Control</h1>
       <p class="lesson-lede">An optimistic lock lets both sessions work and detects the clash at commit; a pessimistic lock lets only one work, and prevents it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Optimistic lock</li><li>Pessimistic lock</li><li>Deadlock</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The section&#x27;s argument first, then the replay</h2>
-      <article class="prose reading"><p>&ldquo;A good way of thinking about this is that an optimistic lock is about conflict detection while a pessimistic lock is about conflict prevention.&rdquo; The sentence is Fowler's and Rice's, from Chapter 5's section Optimistic and Pessimistic Concurrency Control, which this lesson reads with its two parts, Preventing Inconsistent Reads and Deadlocks. It is a narrative, read as an argument; read it in your own copy first.</p><p>The section's question is what to do with data that can change and cannot be isolated, and it answers with two forms of control, on the source code example again. Martin and David both want to edit one file. With <em>optimistic</em> locking each takes a copy and edits freely; David checks in first without trouble, and when Martin tries to commit, the system detects the conflict, rejects his commit and leaves it to him to sort out. With <em>pessimistic</em> locking whoever checks the file out first stops anyone else editing it, so David cannot work on the file until Martin has committed. The authors grant, in an aside, that optimistic locking is arguably not locking at all, and keep the word because it is convenient and widespread.</p><p>Each has its cost. A pessimistic lock reduces concurrency: while Martin holds the file everyone else waits, and with enterprise data, the authors add, someone editing can stop others even reading. An optimistic lock is held only during the commit, so people make better progress, but a conflict means that everyone after the first commit must take the new version and merge. Source code merges easily, often automatically; business data usually does not, and often the only course is to throw the work away and start again. So the choice turns on the frequency and severity of conflicts: if they are rare or cheap, the section says you should usually pick optimistic locks, which give better concurrency and are usually easier to build; if a conflict is painful for users, you need a pessimistic technique.</p><p>Preventing Inconsistent Reads returns to the problem of the last lesson. Martin edits a class that calls another, David changes the other's interface and checks in first, and the shared build breaks although nobody overwrote anybody. Pessimistic schemes prevent this with read (shared) and write (exclusive) locks: many readers, or one writer. Optimistic schemes keep a <em>version marker</em>, a timestamp or a counter, on the data: an update is allowed only if the marker is unchanged, and then the marker moves on. Catching an inconsistent read means checking the markers of what was read too, and checking everything costs conflicts on data that hardly matters, so the section asks you to separate data you used from data you merely glanced at, which takes thought about what each is for. Temporal reads, which ask for data as of a time, are the third remedy, and few databases offer them.</p><p>Deadlocks are the hazard of the pessimistic side: Martin holds one file and wants David's, and David holds that one and wants Martin's. You can detect a deadlock and pick a victim, who loses his work and locks; give every lock a time limit; make everyone take all their locks at the start; take locks in a fixed order, such as alphabetical; or make anyone who asks for a lock already held a victim at once. Because it is easy to think a scheme is deadlock-proof and then meet a chain of events nobody considered, the authors prefer very simple, conservative schemes, even at the price of unnecessary victims.</p><p>The snippet holds both controls in one class. <span class="math" data-say="can commit">canCommit</span> is the optimistic check: the session remembers the version it read, and the commit may go ahead only if the stored version is still that one. <span class="math" data-say="try load for edit">tryLoadForEdit</span> is the pessimistic one: the session asks for the file before it loads it, and is turned away at once if another session holds it. The class leaves out moving the version on after a commit and releasing the lock, which a real store must do, and it does not serialize access to its maps, so two threads could both find a file free; a real lock manager must.</p><pre class="codeblock" data-say="line 1, class file store. line 2, private final map of string and integer versions is set to new hash map. line 3, private final map of string and string locked by is set to new hash map. line 4, comment, Optimistic detect a conflict when the session commits.. line 5, boolean can commit of string file, int version when read. line 6, return versions dot get or default of file, 0 equals version when read. line 9, comment, Pessimistic lock a file the session will edit before it is. line 10, comment, loaded, so the session works on the latest version or not at all.. line 11, boolean try load for edit of string file, string session. line 12, string holder is set to locked by dot get of file. line 13, if holder is not equal to null and not holder dot equals of session. line 14, return false. line 16, locked by dot put of file, session. line 17, return true" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">class FileStore {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The section&#x27;s argument first, then the replay</h2><div class="prose reading"><p>&ldquo;A good way of thinking about this is that an optimistic lock is about conflict detection while a pessimistic lock is about conflict prevention.&rdquo; The sentence is Fowler's and Rice's, from Chapter 5's section Optimistic and Pessimistic Concurrency Control, which this lesson reads with its two parts, Preventing Inconsistent Reads and Deadlocks. It is a narrative, read as an argument; read it in your own copy first.</p><p>The section's question is what to do with data that can change and cannot be isolated, and it answers with two forms of control, on the source code example again. Martin and David both want to edit one file. With <em>optimistic</em> locking each takes a copy and edits freely; David checks in first without trouble, and when Martin tries to commit, the system detects the conflict, rejects his commit and leaves it to him to sort out. With <em>pessimistic</em> locking whoever checks the file out first stops anyone else editing it, so David cannot work on the file until Martin has committed. The authors grant, in an aside, that optimistic locking is arguably not locking at all, and keep the word because it is convenient and widespread.</p><p>Each has its cost. A pessimistic lock reduces concurrency: while Martin holds the file everyone else waits, and with enterprise data, the authors add, someone editing can stop others even reading. An optimistic lock is held only during the commit, so people make better progress, but a conflict means that everyone after the first commit must take the new version and merge. Source code merges easily, often automatically; business data usually does not, and often the only course is to throw the work away and start again. So the choice turns on the frequency and severity of conflicts: if they are rare or cheap, the section says you should usually pick optimistic locks, which give better concurrency and are usually easier to build; if a conflict is painful for users, you need a pessimistic technique.</p><p>Preventing Inconsistent Reads returns to the problem of the last lesson. Martin edits a class that calls another, David changes the other's interface and checks in first, and the shared build breaks although nobody overwrote anybody. Pessimistic schemes prevent this with read (shared) and write (exclusive) locks: many readers, or one writer. Optimistic schemes keep a <em>version marker</em>, a timestamp or a counter, on the data: an update is allowed only if the marker is unchanged, and then the marker moves on. Catching an inconsistent read means checking the markers of what was read too, and checking everything costs conflicts on data that hardly matters, so the section asks you to separate data you used from data you merely glanced at, which takes thought about what each is for. Temporal reads, which ask for data as of a time, are the third remedy, and few databases offer them.</p><p>Deadlocks are the hazard of the pessimistic side: Martin holds one file and wants David's, and David holds that one and wants Martin's. You can detect a deadlock and pick a victim, who loses his work and locks; give every lock a time limit; make everyone take all their locks at the start; take locks in a fixed order, such as alphabetical; or make anyone who asks for a lock already held a victim at once. Because it is easy to think a scheme is deadlock-proof and then meet a chain of events nobody considered, the authors prefer very simple, conservative schemes, even at the price of unnecessary victims.</p><p>The snippet holds both controls in one class. <span class="math" data-say="can commit">canCommit</span> is the optimistic check: the session remembers the version it read, and the commit may go ahead only if the stored version is still that one. <span class="math" data-say="try load for edit">tryLoadForEdit</span> is the pessimistic one: the session asks for the file before it loads it, and is turned away at once if another session holds it. The class leaves out moving the version on after a commit and releasing the lock, which a real store must do, and it does not serialize access to its maps, so two threads could both find a file free; a real lock manager must.</p><pre class="codeblock" data-say="line 1, class file store. line 2, private final map of string and integer versions is set to new hash map. line 3, private final map of string and string locked by is set to new hash map. line 4, comment, Optimistic detect a conflict when the session commits.. line 5, boolean can commit of string file, int version when read. line 6, return versions dot get or default of file, 0 equals version when read. line 9, comment, Pessimistic lock a file the session will edit before it is. line 10, comment, loaded, so the session works on the latest version or not at all.. line 11, boolean try load for edit of string file, string session. line 12, string holder is set to locked by dot get of file. line 13, if holder is not equal to null and not holder dot equals of session. line 14, return false. line 16, locked by dot put of file, session. line 17, return true" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">class FileStore {</span>
 <span class="cl">    private final Map&lt;String, Integer&gt; versions = new HashMap&lt;&gt;();</span>
 <span class="cl">    private final Map&lt;String, String&gt; lockedBy = new HashMap&lt;&gt;();</span>
 <span class="cl">    // Optimistic: detect a conflict when the session commits.</span>
@@ -1463,17 +1507,11 @@
 <span class="cl">        lockedBy.put(file, session);</span>
 <span class="cl">        return true;</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The lab replays a timeline of events, each a minute, a session, an action (read, edit or commit) and a record. Every record has a version that starts at 0, a commit adds one to each record the session edited, and a session remembers the version it first saw. The tiles count the sessions that committed, those whose commit conflicted, and those refused a lock, each with their names; the lost updates; the minutes of work redone, from a failed session's first event to its failure; and the most locks held at once. The one timeline here is the chapter's situation with minutes added: Martin reads the design at minute 0 and David at 1; David edits at 5 and Martin at 6; David commits at 8 and Martin at 10.</p><p>With <code>no-control</code> the lab prints &ldquo;2: david, martin&rdquo; committed, 1 lost update and 0 minutes redone. Both commits succeed, and Martin's, made from the version he read at minute 0, writes over David's change. Nobody is told; the lost update is in the count and nowhere else. With <code>optimistic</code> the lab prints &ldquo;1: david&rdquo; committed and &ldquo;1: martin&rdquo; in conflict, with 10 minutes redone: David moved the version to 1 at minute 8, Martin's commit at minute 10 finds it changed, and everything since minute 0 must be done again.</p><p>With <code>pessimistic</code> the lab prints &ldquo;1: martin&rdquo; committed, &ldquo;1: david&rdquo; refused, 0 minutes redone and at most 1 lock held. Martin loads the design for editing at minute 0 and takes the lock then, because a pessimistic lock is taken before the data is loaded, not when the editing starts. David is refused at minute 1, before he has done any work, and the lab skips his later events. His read is refused because he goes on to edit the design: the lab's lock is the exclusive write lock, taken when a session loads a record it means to edit, as <span class="math" data-say="try load for edit">tryLoadForEdit</span> asks for it. A session that only read the design would be let through. What no tile shows is his wait: he cannot work on the design until Martin commits at minute 10.</p><p>So which is safer? On this timeline the two sessions do collide, and the schemes only choose who pays: ten minutes of Martin's work, or David kept out for nine. Now delete Martin's commit from the timeline, as if he had walked away without saving, so that there is no collision at all. Pessimistically David is still refused at minute 1; optimistically he commits and nobody loses anything. That is why the section makes the choice turn on how often conflicts happen and how much each one costs.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, 0, ann, read, plan. line 2, 2, bo, read, plan. line 3, 3, ann, edit, plan. line 4, 4, bo, edit, plan. line 5, 9, bo, commit, no record. line 6, 12, ann, commit, no record" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">0, ann, read, plan;</span>
-<span class="cl">2, bo, read, plan;</span>
-<span class="cl">3, ann, edit, plan;</span>
-<span class="cl">4, bo, edit, plan;</span>
-<span class="cl">9, bo, commit, -;</span>
-<span class="cl">12, ann, commit, -</span></code></pre><p>Replay this timeline by hand, first under optimistic locking and then under pessimistic locking. For each, say who commits, who fails and at which minute, and how many minutes of work the failure discards.</p><p>The lab's reads are on one side of a commit or the other because nothing else ties them together. The next lesson, Transactions and Isolation, reads the tool that does: the database transaction, and how much of its protection systems give up for speed.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Concurrency</h2></div><p>sessions under no control, optimistic and pessimistic locking</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The lab replays a timeline of events, each a minute, a session, an action (read, edit or commit) and a record. Every record has a version that starts at 0, a commit adds one to each record the session edited, and a session remembers the version it first saw. The tiles count the sessions that committed, those whose commit conflicted, and those refused a lock, each with their names; the lost updates; the minutes of work redone, from a failed session's first event to its failure; and the most locks held at once. The one timeline here is the chapter's situation with minutes added: Martin reads the design at minute 0 and David at 1; David edits at 5 and Martin at 6; David commits at 8 and Martin at 10.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Concurrency</h2></div><p>sessions under no control, optimistic and pessimistic locking</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Concurrency</strong><span>sessions under no control, optimistic and pessimistic locking</span></div>
       </div>
@@ -1481,10 +1519,10 @@
       <div class="table-wrap" id="olTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="olTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Every group has a version, 0 at the start, and a successful commit adds one to each group the session edited; a record not given a group is its own. A session's first read or edit of a group records the version it saw. None: every commit succeeds, and a lost update is counted for each edited group whose version changed since the session saw it. Optimistic: a commit fails (a conflict) when an edited group has changed since the session saw it; with reads checked, the groups it only read too. Pessimistic: the lock is taken when the record is first loaded for editing, not when the edit begins: at the session's first read or edit of a group it edits anywhere in the timeline (a read of a group it never edits takes none); this is the exclusive write lock, the first of Pessimistic Offline Lock's three. Taking a lock another session holds is refused and ends the session, releasing its locks; a commit releases them. A failed session's later events are skipped. Redo is the minutes from a failed session's first event to its failure.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>One timeline under three schemes</h3>
-          <p>A count over the situation the lesson states. Each event is a minute, a session, an action and a record. The lab replays the events under the scheme chosen and counts who commits, who conflicts at commit, who is refused a lock, the updates lost, the minutes of work redone and the most locks held at once. The timeline is the chapter's situation; its minutes are illustrative.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>One timeline under three schemes</h3>
+            <p>A count over the situation the lesson states. Each event is a minute, a session, an action and a record. The lab replays the events under the scheme chosen and counts who commits, who conflicts at commit, who is refused a lock, the updates lost, the minutes of work redone and the most locks held at once. The timeline is the chapter's situation; its minutes are illustrative.</p>
         <div class="field">
           <label for="olPreset">Worked example</label>
           <select id="olPreset"><option value="no-control" selected>Martin and David edit the design, with no control</option><option value="optimistic">The same timeline, optimistic</option><option value="pessimistic">The same timeline, pessimistic</option></select>
@@ -1514,12 +1552,20 @@
           <div class="kpi"><span>Most locks held at once</span><strong id="olPeakLocks">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>With <code>no-control</code> the lab prints &ldquo;2: david, martin&rdquo; committed, 1 lost update and 0 minutes redone. Both commits succeed, and Martin's, made from the version he read at minute 0, writes over David's change. Nobody is told; the lost update is in the count and nowhere else. With <code>optimistic</code> the lab prints &ldquo;1: david&rdquo; committed and &ldquo;1: martin&rdquo; in conflict, with 10 minutes redone: David moved the version to 1 at minute 8, Martin's commit at minute 10 finds it changed, and everything since minute 0 must be done again.</p><p>With <code>pessimistic</code> the lab prints &ldquo;1: martin&rdquo; committed, &ldquo;1: david&rdquo; refused, 0 minutes redone and at most 1 lock held. Martin loads the design for editing at minute 0 and takes the lock then, because a pessimistic lock is taken before the data is loaded, not when the editing starts. David is refused at minute 1, before he has done any work, and the lab skips his later events. His read is refused because he goes on to edit the design: the lab's lock is the exclusive write lock, taken when a session loads a record it means to edit, as <span class="math" data-say="try load for edit">tryLoadForEdit</span> asks for it. A session that only read the design would be let through. What no tile shows is his wait: he cannot work on the design until Martin commits at minute 10.</p><p>So which is safer? On this timeline the two sessions do collide, and the schemes only choose who pays: ten minutes of Martin's work, or David kept out for nine. Now delete Martin's commit from the timeline, as if he had walked away without saving, so that there is no collision at all. Pessimistically David is still refused at minute 1; optimistically he commits and nobody loses anything. That is why the section makes the choice turn on how often conflicts happen and how much each one costs.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, 0, ann, read, plan. line 2, 2, bo, read, plan. line 3, 3, ann, edit, plan. line 4, 4, bo, edit, plan. line 5, 9, bo, commit, no record. line 6, 12, ann, commit, no record" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">0, ann, read, plan;</span>
+<span class="cl">2, bo, read, plan;</span>
+<span class="cl">3, ann, edit, plan;</span>
+<span class="cl">4, bo, edit, plan;</span>
+<span class="cl">9, bo, commit, -;</span>
+<span class="cl">12, ann, commit, -</span></code></pre><p>Replay this timeline by hand, first under optimistic locking and then under pessimistic locking. For each, say who commits, who fails and at which minute, and how many minutes of work the failure discards.</p><p>The lab's reads are on one side of a commit or the other because nothing else ties them together. The next lesson, Transactions and Isolation, reads the tool that does: the database transaction, and how much of its protection systems give up for speed.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Replaying a timeline</h2></div><p>Four steps, the last of them on a record of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Note the version each session saw</h3><p>Every record starts at version 0. For each session, write the version of each record at its first read or edit, and add one to a record's version at each successful commit that edited it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Replay it optimistically</h3><p>At each commit, compare the versions the session saw with the current ones for the records it edited. If any has moved, the commit conflicts; its redo is the minutes from the session's first event to that commit.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Replay it pessimistically</h3><p>Give a session the lock on a record at its first read or edit of a record it will edit. A session that asks for a lock another holds is refused there and then, and its later events never happen; a commit releases its locks.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a record of your own</h3><p>Pick one record in a system you know that two people edit. Write down which scheme protects it, if any, and what the second editor sees when the first has already saved.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Replaying a timeline</h2>
+      <p class="lead-in">Four steps, the last of them on a record of your own.</p>
+      <ol class="key-ideas method"><li><strong>Note the version each session saw.</strong> Every record starts at version 0. For each session, write the version of each record at its first read or edit, and add one to a record's version at each successful commit that edited it.</li><li><strong>Replay it optimistically.</strong> At each commit, compare the versions the session saw with the current ones for the records it edited. If any has moved, the commit conflicts; its redo is the minutes from the session's first event to that commit.</li><li><strong>Replay it pessimistically.</strong> Give a session the lock on a record at its first read or edit of a record it will edit. A session that asks for a lock another holds is refused there and then, and its later events never happen; a commit releases its locks.</li><li><strong>Do it on a record of your own.</strong> Pick one record in a system you know that two people edit. Write down which scheme protects it, if any, and what the second editor sees when the first has already saved.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1539,17 +1585,16 @@ pessimistic: Martin locks at minute 0
 pessimistic: David refused at minute 1</div><p>Pessimistically nobody redoes anything, and David is kept from the design from minute 1 to minute 10. Optimistically David is never kept out, and Martin pays ten minutes. Neither figure is the scheme's verdict; each is what this timeline costs under it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking pessimistic locking is safer, so better</strong><span>Prevention sounds safer than detection, and a pessimistic lock does turn a conflict away before any work is done. It also keeps the second session out when the two would never have collided, and it holds everyone else back while one session works. Chapter 5's choice turns on how often conflicts happen and what one costs. On the lesson's illustration the schemes only move the cost: ten minutes of Martin's work optimistically, David kept out for nine pessimistically.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking optimistic locking loses no work</strong><span>It does stop the lost update: Martin's commit is refused, David's change survives, and the lab counts 0 lost updates. But it stops it by throwing away the second session's work, not by saving it. Unless Martin can merge, everything he did is gone, and the section warns that business data is seldom easy to merge. On the lesson's timeline Martin redoes ten minutes.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Checking only what you write</strong><span>A version check on the records a session writes catches lost updates, and misses the inconsistent read: work built on something another session changed meanwhile. Preventing Inconsistent Reads asks for the versions of what was read to be checked too, for the data that matters, which takes knowing what each piece is used for.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can replay a timeline under each scheme.</strong><p>Given a timeline of reads, edits and commits by two sessions, state under no control, optimistic and pessimistic locking who commits and who fails, at which minute, and how many minutes of work the failure discards.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's pessimistic lock is the simplest kind, one editor at a time, refused at once rather than kept waiting, so it never deadlocks; read locks, waiting and timeouts are not in it. Nor can it say how often your sessions collide, which is the figure the chapter's choice depends on: that has to come from your own system.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking pessimistic locking is safer, so better</strong><span>Prevention sounds safer than detection, and a pessimistic lock does turn a conflict away before any work is done. It also keeps the second session out when the two would never have collided, and it holds everyone else back while one session works. Chapter 5's choice turns on how often conflicts happen and what one costs. On the lesson's illustration the schemes only move the cost: ten minutes of Martin's work optimistically, David kept out for nine pessimistically.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking optimistic locking loses no work</strong><span>It does stop the lost update: Martin's commit is refused, David's change survives, and the lab counts 0 lost updates. But it stops it by throwing away the second session's work, not by saving it. Unless Martin can merge, everything he did is gone, and the section warns that business data is seldom easy to merge. On the lesson's timeline Martin redoes ten minutes.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Checking only what you write</strong><span>A version check on the records a session writes catches lost updates, and misses the inconsistent read: work built on something another session changed meanwhile. Preventing Inconsistent Reads asks for the versions of what was read to be checked too, for the data that matters, which takes knowing what each piece is used for.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can replay a timeline under each scheme.</strong><p>Given a timeline of reads, edits and commits by two sessions, state under no control, optimistic and pessimistic locking who commits and who fails, at which minute, and how many minutes of work the failure discards.</p></div></div><div class="note"><strong>Note:</strong> The lab's pessimistic lock is the simplest kind, one editor at a time, refused at once rather than kept waiting, so it never deadlocks; read locks, waiting and timeouts are not in it. Nor can it say how often your sessions collide, which is the figure the chapter's choice depends on: that has to come from your own system.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Optimistic lock</summary><p>Every session may work on the data. When a session commits, the system checks whether anyone else committed a change to that data since the session read it, and refuses the commit if so. It detects a conflict; it does not stop one.</p></details><details class="recall"><summary>Pessimistic lock</summary><p>The first session to take the data for editing locks it, and nobody else may edit it until that session finishes. It prevents a conflict by making the second session wait or give up before it starts.</p></details><details class="recall"><summary>Deadlock</summary><p>Two sessions each hold a lock the other needs, so neither can go on. It is a hazard of pessimistic locking, and Chapter 5 prefers very simple, conservative schemes, even at the cost of unnecessary victims.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 5's two forms of concurrency control, and how to choose between them by how often conflicts happen and how much one costs. Replay one timeline of two sessions with no control, optimistically and pessimistically, and count who commits, who is refused or conflicts, and how much work is lost.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Optimistic lock.</strong> Every session may work on the data. When a session commits, the system checks whether anyone else committed a change to that data since the session read it, and refuses the commit if so. It detects a conflict; it does not stop one.</li><li><strong>Pessimistic lock.</strong> The first session to take the data for editing locks it, and nobody else may edit it until that session finishes. It prevents a conflict by making the second session wait or give up before it starts.</li><li><strong>Deadlock.</strong> Two sessions each hold a lock the other needs, so neither can go on. It is a hazard of pessimistic locking, and Chapter 5 prefers very simple, conservative schemes, even at the cost of unnecessary victims.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="optimistic, detect the conflict at commit. pessimistic, prevent it, one editor at a time. choose by how often, and how much it hurts. version marker, compare, then increment. deadlock, simple, conservative schemes" tabindex="0" role="region" aria-label="Mathematical notation">optimistic: detect the conflict at commit
 pessimistic: prevent it, one editor at a time
 choose by how often, and how much it hurts
@@ -2279,11 +2324,42 @@ deadlock: simple, conservative schemes</div><figcaption>The section in five line
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2351,7 +2427,7 @@ deadlock: simple, conservative schemes</div><figcaption>The section in five line
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

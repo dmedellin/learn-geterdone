@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,27 +1424,25 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Intractability and Approximation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Guarantees, and the lower bound they rest on</p>
       <h1>Twice a Matching</h1>
       <p class="lesson-lede">Take both ends of every matched edge, and watch a cover of 6 sit against an optimum of 3 with the promise of 2 exactly attained.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A guarantee is proved against a lower bound, not against the optimum</li><li>Why both ends, and why maximal is enough</li><li>Bipartite graphs do not need this at all</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The algorithm, the chain it rests on, and the sweep that tests the promise</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Maximal matching, and the cover built from it</span><p>A <strong>matching</strong> is a set of edges no two of which share a vertex; it is <strong>maximal</strong> when no further edge can be added. The algorithm scans the edges in order, keeps an edge whenever neither end has been used, and returns the set of all endpoints of the kept edges as its cover.</p></div><div class="thm"><span class="label">Theorem &middot; The endpoints of a maximal matching are a cover of at most twice the minimum</span><p>Let <span class="math" data-say="M">M</span> be a maximal matching and <span class="math" data-say="C">C</span> the set of endpoints of its edges. Then <span class="math" data-say="C">C</span> is a vertex cover, and <span class="math" data-say="the size of C, equals 2 times the size of M, is at most 2 times tau">|C| = 2|M| ≤ 2 · τ</span>, where <span class="math" data-say="tau">τ</span> is the size of the smallest cover.</p></div><div class="proof"><p><span class="math" data-say="C">C</span> is a cover: if some edge had neither end in <span class="math" data-say="C">C</span>, neither of its ends is used by a matched edge, so it could be added to <span class="math" data-say="M">M</span>, contradicting maximality.</p><p><span class="math" data-say="the size of M, is at most tau">|M| ≤ τ</span>: the edges of <span class="math" data-say="M">M</span> are pairwise disjoint, and any cover must contain at least one end of each, so it contains at least <span class="math" data-say="the size of M">|M|</span> distinct vertices.</p><p><span class="math" data-say="the size of C, equals 2 times the size of M">|C| = 2|M|</span> by construction, since the endpoints of disjoint edges are all different. Combining, <span class="math" data-say="the size of C, equals 2 times the size of M, is at most 2 tau">|C| = 2|M| ≤ 2τ</span>. Note which quantities appear in each line: the algorithm computes <span class="math" data-say="M">M</span> and <span class="math" data-say="C">C</span>, and <span class="math" data-say="tau">τ</span> enters only in the middle inequality, which is the one nobody has to evaluate.</p><p><span class="qed">&#9633;</span></p></div><h3>The chain, as four numbers on the panel</h3><div class="mathblock" data-say="matching, 3, a lower bound the algorithm can see. optimum, 3, by exhaustive search over the subsets. cover built, 6, the endpoints of the matching. twice the matching, 6, the promise" tabindex="0" role="region" aria-label="Mathematical notation">matching        3      a lower bound the algorithm can see
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The algorithm, the chain it rests on, and the sweep that tests the promise</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Maximal matching, and the cover built from it</span><p>A <strong>matching</strong> is a set of edges no two of which share a vertex; it is <strong>maximal</strong> when no further edge can be added. The algorithm scans the edges in order, keeps an edge whenever neither end has been used, and returns the set of all endpoints of the kept edges as its cover.</p></div><div class="thm"><span class="label">Theorem &middot; The endpoints of a maximal matching are a cover of at most twice the minimum</span><p>Let <span class="math" data-say="M">M</span> be a maximal matching and <span class="math" data-say="C">C</span> the set of endpoints of its edges. Then <span class="math" data-say="C">C</span> is a vertex cover, and <span class="math" data-say="the size of C, equals 2 times the size of M, is at most 2 times tau">|C| = 2|M| ≤ 2 · τ</span>, where <span class="math" data-say="tau">τ</span> is the size of the smallest cover.</p></div><div class="proof"><p><span class="math" data-say="C">C</span> is a cover: if some edge had neither end in <span class="math" data-say="C">C</span>, neither of its ends is used by a matched edge, so it could be added to <span class="math" data-say="M">M</span>, contradicting maximality.</p><p><span class="math" data-say="the size of M, is at most tau">|M| ≤ τ</span>: the edges of <span class="math" data-say="M">M</span> are pairwise disjoint, and any cover must contain at least one end of each, so it contains at least <span class="math" data-say="the size of M">|M|</span> distinct vertices.</p><p><span class="math" data-say="the size of C, equals 2 times the size of M">|C| = 2|M|</span> by construction, since the endpoints of disjoint edges are all different. Combining, <span class="math" data-say="the size of C, equals 2 times the size of M, is at most 2 tau">|C| = 2|M| ≤ 2τ</span>. Note which quantities appear in each line: the algorithm computes <span class="math" data-say="M">M</span> and <span class="math" data-say="C">C</span>, and <span class="math" data-say="tau">τ</span> enters only in the middle inequality, which is the one nobody has to evaluate.</p><p><span class="qed">&#9633;</span></p></div><h3>The chain, as four numbers on the panel</h3><div class="mathblock" data-say="matching, 3, a lower bound the algorithm can see. optimum, 3, by exhaustive search over the subsets. cover built, 6, the endpoints of the matching. twice the matching, 6, the promise" tabindex="0" role="region" aria-label="Mathematical notation">matching        3      a lower bound the algorithm can see
 optimum         3      by exhaustive search over the subsets
 cover built     6      the endpoints of the matching
-twice the matching  6  the promise</div><p>The loaded graph is the three disjoint edges <span class="math" data-say="1 minus 2, 3 minus 4, 5 minus 6">1-2, 3-4, 5-6</span>. The matching takes all three, the cover takes all six vertices, and the optimum is 3 &mdash; one end of each edge. The realised ratio is exactly 2 and the panel prints it against the promised 2. This is the worst the algorithm can do, and it is not an artefact of a strange graph: every matched edge needs one vertex in a cover and the algorithm takes two.</p><p>The middle link is the only one needing an optimum, and it is the only one the panel had to do extra work for: 3 comes from an exhaustive search over the subsets of the vertices. Without it the ratio printed above would be a fraction with an invented denominator, which is why every mode of this lab computes both halves.</p><h3>Every graph of a size, not just this one</h3><p>The panel then does something a page about approximation usually only describes. It enumerates every graph on the number of vertices its slider names &mdash; 63 non-empty graphs on four vertices &mdash; solves each one exactly, runs the approximation on each, and reports the worst ratio any of them produced. The answer is 2, attained by 49 of the 63, and it names both the first witness in edge order, which is a single edge, and the densest, which has five edges. Both, because a reader shown only a single edge concludes the bound is an artefact of a degenerate case.</p><div class="example"><span class="label">Example &middot; A ratio strictly inside the promise</span><p>Switch to the five-cycle: the greedy matching takes two edges, the cover has four vertices, the optimum is three, and the ratio is 4/3. Switch to the two triangles and the ratio is 1 &mdash; the algorithm returns the optimum. Neither number is the algorithm's number, and both are inside a promise of 2 that the first graph attains exactly.</p></div><p>One honest caveat the panel states itself. The matching is greedy in edge order, so the worst ratio found by the sweep is the worst case of this implementation on graphs of that size; a different edge order is a different matching. The bound of 2 covers all of them, because the proof never mentioned the order &mdash; which is the sense in which a proof is stronger than a sweep over every instance of a size.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Vertex cover in two: a matching is the lower bound</h2></div><p>The matched edges share no vertex, so the optimum is above the matching; the cover is twice it — and the optimum appears only in the last line</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+twice the matching  6  the promise</div><p>The loaded graph is the three disjoint edges <span class="math" data-say="1 minus 2, 3 minus 4, 5 minus 6">1-2, 3-4, 5-6</span>. The matching takes all three, the cover takes all six vertices, and the optimum is 3 &mdash; one end of each edge. The realised ratio is exactly 2 and the panel prints it against the promised 2. This is the worst the algorithm can do, and it is not an artefact of a strange graph: every matched edge needs one vertex in a cover and the algorithm takes two.</p><p>The middle link is the only one needing an optimum, and it is the only one the panel had to do extra work for: 3 comes from an exhaustive search over the subsets of the vertices. Without it the ratio printed above would be a fraction with an invented denominator, which is why every mode of this lab computes both halves.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Vertex cover in two: a matching is the lower bound</h2></div><p>The matched edges share no vertex, so the optimum is above the matching; the cover is twice it — and the optimum appears only in the last line</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Vertex cover in two: a matching is the lower bound</strong><span>every matched edge needs an endpoint, so the matching is below the optimum and its endpoints are above it</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>in the cover the algorithm built</span><span class="tone-purple"><i class="legend-swatch"></i>a matched edge</span><span class="tone-green"><i class="legend-swatch"></i>the true optimum</span><span class="tone-red"><i class="legend-swatch"></i>the promise, twice the matching</span></div>
@@ -1408,10 +1451,10 @@ twice the matching  6  the promise</div><p>The loaded graph is the three disjoin
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="vcChain"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="vcWorst"></table></div>
       <div class="status-banner" id="vcStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Edit the graph, then search every graph of a size for the worst ratio</h3>
-          <p>The optimum is an exhaustive search over the subsets, computed separately from the algorithm, so the realised ratio has a real denominator. The second table goes further and enumerates <em>every</em> graph on the number of vertices you choose, which turns &ldquo;the bound is tight&rdquo; from a word into an instance.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Edit the graph, then search every graph of a size for the worst ratio</h3>
+            <p>The optimum is an exhaustive search over the subsets, computed separately from the algorithm, so the realised ratio has a real denominator. The second table goes further and enumerates <em>every</em> graph on the number of vertices you choose, which turns &ldquo;the bound is tight&rdquo; from a word into an instance.</p>
         <div class="field">
           <label for="vcPreset">Worked example</label>
           <select id="vcPreset"><option value="matching" selected>three disjoint edges</option><option value="star">a star — one hub, four leaves</option><option value="cycle5">a five-cycle</option><option value="cycle6">a six-cycle</option><option value="path5">a path on five vertices</option><option value="triangles">two disjoint triangles</option></select>
@@ -1435,12 +1478,15 @@ twice the matching  6  the promise</div><p>The loaded graph is the three disjoin
           <div class="kpi"><span>A graph that attains it</span><strong id="vcWorstGraph">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="vcHint" style="margin:0;">Take edges one at a time, skipping any that touches a vertex already used: that is a <em>maximal</em> matching. Every one of its edges needs at least one endpoint in any cover, and its edges share no vertex, so the optimum is at least the matching size. Taking <em>both</em> ends of every matched edge covers the whole graph, because an uncovered edge would have been addable to the matching. So the cover is at most twice a number that is at most the optimum &mdash; and neither half of that sentence mentions the optimum itself.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Every graph of a size, not just this one</h3><p>The panel then does something a page about approximation usually only describes. It enumerates every graph on the number of vertices its slider names &mdash; 63 non-empty graphs on four vertices &mdash; solves each one exactly, runs the approximation on each, and reports the worst ratio any of them produced. The answer is 2, attained by 49 of the 63, and it names both the first witness in edge order, which is a single edge, and the densest, which has five edges. Both, because a reader shown only a single edge concludes the bound is an artefact of a degenerate case.</p><div class="example"><span class="label">Example &middot; A ratio strictly inside the promise</span><p>Switch to the five-cycle: the greedy matching takes two edges, the cover has four vertices, the optimum is three, and the ratio is 4/3. Switch to the two triangles and the ratio is 1 &mdash; the algorithm returns the optimum. Neither number is the algorithm's number, and both are inside a promise of 2 that the first graph attains exactly.</p></div><p>One honest caveat the panel states itself. The matching is greedy in edge order, so the worst ratio found by the sweep is the worst case of this implementation on graphs of that size; a different edge order is a different matching. The bound of 2 covers all of them, because the proof never mentioned the order &mdash; which is the sense in which a proof is stronger than a sweep over every instance of a size.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Stating and checking an approximation guarantee</h2></div><p>Five steps, and the first is the one that decides whether the guarantee means anything.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find a lower bound the algorithm can compute</h3><p>Not the optimum &mdash; something below it that falls out of the run. A maximal matching is the example here; a minimum spanning tree is the example on the next page. If there is no computable lower bound, there is no guarantee to prove, only a hope to measure.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Bound the answer against that lower bound</h3><p>Show the returned solution is at most <span class="math" data-say="rho">ρ</span> times the lower bound, by construction rather than by argument if possible. Here it is exactly twice, because the cover is the endpoints of disjoint edges and nothing else.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write the chain out and check which link needs the optimum</h3><p>Lower bound, optimum, answer, promise. Only the middle inequality involves the optimum, and it holds because the lower bound is a lower bound. If your chain needs the optimum anywhere else, the guarantee is not provable in this shape.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Print the realised ratio with the optimum it is a ratio to</h3><p>On instances small enough to solve exactly, compute the optimum and divide. A ratio without its denominator is not a measurement, and the panel refuses to show one. Say also that the realised ratio is about this instance and the promise is about all of them.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Check the special cases before approximating at all</h3><p>Bipartite graphs have an exact polynomial algorithm for this problem, and the graph on screen is bipartite. Trees, bipartite graphs and bounded-degree graphs are the usual islands of tractability; walking past one to use a 2-approximation is a real mistake and the panel's default instance is an example of it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Stating and checking an approximation guarantee</h2>
+      <p class="lead-in">Five steps, and the first is the one that decides whether the guarantee means anything.</p>
+      <ol class="key-ideas method"><li><strong>Find a lower bound the algorithm can compute.</strong> Not the optimum &mdash; something below it that falls out of the run. A maximal matching is the example here; a minimum spanning tree is the example on the next page. If there is no computable lower bound, there is no guarantee to prove, only a hope to measure.</li><li><strong>Bound the answer against that lower bound.</strong> Show the returned solution is at most <span class="math" data-say="rho">ρ</span> times the lower bound, by construction rather than by argument if possible. Here it is exactly twice, because the cover is the endpoints of disjoint edges and nothing else.</li><li><strong>Write the chain out and check which link needs the optimum.</strong> Lower bound, optimum, answer, promise. Only the middle inequality involves the optimum, and it holds because the lower bound is a lower bound. If your chain needs the optimum anywhere else, the guarantee is not provable in this shape.</li><li><strong>Print the realised ratio with the optimum it is a ratio to.</strong> On instances small enough to solve exactly, compute the optimum and divide. A ratio without its denominator is not a measurement, and the panel refuses to show one. Say also that the realised ratio is about this instance and the promise is about all of them.</li><li><strong>Check the special cases before approximating at all.</strong> Bipartite graphs have an exact polynomial algorithm for this problem, and the graph on screen is bipartite. Trees, bipartite graphs and bounded-degree graphs are the usual islands of tractability; walking past one to use a 2-approximation is a real mistake and the panel's default instance is an example of it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1469,17 +1515,16 @@ twice the matching  6  the promise</div><p>The loaded graph is the three disjoin
   and the promise                         every graph, every size    2</div><p>The first row of the chain is an equality here, and that is the coincidence that makes this instance the worst case: the matching is not merely a lower bound on the optimum, it equals it. The cover is then twice the optimum exactly, with no slack anywhere in the chain.</p><p>The two witnesses from the sweep are both worth looking at. The single edge attains the ratio trivially &mdash; matching 1, cover 2, optimum 1 &mdash; and proves nothing about interesting graphs. The five-edge witness on four vertices is the same ratio on a graph that is nearly complete, and it is the one that shows the bound is not about degenerate cases. A page reporting only the first would be technically correct and would mislead.</p><p>For a faded rehearsal, move the slider to five vertices and predict the worst ratio before running it. The supplied first move: the proof gives 2 for every size, and a single edge is a graph on five vertices too, so the worst ratio cannot be below 2 and cannot be above it. Say how many graphs are searched, and then check &mdash; and note that the answer being the same at three, four and five vertices is still not the theorem.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a guarantee as a statement about the optimum</strong><span>&ldquo;Within a factor 2 of optimal&rdquo; is true and is proved without ever evaluating the optimum. If you cannot say which computable quantity the argument compares the answer to, you cannot check the guarantee and you cannot tell a proved bound from an observed one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting a realised ratio as the algorithm&#x27;s ratio</strong><span>This graph gives 2, the five-cycle gives 4/3 and the two triangles give 1. The promise is 2 for every graph and no single instance establishes it. The panel prints the instance's ratio, the worst over a whole size, and the promise as three separate rows for exactly this reason.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Approximating a problem on an instance where it is exactly solvable</strong><span>Bipartite structure, bounded degree, tree shape: each turns this problem polynomial. Reaching for the 2-approximation without checking is how an algorithm returns twice the right answer on an instance that would have given the right answer cheaply, which is precisely what happens on the default graph here.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can prove a ratio against a lower bound and print it with its optimum.</strong><p>You should be able to construct a maximal matching by hand, show its endpoints cover the graph, prove the two inequalities that give the factor of 2, write the four-link chain and identify the only link mentioning the optimum, and name a special case where the exact answer is available in polynomial time.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lower bound here came from the algorithm's own run. &ldquo;The Hypothesis Doing the Work&rdquo; takes its lower bound from a minimum spanning tree instead, and the guarantee holds only under an assumption about the input that the panel lets you switch off.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a guarantee as a statement about the optimum</strong><span>&ldquo;Within a factor 2 of optimal&rdquo; is true and is proved without ever evaluating the optimum. If you cannot say which computable quantity the argument compares the answer to, you cannot check the guarantee and you cannot tell a proved bound from an observed one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting a realised ratio as the algorithm&#x27;s ratio</strong><span>This graph gives 2, the five-cycle gives 4/3 and the two triangles give 1. The promise is 2 for every graph and no single instance establishes it. The panel prints the instance's ratio, the worst over a whole size, and the promise as three separate rows for exactly this reason.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Approximating a problem on an instance where it is exactly solvable</strong><span>Bipartite structure, bounded degree, tree shape: each turns this problem polynomial. Reaching for the 2-approximation without checking is how an algorithm returns twice the right answer on an instance that would have given the right answer cheaply, which is precisely what happens on the default graph here.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can prove a ratio against a lower bound and print it with its optimum.</strong><p>You should be able to construct a maximal matching by hand, show its endpoints cover the graph, prove the two inequalities that give the factor of 2, write the four-link chain and identify the only link mentioning the optimum, and name a special case where the exact answer is available in polynomial time.</p></div></div><div class="note"><strong>Note:</strong> The lower bound here came from the algorithm's own run. &ldquo;The Hypothesis Doing the Work&rdquo; takes its lower bound from a minimum spanning tree instead, and the guarantee holds only under an assumption about the input that the panel lets you switch off.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A guarantee is proved against a lower bound, not against the optimum</summary><p>Say an algorithm returns a cover at most twice the smallest. The smallest is not known &mdash; computing it is the problem. What is known is the matching the algorithm built, and the argument runs entirely through it: the matching is below the optimum, and the answer is exactly twice the matching. The optimum is squeezed in the middle and is never computed. That is the shape of every approximation guarantee on this course, and it is why the panel draws four numbers on one axis rather than two.</p></details><details class="recall"><summary>Why both ends, and why maximal is enough</summary><p>Take edges one at a time, skipping any that touches a vertex already used: that is a <strong>maximal</strong> matching, meaning no edge can be added, not a <strong>maximum</strong> one. Maximal is enough for both halves. Its edges are disjoint, so every cover needs a vertex from each and the optimum is at least its size; and if some edge had neither end in the chosen set, that edge could have been added, contradicting maximality &mdash; so taking both ends of every matched edge covers everything.</p></details><details class="recall"><summary>Bipartite graphs do not need this at all</summary><p>König's theorem, proved from max-flow in the graph course, says the minimum vertex cover of a bipartite graph equals its maximum matching, and both are computable in polynomial time. The graph on screen is bipartite: three disjoint edges, maximum matching 3, minimum cover 3. So the approximation returns 6 where an exact polynomial algorithm returns 3, and this instance &mdash; where the guarantee is exactly attained &mdash; is an instance where the guarantee should not have been used. Knowing which special cases are exactly solvable is part of knowing when to approximate.</p></details></div>
+      <h3>Summary</h3>
       <p>A guarantee cannot be a claim about the optimum, because nobody computing it knows the optimum. It is a claim about a <em>lower bound the algorithm can see</em>. A maximal matching is such a bound: its edges share no vertex, so any cover needs a distinct vertex for each, and taking both ends of each is a cover of exactly twice that. On the loaded graph the ratio is exactly 2, and the panel then searches every graph on four vertices to see whether anything does worse.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A guarantee is proved against a lower bound, not against the optimum.</strong> Say an algorithm returns a cover at most twice the smallest. The smallest is not known &mdash; computing it is the problem. What is known is the matching the algorithm built, and the argument runs entirely through it: the matching is below the optimum, and the answer is exactly twice the matching. The optimum is squeezed in the middle and is never computed. That is the shape of every approximation guarantee on this course, and it is why the panel draws four numbers on one axis rather than two.</li><li><strong>Why both ends, and why maximal is enough.</strong> Take edges one at a time, skipping any that touches a vertex already used: that is a <strong>maximal</strong> matching, meaning no edge can be added, not a <strong>maximum</strong> one. Maximal is enough for both halves. Its edges are disjoint, so every cover needs a vertex from each and the optimum is at least its size; and if some edge had neither end in the chosen set, that edge could have been added, contradicting maximality &mdash; so taking both ends of every matched edge covers everything.</li><li><strong>Bipartite graphs do not need this at all.</strong> König's theorem, proved from max-flow in the graph course, says the minimum vertex cover of a bipartite graph equals its maximum matching, and both are computable in polynomial time. The graph on screen is bipartite: three disjoint edges, maximum matching 3, minimum cover 3. So the approximation returns 6 where an exact polynomial algorithm returns 3, and this instance &mdash; where the guarantee is exactly attained &mdash; is an instance where the guarantee should not have been used. Knowing which special cases are exactly solvable is part of knowing when to approximate.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="matching is at most optimum is at most cover equals 2 times matching, the whole proof, four numbers. the optimum appears in the middle link and nowhere in the algorithm. three disjoint edges, matching 3, optimum 3, cover 6, ratio exactly 2. worst ratio over all 63 graphs on four vertices with an edge, 2. on a bipartite graph the exact answer is a maximum matching, K ö nig, and cheap" tabindex="0" role="region" aria-label="Mathematical notation">matching ≤ optimum ≤ cover = 2 × matching     the whole proof, four numbers
 the optimum appears in the middle link and nowhere in the algorithm
 
@@ -3472,11 +3517,42 @@ on a bipartite graph the exact answer is a maximum matching — König, and chea
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3544,7 +3620,7 @@ on a bipartite graph the exact answer is a maximum matching — König, and chea
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

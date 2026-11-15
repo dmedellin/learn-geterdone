@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Measuring and Changing Culture</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 3 · Measuring and Changing Culture</p>
       <h1>Modeling and Measuring Culture</h1>
       <p class="lesson-lede">Culture is a word with many definitions; the authors chose Westrum&#x27;s three types, which sit on a scale and so can be measured.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Westrum&#x27;s typology</li><li>Information flow</li><li>Respondent mean and band</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s choice of a model, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Westrum&rsquo;s further insight was that the organizational culture predicts the way information flows through an organization.&rdquo; The sentence comes from Modeling and Measuring Culture, the first section of Chapter 3, and it explains why a chapter in a book about software delivery borrows a typology from the study of accidents. The authors say what they needed: a model of culture that is defined well in the scientific literature, can be measured, and has predictive power in their field. This lesson reads how they chose one.</p><p>They begin by admitting that there are many ways to model culture: by nation, by the values an organization enacts, and more. Within organizational culture they follow Edgar Schein (1985), who describes three levels. The first is basic assumptions, which build up as a group interprets what happens around it; they are the least visible, the things a team simply knows and struggles to articulate. The second is values and norms, which members can debate openly and which shape how they act. The third is artifacts, the most visible level: mission statements, procedures, technology, heroes and rituals. The authors work at the second level, which is what most people have in mind when they say a team has a culture.</p><p>The model they chose is Ron Westrum&rsquo;s, a sociologist who studied human factors in safety in fields where accidents are costly. His typology of 1988 has three types. A pathological organization is power-oriented, and marked by fear and threat; people hoard information or bend it to look better. A bureaucratic organization is rule-oriented and protects its departments, each keeping to its own rules and turf. A generative organization is performance-oriented and keeps its eye on the mission, so that everything is subordinated to doing what the organization is there to do.</p><p>Westrum&rsquo;s point is about information. He names three marks of good information: it answers the questions the receiver has, it is timely, and it is presented so the receiver can use it. Good flow matters most where work is fast and mistakes are expensive, and technology organizations are among those. Chapter 3 then lays out, in its Table 3.1, how the three types differ on six aspects: cooperation, how messengers are treated, responsibilities, bridging between groups, how failure is handled, and how novelty is received. The table is the book&rsquo;s; the lesson only names the aspects. Read down failure and you see the sharpest contrast, from blaming someone, through judging them by the rules, to asking what happened.</p><p>The authors are careful not to turn the bureaucratic type into a villain. They quote Mark Schwartz, who argues that the purpose of bureaucracy is fairness: the same rules for every case, built from the accumulated knowledge of experts. Westrum&rsquo;s bureaucratic culture is best read, they say, as one where following the rules counts for more than achieving the mission. They add that they have worked with United States federal government teams they would call generative and with startups that are plainly pathological, so the type cannot be read off the kind of organization.</p><p>Now the count. The lab takes six aspects, a scale of 1 to 7, and each respondent&rsquo;s six answers, written respondent then answers. It finds each respondent&rsquo;s mean, the team&rsquo;s mean, and a band for each. The lesson states two cut-points of its own, 3 and 5: below 3 is nearest the pathological type, 3 up to 5 the bureaucratic, 5 and above the generative. They are an assumption, because the chapter gives none and treats the types as points on a continuum. The sample is invented: seven people on one team. On the preset <code>mixed</code> the respondent means are 5.667, 4.667, 2.833, 5.667, 3.667, 2.333 and 4.667; two people fall in the pathological band, three in the bureaucratic and two in the generative. The team mean is 177 over 42 (59 over 14 in lowest terms, as the lab prints it), which is 4.214, and the team falls in the bureaucratic band.</p><p>The preset <code>even</code> is a second team of seven with the same team mean, 4.214, and a different shape: everyone answers 4 or 5 on every aspect, so every respondent mean lies between 4.167 and 4.333 and all seven sit in the bureaucratic band. The two teams get the same team figure, and their lives inside the team are not the same. The first has two people who answer as if it were a fearful place and two who answer as if it were a good one; a single mean cannot tell you that, and it is a reason to look at the answers person by person before acting on a team figure.</p><p>The lab shows how a score is made and nothing more. Martin Fowler&rsquo;s foreword adds a caution that applies here: these are surveys of subjective perceptions, and a sample can differ from the industry it is taken from. The chapter also reports, in a footnote, that in 2016 31 percent of respondents were classified as pathological, 48 percent as bureaucratic and 21 percent as generative; it does not say in that chapter where the dividing lines were drawn, which is why the lab states its own.</p><h3>Exercise</h3><ul><li>Aspects, in order: <span class="math" data-say="cooperation">cooperation</span>, <span class="math" data-say="messengers">messengers</span>, <span class="math" data-say="responsibility">responsibility</span>, <span class="math" data-say="bridging">bridging</span>, <span class="math" data-say="failure">failure</span>, <span class="math" data-say="novelty">novelty</span>. Scale 1 to 7; cut-points 3 and 5.</li><li>A platform team of five: <span class="math" data-say="e 1, 2, 3, 2, 3, 2, 2, e 2, 4, 4, 5, 4, 4, 5, e 3, 7, 6, 6, 7, 6, 6, e 4, 3, 3, 4, 3, 3, 3, e 5, 5, 5, 5, 5, 5, 4">e1, 2, 3, 2, 3, 2, 2; e2, 4, 4, 5, 4, 4, 5; e3, 7, 6, 6, 7, 6, 6; e4, 3, 3, 4, 3, 3, 3; e5, 5, 5, 5, 5, 5, 4</span>.</li></ul><p>Work out each person&rsquo;s mean by hand and place each in a band, then the team&rsquo;s mean and band. Say how many people sit in each band and whether the team figure describes any one of them. Then type the records into the lab to check your count.</p><p>Averaging is only the first step; the next lesson, Measuring Culture, reads how the chapter turns the types into survey statements and what has to be true of the answers before the score means anything.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Likert-type items</h2></div><p>a Westrum culture score and its band, by cut-points the lesson states</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s choice of a model, then the count</h2><div class="prose reading"><p>&ldquo;Westrum&rsquo;s further insight was that the organizational culture predicts the way information flows through an organization.&rdquo; The sentence comes from Modeling and Measuring Culture, the first section of Chapter 3, and it explains why a chapter in a book about software delivery borrows a typology from the study of accidents. The authors say what they needed: a model of culture that is defined well in the scientific literature, can be measured, and has predictive power in their field. This lesson reads how they chose one.</p><p>They begin by admitting that there are many ways to model culture: by nation, by the values an organization enacts, and more. Within organizational culture they follow Edgar Schein (1985), who describes three levels. The first is basic assumptions, which build up as a group interprets what happens around it; they are the least visible, the things a team simply knows and struggles to articulate. The second is values and norms, which members can debate openly and which shape how they act. The third is artifacts, the most visible level: mission statements, procedures, technology, heroes and rituals. The authors work at the second level, which is what most people have in mind when they say a team has a culture.</p><p>The model they chose is Ron Westrum&rsquo;s, a sociologist who studied human factors in safety in fields where accidents are costly. His typology of 1988 has three types. A pathological organization is power-oriented, and marked by fear and threat; people hoard information or bend it to look better. A bureaucratic organization is rule-oriented and protects its departments, each keeping to its own rules and turf. A generative organization is performance-oriented and keeps its eye on the mission, so that everything is subordinated to doing what the organization is there to do.</p><p>Westrum&rsquo;s point is about information. He names three marks of good information: it answers the questions the receiver has, it is timely, and it is presented so the receiver can use it. Good flow matters most where work is fast and mistakes are expensive, and technology organizations are among those. Chapter 3 then lays out, in its Table 3.1, how the three types differ on six aspects: cooperation, how messengers are treated, responsibilities, bridging between groups, how failure is handled, and how novelty is received. The table is the book&rsquo;s; the lesson only names the aspects. Read down failure and you see the sharpest contrast, from blaming someone, through judging them by the rules, to asking what happened.</p><p>The authors are careful not to turn the bureaucratic type into a villain. They quote Mark Schwartz, who argues that the purpose of bureaucracy is fairness: the same rules for every case, built from the accumulated knowledge of experts. Westrum&rsquo;s bureaucratic culture is best read, they say, as one where following the rules counts for more than achieving the mission. They add that they have worked with United States federal government teams they would call generative and with startups that are plainly pathological, so the type cannot be read off the kind of organization.</p><p>Now the count. The lab takes six aspects, a scale of 1 to 7, and each respondent&rsquo;s six answers, written respondent then answers. It finds each respondent&rsquo;s mean, the team&rsquo;s mean, and a band for each. The lesson states two cut-points of its own, 3 and 5: below 3 is nearest the pathological type, 3 up to 5 the bureaucratic, 5 and above the generative. They are an assumption, because the chapter gives none and treats the types as points on a continuum. The sample is invented: seven people on one team. On the preset <code>mixed</code> the respondent means are 5.667, 4.667, 2.833, 5.667, 3.667, 2.333 and 4.667; two people fall in the pathological band, three in the bureaucratic and two in the generative. The team mean is 177 over 42 (59 over 14 in lowest terms, as the lab prints it), which is 4.214, and the team falls in the bureaucratic band.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Likert-type items</h2></div><p>a Westrum culture score and its band, by cut-points the lesson states</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Likert-type items</strong><span>a Westrum culture score and its band, by cut-points the lesson states</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="alkTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alkTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Items are scored as in the score view (reverse-coded ones reversed) and must all belong to one construct. A mean below the first cut is pathological, from the first cut up to (not including) the second is bureaucratic, and from the second cut up is generative. The cuts are the lesson's: the book gives none. The team mean is the mean of the respondents' means. With a second survey, a respondent's change is their second mean less their first, for respondents named in both; the change in the team mean uses everyone in each survey.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A team on Westrum&#x27;s scale</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A team on Westrum&#x27;s scale</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="alkPreset">Worked example</label>
           <select id="alkPreset"><option value="mixed" selected>Seven people: two near pathological, two near generative</option><option value="even">Seven people with the same team mean, all in the middle</option></select>
@@ -1442,12 +1485,15 @@
           <div class="kpi"><span>Change per respondent in both surveys</span><strong id="alkEach">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>even</code> is a second team of seven with the same team mean, 4.214, and a different shape: everyone answers 4 or 5 on every aspect, so every respondent mean lies between 4.167 and 4.333 and all seven sit in the bureaucratic band. The two teams get the same team figure, and their lives inside the team are not the same. The first has two people who answer as if it were a fearful place and two who answer as if it were a good one; a single mean cannot tell you that, and it is a reason to look at the answers person by person before acting on a team figure.</p><p>The lab shows how a score is made and nothing more. Martin Fowler&rsquo;s foreword adds a caution that applies here: these are surveys of subjective perceptions, and a sample can differ from the industry it is taken from. The chapter also reports, in a footnote, that in 2016 31 percent of respondents were classified as pathological, 48 percent as bureaucratic and 21 percent as generative; it does not say in that chapter where the dividing lines were drawn, which is why the lab states its own.</p><h3>Exercise</h3><ul><li>Aspects, in order: <span class="math" data-say="cooperation">cooperation</span>, <span class="math" data-say="messengers">messengers</span>, <span class="math" data-say="responsibility">responsibility</span>, <span class="math" data-say="bridging">bridging</span>, <span class="math" data-say="failure">failure</span>, <span class="math" data-say="novelty">novelty</span>. Scale 1 to 7; cut-points 3 and 5.</li><li>A platform team of five: <span class="math" data-say="e 1, 2, 3, 2, 3, 2, 2, e 2, 4, 4, 5, 4, 4, 5, e 3, 7, 6, 6, 7, 6, 6, e 4, 3, 3, 4, 3, 3, 3, e 5, 5, 5, 5, 5, 5, 4">e1, 2, 3, 2, 3, 2, 2; e2, 4, 4, 5, 4, 4, 5; e3, 7, 6, 6, 7, 6, 6; e4, 3, 3, 4, 3, 3, 3; e5, 5, 5, 5, 5, 5, 4</span>.</li></ul><p>Work out each person&rsquo;s mean by hand and place each in a band, then the team&rsquo;s mean and band. Say how many people sit in each band and whether the team figure describes any one of them. Then type the records into the lab to check your count.</p><p>Averaging is only the first step; the next lesson, Measuring Culture, reads how the chapter turns the types into survey statements and what has to be true of the answers before the score means anything.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Placing a team on the scale</h2></div><p>Four steps, the last of them on a team of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix the scale and the cut-points first</h3><p>Write down the scale (1 to 7) and your two cut-points before you look at any answers, so that the bands are not drawn to suit the results.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Average each person&#x27;s answers</h3><p>Add one respondent's six answers and divide by six. Do this for everyone before you look at the team.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Band each person, then the team</h3><p>Compare each mean with the cut-points, and the team mean with them. Count the people in each band.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Try it on a team you know</h3><p>Ask five people you work with to rate the six aspects from 1 to 7 without names, type the answers into the lab, and write down whether the team mean describes any one of them.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Placing a team on the scale</h2>
+      <p class="lead-in">Four steps, the last of them on a team of your own.</p>
+      <ol class="key-ideas method"><li><strong>Fix the scale and the cut-points first.</strong> Write down the scale (1 to 7) and your two cut-points before you look at any answers, so that the bands are not drawn to suit the results.</li><li><strong>Average each person&#x27;s answers.</strong> Add one respondent's six answers and divide by six. Do this for everyone before you look at the team.</li><li><strong>Band each person, then the team.</strong> Compare each mean with the cut-points, and the team mean with them. Count the people in each band.</li><li><strong>Try it on a team you know.</strong> Ask five people you work with to rate the six aspects from 1 to 7 without names, type the answers into the lab, and write down whether the team mean describes any one of them.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1466,17 +1512,16 @@ team total 177, answers 7 x 6 = 42
 team mean 177 / 42 = 4.214: bureaucratic band</div><p>The team mean is the mean of the respondent means, because every respondent answered the same six items. No single respondent is at 4.214.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating Westrum&#x27;s types as three boxes a team falls into</strong><span>The authors use the types as points on a scale, a continuum, which is what makes them measurable with a scale of 1 to 7. A team mean of 4.2 is a position between the poles. The lab's bands are a convenience with cut-points the lesson chose, and a person whose mean is 4.9 and one whose mean is 5.1 are not in different worlds.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading “bureaucratic” as an insult</strong><span>The authors take care to say bureaucracy is not necessarily bad. Its goal, in the words they quote, is to treat every case alike and to keep the best rules the organization has learned. The type describes where the rules rank against the mission, and the authors add that they have met generative teams in the US federal government and pathological startups.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the team mean as a description of the people in the team</strong><span>A mean of 4.214 comes from seven people whose own means run from 2.333 to 5.667, and it comes equally from seven people who all sit near 4.2. The mean says nothing about the spread. Look at the answers person by person before acting on a team figure.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can place a team and its people on the scale.</strong><p>Given respondents' answers on six aspects and two cut-points, find each respondent's mean, band each, find and band the team mean, and say what the team mean hides.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab averages the answers you type and compares the means with cut-points you state. It cannot tell whether six aspects capture a culture, whether seven people represent a team, or whether the people answered candidly; the survey measures perceptions, and whether the construct is valid and reliable is the next lesson&rsquo;s question.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating Westrum&#x27;s types as three boxes a team falls into</strong><span>The authors use the types as points on a scale, a continuum, which is what makes them measurable with a scale of 1 to 7. A team mean of 4.2 is a position between the poles. The lab's bands are a convenience with cut-points the lesson chose, and a person whose mean is 4.9 and one whose mean is 5.1 are not in different worlds.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading “bureaucratic” as an insult</strong><span>The authors take care to say bureaucracy is not necessarily bad. Its goal, in the words they quote, is to treat every case alike and to keep the best rules the organization has learned. The type describes where the rules rank against the mission, and the authors add that they have met generative teams in the US federal government and pathological startups.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the team mean as a description of the people in the team</strong><span>A mean of 4.214 comes from seven people whose own means run from 2.333 to 5.667, and it comes equally from seven people who all sit near 4.2. The mean says nothing about the spread. Look at the answers person by person before acting on a team figure.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can place a team and its people on the scale.</strong><p>Given respondents' answers on six aspects and two cut-points, find each respondent's mean, band each, find and band the team mean, and say what the team mean hides.</p></div></div><div class="note"><strong>Note:</strong> The lab averages the answers you type and compares the means with cut-points you state. It cannot tell whether six aspects capture a culture, whether seven people represent a team, or whether the people answered candidly; the survey measures perceptions, and whether the construct is valid and reliable is the next lesson&rsquo;s question.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Westrum&#x27;s typology</summary><p>Ron Westrum's three kinds of organization, set out in 1988 from his work on safety in fields such as aviation and healthcare: pathological, which is power-oriented, bureaucratic, which is rule-oriented, and generative, which is performance-oriented. They differ in how cooperative people are and in what happens to messengers, responsibilities, bridging between groups, failure and new ideas.</p></details><details class="recall"><summary>Information flow</summary><p>How well what people know reaches the people who need it. Westrum counts information as good when it answers the receiver's questions, arrives in time and is presented so that the receiver can use it. The chapter's claim is that culture predicts this flow.</p></details><details class="recall"><summary>Respondent mean and band</summary><p>One person's answers on the six aspects, averaged on the 1 to 7 scale, and the name of the type nearest that mean under two cut-points. The book gives no cut-points; the lab's are the lesson's own, stated where they are used.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 3 begins by choosing a model of culture. Read the three levels the authors distinguish, why they work at the level of values, and Westrum's pathological, bureaucratic and generative types with the information flow behind them; then score seven respondents on six aspects and see where a team falls among stated cut-points.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Westrum&#x27;s typology.</strong> Ron Westrum's three kinds of organization, set out in 1988 from his work on safety in fields such as aviation and healthcare: pathological, which is power-oriented, bureaucratic, which is rule-oriented, and generative, which is performance-oriented. They differ in how cooperative people are and in what happens to messengers, responsibilities, bridging between groups, failure and new ideas.</li><li><strong>Information flow.</strong> How well what people know reaches the people who need it. Westrum counts information as good when it answers the receiver's questions, arrives in time and is presented so that the receiver can use it. The chapter's claim is that culture predicts this flow.</li><li><strong>Respondent mean and band.</strong> One person's answers on the six aspects, averaged on the 1 to 7 scale, and the name of the type nearest that mean under two cut-points. The book gives no cut-points; the lab's are the lesson's own, stated where they are used.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="three levels, assumptions, values, artifacts. this chapter works at the level of values. pathological, bureaucratic, generative. culture shapes how information flows. the types sit on a scale, not in boxes. a team the character s mean can hide its spread" tabindex="0" role="region" aria-label="Mathematical notation">three levels: assumptions, values, artifacts
 this chapter works at the level of values
 pathological, bureaucratic, generative
@@ -2363,11 +2408,42 @@ a team&#x27;s mean can hide its spread</div><figcaption>Modeling culture in six 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2435,7 +2511,7 @@ a team&#x27;s mean can hide its spread</div><figcaption>Modeling culture in six 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

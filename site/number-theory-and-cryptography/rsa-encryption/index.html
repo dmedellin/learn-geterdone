@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Number Theory and Cryptography</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Cryptography</p>
       <h1>RSA Encryption</h1>
       <p class="lesson-lede">Public-key encryption from Euler&#x27;s theorem — and what its security rests on.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Correctness is Euler&#x27;s theorem</li><li>The public key reveals <span class="math" data-say="n">n</span>, not <span class="math" data-say="phi of n">φ(n)</span></li><li>Security is an assumption, not a theorem</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>RSA</h2>
-      <article class="prose reading"><h3>Key generation</h3><div class="mathblock" data-say="1, choose two large distinct primes, p, q. 2, n equals p times q. 3, phi of n equals the quantity p minus 1, times the quantity q minus 1. 4, choose e with 1 is less than e is less than phi of n and the gcd of e and phi of n equals 1. 5, compute d equals e inverse, mod phi of n, extended Euclid. PUBLIC KEY, n, e. PRIVATE KEY, n, d, and p, q, phi of n must stay secret" tabindex="0" role="region" aria-label="Mathematical notation">1.  choose two large distinct primes  p, q
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>RSA</h2><div class="prose reading"><h3>Key generation</h3><div class="mathblock" data-say="1, choose two large distinct primes, p, q. 2, n equals p times q. 3, phi of n equals the quantity p minus 1, times the quantity q minus 1. 4, choose e with 1 is less than e is less than phi of n and the gcd of e and phi of n equals 1. 5, compute d equals e inverse, mod phi of n, extended Euclid. PUBLIC KEY, n, e. PRIVATE KEY, n, d, and p, q, phi of n must stay secret" tabindex="0" role="region" aria-label="Mathematical notation">1.  choose two large distinct primes  p, q
 2.  n = p·q
 3.  φ(n) = (p−1)(q−1)
 4.  choose e with 1 &lt; e &lt; φ(n) and gcd(e, φ(n)) = 1
@@ -1403,22 +1447,21 @@ e = 17                 gcd(17, 3120) = 1                  ✓
 d = 17⁻¹ mod 3120 = 2753        (“Bézout&#x27;s Identity and Modular Inverses” computed this)
 
 encrypt m = 65:   65^17 mod 3233 = 2790
-decrypt:        2790^2753 mod 3233 =   65        ✓</div><h3>What the security rests on</h3><p>An attacker sees <span class="math" data-say="n">n</span> and <span class="math" data-say="e">e</span>. To find <span class="math" data-say="d">d</span> they need <span class="math" data-say="phi of n">φ(n)</span>, and computing <span class="math" data-say="phi of n">φ(n)</span> from <span class="math" data-say="n">n</span> is equivalent to factoring <span class="math" data-say="n">n</span>: knowing <span class="math" data-say="n equals p q">n = pq</span> and <span class="math" data-say="phi of n equals the quantity p minus 1, times the quantity q minus 1">φ(n) = (p−1)(q−1)</span> gives <span class="math" data-say="p plus q equals n minus phi of n plus 1">p + q = n − φ(n) + 1</span>, and with <span class="math" data-say="p q equals n">pq = n</span> that is a quadratic whose roots are <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span>.</p><p>So RSA is secure only if factoring large numbers is hard. That is <strong>believed</strong> and not proved. The best known general algorithm, the number field sieve, is sub-exponential but not polynomial; the largest RSA modulus factored publicly is 829 bits, which took thousands of core-years.</p><p>Two further caveats, both important. Nobody has proved that breaking RSA <em>requires</em> factoring &mdash; there might be an easier attack on the exponentiation itself. And Shor's algorithm factors in polynomial time on a quantum computer, so RSA is broken outright if a large enough one is ever built.</p><h3>Why the lab can break its own key</h3><p>The lab on this page factors the modulus it just generated, by trial division, in microseconds &mdash; and recovers the private exponent. Nothing about the method resists that; only the SIZE of the primes does. Real keys use primes of about 1024 bits each, where the same trial division would outlast the universe.</p><p>One last honest note: <strong>textbook RSA as described here is not secure to deploy</strong>. It is deterministic, so identical messages produce identical ciphertexts and an attacker can test guesses; small messages with small <span class="math" data-say="e">e</span> can be recovered by taking an ordinary integer root. Real systems use randomised padding (OAEP) for exactly these reasons. The mathematics here is right and the engineering is not present.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>RSA, generated and broken</h2></div><p>Small enough to check by hand</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+decrypt:        2790^2753 mod 3233 =   65        ✓</div><h3>What the security rests on</h3><p>An attacker sees <span class="math" data-say="n">n</span> and <span class="math" data-say="e">e</span>. To find <span class="math" data-say="d">d</span> they need <span class="math" data-say="phi of n">φ(n)</span>, and computing <span class="math" data-say="phi of n">φ(n)</span> from <span class="math" data-say="n">n</span> is equivalent to factoring <span class="math" data-say="n">n</span>: knowing <span class="math" data-say="n equals p q">n = pq</span> and <span class="math" data-say="phi of n equals the quantity p minus 1, times the quantity q minus 1">φ(n) = (p−1)(q−1)</span> gives <span class="math" data-say="p plus q equals n minus phi of n plus 1">p + q = n − φ(n) + 1</span>, and with <span class="math" data-say="p q equals n">pq = n</span> that is a quadratic whose roots are <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span>.</p><p>So RSA is secure only if factoring large numbers is hard. That is <strong>believed</strong> and not proved. The best known general algorithm, the number field sieve, is sub-exponential but not polynomial; the largest RSA modulus factored publicly is 829 bits, which took thousands of core-years.</p><p>Two further caveats, both important. Nobody has proved that breaking RSA <em>requires</em> factoring &mdash; there might be an easier attack on the exponentiation itself. And Shor's algorithm factors in polynomial time on a quantum computer, so RSA is broken outright if a large enough one is ever built.</p><h3>Why the lab can break its own key</h3><p>The lab on this page factors the modulus it just generated, by trial division, in microseconds &mdash; and recovers the private exponent. Nothing about the method resists that; only the SIZE of the primes does. Real keys use primes of about 1024 bits each, where the same trial division would outlast the universe.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>RSA, generated and broken</h2></div><p>Small enough to check by hand</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>RSA with small primes</strong><span>Key generation, encryption, decryption, and the attack</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>public</span><span class="tone-red"><i class="legend-swatch"></i>private</span></div>
       </div>
       <div class="lab-stage"><div class="table-wrap" id="rsaOut" tabindex="0" role="region" aria-label="Data table"></div></div>
       <div class="status-banner" id="rsaStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Generate, use, break</h3>
-          <p>The default primes are the textbook ones: <span class="math" data-say="n equals 3233">n = 3233</span>, <span class="math" data-say="d equals 2753">d = 2753</span>, and 65 encrypts to 2790 and back. Set <span class="math" data-say="p equals 11">p = 11</span>, <span class="math" data-say="q equals 13">q = 13</span>, <span class="math" data-say="e equals 7">e = 7</span>, <span class="math" data-say="m equals 9">m = 9</span> and the lab prints the worked example's <span class="math" data-say="c equals 48">c = 48</span> from the definitions rather than from this page. Change the primes and watch the key change; then read the last paragraph of the status line, where the lab factors <span class="math" data-say="n">n</span> and recovers <span class="math" data-say="d">d</span>.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Generate, use, break</h3>
+            <p>The default primes are the textbook ones: <span class="math" data-say="n equals 3233">n = 3233</span>, <span class="math" data-say="d equals 2753">d = 2753</span>, and 65 encrypts to 2790 and back. Set <span class="math" data-say="p equals 11">p = 11</span>, <span class="math" data-say="q equals 13">q = 13</span>, <span class="math" data-say="e equals 7">e = 7</span>, <span class="math" data-say="m equals 9">m = 9</span> and the lab prints the worked example's <span class="math" data-say="c equals 48">c = 48</span> from the definitions rather than from this page. Change the primes and watch the key change; then read the last paragraph of the status line, where the lab factors <span class="math" data-say="n">n</span> and recovers <span class="math" data-say="d">d</span>.</p>
         <div class="field">
           <label for="rsaP">p (prime)</label>
           <input id="rsaP" type="number" value="61" />
@@ -1440,12 +1483,15 @@ decrypt:        2790^2753 mod 3233 =   65        ✓</div><h3>What the security 
           <div class="kpi"><span>&phi;(n)</span><strong id="rsaPhi">&mdash;</strong></div>
           <div class="kpi"><span>d</span><strong id="rsaD">&mdash;</strong></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>One last honest note: <strong>textbook RSA as described here is not secure to deploy</strong>. It is deterministic, so identical messages produce identical ciphertexts and an attacker can test guesses; small messages with small <span class="math" data-say="e">e</span> can be recovered by taking an ordinary integer root. Real systems use randomised padding (OAEP) for exactly these reasons. The mathematics here is right and the engineering is not present.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Using RSA</h2></div><p>Each step is a theorem from this course.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Choose two distinct primes and multiply</h3><p><span class="math" data-say="n equals p q">n = pq</span>. They must be distinct, or <span class="math" data-say="phi of n equals p times the quantity p minus 1">φ(n) = p(p−1)</span> rather than <span class="math" data-say="the quantity p minus 1, squared">(p−1)²</span> and <span class="math" data-say="n">n</span> is a square, trivially factorable.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute <span class="math" data-say="phi of n equals the quantity p minus 1, times the quantity q minus 1">φ(n) = (p−1)(q−1)</span></h3><p>Multiplicativity of <span class="math" data-say="phi">φ</span> from “Fermat's Little Theorem and Euler's Theorem”. This value must never be published.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Choose <span class="math" data-say="e">e</span> coprime to <span class="math" data-say="phi of n">φ(n)</span> and invert it</h3><p><span class="math" data-say="the gcd of e and phi of n equals 1">gcd(e, φ(n)) = 1</span> by “Greatest Common Divisor”, and <span class="math" data-say="d equals e inverse, mod phi of n">d = e⁻¹ mod φ(n)</span> by “Bézout's Identity and Modular Inverses”. <span class="math" data-say="e">e</span> need not be prime, only coprime; 65537 is the usual choice because a prime is coprime to <span class="math" data-say="phi of n">φ(n)</span> unless it divides it, one check, and <span class="math" data-say="2 to the power 16 plus 1">2¹⁶ + 1</span> has two set bits, so <span class="math" data-say="m to the power e">m^e</span> costs sixteen squarings and one multiplication.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Exponentiate to encrypt and decrypt</h3><p>By “Modular Exponentiation”'s square and multiply, which is what makes 2048-bit exponents practical.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Using RSA</h2>
+      <p class="lead-in">Each step is a theorem from this course.</p>
+      <ol class="key-ideas method"><li><strong>Choose two distinct primes and multiply.</strong> <span class="math" data-say="n equals p q">n = pq</span>. They must be distinct, or <span class="math" data-say="phi of n equals p times the quantity p minus 1">φ(n) = p(p−1)</span> rather than <span class="math" data-say="the quantity p minus 1, squared">(p−1)²</span> and <span class="math" data-say="n">n</span> is a square, trivially factorable.</li><li><strong>Compute <span class="math" data-say="phi of n equals the quantity p minus 1, times the quantity q minus 1">φ(n) = (p−1)(q−1)</span>.</strong> Multiplicativity of <span class="math" data-say="phi">φ</span> from “Fermat's Little Theorem and Euler's Theorem”. This value must never be published.</li><li><strong>Choose <span class="math" data-say="e">e</span> coprime to <span class="math" data-say="phi of n">φ(n)</span> and invert it.</strong> <span class="math" data-say="the gcd of e and phi of n equals 1">gcd(e, φ(n)) = 1</span> by “Greatest Common Divisor”, and <span class="math" data-say="d equals e inverse, mod phi of n">d = e⁻¹ mod φ(n)</span> by “Bézout's Identity and Modular Inverses”. <span class="math" data-say="e">e</span> need not be prime, only coprime; 65537 is the usual choice because a prime is coprime to <span class="math" data-say="phi of n">φ(n)</span> unless it divides it, one check, and <span class="math" data-say="2 to the power 16 plus 1">2¹⁶ + 1</span> has two set bits, so <span class="math" data-say="m to the power e">m^e</span> costs sixteen squarings and one multiplication.</li><li><strong>Exponentiate to encrypt and decrypt.</strong> By “Modular Exponentiation”'s square and multiply, which is what makes 2048-bit exponents practical.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1474,17 +1520,16 @@ encrypt m = 9:    9^7 mod 143
 decrypt:  48^103 mod 143 = 9      (103 = 1100111₂, “Modular Exponentiation”)     ✓</div><p>The public key <span class="math" data-say="143, 7">(143, 7)</span> is enough to encrypt and useless for decrypting &mdash; unless you factor 143, which takes one division by 11. That is the whole security story, and the only thing that changes at 2048 bits is how long that division takes.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Publishing or leaking <span class="math" data-say="phi of n">φ(n)</span></strong><span>With <span class="math" data-say="n">n</span> it gives <span class="math" data-say="p plus q">p + q</span> and hence the factorisation. It is as sensitive as the primes themselves.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using equal or close primes</strong><span><span class="math" data-say="p equals q">p = q</span> makes <span class="math" data-say="n">n</span> a perfect square. Primes that are close make Fermat's factorisation method succeed quickly.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Deploying textbook RSA</strong><span>It is deterministic and malleable. Real systems randomise with OAEP padding, and the mathematics on this page is not the whole system.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can generate a key and say what each step assumes.</strong><p>Build a key from <span class="math" data-say="p equals 17">p = 17</span>, <span class="math" data-say="q equals 23">q = 23</span>, encrypt a small message, decrypt it, and then factor <span class="math" data-say="n">n</span> to recover <span class="math" data-say="d">d</span>. With <span class="math" data-say="e equals 3">e = 3</span> you should find <span class="math" data-say="n equals 391">n = 391</span>, <span class="math" data-say="phi of n equals 352">φ(n) = 352</span> and <span class="math" data-say="d equals 235">d = 235</span>. Doing the attack yourself is what makes the security argument concrete rather than asserted.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This course ends where cryptographic engineering begins. Padding schemes, key management, side-channel resistance and protocol design are all essential and none of them is number theory. What number theory supplies is the core operation and an honest account of what it does and does not guarantee.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Publishing or leaking <span class="math" data-say="phi of n">φ(n)</span></strong><span>With <span class="math" data-say="n">n</span> it gives <span class="math" data-say="p plus q">p + q</span> and hence the factorisation. It is as sensitive as the primes themselves.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using equal or close primes</strong><span><span class="math" data-say="p equals q">p = q</span> makes <span class="math" data-say="n">n</span> a perfect square. Primes that are close make Fermat's factorisation method succeed quickly.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Deploying textbook RSA</strong><span>It is deterministic and malleable. Real systems randomise with OAEP padding, and the mathematics on this page is not the whole system.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can generate a key and say what each step assumes.</strong><p>Build a key from <span class="math" data-say="p equals 17">p = 17</span>, <span class="math" data-say="q equals 23">q = 23</span>, encrypt a small message, decrypt it, and then factor <span class="math" data-say="n">n</span> to recover <span class="math" data-say="d">d</span>. With <span class="math" data-say="e equals 3">e = 3</span> you should find <span class="math" data-say="n equals 391">n = 391</span>, <span class="math" data-say="phi of n equals 352">φ(n) = 352</span> and <span class="math" data-say="d equals 235">d = 235</span>. Doing the attack yourself is what makes the security argument concrete rather than asserted.</p></div></div><div class="note"><strong>Note:</strong> This course ends where cryptographic engineering begins. Padding schemes, key management, side-channel resistance and protocol design are all essential and none of them is number theory. What number theory supplies is the core operation and an honest account of what it does and does not guarantee.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Correctness is Euler&#x27;s theorem</summary><p><span class="math" data-say="e d is congruent to 1, mod phi of n">ed ≡ 1 (mod φ(n))</span> makes <span class="math" data-say="m to the power ed is congruent to m mod n">m^{ed} ≡ m (mod n)</span>, which is why decryption returns the message.</p></details><details class="recall"><summary>The public key reveals <span class="math" data-say="n">n</span>, not <span class="math" data-say="phi of n">φ(n)</span></summary><p>Knowing <span class="math" data-say="phi of n equals the quantity p minus 1, times the quantity q minus 1">φ(n) = (p−1)(q−1)</span> together with <span class="math" data-say="n equals p q">n = pq</span> gives <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> immediately. So <span class="math" data-say="phi of n">φ(n)</span> is as secret as the factorisation.</p></details><details class="recall"><summary>Security is an assumption, not a theorem</summary><p>No proof exists that factoring is hard, and no proof exists that breaking RSA requires factoring. Both are believed and neither is established.</p></details></div>
+      <h3>Summary</h3>
       <p>Generate <span class="math" data-say="n equals p q">n = pq</span>, choose <span class="math" data-say="e">e</span> coprime to <span class="math" data-say="phi of n">φ(n)</span>, compute <span class="math" data-say="d equals e inverse, mod phi of n">d = e⁻¹ mod φ(n)</span>. Encryption is <span class="math" data-say="m to the power e mod n">m^e mod n</span> and decryption <span class="math" data-say="c to the power d mod n">c^d mod n</span>. Every step is a theorem from this course, and the security is one unproved assumption.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Correctness is Euler&#x27;s theorem.</strong> <span class="math" data-say="e d is congruent to 1, mod phi of n">ed ≡ 1 (mod φ(n))</span> makes <span class="math" data-say="m to the power ed is congruent to m mod n">m^{ed} ≡ m (mod n)</span>, which is why decryption returns the message.</li><li><strong>The public key reveals <span class="math" data-say="n">n</span>, not <span class="math" data-say="phi of n">φ(n)</span>.</strong> Knowing <span class="math" data-say="phi of n equals the quantity p minus 1, times the quantity q minus 1">φ(n) = (p−1)(q−1)</span> together with <span class="math" data-say="n equals p q">n = pq</span> gives <span class="math" data-say="p">p</span> and <span class="math" data-say="q">q</span> immediately. So <span class="math" data-say="phi of n">φ(n)</span> is as secret as the factorisation.</li><li><strong>Security is an assumption, not a theorem.</strong> No proof exists that factoring is hard, and no proof exists that breaking RSA requires factoring. Both are believed and neither is established.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="n equals p q, phi of n equals the quantity p minus 1, times the quantity q minus 1, the gcd of e and phi of n equals 1, d equals e inverse, mod phi of n. PUBLIC, n, e, PRIVATE, d, and p, q. encrypt, c equals m to the power e mod n, decrypt, m equals c to the power d mod n. security, factoring n is believed hard, It is not proved" tabindex="0" role="region" aria-label="Mathematical notation">n = pq,  φ(n) = (p−1)(q−1),  gcd(e, φ(n)) = 1,  d = e⁻¹ mod φ(n)
 PUBLIC  (n, e)      PRIVATE  (d, and p, q)
 encrypt  c = m^e mod n        decrypt  m = c^d mod n
@@ -2081,11 +2126,42 @@ security: factoring n is believed hard. It is not proved.</div><figcaption>The w
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2153,7 +2229,7 @@ security: factoring n is believed hard. It is not proved.</div><figcaption>The w
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

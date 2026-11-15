@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Accelerate and Measuring Performance</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 2 · Measuring Performance</p>
       <h1>Measuring Software Delivery Performance</h1>
       <p class="lesson-lede">Lead time, deployment frequency, time to restore service and change fail rate: four team-level outcomes, each recorded as a choice among a few answers.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Lead time for changes</li><li>Deployment frequency</li><li>Tempo and stability</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Four measures, chosen against two criteria</h2>
-      <article class="prose reading"><p>The authors give their measure two criteria. It should be a global outcome, because, in their words, &ldquo;it should focus on a global outcome to ensure teams aren’t pitted against each other&rdquo;, and their example is paying developers for throughput and operations for stability, which builds the wall of confusion between them. And it should be an outcome and not output, so that it cannot be raised with busywork. They settle on four measures: delivery lead time, deployment frequency, time to restore service and change fail rate.</p><p>Lead time is the Lean measure of how long it takes to go from a customer's request to its satisfaction. In product development it has two parts. Designing and validating a feature is uncertain, it is hard to say when the clock starts, and the variance is high, which Reinertsen, whom the authors cite, calls the fuzzy front end. Delivering it, from implementation through test to release, is easier to measure and steadier. The authors measure only the second: the time from code committed to code running in production. Their survey offered six answers: less than one hour; less than one day; between one day and one week; between one week and one month; between one month and six months; more than six months.</p><p>Batch size is the second measure&rsquo;s subject, and the difficulty is that in software there is no visible inventory. Reducing batches shortens cycle times, speeds feedback and cuts risk, in the Lean tradition the authors cite from Toyota, so they needed a stand-in that respondents can report: deployment frequency, to production or an app store. The six answers were on demand, meaning several deploys a day; between once an hour and once a day; between once a day and once a week; between once a week and once a month; between once a month and once every six months; and fewer than once every six months. A release usually contains several commits, unless each commit goes out alone.</p><p>Lead time and deployment frequency are the tempo of delivery. To see whether teams that speed up give up stability, the authors add two measures. Traditionally reliability is the time between failures, but in complex, quickly changing systems failure is inevitable, so the question becomes how quickly service is restored after an incident, answered from the same six options as lead time. And the change fail rate: the percentage of changes to production, including releases and configuration changes, that degrade service or have to be remedied. In Lean terms, they note, it is the percent complete and accurate of the delivery process.</p><p>Notice what kind of data these are. In the book, each measure is a respondent's answer to a question about their primary application or service, an option from a short list, which is why Fowler's foreword says they capture perceptions. The lab does something the survey did not: it computes the four from a log of changes and incidents, and then reads each on the book's scale, so that you can see which answer a team would give.</p><p>The preset <code>fortnight</code> is a team&rsquo;s log over 14 days: ten changes, each with the time it was committed and the time it reached production, one of them failed, and two incidents. The lab reports the ten deployments, 5 a week, which is between once a day and once a week; a median lead time of 4.5 hours, less than one day; a change fail rate of 1 in 10, 10 percent, in the 0 to 15 percent band; and a median time to restore of 7.5 hours, from restorations of 3 and 12 hours, less than one day. The longest lead times are 26 and 20 hours, two waits that ran overnight, and the median hides them.</p><p>The preset <code>batched</code> is a different team over 28 days that gathers its changes and ships them together: seven changes in three deployments, committed on days 2 to 26 and released on days 10, 19 and 28. Median lead time is 140 hours, between one day and one week, because a change waits for the next release. Two of the seven failed, 28.6 percent, in the 16 to 30 percent band, and the two incidents took 48 and 24 hours to restore, a median of 36 hours, between one day and one week. The sample is written so that the long wait, the failures and the slow recovery fall on the same team; a real log would not have to, and the next lesson is about whether they do.</p><p>What the lab cannot do is decide where your clock starts. The authors choose commit to production because it can be timed, and Fowler remarks that the book covers delivery and not the entire development process; a team that merges once a day and waits for review for three days has lead time that begins earlier than the log shows. Which events a team records as commit, deploy, failure and restoration is the measurement, and the figures are only as good as that choice.</p><h3>Exercise</h3><p>A third team&rsquo;s week, a period of 7 days: four changes, w1 committed at 10:00 on day 1 and deployed at 12:00; w2 committed at 09:00 on day 2 and deployed at 15:00, and failed; w3 committed at 11:00 on day 3 and deployed at 13:00; w4 committed at 14:00 on day 5 and deployed at 15:00. One incident began at 15:30 on day 2 and ended at 18:30 the same day.</p><p>Work out the lead time of each change, the median, the change fail rate and the time to restore, and say which of the book&rsquo;s answers each falls under. Then type the log into the lab to check it.</p><p>The next lesson, High, Medium and Low Performers, takes the next step in the chapter: grouping teams by these four answers, without a prior idea of which are good.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Delivery performance</h2></div><p>the four measures from a log of changes and incidents</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Four measures, chosen against two criteria</h2><div class="prose reading"><p>The authors give their measure two criteria. It should be a global outcome, because, in their words, &ldquo;it should focus on a global outcome to ensure teams aren’t pitted against each other&rdquo;, and their example is paying developers for throughput and operations for stability, which builds the wall of confusion between them. And it should be an outcome and not output, so that it cannot be raised with busywork. They settle on four measures: delivery lead time, deployment frequency, time to restore service and change fail rate.</p><p>Lead time is the Lean measure of how long it takes to go from a customer's request to its satisfaction. In product development it has two parts. Designing and validating a feature is uncertain, it is hard to say when the clock starts, and the variance is high, which Reinertsen, whom the authors cite, calls the fuzzy front end. Delivering it, from implementation through test to release, is easier to measure and steadier. The authors measure only the second: the time from code committed to code running in production. Their survey offered six answers: less than one hour; less than one day; between one day and one week; between one week and one month; between one month and six months; more than six months.</p><p>Batch size is the second measure&rsquo;s subject, and the difficulty is that in software there is no visible inventory. Reducing batches shortens cycle times, speeds feedback and cuts risk, in the Lean tradition the authors cite from Toyota, so they needed a stand-in that respondents can report: deployment frequency, to production or an app store. The six answers were on demand, meaning several deploys a day; between once an hour and once a day; between once a day and once a week; between once a week and once a month; between once a month and once every six months; and fewer than once every six months. A release usually contains several commits, unless each commit goes out alone.</p><p>Lead time and deployment frequency are the tempo of delivery. To see whether teams that speed up give up stability, the authors add two measures. Traditionally reliability is the time between failures, but in complex, quickly changing systems failure is inevitable, so the question becomes how quickly service is restored after an incident, answered from the same six options as lead time. And the change fail rate: the percentage of changes to production, including releases and configuration changes, that degrade service or have to be remedied. In Lean terms, they note, it is the percent complete and accurate of the delivery process.</p><p>Notice what kind of data these are. In the book, each measure is a respondent's answer to a question about their primary application or service, an option from a short list, which is why Fowler's foreword says they capture perceptions. The lab does something the survey did not: it computes the four from a log of changes and incidents, and then reads each on the book's scale, so that you can see which answer a team would give.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Delivery performance</h2></div><p>the four measures from a log of changes and incidents</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Delivery performance</strong><span>the four measures from a log of changes and incidents</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="adeTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="adeTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A time is day.hh:mm from the period's start (1.09:30 is day 1 at 09:30; day 1 begins at hour 0) or decimal hours from the start (33.5). Every time falls within the period. A deployment is one deploy time: changes deployed at the same moment are one deployment. Lead time is deployed minus committed, for each change deployed; time to restore is restored minus start. A median is the middle value, or the mean of the two middle values. Change fail rate is the failed changes over the changes deployed. Each measure is placed on the book's six answer options: lead time and time to restore under less than one hour, less than one day, between one day and one week, between one week and one month (30 days), between one month and six months (180 days), more than six months, a value exactly on a boundary going to the longer option (one hour exactly is less than one day); deployment frequency by deployments per day over the period, where the book's first two options overlap, so two or more a day is on demand (multiple deploys per day), at least one but fewer than two is between once per hour and once per day, at least one a week between once per day and once per week, at least one in 30 days between once per week and once per month, at least one in 180 days between once per month and once every six months, a rate exactly on a boundary going to the more frequent option. The fail rate's bands are 0–15%, 16–30%, 31–45%, 46–60% (the book's) and the lab's 61–75%, 76–100%, a rate in the first band whose top it does not pass (15.5% is 16–30%). With period 2 given, each tile reads period 1 → period 2, over the same number of days.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Four delivery measures from a log</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Four delivery measures from a log</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="adePreset">Worked example</label>
           <select id="adePreset"><option value="fortnight" selected>A team that ships small changes, over 14 days</option><option value="batched">A team that gathers changes into releases, over 28 days</option></select>
@@ -1446,12 +1489,15 @@
           <div class="kpi"><span>Time to restore, as the book's answer option</span><strong id="adeRestoreOpt">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>fortnight</code> is a team&rsquo;s log over 14 days: ten changes, each with the time it was committed and the time it reached production, one of them failed, and two incidents. The lab reports the ten deployments, 5 a week, which is between once a day and once a week; a median lead time of 4.5 hours, less than one day; a change fail rate of 1 in 10, 10 percent, in the 0 to 15 percent band; and a median time to restore of 7.5 hours, from restorations of 3 and 12 hours, less than one day. The longest lead times are 26 and 20 hours, two waits that ran overnight, and the median hides them.</p><p>The preset <code>batched</code> is a different team over 28 days that gathers its changes and ships them together: seven changes in three deployments, committed on days 2 to 26 and released on days 10, 19 and 28. Median lead time is 140 hours, between one day and one week, because a change waits for the next release. Two of the seven failed, 28.6 percent, in the 16 to 30 percent band, and the two incidents took 48 and 24 hours to restore, a median of 36 hours, between one day and one week. The sample is written so that the long wait, the failures and the slow recovery fall on the same team; a real log would not have to, and the next lesson is about whether they do.</p><p>What the lab cannot do is decide where your clock starts. The authors choose commit to production because it can be timed, and Fowler remarks that the book covers delivery and not the entire development process; a team that merges once a day and waits for review for three days has lead time that begins earlier than the log shows. Which events a team records as commit, deploy, failure and restoration is the measurement, and the figures are only as good as that choice.</p><h3>Exercise</h3><p>A third team&rsquo;s week, a period of 7 days: four changes, w1 committed at 10:00 on day 1 and deployed at 12:00; w2 committed at 09:00 on day 2 and deployed at 15:00, and failed; w3 committed at 11:00 on day 3 and deployed at 13:00; w4 committed at 14:00 on day 5 and deployed at 15:00. One incident began at 15:30 on day 2 and ended at 18:30 the same day.</p><p>Work out the lead time of each change, the median, the change fail rate and the time to restore, and say which of the book&rsquo;s answers each falls under. Then type the log into the lab to check it.</p><p>The next lesson, High, Medium and Low Performers, takes the next step in the chapter: grouping teams by these four answers, without a prior idea of which are good.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Measuring delivery from a log</h2></div><p>Four steps, the last of them on a service of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix the events</h3><p>Decide which timestamps mean committed, deployed to production, failed and restored, and write the decision down.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the four</h3><p>For one period, count the deployments, take the median commit-to-deploy time, the share of the changes deployed that failed, and the median time to restore.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read each on the book&#x27;s scale</h3><p>Find the answer each figure falls under, and note which of the four is tempo and which is stability.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a service of your own</h3><p>Take a fortnight from your own history, type it into the lab, and look first at the longest lead time and the slowest restoration, which the medians hide.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Measuring delivery from a log</h2>
+      <p class="lead-in">Four steps, the last of them on a service of your own.</p>
+      <ol class="key-ideas method"><li><strong>Fix the events.</strong> Decide which timestamps mean committed, deployed to production, failed and restored, and write the decision down.</li><li><strong>Compute the four.</strong> For one period, count the deployments, take the median commit-to-deploy time, the share of the changes deployed that failed, and the median time to restore.</li><li><strong>Read each on the book&#x27;s scale.</strong> Find the answer each figure falls under, and note which of the four is tempo and which is stability.</li><li><strong>Do it on a service of your own.</strong> Take a fortnight from your own history, type it into the lab, and look first at the longest lead time and the slowest restoration, which the medians hide.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1470,17 +1516,16 @@ change fail rate: 1 / 10 = 10 percent, band 0 to 15
 restore: 12 and 3 hours, median 7.5, less than one day</div><p>The median of an even count is the mean of the middle two. The mean lead time would be 8.1 hours, because of the two long waits; the median is the figure the lab reads on the scale.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Measuring developers on throughput and operations on stability</strong><span>The authors give this as the classic example of a measure that is not global: each side is rewarded for what it controls, and the wall of confusion between them follows. Their four measures are for the delivery as a whole, which no function achieves alone.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking lead time to start with the customer&#x27;s request</strong><span>The book splits lead time and measures only the delivery part, from commit to production, because the design part has no clear start and is highly variable. Fowler's foreword says plainly that the book covers IT delivery, not the whole development process.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Trusting a median to describe every change</strong><span>On the lesson's fortnight the median is 4.5 hours, and two changes took 20 and 26. The book asks respondents for a typical answer; a log can show the spread, and the long waits are where to look.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the four measures from a log.</strong><p>Given a period's changes and incidents, compute the lead time, deployment frequency, change fail rate and time to restore, and say which of the book's answers each falls under.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab computes the measures from the log you type, with the events you say are commits, deployments, failures and restorations. The book's own figures were survey answers, from other respondents, in 2014 to 2017; a log of one team is not a sample of them.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Measuring developers on throughput and operations on stability</strong><span>The authors give this as the classic example of a measure that is not global: each side is rewarded for what it controls, and the wall of confusion between them follows. Their four measures are for the delivery as a whole, which no function achieves alone.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking lead time to start with the customer&#x27;s request</strong><span>The book splits lead time and measures only the delivery part, from commit to production, because the design part has no clear start and is highly variable. Fowler's foreword says plainly that the book covers IT delivery, not the whole development process.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Trusting a median to describe every change</strong><span>On the lesson's fortnight the median is 4.5 hours, and two changes took 20 and 26. The book asks respondents for a typical answer; a log can show the spread, and the long waits are where to look.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the four measures from a log.</strong><p>Given a period's changes and incidents, compute the lead time, deployment frequency, change fail rate and time to restore, and say which of the book's answers each falls under.</p></div></div><div class="note"><strong>Note:</strong> The lab computes the measures from the log you type, with the events you say are commits, deployments, failures and restorations. The book's own figures were survey answers, from other respondents, in 2014 to 2017; a log of one team is not a sample of them.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Lead time for changes</summary><p>The time from code committed to that code running successfully in production. The authors split a feature's whole lead time into a design part, hard to time and highly variable, and this delivery part, which is easier to measure and steadier.</p></details><details class="recall"><summary>Deployment frequency</summary><p>How often the primary service is deployed to production or to an app store. The authors use it as a proxy for batch size, since a smaller batch is deployed more often and the batch itself is hard to see.</p></details><details class="recall"><summary>Tempo and stability</summary><p>The two pairs the four measures fall into. Lead time and deployment frequency are tempo; time to restore service and change fail rate are stability. The authors test whether improving the first costs the second.</p></details></div>
+      <h3>Summary</h3>
       <p>The authors want a measure that rewards a global outcome and not output, and they settle on four. Read why lead time is split in two and only the delivery half measured, why deployment frequency stands for batch size, and why restoring service replaced time between failures; then compute all four from a two-week log.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Lead time for changes.</strong> The time from code committed to that code running successfully in production. The authors split a feature's whole lead time into a design part, hard to time and highly variable, and this delivery part, which is easier to measure and steadier.</li><li><strong>Deployment frequency.</strong> How often the primary service is deployed to production or to an app store. The authors use it as a proxy for batch size, since a smaller batch is deployed more often and the batch itself is hard to see.</li><li><strong>Tempo and stability.</strong> The two pairs the four measures fall into. Lead time and deployment frequency are tempo; time to restore service and change fail rate are stability. The authors test whether improving the first costs the second.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a global outcome, not output. lead time, commit to running in production. deployment frequency stands for batch size. tempo, lead time, deployment frequency. stability, time to restore, change fail rate. each is a survey answer, picked from options" tabindex="0" role="region" aria-label="Mathematical notation">a global outcome, not output
 lead time: commit to running in production
 deployment frequency stands for batch size
@@ -2377,11 +2422,42 @@ each is a survey answer, picked from options</div><figcaption>The four measures 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2449,7 +2525,7 @@ each is a survey answer, picked from options</div><figcaption>The four measures 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

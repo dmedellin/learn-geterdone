@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Systems and Matrices</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Systems</p>
       <h1>Solving by Substitution</h1>
       <p class="lesson-lede">Choose an efficient isolation, solve by substitution, and diagnose a contradiction or identity.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Substitution is legal because the two expressions name one number</li><li>The target is one equation in one unknown</li><li>What you isolate is a free choice with consequences</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The method, and why it is allowed</h2>
-      <article class="prose reading"><p>The method has four moves. Solve one of the equations for one of its variables. Substitute the resulting expression into the other equation, which then contains one variable. Solve it. Put that value back into the isolated equation to get the partner, and check the pair in both originals.</p><div class="thm"><span class="label">Theorem &middot; Substitution preserves the solution set</span><p>Let a system consist of <span class="math" data-say="x equals E">x = E</span>, where <span class="math" data-say="E">E</span> is an expression in <span class="math" data-say="y">y</span>, together with a second equation. Replacing every <span class="math" data-say="x">x</span> in the second equation by <span class="math" data-say="E">E</span> produces a system with exactly the same solutions, provided <span class="math" data-say="x equals E">x = E</span> is kept.</p></div><div class="proof"><p>Take a pair <span class="math" data-say="x, y">(x, y)</span> satisfying both original equations. It satisfies <span class="math" data-say="x equals E">x = E</span>, so <span class="math" data-say="x">x</span> and <span class="math" data-say="E">E</span> are the same number, and putting one in place of the other in a true equation leaves a true equation. So the pair satisfies the substituted equation as well.</p><p>Now take a pair satisfying <span class="math" data-say="x equals E">x = E</span> and the substituted equation. The same argument, run with <span class="math" data-say="E">E</span> replaced by <span class="math" data-say="x">x</span>, returns the original second equation. Neither direction loses a pair, so the two systems have the same solution set.</p><p><span class="qed">&#9633;</span></p></div><p>The proviso is not decoration. The isolated equation stays part of the system, and it is what produces the value of <span class="math" data-say="x">x</span> at the end. Dropping it once the substitution is made leaves a single equation in one variable, which has a different solution set from the system you started with.</p><h3>Choosing what to isolate</h3><p>Look for a coefficient of <span class="math" data-say="1">1</span> or <span class="math" data-say="negative 1">−1</span>. In <span class="math" data-say="5 x minus 2 y equals 4">5x − 2y = 4</span> and <span class="math" data-say="3 x plus y equals 9">3x + y = 9</span>, the <span class="math" data-say="y">y</span> in the second equation has coefficient <span class="math" data-say="1">1</span>, so <span class="math" data-say="y equals 9 minus 3 x">y = 9 − 3x</span> arrives without a division. If no coefficient is <span class="math" data-say="1">1</span> or <span class="math" data-say="negative 1">−1</span>, pick whichever looks smallest and accept the fraction.</p><div class="mathblock" data-say="3 x plus 2 y equals 4, no coefficient is 1 or negative 1, isolate x below. 2 x minus 5 y equals 9, goes to, x equals the quantity 9 plus 5 y, over 2. 3 times the quantity 9 plus 5 y, over 2 plus 2 y equals 4, substitute into the FIRST equation. 3 times the quantity 9 plus 5 y, plus 4 y equals 8, times 2, clearing the denominator. 27 plus 15 y plus 4 y equals 8. 19 y equals negative 19, goes to, y equals negative 1. x equals the quantity 9 plus 5 times the quantity negative 1, over 2 equals 4 over 2 equals 2. check, 3 times 2 plus 2 times the quantity negative 1, equals 6 minus 2 equals 4, check. 2 times 2 minus 5 times the quantity negative 1, equals 4 plus 5 equals 9, check" tabindex="0" role="region" aria-label="Mathematical notation">3x + 2y = 4          no coefficient is 1 or −1;  isolate x below
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The method, and why it is allowed</h2><div class="prose reading"><p>The method has four moves. Solve one of the equations for one of its variables. Substitute the resulting expression into the other equation, which then contains one variable. Solve it. Put that value back into the isolated equation to get the partner, and check the pair in both originals.</p><div class="thm"><span class="label">Theorem &middot; Substitution preserves the solution set</span><p>Let a system consist of <span class="math" data-say="x equals E">x = E</span>, where <span class="math" data-say="E">E</span> is an expression in <span class="math" data-say="y">y</span>, together with a second equation. Replacing every <span class="math" data-say="x">x</span> in the second equation by <span class="math" data-say="E">E</span> produces a system with exactly the same solutions, provided <span class="math" data-say="x equals E">x = E</span> is kept.</p></div><div class="proof"><p>Take a pair <span class="math" data-say="x, y">(x, y)</span> satisfying both original equations. It satisfies <span class="math" data-say="x equals E">x = E</span>, so <span class="math" data-say="x">x</span> and <span class="math" data-say="E">E</span> are the same number, and putting one in place of the other in a true equation leaves a true equation. So the pair satisfies the substituted equation as well.</p><p>Now take a pair satisfying <span class="math" data-say="x equals E">x = E</span> and the substituted equation. The same argument, run with <span class="math" data-say="E">E</span> replaced by <span class="math" data-say="x">x</span>, returns the original second equation. Neither direction loses a pair, so the two systems have the same solution set.</p><p><span class="qed">&#9633;</span></p></div><p>The proviso is not decoration. The isolated equation stays part of the system, and it is what produces the value of <span class="math" data-say="x">x</span> at the end. Dropping it once the substitution is made leaves a single equation in one variable, which has a different solution set from the system you started with.</p><h3>Choosing what to isolate</h3><p>Look for a coefficient of <span class="math" data-say="1">1</span> or <span class="math" data-say="negative 1">−1</span>. In <span class="math" data-say="5 x minus 2 y equals 4">5x − 2y = 4</span> and <span class="math" data-say="3 x plus y equals 9">3x + y = 9</span>, the <span class="math" data-say="y">y</span> in the second equation has coefficient <span class="math" data-say="1">1</span>, so <span class="math" data-say="y equals 9 minus 3 x">y = 9 − 3x</span> arrives without a division. If no coefficient is <span class="math" data-say="1">1</span> or <span class="math" data-say="negative 1">−1</span>, pick whichever looks smallest and accept the fraction.</p><div class="mathblock" data-say="3 x plus 2 y equals 4, no coefficient is 1 or negative 1, isolate x below. 2 x minus 5 y equals 9, goes to, x equals the quantity 9 plus 5 y, over 2. 3 times the quantity 9 plus 5 y, over 2 plus 2 y equals 4, substitute into the FIRST equation. 3 times the quantity 9 plus 5 y, plus 4 y equals 8, times 2, clearing the denominator. 27 plus 15 y plus 4 y equals 8. 19 y equals negative 19, goes to, y equals negative 1. x equals the quantity 9 plus 5 times the quantity negative 1, over 2 equals 4 over 2 equals 2. check, 3 times 2 plus 2 times the quantity negative 1, equals 6 minus 2 equals 4, check. 2 times 2 minus 5 times the quantity negative 1, equals 4 plus 5 equals 9, check" tabindex="0" role="region" aria-label="Mathematical notation">3x + 2y = 4          no coefficient is 1 or −1;  isolate x below
 2x − 5y = 9      →   x = (9 + 5y)/2
 
 3(9 + 5y)/2 + 2y = 4          substitute into the FIRST equation
@@ -1408,22 +1452,21 @@ check    3(2) + 2(−1) = 6 − 2 = 4    ✓
 x − 2y = 3     →   x = 2y + 3
 2x − 4y = 6        2(2y + 3) − 4y = 6   →   6 = 6
                    TRUE for every y   →   infinitely many
-                   solution set   {(2t + 3, t) : t real}</div><div class="example"><span class="label">Example &middot; Reading a parameter form</span><p><span class="math" data-say="the set 2 t plus 3, t">{(2t + 3, t)}</span> is a recipe: choose <span class="math" data-say="t">t</span>, get a pair. <span class="math" data-say="t equals 0">t = 0</span> gives <span class="math" data-say="3, 0">(3, 0)</span>, <span class="math" data-say="t equals 1">t = 1</span> gives <span class="math" data-say="5, 1">(5, 1)</span>, <span class="math" data-say="t equals 5">t = 5</span> gives <span class="math" data-say="13, 5">(13, 5)</span>. Each satisfies <span class="math" data-say="x minus 2 y equals 3">x − 2y = 3</span> and <span class="math" data-say="2 x minus 4 y equals 6">2x − 4y = 6</span>.</p><p>The letter is arbitrary and the description is not unique: <span class="math" data-say="the set s, the quantity s minus 3, over 2">{(s, (s − 3)/2)}</span> describes the same line. Any correct description of the set is a correct answer.</p></div><p>The check at the end is a check of both original equations. This is the same discipline as “Systems of Two Linear Equations” and for the same reason: an arithmetic slip in the substitution produces a pair that fits the equation it came out of.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Solving by substitution</h2></div><p>Isolate one unknown, put it in the other equation, and check the answer</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+                   solution set   {(2t + 3, t) : t real}</div><div class="example"><span class="label">Example &middot; Reading a parameter form</span><p><span class="math" data-say="the set 2 t plus 3, t">{(2t + 3, t)}</span> is a recipe: choose <span class="math" data-say="t">t</span>, get a pair. <span class="math" data-say="t equals 0">t = 0</span> gives <span class="math" data-say="3, 0">(3, 0)</span>, <span class="math" data-say="t equals 1">t = 1</span> gives <span class="math" data-say="5, 1">(5, 1)</span>, <span class="math" data-say="t equals 5">t = 5</span> gives <span class="math" data-say="13, 5">(13, 5)</span>. Each satisfies <span class="math" data-say="x minus 2 y equals 3">x − 2y = 3</span> and <span class="math" data-say="2 x minus 4 y equals 6">2x − 4y = 6</span>.</p><p>The letter is arbitrary and the description is not unique: <span class="math" data-say="the set s, the quantity s minus 3, over 2">{(s, (s − 3)/2)}</span> describes the same line. Any correct description of the set is a correct answer.</p></div><p>The check at the end is a check of both original equations. This is the same discipline as “Systems of Two Linear Equations” and for the same reason: an arithmetic slip in the substitution produces a pair that fits the equation it came out of.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Solving by substitution</h2></div><p>Isolate one unknown, put it in the other equation, and check the answer</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="syTitle">System</strong><span id="sySub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>exact fractions throughout</span><span class="tone-amber"><i class="legend-swatch"></i>every step shown</span></div>
       </div>
       <div id="syWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="syStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Watch the substitution</h3>
-          <p>Enter a system and the lab isolates one variable and shows the single-variable equation that results. Switch which variable it isolates and compare the two routes: the same pair at the end, and not the same fractions on the way.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Watch the substitution</h3>
+            <p>Enter a system and the lab isolates one variable and shows the single-variable equation that results. Switch which variable it isolates and compare the two routes: the same pair at the end, and not the same fractions on the way.</p>
         <div class="field" id="syFieldPreset">
           <label for="syPreset">Worked example</label>
           <select id="syPreset"><option value="0">one equation already gives y</option><option value="1">the coefficient is not 1, so a fraction appears at once</option><option value="2">the substitution ends at 0 = 5, which is false</option><option value="3">the substitution ends at 0 = 0, which is true for every x</option><option value="4">fractions in the equations, exact all the way down</option><option value="5">the unknown you chose is missing from that equation</option></select>
@@ -1446,12 +1489,14 @@ x − 2y = 3     →   x = 2y + 3
           <div class="kpi"><span id="syK3Lab">&mdash;</span><strong id="syK3">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="syHint" style="margin:0;">Type equations the way you would write them: <code>2x + 3y = 12</code>, <code>y = 2x - 1</code>, <code>x/2 + y/3 = 1</code>. Brackets and implicit multiplication are understood, and every coefficient becomes an exact fraction.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Substituting without losing a solution</h2></div><p>Four moves. The third is where the sign errors are.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Pick the variable with coefficient 1 or minus 1</h3><p>It isolates without division and keeps the next line clean. If no coefficient qualifies, choose any variable and expect one fraction, which will clear when you multiply through.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Isolate it, and keep that equation</h3><p>Write <span class="math" data-say="y equals 9 minus 3 x">y = 9 − 3x</span> down on its own line. It is still one of the two equations of the system, and it is the one that supplies the second coordinate at the end.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Substitute into the other equation, in brackets</h3><p>The whole expression replaces the variable. In <span class="math" data-say="5 x minus 2 y equals 4">5x − 2y = 4</span> the <span class="math" data-say="y">y</span> becomes <span class="math" data-say="9 minus 3 x">(9 − 3x)</span> inside brackets, so the <span class="math" data-say="negative 2">−2</span> multiplies both terms: <span class="math" data-say="negative 2 times the quantity 9 minus 3 x, equals negative 18 plus 6 x">−2(9 − 3x) = −18 + 6x</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Back-substitute, then check in both originals</h3><p>Put the number into the isolated equation to get the partner. Then test the pair in the two equations you were given, not in anything you have derived.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Substituting without losing a solution</h2>
+      <p class="lead-in">Four moves. The third is where the sign errors are.</p>
+      <ol class="key-ideas method"><li><strong>Pick the variable with coefficient 1 or minus 1.</strong> It isolates without division and keeps the next line clean. If no coefficient qualifies, choose any variable and expect one fraction, which will clear when you multiply through.</li><li><strong>Isolate it, and keep that equation.</strong> Write <span class="math" data-say="y equals 9 minus 3 x">y = 9 − 3x</span> down on its own line. It is still one of the two equations of the system, and it is the one that supplies the second coordinate at the end.</li><li><strong>Substitute into the other equation, in brackets.</strong> The whole expression replaces the variable. In <span class="math" data-say="5 x minus 2 y equals 4">5x − 2y = 4</span> the <span class="math" data-say="y">y</span> becomes <span class="math" data-say="9 minus 3 x">(9 − 3x)</span> inside brackets, so the <span class="math" data-say="negative 2">−2</span> multiplies both terms: <span class="math" data-say="negative 2 times the quantity 9 minus 3 x, equals negative 18 plus 6 x">−2(9 − 3x) = −18 + 6x</span>.</li><li><strong>Back-substitute, then check in both originals.</strong> Put the number into the isolated equation to get the partner. Then test the pair in the two equations you were given, not in anything you have derived.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1476,17 +1521,16 @@ check    5(2) − 2(3) = 10 − 6 = 4    ✓
 solution   (2, 3)</div><p>The second line of the substitution is the one that goes wrong. <span class="math" data-say="negative 2">−2</span> times <span class="math" data-say="negative 3 x">−3x</span> is <span class="math" data-say="plus 6 x">+6x</span>; writing <span class="math" data-say="5 x minus 18 minus 6 x equals 4">5x − 18 − 6x = 4</span> instead gives <span class="math" data-say="negative x equals 22">−x = 22</span> and <span class="math" data-say="x equals negative 22">x = −22</span>, which fails the very first check. The bracket is what prevents it, and the bracket costs nothing.</p><p>Isolating <span class="math" data-say="x">x</span> from the first equation instead is legitimate and gives <span class="math" data-say="x equals the quantity 4 plus 2 y, over 5">x = (4 + 2y)/5</span>. The same pair comes out. The fifths are the price of ignoring the coefficient of <span class="math" data-say="1">1</span> sitting in the other equation.</p><p>Faded rehearsal: solve <span class="math" data-say="4 x minus y equals 11">4x − y = 11</span> and <span class="math" data-say="2 x plus 3 y equals 9">2x + 3y = 9</span>. The cheap first move is supplied: isolate <span class="math" data-say="y">y</span> from the first equation. Put the whole expression into the second in brackets, finish the pair, and use both original equations &mdash; not a derived one &mdash; for the check.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Substituting back into the equation you isolated from</strong><span><span class="math" data-say="y equals 9 minus 3 x">y = 9 − 3x</span> returned to <span class="math" data-say="3 x plus y equals 9">3x + y = 9</span> gives <span class="math" data-say="9 equals 9">9 = 9</span>. That is true and it is not evidence of anything &mdash; in particular it does not mean the system is dependent. The substitution goes into the equation that has not been used.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dropping the brackets</strong><span><span class="math" data-say="negative 2 y">−2y</span> with <span class="math" data-say="y equals 9 minus 3 x">y = 9 − 3x</span> is <span class="math" data-say="negative 2 times the quantity 9 minus 3 x">−2(9 − 3x)</span>. Written without brackets the <span class="math" data-say="negative 2">−2</span> reaches only the <span class="math" data-say="9">9</span>, the <span class="math" data-say="x">x</span> term keeps the wrong sign, and the answer that follows is confidently wrong.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Stopping at one number</strong><span><span class="math" data-say="x equals 2">x = 2</span> is not a solution of a two-variable system. Back-substitution is a step of the method, not a flourish, and the pair is the answer.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the fractions do not stop you.</strong><p>Isolating a variable whose coefficient is <span class="math" data-say="2">2</span> or <span class="math" data-say="negative 5">−5</span> produces an expression such as <span class="math" data-say="the quantity 9 plus 5 y, over 2">(9 + 5y)/2</span>, and the method carries on unchanged: multiply through and the denominator goes. The standard is a system in which no coefficient is <span class="math" data-say="1">1</span>, solved in exact fractions, with the pair checked in both original equations.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Substitution is the method that generalises furthest. It is how “Systems in Three Variables” finishes a three-variable system once elimination has done the reduction, and it is what "back-substitution" means in “Gaussian Elimination”. Elimination is usually quicker when both equations are already in standard form &mdash; and slower when one variable is sitting there with a coefficient of <span class="math" data-say="1">1</span>.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Substituting back into the equation you isolated from</strong><span><span class="math" data-say="y equals 9 minus 3 x">y = 9 − 3x</span> returned to <span class="math" data-say="3 x plus y equals 9">3x + y = 9</span> gives <span class="math" data-say="9 equals 9">9 = 9</span>. That is true and it is not evidence of anything &mdash; in particular it does not mean the system is dependent. The substitution goes into the equation that has not been used.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dropping the brackets</strong><span><span class="math" data-say="negative 2 y">−2y</span> with <span class="math" data-say="y equals 9 minus 3 x">y = 9 − 3x</span> is <span class="math" data-say="negative 2 times the quantity 9 minus 3 x">−2(9 − 3x)</span>. Written without brackets the <span class="math" data-say="negative 2">−2</span> reaches only the <span class="math" data-say="9">9</span>, the <span class="math" data-say="x">x</span> term keeps the wrong sign, and the answer that follows is confidently wrong.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Stopping at one number</strong><span><span class="math" data-say="x equals 2">x = 2</span> is not a solution of a two-variable system. Back-substitution is a step of the method, not a flourish, and the pair is the answer.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the fractions do not stop you.</strong><p>Isolating a variable whose coefficient is <span class="math" data-say="2">2</span> or <span class="math" data-say="negative 5">−5</span> produces an expression such as <span class="math" data-say="the quantity 9 plus 5 y, over 2">(9 + 5y)/2</span>, and the method carries on unchanged: multiply through and the denominator goes. The standard is a system in which no coefficient is <span class="math" data-say="1">1</span>, solved in exact fractions, with the pair checked in both original equations.</p></div></div><div class="note"><strong>Note:</strong> Substitution is the method that generalises furthest. It is how “Systems in Three Variables” finishes a three-variable system once elimination has done the reduction, and it is what "back-substitution" means in “Gaussian Elimination”. Elimination is usually quicker when both equations are already in standard form &mdash; and slower when one variable is sitting there with a coefficient of <span class="math" data-say="1">1</span>.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Substitution is legal because the two expressions name one number</summary><p>If <span class="math" data-say="x equals y plus 1">x = y + 1</span> holds, then <span class="math" data-say="x">x</span> and <span class="math" data-say="y plus 1">y + 1</span> are two names for the same number, and either may be written where the other stands. That is the entire justification, and it is why the expression must go into the equation you have not used.</p></details><details class="recall"><summary>The target is one equation in one unknown</summary><p>Everything else is bookkeeping. Linear Equations and Inequalities already solves any linear equation in one variable; this lesson is about manufacturing one.</p></details><details class="recall"><summary>What you isolate is a free choice with consequences</summary><p>A variable whose coefficient is <span class="math" data-say="1">1</span> or <span class="math" data-say="negative 1">−1</span> isolates with no division. Any other choice produces a fraction, which is survivable &mdash; multiply through and it clears &mdash; but it is extra work chosen, not imposed.</p></details></div>
+      <h3>Summary</h3>
       <p>Solve one equation for one unknown, put that expression into the other equation, and a system in two variables becomes an equation in one. The method always works; the choice of what to isolate decides whether it is pleasant.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Substitution is legal because the two expressions name one number.</strong> If <span class="math" data-say="x equals y plus 1">x = y + 1</span> holds, then <span class="math" data-say="x">x</span> and <span class="math" data-say="y plus 1">y + 1</span> are two names for the same number, and either may be written where the other stands. That is the entire justification, and it is why the expression must go into the equation you have not used.</li><li><strong>The target is one equation in one unknown.</strong> Everything else is bookkeeping. Linear Equations and Inequalities already solves any linear equation in one variable; this lesson is about manufacturing one.</li><li><strong>What you isolate is a free choice with consequences.</strong> A variable whose coefficient is <span class="math" data-say="1">1</span> or <span class="math" data-say="negative 1">−1</span> isolates with no division. Any other choice produces a fraction, which is survivable &mdash; multiply through and it clears &mdash; but it is extra work chosen, not imposed.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="x minus y equals 1, goes to, x equals y plus 1, isolate. 2 x plus 3 y equals 12, goes to, 2 times the quantity y plus 1, plus 3 y equals 12, substitute into the OTHER one. 5 y equals 10, goes to, y equals 2, solve. x equals 2 plus 1 equals 3, back-substitute, 3, 2" tabindex="0" role="region" aria-label="Mathematical notation">x − y = 1        →   x = y + 1              isolate
 2x + 3y = 12     →   2(y + 1) + 3y = 12     substitute into the OTHER one
                      5y = 10  →  y = 2      solve
@@ -3992,11 +4036,42 @@ solution   (2, 3)</div><p>The second line of the substitution is the one that go
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -4064,7 +4139,7 @@ solution   (2, 3)</div><p>The second line of the substitution is the one that go
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

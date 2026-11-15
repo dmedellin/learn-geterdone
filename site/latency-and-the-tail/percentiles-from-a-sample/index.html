@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,31 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Latency and the Tail</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The tail</p>
       <h1>Percentiles from a Sample</h1>
       <p class="lesson-lede">Compute p50, p95 and p99 of a sample exactly by rank, and say what the mean is and is not about.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A percentile is selected by rank</li><li>The mean answers a different question</li><li>A small sample cannot support a high percentile</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Ranks, and the average that is nobody</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Nearest-rank percentile</span><p>For a sample of <span class="math" data-say="n">n</span> values sorted ascending and a fraction <span class="math" data-say="q">q</span> between <span class="math" data-say="0">0</span> and <span class="math" data-say="1">1</span>, the <strong><span class="math" data-say="q">q</span>-th percentile by nearest rank</strong> is the value at position <span class="math" data-say="r equals the ceiling of q times n">r = ⌈q · n⌉</span>. It is one of the observed values, always. Other definitions exist that interpolate between neighbours and can return a number nobody measured; this course uses nearest rank throughout and prints the rank beside the value.</p></div><p>The lab&rsquo;s preset is twenty measurements in milliseconds, already sorted: <span class="math" data-say="12, 13, 14, 14, 15, 15, 16, 17, 18, 19, 21, 22, 24, 27, 31, 38, 52, 96, 180, 420">12, 13, 14, 14, 15, 15, 16, 17, 18, 19, 21, 22, 24, 27, 31, 38, 52, 96, 180, 420</span>. The ranks are the whole computation.</p><div class="mathblock" data-say="n equals 20. p 50, r equals the ceiling of 0.50 times 20, equals the ceiling of 10.0, equals 10, 10 t h value, equals, 19 milliseconds. p 90, r equals the ceiling of 0.90 times 20, equals the ceiling of 18.0, equals 18, 18 t h value, equals, 96 milliseconds. p 95, r equals the ceiling of 0.95 times 20, equals the ceiling of 19.0, equals 19, 19 t h value, equals 180 milliseconds. p 99, r equals the ceiling of 0.99 times 20, equals the ceiling of 19.8, equals 20, 20 t h value, equals 420 milliseconds. mean, the quantity 12 plus 13, and so on, plus 420, over 20, equals, 1064 over 20, equals, 266 over 5, equals, 53.2 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">n = 20
-
-p50    r = ⌈0.50 × 20⌉ = ⌈10.0⌉ = 10      10th value  =  19 ms
-p90    r = ⌈0.90 × 20⌉ = ⌈18.0⌉ = 18      18th value  =  96 ms
-p95    r = ⌈0.95 × 20⌉ = ⌈19.0⌉ = 19      19th value  = 180 ms
-p99    r = ⌈0.99 × 20⌉ = ⌈19.8⌉ = 20      20th value  = 420 ms
-
-mean   (12 + 13 + … + 420) / 20  =  1064 / 20  =  266/5  =  53.2 ms</div><p>Four numbers describing one sample: <span class="math" data-say="19">19</span>, <span class="math" data-say="96">96</span>, <span class="math" data-say="180">180</span>, <span class="math" data-say="420">420</span>. The median is <span class="math" data-say="19 milliseconds">19 ms</span> and the p99 is twenty-two times that. A single summary figure cannot carry that spread, and choosing which single figure to carry is the decision this lesson is about.</p><h3>Why the mean cannot be repaired</h3><p>The mean is <span class="math" data-say="53.2 milliseconds">53.2 ms</span>. Seventeen of the twenty requests were faster than the mean, and no request in the sample took anything near <span class="math" data-say="53 milliseconds">53 ms</span> &mdash; the values on either side of it are <span class="math" data-say="52">52</span> and <span class="math" data-say="96">96</span>. The mean has landed in a gap. This is not a defect of this sample; it is what happens to an average whenever a few large values are pulled far out, which is the normal shape of a latency distribution.</p><div class="example"><span class="label">Example &middot; “The average user sees 53 ms”</span><p>No user saw <span class="math" data-say="53 milliseconds">53 ms</span>. The claim, read as a claim about a typical experience, is false in this sample by construction: <span class="math" data-say="85 percent">85%</span> of the requests were faster and <span class="math" data-say="15 percent">15%</span> were much slower, and the number in the middle belongs to neither group. What is true of the mean is that twenty requests consumed <span class="math" data-say="20 times 53.2 equals 1064 milliseconds">20 × 53.2 = 1064 ms</span> of service time in total &mdash; a fact about load, which is exactly what a capacity calculation needs and exactly what a latency report does not.</p></div><p>Notice what removing one measurement does. Delete the <span class="math" data-say="420">420</span> from the sample in the lab and the p99 of the remaining nineteen becomes <span class="math" data-say="180 milliseconds">180 ms</span>, less than half of what it was, because at <span class="math" data-say="n equals 19">n = 19</span> the rank <span class="math" data-say="the ceiling of 0.99 times 19, equals 19">⌈0.99 × 19⌉ = 19</span> now selects the new maximum. A high percentile of a small sample is a claim resting on one or two observations, and moving one of them moves the answer by a factor of two. The fix is more measurements, not a different formula.</p><p>The rank definition also says something about how the value is found. Sorting is the obvious method and it is what the lab shows, because seeing the sorted list is the point. It is not the only method: &ldquo;Quickselect&rdquo; on the Algorithms path finds the <span class="math" data-say="r">r</span>-th smallest value without sorting the rest, which is how a system with millions of measurements a second computes the same number. The definition does not change; only the work does.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>p50, p95, p99 and the mean</h2></div><p>Four numbers about one sample, three of which a request actually took</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Ranks, and the average that is nobody</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Nearest-rank percentile</span><p>For a sample of <span class="math" data-say="n">n</span> values sorted ascending and a fraction <span class="math" data-say="q">q</span> between <span class="math" data-say="0">0</span> and <span class="math" data-say="1">1</span>, the <strong><span class="math" data-say="q">q</span>-th percentile by nearest rank</strong> is the value at position <span class="math" data-say="r equals the ceiling of q times n">r = ⌈q · n⌉</span>. It is one of the observed values, always. Other definitions exist that interpolate between neighbours and can return a number nobody measured; this course uses nearest rank throughout and prints the rank beside the value.</p></div><p>The lab&rsquo;s preset is twenty measurements in milliseconds, already sorted: <span class="math" data-say="12, 13, 14, 14, 15, 15, 16, 17, 18, 19, 21, 22, 24, 27, 31, 38, 52, 96, 180, 420">12, 13, 14, 14, 15, 15, 16, 17, 18, 19, 21, 22, 24, 27, 31, 38, 52, 96, 180, 420</span>. The ranks are the whole computation.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>p50, p95, p99 and the mean</h2></div><p>Four numbers about one sample, three of which a request actually took</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Percentiles from a sample</strong><span>a rank in a sorted list, not an average of anything</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the sample</span><span class="tone-amber"><i class="legend-swatch"></i>the selected rank</span><span class="tone-red"><i class="legend-swatch"></i>the mean</span></div>
@@ -1411,10 +1447,10 @@ mean   (12 + 13 + … + 420) / 20  =  1064 / 20  =  266/5  =  53.2 ms</div><p>Fo
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="pcPlot" viewBox="0 0 520 150" role="img" aria-label="The sorted sample as ticks on a time axis, with the percentiles marked."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="pcTable"></table></div>
       <div class="status-banner" id="pcStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Edit the sample</h3>
-          <p>The sorted list, the computed rank and the value that rank selects are shown together, with the mean marked against them. Add one very large measurement and watch which of the four figures move.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Edit the sample</h3>
+            <p>The sorted list, the computed rank and the value that rank selects are shown together, with the mean marked against them. Add one very large measurement and watch which of the four figures move.</p>
         <div class="field">
           <label for="pcSample">The sample (milliseconds, any separator)</label>
           <input id="pcSample" type="text" value="12, 13, 14, 14, 15, 15, 16, 17, 18, 19, 21, 22, 24, 27, 31, 38, 52, 96, 180, 420" inputmode="text" autocomplete="off">
@@ -1430,12 +1466,22 @@ mean   (12 + 13 + … + 420) / 20  =  1064 / 20  =  266/5  =  53.2 ms</div><p>Fo
           <div class="kpi"><span>Mean</span><strong id="pcMean">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="pcHint" style="margin:0;">The rank is &lceil;q &times; n&rceil;, so the answer is always a value some request actually took. The mean is not: it is an arithmetic average that can land in a gap no request ever occupied.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="n equals 20. p 50, r equals the ceiling of 0.50 times 20, equals the ceiling of 10.0, equals 10, 10 t h value, equals, 19 milliseconds. p 90, r equals the ceiling of 0.90 times 20, equals the ceiling of 18.0, equals 18, 18 t h value, equals, 96 milliseconds. p 95, r equals the ceiling of 0.95 times 20, equals the ceiling of 19.0, equals 19, 19 t h value, equals 180 milliseconds. p 99, r equals the ceiling of 0.99 times 20, equals the ceiling of 19.8, equals 20, 20 t h value, equals 420 milliseconds. mean, the quantity 12 plus 13, and so on, plus 420, over 20, equals, 1064 over 20, equals, 266 over 5, equals, 53.2 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">n = 20
+
+p50    r = ⌈0.50 × 20⌉ = ⌈10.0⌉ = 10      10th value  =  19 ms
+p90    r = ⌈0.90 × 20⌉ = ⌈18.0⌉ = 18      18th value  =  96 ms
+p95    r = ⌈0.95 × 20⌉ = ⌈19.0⌉ = 19      19th value  = 180 ms
+p99    r = ⌈0.99 × 20⌉ = ⌈19.8⌉ = 20      20th value  = 420 ms
+
+mean   (12 + 13 + … + 420) / 20  =  1064 / 20  =  266/5  =  53.2 ms</div><p>Four numbers describing one sample: <span class="math" data-say="19">19</span>, <span class="math" data-say="96">96</span>, <span class="math" data-say="180">180</span>, <span class="math" data-say="420">420</span>. The median is <span class="math" data-say="19 milliseconds">19 ms</span> and the p99 is twenty-two times that. A single summary figure cannot carry that spread, and choosing which single figure to carry is the decision this lesson is about.</p><h3>Why the mean cannot be repaired</h3><p>The mean is <span class="math" data-say="53.2 milliseconds">53.2 ms</span>. Seventeen of the twenty requests were faster than the mean, and no request in the sample took anything near <span class="math" data-say="53 milliseconds">53 ms</span> &mdash; the values on either side of it are <span class="math" data-say="52">52</span> and <span class="math" data-say="96">96</span>. The mean has landed in a gap. This is not a defect of this sample; it is what happens to an average whenever a few large values are pulled far out, which is the normal shape of a latency distribution.</p><div class="example"><span class="label">Example &middot; “The average user sees 53 ms”</span><p>No user saw <span class="math" data-say="53 milliseconds">53 ms</span>. The claim, read as a claim about a typical experience, is false in this sample by construction: <span class="math" data-say="85 percent">85%</span> of the requests were faster and <span class="math" data-say="15 percent">15%</span> were much slower, and the number in the middle belongs to neither group. What is true of the mean is that twenty requests consumed <span class="math" data-say="20 times 53.2 equals 1064 milliseconds">20 × 53.2 = 1064 ms</span> of service time in total &mdash; a fact about load, which is exactly what a capacity calculation needs and exactly what a latency report does not.</p></div><p>Notice what removing one measurement does. Delete the <span class="math" data-say="420">420</span> from the sample in the lab and the p99 of the remaining nineteen becomes <span class="math" data-say="180 milliseconds">180 ms</span>, less than half of what it was, because at <span class="math" data-say="n equals 19">n = 19</span> the rank <span class="math" data-say="the ceiling of 0.99 times 19, equals 19">⌈0.99 × 19⌉ = 19</span> now selects the new maximum. A high percentile of a small sample is a claim resting on one or two observations, and moving one of them moves the answer by a factor of two. The fix is more measurements, not a different formula.</p><p>The rank definition also says something about how the value is found. Sorting is the obvious method and it is what the lab shows, because seeing the sorted list is the point. It is not the only method: &ldquo;Quickselect&rdquo; on the Algorithms path finds the <span class="math" data-say="r">r</span>-th smallest value without sorting the rest, which is how a system with millions of measurements a second computes the same number. The definition does not change; only the work does.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a percentile off a sample</h2></div><p>Do this by hand once. It is four steps and it permanently changes how the word p99 reads.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Sort the sample ascending</h3><p>Every step after this is a position in that list. If the sample arrived as a stream of numbers this is the only part that costs anything, and it is also the part that makes the rest obviously correct.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the rank <span class="math" data-say="r equals the ceiling of q times n">r = ⌈q · n⌉</span></h3><p>Round up, always: <span class="math" data-say="the ceiling of 0.99 times 20, equals 20">⌈0.99 × 20⌉ = 20</span> and <span class="math" data-say="the ceiling of 0.99 times 200, equals 198">⌈0.99 × 200⌉ = 198</span>. Rounding down or to nearest gives a neighbouring value, which on a tail can be very different from the right one.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Take the <span class="math" data-say="r">r</span>-th value and report it as a measurement</h3><p>It is a time some request actually took. Say which one it is if the sample is small &mdash; &ldquo;the p99 is the slowest of twenty&rdquo; is a more honest sentence than &ldquo;the p99 is 420 ms&rdquo; when both are the same fact.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compute the mean too, and use it only for totals</h3><p>The mean times the count is the total service time, which is what capacity and cost are made of. Do not report it as an experience, and check how many observations fall below it &mdash; on a latency sample the answer is usually most of them.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a percentile off a sample</h2>
+      <p class="lead-in">Do this by hand once. It is four steps and it permanently changes how the word p99 reads.</p>
+      <ol class="key-ideas method"><li><strong>Sort the sample ascending.</strong> Every step after this is a position in that list. If the sample arrived as a stream of numbers this is the only part that costs anything, and it is also the part that makes the rest obviously correct.</li><li><strong>Compute the rank <span class="math" data-say="r equals the ceiling of q times n">r = ⌈q · n⌉</span>.</strong> Round up, always: <span class="math" data-say="the ceiling of 0.99 times 20, equals 20">⌈0.99 × 20⌉ = 20</span> and <span class="math" data-say="the ceiling of 0.99 times 200, equals 198">⌈0.99 × 200⌉ = 198</span>. Rounding down or to nearest gives a neighbouring value, which on a tail can be very different from the right one.</li><li><strong>Take the <span class="math" data-say="r">r</span>-th value and report it as a measurement.</strong> It is a time some request actually took. Say which one it is if the sample is small &mdash; &ldquo;the p99 is the slowest of twenty&rdquo; is a more honest sentence than &ldquo;the p99 is 420 ms&rdquo; when both are the same fact.</li><li><strong>Compute the mean too, and use it only for totals.</strong> The mean times the count is the total service time, which is what capacity and cost are made of. Do not report it as an experience, and check how many observations fall below it &mdash; on a latency sample the answer is usually most of them.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1463,17 +1509,16 @@ mean  1064 / 20  =  53.2 ms
 p99 / p50  =  420 / 19  =  22.1 ×</div><p>The <span class="math" data-say="22.1 times">22.1×</span> ratio at the bottom is the shape of the distribution in one number, and it is the figure that makes the rest of this course necessary. A system whose p99 is twenty-two times its median does not have a latency problem in any stage; it has a tail, and the tail is a separate object with its own arithmetic.</p><p>It is worth noticing that the p50 and the mean disagree by nearly a factor of three, in the direction they always disagree: the mean is above the median whenever the large values are the far ones. If a system reports a mean close to its median, either the tail is unusually tame or something is truncating the measurements &mdash; which is its own subject, and belongs to Measuring Systems.</p><p>For a faded rehearsal, take the eleven measurements <span class="math" data-say="5, 6, 6, 7, 8, 9, 11, 14, 20, 60, 300">5, 6, 6, 7, 8, 9, 11, 14, 20, 60, 300</span>. The supplied first move is the size: <span class="math" data-say="n equals 11">n = 11</span>. Compute the ranks and the values for p50, p90 and p99, then the mean, then count how many observations are below the mean. Say which single observation the p99 rests on, and type the sample into the lab to check every figure before opening the quiz.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling the p99 an average of the slow requests</strong><span>It is one observation, selected by position. It is not the mean of the worst one percent, and it is not an average of anything. The distinction matters as soon as percentiles are combined, because averages compose in ways that ranks do not.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Rounding the rank down or to nearest</strong><span><span class="math" data-say="the ceiling of 0.99 times 20">⌈0.99 × 20⌉</span> is <span class="math" data-say="20">20</span>, not <span class="math" data-say="19">19</span>. On this sample rounding down returns <span class="math" data-say="180 milliseconds">180 ms</span> instead of <span class="math" data-say="420 milliseconds">420 ms</span>, an error of a factor of two and a third. The ceiling is part of the definition and it is exactly what stops the percentile from being a value below which fewer than <span class="math" data-say="q">q</span> of the sample sits.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reporting the mean as what a typical user experiences</strong><span>On the preset, <span class="math" data-say="85 percent">85%</span> of requests were faster than the mean and none took the mean. The mean is the right number for total work and the wrong number for a typical experience, and the two get confused because both are described with the word &ldquo;average&rdquo;.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you reach for a sorted list rather than a formula.</strong><p>You should be able to compute a rank, select the value it names, compute the mean of the same sample, count how many observations fall below it, and state how many observations the reported percentile actually rests on.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A percentile of one call is now a computable object, which makes the rest of this course possible. &ldquo;Tail Amplification under Fan-out&rdquo; asks what happens when a request has to wait for many calls that each sit inside their own p99, and the answer &mdash; that at sixty-nine of them the p99 has become the median &mdash; is the result this course exists to establish.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling the p99 an average of the slow requests</strong><span>It is one observation, selected by position. It is not the mean of the worst one percent, and it is not an average of anything. The distinction matters as soon as percentiles are combined, because averages compose in ways that ranks do not.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Rounding the rank down or to nearest</strong><span><span class="math" data-say="the ceiling of 0.99 times 20">⌈0.99 × 20⌉</span> is <span class="math" data-say="20">20</span>, not <span class="math" data-say="19">19</span>. On this sample rounding down returns <span class="math" data-say="180 milliseconds">180 ms</span> instead of <span class="math" data-say="420 milliseconds">420 ms</span>, an error of a factor of two and a third. The ceiling is part of the definition and it is exactly what stops the percentile from being a value below which fewer than <span class="math" data-say="q">q</span> of the sample sits.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reporting the mean as what a typical user experiences</strong><span>On the preset, <span class="math" data-say="85 percent">85%</span> of requests were faster than the mean and none took the mean. The mean is the right number for total work and the wrong number for a typical experience, and the two get confused because both are described with the word &ldquo;average&rdquo;.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you reach for a sorted list rather than a formula.</strong><p>You should be able to compute a rank, select the value it names, compute the mean of the same sample, count how many observations fall below it, and state how many observations the reported percentile actually rests on.</p></div></div><div class="note"><strong>Note:</strong> A percentile of one call is now a computable object, which makes the rest of this course possible. &ldquo;Tail Amplification under Fan-out&rdquo; asks what happens when a request has to wait for many calls that each sit inside their own p99, and the answer &mdash; that at sixty-nine of them the p99 has become the median &mdash; is the result this course exists to establish.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A percentile is selected by rank</summary><p>Sort the sample. Compute <span class="math" data-say="r equals the ceiling of q times n">r = ⌈q · n⌉</span>. Take the <span class="math" data-say="r">r</span>-th value. For <span class="math" data-say="q equals 0.99">q = 0.99</span> and <span class="math" data-say="n equals 20">n = 20</span> that is <span class="math" data-say="the ceiling of 19.8, equals 20">⌈19.8⌉ = 20</span>, so the p99 is the twentieth of twenty values. No arithmetic is done on the numbers themselves &mdash; they are only compared &mdash; which is why the answer is always a measurement rather than a construction.</p></details><details class="recall"><summary>The mean answers a different question</summary><p>The mean of this sample is <span class="math" data-say="53.2 milliseconds">53.2 ms</span>, and <span class="math" data-say="17">17</span> of the <span class="math" data-say="20">20</span> requests were faster than that. It is not a typical experience and it is not meant to be: the mean times the count is the total time spent, which is the right number for capacity and cost and the wrong number for describing what a user saw.</p></details><details class="recall"><summary>A small sample cannot support a high percentile</summary><p>With <span class="math" data-say="n equals 20">n = 20</span> the rank for <span class="math" data-say="q equals 0.99">q = 0.99</span> is <span class="math" data-say="20">20</span>, so the p99 of this sample <em>is</em> its maximum &mdash; one measurement, carrying the whole claim. A percentile is only as trustworthy as the number of observations beyond it, and <span class="math" data-say="1 over n">1/n</span> is the finest resolution a sample of size <span class="math" data-say="n">n</span> has.</p></details></div>
+      <h3>Summary</h3>
       <p>A percentile is a position in a sorted list, not an average: the p99 is the <span class="math" data-say="the ceiling of 0.99 n">⌈0.99n⌉</span>-th value, which means it is a time some request actually took. The mean is a different kind of number about a different question, and on a latency sample it is usually a value no request came close to. Computing both on the same twenty measurements is what makes the difference stop being a slogan.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A percentile is selected by rank.</strong> Sort the sample. Compute <span class="math" data-say="r equals the ceiling of q times n">r = ⌈q · n⌉</span>. Take the <span class="math" data-say="r">r</span>-th value. For <span class="math" data-say="q equals 0.99">q = 0.99</span> and <span class="math" data-say="n equals 20">n = 20</span> that is <span class="math" data-say="the ceiling of 19.8, equals 20">⌈19.8⌉ = 20</span>, so the p99 is the twentieth of twenty values. No arithmetic is done on the numbers themselves &mdash; they are only compared &mdash; which is why the answer is always a measurement rather than a construction.</li><li><strong>The mean answers a different question.</strong> The mean of this sample is <span class="math" data-say="53.2 milliseconds">53.2 ms</span>, and <span class="math" data-say="17">17</span> of the <span class="math" data-say="20">20</span> requests were faster than that. It is not a typical experience and it is not meant to be: the mean times the count is the total time spent, which is the right number for capacity and cost and the wrong number for describing what a user saw.</li><li><strong>A small sample cannot support a high percentile.</strong> With <span class="math" data-say="n equals 20">n = 20</span> the rank for <span class="math" data-say="q equals 0.99">q = 0.99</span> is <span class="math" data-say="20">20</span>, so the p99 of this sample <em>is</em> its maximum &mdash; one measurement, carrying the whole claim. A percentile is only as trustworthy as the number of observations beyond it, and <span class="math" data-say="1 over n">1/n</span> is the finest resolution a sample of size <span class="math" data-say="n">n</span> has.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the rank of, r equals the ceiling of q times n, q the percentile, n the sample size. p sub q, the r-th smallest value, a value some request actually took. n equals 20, p 50 equals 19 milliseconds, p 95 equals 180 milliseconds, p 99 equals 420 milliseconds. mean, 266 over 5 equals 53.2 milliseconds, and 17 of the 20 are faster than it. no request in the sample took 53 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">rank    r = ⌈q · n⌉             q the percentile, n the sample size
 p_q     the r-th smallest value  a value some request actually took
 n = 20  p50 = 19 ms   p95 = 180 ms   p99 = 420 ms
@@ -2500,11 +2545,42 @@ no request in the sample took 53 ms</div><figcaption>A percentile is a rank; a m
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2572,7 +2648,7 @@ no request in the sample took 53 ms</div><figcaption>A percentile is a rank; a m
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

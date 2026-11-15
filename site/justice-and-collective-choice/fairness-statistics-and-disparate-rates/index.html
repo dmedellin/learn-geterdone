@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,37 +1424,35 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Justice and Collective Choice</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Distributive justice</p>
       <h1>Fairness, Statistics and Disparate Rates</h1>
       <p class="lesson-lede">Equal treatment within every department can coexist with unequal overall rates, and the two ideas of fairness then give different answers.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A rate is a fraction of applicants</li><li>The pooled rate depends on the mix</li><li>Two notions of fairness</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two departments, one gap</h2>
-      <article class="prose reading"><p>A university has an open department and a selective one. In the open department three applicants in five are admitted, and in the selective department one in five. Men and women are admitted at exactly those rates in both. The only difference between the groups is where they applied: of every hundred men, eighty applied to the open department and twenty to the selective; of every hundred women, twenty applied to the open department and eighty to the selective.</p><div class="mathblock" data-say="men, women. open, 48 of 80, 12 of 20. selective, 4 of 20, 16 of 80. pooled, 52 of 100, 28 of 100" tabindex="0" role="region" aria-label="Mathematical notation">                     men            women
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two departments, one gap</h2><div class="prose reading"><p>A university has an open department and a selective one. In the open department three applicants in five are admitted, and in the selective department one in five. Men and women are admitted at exactly those rates in both. The only difference between the groups is where they applied: of every hundred men, eighty applied to the open department and twenty to the selective; of every hundred women, twenty applied to the open department and eighty to the selective.</p><div class="mathblock" data-say="men, women. open, 48 of 80, 12 of 20. selective, 4 of 20, 16 of 80. pooled, 52 of 100, 28 of 100" tabindex="0" role="region" aria-label="Mathematical notation">                     men            women
      open        48 of 80        12 of 20
      selective    4 of 20        16 of 80
-     pooled      52 of 100       28 of 100</div><p>Within the open department both groups are admitted at <span class="math" data-say="3 over 5">3/5</span>, and within the selective department both at <span class="math" data-say="1 over 5">1/5</span>. Pooled, the men's rate is <span class="math" data-say="52 over 100">52/100</span>, which is <span class="math" data-say="13 over 25">13/25</span>, and the women's is <span class="math" data-say="28 over 100">28/100</span>, which is <span class="math" data-say="7 over 25">7/25</span>. A glance at the pooled rates suggests the men are admitted at nearly twice the rate. A glance at the departments shows no group treated differently anywhere.</p><p>The pattern is the one Bickel, Hammel and O'Connell found in the graduate admissions at Berkeley in 1973, where the pooled rates suggested a bias against women that the departments, taken one at a time, did not show. The counts here are made small enough to follow by hand.</p><p>Both statements are true of the same counts. What differs is the question each answers. The within-department comparison asks whether, for the choice the applicant has already made, the outcome depends on their group. The pooled comparison asks whether the two groups end up in the same overall position.</p><div class="defbox"><span class="label">Definition &middot; Standardised rate</span><p>A <strong>standardised rate</strong> weights each department's rate by the same shares for both groups, here each department's share of all applicants, so that the mix of applications cannot move the comparison.</p></div><p>Half of all applicants, <span class="math" data-say="100">100</span> of <span class="math" data-say="200">200</span>, applied to each department. The standardised rate for either group is <span class="math" data-say="the quantity 1 over 2, times the quantity 3 over 5, plus the quantity 1 over 2, times the quantity 1 over 5">(1/2)·(3/5) + (1/2)·(1/5)</span>, which is <span class="math" data-say="2 over 5">2/5</span>. The two groups are equal at <span class="math" data-say="2 over 5">2/5</span>, and the gap in the pooled rates has vanished, which shows that the gap came from the mix.</p><h3>Where the two notions come apart</h3><p>Equal treatment holds in this table and equal outcomes fails. Each is a respectable notion of fairness, and a policy that secures one need not secure the other. A rule that equalised the pooled rates would have to admit applicants to the selective department at different rates for men and women, which breaks equal treatment in the department.</p><p>What the lab cannot decide is whether the mix is itself the unfairness. If women apply to the selective department because the open one is closed to them in practice, or because of what they were taught was possible, the equal rates within departments conceal a disadvantage upstream. If they apply there from preference, they do not. The same counts fit both stories, and which is true is not in the table.</p><div class="example"><span class="label">Example &middot; A reversal</span><p>Make women's rates higher in each department, <span class="math" data-say="3 over 4">3/4</span> against <span class="math" data-say="7 over 10">7/10</span> in the open one and <span class="math" data-say="1 over 8">1/8</span> against <span class="math" data-say="1 over 10">1/10</span> in the selective one, with the same application mix. The pooled rates are then <span class="math" data-say="58 over 100">58/100</span> for men and <span class="math" data-say="25 over 100">25/100</span> for women: the women do better in each department and worse overall. The lab marks this as a reversal, and the standardised rates put the women ahead.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Rates within groups and pooled</h2></div><p>the same counts, compared group by group and all together</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+     pooled      52 of 100       28 of 100</div><p>Within the open department both groups are admitted at <span class="math" data-say="3 over 5">3/5</span>, and within the selective department both at <span class="math" data-say="1 over 5">1/5</span>. Pooled, the men's rate is <span class="math" data-say="52 over 100">52/100</span>, which is <span class="math" data-say="13 over 25">13/25</span>, and the women's is <span class="math" data-say="28 over 100">28/100</span>, which is <span class="math" data-say="7 over 25">7/25</span>. A glance at the pooled rates suggests the men are admitted at nearly twice the rate. A glance at the departments shows no group treated differently anywhere.</p><p>The pattern is the one Bickel, Hammel and O'Connell found in the graduate admissions at Berkeley in 1973, where the pooled rates suggested a bias against women that the departments, taken one at a time, did not show. The counts here are made small enough to follow by hand.</p><p>Both statements are true of the same counts. What differs is the question each answers. The within-department comparison asks whether, for the choice the applicant has already made, the outcome depends on their group. The pooled comparison asks whether the two groups end up in the same overall position.</p><div class="defbox"><span class="label">Definition &middot; Standardised rate</span><p>A <strong>standardised rate</strong> weights each department's rate by the same shares for both groups, here each department's share of all applicants, so that the mix of applications cannot move the comparison.</p></div><p>Half of all applicants, <span class="math" data-say="100">100</span> of <span class="math" data-say="200">200</span>, applied to each department. The standardised rate for either group is <span class="math" data-say="the quantity 1 over 2, times the quantity 3 over 5, plus the quantity 1 over 2, times the quantity 1 over 5">(1/2)·(3/5) + (1/2)·(1/5)</span>, which is <span class="math" data-say="2 over 5">2/5</span>. The two groups are equal at <span class="math" data-say="2 over 5">2/5</span>, and the gap in the pooled rates has vanished, which shows that the gap came from the mix.</p><h3>Where the two notions come apart</h3><p>Equal treatment holds in this table and equal outcomes fails. Each is a respectable notion of fairness, and a policy that secures one need not secure the other. A rule that equalised the pooled rates would have to admit applicants to the selective department at different rates for men and women, which breaks equal treatment in the department.</p><p>What the lab cannot decide is whether the mix is itself the unfairness. If women apply to the selective department because the open one is closed to them in practice, or because of what they were taught was possible, the equal rates within departments conceal a disadvantage upstream. If they apply there from preference, they do not. The same counts fit both stories, and which is true is not in the table.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Rates within groups and pooled</h2></div><p>the same counts, compared group by group and all together</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Two treatments, two groups</strong><span>a rate is successes over trials, kept as a fraction</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="siTable"></table></div>
       <div class="status-banner" id="siStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Compare the groups within and across departments</h3>
-          <p>Each cell reads admitted/applied. The adjusted tile uses the standardised weights, each department's share of all applicants; switch the weighting to pooled to see the raw comparison.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Compare the groups within and across departments</h3>
+            <p>Each cell reads admitted/applied. The adjusted tile uses the standardised weights, each department's share of all applicants; switch the weighting to pooled to see the raw comparison.</p>
         <div class="field">
           <label for="siPreset">Worked example</label>
           <select id="siPreset"><option value="berkeley" selected>Equal rates in both departments, different application mixes</option><option value="reversal">Women higher in each department, men higher pooled</option><option value="equal-everywhere">Equal rates and equal application mixes</option></select>
@@ -1434,12 +1477,15 @@
           <div class="kpi"><span>Verdict</span><strong id="siVerdict">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="example"><span class="label">Example &middot; A reversal</span><p>Make women's rates higher in each department, <span class="math" data-say="3 over 4">3/4</span> against <span class="math" data-say="7 over 10">7/10</span> in the open one and <span class="math" data-say="1 over 8">1/8</span> against <span class="math" data-say="1 over 10">1/10</span> in the selective one, with the same application mix. The pooled rates are then <span class="math" data-say="58 over 100">58/100</span> for men and <span class="math" data-say="25 over 100">25/100</span> for women: the women do better in each department and worse overall. The lab marks this as a reversal, and the standardised rates put the women ahead.</p></div></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Comparing two groups fairly</h2></div><p>Five moves, and the third is the one that separates the two notions of fairness.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write each cell as admitted over applied</h3><p>Keep the fractions as they are. A rate rounded early hides the equalities this lesson depends on.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the rate for each group in each department</h3><p>Compare the two groups within a department only. This is the equal-treatment comparison.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the pooled rates and compare</h3><p>Add admitted over added applied for each group. This is the equal-outcomes comparison, and it may disagree with the last step.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Standardise</h3><p>Weight each department by its share of all applicants, the same for both groups, and compare again. If the gap vanishes, it came from the application mix.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Ask why the mix is what it is</h3><p>Whether the mix is itself unfair is a question about the world that lies outside the counts. State which answer your conclusion depends on.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Comparing two groups fairly</h2>
+      <p class="lead-in">Five moves, and the third is the one that separates the two notions of fairness.</p>
+      <ol class="key-ideas method"><li><strong>Write each cell as admitted over applied.</strong> Keep the fractions as they are. A rate rounded early hides the equalities this lesson depends on.</li><li><strong>Compute the rate for each group in each department.</strong> Compare the two groups within a department only. This is the equal-treatment comparison.</li><li><strong>Compute the pooled rates and compare.</strong> Add admitted over added applied for each group. This is the equal-outcomes comparison, and it may disagree with the last step.</li><li><strong>Standardise.</strong> Weight each department by its share of all applicants, the same for both groups, and compare again. If the gap vanishes, it came from the application mix.</li><li><strong>Ask why the mix is what it is.</strong> Whether the mix is itself unfair is a question about the world that lies outside the counts. State which answer your conclusion depends on.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1456,17 +1502,16 @@ pooled      men 52/100          women 28/100
 standardised (half and half): both (3/5 + 1/5) / 2 = 2/5</div><p>Within each department the groups are treated alike, and standardised to the same mix they are equal at <span class="math" data-say="2 over 5">2/5</span>. The pooled gap, <span class="math" data-say="13 over 25">13/25</span> against <span class="math" data-say="7 over 25">7/25</span>, is explained by who applied where.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a gap in the pooled rate as a gap in treatment</strong><span>In the lesson's table the pooled rates are 13/25 and 7/25, yet both groups are admitted at 3/5 in the open department and 1/5 in the selective one. The pooled gap comes from where each group applied. A pooled disparity is a reason to ask why, and it does not by itself show unequal treatment.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Concluding that equal rates within departments settle the matter</strong><span>They settle equal treatment inside the department, and nothing else. If the application mix reflects barriers to entering the open department, the equal rates sit on top of an unfairness the table cannot show. The lab will compute the rates for any counts, and a fair-looking table does not certify its own inputs.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting one fair policy to satisfy both notions</strong><span>To equalise the pooled rates here the selective department would have to admit the two groups at different rates, which breaks equal treatment there. When the mixes differ, the two notions give different instructions, and the choice between them is a choice of values.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute within-group and pooled rates and say which notion of fairness each tests.</strong><p>Given admitted and applied counts for two groups in two departments, compute the four rates and the two pooled rates, standardise them, report whether the pooled comparison reverses, and name the claim about the mix on which the fairness verdict depends.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Move ten of the women's applications in the first table from the selective department to the open one, keeping the rates, so that the women's cells read 18 of 30 and 14 of 70, and watch the pooled gap narrow, to <span class="math" data-say="32 over 100">32/100</span> against <span class="math" data-say="52 over 100">52/100</span>, while the rates within each department stay put. This is the arithmetic of “Correlation, Confounding and Simpson's Paradox” put to a question of justice.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a gap in the pooled rate as a gap in treatment</strong><span>In the lesson's table the pooled rates are 13/25 and 7/25, yet both groups are admitted at 3/5 in the open department and 1/5 in the selective one. The pooled gap comes from where each group applied. A pooled disparity is a reason to ask why, and it does not by itself show unequal treatment.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Concluding that equal rates within departments settle the matter</strong><span>They settle equal treatment inside the department, and nothing else. If the application mix reflects barriers to entering the open department, the equal rates sit on top of an unfairness the table cannot show. The lab will compute the rates for any counts, and a fair-looking table does not certify its own inputs.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting one fair policy to satisfy both notions</strong><span>To equalise the pooled rates here the selective department would have to admit the two groups at different rates, which breaks equal treatment there. When the mixes differ, the two notions give different instructions, and the choice between them is a choice of values.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute within-group and pooled rates and say which notion of fairness each tests.</strong><p>Given admitted and applied counts for two groups in two departments, compute the four rates and the two pooled rates, standardise them, report whether the pooled comparison reverses, and name the claim about the mix on which the fairness verdict depends.</p></div></div><div class="note"><strong>Note:</strong> Move ten of the women's applications in the first table from the selective department to the open one, keeping the rates, so that the women's cells read 18 of 30 and 14 of 70, and watch the pooled gap narrow, to <span class="math" data-say="32 over 100">32/100</span> against <span class="math" data-say="52 over 100">52/100</span>, while the rates within each department stay put. This is the arithmetic of “Correlation, Confounding and Simpson's Paradox” put to a question of justice.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A rate is a fraction of applicants</summary><p>An acceptance rate is the number admitted over the number who applied. Compared within a department, it asks whether like applicants were treated alike. Compared across departments pooled together, it asks something else.</p></details><details class="recall"><summary>The pooled rate depends on the mix</summary><p>The pooled rate for a group is an average of its department rates weighted by where its members applied. Two groups with the same rate in every department can have different pooled rates if they applied in different proportions.</p></details><details class="recall"><summary>Two notions of fairness</summary><p>Equal treatment says applicants with the same qualification in the same department should have the same chance. Equal outcomes says the overall rates for the groups should match. The two can disagree about the same data.</p></details></div>
+      <h3>Summary</h3>
       <p>A pooled acceptance rate can differ between two groups although each department accepts both at the same rate, because the groups apply to different departments. Standardising the rates removes the effect of the mix. The wrong model is that a gap in the pooled rate is a gap in treatment.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A rate is a fraction of applicants.</strong> An acceptance rate is the number admitted over the number who applied. Compared within a department, it asks whether like applicants were treated alike. Compared across departments pooled together, it asks something else.</li><li><strong>The pooled rate depends on the mix.</strong> The pooled rate for a group is an average of its department rates weighted by where its members applied. Two groups with the same rate in every department can have different pooled rates if they applied in different proportions.</li><li><strong>Two notions of fairness.</strong> Equal treatment says applicants with the same qualification in the same department should have the same chance. Equal outcomes says the overall rates for the groups should match. The two can disagree about the same data.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="within each department, same rate for both. pooled rate, weighted by who applied where. a gap in the pooled rate can come from the mix. equal treatment is not equal outcome" tabindex="0" role="region" aria-label="Mathematical notation">within each department: same rate for both
 pooled rate: weighted by who applied where
 a gap in the pooled rate can come from the mix
@@ -2129,11 +2174,42 @@ equal treatment is not equal outcome</div><figcaption>Two comparisons, two answe
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2201,7 +2277,7 @@ equal treatment is not equal outcome</div><figcaption>Two comparisons, two answe
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Latency and the Tail</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The tail</p>
       <h1>Hedged Requests</h1>
       <p class="lesson-lede">Compute the hedged p99 and the extra load for a chosen hedge delay, and say when the independence it rests on is absent.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A hedge turns one call into the faster of two</li><li>The tail past the delay is multiplied, not added</li><li>The cost is exactly the tail you hedge past</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>A second copy, sent late</h2>
-      <article class="prose reading"><p>The lab&rsquo;s preset is a hundred measured calls, given as run lengths: forty at <span class="math" data-say="10 milliseconds">10 ms</span>, twenty-five at <span class="math" data-say="12 milliseconds">12 ms</span>, fifteen at <span class="math" data-say="15 milliseconds">15 ms</span>, ten at <span class="math" data-say="20 milliseconds">20 ms</span>, five at <span class="math" data-say="30 milliseconds">30 ms</span>, three at <span class="math" data-say="50 milliseconds">50 ms</span>, one at <span class="math" data-say="120 milliseconds">120 ms</span> and one at <span class="math" data-say="300 milliseconds">300 ms</span>. Its median is <span class="math" data-say="12 milliseconds">12 ms</span>, its p95 is <span class="math" data-say="30 milliseconds">30 ms</span> and its p99 is <span class="math" data-say="120 milliseconds">120 ms</span> &mdash; a tail ten times the median, which is an ordinary shape for a service that is not in trouble.</p><div class="defbox"><span class="label">Definition &middot; Hedged request</span><p>A <strong>hedged request</strong> with delay <span class="math" data-say="d">d</span> issues a second, independent copy of the call if the first has not answered within <span class="math" data-say="d">d</span>, and completes when either copy answers. Its completion time is <span class="math" data-say="the min of X and d plus Y">min(X, d + Y)</span>, where <span class="math" data-say="X">X</span> and <span class="math" data-say="Y">Y</span> are independent draws from the service&rsquo;s latency distribution. The <strong>extra load</strong> it creates is <span class="math" data-say="P of X is greater than d">P(X > d)</span>: the fraction of requests that live long enough to trigger the copy.</p></div><p>The tail of the hedged request factorises. It exceeds <span class="math" data-say="t">t</span> only if the first copy is still running at <span class="math" data-say="t">t</span> and the second copy, which started at <span class="math" data-say="d">d</span>, is still running at <span class="math" data-say="t">t</span>. Those are independent, so their probabilities multiply:</p><div class="mathblock" data-say="P of hedged is greater than t, equals, P of X is greater than t times P of X is greater than t minus d. d equals 30 milliseconds, the p 95 of the service. extra load, equals, P of X is greater than 30, equals, 5 over 100, equals, 1 over 20, equals, 5.0 percent. just past d, equals, P of X is greater than 30 times P of X is greater than 0, is approximately, 1 over 20, one copy only. at t equals 42, equals, P of X is greater than 42 times P of X is greater than 12, equals, the quantity 1 over 20, times the quantity 7 over 20, equals, 7 over 400. at t equals 45, equals, P of X is greater than 45 times P of X is greater than 15, equals, 1 over 100. hedged p 99, equals, 45 milliseconds, unhedged p 99, equals, 120 milliseconds. hedged p 50, equals, 12 milliseconds, unhedged p 50, equals, 12 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">P(hedged &gt; t)  =  P(X &gt; t) · P(X &gt; t − d)
-
-d = 30 ms,  the p95 of the service
-
-extra load    =  P(X &gt; 30)              =  5/100   =  1/20   =  5.0%
-just past d   =  P(X &gt; 30)·P(X &gt; 0)     ≈  1/20     (one copy only)
-at t = 42     =  P(X &gt; 42)·P(X &gt; 12)    =  (1/20)(7/20)  =  7/400
-at t = 45     =  P(X &gt; 45)·P(X &gt; 15)    =  1/100
-
-hedged p99    =  45 ms          unhedged p99  =  120 ms
-hedged p50    =  12 ms          unhedged p50  =   12 ms</div><p>Two things happened and only one of them was asked for. The p99 fell from <span class="math" data-say="120 milliseconds">120 ms</span> to <span class="math" data-say="45 milliseconds">45 ms</span>, a reduction of <span class="math" data-say="62 percent">62%</span>, for five percent more traffic. The median did not move at all &mdash; it is still <span class="math" data-say="12 milliseconds">12 ms</span> &mdash; because ninety-five percent of requests never reach the delay and never trigger anything. A hedge is a tail instrument. It does not make a service faster; it makes a service less occasionally awful.</p><h3>Choosing the delay</h3><ul><li><span class="math" data-say="d equals 12 milliseconds">d = 12 ms</span>, the median &mdash; load <span class="math" data-say="plus 35.0 percent">+35.0%</span>, hedged p99 <span class="math" data-say="30 milliseconds">30 ms</span></li><li><span class="math" data-say="d equals 20 milliseconds">d = 20 ms</span> &mdash; load <span class="math" data-say="plus 10.0 percent">+10.0%</span>, hedged p99 <span class="math" data-say="35 milliseconds">35 ms</span></li><li><span class="math" data-say="d equals 30 milliseconds">d = 30 ms</span>, the p95 &mdash; load <span class="math" data-say="plus 5.0 percent">+5.0%</span>, hedged p99 <span class="math" data-say="45 milliseconds">45 ms</span></li><li><span class="math" data-say="d equals 50 milliseconds">d = 50 ms</span> &mdash; load <span class="math" data-say="plus 2.0 percent">+2.0%</span>, hedged p99 <span class="math" data-say="62 milliseconds">62 ms</span></li><li><span class="math" data-say="d equals 120 milliseconds">d = 120 ms</span>, the p99 &mdash; load <span class="math" data-say="plus 1.0 percent">+1.0%</span>, hedged p99 <span class="math" data-say="120 milliseconds">120 ms</span></li></ul><p>The list is the whole design decision. Hedging at the median buys <span class="math" data-say="15 milliseconds">15 ms</span> more of tail reduction than hedging at the p95 and costs seven times the extra traffic to get it. Hedging at the p99 costs almost nothing and achieves almost nothing, because by <span class="math" data-say="120 milliseconds">120 ms</span> the only requests left running are the ones whose second copy will not finish in time either. Somewhere around the p95 is where the curve bends, which is why that is the usual recommendation.</p><div class="example"><span class="label">Example &middot; Why the extra load is not a rounding error</span><p>A service handling <span class="math" data-say="40000">40 000</span> requests a second at a <span class="math" data-say="5 percent">5%</span> hedge rate sends an extra <span class="math" data-say="2000">2000</span> calls a second. That is real capacity, it must be provisioned, and it arrives precisely when the service is already having difficulty &mdash; the requests that trigger hedges are the slow ones, and slowness is correlated in time. A hedge that is not capacity-planned adds load to a system at the exact moment load is what is wrong with it.</p></div><p>That last observation is also the limit of the technique, and it is worth stating as sharply as possible. Every number on this page assumes the second copy is independent of the first. If the call is slow because the <em>request</em> is expensive &mdash; a large query, a cold cache entry, a user with a great deal of data &mdash; then the second copy is expensive in exactly the same way and <span class="math" data-say="P of both slow">P(both slow)</span> is not <span class="math" data-say="p squared">p²</span> but something close to <span class="math" data-say="p">p</span>. The hedge then costs its extra load and buys nothing.</p><p>Independence is plausible when the slowness belongs to the server: a garbage-collection pause, a scheduling delay, a disk that is briefly busy. It is implausible when the slowness belongs to the request, and it is worse than implausible when the second copy is routed to the same replica, which makes the two copies the same draw. Hedging to a different replica is not a refinement of the technique; it is a condition for the arithmetic being about anything.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A backup request, and what it costs</h2></div><p>The tail squared past the hedge delay, bought with the tail in extra load</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>A second copy, sent late</h2><div class="prose reading"><p>The lab&rsquo;s preset is a hundred measured calls, given as run lengths: forty at <span class="math" data-say="10 milliseconds">10 ms</span>, twenty-five at <span class="math" data-say="12 milliseconds">12 ms</span>, fifteen at <span class="math" data-say="15 milliseconds">15 ms</span>, ten at <span class="math" data-say="20 milliseconds">20 ms</span>, five at <span class="math" data-say="30 milliseconds">30 ms</span>, three at <span class="math" data-say="50 milliseconds">50 ms</span>, one at <span class="math" data-say="120 milliseconds">120 ms</span> and one at <span class="math" data-say="300 milliseconds">300 ms</span>. Its median is <span class="math" data-say="12 milliseconds">12 ms</span>, its p95 is <span class="math" data-say="30 milliseconds">30 ms</span> and its p99 is <span class="math" data-say="120 milliseconds">120 ms</span> &mdash; a tail ten times the median, which is an ordinary shape for a service that is not in trouble.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A backup request, and what it costs</h2></div><p>The tail squared past the hedge delay, bought with the tail in extra load</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Hedged requests</strong><span>send a backup after d; the request finishes at min(X, d + Y)</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>one copy</span><span class="tone-green"><i class="legend-swatch"></i>hedged</span><span class="tone-amber"><i class="legend-swatch"></i>the hedge delay</span></div>
@@ -1414,10 +1447,10 @@ hedged p50    =  12 ms          unhedged p50  =   12 ms</div><p>Two things happe
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="hgPlot" viewBox="0 0 520 180" role="img" aria-label="The survival curve of one copy against the hedged survival curve."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="hgTable"></table></div>
       <div class="status-banner" id="hgStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the hedge delay</h3>
-          <p>The hedged tail is computed on the grid of times where it can change &mdash; the sample&rsquo;s own values, and those values shifted by the delay. Move the delay from the p99 down toward the median and watch the extra load rise faster than the tail falls.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the hedge delay</h3>
+            <p>The hedged tail is computed on the grid of times where it can change &mdash; the sample&rsquo;s own values, and those values shifted by the delay. Move the delay from the p99 down toward the median and watch the extra load rise faster than the tail falls.</p>
         <div class="field">
           <label for="hgSpec">The service's latency, as ms:count pairs</label>
           <input id="hgSpec" type="text" value="10:40, 12:25, 15:15, 20:10, 30:5, 50:3, 120:1, 300:1" inputmode="text" autocomplete="off">
@@ -1433,12 +1466,25 @@ hedged p50    =  12 ms          unhedged p50  =   12 ms</div><p>Two things happe
           <div class="kpi"><span>Extra load</span><strong id="hgLoad">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="hgHint" style="margin:0;">The backup only goes out if the first copy is still running at d, so the extra load is exactly the tail past d. Hedging at the median doubles the traffic; hedging at the p95 adds a twentieth of it.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Hedged request</span><p>A <strong>hedged request</strong> with delay <span class="math" data-say="d">d</span> issues a second, independent copy of the call if the first has not answered within <span class="math" data-say="d">d</span>, and completes when either copy answers. Its completion time is <span class="math" data-say="the min of X and d plus Y">min(X, d + Y)</span>, where <span class="math" data-say="X">X</span> and <span class="math" data-say="Y">Y</span> are independent draws from the service&rsquo;s latency distribution. The <strong>extra load</strong> it creates is <span class="math" data-say="P of X is greater than d">P(X > d)</span>: the fraction of requests that live long enough to trigger the copy.</p></div><p>The tail of the hedged request factorises. It exceeds <span class="math" data-say="t">t</span> only if the first copy is still running at <span class="math" data-say="t">t</span> and the second copy, which started at <span class="math" data-say="d">d</span>, is still running at <span class="math" data-say="t">t</span>. Those are independent, so their probabilities multiply:</p><div class="mathblock" data-say="P of hedged is greater than t, equals, P of X is greater than t times P of X is greater than t minus d. d equals 30 milliseconds, the p 95 of the service. extra load, equals, P of X is greater than 30, equals, 5 over 100, equals, 1 over 20, equals, 5.0 percent. just past d, equals, P of X is greater than 30 times P of X is greater than 0, is approximately, 1 over 20, one copy only. at t equals 42, equals, P of X is greater than 42 times P of X is greater than 12, equals, the quantity 1 over 20, times the quantity 7 over 20, equals, 7 over 400. at t equals 45, equals, P of X is greater than 45 times P of X is greater than 15, equals, 1 over 100. hedged p 99, equals, 45 milliseconds, unhedged p 99, equals, 120 milliseconds. hedged p 50, equals, 12 milliseconds, unhedged p 50, equals, 12 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">P(hedged &gt; t)  =  P(X &gt; t) · P(X &gt; t − d)
+
+d = 30 ms,  the p95 of the service
+
+extra load    =  P(X &gt; 30)              =  5/100   =  1/20   =  5.0%
+just past d   =  P(X &gt; 30)·P(X &gt; 0)     ≈  1/20     (one copy only)
+at t = 42     =  P(X &gt; 42)·P(X &gt; 12)    =  (1/20)(7/20)  =  7/400
+at t = 45     =  P(X &gt; 45)·P(X &gt; 15)    =  1/100
+
+hedged p99    =  45 ms          unhedged p99  =  120 ms
+hedged p50    =  12 ms          unhedged p50  =   12 ms</div><p>Two things happened and only one of them was asked for. The p99 fell from <span class="math" data-say="120 milliseconds">120 ms</span> to <span class="math" data-say="45 milliseconds">45 ms</span>, a reduction of <span class="math" data-say="62 percent">62%</span>, for five percent more traffic. The median did not move at all &mdash; it is still <span class="math" data-say="12 milliseconds">12 ms</span> &mdash; because ninety-five percent of requests never reach the delay and never trigger anything. A hedge is a tail instrument. It does not make a service faster; it makes a service less occasionally awful.</p><h3>Choosing the delay</h3><ul><li><span class="math" data-say="d equals 12 milliseconds">d = 12 ms</span>, the median &mdash; load <span class="math" data-say="plus 35.0 percent">+35.0%</span>, hedged p99 <span class="math" data-say="30 milliseconds">30 ms</span></li><li><span class="math" data-say="d equals 20 milliseconds">d = 20 ms</span> &mdash; load <span class="math" data-say="plus 10.0 percent">+10.0%</span>, hedged p99 <span class="math" data-say="35 milliseconds">35 ms</span></li><li><span class="math" data-say="d equals 30 milliseconds">d = 30 ms</span>, the p95 &mdash; load <span class="math" data-say="plus 5.0 percent">+5.0%</span>, hedged p99 <span class="math" data-say="45 milliseconds">45 ms</span></li><li><span class="math" data-say="d equals 50 milliseconds">d = 50 ms</span> &mdash; load <span class="math" data-say="plus 2.0 percent">+2.0%</span>, hedged p99 <span class="math" data-say="62 milliseconds">62 ms</span></li><li><span class="math" data-say="d equals 120 milliseconds">d = 120 ms</span>, the p99 &mdash; load <span class="math" data-say="plus 1.0 percent">+1.0%</span>, hedged p99 <span class="math" data-say="120 milliseconds">120 ms</span></li></ul><p>The list is the whole design decision. Hedging at the median buys <span class="math" data-say="15 milliseconds">15 ms</span> more of tail reduction than hedging at the p95 and costs seven times the extra traffic to get it. Hedging at the p99 costs almost nothing and achieves almost nothing, because by <span class="math" data-say="120 milliseconds">120 ms</span> the only requests left running are the ones whose second copy will not finish in time either. Somewhere around the p95 is where the curve bends, which is why that is the usual recommendation.</p><div class="example"><span class="label">Example &middot; Why the extra load is not a rounding error</span><p>A service handling <span class="math" data-say="40000">40 000</span> requests a second at a <span class="math" data-say="5 percent">5%</span> hedge rate sends an extra <span class="math" data-say="2000">2000</span> calls a second. That is real capacity, it must be provisioned, and it arrives precisely when the service is already having difficulty &mdash; the requests that trigger hedges are the slow ones, and slowness is correlated in time. A hedge that is not capacity-planned adds load to a system at the exact moment load is what is wrong with it.</p></div><p>That last observation is also the limit of the technique, and it is worth stating as sharply as possible. Every number on this page assumes the second copy is independent of the first. If the call is slow because the <em>request</em> is expensive &mdash; a large query, a cold cache entry, a user with a great deal of data &mdash; then the second copy is expensive in exactly the same way and <span class="math" data-say="P of both slow">P(both slow)</span> is not <span class="math" data-say="p squared">p²</span> but something close to <span class="math" data-say="p">p</span>. The hedge then costs its extra load and buys nothing.</p><p>Independence is plausible when the slowness belongs to the server: a garbage-collection pause, a scheduling delay, a disk that is briefly busy. It is implausible when the slowness belongs to the request, and it is worse than implausible when the second copy is routed to the same replica, which makes the two copies the same draw. Hedging to a different replica is not a refinement of the technique; it is a condition for the arithmetic being about anything.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sizing a hedge</h2></div><p>The delay is the only parameter, and it sets both numbers at once.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check that the slowness belongs to the server, not the request</h3><p>If an expensive request is slow on every replica, a second copy is a second expensive request. Hedging is for variance that the request does not carry with it, and this question is prior to all the arithmetic.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read the percentiles of the service you are hedging</h3><p>You need the distribution, not a mean: the median, the p95 and the p99 of measured calls. The delay will be chosen against these and the extra load read off the same list.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Pick the delay and read both consequences</h3><p>The extra load is <span class="math" data-say="P of X is greater than d">P(X > d)</span>, straight off the distribution. The hedged percentile comes from <span class="math" data-say="P of X is greater than t times P of X is greater than t minus d">P(X > t)·P(X > t − d)</span>. Quote them together: a hedge is a trade and a number that reports only the improvement is half an answer.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Provision the extra capacity, and make the copy go elsewhere</h3><p>The hedge rate is extra steady-state load and it clusters in time with the trouble that caused it. Route the second copy to a different replica, or the two draws are the same draw and <span class="math" data-say="p squared">p²</span> is a fiction.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sizing a hedge</h2>
+      <p class="lead-in">The delay is the only parameter, and it sets both numbers at once.</p>
+      <ol class="key-ideas method"><li><strong>Check that the slowness belongs to the server, not the request.</strong> If an expensive request is slow on every replica, a second copy is a second expensive request. Hedging is for variance that the request does not carry with it, and this question is prior to all the arithmetic.</li><li><strong>Read the percentiles of the service you are hedging.</strong> You need the distribution, not a mean: the median, the p95 and the p99 of measured calls. The delay will be chosen against these and the extra load read off the same list.</li><li><strong>Pick the delay and read both consequences.</strong> The extra load is <span class="math" data-say="P of X is greater than d">P(X > d)</span>, straight off the distribution. The hedged percentile comes from <span class="math" data-say="P of X is greater than t times P of X is greater than t minus d">P(X > t)·P(X > t − d)</span>. Quote them together: a hedge is a trade and a number that reports only the improvement is half an answer.</li><li><strong>Provision the extra capacity, and make the copy go elsewhere.</strong> The hedge rate is extra steady-state load and it clusters in time with the trouble that caused it. Route the second copy to a different replica, or the two draws are the same draw and <span class="math" data-say="p squared">p²</span> is a fiction.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1467,17 +1513,16 @@ benefit    P(hedged &gt; t) = P(X &gt; t) · P(X &gt; t − 30)
 compare    d = 12 ms (the median):  load 35.0%,  hedged p99 30 ms</div><p>The final line is the comparison worth keeping. Moving the delay from the p95 to the median improves the hedged p99 from <span class="math" data-say="45 milliseconds">45 ms</span> to <span class="math" data-say="30 milliseconds">30 ms</span> &mdash; a further <span class="math" data-say="15 milliseconds">15 ms</span> &mdash; and takes the extra load from <span class="math" data-say="5 percent">5%</span> to <span class="math" data-say="35 percent">35%</span>. Seven times the traffic to remove a further fifteen milliseconds is the sort of trade that looks reasonable when only one of its two numbers is on the slide.</p><p>Notice also how the hedged p99 is found. It is not a formula: the function <span class="math" data-say="P of X is greater than t times P of X is greater than t minus d">P(X > t)·P(X > t − d)</span> can only change at the sample&rsquo;s own values and at those values shifted by <span class="math" data-say="d">d</span>, so the answer is a search over that grid for the first time the product falls to <span class="math" data-say="1 over 100">1/100</span>. Here it lands exactly on <span class="math" data-say="1 over 100">1/100</span> at <span class="math" data-say="45 milliseconds">45 ms</span>, which is <span class="math" data-say="30 milliseconds">30 ms</span> of delay plus the <span class="math" data-say="15 milliseconds">15 ms</span> atom.</p><p>For a faded rehearsal, keep the same service and set the delay to <span class="math" data-say="20 milliseconds">20 ms</span>. The supplied first move is the cost: <span class="math" data-say="P of X is greater than 20 equals the quantity 5 plus 3 plus 1 plus 1, over 100 equals 10.0 percent">P(X > 20) = (5 + 3 + 1 + 1)/100 = 10.0%</span>. Work out the hedged p99 by walking the grid upward from <span class="math" data-say="20 milliseconds">20 ms</span>, then say whether doubling the extra load from the p95 choice was worth the improvement it bought. Check both figures in the lab before opening the quiz.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Hedging near the median</strong><span>The extra load is the tail past the delay, so moving the delay toward the middle of the distribution moves the cost toward a second copy of every request. On the lab&rsquo;s service the p95 costs <span class="math" data-say="5 percent">5%</span> and the median costs <span class="math" data-say="35 percent">35%</span>, for <span class="math" data-say="15 milliseconds">15 ms</span> of further improvement. Read both numbers before choosing, not just the one that improved.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming independence when the request carries the slowness</strong><span><span class="math" data-say="P of both slow equals p squared">P(both slow) = p²</span> is a consequence of two independent draws. An expensive query, a cold entry or a large user makes both copies slow together, and a second copy sent to the same replica makes them the same draw. In either case the hedge pays its load and buys nothing.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the extra load as free because it is small</strong><span>Five percent of a large service is a large number of calls, and it arrives correlated with exactly the conditions that produced the slow requests. A hedge deployed without provisioning for its steady-state load is a mechanism for adding traffic to a system at its worst moment.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you quote a hedge as two numbers, never one.</strong><p>You should be able to read a service&rsquo;s percentiles from a sample, choose a hedge delay, compute the extra load and the hedged percentile it produces, and state the condition under which the second of those figures is meaningless.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both &ldquo;Tail Amplification under Fan-out&rdquo; and this lesson compose independent copies of a distribution. So does &ldquo;Percentiles Do Not Add&rdquo;, which asks what happens to the tail when two stages run one after the other instead of beside each other &mdash; and finds that the obvious arithmetic, adding the two stage p99s, is not the percentile of anything.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Hedging near the median</strong><span>The extra load is the tail past the delay, so moving the delay toward the middle of the distribution moves the cost toward a second copy of every request. On the lab&rsquo;s service the p95 costs <span class="math" data-say="5 percent">5%</span> and the median costs <span class="math" data-say="35 percent">35%</span>, for <span class="math" data-say="15 milliseconds">15 ms</span> of further improvement. Read both numbers before choosing, not just the one that improved.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming independence when the request carries the slowness</strong><span><span class="math" data-say="P of both slow equals p squared">P(both slow) = p²</span> is a consequence of two independent draws. An expensive query, a cold entry or a large user makes both copies slow together, and a second copy sent to the same replica makes them the same draw. In either case the hedge pays its load and buys nothing.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the extra load as free because it is small</strong><span>Five percent of a large service is a large number of calls, and it arrives correlated with exactly the conditions that produced the slow requests. A hedge deployed without provisioning for its steady-state load is a mechanism for adding traffic to a system at its worst moment.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you quote a hedge as two numbers, never one.</strong><p>You should be able to read a service&rsquo;s percentiles from a sample, choose a hedge delay, compute the extra load and the hedged percentile it produces, and state the condition under which the second of those figures is meaningless.</p></div></div><div class="note"><strong>Note:</strong> Both &ldquo;Tail Amplification under Fan-out&rdquo; and this lesson compose independent copies of a distribution. So does &ldquo;Percentiles Do Not Add&rdquo;, which asks what happens to the tail when two stages run one after the other instead of beside each other &mdash; and finds that the obvious arithmetic, adding the two stage p99s, is not the percentile of anything.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A hedge turns one call into the faster of two</summary><p>Issue the call. If no answer has arrived by <span class="math" data-say="d">d</span> milliseconds, issue a second copy and use whichever finishes first. The request finishes at <span class="math" data-say="the min of X and d plus Y">min(X, d + Y)</span> with <span class="math" data-say="Y">Y</span> an independent copy of the same service, so a request is slow only when both copies are slow at once.</p></details><details class="recall"><summary>The tail past the delay is multiplied, not added</summary><p><span class="math" data-say="P of hedged is greater than t equals P of X is greater than t times P of X is greater than t minus d">P(hedged > t) = P(X > t) · P(X > t − d)</span>. Just past <span class="math" data-say="d">d</span> that is roughly the tail squared: on the lab&rsquo;s service, a <span class="math" data-say="1 over 20">1/20</span> tail at <span class="math" data-say="30 milliseconds">30 ms</span> becomes <span class="math" data-say="1 over 400">1/400</span>. Squaring a small probability is a large change, and it is the same multiplication rule that made a fan-out of sixty-nine calls miss its p99 half the time.</p></details><details class="recall"><summary>The cost is exactly the tail you hedge past</summary><p>The second copy is sent only for requests still running at <span class="math" data-say="d">d</span>, so the extra load is <span class="math" data-say="P of X is greater than d">P(X > d)</span> and nothing else. Hedge at the p95 and that is <span class="math" data-say="5 percent">5%</span>. Hedge nearer the median and the figure climbs fast: at the lab&rsquo;s <span class="math" data-say="12 milliseconds">12 ms</span> median the backup goes out for <span class="math" data-say="35 percent">35%</span> of requests, seven times the traffic for a worse result.</p></details></div>
+      <h3>Summary</h3>
       <p>Send the request; if it has not answered by the p95 delay, send a second copy and take whichever returns first. Under independence the request is slow only if both copies are, so the tail past the delay is squared &mdash; and the second copy goes out only for the five percent of requests that were still running, so it costs about five percent more load. On the lab&rsquo;s service that takes a <span class="math" data-say="120 milliseconds">120 ms</span> p99 to <span class="math" data-say="45 milliseconds">45 ms</span>.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A hedge turns one call into the faster of two.</strong> Issue the call. If no answer has arrived by <span class="math" data-say="d">d</span> milliseconds, issue a second copy and use whichever finishes first. The request finishes at <span class="math" data-say="the min of X and d plus Y">min(X, d + Y)</span> with <span class="math" data-say="Y">Y</span> an independent copy of the same service, so a request is slow only when both copies are slow at once.</li><li><strong>The tail past the delay is multiplied, not added.</strong> <span class="math" data-say="P of hedged is greater than t equals P of X is greater than t times P of X is greater than t minus d">P(hedged > t) = P(X > t) · P(X > t − d)</span>. Just past <span class="math" data-say="d">d</span> that is roughly the tail squared: on the lab&rsquo;s service, a <span class="math" data-say="1 over 20">1/20</span> tail at <span class="math" data-say="30 milliseconds">30 ms</span> becomes <span class="math" data-say="1 over 400">1/400</span>. Squaring a small probability is a large change, and it is the same multiplication rule that made a fan-out of sixty-nine calls miss its p99 half the time.</li><li><strong>The cost is exactly the tail you hedge past.</strong> The second copy is sent only for requests still running at <span class="math" data-say="d">d</span>, so the extra load is <span class="math" data-say="P of X is greater than d">P(X > d)</span> and nothing else. Hedge at the p95 and that is <span class="math" data-say="5 percent">5%</span>. Hedge nearer the median and the figure climbs fast: at the lab&rsquo;s <span class="math" data-say="12 milliseconds">12 ms</span> median the backup goes out for <span class="math" data-say="35 percent">35%</span> of requests, seven times the traffic for a worse result.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="hedge at d, finish at the min of X and d plus Y, Y an independent copy. P of hedged is greater than t, equals, P of X is greater than t times P of X is greater than t minus d. extra load, equals, P of X is greater than d, the tail past the delay. d equals 30 milliseconds the p 95, load plus 5.0 percent, p 99 falls 120 milliseconds to 45 milliseconds. P of both slow past d, equals, the quantity 1 over 20, squared equals 1 over 400" tabindex="0" role="region" aria-label="Mathematical notation">hedge at d:  finish at min(X, d + Y)     Y an independent copy
 P(hedged &gt; t)  =  P(X &gt; t) · P(X &gt; t − d)
 extra load     =  P(X &gt; d)               the tail past the delay
@@ -2509,11 +2554,42 @@ P(both slow past d)  =  (1/20)² = 1/400</div><figcaption>A second copy, and wha
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2581,7 +2657,7 @@ P(both slow past d)  =  (1/20)² = 1/400</div><figcaption>A second copy, and wha
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Linear Equations and Inequalities</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Equations</p>
       <h1>One- and Two-Step Equations</h1>
       <p class="lesson-lede">Undoing operations in the reverse of the order they were applied.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Each step is one named operation applied to both sides</li><li>Undo in the reverse of the order the operations were applied</li><li>The coefficient carries its sign into the division</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Isolating the variable</h2>
-      <article class="prose reading"><p>Read <span class="math" data-say="3 x minus 4">3x − 4</span> as a recipe applied to <span class="math" data-say="x">x</span>: multiply by 3, then subtract 4. Solving reverses the recipe. Because the subtraction happened last, it is undone first. The four one-step equations are the recipe with a single instruction in it, and each is undone by the one operation that reverses it, applied to both sides:</p><div class="mathblock" data-say="x plus 7 equals 2, subtract 7 from both sides, x equals negative 5. x minus 7 equals 2, add 7 to both sides, x equals 9. 7 x, equals 2, divide both sides by 7, x equals 2 over 7. x over 7, equals 2, multiply both sides by 7, x equals 14" tabindex="0" role="region" aria-label="Mathematical notation">x + 7 = 2       subtract 7 from both sides     x = −5
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Isolating the variable</h2><div class="prose reading"><p>Read <span class="math" data-say="3 x minus 4">3x − 4</span> as a recipe applied to <span class="math" data-say="x">x</span>: multiply by 3, then subtract 4. Solving reverses the recipe. Because the subtraction happened last, it is undone first. The four one-step equations are the recipe with a single instruction in it, and each is undone by the one operation that reverses it, applied to both sides:</p><div class="mathblock" data-say="x plus 7 equals 2, subtract 7 from both sides, x equals negative 5. x minus 7 equals 2, add 7 to both sides, x equals 9. 7 x, equals 2, divide both sides by 7, x equals 2 over 7. x over 7, equals 2, multiply both sides by 7, x equals 14" tabindex="0" role="region" aria-label="Mathematical notation">x + 7 = 2       subtract 7 from both sides     x = −5
 x − 7 = 2       add 7 to both sides            x = 9
 7x    = 2       divide both sides by 7         x = 2/7
 x/7   = 2       multiply both sides by 7       x = 14</div><p>The third line is the one people rewrite. <span class="math" data-say="x equals 2 over 7">x = 2/7</span> is a finished answer. Turning it into <span class="math" data-say="0.2857">0.2857</span> makes it a different number, and “What It Means to Solve an Equation” showed what happens to a different number in the check.</p><h3>Two steps</h3><p>With both a coefficient and a constant, deal with the constant first:</p><div class="mathblock" data-say="3 x minus 4 equals 11. add 4 to both sides, 3 x equals 15. divide both sides by 3, x equals 5. check, 3 times 5 minus 4, equals, 15 minus 4, equals, 11, and the right side is 11" tabindex="0" role="region" aria-label="Mathematical notation">3x − 4 = 11
@@ -1403,12 +1447,11 @@ check    3·5 − 4  =  15 − 4  =  11         and the right side is 11</div><p
      subtract 7 from both sides      −2x = 12
      divide both sides by −2           x = −6
 
-check    7 − 2·(−6)  =  7 + 12  =  19</div><div class="thm"><span class="label">Theorem &middot; What the last step needs</span><p>An equation of the form <span class="math" data-say="p x equals q">px = q</span> with <span class="math" data-say="p is not equal to 0">p ≠ 0</span> has exactly one solution, <span class="math" data-say="x equals q over p">x = q/p</span>.</p><p>Division by <span class="math" data-say="p">p</span> is legal because <span class="math" data-say="p is not equal to 0">p ≠ 0</span>, and it is reversible, so the solution set does not change. What happens when <span class="math" data-say="p equals 0">p = 0</span> is the subject of “Identities and Contradictions”.</p></div><div class="example"><span class="label">Example &middot; A fraction that is the answer</span><p><span class="math" data-say="the quantity 3 over 4, times x plus 1 over 2 equals 5 over 4">(3/4)x + 1/2 = 5/4</span>. Subtract <span class="math" data-say="1 over 2">1/2</span> from both sides: <span class="math" data-say="the quantity 3 over 4, times x equals 3 over 4">(3/4)x = 3/4</span>, since <span class="math" data-say="5 over 4 minus 1 over 2 equals 5 over 4 minus 2 over 4 equals 3 over 4">5/4 − 1/2 = 5/4 − 2/4 = 3/4</span>. Divide both sides by <span class="math" data-say="3 over 4">3/4</span>: <span class="math" data-say="x equals 1">x = 1</span>. “Equations with Fractions” shows a route through this kind of equation that avoids fractional arithmetic entirely.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Solving, one operation at a time</h2></div><p>Every step named, and the answer put back</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+check    7 − 2·(−6)  =  7 + 12  =  19</div><div class="thm"><span class="label">Theorem &middot; What the last step needs</span><p>An equation of the form <span class="math" data-say="p x equals q">px = q</span> with <span class="math" data-say="p is not equal to 0">p ≠ 0</span> has exactly one solution, <span class="math" data-say="x equals q over p">x = q/p</span>.</p><p>Division by <span class="math" data-say="p">p</span> is legal because <span class="math" data-say="p is not equal to 0">p ≠ 0</span>, and it is reversible, so the solution set does not change. What happens when <span class="math" data-say="p equals 0">p = 0</span> is the subject of “Identities and Contradictions”.</p></div><div class="example"><span class="label">Example &middot; A fraction that is the answer</span><p><span class="math" data-say="the quantity 3 over 4, times x plus 1 over 2 equals 5 over 4">(3/4)x + 1/2 = 5/4</span>. Subtract <span class="math" data-say="1 over 2">1/2</span> from both sides: <span class="math" data-say="the quantity 3 over 4, times x equals 3 over 4">(3/4)x = 3/4</span>, since <span class="math" data-say="5 over 4 minus 1 over 2 equals 5 over 4 minus 2 over 4 equals 3 over 4">5/4 − 1/2 = 5/4 − 2/4 = 3/4</span>. Divide both sides by <span class="math" data-say="3 over 4">3/4</span>: <span class="math" data-say="x equals 1">x = 1</span>. “Equations with Fractions” shows a route through this kind of equation that avoids fractional arithmetic entirely.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Solving, one operation at a time</h2></div><p>Every step named, and the answer put back</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="eqTitle">a statement to solve</strong><span id="eqSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>left side</span><span class="tone-purple"><i class="legend-swatch"></i>right side</span><span class="tone-green"><i class="legend-swatch"></i>where they agree</span></div>
@@ -1416,10 +1459,10 @@ check    7 − 2·(−6)  =  7 + 12  =  19</div><div class="thm"><span class="la
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="eqPlot"></svg></div>
       <div id="eqWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="eqStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>One operation per row</h3>
-          <p>Before selecting a preset, write the operations in the order you expect and predict the exact answer. Each lab row then names one operation applied to both sides, and the last table puts the answer back into the equation exactly as you typed it.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>One operation per row</h3>
+            <p>Before selecting a preset, write the operations in the order you expect and predict the exact answer. Each lab row then names one operation applied to both sides, and the last table puts the answer back into the equation exactly as you typed it.</p>
         <div class="field">
           <label for="eqPreset">Statement</label>
           <select id="eqPreset"><option value="3x - 4|11">3x - 4 = 11</option><option value="5x + 2|3x - 8">5x + 2 = 3x - 8</option><option value="2(x - 3) + 4|3(x + 1) - 5">2(x - 3) + 4 = 3(x + 1) - 5</option><option value="(3/4)x + 1/2|5/4">(3/4)x + 1/2 = 5/4</option><option value="7 - 2x|19">7 - 2x = 19</option><option value="4(x + 1)|4x + 4">4(x + 1) = 4x + 4</option></select>
@@ -1435,12 +1478,14 @@ check    7 − 2·(−6)  =  7 + 12  =  19</div><div class="thm"><span class="la
         <div class="kpi-grid"><div class="kpi"><span>solution</span><strong id="eqKA">&mdash;</strong></div><div class="kpi"><span>kind</span><strong id="eqKB">&mdash;</strong></div><div class="kpi"><span>check</span><strong id="eqKC">&mdash;</strong></div></div>
         <p class="small-copy" style="margin:0;">Type any linear equation. Every row below is one operation applied to both sides, and the last table puts the answer back into what you typed.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Solving a one- or two-step equation</h2></div><p>Simplify before you undo anything; then undo in reverse order.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Simplify each side on its own</h3><p>Multiply out brackets and combine like terms, left side and right side separately. You cannot reliably see which operations were applied to <span class="math" data-say="x">x</span> until each side is a tidy expression.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Undo the addition or subtraction first</h3><p>Whatever constant is attached to the variable term, remove it by doing the opposite to both sides. It was applied last, so it comes off first.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Divide both sides by the coefficient, sign included</h3><p><span class="math" data-say="negative 2 x equals 12">−2x = 12</span> becomes <span class="math" data-say="x equals negative 6">x = −6</span>. Write the answer as an exact fraction if it is not a whole number: <span class="math" data-say="x equals 7 over 3">x = 7/3</span>, not <span class="math" data-say="2.33">2.33</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Substitute the answer into the original equation</h3><p>Both sides, evaluated separately, must come out to the same number. This is the step that turns a candidate into an answer, and it takes about ten seconds.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Solving a one- or two-step equation</h2>
+      <p class="lead-in">Simplify before you undo anything; then undo in reverse order.</p>
+      <ol class="key-ideas method"><li><strong>Simplify each side on its own.</strong> Multiply out brackets and combine like terms, left side and right side separately. You cannot reliably see which operations were applied to <span class="math" data-say="x">x</span> until each side is a tidy expression.</li><li><strong>Undo the addition or subtraction first.</strong> Whatever constant is attached to the variable term, remove it by doing the opposite to both sides. It was applied last, so it comes off first.</li><li><strong>Divide both sides by the coefficient, sign included.</strong> <span class="math" data-say="negative 2 x equals 12">−2x = 12</span> becomes <span class="math" data-say="x equals negative 6">x = −6</span>. Write the answer as an exact fraction if it is not a whole number: <span class="math" data-say="x equals 7 over 3">x = 7/3</span>, not <span class="math" data-say="2.33">2.33</span>.</li><li><strong>Substitute the answer into the original equation.</strong> Both sides, evaluated separately, must come out to the same number. This is the step that turns a candidate into an answer, and it takes about ten seconds.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1467,17 +1512,16 @@ C.  x/4 + 3 = 1
     check   (−8)/4 + 3 = −2 + 3 = 1                agrees</div><p>In B the division is by <span class="math" data-say="negative 2">−2</span>, and it is the only place the sign can be lost. Dividing by <span class="math" data-say="2">2</span> instead gives <span class="math" data-say="x equals 6">x = 6</span>, and the check then reads <span class="math" data-say="7 minus 12 equals negative 5">7 − 12 = −5</span>, which is not <span class="math" data-say="19">19</span>. The error is invisible in the working and obvious in the check.</p><p>In C the bracket in <span class="math" data-say="the quantity negative 8, over 4">(−8)/4</span> matters when you write the check out. Substituting a negative value without brackets is how a correct answer gets rejected by its own verification.</p><p>For a faded pass, start <span class="math" data-say="5 minus 3 x equals negative 7">5 − 3x = −7</span> with the supplied first move: subtract <span class="math" data-say="5">5</span> from both sides to get <span class="math" data-say="negative 3 x equals negative 12">−3x = −12</span>. Name and complete the remaining move, then check the value in <span class="math" data-say="5 minus 3 x equals negative 7">5 − 3x = −7</span> before opening the same equation in the lab.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Applying the operation to one side only</strong><span>Going from <span class="math" data-say="3 x minus 4 equals 11">3x − 4 = 11</span> to <span class="math" data-say="3 x equals 11">3x = 11</span> adds 4 on the left and nothing on the right. The property of equality says both sides, and the two sides stop being equal the moment you treat them differently.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dividing by the coefficient without its sign</strong><span><span class="math" data-say="negative 2 x equals 12">−2x = 12</span> gives <span class="math" data-say="x equals negative 6">x = −6</span>. The minus is part of the number you are dividing by, not a decoration on the term, and this is the single most common arithmetic slip in the lesson.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Rounding an exact answer to a decimal</strong><span><span class="math" data-say="x equals 7 over 3">x = 7/3</span> is the answer; <span class="math" data-say="2.33">2.33</span> is a nearby number that fails the check. Fractions are exact, they are not harder to substitute, and the rest of this path expects them.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can name every operation you apply and check the result without being asked.</strong><p>Solve <span class="math" data-say="9 minus 4 x equals negative 6">9 − 4x = −6</span> without the lab: name each operation, keep the answer as an exact fraction, and substitute it into the original. Then solve <span class="math" data-say="3 times the quantity x plus 2, equals 21">3(x + 2) = 21</span> once by division first and once by distribution; the two routes must agree. Everything in “Variables on Both Sides”, “Equations with Fractions” and “Literal Equations and Formulas” adds new opening moves and finishes exactly like this.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab shows one operation per row on purpose. When an equation goes wrong it is almost never the strategy that failed &mdash; it is one row, and a trace where every row is named tells you which one. “Variables on Both Sides” adds the only genuinely new move on the course: subtracting a variable term.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Applying the operation to one side only</strong><span>Going from <span class="math" data-say="3 x minus 4 equals 11">3x − 4 = 11</span> to <span class="math" data-say="3 x equals 11">3x = 11</span> adds 4 on the left and nothing on the right. The property of equality says both sides, and the two sides stop being equal the moment you treat them differently.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dividing by the coefficient without its sign</strong><span><span class="math" data-say="negative 2 x equals 12">−2x = 12</span> gives <span class="math" data-say="x equals negative 6">x = −6</span>. The minus is part of the number you are dividing by, not a decoration on the term, and this is the single most common arithmetic slip in the lesson.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Rounding an exact answer to a decimal</strong><span><span class="math" data-say="x equals 7 over 3">x = 7/3</span> is the answer; <span class="math" data-say="2.33">2.33</span> is a nearby number that fails the check. Fractions are exact, they are not harder to substitute, and the rest of this path expects them.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can name every operation you apply and check the result without being asked.</strong><p>Solve <span class="math" data-say="9 minus 4 x equals negative 6">9 − 4x = −6</span> without the lab: name each operation, keep the answer as an exact fraction, and substitute it into the original. Then solve <span class="math" data-say="3 times the quantity x plus 2, equals 21">3(x + 2) = 21</span> once by division first and once by distribution; the two routes must agree. Everything in “Variables on Both Sides”, “Equations with Fractions” and “Literal Equations and Formulas” adds new opening moves and finishes exactly like this.</p></div></div><div class="note"><strong>Note:</strong> The lab shows one operation per row on purpose. When an equation goes wrong it is almost never the strategy that failed &mdash; it is one row, and a trace where every row is named tells you which one. “Variables on Both Sides” adds the only genuinely new move on the course: subtracting a variable term.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Each step is one named operation applied to both sides</summary><p>"Add 4 to both sides", "divide both sides by 3". If you cannot name the operation you are performing, you cannot check that it is one of the legal ones, and the step is a guess.</p></details><details class="recall"><summary>Undo in the reverse of the order the operations were applied</summary><p><span class="math" data-say="3 x minus 4">3x − 4</span> multiplies by 3 and then subtracts 4. Reversing that means adding 4 and then dividing by 3. This is the order of operations run backwards, and it is the only thing you have to remember.</p></details><details class="recall"><summary>The coefficient carries its sign into the division</summary><p>From <span class="math" data-say="negative 2 x equals 12">−2x = 12</span> the last move is division by <span class="math" data-say="negative 2">−2</span>, not by <span class="math" data-say="2">2</span>. Dropping the sign here produces <span class="math" data-say="6">6</span> instead of <span class="math" data-say="negative 6">−6</span> and the check catches it &mdash; but only if you do the check.</p></details></div>
+      <h3>Summary</h3>
       <p>An expression like <span class="math" data-say="3 x minus 4">3x − 4</span> is built from <span class="math" data-say="x">x</span> by a sequence of operations, and isolating <span class="math" data-say="x">x</span> means undoing them in the opposite order. Every step is one operation applied to both sides, and the answer is an exact fraction, checked in the original equation.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Each step is one named operation applied to both sides.</strong> "Add 4 to both sides", "divide both sides by 3". If you cannot name the operation you are performing, you cannot check that it is one of the legal ones, and the step is a guess.</li><li><strong>Undo in the reverse of the order the operations were applied.</strong> <span class="math" data-say="3 x minus 4">3x − 4</span> multiplies by 3 and then subtracts 4. Reversing that means adding 4 and then dividing by 3. This is the order of operations run backwards, and it is the only thing you have to remember.</li><li><strong>The coefficient carries its sign into the division.</strong> From <span class="math" data-say="negative 2 x equals 12">−2x = 12</span> the last move is division by <span class="math" data-say="negative 2">−2</span>, not by <span class="math" data-say="2">2</span>. Dropping the sign here produces <span class="math" data-say="6">6</span> instead of <span class="math" data-say="negative 6">−6</span> and the check catches it &mdash; but only if you do the check.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="3 x minus 4 equals 11, x was multiplied by 3, then 4 was subtracted. so undo in reverse, add 4, then divide by 3. 3 x minus 4 equals 11, goes to, 3 x equals 15, goes to, x equals 5, check, 3 times 5 minus 4 equals 11" tabindex="0" role="region" aria-label="Mathematical notation">3x − 4 = 11     x was multiplied by 3,   then 4 was subtracted
                 so undo in reverse:      add 4,   then divide by 3
 
@@ -4018,11 +4062,42 @@ C.  x/4 + 3 = 1
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -4090,7 +4165,7 @@ C.  x/4 + 3 = 1
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,26 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Skimming, Scanning and Previewing</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Scanning and skimming</p>
       <h1>Previewing Before Reading</h1>
       <p class="lesson-lede">Preview a passage for thirty seconds before reading it, count the preview in the time, and see whether it paid.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>What a preview shows</li><li>The preview is in the time</li><li>Two ways to pay</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Putting a price on the look</h2>
-      <article class="prose reading"><p>The drill has two readings, in the order the lab says above them. In one you read a passage about bridges cold, at your usual pace, logged as a test. In the other a passage about refrigerators shows its headings and its first and last paragraphs for 30 seconds, then the whole passage; read it at your usual pace and press Done. The clock starts at the preview, so the 30 seconds are in your time, and the reading is logged as a condition. Both have six questions.</p><p>The advice is older than any test of it. Robinson's SQ3R (1946) begins with a survey of a chapter's headings before the reading, and Adler and Van Doren (1972) advise looking a text over before deciding how to read it. Both are advice, and the drill is a way to test it on your own reading.</p><div class="mathblock" data-say="cold, 451 times 60 over 110 equals 246, 246 times 4 over 6 equals 164. previewed, 433 times 60 over the quantity 30 plus 120, equals 173.2, times 6 over 6 equals 173.2. difference 173.2 minus 164 equals plus 9.2" tabindex="0" role="region" aria-label="Mathematical notation">cold:      451 × 60 / 110 = 246;    246 × 4/6 = 164
-previewed: 433 × 60 / (30 + 120) = 173.2;  × 6/6 = 173.2
-difference 173.2 − 164 = +9.2</div><p>Those are the <strong>pays</strong> preset. The reader read the 451-word bridge passage cold in 110 seconds, 246 words a minute, and got 4 of 6: an effective rate of 164. They previewed the 433-word refrigerator passage for 30 seconds and read it in 120, 150 seconds in all, which is 173.2 words a minute counted from the start of the preview, and got all six: an effective rate of 173.2, which is 9.2 above. The preview cost 30 seconds and came with two more questions right.</p><p>The <strong>does-not</strong> preset has the same times with five right on both: <span data-say="246 times 5 over 6 equals 205">246 × 5/6 = 205</span> for the cold reading, <span data-say="173.2 times 5 over 6 is approximately 144.3">173.2 × 5/6 ≈ 144.3</span> for the previewed one, about 60.7 below. The preview bought nothing the reader did not get anyway, and its 30 seconds were a fifth of the time.</p><p>Leave the 30 seconds out of the pays preset and the previewed reading becomes <span data-say="433 times 60 over 120 equals 216.5">433 × 60 / 120 = 216.5</span> words a minute, faster than the cold one, and for the wrong reason. A comparison that starts the clock after the preview has made the preview free, and the lab refuses to make it.</p><p>Where a preview pays most is the second way, which this drill cannot show. On a long report the headings and the last paragraph can tell you that two sections do not concern you, and skipping them saves minutes, not seconds. The passages here are short and every part is asked about, so a preview can only pay through comprehension.</p><p>If your preview cost more than it paid, or paid far more than either preset, you have not refuted Robinson's advice, and it has not refuted you: two different passages, read once each, in an order that alternates, are one comparison. Run it again on another pair before you change how you read.</p><p>A preview of a passage takes thirty seconds; a preview of a whole book takes a few minutes, and Inspectional Reading, which opens the next module, times one.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Timed reading drill</h2></div><p>rate, comprehension and the effective rate, measured on your own reading</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Putting a price on the look</h2><div class="prose reading"><p>The drill has two readings, in the order the lab says above them. In one you read a passage about bridges cold, at your usual pace, logged as a test. In the other a passage about refrigerators shows its headings and its first and last paragraphs for 30 seconds, then the whole passage; read it at your usual pace and press Done. The clock starts at the preview, so the 30 seconds are in your time, and the reading is logged as a condition. Both have six questions.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Timed reading drill</h2></div><p>rate, comprehension and the effective rate, measured on your own reading</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Timed reading drill</strong><span>rate, comprehension and the effective rate, measured on your own reading</span></div>
       </div>
@@ -1427,10 +1468,10 @@ difference 173.2 − 164 = +9.2</div><p>Those are the <strong>pays</strong> pres
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="drTable"></table></div>
       <div class="status-banner" id="drStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Your reading, in numbers</h3>
-          <p>Your measurement: press Start, read, press Done, answer the questions, press Score, and the boxes fill with what you did. Before you do, the boxes hold a worked example; the tiles compute from the boxes either way. One question is <span data-say="is approximately 16.7">≈ 16.7</span> points; a one-question difference is not a result.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Your reading, in numbers</h3>
+            <p>Your measurement: press Start, read, press Done, answer the questions, press Score, and the boxes fill with what you did. Before you do, the boxes hold a worked example; the tiles compute from the boxes either way. One question is <span data-say="is approximately 16.7">≈ 16.7</span> points; a one-question difference is not a result.</p>
         <div class="field">
           <label for="drPreset">Worked example</label>
           <select id="drPreset"><option value="pays" selected>Cold 4 of 6; previewed 6 of 6</option><option value="does-not">Cold 5 of 6; previewed 5 of 6</option></select>
@@ -1491,12 +1532,17 @@ difference 173.2 − 164 = +9.2</div><p>Those are the <strong>pays</strong> pres
           <div class="kpi"><span>Rate B against your baseline range</span><strong id="drVerdictB">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The advice is older than any test of it. Robinson's SQ3R (1946) begins with a survey of a chapter's headings before the reading, and Adler and Van Doren (1972) advise looking a text over before deciding how to read it. Both are advice, and the drill is a way to test it on your own reading.</p><div class="mathblock" data-say="cold, 451 times 60 over 110 equals 246, 246 times 4 over 6 equals 164. previewed, 433 times 60 over the quantity 30 plus 120, equals 173.2, times 6 over 6 equals 173.2. difference 173.2 minus 164 equals plus 9.2" tabindex="0" role="region" aria-label="Mathematical notation">cold:      451 × 60 / 110 = 246;    246 × 4/6 = 164
+previewed: 433 × 60 / (30 + 120) = 173.2;  × 6/6 = 173.2
+difference 173.2 − 164 = +9.2</div><p>Those are the <strong>pays</strong> preset. The reader read the 451-word bridge passage cold in 110 seconds, 246 words a minute, and got 4 of 6: an effective rate of 164. They previewed the 433-word refrigerator passage for 30 seconds and read it in 120, 150 seconds in all, which is 173.2 words a minute counted from the start of the preview, and got all six: an effective rate of 173.2, which is 9.2 above. The preview cost 30 seconds and came with two more questions right.</p><p>The <strong>does-not</strong> preset has the same times with five right on both: <span data-say="246 times 5 over 6 equals 205">246 × 5/6 = 205</span> for the cold reading, <span data-say="173.2 times 5 over 6 is approximately 144.3">173.2 × 5/6 ≈ 144.3</span> for the previewed one, about 60.7 below. The preview bought nothing the reader did not get anyway, and its 30 seconds were a fifth of the time.</p><p>Leave the 30 seconds out of the pays preset and the previewed reading becomes <span data-say="433 times 60 over 120 equals 216.5">433 × 60 / 120 = 216.5</span> words a minute, faster than the cold one, and for the wrong reason. A comparison that starts the clock after the preview has made the preview free, and the lab refuses to make it.</p><p>Where a preview pays most is the second way, which this drill cannot show. On a long report the headings and the last paragraph can tell you that two sections do not concern you, and skipping them saves minutes, not seconds. The passages here are short and every part is asked about, so a preview can only pay through comprehension.</p><p>If your preview cost more than it paid, or paid far more than either preset, you have not refuted Robinson's advice, and it has not refuted you: two different passages, read once each, in an order that alternates, are one comparison. Run it again on another pair before you change how you read.</p><p>A preview of a passage takes thirty seconds; a preview of a whole book takes a few minutes, and Inspectional Reading, which opens the next module, times one.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing a preview on your own reading</h2></div><p>Five steps; the clock runs through the second.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Read one text cold</h3><p>Pick two texts of the same kind and length. Time a reading of the first at your usual pace, and check what you kept.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Preview the other, clock running</h3><p>Start the clock, look at the headings and the first and last paragraphs for about 30 seconds, then read the whole text, and stop the clock at the end.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Score both with the preview counted</h3><p>Words <span data-say="times 60">× 60</span> over all the seconds, times the share of questions right, for each reading.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Note any part you could have skipped</h3><p>On a long text, mark what the preview told you to skip. That is where a preview earns most, and the short passages here cannot show it.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Finish with today's reading from The Daily Drill.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing a preview on your own reading</h2>
+      <p class="lead-in">Five steps; the clock runs through the second.</p>
+      <ol class="key-ideas method"><li><strong>Read one text cold.</strong> Pick two texts of the same kind and length. Time a reading of the first at your usual pace, and check what you kept.</li><li><strong>Preview the other, clock running.</strong> Start the clock, look at the headings and the first and last paragraphs for about 30 seconds, then read the whole text, and stop the clock at the end.</li><li><strong>Score both with the preview counted.</strong> Words <span data-say="times 60">× 60</span> over all the seconds, times the share of questions right, for each reading.</li><li><strong>Note any part you could have skipped.</strong> On a long text, mark what the preview told you to skip. That is where a preview earns most, and the short passages here cannot show it.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Finish with today's reading from The Daily Drill.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1514,17 +1560,16 @@ previewed effect.  173.2 × 6/6 = 173.2
 difference         173.2 − 164 = +9.2</div><p>Without the preview's 30 seconds the previewed rate would have been 216.5, and the difference 52.5 instead of 9.2. Counting the preview is the whole of the method.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating a preview as free</strong><span>It costs time, and the time has to be counted. In the pays preset 30 seconds came with two more questions right and the effective rate rose by 9.2; in the does-not preset the same 30 seconds bought nothing and the effective rate fell by about 60.7. A preview pays when it raises comprehension or lets you skip a section.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Starting the clock after the preview</strong><span>Leaving the 30 seconds out turns 173.2 into 216.5 in the pays preset, and makes any preview look like a gain in speed.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Previewing a text that has no plan</strong><span>Headings and first and last paragraphs are a bet that the text was built to a plan. A story or a letter without headings shows you little in thirty seconds.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say whether a preview paid, with its time counted.</strong><p>Given the words, times and scores of a cold reading and a previewed one, compute both effective rates with the preview in the time, give the difference, and say whether the preview paid and by which of the two ways.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Two different passages, one reading each: the bridge and refrigerator passages are matched in kind and length but not in subject, and the second reading has the first behind it, which is why the order alternates. The drill can show a preview paying only through comprehension; skipping a section, the larger saving, needs a longer text than these.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating a preview as free</strong><span>It costs time, and the time has to be counted. In the pays preset 30 seconds came with two more questions right and the effective rate rose by 9.2; in the does-not preset the same 30 seconds bought nothing and the effective rate fell by about 60.7. A preview pays when it raises comprehension or lets you skip a section.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Starting the clock after the preview</strong><span>Leaving the 30 seconds out turns 173.2 into 216.5 in the pays preset, and makes any preview look like a gain in speed.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Previewing a text that has no plan</strong><span>Headings and first and last paragraphs are a bet that the text was built to a plan. A story or a letter without headings shows you little in thirty seconds.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say whether a preview paid, with its time counted.</strong><p>Given the words, times and scores of a cold reading and a previewed one, compute both effective rates with the preview in the time, give the difference, and say whether the preview paid and by which of the two ways.</p></div></div><div class="note"><strong>Note:</strong> Two different passages, one reading each: the bridge and refrigerator passages are matched in kind and length but not in subject, and the second reading has the first behind it, which is why the order alternates. The drill can show a preview paying only through comprehension; skipping a section, the larger saving, needs a longer text than these.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>What a preview shows</summary><p>Headings, the first paragraph and the last: in a text written to a plan, the question it starts from, its parts and where it ends up. The drill shows them for 30 seconds, then the whole passage, and the clock runs through both.</p></details><details class="recall"><summary>The preview is in the time</summary><p>A preview's cost is easy to forget, because it does not feel like reading. Counting it is the only fair comparison: 30 seconds before a 120-second reading make a 150-second reading.</p></details><details class="recall"><summary>Two ways to pay</summary><p>A preview earns its time back in one of two ways: you understand more of what you then read, or you learn that a part does not need reading and skip it. If neither happens, it was a cost.</p></details></div>
+      <h3>Summary</h3>
       <p>A preview of the headings, the first paragraph and the last costs time before the reading starts. Read a passage on bridges cold, preview a matched passage on refrigerators for 30 seconds before reading it, with the preview counted in the time, and compare the two effective rates.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>What a preview shows.</strong> Headings, the first paragraph and the last: in a text written to a plan, the question it starts from, its parts and where it ends up. The drill shows them for 30 seconds, then the whole passage, and the clock runs through both.</li><li><strong>The preview is in the time.</strong> A preview's cost is easy to forget, because it does not feel like reading. Counting it is the only fair comparison: 30 seconds before a 120-second reading make a 150-second reading.</li><li><strong>Two ways to pay.</strong> A preview earns its time back in one of two ways: you understand more of what you then read, or you learn that a part does not need reading and skip it. If neither happens, it was a cost.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="time equals preview plus reading. effective rate equals rate times comprehension. pays if comprehension rises enough. or if it lets you skip a part. always count the preview&#x27;s time" tabindex="0" role="region" aria-label="Mathematical notation">time = preview + reading
 effective rate = rate × comprehension
 pays if comprehension rises enough
@@ -2554,11 +2599,42 @@ always count the preview&#x27;s time</div><figcaption>Previewing in five lines</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2626,7 +2702,7 @@ always count the preview&#x27;s time</div><figcaption>Previewing in five lines</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,31 +1424,29 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Systems and Matrices</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Matrices</p>
       <h1>Systems of Inequalities and Linear Programming</h1>
       <p class="lesson-lede">Build a closed, bounded feasible region, test every boundary crossing, and optimise at its corners.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>One inequality, one half-plane</li><li>The feasible region is an intersection, not a union</li><li>The corner point theorem is what makes the bounded case finite</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Feasible regions and the corner point theorem</h2>
-      <article class="prose reading"><p>Lines, Functions and Graphs ended with a single linear inequality in two variables: draw the boundary line, decide which side, shade it. Everything here is that, done several times on one set of axes, and then asked a question.</p><div class="defbox"><span class="label">Definition &middot; Solution of a linear inequality in two variables</span><p>The set of points <span class="math" data-say="x, y">(x, y)</span> making the statement true. For a linear inequality it is a <strong>half-plane</strong>: everything on one side of the line <span class="math" data-say="A x plus b y equals c">ax + by = c</span>, with the line included when the inequality is <span class="math" data-say="less-than-or-equal">≤</span> or <span class="math" data-say="greater-than-or-equal">≥</span> and excluded when it is <span class="math" data-say="less-than">&lt;</span> or <span class="math" data-say="greater-than">&gt;</span>.</p></div><p>One test point settles the shading. Pick any point not on the boundary &mdash; the origin, unless the line passes through it &mdash; and substitute. If the statement is true, shade that side; if false, shade the other. This works because <span class="math" data-say="A x plus b y minus c">ax + by - c</span> keeps one sign throughout each side and only changes sign by passing through the line.</p><div class="mathblock" data-say="x plus y is at most 8, boundary, x plus y equals 8, solid, is at most includes it. test 0, 0, 0 plus 0 equals 0 is at most 8, true, shade the origin side. 2 x plus y is at most 10, boundary, 2 x plus y equals 10, solid. test 0, 0, 0 is at most 10, true, shade the origin side. 2 x minus 3 y is at least 6, boundary, 2 x minus 3 y equals 6, solid. test 0, 0, 0 is at least 6, false, shade the other side" tabindex="0" role="region" aria-label="Mathematical notation">x + y ≤ 8       boundary  x + y = 8      solid: ≤ includes it
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Feasible regions and the corner point theorem</h2><div class="prose reading"><p>Lines, Functions and Graphs ended with a single linear inequality in two variables: draw the boundary line, decide which side, shade it. Everything here is that, done several times on one set of axes, and then asked a question.</p><div class="defbox"><span class="label">Definition &middot; Solution of a linear inequality in two variables</span><p>The set of points <span class="math" data-say="x, y">(x, y)</span> making the statement true. For a linear inequality it is a <strong>half-plane</strong>: everything on one side of the line <span class="math" data-say="A x plus b y equals c">ax + by = c</span>, with the line included when the inequality is <span class="math" data-say="less-than-or-equal">≤</span> or <span class="math" data-say="greater-than-or-equal">≥</span> and excluded when it is <span class="math" data-say="less-than">&lt;</span> or <span class="math" data-say="greater-than">&gt;</span>.</p></div><p>One test point settles the shading. Pick any point not on the boundary &mdash; the origin, unless the line passes through it &mdash; and substitute. If the statement is true, shade that side; if false, shade the other. This works because <span class="math" data-say="A x plus b y minus c">ax + by - c</span> keeps one sign throughout each side and only changes sign by passing through the line.</p><div class="mathblock" data-say="x plus y is at most 8, boundary, x plus y equals 8, solid, is at most includes it. test 0, 0, 0 plus 0 equals 0 is at most 8, true, shade the origin side. 2 x plus y is at most 10, boundary, 2 x plus y equals 10, solid. test 0, 0, 0 is at most 10, true, shade the origin side. 2 x minus 3 y is at least 6, boundary, 2 x minus 3 y equals 6, solid. test 0, 0, 0 is at least 6, false, shade the other side" tabindex="0" role="region" aria-label="Mathematical notation">x + y ≤ 8       boundary  x + y = 8      solid: ≤ includes it
 test (0, 0):    0 + 0 = 0 ≤ 8    true    shade the origin side
 
 2x + y ≤ 10     boundary  2x + y = 10    solid
 test (0, 0):    0 ≤ 10           true    shade the origin side
 
 2x - 3y ≥ 6     boundary  2x - 3y = 6    solid
-test (0, 0):    0 ≥ 6            false   shade the other side</div><div class="defbox"><span class="label">Definition &middot; Feasible region</span><p>Given a system of linear inequalities, the <strong>feasible region</strong> is the set of points satisfying all of them at once: the intersection of the half-planes. It may be empty, it may be a bounded polygon, and it may run off to infinity.</p></div><div class="example"><span class="label">Example &middot; A region with four corners</span><p><span class="math" data-say="x is at least 0">x ≥ 0</span>, <span class="math" data-say="y is at least 0">y ≥ 0</span>, <span class="math" data-say="x plus y is at most 8">x + y ≤ 8</span>, <span class="math" data-say="2 x plus y is at most 10">2x + y ≤ 10</span>. The first two confine everything to the first quadrant; the last two cut it with two lines. What survives is a four-sided region with corners at <span class="math" data-say="0, 0">(0, 0)</span>, <span class="math" data-say="5, 0">(5, 0)</span>, <span class="math" data-say="2, 6">(2, 6)</span> and <span class="math" data-say="0, 8">(0, 8)</span>, and the worked example below finds those corners rather than reading them off a picture.</p></div><h3>Asking for the best point in the region</h3><div class="defbox"><span class="label">Definition &middot; Linear programming problem</span><p>A linear <strong>objective function</strong> <span class="math" data-say="P equals A x plus b y">P = ax + by</span>, together with a system of linear inequalities called the <strong>constraints</strong>. The problem is to find the point of the feasible region at which <span class="math" data-say="P">P</span> is largest, or smallest. Such a point is called <strong>optimal</strong>.</p></div><div class="thm"><span class="label">Theorem &middot; The corner point theorem</span><p>If the feasible region is not empty, closed and bounded, then a linear objective function attains both a maximum and a minimum on it, and each occurs at a corner. If the same optimal value occurs at two corners, then every point of the edge joining them is optimal as well.</p><p>This statement does not classify an unbounded feasible region. There the objective must also be tested along the directions in which the region continues; a maximum, a minimum, both or neither may exist.</p></div><p>The reason is worth seeing even though the proof is not given here. The points where <span class="math" data-say="A x plus b y">ax + by</span> takes some fixed value <span class="math" data-say="k">k</span> form a line, and different values of <span class="math" data-say="k">k</span> give parallel lines. Increasing <span class="math" data-say="k">k</span> slides that line across the plane in one direction. The largest <span class="math" data-say="k">k</span> for which the line still touches the region is the one where it is just about to leave &mdash; and a straight line leaving a polygon leaves through a corner, or along a whole edge if it happens to be parallel to one.</p><p>That is the entire method. Infinitely many feasible points, and the theorem says four of them need checking. Nothing about it survives if the objective is not linear: <span class="math" data-say="P equals x y">P = xy</span> on the region above is largest at <span class="math" data-say="2.5, 5">(2.5, 5)</span>, which is not a corner of anything.</p><div class="example"><span class="label">Example &middot; An unbounded region needs a direction check</span><p>Take <span class="math" data-say="x is at least 0">x ≥ 0</span>, <span class="math" data-say="y is at least 0">y ≥ 0</span>, <span class="math" data-say="x plus y is at least 4">x + y ≥ 4</span>. The region is everything in the first quadrant on or above the line <span class="math" data-say="x plus y equals 4">x + y = 4</span>, and it runs off to infinity. <span class="math" data-say="C equals 2 x plus 3 y">C = 2x + 3y</span> has a minimum of <span class="math" data-say="8">8</span> at <span class="math" data-say="4, 0">(4, 0)</span>: <span class="math" data-say="C equals 2 times the quantity x plus y, plus y is at least 8">C = 2(x + y) + y ≥ 8</span>. It has no maximum, because the feasible points <span class="math" data-say="4 plus t, 0">(4 + t, 0)</span> make <span class="math" data-say="C equals 8 plus 2 t">C = 8 + 2t</span> grow without bound. The corner values suggest the minimum, but these two inequalities prove the global claims.</p></div><p>Two practical cautions. A strict inequality removes its boundary line from the region, so an optimum sitting on that line is approached but never reached; applied problems are stated with <span class="math" data-say="less-than-or-equal">≤</span> and <span class="math" data-say="greater-than-or-equal">≥</span> for exactly this reason. And if the quantities are things like whole machines or whole people, the corner may be fractional, and rounding it is not guaranteed to give the best whole-number answer &mdash; that is a different subject.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Linear programming</h2></div><p>The objective at every corner, and the corner that wins</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+test (0, 0):    0 ≥ 6            false   shade the other side</div><div class="defbox"><span class="label">Definition &middot; Feasible region</span><p>Given a system of linear inequalities, the <strong>feasible region</strong> is the set of points satisfying all of them at once: the intersection of the half-planes. It may be empty, it may be a bounded polygon, and it may run off to infinity.</p></div><div class="example"><span class="label">Example &middot; A region with four corners</span><p><span class="math" data-say="x is at least 0">x ≥ 0</span>, <span class="math" data-say="y is at least 0">y ≥ 0</span>, <span class="math" data-say="x plus y is at most 8">x + y ≤ 8</span>, <span class="math" data-say="2 x plus y is at most 10">2x + y ≤ 10</span>. The first two confine everything to the first quadrant; the last two cut it with two lines. What survives is a four-sided region with corners at <span class="math" data-say="0, 0">(0, 0)</span>, <span class="math" data-say="5, 0">(5, 0)</span>, <span class="math" data-say="2, 6">(2, 6)</span> and <span class="math" data-say="0, 8">(0, 8)</span>, and the worked example below finds those corners rather than reading them off a picture.</p></div><h3>Asking for the best point in the region</h3><div class="defbox"><span class="label">Definition &middot; Linear programming problem</span><p>A linear <strong>objective function</strong> <span class="math" data-say="P equals A x plus b y">P = ax + by</span>, together with a system of linear inequalities called the <strong>constraints</strong>. The problem is to find the point of the feasible region at which <span class="math" data-say="P">P</span> is largest, or smallest. Such a point is called <strong>optimal</strong>.</p></div><div class="thm"><span class="label">Theorem &middot; The corner point theorem</span><p>If the feasible region is not empty, closed and bounded, then a linear objective function attains both a maximum and a minimum on it, and each occurs at a corner. If the same optimal value occurs at two corners, then every point of the edge joining them is optimal as well.</p><p>This statement does not classify an unbounded feasible region. There the objective must also be tested along the directions in which the region continues; a maximum, a minimum, both or neither may exist.</p></div><p>The reason is worth seeing even though the proof is not given here. The points where <span class="math" data-say="A x plus b y">ax + by</span> takes some fixed value <span class="math" data-say="k">k</span> form a line, and different values of <span class="math" data-say="k">k</span> give parallel lines. Increasing <span class="math" data-say="k">k</span> slides that line across the plane in one direction. The largest <span class="math" data-say="k">k</span> for which the line still touches the region is the one where it is just about to leave &mdash; and a straight line leaving a polygon leaves through a corner, or along a whole edge if it happens to be parallel to one.</p><p>That is the entire method. Infinitely many feasible points, and the theorem says four of them need checking. Nothing about it survives if the objective is not linear: <span class="math" data-say="P equals x y">P = xy</span> on the region above is largest at <span class="math" data-say="2.5, 5">(2.5, 5)</span>, which is not a corner of anything.</p><div class="example"><span class="label">Example &middot; An unbounded region needs a direction check</span><p>Take <span class="math" data-say="x is at least 0">x ≥ 0</span>, <span class="math" data-say="y is at least 0">y ≥ 0</span>, <span class="math" data-say="x plus y is at least 4">x + y ≥ 4</span>. The region is everything in the first quadrant on or above the line <span class="math" data-say="x plus y equals 4">x + y = 4</span>, and it runs off to infinity. <span class="math" data-say="C equals 2 x plus 3 y">C = 2x + 3y</span> has a minimum of <span class="math" data-say="8">8</span> at <span class="math" data-say="4, 0">(4, 0)</span>: <span class="math" data-say="C equals 2 times the quantity x plus y, plus y is at least 8">C = 2(x + y) + y ≥ 8</span>. It has no maximum, because the feasible points <span class="math" data-say="4 plus t, 0">(4 + t, 0)</span> make <span class="math" data-say="C equals 8 plus 2 t">C = 8 + 2t</span> grow without bound. The corner values suggest the minimum, but these two inequalities prove the global claims.</p></div><p>Two practical cautions. A strict inequality removes its boundary line from the region, so an optimum sitting on that line is approached but never reached; applied problems are stated with <span class="math" data-say="less-than-or-equal">≤</span> and <span class="math" data-say="greater-than-or-equal">≥</span> for exactly this reason. And if the quantities are things like whole machines or whole people, the corner may be fractional, and rounding it is not guaranteed to give the best whole-number answer &mdash; that is a different subject.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Linear programming</h2></div><p>The objective at every corner, and the corner that wins</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="syTitle">System</strong><span id="sySub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the feasible region</span><span class="tone-purple"><i class="legend-swatch"></i>a boundary</span><span class="tone-amber"><i class="legend-swatch"></i>corners</span><span class="tone-green"><i class="legend-swatch"></i>the winning corner</span></div>
@@ -1411,10 +1454,10 @@ test (0, 0):    0 ≥ 6            false   shade the other side</div><div class=
       <div class="lab-stage" id="syStage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="syPlot"></svg></div>
       <div id="syWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="syStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Drag a constraint, watch the corner move</h3>
-          <p>Change a constraint and the lab redraws the feasible region, recomputes every corner, and evaluates the objective at each. Watch which corner wins as you tilt the objective from <span class="math" data-say="5 x plus 4 y">5x + 4y</span> toward <span class="math" data-say="3 x plus 4 y">3x + 4y</span>.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Drag a constraint, watch the corner move</h3>
+            <p>Change a constraint and the lab redraws the feasible region, recomputes every corner, and evaluates the objective at each. Watch which corner wins as you tilt the objective from <span class="math" data-say="5 x plus 4 y">5x + 4y</span> toward <span class="math" data-say="3 x plus 4 y">3x + 4y</span>.</p>
         <div class="field" id="syFieldPreset">
           <label for="syPreset">Worked example</label>
           <select id="syPreset"><option value="0">maximise 3x + 2y on a bounded region</option><option value="1">minimise 3x + 4y where the region is open above</option><option value="2">the optimum is a whole EDGE, and two corners tie</option><option value="3">unbounded: the objective has nowhere to stop</option><option value="4">infeasible: there is no corner to evaluate</option><option value="5">the optimal corner is (20/19, 45/19)</option></select>
@@ -1449,12 +1492,14 @@ test (0, 0):    0 ≥ 6            false   shade the other side</div><div class=
           <div class="kpi"><span id="syK3Lab">&mdash;</span><strong id="syK3">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="syHint" style="margin:0;">The four boxes are the constraints and the fifth is what you are optimising. Every corner of the region is found exactly and the objective is evaluated at each of them, so the winner is read off a table rather than guessed from the picture.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Solving a linear programming problem</h2></div><p>Four steps. The third is where the answers are lost.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Graph every boundary line</h3><p>Replace each inequality sign by <span class="math" data-say="equals sign">=</span> and draw the line, solid for <span class="math" data-say="less-than-or-equal">≤</span> and <span class="math" data-say="greater-than-or-equal">≥</span>, dashed for <span class="math" data-say="less-than">&lt;</span> and <span class="math" data-say="greater-than">&gt;</span>. Do not skip <span class="math" data-say="x is at least 0">x ≥ 0</span> and <span class="math" data-say="y is at least 0">y ≥ 0</span>; they are constraints like any other and they contribute corners.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Shade with a test point</h3><p>One point per inequality, the origin where possible. The feasible region is what all the shadings have in common, and it is worth outlining once it is clear.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the corners, then check each one</h3><p>Every corner is the intersection of two boundary lines, so solve those two equations together &mdash; elimination, from “Solving by Elimination”. Then test the point against every other constraint and discard it if it fails one.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Evaluate the objective at each surviving corner</h3><p>For a nonempty closed, bounded region, tabulate the values and pick the largest or the smallest, as asked; the corner theorem makes that comparison conclusive. For an unbounded region, also test the feasible directions in which the region continues.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Solving a linear programming problem</h2>
+      <p class="lead-in">Four steps. The third is where the answers are lost.</p>
+      <ol class="key-ideas method"><li><strong>Graph every boundary line.</strong> Replace each inequality sign by <span class="math" data-say="equals sign">=</span> and draw the line, solid for <span class="math" data-say="less-than-or-equal">≤</span> and <span class="math" data-say="greater-than-or-equal">≥</span>, dashed for <span class="math" data-say="less-than">&lt;</span> and <span class="math" data-say="greater-than">&gt;</span>. Do not skip <span class="math" data-say="x is at least 0">x ≥ 0</span> and <span class="math" data-say="y is at least 0">y ≥ 0</span>; they are constraints like any other and they contribute corners.</li><li><strong>Shade with a test point.</strong> One point per inequality, the origin where possible. The feasible region is what all the shadings have in common, and it is worth outlining once it is clear.</li><li><strong>Find the corners, then check each one.</strong> Every corner is the intersection of two boundary lines, so solve those two equations together &mdash; elimination, from “Solving by Elimination”. Then test the point against every other constraint and discard it if it fails one.</li><li><strong>Evaluate the objective at each surviving corner.</strong> For a nonempty closed, bounded region, tabulate the values and pick the largest or the smallest, as asked; the corner theorem makes that comparison conclusive. For an unbounded region, also test the feasible directions in which the region continues.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1489,17 +1534,16 @@ objective at the four corners
 at the two rejected crossings   P = 40 at (8, 0) and at (0, 10)</div><p>The last line is why step 3 ends with a test rather than a corner. Both rejected crossings give <span class="math" data-say="P equals 40">P = 40</span>, comfortably larger than the true maximum of <span class="math" data-say="34">34</span>. An unchecked crossing does not add a harmless extra candidate to the list; it wins, and the answer is then a point at which one of the constraints is false.</p><p>The maximum is <span class="math" data-say="34">34</span>, attained at <span class="math" data-say="x equals 2">x = 2</span>, <span class="math" data-say="y equals 6">y = 6</span>. Report the point as well as the value: "34" alone does not say what to do.</p><p>Faded rehearsal: keep the same four constraints but minimise <span class="math" data-say="C equals 2 x plus 7 y">C = 2x + 7y</span>. The feasible corners have already been established, so build a fresh objective table without reusing the old <span class="math" data-say="P">P</span> values. Name both the winning point and value, then explain why the bounded closed, bounded region makes the corner comparison conclusive.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating every crossing of two boundary lines as a corner</strong><span>In the worked example <span class="math" data-say="8, 0">(8, 0)</span> is where two boundaries meet and it violates <span class="math" data-say="2 x plus y is at most 10">2x + y ≤ 10</span>. It is not in the region, and it gives a bigger objective value than the real answer, so leaving it in produces a confident wrong answer rather than a visible error.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Losing the direction of the inequality while solving for y</strong><span><span class="math" data-say="negative 2 x plus y is at most 6">-2x + y ≤ 6</span> rearranges to <span class="math" data-say="y is at most 2 x plus 6">y ≤ 2x + 6</span>, but <span class="math" data-say="2 x minus y is at most 6">2x - y ≤ 6</span> rearranges to <span class="math" data-say="y is at least 2 x minus 6">y ≥ 2x - 6</span>: dividing by <span class="math" data-say="negative 1">-1</span> reverses the sign. The safer route is not to rearrange at all &mdash; draw the boundary and test a point.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Looking for the optimum inside the region</strong><span>A nonconstant linear objective cannot have its only optimum strictly inside a full-dimensional feasible region: moving in the direction that increases <span class="math" data-say="A x plus b y">ax + by</span> improves it until a boundary stops you. A constant objective makes every feasible point optimal; neither case is solved by checking a few random interior points.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when every candidate corner is solved, tested and used within the theorem&#x27;s scope.</strong><p>Given four or five constraints you should be able to produce the corner list without a graph, discard the crossings that fail a constraint, and on a nonempty closed, bounded region name the optimal point and its value. For an unbounded region, exhibit a feasible ray or a global bound instead of citing the bounded theorem. Saying "the maximum is 34" without saying where is half an answer.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Everything expensive in this lesson was elimination: each corner is a 2 by 2 system, solved exactly as in “Solving by Elimination”. That is the course's first half in service of a question it could not have asked. This is the last lesson of the course; Sequences and Series takes up objects that are ordered lists rather than solution sets.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating every crossing of two boundary lines as a corner</strong><span>In the worked example <span class="math" data-say="8, 0">(8, 0)</span> is where two boundaries meet and it violates <span class="math" data-say="2 x plus y is at most 10">2x + y ≤ 10</span>. It is not in the region, and it gives a bigger objective value than the real answer, so leaving it in produces a confident wrong answer rather than a visible error.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Losing the direction of the inequality while solving for y</strong><span><span class="math" data-say="negative 2 x plus y is at most 6">-2x + y ≤ 6</span> rearranges to <span class="math" data-say="y is at most 2 x plus 6">y ≤ 2x + 6</span>, but <span class="math" data-say="2 x minus y is at most 6">2x - y ≤ 6</span> rearranges to <span class="math" data-say="y is at least 2 x minus 6">y ≥ 2x - 6</span>: dividing by <span class="math" data-say="negative 1">-1</span> reverses the sign. The safer route is not to rearrange at all &mdash; draw the boundary and test a point.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Looking for the optimum inside the region</strong><span>A nonconstant linear objective cannot have its only optimum strictly inside a full-dimensional feasible region: moving in the direction that increases <span class="math" data-say="A x plus b y">ax + by</span> improves it until a boundary stops you. A constant objective makes every feasible point optimal; neither case is solved by checking a few random interior points.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when every candidate corner is solved, tested and used within the theorem&#x27;s scope.</strong><p>Given four or five constraints you should be able to produce the corner list without a graph, discard the crossings that fail a constraint, and on a nonempty closed, bounded region name the optimal point and its value. For an unbounded region, exhibit a feasible ray or a global bound instead of citing the bounded theorem. Saying "the maximum is 34" without saying where is half an answer.</p></div></div><div class="note"><strong>Note:</strong> Everything expensive in this lesson was elimination: each corner is a 2 by 2 system, solved exactly as in “Solving by Elimination”. That is the course's first half in service of a question it could not have asked. This is the last lesson of the course; Sequences and Series takes up objects that are ordered lists rather than solution sets.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>One inequality, one half-plane</summary><p>The line <span class="math" data-say="A x plus b y equals c">ax + by = c</span> splits the plane in two. On one side <span class="math" data-say="A x plus b y is greater than c">ax + by &gt; c</span>, on the other <span class="math" data-say="A x plus b y is less than c">ax + by &lt; c</span>, and on the line itself they are equal. So a single test point decides the entire side, and the boundary belongs to the solution for <span class="math" data-say="less-than-or-equal">≤</span> and <span class="math" data-say="greater-than-or-equal">≥</span> and not for <span class="math" data-say="less-than">&lt;</span> and <span class="math" data-say="greater-than">&gt;</span>.</p></details><details class="recall"><summary>The feasible region is an intersection, not a union</summary><p>A point is feasible only if it satisfies <em>every</em> constraint. Two boundary lines crossing somewhere is not enough to make that crossing a corner of the region; it has to survive all the other constraints as well.</p></details><details class="recall"><summary>The corner point theorem is what makes the bounded case finite</summary><p>A linear objective on a feasible polygon that is nonempty, closed and bounded attains its largest and smallest values at corners. That is why the method is "list the corners and evaluate" rather than a search. An unbounded region needs a separate check of the directions in which it continues.</p></details></div>
+      <h3>Summary</h3>
       <p>A linear inequality in two variables is satisfied by a half-plane, and a system of them by the region where the half-planes overlap. On a nonempty closed, bounded feasible polygon, a linear objective reaches its largest and smallest values at corners, reducing infinitely many candidates to a finite list.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>One inequality, one half-plane.</strong> The line <span class="math" data-say="A x plus b y equals c">ax + by = c</span> splits the plane in two. On one side <span class="math" data-say="A x plus b y is greater than c">ax + by &gt; c</span>, on the other <span class="math" data-say="A x plus b y is less than c">ax + by &lt; c</span>, and on the line itself they are equal. So a single test point decides the entire side, and the boundary belongs to the solution for <span class="math" data-say="less-than-or-equal">≤</span> and <span class="math" data-say="greater-than-or-equal">≥</span> and not for <span class="math" data-say="less-than">&lt;</span> and <span class="math" data-say="greater-than">&gt;</span>.</li><li><strong>The feasible region is an intersection, not a union.</strong> A point is feasible only if it satisfies <em>every</em> constraint. Two boundary lines crossing somewhere is not enough to make that crossing a corner of the region; it has to survive all the other constraints as well.</li><li><strong>The corner point theorem is what makes the bounded case finite.</strong> A linear objective on a feasible polygon that is nonempty, closed and bounded attains its largest and smallest values at corners. That is why the method is "list the corners and evaluate" rather than a search. An unbounded region needs a separate check of the directions in which it continues.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="one inequality, a half-plane, boundary solid for at most and at least. several, the overlap, every constraint holds at once. corners, solve the boundary lines in pairs, then test. max and min on a nonempty closed bounded polygon, at a corner" tabindex="0" role="region" aria-label="Mathematical notation">one inequality      a half-plane, boundary solid for ≤ and ≥
 several            the overlap: every constraint holds at once
 corners            solve the boundary lines in pairs, then test
@@ -4005,11 +4049,42 @@ max and min on a nonempty closed bounded polygon:  at a corner</div><figcaption>
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -4077,7 +4152,7 @@ max and min on a nonempty closed bounded polygon:  at a corner</div><figcaption>
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

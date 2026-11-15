@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,26 +1424,24 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Identity, Modality and Freedom</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Modality</p>
       <h1>The Ontological Argument in S5</h1>
       <p class="lesson-lede">The modal ontological argument is valid when the frame is euclidean, so the dispute is over its first premise and over the choice of frame.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The argument has one modal premise</li><li>The step from premise to conclusion is a property of the frame</li><li>Validity is not the same as acceptance</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Where S5 does the work</h2>
-      <article class="prose reading"><p>The argument runs in three lines. A being is maximally great if it is as excellent as a being can be in every possible world. A being like that, if there is one, exists necessarily, since otherwise there would be a world in which it was missing, and it would not be maximally great there. So the claim that there could be such a being is the claim that it is possible that something exists necessarily. Write <span class="math" data-say="G">G</span> for &ldquo;a maximally great being exists&rdquo;. The first premise is <span class="math" data-say="possibly necessarily G">◇□G</span>. The second is a fact about the logic of necessity, and the conclusion is <span class="math" data-say="necessarily G">□G</span>.</p><div class="mathblock" data-say="premise 1, possibly necessarily G. logic, possibly necessarily G implies necessarily G. conclusion, necessarily G" tabindex="0" role="region" aria-label="Mathematical notation">premise 1:   ◇□G
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Where S5 does the work</h2><div class="prose reading"><p>The argument runs in three lines. A being is maximally great if it is as excellent as a being can be in every possible world. A being like that, if there is one, exists necessarily, since otherwise there would be a world in which it was missing, and it would not be maximally great there. So the claim that there could be such a being is the claim that it is possible that something exists necessarily. Write <span class="math" data-say="G">G</span> for &ldquo;a maximally great being exists&rdquo;. The first premise is <span class="math" data-say="possibly necessarily G">◇□G</span>. The second is a fact about the logic of necessity, and the conclusion is <span class="math" data-say="necessarily G">□G</span>.</p><div class="mathblock" data-say="premise 1, possibly necessarily G. logic, possibly necessarily G implies necessarily G. conclusion, necessarily G" tabindex="0" role="region" aria-label="Mathematical notation">premise 1:   ◇□G
 logic:       ◇□G → □G
-conclusion:  □G</div><p>The second line is valid on a frame exactly when the frame is euclidean, meaning that if a world sees two worlds, the first of them sees the second. The reasoning is short. Suppose w sees v, where <span class="math" data-say="necessarily G">□G</span> holds, and w sees u. Euclidean says v sees u, and <span class="math" data-say="necessarily G">□G</span> at v gives <span class="math" data-say="G">G</span> at u. So every world w sees has <span class="math" data-say="G">G</span>, and <span class="math" data-say="necessarily G">□G</span> holds at w. In a frame that is reflexive and euclidean, which is the same as an equivalence relation, every world can see every other in its group, and that is S5. The lab shows the equivalence frame validating the conditional.</p><h3>A frame where it fails</h3><p>Weaken S5 by one property. Let w1 see itself and w2, and let w2 see only itself. This frame is reflexive and transitive, the system S4, but not symmetric. Put <span class="math" data-say="G">G</span> at w2 only. At w2 the box holds, since the only world w2 sees has <span class="math" data-say="G">G</span>. At w1, <span class="math" data-say="possibly necessarily G">◇□G</span> is true because w1 sees w2. But <span class="math" data-say="necessarily G">□G</span> is false at w1, because w1 sees itself and <span class="math" data-say="G">G</span> is false there. The premise is true and the conclusion false, so the conditional fails on this frame.</p><p>The missing arc is the one from w2 back to w1. Add it, and w2 now sees a world where <span class="math" data-say="G">G</span> is false, so <span class="math" data-say="necessarily G">□G</span> fails at w2 and the antecedent fails at w1 as well. The conditional is true, and the frame is the equivalence relation of S5, the S4 frame plus the symmetry that B demands. The argument therefore needs the frame to be euclidean, which on a reflexive frame means symmetric as well as transitive, and it gets no help from S4.</p><div class="thm"><span class="label">Theorem &middot; What the lab establishes</span><p>On a euclidean frame the conditional <span class="math" data-say="possibly necessarily G implies necessarily G">◇□G → □G</span> holds at every world for every valuation of <span class="math" data-say="G">G</span>. On the frame without the arc from w2 to w1 there is a valuation and a world where it fails. The argument is valid in S5.</p></div><h3>What the argument costs</h3><p>Two exits are open, and each is an argument. The first is to deny <span class="math" data-say="possibly necessarily G">◇□G</span>. The same logic proves <span class="math" data-say="possibly necessarily not G implies necessarily not G">◇□¬G → □¬G</span>, so whoever grants that it is possible that God necessarily exists must also refuse the parallel premise, that it is possible that God necessarily does not exist, and in S5 both premises cannot be true at one world. Granting the first is therefore not a modest concession. It carries the conclusion with it, and the modest-sounding word &ldquo;possible&rdquo; hides that. The second exit is to reject S5 as the logic of the necessity in question, for example because metaphysical necessity may not be symmetric. Then the argument has no valid form to stand on.</p><p>The lab can say none of this for you. It computes that the argument is valid on one frame and invalid on another. Which frame suits God, or necessity, or the word &ldquo;possible&rdquo; in the first premise, is the philosophical question, and it comes after the logic, not instead of it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Possible worlds</h2></div><p>Modal formulas at every world, and the axioms the frame validates</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+conclusion:  □G</div><p>The second line is valid on a frame exactly when the frame is euclidean, meaning that if a world sees two worlds, the first of them sees the second. The reasoning is short. Suppose w sees v, where <span class="math" data-say="necessarily G">□G</span> holds, and w sees u. Euclidean says v sees u, and <span class="math" data-say="necessarily G">□G</span> at v gives <span class="math" data-say="G">G</span> at u. So every world w sees has <span class="math" data-say="G">G</span>, and <span class="math" data-say="necessarily G">□G</span> holds at w. In a frame that is reflexive and euclidean, which is the same as an equivalence relation, every world can see every other in its group, and that is S5. The lab shows the equivalence frame validating the conditional.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Possible worlds</h2></div><p>Modal formulas at every world, and the axioms the frame validates</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Worlds and what they can see</strong><span>□ holds where every visible world agrees; ◇ where one does</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the formula holds</span><span class="tone-amber"><i class="legend-swatch"></i>the world evaluated</span></div>
@@ -1406,10 +1449,10 @@ conclusion:  □G</div><p>The second line is valid on a frame exactly when the f
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="krSvg" viewBox="0 0 520 290" role="img" aria-label="The worlds as circles with arrows for accessibility; the atoms true at each world are written inside it, and the worlds where the formula holds are filled."></svg></div>
       <div class="status-banner" id="krStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Test the conditional on a frame</h3>
-          <p>The formula is the logical step of the argument. The first model is an equivalence relation with <span class="math" data-say="G">G</span> at every world of one group, the second lacks the arc from w2 to w1, and the third restores it. The axioms tile tells you which frame you are on.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Test the conditional on a frame</h3>
+            <p>The formula is the logical step of the argument. The first model is an equivalence relation with <span class="math" data-say="G">G</span> at every world of one group, the second lacks the arc from w2 to w1, and the third restores it. The axioms tile tells you which frame you are on.</p>
         <div class="field">
           <label for="krPreset">Model</label>
           <select id="krPreset"><option value="s5" selected>w1 and w2 see each other, w3 sees itself</option><option value="no-symmetry">w1 sees w1 and w2, w2 sees only w2</option><option value="b-axiom">w1 and w2 see each other and themselves</option></select>
@@ -1446,12 +1489,15 @@ conclusion:  □G</div><p>The second line is valid on a frame exactly when the f
         </div>
         <p class="small-copy" style="margin:0;">Type [] for the box and &lt;&gt; for the diamond, or use the symbols, with ~ &amp; | -&gt; &lt;-&gt; as usual.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>A frame where it fails</h3><p>Weaken S5 by one property. Let w1 see itself and w2, and let w2 see only itself. This frame is reflexive and transitive, the system S4, but not symmetric. Put <span class="math" data-say="G">G</span> at w2 only. At w2 the box holds, since the only world w2 sees has <span class="math" data-say="G">G</span>. At w1, <span class="math" data-say="possibly necessarily G">◇□G</span> is true because w1 sees w2. But <span class="math" data-say="necessarily G">□G</span> is false at w1, because w1 sees itself and <span class="math" data-say="G">G</span> is false there. The premise is true and the conclusion false, so the conditional fails on this frame.</p><p>The missing arc is the one from w2 back to w1. Add it, and w2 now sees a world where <span class="math" data-say="G">G</span> is false, so <span class="math" data-say="necessarily G">□G</span> fails at w2 and the antecedent fails at w1 as well. The conditional is true, and the frame is the equivalence relation of S5, the S4 frame plus the symmetry that B demands. The argument therefore needs the frame to be euclidean, which on a reflexive frame means symmetric as well as transitive, and it gets no help from S4.</p><div class="thm"><span class="label">Theorem &middot; What the lab establishes</span><p>On a euclidean frame the conditional <span class="math" data-say="possibly necessarily G implies necessarily G">◇□G → □G</span> holds at every world for every valuation of <span class="math" data-say="G">G</span>. On the frame without the arc from w2 to w1 there is a valuation and a world where it fails. The argument is valid in S5.</p></div><h3>What the argument costs</h3><p>Two exits are open, and each is an argument. The first is to deny <span class="math" data-say="possibly necessarily G">◇□G</span>. The same logic proves <span class="math" data-say="possibly necessarily not G implies necessarily not G">◇□¬G → □¬G</span>, so whoever grants that it is possible that God necessarily exists must also refuse the parallel premise, that it is possible that God necessarily does not exist, and in S5 both premises cannot be true at one world. Granting the first is therefore not a modest concession. It carries the conclusion with it, and the modest-sounding word &ldquo;possible&rdquo; hides that. The second exit is to reject S5 as the logic of the necessity in question, for example because metaphysical necessity may not be symmetric. Then the argument has no valid form to stand on.</p><p>The lab can say none of this for you. It computes that the argument is valid on one frame and invalid on another. Which frame suits God, or necessity, or the word &ldquo;possible&rdquo; in the first premise, is the philosophical question, and it comes after the logic, not instead of it.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing a modal argument on a frame</h2></div><p>Five moves. The fourth is the one a reader tends to skip.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>State the argument as premises, a logic and a conclusion</h3><p>Mark which line is a claim about the world and which is a principle about necessity. Here the first is <span class="math" data-say="possibly necessarily G">◇□G</span> and the second is the conditional.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Test the logical line on a frame the logic is meant to describe</h3><p>Build the frame, type the conditional, and read the value at a world. On an equivalence relation it holds.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Weaken the frame by one property</h3><p>Remove the arc that symmetry requires, and read the value again. The change in the tile is the property the argument needs.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the parallel premise</h3><p>Replace <span class="math" data-say="G">G</span> with <span class="math" data-say="not G">¬G</span> in the premise and the conclusion. If the logic proves both, the two premises cannot both be granted, and the choice is no longer neutral.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Decide where to push</h3><p>Either the premise, or the claim that the frame is the right one. Say which you pick and what it costs.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing a modal argument on a frame</h2>
+      <p class="lead-in">Five moves. The fourth is the one a reader tends to skip.</p>
+      <ol class="key-ideas method"><li><strong>State the argument as premises, a logic and a conclusion.</strong> Mark which line is a claim about the world and which is a principle about necessity. Here the first is <span class="math" data-say="possibly necessarily G">◇□G</span> and the second is the conditional.</li><li><strong>Test the logical line on a frame the logic is meant to describe.</strong> Build the frame, type the conditional, and read the value at a world. On an equivalence relation it holds.</li><li><strong>Weaken the frame by one property.</strong> Remove the arc that symmetry requires, and read the value again. The change in the tile is the property the argument needs.</li><li><strong>Check the parallel premise.</strong> Replace <span class="math" data-say="G">G</span> with <span class="math" data-say="not G">¬G</span> in the premise and the conclusion. If the logic proves both, the two premises cannot both be granted, and the choice is no longer neutral.</li><li><strong>Decide where to push.</strong> Either the premise, or the claim that the frame is the right one. Say which you pick and what it costs.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1471,17 +1517,16 @@ box of G at w2: now w2 sees w1, G false there: false
 diamond of box of G at w1: false, so the conditional: true</div><p>On the frame without symmetry the antecedent is true and the consequent false. Restoring the arc does not make the consequent true. It makes the antecedent false, which is how the conditional becomes true on that frame, and it is the sense in which S5 does the work.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that the modal ontological argument is invalid</strong><span>On the equivalence frame the lab finds the conditional true, and the proof for euclidean frames shows why it holds at every world for every valuation. The argument is valid in S5. What the reader may doubt is the first premise, or the claim that the necessity in question has the arcs of S5, and each of these is a reason to reject the conclusion without calling the reasoning a mistake.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the conditional as a claim about God</strong><span><span class="math" data-say="possibly necessarily G implies necessarily G">◇□G → □G</span> mentions <span class="math" data-say="G">G</span> only as an example of a letter. The same conditional is valid for <span class="math" data-say="not G">¬G</span>, for <span class="math" data-say="p">p</span> and for any sentence at all, so it carries no theological content. All the content is in <span class="math" data-say="possibly necessarily G">◇□G</span>, which is why a reader who grants it has granted nearly everything.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a valid argument to be a proof of its conclusion</strong><span>A valid argument can be run backwards. If <span class="math" data-say="necessarily G">□G</span> is false at a world, the conditional gives that <span class="math" data-say="possibly necessarily G">◇□G</span> is false there as well. A reader who finds the conclusion more doubtful than the premise is entitled to deny the premise, and nothing in the lab ranks the two doubts.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which property of the frame the argument needs and which premise is left to dispute.</strong><p>You should be able to evaluate the conditional on an equivalence relation and on a reflexive transitive frame without symmetry, state the frame property that separates them, and name two replies open to someone who finds the conclusion hard to accept. A reply that says only &ldquo;the argument is a trick&rdquo; has not located the premise.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The frame tile and the axioms tile describe the frame, not the formula. A formula that is true at w1 on one valuation does not show validity, and the proof for euclidean frames is what shows it for every valuation.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that the modal ontological argument is invalid</strong><span>On the equivalence frame the lab finds the conditional true, and the proof for euclidean frames shows why it holds at every world for every valuation. The argument is valid in S5. What the reader may doubt is the first premise, or the claim that the necessity in question has the arcs of S5, and each of these is a reason to reject the conclusion without calling the reasoning a mistake.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the conditional as a claim about God</strong><span><span class="math" data-say="possibly necessarily G implies necessarily G">◇□G → □G</span> mentions <span class="math" data-say="G">G</span> only as an example of a letter. The same conditional is valid for <span class="math" data-say="not G">¬G</span>, for <span class="math" data-say="p">p</span> and for any sentence at all, so it carries no theological content. All the content is in <span class="math" data-say="possibly necessarily G">◇□G</span>, which is why a reader who grants it has granted nearly everything.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a valid argument to be a proof of its conclusion</strong><span>A valid argument can be run backwards. If <span class="math" data-say="necessarily G">□G</span> is false at a world, the conditional gives that <span class="math" data-say="possibly necessarily G">◇□G</span> is false there as well. A reader who finds the conclusion more doubtful than the premise is entitled to deny the premise, and nothing in the lab ranks the two doubts.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which property of the frame the argument needs and which premise is left to dispute.</strong><p>You should be able to evaluate the conditional on an equivalence relation and on a reflexive transitive frame without symmetry, state the frame property that separates them, and name two replies open to someone who finds the conclusion hard to accept. A reply that says only &ldquo;the argument is a trick&rdquo; has not located the premise.</p></div></div><div class="note"><strong>Note:</strong> The frame tile and the axioms tile describe the frame, not the formula. A formula that is true at w1 on one valuation does not show validity, and the proof for euclidean frames is what shows it for every valuation.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The argument has one modal premise</summary><p>The premise is <span class="math" data-say="possibly necessarily G">◇□G</span>: it is possible that G is necessary, where G says that a maximally great being exists. The conclusion is <span class="math" data-say="necessarily G">□G</span>, and by T, if the frame is reflexive, <span class="math" data-say="G">G</span> itself.</p></details><details class="recall"><summary>The step from premise to conclusion is a property of the frame</summary><p>The conditional <span class="math" data-say="possibly necessarily G implies necessarily G">◇□G → □G</span> is valid on a frame exactly when the frame is euclidean: whenever a world sees two worlds, the first sees the second.</p></details><details class="recall"><summary>Validity is not the same as acceptance</summary><p>A valid argument with a doubtful premise gives you a choice. You can accept the conclusion, or deny the premise, and the second has an equally good argument available.</p></details></div>
+      <h3>Summary</h3>
       <p>If it is possible that a maximally great being necessarily exists, then, in S5, it necessarily exists. The lab evaluates the conditional on a frame where it holds and on one where it fails, and shows that the missing ingredient is a property of the arcs. What remains for the reader is whether to grant the possibility premise and whether S5 is the right logic for God.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The argument has one modal premise.</strong> The premise is <span class="math" data-say="possibly necessarily G">◇□G</span>: it is possible that G is necessary, where G says that a maximally great being exists. The conclusion is <span class="math" data-say="necessarily G">□G</span>, and by T, if the frame is reflexive, <span class="math" data-say="G">G</span> itself.</li><li><strong>The step from premise to conclusion is a property of the frame.</strong> The conditional <span class="math" data-say="possibly necessarily G implies necessarily G">◇□G → □G</span> is valid on a frame exactly when the frame is euclidean: whenever a world sees two worlds, the first sees the second.</li><li><strong>Validity is not the same as acceptance.</strong> A valid argument with a doubtful premise gives you a choice. You can accept the conclusion, or deny the premise, and the second has an equally good argument available.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="G, a maximally great being exists. possibly necessarily G implies necessarily G, valid on euclidean frames. S 4 plus B equals S 5, the conditional appears. valid in S 5, the premise possibly necessarily G is disputed" tabindex="0" role="region" aria-label="Mathematical notation">G: a maximally great being exists
 ◇□G → □G  valid on euclidean frames
 S4 + B = S5: the conditional appears
@@ -2207,11 +2252,42 @@ valid in S5; the premise ◇□G is disputed</div><figcaption>A valid argument w
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2279,7 +2355,7 @@ valid in S5; the premise ◇□G is disputed</div><figcaption>A valid argument w
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

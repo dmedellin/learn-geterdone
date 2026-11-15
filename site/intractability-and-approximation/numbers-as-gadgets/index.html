@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Intractability and Approximation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Hardness that travels</p>
       <h1>Numbers as Gadgets, and Weak Hardness</h1>
       <p class="lesson-lede">Turn two clauses into eight base-ten numbers, add up every digit in every column, and watch the largest total come out at 5 against a base of 10.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A number is a row of independent columns</li><li>No column can carry, and that is a computed fact</li><li>Weakly NP-hard: hard in the magnitude, not in the digits</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The digit table, the no-carry argument, and what the pseudo-polynomial table does not buy</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Subset sum</span><p>Given a list of positive integers and a target, is there a sublist adding to the target exactly? The input is the digits of the numbers, which matters for every complexity claim on this page: a list of ten numbers with a thousand digits each is a large input, and a list of ten numbers under 100 is a small one.</p></div><h3>The construction</h3><ol><li>One column per variable and one per clause, so <span class="math" data-say="n plus m">n + m</span> columns, read in base ten.</li><li>For each variable, a number <span class="math" data-say="x true">x true</span> with a 1 in that variable's column and a 1 in every clause column the positive literal satisfies; and a number <span class="math" data-say="x false">x false</span> with a 1 in the variable's column and a 1 in every clause column the negative literal satisfies.</li><li>For each clause, two <em>slack</em> numbers with a 1 and a 2 in that clause's column and zeros everywhere else.</li><li>The target has a 1 in every variable column and a 4 in every clause column.</li></ol><div class="thm"><span class="label">Theorem &middot; The construction is a reduction</span><p>The formula is satisfiable if and only if some subset of the constructed numbers adds to the target.</p></div><div class="proof"><p>No column can carry, because every column's digits add to at most 6 across all the rows, and 6 is less than 10. So a subset hits the target exactly when it hits each column's digit separately.</p><p>A variable column can only be reached by that variable's two numbers, each contributing 1, and the target is 1, so exactly one of the two is chosen: the subset picks an assignment. A clause column receives 1 from each chosen literal number that satisfies the clause, so between 0 and 3, plus whatever the two slack numbers contribute, which is 0, 1, 2 or 3.</p><p>The target is 4. If the assignment satisfies the clause, the literal contribution is 1, 2 or 3 and exactly one of the four slack combinations makes up the remaining 3, 2 or 1. If the assignment does not satisfy it, the literal contribution is 0 and the slack numbers can supply at most 3, so the column cannot reach 4. Hence the subsets that hit the target are exactly the satisfying assignments, each with its forced slack choice &mdash; which is why the map is not merely sound but a bijection.</p><p><span class="qed">&#9633;</span></p></div><h3>What the lab built</h3><p>The loaded formula is <span class="math" data-say="x 1 or x 2 and not x 1 or x 2">(x1 or x2) and (not x1 or x2)</span>: two variables, two clauses, so four columns. The panel reports 8 numbers of 4 digits, the target 1144, 2 subsets reaching it, 2 satisfying assignments out of 4, a largest column total of 5 against the base 10, and the verdict that the map is a bijection &mdash; sound, surjective and injective, all three computed.</p><p>The column totals are 2, 2, 5 and 5. The two variable columns get a 1 from each of the variable's two numbers and nothing else. Each clause column gets a 1 from every literal number satisfying that clause &mdash; two of them here &mdash; plus 1 and 2 from the slack, which is 5. Five is comfortably under ten and the bar chart draws it against the line.</p><p>Beside the enumeration the panel runs the dynamic programme from Dynamic Programming and Optimal Substructure on the same numbers and the same target, and requires the two to agree about whether the target is reachable. Two exhaustive routes that agree is evidence; one clever route is not, and the two routes here share no code.</p><div class="example"><span class="label">Example &middot; Both subsets, added in columns</span><p><span class="math" data-say="x 1 false plus x 2 true plus slack 1.1 plus slack 1.2 plus slack 2.2">x1 false + x2 true + slack 1.1 + slack 1.2 + slack 2.2</span> is <span class="math" data-say="1001 plus 0111 plus 0010 plus 0020 plus 0002 equals 1144">1001 + 0111 + 0010 + 0020 + 0002 = 1144</span>, and carries back to <span class="math" data-say="x 1 equals F, x 2 equals T">x1 = F, x2 = T</span>. The clause-1 column reads 1 from <span class="math" data-say="x 2 true">x2 true</span> plus 1 and 2 from the slacks; the clause-2 column reads 1 from <span class="math" data-say="x 1 false">x1 false</span>, 1 from <span class="math" data-say="x 2 true">x2 true</span> and 2 from a slack. Both reach 4 without help from anywhere else in the number.</p></div><h3>Two senses of hard, and why the table does not rescue this</h3><p>It is tempting to think a problem with a dynamic programme cannot be NP-hard. The table for subset sum has one row per item and one column per value from 0 to the target, so its size is proportional to <span class="math" data-say="n">n</span> times the target. That is polynomial in the target as a NUMBER and exponential in the target as an INPUT, because a target with <span class="math" data-say="d">d</span> digits has magnitude about <span class="math" data-say="10 to the power d">10^d</span>. Here <span class="math" data-say="d">d</span> is the number of variables plus the number of clauses, so the table has about <span class="math" data-say="10 to the power the quantity n plus m">10^(n+m)</span> columns and is not an algorithm anyone can run.</p><p>The distinction has a name and a consequence. A problem that is NP-hard but has an algorithm polynomial in the numeric values is <strong>weakly</strong> NP-hard; one that stays hard even when the numbers are bounded by a polynomial in the input length is <strong>strongly</strong> NP-hard. Only weakly NP-hard problems can have the kind of approximation scheme built later on this course, and that is not a coincidence: the scheme works by making the numbers small enough for the table to fit.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>3-SAT to subset sum, by the digit table</h2></div><p>One column per variable and per clause, a target of 1s and 4s, and a base large enough that no column can carry</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The digit table, the no-carry argument, and what the pseudo-polynomial table does not buy</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Subset sum</span><p>Given a list of positive integers and a target, is there a sublist adding to the target exactly? The input is the digits of the numbers, which matters for every complexity claim on this page: a list of ten numbers with a thousand digits each is a large input, and a list of ten numbers under 100 is a small one.</p></div><h3>The construction</h3><ol><li>One column per variable and one per clause, so <span class="math" data-say="n plus m">n + m</span> columns, read in base ten.</li><li>For each variable, a number <span class="math" data-say="x true">x true</span> with a 1 in that variable's column and a 1 in every clause column the positive literal satisfies; and a number <span class="math" data-say="x false">x false</span> with a 1 in the variable's column and a 1 in every clause column the negative literal satisfies.</li><li>For each clause, two <em>slack</em> numbers with a 1 and a 2 in that clause's column and zeros everywhere else.</li><li>The target has a 1 in every variable column and a 4 in every clause column.</li></ol><div class="thm"><span class="label">Theorem &middot; The construction is a reduction</span><p>The formula is satisfiable if and only if some subset of the constructed numbers adds to the target.</p></div><div class="proof"><p>No column can carry, because every column's digits add to at most 6 across all the rows, and 6 is less than 10. So a subset hits the target exactly when it hits each column's digit separately.</p><p>A variable column can only be reached by that variable's two numbers, each contributing 1, and the target is 1, so exactly one of the two is chosen: the subset picks an assignment. A clause column receives 1 from each chosen literal number that satisfies the clause, so between 0 and 3, plus whatever the two slack numbers contribute, which is 0, 1, 2 or 3.</p><p>The target is 4. If the assignment satisfies the clause, the literal contribution is 1, 2 or 3 and exactly one of the four slack combinations makes up the remaining 3, 2 or 1. If the assignment does not satisfy it, the literal contribution is 0 and the slack numbers can supply at most 3, so the column cannot reach 4. Hence the subsets that hit the target are exactly the satisfying assignments, each with its forced slack choice &mdash; which is why the map is not merely sound but a bijection.</p><p><span class="qed">&#9633;</span></p></div><h3>What the lab built</h3><p>The loaded formula is <span class="math" data-say="x 1 or x 2 and not x 1 or x 2">(x1 or x2) and (not x1 or x2)</span>: two variables, two clauses, so four columns. The panel reports 8 numbers of 4 digits, the target 1144, 2 subsets reaching it, 2 satisfying assignments out of 4, a largest column total of 5 against the base 10, and the verdict that the map is a bijection &mdash; sound, surjective and injective, all three computed.</p><p>The column totals are 2, 2, 5 and 5. The two variable columns get a 1 from each of the variable's two numbers and nothing else. Each clause column gets a 1 from every literal number satisfying that clause &mdash; two of them here &mdash; plus 1 and 2 from the slack, which is 5. Five is comfortably under ten and the bar chart draws it against the line.</p><p>Beside the enumeration the panel runs the dynamic programme from Dynamic Programming and Optimal Substructure on the same numbers and the same target, and requires the two to agree about whether the target is reachable. Two exhaustive routes that agree is evidence; one clever route is not, and the two routes here share no code.</p><div class="example"><span class="label">Example &middot; Both subsets, added in columns</span><p><span class="math" data-say="x 1 false plus x 2 true plus slack 1.1 plus slack 1.2 plus slack 2.2">x1 false + x2 true + slack 1.1 + slack 1.2 + slack 2.2</span> is <span class="math" data-say="1001 plus 0111 plus 0010 plus 0020 plus 0002 equals 1144">1001 + 0111 + 0010 + 0020 + 0002 = 1144</span>, and carries back to <span class="math" data-say="x 1 equals F, x 2 equals T">x1 = F, x2 = T</span>. The clause-1 column reads 1 from <span class="math" data-say="x 2 true">x2 true</span> plus 1 and 2 from the slacks; the clause-2 column reads 1 from <span class="math" data-say="x 1 false">x1 false</span>, 1 from <span class="math" data-say="x 2 true">x2 true</span> and 2 from a slack. Both reach 4 without help from anywhere else in the number.</p></div><h3>Two senses of hard, and why the table does not rescue this</h3><p>It is tempting to think a problem with a dynamic programme cannot be NP-hard. The table for subset sum has one row per item and one column per value from 0 to the target, so its size is proportional to <span class="math" data-say="n">n</span> times the target. That is polynomial in the target as a NUMBER and exponential in the target as an INPUT, because a target with <span class="math" data-say="d">d</span> digits has magnitude about <span class="math" data-say="10 to the power d">10^d</span>. Here <span class="math" data-say="d">d</span> is the number of variables plus the number of clauses, so the table has about <span class="math" data-say="10 to the power the quantity n plus m">10^(n+m)</span> columns and is not an algorithm anyone can run.</p><p>The distinction has a name and a consequence. A problem that is NP-hard but has an algorithm polynomial in the numeric values is <strong>weakly</strong> NP-hard; one that stays hard even when the numbers are bounded by a polynomial in the input length is <strong>strongly</strong> NP-hard. Only weakly NP-hard problems can have the kind of approximation scheme built later on this course, and that is not a coincidence: the scheme works by making the numbers small enough for the table to fit.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>3-SAT to subset sum, by the digit table</h2></div><p>One column per variable and per clause, a target of 1s and 4s, and a base large enough that no column can carry</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>3-SAT to subset sum, by the digit table</strong><span>one column per variable and per clause, and a base big enough that no column can carry</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>a column total, safely under the base</span><span class="tone-red"><i class="legend-swatch"></i>a column that would carry</span><span class="tone-green"><i class="legend-swatch"></i>a row in the subset shown</span></div>
@@ -1405,10 +1448,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ssTable"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ssMap"></table></div>
       <div class="status-banner" id="ssStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Read the table as the construction, then carry a subset back</h3>
-          <p>The column totals are computed over every row and drawn against the base, because &ldquo;no column carries&rdquo; is the proof obligation the whole reduction rests on. Both sides are solved exhaustively and the map between them is checked to be a bijection &mdash; which this one is, unlike the independent-set reduction.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Read the table as the construction, then carry a subset back</h3>
+            <p>The column totals are computed over every row and drawn against the base, because &ldquo;no column carries&rdquo; is the proof obligation the whole reduction rests on. Both sides are solved exhaustively and the map between them is checked to be a bijection &mdash; which this one is, unlike the independent-set reduction.</p>
         <div class="field">
           <label for="ssPreset">Worked example</label>
           <select id="ssPreset"><option value="two" selected>two variables, two clauses</option><option value="three">three variables, two clauses</option><option value="forced">three clauses on two variables</option><option value="unsat">four clauses on two variables — unsatisfiable</option><option value="single">one clause</option></select>
@@ -1432,12 +1475,14 @@
           <div class="kpi"><span>The dynamic programme agrees</span><strong id="ssDp">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="ssHint" style="margin:0;">Each variable contributes two numbers &mdash; <span class="tt">x true</span> and <span class="tt">x false</span> &mdash; each with a 1 in its own column and a 1 in every clause column it satisfies. The target has 1 in every variable column, which forces exactly one of each pair, and 4 in every clause column. A clause with <span class="tt">k</span> true literals contributes <span class="tt">k</span> to its column, and its two slack numbers 1 and 2 make up the difference in exactly one way &mdash; which is why this map is a bijection and why <span class="tt">k = 0</span> can never be fixed.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a digit-table reduction, and checking it cannot carry</h2></div><p>The construction is four lines. The check that makes it valid is one addition per column, and it is the step to do first.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the columns before writing any number</h3><p>One per variable, one per clause. The number of columns fixes the width of every row and the magnitude of every number, and it is the quantity that makes this reduction produce astronomically large integers from a small formula.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Add every digit in each column, over every row</h3><p>Not over the rows in a solution &mdash; over all of them. The question is whether a carry is possible at all, which is a property of the table rather than of any subset. The panel prints the totals and colours the bar red if any total reaches the base.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check the forcing in the variable columns</h3><p>The target digit is 1 and exactly two rows contribute to that column, so exactly one is chosen. If a construction lets both or neither be chosen it is not encoding an assignment, and no amount of correct clause arithmetic will repair it.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the slack arithmetic in both directions</h3><p>A satisfied clause receives 1, 2 or 3 from its literals and the slack numbers can supply 3, 2 or 1 in exactly one way each. An unsatisfied clause receives 0 and the slack tops out at 3. Both halves are needed: the first makes the map onto the models, the second makes it sound.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Say which quantity the running time is polynomial in</h3><p>For any algorithm you quote on a numeric problem, name whether the bound is polynomial in the input length or in the magnitude of the numbers. The two coincide for graph problems and diverge here, and every confused claim about subset sum lives in that gap.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a digit-table reduction, and checking it cannot carry</h2>
+      <p class="lead-in">The construction is four lines. The check that makes it valid is one addition per column, and it is the step to do first.</p>
+      <ol class="key-ideas method"><li><strong>Count the columns before writing any number.</strong> One per variable, one per clause. The number of columns fixes the width of every row and the magnitude of every number, and it is the quantity that makes this reduction produce astronomically large integers from a small formula.</li><li><strong>Add every digit in each column, over every row.</strong> Not over the rows in a solution &mdash; over all of them. The question is whether a carry is possible at all, which is a property of the table rather than of any subset. The panel prints the totals and colours the bar red if any total reaches the base.</li><li><strong>Check the forcing in the variable columns.</strong> The target digit is 1 and exactly two rows contribute to that column, so exactly one is chosen. If a construction lets both or neither be chosen it is not encoding an assignment, and no amount of correct clause arithmetic will repair it.</li><li><strong>Check the slack arithmetic in both directions.</strong> A satisfied clause receives 1, 2 or 3 from its literals and the slack numbers can supply 3, 2 or 1 in exactly one way each. An unsatisfied clause receives 0 and the slack tops out at 3. Both halves are needed: the first makes the map onto the models, the second makes it sound.</li><li><strong>Say which quantity the running time is polynomial in.</strong> For any algorithm you quote on a numeric problem, name whether the bound is polynomial in the input length or in the magnitude of the numbers. The two coincide for graph problems and diverge here, and every confused claim about subset sum lives in that gap.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1470,17 +1515,16 @@
   the map is a bijection: sound, surjective and injective</div><p>Both models have <span class="math" data-say="x 2">x2</span> true, and they must: if <span class="math" data-say="x 2">x2</span> were false the two clauses would read <span class="math" data-say="x 1">x1</span> and <span class="math" data-say="not x 1">not x1</span>. So the <span class="math" data-say="x 2 true">x2 true</span> row is in both subsets and the <span class="math" data-say="x 2 false">x2 false</span> row is in neither, which is the assignment being forced showing up as a row that is never chosen.</p><p>The slack choices are the part worth checking by hand. In the first subset clause 1 gets 1 from <span class="math" data-say="x 2 true">x2 true</span> and needs 3 more, so both slacks are taken; clause 2 gets 1 from <span class="math" data-say="x 1 false">x1 false</span> and 1 from <span class="math" data-say="x 2 true">x2 true</span> and needs 2 more, so only the 2 is taken. Each shortfall has exactly one repair, which is the injectivity of the map made concrete.</p><p>For a faded rehearsal, switch to the single-clause example and predict the target before running it. The supplied first move: two variables and one clause means three columns, and the target is 1 in each variable column and 4 in the clause column. Say what the target is as a number and how many rows there are, then check &mdash; and note that being right about this table says nothing about the three-variable one, where the largest column total moves to 6.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming no carry instead of computing it</strong><span>The independence of the columns is the entire reduction and it is one addition per column to check. A construction with a base that is too small is wrong in a way that produces plausible-looking numbers and correct-looking totals on small instances, which is the worst failure mode available here.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the dynamic programme as a contradiction</strong><span>&ldquo;It has a polynomial algorithm, so it cannot be NP-hard&rdquo; is the commonest error about this problem. The algorithm is polynomial in a quantity that is not the input length. Say which quantity, every time, and the apparent paradox disappears.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Counting numbers instead of digits</strong><span>Eight numbers sounds small. Each is four digits here and would be <span class="math" data-say="n plus m">n + m</span> digits in general, and it is the digits that the input length counts and that the table's column count is exponential in. The panel labels this field &ldquo;numbers built, and their width&rdquo; for that reason.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build the digit table for a formula of your own and justify the base you chose.</strong><p>You should be able to lay out the columns, write both numbers for each variable and both slack numbers for each clause, state the target, add each column over every row to show no carry is possible, and say whether a numeric algorithm you quote is polynomial in the input length or in the magnitude of the numbers.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Weak hardness is the hinge of this course: it is what makes an approximation scheme possible later, and &ldquo;Accuracy by the Epsilon&rdquo; uses exactly this table with the values scaled down until it fits.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming no carry instead of computing it</strong><span>The independence of the columns is the entire reduction and it is one addition per column to check. A construction with a base that is too small is wrong in a way that produces plausible-looking numbers and correct-looking totals on small instances, which is the worst failure mode available here.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the dynamic programme as a contradiction</strong><span>&ldquo;It has a polynomial algorithm, so it cannot be NP-hard&rdquo; is the commonest error about this problem. The algorithm is polynomial in a quantity that is not the input length. Say which quantity, every time, and the apparent paradox disappears.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Counting numbers instead of digits</strong><span>Eight numbers sounds small. Each is four digits here and would be <span class="math" data-say="n plus m">n + m</span> digits in general, and it is the digits that the input length counts and that the table's column count is exponential in. The panel labels this field &ldquo;numbers built, and their width&rdquo; for that reason.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build the digit table for a formula of your own and justify the base you chose.</strong><p>You should be able to lay out the columns, write both numbers for each variable and both slack numbers for each clause, state the target, add each column over every row to show no carry is possible, and say whether a numeric algorithm you quote is polynomial in the input length or in the magnitude of the numbers.</p></div></div><div class="note"><strong>Note:</strong> Weak hardness is the hinge of this course: it is what makes an approximation scheme possible later, and &ldquo;Accuracy by the Epsilon&rdquo; uses exactly this table with the values scaled down until it fits.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A number is a row of independent columns</summary><p>Each variable gets a number for <span class="math" data-say="x">x</span> true and a number for <span class="math" data-say="x">x</span> false, each carrying a 1 in its own variable column and a 1 in every clause column the literal satisfies. The target has 1 in each variable column, which forces exactly one of each pair into the subset, and 4 in each clause column. So choosing a subset that hits the target <em>is</em> choosing an assignment, and the arithmetic does the work the triangles did in the graph construction.</p></details><details class="recall"><summary>No column can carry, and that is a computed fact</summary><p>The construction is nonsense if a column can carry, because then a shortfall in one column could be made up by an excess in another and the columns would stop encoding independent constraints. The panel adds every digit of every row, whether the row is in the subset or not: a variable column totals 2 and a clause column totals at most 6 &mdash; three literal occurrences plus the slack numbers 1 and 2. Six is less than ten. On the loaded formula the largest total is 5 and the panel prints it against the base.</p></details><details class="recall"><summary>Weakly NP-hard: hard in the magnitude, not in the digits</summary><p>Subset sum has a dynamic programme filling a table of size proportional to the number of items times the target, which Dynamic Programming and Optimal Substructure built. That is polynomial in the target's <em>value</em> and exponential in its number of digits, and the input is the digits. Here the target has one digit per variable plus one per clause, so the numbers this reduction produces are astronomically large in the formula's size and the table is no help. A problem hard only when its numbers are large is <strong>weakly</strong> NP-hard, and subset sum is the standard example.</p></details></div>
+      <h3>Summary</h3>
       <p>The transformed instance here is not a graph, it is a list of integers, and the construction is a table of digits. The reason it works is arithmetical: the largest column total is 5 and the base is 10, so no column can carry into the next and the columns are independent. The lab adds every digit of every row to check that, and the same page explains why a problem with a table-filling algorithm is NP-hard anyway.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A number is a row of independent columns.</strong> Each variable gets a number for <span class="math" data-say="x">x</span> true and a number for <span class="math" data-say="x">x</span> false, each carrying a 1 in its own variable column and a 1 in every clause column the literal satisfies. The target has 1 in each variable column, which forces exactly one of each pair into the subset, and 4 in each clause column. So choosing a subset that hits the target <em>is</em> choosing an assignment, and the arithmetic does the work the triangles did in the graph construction.</li><li><strong>No column can carry, and that is a computed fact.</strong> The construction is nonsense if a column can carry, because then a shortfall in one column could be made up by an excess in another and the columns would stop encoding independent constraints. The panel adds every digit of every row, whether the row is in the subset or not: a variable column totals 2 and a clause column totals at most 6 &mdash; three literal occurrences plus the slack numbers 1 and 2. Six is less than ten. On the loaded formula the largest total is 5 and the panel prints it against the base.</li><li><strong>Weakly NP-hard: hard in the magnitude, not in the digits.</strong> Subset sum has a dynamic programme filling a table of size proportional to the number of items times the target, which Dynamic Programming and Optimal Substructure built. That is polynomial in the target's <em>value</em> and exponential in its number of digits, and the input is the digits. Here the target has one digit per variable plus one per clause, so the numbers this reduction produces are astronomically large in the formula's size and the table is no help. A problem hard only when its numbers are large is <strong>weakly</strong> NP-hard, and subset sum is the standard example.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="one column per variable and one per clause, two numbers per variable, two slack per clause. target, 1 in every variable column, 4 in every clause column. 2 variables, 2 clauses, goes to, 8 numbers of 4 digits, target 1144. largest column total 5, against the base 10, so no column can carry. 2 subsets reach the target, 2 satisfying assignments, and the map is a bijection. the table is big O of the quantity n times target, the target has n plus m digits, so it is exponential in the input" tabindex="0" role="region" aria-label="Mathematical notation">one column per variable and one per clause; two numbers per variable, two slack per clause
 target: 1 in every variable column, 4 in every clause column
 
@@ -3383,11 +3427,42 @@ the table is O(n · target); the target has n + m digits, so it is exponential i
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3455,7 +3530,7 @@ the table is O(n · target); the target has n + m digits, so it is exponential i
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

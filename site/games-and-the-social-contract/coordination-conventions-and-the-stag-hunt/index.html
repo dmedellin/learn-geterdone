@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Games and the Social Contract</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; One-shot games</p>
       <h1>Coordination, Conventions and the Stag Hunt</h1>
       <p class="lesson-lede">When several equilibria pay, what makes people land on one is a shared expectation, and the belief it takes can be computed.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Coordination games</li><li>Convention</li><li>Payoff dominance against risk dominance</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Three coordination games</h2>
-      <article class="prose reading"><p>The driving game is the plainest coordination problem. Two drivers meet on a road and each chooses to keep to the left or to the right. If they choose the same side they pass safely and each gets <span class="math" data-say="1">1</span>. If they choose differently each gets <span class="math" data-say="0">0</span>. The lab marks two equilibria, left with left and right with right, and gives them identical payoffs.</p><div class="defbox"><span class="label">Definition &middot; Convention</span><p>A <strong>convention</strong> is a way of behaving, in a coordination game that keeps coming up, such that everyone follows it, everyone expects the others to follow it, and everyone prefers to follow it provided the others do. Some other way of behaving would have served as well.</p></div><p>Driving on the right is a convention in this sense in every country that does it, and so is driving on the left. Nothing in the table prefers either. What keeps a country on one side is each driver's expectation of the others, and that expectation is in turn kept going by the fact that each does best conforming. It does not need anyone to have promised anything, which is why the term &ldquo;agreement&rdquo; is the wrong model: an agreement could start a convention, and a custom with no origin in any agreement can be one.</p><p>The stag hunt has the same two matched cells with payoffs that differ. Two hunters can each go for a stag or for a hare. A stag takes both of them to bring down and is worth <span class="math" data-say="4">4</span> to each; a hare can be taken alone and is worth <span class="math" data-say="3">3</span>. A hunter who goes for a stag alone gets nothing.</p><div class="mathblock" data-say="column Stag, column Hare. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">                 column Stag    column Hare
-     row Stag       4, 4           0, 3
-     row Hare       3, 0           3, 3</div><p>Stag with stag and Hare with Hare are both equilibria. The first pays both players more, so it is <strong>payoff-dominant</strong>; the second is Pareto-dominated by the first. But Hare guarantees <span class="math" data-say="3">3</span> whatever the other does, and Stag risks <span class="math" data-say="0">0</span>. One standard measure of that risk compares what each player would lose by deviating: from Stag, Stag a deviator loses <span class="math" data-say="1">1</span>, and from Hare, Hare a deviator loses <span class="math" data-say="3">3</span>. The equilibrium whose product of losses is larger, here <span class="math" data-say="3 times 3 equals 9">3·3 = 9</span> against <span class="math" data-say="1 times 1 equals 1">1·1 = 1</span>, is <strong>risk-dominant</strong>. That is Hare, Hare.</p><h3>The belief at which stag is worth it</h3><p>Let <span class="math" data-say="q">q</span> be the probability the hunter gives to the other hunting stag. Going for the stag pays <span class="math" data-say="4 q">4q</span>, since it succeeds only when the other joins. Going for the hare pays <span class="math" data-say="3">3</span> whatever happens. So stag is the better choice exactly when <span class="math" data-say="4 q is at least 3">4q ≥ 3</span>, that is when <span class="math" data-say="q is at least 3 over 4">q ≥ 3/4</span>.</p><p>Three-quarters is the number the lab prints as the mixed equilibrium, now read as a threshold on belief. A hunter who is only fifty-fifty about the partner should go for the hare, and a pair who both give stag a probability of nine in ten can sustain it. The table does not say which belief the pair will have. That depends on what each has seen the other do, which is the part of the problem a convention answers and a table cannot.</p><p>A third game, the battle of the sexes, adds disagreement about which match is better. One player prefers the opera and the other the football; both prefer going together to going apart. With the opera worth <span class="math" data-say="3">3</span> to one and <span class="math" data-say="2">2</span> to the other, and the football the reverse, the lab marks both matches as equilibria and prints a mix in which the row player chooses the opera with probability <span class="math" data-say="3 over 5">3/5</span> and the column player with probability <span class="math" data-say="2 over 5">2/5</span>. At that mix each expects only <span class="math" data-say="6 over 5">6/5</span>, less than the <span class="math" data-say="2">2</span> either gets at the match they like less. The move from a coordination problem to a bargaining problem is already visible: even a convention now favours someone.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A game in a table</h2></div><p>best responses, equilibria, dominance and efficiency, computed from the payoffs</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Three coordination games</h2><div class="prose reading"><p>The driving game is the plainest coordination problem. Two drivers meet on a road and each chooses to keep to the left or to the right. If they choose the same side they pass safely and each gets <span class="math" data-say="1">1</span>. If they choose differently each gets <span class="math" data-say="0">0</span>. The lab marks two equilibria, left with left and right with right, and gives them identical payoffs.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A game in a table</h2></div><p>best responses, equilibria, dominance and efficiency, computed from the payoffs</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Two players, payoffs row first</strong><span>an equilibrium is a cell where both are best-responding</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gaTable"></table></div>
       <div class="status-banner" id="gaStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Compare the equilibria</h3>
-          <p>Efficient cells are shown in green and an equilibrium that is not efficient in amber. The mixed tile is the probability, for each player, of the first strategy.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Compare the equilibria</h3>
+            <p>Efficient cells are shown in green and an equilibrium that is not efficient in amber. The mixed tile is the probability, for each player, of the first strategy.</p>
         <div class="field">
           <label for="gaPreset">Worked example</label>
           <select id="gaPreset"><option value="stag" selected>Stag worth 4, hare worth 3, a failed stag 0</option><option value="driving">Left or right, a match pays 1</option><option value="sexes">Opera or football, each prefers a different match</option></select>
@@ -1436,12 +1477,17 @@
           <div class="kpi"><span>Pareto</span><strong id="gaPareto">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Convention</span><p>A <strong>convention</strong> is a way of behaving, in a coordination game that keeps coming up, such that everyone follows it, everyone expects the others to follow it, and everyone prefers to follow it provided the others do. Some other way of behaving would have served as well.</p></div><p>Driving on the right is a convention in this sense in every country that does it, and so is driving on the left. Nothing in the table prefers either. What keeps a country on one side is each driver's expectation of the others, and that expectation is in turn kept going by the fact that each does best conforming. It does not need anyone to have promised anything, which is why the term &ldquo;agreement&rdquo; is the wrong model: an agreement could start a convention, and a custom with no origin in any agreement can be one.</p><p>The stag hunt has the same two matched cells with payoffs that differ. Two hunters can each go for a stag or for a hare. A stag takes both of them to bring down and is worth <span class="math" data-say="4">4</span> to each; a hare can be taken alone and is worth <span class="math" data-say="3">3</span>. A hunter who goes for a stag alone gets nothing.</p><div class="mathblock" data-say="column Stag, column Hare. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">                 column Stag    column Hare
+     row Stag       4, 4           0, 3
+     row Hare       3, 0           3, 3</div><p>Stag with stag and Hare with Hare are both equilibria. The first pays both players more, so it is <strong>payoff-dominant</strong>; the second is Pareto-dominated by the first. But Hare guarantees <span class="math" data-say="3">3</span> whatever the other does, and Stag risks <span class="math" data-say="0">0</span>. One standard measure of that risk compares what each player would lose by deviating: from Stag, Stag a deviator loses <span class="math" data-say="1">1</span>, and from Hare, Hare a deviator loses <span class="math" data-say="3">3</span>. The equilibrium whose product of losses is larger, here <span class="math" data-say="3 times 3 equals 9">3·3 = 9</span> against <span class="math" data-say="1 times 1 equals 1">1·1 = 1</span>, is <strong>risk-dominant</strong>. That is Hare, Hare.</p><h3>The belief at which stag is worth it</h3><p>Let <span class="math" data-say="q">q</span> be the probability the hunter gives to the other hunting stag. Going for the stag pays <span class="math" data-say="4 q">4q</span>, since it succeeds only when the other joins. Going for the hare pays <span class="math" data-say="3">3</span> whatever happens. So stag is the better choice exactly when <span class="math" data-say="4 q is at least 3">4q ≥ 3</span>, that is when <span class="math" data-say="q is at least 3 over 4">q ≥ 3/4</span>.</p><p>Three-quarters is the number the lab prints as the mixed equilibrium, now read as a threshold on belief. A hunter who is only fifty-fifty about the partner should go for the hare, and a pair who both give stag a probability of nine in ten can sustain it. The table does not say which belief the pair will have. That depends on what each has seen the other do, which is the part of the problem a convention answers and a table cannot.</p><p>A third game, the battle of the sexes, adds disagreement about which match is better. One player prefers the opera and the other the football; both prefer going together to going apart. With the opera worth <span class="math" data-say="3">3</span> to one and <span class="math" data-say="2">2</span> to the other, and the football the reverse, the lab marks both matches as equilibria and prints a mix in which the row player chooses the opera with probability <span class="math" data-say="3 over 5">3/5</span> and the column player with probability <span class="math" data-say="2 over 5">2/5</span>. At that mix each expects only <span class="math" data-say="6 over 5">6/5</span>, less than the <span class="math" data-say="2">2</span> either gets at the match they like less. The move from a coordination problem to a bargaining problem is already visible: even a convention now favours someone.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a coordination game</h2></div><p>Five questions about a table with two matching cells.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the pure equilibria</h3><p>Mark the best responses. A coordination game has at least two doubly marked cells.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compare their payoffs</h3><p>If one pays everyone more, it is payoff-dominant. If the payoffs are the same, the table is silent.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find what each player risks</h3><p>Ask what a player gets in each equilibrium if the other player plays the other strategy.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compute the belief threshold</h3><p>With belief <span class="math" data-say="q">q</span> that the other plays the good strategy, write both payoffs and solve for the <span class="math" data-say="q">q</span> that makes them equal.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Say what would settle the choice</h3><p>Precedent, a signal, or a history of play. These are things outside the table, and a convention is what they leave behind.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a coordination game</h2>
+      <p class="lead-in">Five questions about a table with two matching cells.</p>
+      <ol class="key-ideas method"><li><strong>List the pure equilibria.</strong> Mark the best responses. A coordination game has at least two doubly marked cells.</li><li><strong>Compare their payoffs.</strong> If one pays everyone more, it is payoff-dominant. If the payoffs are the same, the table is silent.</li><li><strong>Find what each player risks.</strong> Ask what a player gets in each equilibrium if the other player plays the other strategy.</li><li><strong>Compute the belief threshold.</strong> With belief <span class="math" data-say="q">q</span> that the other plays the good strategy, write both payoffs and solve for the <span class="math" data-say="q">q</span> that makes them equal.</li><li><strong>Say what would settle the choice.</strong> Precedent, a signal, or a history of play. These are things outside the table, and a convention is what they leave behind.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1459,17 +1505,16 @@ Stag is at least as good when  4q &gt;= 3
 so  q &gt;= 3/4</div><p>The lab's mixed equilibrium, <span class="math" data-say="3 over 4">3/4</span> for each player, is the same number: it is the belief that leaves the other player indifferent between stag and hare. Read as a threshold on belief it says how much trust the better equilibrium needs.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a convention is an agreement</strong><span>In the driving game the two sides pay the same, and no one signs anything for either. What makes each side an equilibrium is that conforming is a best response to the others conforming. An agreement can start such a regularity, but a convention that began in custom is as much a convention as one that began in a treaty.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the payoff-dominant equilibrium to be the one rational players choose</strong><span>Stag with stag pays <span class="math" data-say="4">4</span> each, against <span class="math" data-say="3">3</span> for hare with hare, and rational hunters still end up at hare when each doubts the other. Rationality alone does not pick between equilibria; expectation does.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Hunting stag on an even chance</strong><span>A fifty-fifty belief gives stag an expectation of <span class="math" data-say="2">2</span> against the hare's certain <span class="math" data-say="3">3</span>. The better equilibrium needs a belief of three in four, which is the reason trust is hard to start and easy to lose.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the belief at which the risky equilibrium is worth it.</strong><p>Given a two-by-two coordination game, name its pure equilibria, say which is payoff-dominant and which is risk-dominant, and compute the probability of the partner's cooperation above which the better equilibrium is the better bet.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Risk dominance has several definitions. The one here, the larger product of deviation losses, is the standard one for two-by-two games and agrees with the belief threshold: the risk-dominant equilibrium is the one that is best for the wider range of beliefs.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a convention is an agreement</strong><span>In the driving game the two sides pay the same, and no one signs anything for either. What makes each side an equilibrium is that conforming is a best response to the others conforming. An agreement can start such a regularity, but a convention that began in custom is as much a convention as one that began in a treaty.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the payoff-dominant equilibrium to be the one rational players choose</strong><span>Stag with stag pays <span class="math" data-say="4">4</span> each, against <span class="math" data-say="3">3</span> for hare with hare, and rational hunters still end up at hare when each doubts the other. Rationality alone does not pick between equilibria; expectation does.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Hunting stag on an even chance</strong><span>A fifty-fifty belief gives stag an expectation of <span class="math" data-say="2">2</span> against the hare's certain <span class="math" data-say="3">3</span>. The better equilibrium needs a belief of three in four, which is the reason trust is hard to start and easy to lose.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the belief at which the risky equilibrium is worth it.</strong><p>Given a two-by-two coordination game, name its pure equilibria, say which is payoff-dominant and which is risk-dominant, and compute the probability of the partner's cooperation above which the better equilibrium is the better bet.</p></div></div><div class="note"><strong>Note:</strong> Risk dominance has several definitions. The one here, the larger product of deviation losses, is the standard one for two-by-two games and agrees with the belief threshold: the risk-dominant equilibrium is the one that is best for the wider range of beliefs.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Coordination games</summary><p>Each player does best by matching the other, and there is more than one match to choose. The payoffs reward getting on the same page and do not, in the plainest cases, say which page.</p></details><details class="recall"><summary>Convention</summary><p>A convention is a regularity that is an equilibrium of a coordination game that recurs, and that is followed because the others follow it. Another regularity would have done as well.</p></details><details class="recall"><summary>Payoff dominance against risk dominance</summary><p>One equilibrium may pay both players more while another costs them less if the other player turns out to be elsewhere. The two properties can pick different equilibria.</p></details></div>
+      <h3>Summary</h3>
       <p>In a coordination game both players want to match, and there is more than one way to match. A convention is an equilibrium that is kept going by each player's expectation that the others keep it, with no promise needed. In the stag hunt the best match is also the riskier one, and the lab gives the belief at which the risk is worth taking.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Coordination games.</strong> Each player does best by matching the other, and there is more than one match to choose. The payoffs reward getting on the same page and do not, in the plainest cases, say which page.</li><li><strong>Convention.</strong> A convention is a regularity that is an equilibrium of a coordination game that recurs, and that is followed because the others follow it. Another regularity would have done as well.</li><li><strong>Payoff dominance against risk dominance.</strong> One equilibrium may pay both players more while another costs them less if the other player turns out to be elsewhere. The two properties can pick different equilibria.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="coordination, match, and several matches pay. convention, stable because others conform. two equilibria, one pays most, one is safest. stag is best only above a belief threshold" tabindex="0" role="region" aria-label="Mathematical notation">coordination: match, and several matches pay
 convention: stable because others conform
 two equilibria: one pays most, one is safest
@@ -2250,11 +2295,42 @@ stag is best only above a belief threshold</div><figcaption>Which equilibrium, a
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2322,7 +2398,7 @@ stag is best only above a belief threshold</div><figcaption>Which equilibrium, a
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

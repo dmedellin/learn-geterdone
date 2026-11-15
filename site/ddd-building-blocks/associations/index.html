@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,46 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Building Blocks of a Model-Driven Design</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · A Model Expressed in Software</p>
       <h1>Associations</h1>
       <p class="lesson-lede">Every link the model draws is a mechanism in the code, so impose a direction, add a qualifier, and remove the links the job does not need.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Traversal direction</li><li>Qualifier</li><li>Many end</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The section&#x27;s argument, then the three moves, then the count</h2>
-      <article class="prose reading"><p>&ldquo;It is important to constrain relationships as much as possible. A bidirectional association means that both objects can be understood only together.&rdquo; That is Evans in the Associations section of Chapter 5, A Model Expressed in Software. The chapter's opening sets out its plan: connect the model and the code at the level of detail, starting with associations, then the three kinds of model element that carry the model, Entities, Value Objects and Services, and last Modules. This lesson reads the opening and the first section.</p><p>The section starts from a correspondence. For each association the model says can be traversed, the code needs a mechanism that behaves the same way. A link between a customer and a sales representative is, on one side, a relationship between two people that the team judged relevant, and on the other, a pointer, or a method that looks the other up in a database. A one-to-many link may be a collection in a field, or a query that builds the objects when asked; both carry the same model, and the design must choose one whose behaviour matches the association.</p><p>The trouble is that the world is full of many-to-many links, many of them naturally two-way, and so are early models, while the brainstorm is still going. Those general associations are hard to implement and to maintain, and they say little about the relationship. Evans gives at least three ways to make them tractable: impose a traversal direction, add a qualifier to reduce the multiplicity, and eliminate associations that are not essential.</p><p>His example of the first is a country and its presidents, a link that is one-to-many and could be followed either way, though almost nobody starts from a person and asks which country he led. Making it one-way, from country to president, is both a simpler design and an insight: one direction matters more, and the person no longer depends on the far lesser idea of a presidency. The second move comes from looking harder at the same link. A country has one president at a time, so qualified by the date the association is one-to-one, and the rule is now in the model. A direction imposed on a many-to-many link, he adds, reduces its implementation to one-to-many.</p><p>Constraining associations wherever the domain allows has a second benefit: the two-way links that remain now mean something, since each says that both directions matter to the domain or the application. The last move is the simplest, to remove an association altogether when neither the job nor the meaning of the objects needs it. Evans closes with a brokerage account, written first as plain fields and then as database lookups, both consistent with one model; qualifying its investments by stock turns a set into a map, a rule that he notes would not hold for every business, and that once found belongs in the model and the code.</p><p>Now the count, on a school timetable. The lab takes each association as a record of its two classes, its ends (one to one, one to many, many to one or many to many, typed 1-1, 1-n, n-1 and n-n), its direction (both, or a-b when only the first navigates to the second) and whether it is qualified, and a second list for the model after the moves. The preset <code>timetable</code> starts with five associations, all two-way: a school's teachers, teachers and courses, a room's courses, students and courses, and a student's locker. It counts 10 navigable directions, 2 many-to-many associations and 6 many ends. A two-way link is two references to keep in step, which is what the code below has to do.</p><pre class="codeblock" data-say="line 1, comment, Both ways every change must be made twice, and kept in step.. line 2, class teacher. line 3, private final set of course courses is set to new hash set. line 5, void assign of course c. line 6, courses dot add of c. line 7, c dot add teacher of this, comment, the other end, or the model lies" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Both ways: every change must be made twice, and kept in step.</span>
-<span class="cl">class Teacher {</span>
-<span class="cl">    private final Set&lt;Course&gt; courses = new HashSet&lt;&gt;();</span>
-<span class="cl"></span>
-<span class="cl">    void assign(Course c) {</span>
-<span class="cl">        courses.add(c);</span>
-<span class="cl">        c.addTeacher(this);   // the other end, or the model lies</span>
-<span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The model after the moves keeps four associations. The school reaches its teachers and a teacher reaches his or her courses, one way each, because the timetable is printed per teacher; the room's courses are one way and qualified by period, since a room holds one course at a time; students and courses stay two-way, because the school needs class lists and each student's timetable; the locker goes, since timetabling never asks about it. The lab counts 4 associations, 5 navigable directions, 2 many-to-many associations and 5 many ends, and its two-way tile falls from 5 links to 1, the one left with two references to keep in step. The change tile gives 1 association, 5 directions, 4 two-way links and 1 many end fewer.</p><pre class="codeblock" data-say="line 1, comment, Qualified by period a room holds one course in a period.. line 2, class room. line 3, private final map of period and course timetable is set to new hash map. line 5, course course at of period p. line 6, return timetable dot get of p. line 9, void book of period p, course c. line 10, if timetable dot contains key of p. line 11, throw new illegal state exception of room taken in plus p. line 13, timetable dot put of p, c" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Qualified by period: a room holds one course in a period.</span>
-<span class="cl">class Room {</span>
-<span class="cl">    private final Map&lt;Period, Course&gt; timetable = new HashMap&lt;&gt;();</span>
-<span class="cl"></span>
-<span class="cl">    Course courseAt(Period p) {</span>
-<span class="cl">        return timetable.get(p);</span>
-<span class="cl">    }</span>
-<span class="cl"></span>
-<span class="cl">    void book(Period p, Course c) {</span>
-<span class="cl">        if (timetable.containsKey(p)) {</span>
-<span class="cl">            throw new IllegalStateException(&quot;room taken in &quot; + p);</span>
-<span class="cl">        }</span>
-<span class="cl">        timetable.put(p, c);</span>
-<span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The preset <code>timetable-directions-only</code> applies the first move alone: every association one-way except students and courses, no qualifier, the locker kept. It counts 6 directions, against 10, and the many ends stay at 6. So each move shows in a different tile. The many-to-many tile does not move at all: the lab counts the ends as declared, while Evans's point is that a one-way many-to-many link is built as a collection on one side, like a one-to-many link. The counts measure the implementation's burden; the reasons for each move, that timetables are printed per teacher and a room holds one class at a time, are facts about the school that no count supplies.</p><h3>Exercise</h3><ul><li>A bike-share, before: <span class="math" data-say="city and dock, one to many, both ways, not qualified, dock and bike, one to many, both ways, not qualified, member and ride, one to many, both ways, not qualified, ride and bike, many to one, both ways, not qualified, member and bike, many to many, both ways, not qualified">City, Dock, 1-n, both, no; Dock, Bike, 1-n, both, no; Member, Ride, 1-n, both, no; Ride, Bike, n-1, both, no; Member, Bike, n-n, both, no</span>.</li><li>The moves: city to dock one way; dock to bike one way and qualified by slot; member to ride one way; ride to bike one way; the member's favourite bikes, the many-to-many link, removed.</li></ul><p>Write the model after the moves as records, and count by hand the associations, navigable directions, many-to-many associations and many ends before and after. Then give, for one of the one-way links, the question the business would have to ask for it to need the other direction.</p><p>Links are drawn between objects, and Chapter 5 now turns to the objects themselves. The next lesson, Entities, reads the first kind: objects defined by who they are.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Associations</h2></div><p>a direction, a qualifier, a dropped association</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The section&#x27;s argument, then the three moves, then the count</h2><div class="prose reading"><p>&ldquo;It is important to constrain relationships as much as possible. A bidirectional association means that both objects can be understood only together.&rdquo; That is Evans in the Associations section of Chapter 5, A Model Expressed in Software. The chapter's opening sets out its plan: connect the model and the code at the level of detail, starting with associations, then the three kinds of model element that carry the model, Entities, Value Objects and Services, and last Modules. This lesson reads the opening and the first section.</p><p>The section starts from a correspondence. For each association the model says can be traversed, the code needs a mechanism that behaves the same way. A link between a customer and a sales representative is, on one side, a relationship between two people that the team judged relevant, and on the other, a pointer, or a method that looks the other up in a database. A one-to-many link may be a collection in a field, or a query that builds the objects when asked; both carry the same model, and the design must choose one whose behaviour matches the association.</p><p>The trouble is that the world is full of many-to-many links, many of them naturally two-way, and so are early models, while the brainstorm is still going. Those general associations are hard to implement and to maintain, and they say little about the relationship. Evans gives at least three ways to make them tractable: impose a traversal direction, add a qualifier to reduce the multiplicity, and eliminate associations that are not essential.</p><p>His example of the first is a country and its presidents, a link that is one-to-many and could be followed either way, though almost nobody starts from a person and asks which country he led. Making it one-way, from country to president, is both a simpler design and an insight: one direction matters more, and the person no longer depends on the far lesser idea of a presidency. The second move comes from looking harder at the same link. A country has one president at a time, so qualified by the date the association is one-to-one, and the rule is now in the model. A direction imposed on a many-to-many link, he adds, reduces its implementation to one-to-many.</p><p>Constraining associations wherever the domain allows has a second benefit: the two-way links that remain now mean something, since each says that both directions matter to the domain or the application. The last move is the simplest, to remove an association altogether when neither the job nor the meaning of the objects needs it. Evans closes with a brokerage account, written first as plain fields and then as database lookups, both consistent with one model; qualifying its investments by stock turns a set into a map, a rule that he notes would not hold for every business, and that once found belongs in the model and the code.</p><p>Now the count, on a school timetable. The lab takes each association as a record of its two classes, its ends (one to one, one to many, many to one or many to many, typed 1-1, 1-n, n-1 and n-n), its direction (both, or a-b when only the first navigates to the second) and whether it is qualified, and a second list for the model after the moves. The preset <code>timetable</code> starts with five associations, all two-way: a school's teachers, teachers and courses, a room's courses, students and courses, and a student's locker. It counts 10 navigable directions, 2 many-to-many associations and 6 many ends. A two-way link is two references to keep in step, which is what the code below has to do.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Associations</h2></div><p>a direction, a qualifier, a dropped association</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Associations</strong><span>a direction, a qualifier, a dropped association</span></div>
       </div>
@@ -1480,10 +1501,10 @@
       <div class="table-wrap" id="dasTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dasTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is one association between classes a and b: ends 1-n means one a to many b; direction both, a-b (only a navigates to b) or b-a. A two-way association gives 2 navigable directions and 2 references to keep in step whenever one link changes; a one-way association gives 1 of each. A qualifier (qualified yes) reduces one many end to one: the end navigated to (b for a-b, a for b-a; for both, b if it is many, else a); a qualifier on an end that is already one is refused. Every count is after qualifiers. The after list, when given, is counted the same way, each tile reads before → after, and the change is after − before.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The references an association asks you to keep</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The references an association asks you to keep</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
         <div class="field">
           <label for="dasPreset">Worked example</label>
           <select id="dasPreset"><option value="timetable" selected>A school timetable, before and after all three moves</option><option value="timetable-directions-only">The same timetable with directions imposed and nothing else</option></select>
@@ -1505,12 +1526,37 @@
           <div class="kpi"><span>The change, after − before</span><strong id="dasChange">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, Both ways every change must be made twice, and kept in step.. line 2, class teacher. line 3, private final set of course courses is set to new hash set. line 5, void assign of course c. line 6, courses dot add of c. line 7, c dot add teacher of this, comment, the other end, or the model lies" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Both ways: every change must be made twice, and kept in step.</span>
+<span class="cl">class Teacher {</span>
+<span class="cl">    private final Set&lt;Course&gt; courses = new HashSet&lt;&gt;();</span>
+<span class="cl"></span>
+<span class="cl">    void assign(Course c) {</span>
+<span class="cl">        courses.add(c);</span>
+<span class="cl">        c.addTeacher(this);   // the other end, or the model lies</span>
+<span class="cl">    }</span>
+<span class="cl">}</span></code></pre><p>The model after the moves keeps four associations. The school reaches its teachers and a teacher reaches his or her courses, one way each, because the timetable is printed per teacher; the room's courses are one way and qualified by period, since a room holds one course at a time; students and courses stay two-way, because the school needs class lists and each student's timetable; the locker goes, since timetabling never asks about it. The lab counts 4 associations, 5 navigable directions, 2 many-to-many associations and 5 many ends, and its two-way tile falls from 5 links to 1, the one left with two references to keep in step. The change tile gives 1 association, 5 directions, 4 two-way links and 1 many end fewer.</p><pre class="codeblock" data-say="line 1, comment, Qualified by period a room holds one course in a period.. line 2, class room. line 3, private final map of period and course timetable is set to new hash map. line 5, course course at of period p. line 6, return timetable dot get of p. line 9, void book of period p, course c. line 10, if timetable dot contains key of p. line 11, throw new illegal state exception of room taken in plus p. line 13, timetable dot put of p, c" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Qualified by period: a room holds one course in a period.</span>
+<span class="cl">class Room {</span>
+<span class="cl">    private final Map&lt;Period, Course&gt; timetable = new HashMap&lt;&gt;();</span>
+<span class="cl"></span>
+<span class="cl">    Course courseAt(Period p) {</span>
+<span class="cl">        return timetable.get(p);</span>
+<span class="cl">    }</span>
+<span class="cl"></span>
+<span class="cl">    void book(Period p, Course c) {</span>
+<span class="cl">        if (timetable.containsKey(p)) {</span>
+<span class="cl">            throw new IllegalStateException(&quot;room taken in &quot; + p);</span>
+<span class="cl">        }</span>
+<span class="cl">        timetable.put(p, c);</span>
+<span class="cl">    }</span>
+<span class="cl">}</span></code></pre><p>The preset <code>timetable-directions-only</code> applies the first move alone: every association one-way except students and courses, no qualifier, the locker kept. It counts 6 directions, against 10, and the many ends stay at 6. So each move shows in a different tile. The many-to-many tile does not move at all: the lab counts the ends as declared, while Evans's point is that a one-way many-to-many link is built as a collection on one side, like a one-to-many link. The counts measure the implementation's burden; the reasons for each move, that timetables are printed per teacher and a room holds one class at a time, are facts about the school that no count supplies.</p><h3>Exercise</h3><ul><li>A bike-share, before: <span class="math" data-say="city and dock, one to many, both ways, not qualified, dock and bike, one to many, both ways, not qualified, member and ride, one to many, both ways, not qualified, ride and bike, many to one, both ways, not qualified, member and bike, many to many, both ways, not qualified">City, Dock, 1-n, both, no; Dock, Bike, 1-n, both, no; Member, Ride, 1-n, both, no; Ride, Bike, n-1, both, no; Member, Bike, n-n, both, no</span>.</li><li>The moves: city to dock one way; dock to bike one way and qualified by slot; member to ride one way; ride to bike one way; the member's favourite bikes, the many-to-many link, removed.</li></ul><p>Write the model after the moves as records, and count by hand the associations, navigable directions, many-to-many associations and many ends before and after. Then give, for one of the one-way links, the question the business would have to ask for it to need the other direction.</p><p>Links are drawn between objects, and Chapter 5 now turns to the objects themselves. The next lesson, Entities, reads the first kind: objects defined by who they are.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Simplifying a model&#x27;s associations</h2></div><p>Four steps, the last of them on a model of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Ask which way each link is followed</h3><p>For each association, write down the questions the application asks of it. If every question starts from the same end, make it one-way from that end.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Look for a qualifier</h3><p>For each many end, ask whether some value, a date, a period, a key, picks out exactly one. If it does, qualify the association by it and write the rule down.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Remove what nothing asks</h3><p>Strike any association that no feature traverses and that the meaning of the objects does not need. Recount directions and many ends.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own model</h3><p>Take five associations from a model you know, type them into the lab with the moves you would make, and write down the directions and many ends saved, with the domain reason for each move.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Simplifying a model&#x27;s associations</h2>
+      <p class="lead-in">Four steps, the last of them on a model of your own.</p>
+      <ol class="key-ideas method"><li><strong>Ask which way each link is followed.</strong> For each association, write down the questions the application asks of it. If every question starts from the same end, make it one-way from that end.</li><li><strong>Look for a qualifier.</strong> For each many end, ask whether some value, a date, a period, a key, picks out exactly one. If it does, qualify the association by it and write the rule down.</li><li><strong>Remove what nothing asks.</strong> Strike any association that no feature traverses and that the meaning of the objects does not need. Recount directions and many ends.</li><li><strong>Do it on your own model.</strong> Take five associations from a model you know, type them into the lab with the moves you would make, and write down the directions and many ends saved, with the domain reason for each move.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1529,17 +1575,16 @@ many ends after: 1 + 2 + 0 + 2 makes 5
 saved: 1 link, 5 directions, 1 many end</div><p>The qualifier saved the many end and the direction saved a reference; neither saved a many-to-many link, which a direction only makes easier to build. Each move stands on a fact about the school, and the count would mislead without it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Making every association two-way so that any question can be answered</strong><span>Two-way links are common in the world and in early models, and Evans's point is that they cost: both objects can be understood only together, and each change must be made at both ends. Keep both directions where the domain or the application needs them, and then the two-way links that remain say something.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Choosing a direction for convenience in the code</strong><span>The direction Evans wants is the one the domain is biased toward, found by asking which questions start from which end. A direction chosen because one table has the foreign key may be the wrong one, and the model will say something the business does not.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a qualifier as an implementation trick</strong><span>A qualifier states a rule of the domain, such as one course in a room in a given period, and Evans asks that every such constraint be put into both the model and the code. It makes the model more precise, not only the map lookup faster, and it holds only where the rule does.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can simplify a set of associations and give the reason for each move.</strong><p>Given a model's associations and the questions asked of it, impose directions, add qualifiers and remove links, and count the directions and many ends saved.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts directions, ends and links as you declare them. It cannot tell whether a direction matches the questions the business asks, whether a qualifier's rule is true, or whether a removed link was needed after all; each move is a claim about the domain.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Making every association two-way so that any question can be answered</strong><span>Two-way links are common in the world and in early models, and Evans's point is that they cost: both objects can be understood only together, and each change must be made at both ends. Keep both directions where the domain or the application needs them, and then the two-way links that remain say something.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Choosing a direction for convenience in the code</strong><span>The direction Evans wants is the one the domain is biased toward, found by asking which questions start from which end. A direction chosen because one table has the foreign key may be the wrong one, and the model will say something the business does not.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a qualifier as an implementation trick</strong><span>A qualifier states a rule of the domain, such as one course in a room in a given period, and Evans asks that every such constraint be put into both the model and the code. It makes the model more precise, not only the map lookup faster, and it holds only where the rule does.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can simplify a set of associations and give the reason for each move.</strong><p>Given a model's associations and the questions asked of it, impose directions, add qualifiers and remove links, and count the directions and many ends saved.</p></div></div><div class="note"><strong>Note:</strong> The lab counts directions, ends and links as you declare them. It cannot tell whether a direction matches the questions the business asks, whether a qualifier's rule is true, or whether a removed link was needed after all; each move is a claim about the domain.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Traversal direction</summary><p>Which way the code can follow an association. Both ways means each object can reach the other; one way means only one can, and the other need not know the link exists.</p></details><details class="recall"><summary>Qualifier</summary><p>A value that picks one object out of the many at the far end of an association, such as a period that picks one course out of a room's many. It turns a one-to-many link into a one-to-one link for each value of the qualifier.</p></details><details class="recall"><summary>Many end</summary><p>An end of an association where one object can be linked to many. A one-to-many link has one, a many-to-many link two; the lab counts a qualified many end as a one end, so it is no longer a many end.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 5 begins with the links between objects, simple to draw and costly to maintain. Read Evans's three ways of making an association tractable, and why each says something about the domain, then apply all three to a school timetable and count the directions and the many ends before and after.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Traversal direction.</strong> Which way the code can follow an association. Both ways means each object can reach the other; one way means only one can, and the other need not know the link exists.</li><li><strong>Qualifier.</strong> A value that picks one object out of the many at the far end of an association, such as a period that picks one course out of a room's many. It turns a one-to-many link into a one-to-one link for each value of the qualifier.</li><li><strong>Many end.</strong> An end of an association where one object can be linked to many. A one-to-many link has one, a many-to-many link two; the lab counts a qualified many end as a one end, so it is no longer a many end.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="each association is a mechanism. impose a traversal direction. add a qualifier to cut multiplicity. eliminate what the job does not need. keep both ways only when they mean it" tabindex="0" role="region" aria-label="Mathematical notation">each association is a mechanism
 impose a traversal direction
 add a qualifier to cut multiplicity
@@ -2302,11 +2347,42 @@ keep both ways only when they mean it</div><figcaption>Associations in five line
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2374,7 +2450,7 @@ keep both ways only when they mean it</div><figcaption>Associations in five line
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

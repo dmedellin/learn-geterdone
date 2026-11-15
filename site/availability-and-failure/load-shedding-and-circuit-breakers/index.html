@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Availability and Failure</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Containing the load</p>
       <h1>Load Shedding</h1>
       <p class="lesson-lede">Compute goodput under a shedding threshold and compare it with goodput under collapse.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Work spent on an abandoned request is work lost</li><li>Shedding is admission control, not a second service model</li><li>Rejecting requests is how availability is defended</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Goodput under collapse, and goodput under a threshold</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Goodput, and the overload model</span><p><strong>Goodput</strong> is the rate of requests that are both served and still wanted. With capacity <span class="math" data-say="C">C</span> and offered load <span class="math" data-say="L">L</span>, this lesson's model is: for <span class="math" data-say="L is at most C">L ≤ C</span> the goodput is <span class="math" data-say="L">L</span>; for <span class="math" data-say="L is greater than C">L > C</span> the server's capacity is spread across <span class="math" data-say="L">L</span> requests, only <span class="math" data-say="C over L">C/L</span> of them complete within the client's patience, and the goodput is <span class="math" data-say="C times the quantity C over L">C × (C/L)</span>. A <strong>shedder</strong> with threshold <span class="math" data-say="T">T</span> admits <span class="math" data-say="the min of L and T">min(L, T)</span> and passes it through the same model.</p></div><p>The model is this lesson's own and it is stated so that it can be argued with. The mechanism behind it &mdash; a queue that fills, work spent on entries whose clients have already left, and an admitted rate that is not the completed rate &mdash; is the subject of Queues and Utilisation's &ldquo;Bounded Queues and Loss&rdquo;, and the knee that makes the threshold choice non-obvious is &ldquo;The Knee: Response Time vs Utilisation&rdquo;.</p><div class="mathblock" data-say="C equals 1000 rps, threshold T equals 900 rps. offered, load, goodput shedding, goodput not shedding, ratio. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">C = 1000 rps,  threshold T = 900 rps
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Goodput under collapse, and goodput under a threshold</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Goodput, and the overload model</span><p><strong>Goodput</strong> is the rate of requests that are both served and still wanted. With capacity <span class="math" data-say="C">C</span> and offered load <span class="math" data-say="L">L</span>, this lesson's model is: for <span class="math" data-say="L is at most C">L ≤ C</span> the goodput is <span class="math" data-say="L">L</span>; for <span class="math" data-say="L is greater than C">L > C</span> the server's capacity is spread across <span class="math" data-say="L">L</span> requests, only <span class="math" data-say="C over L">C/L</span> of them complete within the client's patience, and the goodput is <span class="math" data-say="C times the quantity C over L">C × (C/L)</span>. A <strong>shedder</strong> with threshold <span class="math" data-say="T">T</span> admits <span class="math" data-say="the min of L and T">min(L, T)</span> and passes it through the same model.</p></div><p>The model is this lesson's own and it is stated so that it can be argued with. The mechanism behind it &mdash; a queue that fills, work spent on entries whose clients have already left, and an admitted rate that is not the completed rate &mdash; is the subject of Queues and Utilisation's &ldquo;Bounded Queues and Loss&rdquo;, and the knee that makes the threshold choice non-obvious is &ldquo;The Knee: Response Time vs Utilisation&rdquo;.</p><div class="mathblock" data-say="C equals 1000 rps, threshold T equals 900 rps. offered, load, goodput shedding, goodput not shedding, ratio. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">C = 1000 rps,  threshold T = 900 rps
 
 offered   load   goodput shedding   goodput not shedding   ratio
   50%       500        500.0                500.0          1.00
@@ -1400,12 +1444,11 @@ offered   load   goodput shedding   goodput not shedding   ratio
  150%      1500        900.0                666.7          1.35
  200%      2000        900.0                500.0          1.80
  300%      3000        900.0                333.3          2.70
- 400%      4000        900.0                250.0          3.60</div><p>Two features of the table decide everything. The shedder costs goodput at exactly one point &mdash; between the threshold and capacity, where it is refusing work the server could have done &mdash; and that cost is bounded by <span class="math" data-say="C minus T">C − T</span>, here a hundred requests a second. Everywhere above capacity it wins, and the margin grows without limit as the load rises.</p><h3>Where to put the threshold</h3><p>The cost of a threshold below capacity is <span class="math" data-say="C minus T">C − T</span> at full load; the benefit is that the system never enters the collapsing regime. Since response time is already rising steeply as utilisation approaches one, the threshold is normally placed a little under capacity &mdash; <span class="math" data-say="0.9 C">0.9C</span> here &mdash; and the ten per cent is bought as insurance against the estimate of <span class="math" data-say="C">C</span> being wrong.</p><div class="example"><span class="label">Example &middot; A threshold above capacity still collapses</span><p>Set the threshold to <span class="math" data-say="120 percent">120%</span> of capacity and offer <span class="math" data-say="200 percent">200%</span>. The shedder admits <span class="math" data-say="1200">1200</span> requests a second, which the server cannot serve, so the goodput is <span class="math" data-say="1000 squared over 1200 equals 833.3">1000²/1200 = 833.3</span> a second &mdash; better than the <span class="math" data-say="500">500</span> of no shedding and worse than the <span class="math" data-say="900">900</span> of a threshold at <span class="math" data-say="90 percent">90%</span>. The shedder is not a magic boundary; it is a cap, and a cap above capacity caps nothing that matters.</p></div><h3>Utilisation is the quantity being defended</h3><p>With the shedder the utilisation is <span class="math" data-say="admitted over C equals 0.9">admitted/C = 0.9</span>; without it, <span class="math" data-say="offered over C equals 2.0">offered/C = 2.0</span>. A utilisation above one is not a state a system occupies, it is a description of a queue growing without bound, and every second spent there adds latency that never comes back. The shedder's real product is that <span class="math" data-say="0.9">0.9</span>.</p><div class="example"><span class="label">Example &middot; The circuit breaker, from the other end</span><p>A circuit breaker is the same arithmetic with the client doing the refusing. After a threshold number of failures the client stops calling for a cooling period and fails fast locally, which removes its share of <span class="math" data-say="L">L</span> at the source rather than at the server's door. The advantage over server-side shedding is that the rejected request never crosses the network; the disadvantage is that the client is deciding on stale local evidence about a service it has stopped observing.</p></div><p>Both mechanisms are about the same quantity and neither of them makes the offered load smaller. The requests that are shed still failed from the user's point of view &mdash; the argument is not that rejection is free, it is that rejection is cheap and collapse is not, so a fixed amount of failure buys far more successes when it is taken at the door.</p><div class="example"><span class="label">Example &middot; Why this is not a loss of availability</span><p>At <span class="math" data-say="200 percent">200%</span> offered load the unshed service succeeds on <span class="math" data-say="500">500</span> of <span class="math" data-say="2000">2000</span> requests a second, a success ratio of <span class="math" data-say="25 percent">25%</span>. The shed service succeeds on <span class="math" data-say="900">900</span> of <span class="math" data-say="2000">2000</span>, a ratio of <span class="math" data-say="45 percent">45%</span>, while explicitly rejecting <span class="math" data-say="1100">1100</span>. By the error-budget measurement of &ldquo;Error Budgets&rdquo;, which counts failed requests, the shedder spends less budget &mdash; <span class="math" data-say="1100">1100</span> rejections against <span class="math" data-say="1500">1500</span> timeouts a second &mdash; and the rejections are returned immediately rather than after a timeout.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Load shedding and circuit breakers</h2></div><p>Goodput when you refuse work, against goodput when you accept all of it</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+ 400%      4000        900.0                250.0          3.60</div><p>Two features of the table decide everything. The shedder costs goodput at exactly one point &mdash; between the threshold and capacity, where it is refusing work the server could have done &mdash; and that cost is bounded by <span class="math" data-say="C minus T">C − T</span>, here a hundred requests a second. Everywhere above capacity it wins, and the margin grows without limit as the load rises.</p><h3>Where to put the threshold</h3><p>The cost of a threshold below capacity is <span class="math" data-say="C minus T">C − T</span> at full load; the benefit is that the system never enters the collapsing regime. Since response time is already rising steeply as utilisation approaches one, the threshold is normally placed a little under capacity &mdash; <span class="math" data-say="0.9 C">0.9C</span> here &mdash; and the ten per cent is bought as insurance against the estimate of <span class="math" data-say="C">C</span> being wrong.</p><div class="example"><span class="label">Example &middot; A threshold above capacity still collapses</span><p>Set the threshold to <span class="math" data-say="120 percent">120%</span> of capacity and offer <span class="math" data-say="200 percent">200%</span>. The shedder admits <span class="math" data-say="1200">1200</span> requests a second, which the server cannot serve, so the goodput is <span class="math" data-say="1000 squared over 1200 equals 833.3">1000²/1200 = 833.3</span> a second &mdash; better than the <span class="math" data-say="500">500</span> of no shedding and worse than the <span class="math" data-say="900">900</span> of a threshold at <span class="math" data-say="90 percent">90%</span>. The shedder is not a magic boundary; it is a cap, and a cap above capacity caps nothing that matters.</p></div><h3>Utilisation is the quantity being defended</h3><p>With the shedder the utilisation is <span class="math" data-say="admitted over C equals 0.9">admitted/C = 0.9</span>; without it, <span class="math" data-say="offered over C equals 2.0">offered/C = 2.0</span>. A utilisation above one is not a state a system occupies, it is a description of a queue growing without bound, and every second spent there adds latency that never comes back. The shedder's real product is that <span class="math" data-say="0.9">0.9</span>.</p><div class="example"><span class="label">Example &middot; The circuit breaker, from the other end</span><p>A circuit breaker is the same arithmetic with the client doing the refusing. After a threshold number of failures the client stops calling for a cooling period and fails fast locally, which removes its share of <span class="math" data-say="L">L</span> at the source rather than at the server's door. The advantage over server-side shedding is that the rejected request never crosses the network; the disadvantage is that the client is deciding on stale local evidence about a service it has stopped observing.</p></div><p>Both mechanisms are about the same quantity and neither of them makes the offered load smaller. The requests that are shed still failed from the user's point of view &mdash; the argument is not that rejection is free, it is that rejection is cheap and collapse is not, so a fixed amount of failure buys far more successes when it is taken at the door.</p><div class="example"><span class="label">Example &middot; Why this is not a loss of availability</span><p>At <span class="math" data-say="200 percent">200%</span> offered load the unshed service succeeds on <span class="math" data-say="500">500</span> of <span class="math" data-say="2000">2000</span> requests a second, a success ratio of <span class="math" data-say="25 percent">25%</span>. The shed service succeeds on <span class="math" data-say="900">900</span> of <span class="math" data-say="2000">2000</span>, a ratio of <span class="math" data-say="45 percent">45%</span>, while explicitly rejecting <span class="math" data-say="1100">1100</span>. By the error-budget measurement of &ldquo;Error Budgets&rdquo;, which counts failed requests, the shedder spends less budget &mdash; <span class="math" data-say="1100">1100</span> rejections against <span class="math" data-say="1500">1500</span> timeouts a second &mdash; and the rejections are returned immediately rather than after a timeout.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Load shedding and circuit breakers</h2></div><p>Goodput when you refuse work, against goodput when you accept all of it</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Shedding against collapse</strong><span>rejecting deliberately, so that the requests you accept are the ones you finish</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>goodput with shedding</span><span class="tone-red"><i class="legend-swatch"></i>goodput without</span><span class="tone-amber"><i class="legend-swatch"></i>rejected on purpose</span></div>
@@ -1413,10 +1456,10 @@ offered   load   goodput shedding   goodput not shedding   ratio
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="shCurve" viewBox="0 0 520 200" role="img" aria-label="Goodput against offered load, with shedding and without."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="shTable"></table></div>
       <div class="status-banner" id="shStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the load and the shedding threshold</h3>
-          <p>A thousand requests a second of capacity, twice that offered, and a threshold at ninety per cent. The green curve is flat above the threshold and the red one turns over at capacity and falls. Find the one region where the green curve is below the red one, and read off how wide it is.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the load and the shedding threshold</h3>
+            <p>A thousand requests a second of capacity, twice that offered, and a threshold at ninety per cent. The green curve is flat above the threshold and the red one turns over at capacity and falls. Find the one region where the green curve is below the red one, and read off how wide it is.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="shCap">Capacity (requests per second)</label><span class="range-value" id="shCapOut">1000</span></div>
           <input id="shCap" type="range" min="100" max="5000" step="50" value="1000" />
@@ -1438,12 +1481,14 @@ offered   load   goodput shedding   goodput not shedding   ratio
           <div class="kpi"><span>Shedding is better by</span><strong id="shRatio">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="shHint" style="margin:0;">The collapse model is the lesson&rsquo;s own and it is evaluated here, not drawn: above capacity the server still does C units of work a second, but only the share C/L of what it started finishes before the client gives up, so the goodput is C &times; (C/L). Shedding replaces that with a flat line at the threshold.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Choosing and checking a shedding threshold</h2></div><p>The first step is the hard one, because the threshold is expressed relative to a capacity that has to be measured rather than assumed.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Measure capacity as the rate at which latency turns up</h3><p>Not the rate at which the service falls over: the knee, where response time begins rising steeply, is the capacity this model means. A figure taken from the maximum throughput ever observed is already inside the collapsing regime and will put the threshold in the wrong place.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Put the threshold a little below it</h3><p><span class="math" data-say="T">T</span> slightly under <span class="math" data-say="C">C</span> &mdash; ninety per cent is a common choice. The cost is <span class="math" data-say="C minus T">C − T</span> of goodput at full load and the benefit is that an error in the capacity estimate, or a slow drift in request cost, does not push the system over the edge before the shedder engages.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute both goodput curves at the loads you expect</h3><p><span class="math" data-say="the min of L and T">min(L, T)</span> through the model for the shedder, <span class="math" data-say="C squared over L">C²/L</span> above capacity for the collapse. Compare them at the peak load you plan for and at two or three times it, because the ratio is what justifies the threshold and it grows with the overload.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Make the rejection cheap and say so to the client</h3><p>A shed request must cost the server almost nothing and must be distinguishable by the client from a timeout, so that the client can back off rather than retry immediately. A rejection that is expensive to produce, or that looks like a failure worth retrying at once, feeds the loop rather than breaking it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Choosing and checking a shedding threshold</h2>
+      <p class="lead-in">The first step is the hard one, because the threshold is expressed relative to a capacity that has to be measured rather than assumed.</p>
+      <ol class="key-ideas method"><li><strong>Measure capacity as the rate at which latency turns up.</strong> Not the rate at which the service falls over: the knee, where response time begins rising steeply, is the capacity this model means. A figure taken from the maximum throughput ever observed is already inside the collapsing regime and will put the threshold in the wrong place.</li><li><strong>Put the threshold a little below it.</strong> <span class="math" data-say="T">T</span> slightly under <span class="math" data-say="C">C</span> &mdash; ninety per cent is a common choice. The cost is <span class="math" data-say="C minus T">C − T</span> of goodput at full load and the benefit is that an error in the capacity estimate, or a slow drift in request cost, does not push the system over the edge before the shedder engages.</li><li><strong>Compute both goodput curves at the loads you expect.</strong> <span class="math" data-say="the min of L and T">min(L, T)</span> through the model for the shedder, <span class="math" data-say="C squared over L">C²/L</span> above capacity for the collapse. Compare them at the peak load you plan for and at two or three times it, because the ratio is what justifies the threshold and it grows with the overload.</li><li><strong>Make the rejection cheap and say so to the client.</strong> A shed request must cost the server almost nothing and must be distinguishable by the client from a timeout, so that the client can back off rather than retry immediately. A rejection that is expensive to produce, or that looks like a failure worth retrying at once, feeds the loop rather than breaking it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1474,17 +1519,16 @@ failures  2520 against 3200         680 /s fewer
 and the 2520 are refused in microseconds, not after a timeout</div><p>Shedding wins on both columns at once, which is the part that surprises people: it serves nearly three times as many users and produces fewer failures, because the failures it produces are cheap and the ones it avoids were consuming capacity on their way to failing anyway. The utilisation of <span class="math" data-say="0.90">0.90</span> against <span class="math" data-say="3.00">3.00</span> is the same fact stated as a queue property.</p><p>The cost is visible only in a narrow band. Between <span class="math" data-say="1080">1080</span> and <span class="math" data-say="1200">1200</span> requests a second the shedder refuses work the server could have done, up to <span class="math" data-say="120">120</span> requests a second at the top of that band. That is the whole price of the policy, and it is paid in a region the system passes through rather than sits in.</p><p>For a faded rehearsal, the team proposes raising the threshold to <span class="math" data-say="1200">1200</span> &mdash; exactly capacity &mdash; to recover that band. The supplied first move is that the goodput at <span class="math" data-say="T equals C">T = C</span> is still <span class="math" data-say="C">C</span> as long as the capacity estimate is exact. Work out what the goodput becomes if the true capacity turns out to be <span class="math" data-say="1100">1100</span> rather than <span class="math" data-say="1200">1200</span>, under both thresholds, and say what that says about where the ten per cent was actually going.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that rejecting requests lowers availability</strong><span>At twice capacity the shedding service answers <span class="math" data-say="900">900</span> requests a second and the accepting one answers <span class="math" data-say="500">500</span>. Measured as a success ratio that is <span class="math" data-say="45 percent">45%</span> against <span class="math" data-say="25 percent">25%</span>, and the shed failures are immediate rather than timeouts. Refusal is how the successes are protected; accepting everything is what converts capacity into work nobody is waiting for.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Setting the threshold from the maximum throughput ever observed</strong><span>That figure is taken inside the collapsing regime and is higher than the knee, so a threshold based on it admits load the system cannot serve and the shedder never engages until the collapse is already under way. Measure the knee &mdash; where latency turns up &mdash; and set the threshold below it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Rejecting expensively, or indistinguishably from a timeout</strong><span>A rejection that costs the server real work is just another request, and a rejection the client cannot tell from a transient failure is retried immediately, which returns the load at once. The policy depends on the refusal being cheap for the server and legible to the client, and both of those are implementation properties rather than arithmetic ones.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we reject 55% of requests” reads as a defence of availability rather than an admission of failure.</strong><p>You should be able to compute goodput under both policies, identify the narrow band where shedding costs something, place a threshold relative to a measured knee rather than to a maximum, and say why the shedding arm produces both more successes and fewer failures at high overload.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The course has been about requests up to here. The last two lessons are about sets of machines rather than about one request, and they ask two questions that redundancy cannot answer on its own: how likely is it that every copy of a piece of data is gone at once, and how much of a fleet does a single bad machine take with it. &ldquo;Replica Loss and Durability&rdquo; is the first, and it is the one lesson on the course whose headline figure is not exact.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that rejecting requests lowers availability</strong><span>At twice capacity the shedding service answers <span class="math" data-say="900">900</span> requests a second and the accepting one answers <span class="math" data-say="500">500</span>. Measured as a success ratio that is <span class="math" data-say="45 percent">45%</span> against <span class="math" data-say="25 percent">25%</span>, and the shed failures are immediate rather than timeouts. Refusal is how the successes are protected; accepting everything is what converts capacity into work nobody is waiting for.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Setting the threshold from the maximum throughput ever observed</strong><span>That figure is taken inside the collapsing regime and is higher than the knee, so a threshold based on it admits load the system cannot serve and the shedder never engages until the collapse is already under way. Measure the knee &mdash; where latency turns up &mdash; and set the threshold below it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Rejecting expensively, or indistinguishably from a timeout</strong><span>A rejection that costs the server real work is just another request, and a rejection the client cannot tell from a transient failure is retried immediately, which returns the load at once. The policy depends on the refusal being cheap for the server and legible to the client, and both of those are implementation properties rather than arithmetic ones.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we reject 55% of requests” reads as a defence of availability rather than an admission of failure.</strong><p>You should be able to compute goodput under both policies, identify the narrow band where shedding costs something, place a threshold relative to a measured knee rather than to a maximum, and say why the shedding arm produces both more successes and fewer failures at high overload.</p></div></div><div class="note"><strong>Note:</strong> The course has been about requests up to here. The last two lessons are about sets of machines rather than about one request, and they ask two questions that redundancy cannot answer on its own: how likely is it that every copy of a piece of data is gone at once, and how much of a fleet does a single bad machine take with it. &ldquo;Replica Loss and Durability&rdquo; is the first, and it is the one lesson on the course whose headline figure is not exact.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Work spent on an abandoned request is work lost</summary><p>Above capacity the server still does <span class="math" data-say="C">C</span> units of work a second, but it is spread across <span class="math" data-say="L">L</span> requests and only the share <span class="math" data-say="C over L">C/L</span> of them finish before the client gives up. The useful output is therefore <span class="math" data-say="C times the quantity C over L, equals C squared over L">C × (C/L) = C²/L</span>, which falls as <span class="math" data-say="L">L</span> rises. At twice capacity a thousand-per-second service delivers five hundred; at four times capacity, two hundred and fifty.</p></details><details class="recall"><summary>Shedding is admission control, not a second service model</summary><p>A shedder admits <span class="math" data-say="the min of L and T">min(L, T)</span> and puts that through exactly the same model. Below the threshold nothing changes; above it the admitted load is capped and the goodput is flat at <span class="math" data-say="T">T</span>, provided <span class="math" data-say="T">T</span> is at or below capacity. A threshold set above capacity collapses too, more slowly, which is why the threshold is chosen relative to the knee rather than to the load.</p></details><details class="recall"><summary>Rejecting requests is how availability is defended</summary><p>At twice capacity, refusing <span class="math" data-say="55 percent">55%</span> of the traffic outright serves <span class="math" data-say="900">900</span> requests a second where accepting everything serves <span class="math" data-say="500">500</span>. The rejected requests cost almost nothing &mdash; a fast error is cheap &mdash; and the accepted ones are the ones the server can finish. More users get an answer under the policy that says no.</p></details></div>
+      <h3>Summary</h3>
       <p>Above capacity a server spreads its work across more requests than it can finish inside a client's patience, so the share that completes is <span class="math" data-say="C over L">C/L</span> and the goodput is <span class="math" data-say="C times the quantity C over L">C × (C/L)</span> &mdash; it falls as the load rises. Refusing the excess at the door replaces that curve with a flat line at the threshold. At twice capacity, shedding delivers 900 requests a second against 500, so rejecting 55% of the traffic serves 1.8 times as many users as accepting all of it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Work spent on an abandoned request is work lost.</strong> Above capacity the server still does <span class="math" data-say="C">C</span> units of work a second, but it is spread across <span class="math" data-say="L">L</span> requests and only the share <span class="math" data-say="C over L">C/L</span> of them finish before the client gives up. The useful output is therefore <span class="math" data-say="C times the quantity C over L, equals C squared over L">C × (C/L) = C²/L</span>, which falls as <span class="math" data-say="L">L</span> rises. At twice capacity a thousand-per-second service delivers five hundred; at four times capacity, two hundred and fifty.</li><li><strong>Shedding is admission control, not a second service model.</strong> A shedder admits <span class="math" data-say="the min of L and T">min(L, T)</span> and puts that through exactly the same model. Below the threshold nothing changes; above it the admitted load is capped and the goodput is flat at <span class="math" data-say="T">T</span>, provided <span class="math" data-say="T">T</span> is at or below capacity. A threshold set above capacity collapses too, more slowly, which is why the threshold is chosen relative to the knee rather than to the load.</li><li><strong>Rejecting requests is how availability is defended.</strong> At twice capacity, refusing <span class="math" data-say="55 percent">55%</span> of the traffic outright serves <span class="math" data-say="900">900</span> requests a second where accepting everything serves <span class="math" data-say="500">500</span>. The rejected requests cost almost nothing &mdash; a fast error is cheap &mdash; and the accepted ones are the ones the server can finish. More users get an answer under the policy that says no.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="no shedding, goodput equals C times the quantity C over L, for L is greater than C, and L below it. shedding, admit the min of L and T, then the same model, to, flat at T. C equals 1000, L equals 2000, T equals 900, 900 per second shed against 500 per second unshed. rejected 1100 per second equals 55.0 percent of offered, and 1.80 times the goodput" tabindex="0" role="region" aria-label="Mathematical notation">no shedding:  goodput = C × (C/L) for L &gt; C,  and L below it
 shedding:     admit min(L, T), then the same model  →  flat at T
 C = 1000, L = 2000, T = 900:   900 /s shed against 500 /s unshed
@@ -2662,11 +2706,42 @@ rejected 1100 /s = 55.0% of offered,  and 1.80 × the goodput</div><figcaption>O
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2734,7 +2809,7 @@ rejected 1100 /s = 55.0% of offered,  and 1.80 × the goodput</div><figcaption>O
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

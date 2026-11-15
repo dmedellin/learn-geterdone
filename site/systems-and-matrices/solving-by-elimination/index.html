@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Systems and Matrices</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Systems</p>
       <h1>Solving by Elimination</h1>
       <p class="lesson-lede">Choose the cheaper variable, eliminate it reversibly, and classify what remains.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Adding two equations adds equals to equals</li><li>Multiplying an equation by a nonzero number changes nothing</li><li>The new system is equivalent, not merely implied</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Elimination, and why the new system is equivalent</h2>
-      <article class="prose reading"><p>To eliminate a variable, multiply one or both equations by constants chosen so that the coefficients of that variable become opposites, then add the equations. The variable cancels, the sum is a new equation in the other variable alone, and solving it gives one coordinate.</p><div class="thm"><span class="label">Theorem &middot; Elimination preserves the solution set</span><p>Let <span class="math" data-say="E sub 1">E₁</span> and <span class="math" data-say="E sub 2">E₂</span> be equations and let <span class="math" data-say="k">k</span> be any number. The systems <span class="math" data-say="the set E sub 1, E sub 2">{E₁, E₂}</span> and <span class="math" data-say="the set E sub 1, E sub 2 plus k E sub 1">{E₁, E₂ + kE₁}</span> have exactly the same solutions. If <span class="math" data-say="k is not equal to 0">k ≠ 0</span>, the systems <span class="math" data-say="the set E sub 1, E sub 2">{E₁, E₂}</span> and <span class="math" data-say="the set E sub 1, kE sub 2">{E₁, kE₂}</span> have exactly the same solutions.</p></div><div class="proof"><p>Suppose the pair <span class="math" data-say="x, y">(x, y)</span> satisfies <span class="math" data-say="E sub 1">E₁</span> and <span class="math" data-say="E sub 2">E₂</span>. Then the two sides of <span class="math" data-say="E sub 1">E₁</span> are equal numbers at that pair, so <span class="math" data-say="k">k</span> times them are equal, and adding equal quantities to the two sides of <span class="math" data-say="E sub 2">E₂</span> leaves a true equation. So the pair satisfies <span class="math" data-say="E sub 2 plus k E sub 1">E₂ + kE₁</span>, and it still satisfies <span class="math" data-say="E sub 1">E₁</span>, which was not touched.</p><p>Suppose instead the pair satisfies <span class="math" data-say="E sub 1">E₁</span> and <span class="math" data-say="E sub 2 plus k E sub 1">E₂ + kE₁</span>. Run the same argument with <span class="math" data-say="negative k">−k</span>: adding <span class="math" data-say="negative k">−k</span> times <span class="math" data-say="E sub 1">E₁</span> to <span class="math" data-say="E sub 2 plus k E sub 1">E₂ + kE₁</span> gives <span class="math" data-say="E sub 2">E₂</span>, so the pair satisfies <span class="math" data-say="E sub 2">E₂</span>. Every solution of either system is a solution of the other.</p><p>For the second claim, multiplying <span class="math" data-say="E sub 2">E₂</span> by <span class="math" data-say="k">k</span> is undone by multiplying by <span class="math" data-say="1 over k">1/k</span>, which exists exactly when <span class="math" data-say="k is not equal to 0">k ≠ 0</span>.</p><p><span class="qed">&#9633;</span></p></div><p>Keeping <span class="math" data-say="E sub 1">E₁</span> unchanged is what makes the argument run in both directions. Replacing both equations at once by two combinations is not covered by this theorem, and it is genuinely unsafe: from <span class="math" data-say="x equals 1">x = 1</span> and <span class="math" data-say="y equals 1">y = 1</span> you may add each to the other and reach <span class="math" data-say="x plus y equals 2">x + y = 2</span> twice, which has a whole line of solutions. One equation at a time, always.</p><h3>Choosing the multipliers</h3><p>Look at the coefficients of the variable you want to remove. If one divides the other, multiply the smaller equation and you are done. Otherwise take the least common multiple of the two coefficients: for <span class="math" data-say="3 y">3y</span> and <span class="math" data-say="negative 2 y">−2y</span> that is <span class="math" data-say="6">6</span>, so multiply by <span class="math" data-say="2">2</span> and <span class="math" data-say="3">3</span>. The sign of one multiplier is chosen to make the two coefficients opposite.</p><div class="mathblock" data-say="2 x plus 3 y equals 5, times 2, goes to, 4 x plus 6 y equals, 10. 5 x minus 2 y equals negative 16, times 3, goes to, 15 x minus 6 y equals negative 48. negative negative negative negative negative negative negative negative negative negative negative negative negative negative negative negative negative negative negative, add. 19 x equals negative 38, goes to, x equals negative 2. 2 times the quantity negative 2, plus 3 y equals 5, goes to, 3 y equals 9, goes to, y equals 3. check, 5 times the quantity negative 2, minus 2 times 3 equals negative 10 minus 6 equals negative 16, check. solution, negative 2, 3" tabindex="0" role="region" aria-label="Mathematical notation">2x + 3y = 5      × 2    →    4x + 6y =  10
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Elimination, and why the new system is equivalent</h2><div class="prose reading"><p>To eliminate a variable, multiply one or both equations by constants chosen so that the coefficients of that variable become opposites, then add the equations. The variable cancels, the sum is a new equation in the other variable alone, and solving it gives one coordinate.</p><div class="thm"><span class="label">Theorem &middot; Elimination preserves the solution set</span><p>Let <span class="math" data-say="E sub 1">E₁</span> and <span class="math" data-say="E sub 2">E₂</span> be equations and let <span class="math" data-say="k">k</span> be any number. The systems <span class="math" data-say="the set E sub 1, E sub 2">{E₁, E₂}</span> and <span class="math" data-say="the set E sub 1, E sub 2 plus k E sub 1">{E₁, E₂ + kE₁}</span> have exactly the same solutions. If <span class="math" data-say="k is not equal to 0">k ≠ 0</span>, the systems <span class="math" data-say="the set E sub 1, E sub 2">{E₁, E₂}</span> and <span class="math" data-say="the set E sub 1, kE sub 2">{E₁, kE₂}</span> have exactly the same solutions.</p></div><div class="proof"><p>Suppose the pair <span class="math" data-say="x, y">(x, y)</span> satisfies <span class="math" data-say="E sub 1">E₁</span> and <span class="math" data-say="E sub 2">E₂</span>. Then the two sides of <span class="math" data-say="E sub 1">E₁</span> are equal numbers at that pair, so <span class="math" data-say="k">k</span> times them are equal, and adding equal quantities to the two sides of <span class="math" data-say="E sub 2">E₂</span> leaves a true equation. So the pair satisfies <span class="math" data-say="E sub 2 plus k E sub 1">E₂ + kE₁</span>, and it still satisfies <span class="math" data-say="E sub 1">E₁</span>, which was not touched.</p><p>Suppose instead the pair satisfies <span class="math" data-say="E sub 1">E₁</span> and <span class="math" data-say="E sub 2 plus k E sub 1">E₂ + kE₁</span>. Run the same argument with <span class="math" data-say="negative k">−k</span>: adding <span class="math" data-say="negative k">−k</span> times <span class="math" data-say="E sub 1">E₁</span> to <span class="math" data-say="E sub 2 plus k E sub 1">E₂ + kE₁</span> gives <span class="math" data-say="E sub 2">E₂</span>, so the pair satisfies <span class="math" data-say="E sub 2">E₂</span>. Every solution of either system is a solution of the other.</p><p>For the second claim, multiplying <span class="math" data-say="E sub 2">E₂</span> by <span class="math" data-say="k">k</span> is undone by multiplying by <span class="math" data-say="1 over k">1/k</span>, which exists exactly when <span class="math" data-say="k is not equal to 0">k ≠ 0</span>.</p><p><span class="qed">&#9633;</span></p></div><p>Keeping <span class="math" data-say="E sub 1">E₁</span> unchanged is what makes the argument run in both directions. Replacing both equations at once by two combinations is not covered by this theorem, and it is genuinely unsafe: from <span class="math" data-say="x equals 1">x = 1</span> and <span class="math" data-say="y equals 1">y = 1</span> you may add each to the other and reach <span class="math" data-say="x plus y equals 2">x + y = 2</span> twice, which has a whole line of solutions. One equation at a time, always.</p><h3>Choosing the multipliers</h3><p>Look at the coefficients of the variable you want to remove. If one divides the other, multiply the smaller equation and you are done. Otherwise take the least common multiple of the two coefficients: for <span class="math" data-say="3 y">3y</span> and <span class="math" data-say="negative 2 y">−2y</span> that is <span class="math" data-say="6">6</span>, so multiply by <span class="math" data-say="2">2</span> and <span class="math" data-say="3">3</span>. The sign of one multiplier is chosen to make the two coefficients opposite.</p><div class="mathblock" data-say="2 x plus 3 y equals 5, times 2, goes to, 4 x plus 6 y equals, 10. 5 x minus 2 y equals negative 16, times 3, goes to, 15 x minus 6 y equals negative 48. negative negative negative negative negative negative negative negative negative negative negative negative negative negative negative negative negative negative negative, add. 19 x equals negative 38, goes to, x equals negative 2. 2 times the quantity negative 2, plus 3 y equals 5, goes to, 3 y equals 9, goes to, y equals 3. check, 5 times the quantity negative 2, minus 2 times 3 equals negative 10 minus 6 equals negative 16, check. solution, negative 2, 3" tabindex="0" role="region" aria-label="Mathematical notation">2x + 3y = 5      × 2    →    4x + 6y =  10
 5x − 2y = −16    × 3    →   15x − 6y = −48
                              -------------------      add
                              19x = −38    →    x = −2
@@ -1407,22 +1451,21 @@ solution   (−2, 3)</div><p>Either variable may be eliminated, and the answer d
 2x − 6y = 4                   2x − 6y =  4
 −x + 3y = −2     × 2    →    −2x + 6y = −4
                               ---------------      add
-                              0 = 0       TRUE    →   infinitely many</div><div class="example"><span class="label">Example &middot; Describing the dependent solution set</span><p>The second system above is <span class="math" data-say="x minus 3 y equals 2">x − 3y = 2</span> multiplied by <span class="math" data-say="2">2</span> and by <span class="math" data-say="negative 1">−1</span>, so its solution set is that line: <span class="math" data-say="the set 3 t plus 2, t">{(3t + 2, t)}</span>. At <span class="math" data-say="t equals 0">t = 0</span> the pair is <span class="math" data-say="2, 0">(2, 0)</span> and at <span class="math" data-say="t equals 1">t = 1</span> it is <span class="math" data-say="5, 1">(5, 1)</span>, and both satisfy <span class="math" data-say="2 x minus 6 y equals 4">2x − 6y = 4</span> and <span class="math" data-say="negative x plus 3 y equals negative 2">−x + 3y = −2</span>.</p><p><span class="math" data-say="0, 0">(0, 0)</span> is not among them. "Infinitely many" is a count, and the answer is a set.</p></div><p>Between the two methods: elimination is quicker when both equations are in standard form and no coefficient is <span class="math" data-say="1">1</span>, which is most of the time. Substitution wins when a variable is already isolated or has a coefficient of <span class="math" data-say="1">1</span>. Neither is more correct, and the choice is worth five seconds before the pen moves.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Solving by elimination</h2></div><p>Multipliers from the lcm, and the unknown that cancels</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+                              0 = 0       TRUE    →   infinitely many</div><div class="example"><span class="label">Example &middot; Describing the dependent solution set</span><p>The second system above is <span class="math" data-say="x minus 3 y equals 2">x − 3y = 2</span> multiplied by <span class="math" data-say="2">2</span> and by <span class="math" data-say="negative 1">−1</span>, so its solution set is that line: <span class="math" data-say="the set 3 t plus 2, t">{(3t + 2, t)}</span>. At <span class="math" data-say="t equals 0">t = 0</span> the pair is <span class="math" data-say="2, 0">(2, 0)</span> and at <span class="math" data-say="t equals 1">t = 1</span> it is <span class="math" data-say="5, 1">(5, 1)</span>, and both satisfy <span class="math" data-say="2 x minus 6 y equals 4">2x − 6y = 4</span> and <span class="math" data-say="negative x plus 3 y equals negative 2">−x + 3y = −2</span>.</p><p><span class="math" data-say="0, 0">(0, 0)</span> is not among them. "Infinitely many" is a count, and the answer is a set.</p></div><p>Between the two methods: elimination is quicker when both equations are in standard form and no coefficient is <span class="math" data-say="1">1</span>, which is most of the time. Substitution wins when a variable is already isolated or has a coefficient of <span class="math" data-say="1">1</span>. Neither is more correct, and the choice is worth five seconds before the pen moves.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Solving by elimination</h2></div><p>Multipliers from the lcm, and the unknown that cancels</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="syTitle">System</strong><span id="sySub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>exact fractions throughout</span><span class="tone-amber"><i class="legend-swatch"></i>every step shown</span></div>
       </div>
       <div id="syWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="syStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Pick the multipliers</h3>
-          <p>Choose which variable to eliminate and the lab shows the multiplied equations and their sum. Run the same system twice, once for each variable: two routes, one pair, and usually one of them is half the arithmetic.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Pick the multipliers</h3>
+            <p>Choose which variable to eliminate and the lab shows the multiplied equations and their sum. Run the same system twice, once for each variable: two routes, one pair, and usually one of them is half the arithmetic.</p>
         <div class="field" id="syFieldPreset">
           <label for="syPreset">Worked example</label>
           <select id="syPreset"><option value="0">multiply one equation only</option><option value="1">multiply both: the lcm of 2 and 3</option><option value="2">both unknowns vanish and 0 = 9 is left</option><option value="3">both unknowns vanish and 0 = 0 is left</option><option value="4">fractional coefficients, and an answer over 17</option><option value="5">one equation has no y to eliminate</option></select>
@@ -1445,12 +1488,14 @@ solution   (−2, 3)</div><p>Either variable may be eliminated, and the answer d
           <div class="kpi"><span id="syK3Lab">&mdash;</span><strong id="syK3">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="syHint" style="margin:0;">Type equations the way you would write them: <code>2x + 3y = 12</code>, <code>y = 2x - 1</code>, <code>x/2 + y/3 = 1</code>. Brackets and implicit multiplication are understood, and every coefficient becomes an exact fraction.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Eliminating a variable</h2></div><p>Four moves. The first is the one people skip and then pay for.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Line both equations up in standard form</h3><p><span class="math" data-say="A x plus b y equals c">ax + by = c</span>, with the <span class="math" data-say="x">x</span> term above the <span class="math" data-say="x">x</span> term and the constants on the right. Elimination adds columns, and columns that are not aligned add the wrong things together.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Choose the variable and the two multipliers</h3><p>Take the least common multiple of its two coefficients and give one equation the sign that makes them opposites. Choosing the cheaper variable here is the whole of the skill.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add the equations and solve what is left</h3><p>One variable, one equation, Linear Equations and Inequalities. If both variables vanish, read the numeric statement instead: false means no solution, true means infinitely many and the answer is a line.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Back-substitute into an original equation, then check in both</h3><p>Use an equation you were given rather than one you multiplied &mdash; fewer chances to carry a stray factor. Then test the pair in both originals.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Eliminating a variable</h2>
+      <p class="lead-in">Four moves. The first is the one people skip and then pay for.</p>
+      <ol class="key-ideas method"><li><strong>Line both equations up in standard form.</strong> <span class="math" data-say="A x plus b y equals c">ax + by = c</span>, with the <span class="math" data-say="x">x</span> term above the <span class="math" data-say="x">x</span> term and the constants on the right. Elimination adds columns, and columns that are not aligned add the wrong things together.</li><li><strong>Choose the variable and the two multipliers.</strong> Take the least common multiple of its two coefficients and give one equation the sign that makes them opposites. Choosing the cheaper variable here is the whole of the skill.</li><li><strong>Add the equations and solve what is left.</strong> One variable, one equation, Linear Equations and Inequalities. If both variables vanish, read the numeric statement instead: false means no solution, true means infinitely many and the answer is a line.</li><li><strong>Back-substitute into an original equation, then check in both.</strong> Use an equation you were given rather than one you multiplied &mdash; fewer chances to carry a stray factor. Then test the pair in both originals.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1474,17 +1519,16 @@ check    3(2) + 4(1) = 6 + 4  = 10    ✓
 solution   (2, 1)</div><p>Eliminating <span class="math" data-say="x">x</span> instead reaches the same pair by a longer road: multiply the first equation by <span class="math" data-say="5">5</span> and the second by <span class="math" data-say="negative 3">−3</span> to get <span class="math" data-say="15 x plus 20 y equals 50">15x + 20y = 50</span> and <span class="math" data-say="negative 15 x plus 6 y equals negative 24">−15x + 6y = −24</span>, whose sum is <span class="math" data-say="26 y equals 26">26y = 26</span>. Two multiplications against one, with larger numbers in both. That difference is visible before any work is done, which is why the choice belongs at the start.</p><p>The <span class="math" data-say="16">16</span> on the right of the doubled equation is the entry most often left behind. Multiplying an equation means multiplying the constant too, and a check in both originals catches the omission immediately.</p><p>Faded rehearsal: solve <span class="math" data-say="4 x plus 3 y equals 1">4x + 3y = 1</span> and <span class="math" data-say="2 x minus 3 y equals 11">2x − 3y = 11</span>. The multipliers have already been chosen: both are <span class="math" data-say="1">1</span>, so add the aligned equations. Finish the remaining coordinate, check the pair in both originals, and say why eliminating <span class="math" data-say="x">x</span> would cost more work.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding equations that are not aligned</strong><span><span class="math" data-say="3 x plus 4 y equals 10">3x + 4y = 10</span> written above <span class="math" data-say="8 equals 5 x minus 2 y">8 = 5x − 2y</span> invites adding <span class="math" data-say="4 y">4y</span> to <span class="math" data-say="5 x">5x</span>. Standard form first, every time; the alignment is what makes the addition mean anything.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Multiplying only the left-hand side</strong><span><span class="math" data-say="5 x minus 2 y equals 8">5x − 2y = 8</span> doubled is <span class="math" data-say="10 x minus 4 y equals 16">10x − 4y = 16</span>. The <span class="math" data-say="16">16</span> is the part that gets left behind, and the resulting system is a different system that happens to look like the right one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading 0 = 0 as x = 0</strong><span>It is a true statement with no variable in it, so the system is dependent and its solution set is a line. Reporting <span class="math" data-say="0, 0">(0, 0)</span> names a single pair which, for <span class="math" data-say="2 x minus 6 y equals 4">2x − 6y = 4</span>, is not even on that line.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you choose the cheaper variable before starting.</strong><p>Look at the four coefficients, decide which variable costs one multiplication instead of two, and carry it through in exact fractions. Both routes give the same pair; being able to say which is shorter, and why, is the judgement that survives into “Gaussian Elimination”, where the choice is made for you by position on the page.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Elimination is the rest of this half of the course. “Systems in Three Variables” performs it twice to remove one variable from a three-equation system; “Matrices and Row Operations” writes it without the letters, as operations on the rows of a matrix; “Gaussian Elimination” turns it into an algorithm with no decisions left in it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding equations that are not aligned</strong><span><span class="math" data-say="3 x plus 4 y equals 10">3x + 4y = 10</span> written above <span class="math" data-say="8 equals 5 x minus 2 y">8 = 5x − 2y</span> invites adding <span class="math" data-say="4 y">4y</span> to <span class="math" data-say="5 x">5x</span>. Standard form first, every time; the alignment is what makes the addition mean anything.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Multiplying only the left-hand side</strong><span><span class="math" data-say="5 x minus 2 y equals 8">5x − 2y = 8</span> doubled is <span class="math" data-say="10 x minus 4 y equals 16">10x − 4y = 16</span>. The <span class="math" data-say="16">16</span> is the part that gets left behind, and the resulting system is a different system that happens to look like the right one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading 0 = 0 as x = 0</strong><span>It is a true statement with no variable in it, so the system is dependent and its solution set is a line. Reporting <span class="math" data-say="0, 0">(0, 0)</span> names a single pair which, for <span class="math" data-say="2 x minus 6 y equals 4">2x − 6y = 4</span>, is not even on that line.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you choose the cheaper variable before starting.</strong><p>Look at the four coefficients, decide which variable costs one multiplication instead of two, and carry it through in exact fractions. Both routes give the same pair; being able to say which is shorter, and why, is the judgement that survives into “Gaussian Elimination”, where the choice is made for you by position on the page.</p></div></div><div class="note"><strong>Note:</strong> Elimination is the rest of this half of the course. “Systems in Three Variables” performs it twice to remove one variable from a three-equation system; “Matrices and Row Operations” writes it without the letters, as operations on the rows of a matrix; “Gaussian Elimination” turns it into an algorithm with no decisions left in it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Adding two equations adds equals to equals</summary><p>If <span class="math" data-say="A equals b">a = b</span> and <span class="math" data-say="c equals d">c = d</span>, then <span class="math" data-say="A plus c equals b plus d">a + c = b + d</span>. Elimination is that one fact applied to two equations, and it is why the sum of two true equations is a true equation.</p></details><details class="recall"><summary>Multiplying an equation by a nonzero number changes nothing</summary><p>The solution set survives, because dividing by the same number puts the equation back. Multiplying by <span class="math" data-say="0">0</span> is forbidden: <span class="math" data-say="0 equals 0">0 = 0</span> is satisfied by every pair, and there is no operation that recovers what was there.</p></details><details class="recall"><summary>The new system is equivalent, not merely implied</summary><p>Replacing the second equation by second plus <span class="math" data-say="k">k</span> times first can be undone by subtracting <span class="math" data-say="k">k</span> times the first. Nothing is lost and nothing is invented. Operations that cannot be undone &mdash; squaring both sides, in Rational and Radical Expressions &mdash; are exactly the ones that produce solutions that were never there.</p></details></div>
+      <h3>Summary</h3>
       <p>Adding one equation to another is legal, and if the multiples are chosen so that the coefficients of one variable are opposites, that variable leaves. What remains is one equation in one unknown, and the system you now have is the system you started with.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Adding two equations adds equals to equals.</strong> If <span class="math" data-say="A equals b">a = b</span> and <span class="math" data-say="c equals d">c = d</span>, then <span class="math" data-say="A plus c equals b plus d">a + c = b + d</span>. Elimination is that one fact applied to two equations, and it is why the sum of two true equations is a true equation.</li><li><strong>Multiplying an equation by a nonzero number changes nothing.</strong> The solution set survives, because dividing by the same number puts the equation back. Multiplying by <span class="math" data-say="0">0</span> is forbidden: <span class="math" data-say="0 equals 0">0 = 0</span> is satisfied by every pair, and there is no operation that recovers what was there.</li><li><strong>The new system is equivalent, not merely implied.</strong> Replacing the second equation by second plus <span class="math" data-say="k">k</span> times first can be undone by subtracting <span class="math" data-say="k">k</span> times the first. Nothing is lost and nothing is invented. Operations that cannot be undone &mdash; squaring both sides, in Rational and Radical Expressions &mdash; are exactly the ones that produce solutions that were never there.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="3 x plus 4 y equals 10, 3 x plus 4 y equals 10. 5 x minus 2 y equals 8, times 2, goes to, 10 x minus 4 y equals 16. negative negative negative negative negative negative negative negative negative negative negative negative negative negative negative, add. 13 x equals 26, goes to, x equals 2, then, y equals 1" tabindex="0" role="region" aria-label="Mathematical notation">3x + 4y = 10                 3x + 4y = 10
 5x − 2y = 8      × 2    →   10x − 4y = 16
                             ---------------      add
@@ -3990,11 +4034,42 @@ solution   (2, 1)</div><p>Eliminating <span class="math" data-say="x">x</span> i
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -4062,7 +4137,7 @@ solution   (2, 1)</div><p>Eliminating <span class="math" data-say="x">x</span> i
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

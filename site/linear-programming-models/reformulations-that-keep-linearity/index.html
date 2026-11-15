@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Linear Programming Models</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Keeping it linear</p>
       <h1>Reformulations That Keep Linearity</h1>
       <p class="lesson-lede">Rewrite an absolute value and a largest-of-several objective as linear programmes, and check the optimum did not move.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>An auxiliary variable is a claim about where the optimiser will push it</li><li>Flip the direction and the same rows say something else</li><li>Two methods that never look at each other are the only evidence worth having</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Four rewrites, and the direction that makes each one legal</h2>
-      <article class="prose reading"><p>The rewrites below sit on one region: <span class="math" data-say="x plus y is at most 8">x + y ≤ 8</span>, <span class="math" data-say="x is at most 5">x ≤ 5</span>, <span class="math" data-say="y is at most 6">y ≤ 6</span> and <span class="math" data-say="2 x plus 3 y is at least 12">2x + 3y ≥ 12</span>. For the first three, <span class="math" data-say="x">x</span> is free to go negative as far as <span class="math" data-say="negative 4">−4</span>; for the price-band rewrite it is held at or above zero, because a quantity bought under a price schedule cannot be negative. What changes between them is the objective, and what each rewrite does is trade a non-linear objective for extra variables and extra rows.</p><h3>A free variable, as a difference</h3><div class="defbox"><span class="label">Definition &middot; Splitting a free variable</span><p>A variable <span class="math" data-say="x">x</span> with no sign restriction is carried as <span class="math" data-say="x equals x plus minus x minus">x = x⁺ − x⁻</span> with <span class="math" data-say="x plus is at least 0">x⁺ ≥ 0</span> and <span class="math" data-say="x minus is at least 0">x⁻ ≥ 0</span>. Every occurrence of <span class="math" data-say="x">x</span> in every row and in the objective is replaced by that difference.</p><p>Any pair with the right difference gives the same objective value, so nothing needs to push either part anywhere in particular. This is the one rewrite of the four that is legal whichever way the objective is pushed.</p></div><p>With the objective <span class="math" data-say="3 x plus 2 y">3x + 2y</span> minimised, the answer is 3 at <span class="math" data-say="x equals negative 3">x = −3</span>, <span class="math" data-say="y equals 6">y = 6</span>, and the rewrite reports <span class="math" data-say="x plus equals 0">x⁺ = 0</span>, <span class="math" data-say="x minus equals 3">x⁻ = 3</span>: the negative value is carried by the second part. Maximised, the answer is 21 at <span class="math" data-say="5, 3">(5, 3)</span> with <span class="math" data-say="x minus equals 0">x⁻ = 0</span>. Both agree with the original exactly, which is what “legal in either direction” means in practice.</p><h3>An absolute value, when it is minimised</h3><p>The same two parts serve for <span class="math" data-say="the absolute value of x">|x|</span>, as their sum rather than their difference. That sum is <span class="math" data-say="the absolute value of x">|x|</span> only when at least one of <span class="math" data-say="x plus">x⁺</span> and <span class="math" data-say="x minus">x⁻</span> is zero, because otherwise both could be inflated together without changing <span class="math" data-say="x">x</span>. Minimising a non-negative multiple of <span class="math" data-say="x plus plus x minus">x⁺ + x⁻</span> does push one of them to zero. Maximising does the opposite.</p><div class="example"><span class="label">Example &middot; The same rows, read twice</span><p>Minimise <span class="math" data-say="2 times the absolute value of x, plus 5 y">2|x| + 5y</span>: the original is 40/3 at <span class="math" data-say="5, 2 over 3">(5, 2/3)</span> by corner enumeration, the rewrite is 40/3 by the simplex engine with <span class="math" data-say="x plus equals 5">x⁺ = 5</span> and <span class="math" data-say="x minus equals 0">x⁻ = 0</span>, and the difference is exactly zero. Now maximise the same expression: the original is 36 at <span class="math" data-say="negative 3, 6">(−3, 6)</span> and the rewrite is unbounded, because <span class="math" data-say="x plus">x⁺</span> and <span class="math" data-say="x minus">x⁻</span> climb together for ever with nothing to stop them. A reader who only ran the rewrite would have no way to notice.</p></div><h3>The smallest largest piece</h3><div class="thm"><span class="label">Theorem &middot; The epigraph rewrite</span><p>Let <span class="math" data-say="f of x equals the max of p sub 1 of x, p sub 2 of x, and so on">f(x) = max(p₁(x), p₂(x), …)</span> with each <span class="math" data-say="p sub i">pᵢ</span> linear. Then minimising <span class="math" data-say="f">f</span> over a region is the same problem as minimising <span class="math" data-say="t">t</span> over the same region with the rows <span class="math" data-say="t is at least p sub i of x">t ≥ pᵢ(x)</span> added, one per piece, and <span class="math" data-say="t">t</span> free.</p><p>The rows make <span class="math" data-say="t">t</span> at least every piece, so <span class="math" data-say="t is at least f of x">t ≥ f(x)</span> at every feasible point, and minimising cannot leave <span class="math" data-say="t">t</span> above <span class="math" data-say="f of x">f(x)</span>. Maximising can and does: the rewritten programme is then unbounded, and it is a different problem rather than a worse answer to this one.</p></div><p>Minimise <span class="math" data-say="the max of 2 x plus y and negative x plus 5 y">max(2x + y, −x + 5y)</span> on the region and both routes report 132/17, at <span class="math" data-say="x equals 48 over 17">x = 48/17</span>, <span class="math" data-say="y equals 36 over 17">y = 36/17</span>, with <span class="math" data-say="t equals 132 over 17">t = 132/17</span> sitting exactly on the two pieces where they cross. The fraction is worth noting: the corner that wins is the crossing of the boundary of the region with the line where one piece overtakes the other, and nothing about it rounds.</p><h3>A cost quoted in two price bands</h3><p>Suppose the first 3 units of <span class="math" data-say="x">x</span> cost 2 each and every unit after that costs 5. Split the quantity into one variable per band, cap the first at 3, and price them separately. A minimiser fills the cheaper band first &mdash; and the cheaper band is the earlier one only when the later band costs more. That condition is convexity, and it is the condition rather than the background.</p><div class="example"><span class="label">Example &middot; A falling price, and a cost no quantity achieves</span><p>Quote the first 3 units at 5 each and everything after at 2. The true cheapest cost on this region is 16, at <span class="math" data-say="0, 4">(0, 4)</span>. The band model reports 38/3, with <span class="math" data-say="x sub 1 equals 0">x(1) = 0</span> and <span class="math" data-say="x sub 2 equals 5">x(2) = 5</span>: it has bought five units out of the second band without filling the first, which the price schedule does not allow. The model is not a worse answer to the question; it is a cheaper answer to a question with no cost schedule behind it.</p></div><p>So the rule to carry away is not “these four tricks work”. It is that an auxiliary variable comes with a sentence &mdash; what forces it to the value I intend &mdash; and that the sentence is checkable by solving the original some other way and subtracting.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The same problem, written twice</h2></div><p>An auxiliary variable is legal exactly when the direction forces its value</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Four rewrites, and the direction that makes each one legal</h2><div class="prose reading"><p>The rewrites below sit on one region: <span class="math" data-say="x plus y is at most 8">x + y ≤ 8</span>, <span class="math" data-say="x is at most 5">x ≤ 5</span>, <span class="math" data-say="y is at most 6">y ≤ 6</span> and <span class="math" data-say="2 x plus 3 y is at least 12">2x + 3y ≥ 12</span>. For the first three, <span class="math" data-say="x">x</span> is free to go negative as far as <span class="math" data-say="negative 4">−4</span>; for the price-band rewrite it is held at or above zero, because a quantity bought under a price schedule cannot be negative. What changes between them is the objective, and what each rewrite does is trade a non-linear objective for extra variables and extra rows.</p><h3>A free variable, as a difference</h3><div class="defbox"><span class="label">Definition &middot; Splitting a free variable</span><p>A variable <span class="math" data-say="x">x</span> with no sign restriction is carried as <span class="math" data-say="x equals x plus minus x minus">x = x⁺ − x⁻</span> with <span class="math" data-say="x plus is at least 0">x⁺ ≥ 0</span> and <span class="math" data-say="x minus is at least 0">x⁻ ≥ 0</span>. Every occurrence of <span class="math" data-say="x">x</span> in every row and in the objective is replaced by that difference.</p><p>Any pair with the right difference gives the same objective value, so nothing needs to push either part anywhere in particular. This is the one rewrite of the four that is legal whichever way the objective is pushed.</p></div><p>With the objective <span class="math" data-say="3 x plus 2 y">3x + 2y</span> minimised, the answer is 3 at <span class="math" data-say="x equals negative 3">x = −3</span>, <span class="math" data-say="y equals 6">y = 6</span>, and the rewrite reports <span class="math" data-say="x plus equals 0">x⁺ = 0</span>, <span class="math" data-say="x minus equals 3">x⁻ = 3</span>: the negative value is carried by the second part. Maximised, the answer is 21 at <span class="math" data-say="5, 3">(5, 3)</span> with <span class="math" data-say="x minus equals 0">x⁻ = 0</span>. Both agree with the original exactly, which is what “legal in either direction” means in practice.</p><h3>An absolute value, when it is minimised</h3><p>The same two parts serve for <span class="math" data-say="the absolute value of x">|x|</span>, as their sum rather than their difference. That sum is <span class="math" data-say="the absolute value of x">|x|</span> only when at least one of <span class="math" data-say="x plus">x⁺</span> and <span class="math" data-say="x minus">x⁻</span> is zero, because otherwise both could be inflated together without changing <span class="math" data-say="x">x</span>. Minimising a non-negative multiple of <span class="math" data-say="x plus plus x minus">x⁺ + x⁻</span> does push one of them to zero. Maximising does the opposite.</p><div class="example"><span class="label">Example &middot; The same rows, read twice</span><p>Minimise <span class="math" data-say="2 times the absolute value of x, plus 5 y">2|x| + 5y</span>: the original is 40/3 at <span class="math" data-say="5, 2 over 3">(5, 2/3)</span> by corner enumeration, the rewrite is 40/3 by the simplex engine with <span class="math" data-say="x plus equals 5">x⁺ = 5</span> and <span class="math" data-say="x minus equals 0">x⁻ = 0</span>, and the difference is exactly zero. Now maximise the same expression: the original is 36 at <span class="math" data-say="negative 3, 6">(−3, 6)</span> and the rewrite is unbounded, because <span class="math" data-say="x plus">x⁺</span> and <span class="math" data-say="x minus">x⁻</span> climb together for ever with nothing to stop them. A reader who only ran the rewrite would have no way to notice.</p></div><h3>The smallest largest piece</h3><div class="thm"><span class="label">Theorem &middot; The epigraph rewrite</span><p>Let <span class="math" data-say="f of x equals the max of p sub 1 of x, p sub 2 of x, and so on">f(x) = max(p₁(x), p₂(x), …)</span> with each <span class="math" data-say="p sub i">pᵢ</span> linear. Then minimising <span class="math" data-say="f">f</span> over a region is the same problem as minimising <span class="math" data-say="t">t</span> over the same region with the rows <span class="math" data-say="t is at least p sub i of x">t ≥ pᵢ(x)</span> added, one per piece, and <span class="math" data-say="t">t</span> free.</p><p>The rows make <span class="math" data-say="t">t</span> at least every piece, so <span class="math" data-say="t is at least f of x">t ≥ f(x)</span> at every feasible point, and minimising cannot leave <span class="math" data-say="t">t</span> above <span class="math" data-say="f of x">f(x)</span>. Maximising can and does: the rewritten programme is then unbounded, and it is a different problem rather than a worse answer to this one.</p></div><p>Minimise <span class="math" data-say="the max of 2 x plus y and negative x plus 5 y">max(2x + y, −x + 5y)</span> on the region and both routes report 132/17, at <span class="math" data-say="x equals 48 over 17">x = 48/17</span>, <span class="math" data-say="y equals 36 over 17">y = 36/17</span>, with <span class="math" data-say="t equals 132 over 17">t = 132/17</span> sitting exactly on the two pieces where they cross. The fraction is worth noting: the corner that wins is the crossing of the boundary of the region with the line where one piece overtakes the other, and nothing about it rounds.</p><h3>A cost quoted in two price bands</h3><p>Suppose the first 3 units of <span class="math" data-say="x">x</span> cost 2 each and every unit after that costs 5. Split the quantity into one variable per band, cap the first at 3, and price them separately. A minimiser fills the cheaper band first &mdash; and the cheaper band is the earlier one only when the later band costs more. That condition is convexity, and it is the condition rather than the background.</p><div class="example"><span class="label">Example &middot; A falling price, and a cost no quantity achieves</span><p>Quote the first 3 units at 5 each and everything after at 2. The true cheapest cost on this region is 16, at <span class="math" data-say="0, 4">(0, 4)</span>. The band model reports 38/3, with <span class="math" data-say="x sub 1 equals 0">x(1) = 0</span> and <span class="math" data-say="x sub 2 equals 5">x(2) = 5</span>: it has bought five units out of the second band without filling the first, which the price schedule does not allow. The model is not a worse answer to the question; it is a cheaper answer to a question with no cost schedule behind it.</p></div><p>So the rule to carry away is not “these four tricks work”. It is that an auxiliary variable comes with a sentence &mdash; what forces it to the value I intend &mdash; and that the sentence is checkable by solving the original some other way and subtracting.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The same problem, written twice</h2></div><p>An auxiliary variable is legal exactly when the direction forces its value</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The same problem, written twice</strong><span>Corners of the original against a tableau of the rewrite</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the feasible region</span><span class="tone-purple"><i class="legend-swatch"></i>a boundary</span><span class="tone-muted"><i class="legend-swatch"></i>where one piece overtakes another</span><span class="tone-green"><i class="legend-swatch"></i>the original's best corner</span></div>
@@ -1406,10 +1449,10 @@
       <div id="rfCorners" style="margin-top:12px;"></div>
       <div id="rfReform" style="margin-top:12px;"></div>
       <div class="status-banner" id="rfStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Pick a rewrite, then flip the direction and watch it break</h3>
-          <p>The original is answered by enumerating the corners of each part of the region on which one piece of the objective is the one that counts; the rewrite is answered by the simplex engine, and neither looks at the other. Subtracting them is therefore evidence, and on three of the four rewrites the difference stops being zero the moment the direction is flipped.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Pick a rewrite, then flip the direction and watch it break</h3>
+            <p>The original is answered by enumerating the corners of each part of the region on which one piece of the objective is the one that counts; the rewrite is answered by the simplex engine, and neither looks at the other. Subtracting them is therefore evidence, and on three of the four rewrites the difference stops being zero the moment the direction is flipped.</p>
         <div class="field" id="rfRuleField">
           <label for="rfRule">Which rewrite</label>
           <select id="rfRule"><option value="minmax" selected>the largest of two expressions, made into one variable</option><option value="abs">a size, written without the absolute-value bars</option><option value="free">a variable allowed to go negative</option><option value="band">a cost quoted in two price bands</option></select>
@@ -1437,12 +1480,14 @@
           <div class="kpi"><span id="rfK4Lab">&mdash;</span><strong id="rfK4">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Checking a rewrite before trusting it</h2></div><p>The first two steps are the argument and the last two are the evidence. Skipping the evidence is how an illegal rewrite ships.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the auxiliary variables and what each is supposed to equal</h3><p><span class="math" data-say="t">t</span> is supposed to be the largest piece; <span class="math" data-say="x plus plus x minus">x⁺ + x⁻</span> is supposed to be <span class="math" data-say="the absolute value of x">|x|</span>. Writing the intention down is what makes the next step possible.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Say what forces that value, in one sentence about the direction</h3><p>“Minimising <span class="math" data-say="t">t</span> squeezes it onto the largest piece.” If the sentence needs the objective to be pushed the other way, the rewrite is legal the other way and not this way.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Solve the original by some other means</h3><p>In two variables, enumerate the corners &mdash; and on a piecewise objective, the corners of each part on which one piece is the one that counts, because the objective is linear on each of those.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Subtract, and treat a non-zero difference as a different problem</h3><p>Zero is the only acceptable answer. A rewrite that reports a better objective value than the original has not improved anything; it has escaped the constraints of the question.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Checking a rewrite before trusting it</h2>
+      <p class="lead-in">The first two steps are the argument and the last two are the evidence. Skipping the evidence is how an illegal rewrite ships.</p>
+      <ol class="key-ideas method"><li><strong>Name the auxiliary variables and what each is supposed to equal.</strong> <span class="math" data-say="t">t</span> is supposed to be the largest piece; <span class="math" data-say="x plus plus x minus">x⁺ + x⁻</span> is supposed to be <span class="math" data-say="the absolute value of x">|x|</span>. Writing the intention down is what makes the next step possible.</li><li><strong>Say what forces that value, in one sentence about the direction.</strong> “Minimising <span class="math" data-say="t">t</span> squeezes it onto the largest piece.” If the sentence needs the objective to be pushed the other way, the rewrite is legal the other way and not this way.</li><li><strong>Solve the original by some other means.</strong> In two variables, enumerate the corners &mdash; and on a piecewise objective, the corners of each part on which one piece is the one that counts, because the objective is linear on each of those.</li><li><strong>Subtract, and treat a non-zero difference as a different problem.</strong> Zero is the only acceptable answer. A rewrite that reports a better objective value than the original has not improved anything; it has escaped the constraints of the question.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1478,17 +1523,16 @@ now maximise the same objective
   the two, subtracted         there is no comparison to make</div><p>The minimised pair agree to the last fraction, and they were computed by different methods on different models. The maximised pair do not agree at all, and the reason is one sentence: minimising <span class="math" data-say="t">t</span> squeezes it onto the largest piece, and maximising <span class="math" data-say="t">t</span> lets it float away from every piece at once.</p><p>For a faded rehearsal, take the absolute-value rewrite with the same region and the objective <span class="math" data-say="2 times the absolute value of x, plus 5 y">2|x| + 5y</span>. The supplied first move is the pieces: <span class="math" data-say="the absolute value of x">|x|</span> is the larger of <span class="math" data-say="x">x</span> and <span class="math" data-say="negative x">−x</span>, so <span class="math" data-say="2 times the absolute value of x, plus 5 y">2|x| + 5y</span> is the larger of <span class="math" data-say="2 x plus 5 y">2x + 5y</span> and <span class="math" data-say="negative 2 x plus 5 y">−2x + 5y</span>. Minimise it both ways &mdash; by the corners of the two parts, and by the split model &mdash; then flip to maximise and say, before running anything, which of the two will report a finite answer.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming a rewrite works in either direction</strong><span>Three of the four here do not. Applied to a maximised maximum, or to <span class="math" data-say="the absolute value of x">|x|</span> in a maximised objective, the optimiser pushes the auxiliary variable the other way and the programme becomes unbounded or reports a value the original cannot reach. The detection is cheap: solve the original another way and subtract.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating a better objective value as good news</strong><span>A rewrite that beats the original has not found a better plan &mdash; it has dropped part of the question. The falling-price band model reports 38/3 against a true 16 by buying out of a band it never filled, and nothing in the arithmetic objects.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Leaving the convexity condition unstated in the price-band rewrite</strong><span>Segments fill in order only when each later segment costs more than the one before. That is a condition on the data, not a property of the modelling trick, and a schedule with a volume discount in it fails it. Say the condition when you write the model, and check it against the prices in front of you.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when every auxiliary variable you introduce arrives with a sentence about the direction.</strong><p>You should be able to rewrite an absolute value and a min-max objective as linear programmes, say what forces each auxiliary variable to its intended value, solve the original another way, and read a non-zero difference as the rewrite being a different problem.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Deviation variables in “Goal Programming and Deviation Variables” are the same idea once more, with a twist: there are two of them per target, only the one you mind is penalised, and the direction argument is what keeps the other from absorbing it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming a rewrite works in either direction</strong><span>Three of the four here do not. Applied to a maximised maximum, or to <span class="math" data-say="the absolute value of x">|x|</span> in a maximised objective, the optimiser pushes the auxiliary variable the other way and the programme becomes unbounded or reports a value the original cannot reach. The detection is cheap: solve the original another way and subtract.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating a better objective value as good news</strong><span>A rewrite that beats the original has not found a better plan &mdash; it has dropped part of the question. The falling-price band model reports 38/3 against a true 16 by buying out of a band it never filled, and nothing in the arithmetic objects.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Leaving the convexity condition unstated in the price-band rewrite</strong><span>Segments fill in order only when each later segment costs more than the one before. That is a condition on the data, not a property of the modelling trick, and a schedule with a volume discount in it fails it. Say the condition when you write the model, and check it against the prices in front of you.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when every auxiliary variable you introduce arrives with a sentence about the direction.</strong><p>You should be able to rewrite an absolute value and a min-max objective as linear programmes, say what forces each auxiliary variable to its intended value, solve the original another way, and read a non-zero difference as the rewrite being a different problem.</p></div></div><div class="note"><strong>Note:</strong> Deviation variables in “Goal Programming and Deviation Variables” are the same idea once more, with a twist: there are two of them per target, only the one you mind is penalised, and the direction argument is what keeps the other from absorbing it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>An auxiliary variable is a claim about where the optimiser will push it</summary><p>Adding <span class="math" data-say="t">t</span> with the rows <span class="math" data-say="t is at least piece sub 1">t ≥ piece₁</span> and <span class="math" data-say="t is at least piece sub 2">t ≥ piece₂</span> does not make <span class="math" data-say="t">t</span> the larger piece; it makes <span class="math" data-say="t">t</span> at least the larger piece. Minimising <span class="math" data-say="t">t</span> squeezes it down onto that piece, and only then is the rewrite an equality in disguise.</p></details><details class="recall"><summary>Flip the direction and the same rows say something else</summary><p>Maximise <span class="math" data-say="t">t</span> in that model and nothing above it stops it climbing: the programme is unbounded while the original still has a finite answer at a corner. The rows did not change &mdash; the claim about where the optimiser pushes <span class="math" data-say="t">t</span> did.</p></details><details class="recall"><summary>Two methods that never look at each other are the only evidence worth having</summary><p>The lab optimises the original by enumerating the corners of each part of the region where one piece is the one that counts, and the rewrite by the simplex engine. Subtracting the two answers is a test that can fail, which is why it is worth running.</p></details></div>
+      <h3>Summary</h3>
       <p>Four requirements that look non-linear are linear after an auxiliary variable is introduced, and all four are the same argument: the rewrite is legal exactly when the direction of optimisation forces the auxiliary variable to the value you intended. Flip the direction and three of the four stop being about the original problem at all &mdash; which is something a reader can detect, by solving both and subtracting.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>An auxiliary variable is a claim about where the optimiser will push it.</strong> Adding <span class="math" data-say="t">t</span> with the rows <span class="math" data-say="t is at least piece sub 1">t ≥ piece₁</span> and <span class="math" data-say="t is at least piece sub 2">t ≥ piece₂</span> does not make <span class="math" data-say="t">t</span> the larger piece; it makes <span class="math" data-say="t">t</span> at least the larger piece. Minimising <span class="math" data-say="t">t</span> squeezes it down onto that piece, and only then is the rewrite an equality in disguise.</li><li><strong>Flip the direction and the same rows say something else.</strong> Maximise <span class="math" data-say="t">t</span> in that model and nothing above it stops it climbing: the programme is unbounded while the original still has a finite answer at a corner. The rows did not change &mdash; the claim about where the optimiser pushes <span class="math" data-say="t">t</span> did.</li><li><strong>Two methods that never look at each other are the only evidence worth having.</strong> The lab optimises the original by enumerating the corners of each part of the region where one piece is the one that counts, and the rewrite by the simplex engine. Subtracting the two answers is a test that can fail, which is why it is worth running.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="x free, x equals x plus minus x minus, x plus, x minus is at least 0. the absolute value of x, minimised, the absolute value of x, equals x plus plus x minus, at least one is pushed to 0. min of a max, t is at least every piece, minimise t. a rising price, one variable per band, the cheaper band fills first. legal, if and only if, the direction of optimisation forces the auxiliary value. the check, original by corners minus rewrite by simplex, equals, 0" tabindex="0" role="region" aria-label="Mathematical notation">x free            x = x⁺ − x⁻,          x⁺, x⁻ ≥ 0
 |x| minimised     |x| = x⁺ + x⁻         at least one is pushed to 0
 min of a max      t ≥ every piece,      minimise t
@@ -3710,11 +3754,42 @@ the check:  original by corners − rewrite by simplex  =  0</div><figcaption>Fo
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3782,7 +3857,7 @@ the check:  original by corners − rewrite by simplex  =  0</div><figcaption>Fo
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

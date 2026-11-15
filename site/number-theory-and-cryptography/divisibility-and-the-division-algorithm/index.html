@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Number Theory and Cryptography</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Divisibility</p>
       <h1>Divisibility and the Division Algorithm</h1>
       <p class="lesson-lede">Every division leaves a unique quotient and remainder.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Divisibility is exact</li><li>The remainder is unique and non-negative</li><li>Divisibility is transitive and additive</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Divisibility and division</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Divisibility</span><p>For integers <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span> with <span class="math" data-say="b is not equal to 0">b ≠ 0</span>, <span class="math" data-say="b divides a">b | a</span> ("<span class="math" data-say="b">b</span> divides <span class="math" data-say="A">a</span>") means there is an integer <span class="math" data-say="k">k</span> with <span class="math" data-say="A equals b k">a = bk</span>. Then <span class="math" data-say="b">b</span> is a <strong>divisor</strong> or <strong>factor</strong> of <span class="math" data-say="A">a</span>.</p></div><div class="thm"><span class="label">Theorem &middot; Basic properties</span><p>For integers <span class="math" data-say="A, b, c, d">a, b, c, d</span>: if <span class="math" data-say="d divides a">d | a</span> and <span class="math" data-say="d divides b">d | b</span> then <span class="math" data-say="d divides A x plus by">d | (ax + by)</span> for all integers <span class="math" data-say="x, y">x, y</span>; if <span class="math" data-say="A divides b">a | b</span> and <span class="math" data-say="b divides c">b | c</span> then <span class="math" data-say="A divides c">a | c</span>; and <span class="math" data-say="d divides a">d | a</span> with <span class="math" data-say="A is not equal to 0">a ≠ 0</span> implies <span class="math" data-say="the absolute value of d, is at most the absolute value of a">|d| ≤ |a|</span>.</p></div><div class="proof"><p>For the first: <span class="math" data-say="A equals d m">a = dm</span> and <span class="math" data-say="b equals d n">b = dn</span>, so <span class="math" data-say="A x plus b y equals d times the quantity m x plus n y">ax + by = d(mx + ny)</span>, and <span class="math" data-say="m x plus n y">mx + ny</span> is an integer.</p><p>For the second: <span class="math" data-say="b equals A m">b = am</span> and <span class="math" data-say="c equals b n">c = bn</span>, so <span class="math" data-say="c equals A times m n">c = a(mn)</span>.</p><p>For the third: <span class="math" data-say="A equals d k">a = dk</span> with <span class="math" data-say="A is not equal to 0">a ≠ 0</span> forces <span class="math" data-say="k is not equal to 0">k ≠ 0</span>, so <span class="math" data-say="the absolute value of k, is at least 1">|k| ≥ 1</span> and <span class="math" data-say="the absolute value of a, equals the absolute value of d the absolute value of k, is at least the absolute value of d">|a| = |d||k| ≥ |d|</span>.</p><p><span class="qed">&#9633;</span></p></div><p>The first property is the workhorse. It is what lets the Euclidean algorithm work, what proves Euclid's theorem on primes, and what makes Bézout's identity useful &mdash; and it is one line.</p><div class="thm"><span class="label">Theorem &middot; Division algorithm</span><p>For any integer <span class="math" data-say="A">a</span> and any positive integer <span class="math" data-say="b">b</span>, there are unique integers <span class="math" data-say="q">q</span> and <span class="math" data-say="r">r</span> with <span class="math" data-say="A equals q b plus r">a = qb + r</span> and <span class="math" data-say="0 is at most r is less than b">0 ≤ r &lt; b</span>.</p></div><div class="proof"><p><strong>Existence.</strong> Let <span class="math" data-say="S equals the set A minus q b such that q in the integers, A minus q b is at least 0">S = {a − qb : q ∈ ℤ, a − qb ≥ 0}</span>. It is nonempty (take <span class="math" data-say="q">q</span> very negative) and consists of non-negative integers, so by well-ordering (“The Well-Ordering Principle” in Induction and Recursion) it has a least element <span class="math" data-say="r equals A minus q b">r = a − qb</span>.</p><p>If <span class="math" data-say="r is at least b">r ≥ b</span> then <span class="math" data-say="r minus b equals A minus the quantity q plus 1, times b">r − b = a − (q+1)b</span> is in <span class="math" data-say="S">S</span> and smaller than <span class="math" data-say="r">r</span>, contradicting minimality. So <span class="math" data-say="0 is at most r is less than b">0 ≤ r &lt; b</span>.</p><p><strong>Uniqueness.</strong> If <span class="math" data-say="A equals q b plus r equals q &#x27; b plus r prime">a = qb + r = q'b + r'</span> with both remainders in <span class="math" data-say="0, b">[0, b)</span>, then <span class="math" data-say="b times the quantity q minus q prime, equals r prime minus r">b(q − q') = r' − r</span>. The right side has absolute value less than <span class="math" data-say="b">b</span>, and the left is a multiple of <span class="math" data-say="b">b</span>, so both are 0. Hence <span class="math" data-say="r equals r prime">r = r'</span> and <span class="math" data-say="q equals q prime">q = q'</span>.</p><p><span class="qed">&#9633;</span></p></div><p>Uniqueness is what makes the notation legitimate: <span class="math" data-say="a div b">a div b</span> and <span class="math" data-say="a mod b">a mod b</span> name specific integers rather than one of several possibilities.</p><h3>Negative dividends</h3><div class="example"><span class="label">Example &middot; <span class="math" data-say="negative 7">−7</span> divided by 3</span><p><span class="math" data-say="negative 7 equals the quantity negative 3, times 3 plus 2">−7 = (−3)(3) + 2</span>, so <span class="math" data-say="q equals negative 3">q = −3</span> and <span class="math" data-say="r equals 2">r = 2</span>. Not <span class="math" data-say="the quantity negative 2, times 3 plus negative 1">(−2)(3) + (−1)</span>, because the theorem requires <span class="math" data-say="0 is at most r is less than b">0 ≤ r &lt; b</span>. The quotient rounds toward negative infinity, not toward zero.</p></div><p>Many programming languages disagree with the theorem here: C-style <span class="math" data-say="percent">%</span> returns <span class="math" data-say="negative 1">−1</span> for <span class="math" data-say="negative 7 percent 3">−7 % 3</span>, while Python returns 2. The mathematical convention is Python's, and it is the one that makes modular arithmetic work &mdash; classes should not depend on the sign of a representative.</p><div class="defbox"><span class="label">Definition &middot; The mod operator</span><p><span class="math" data-say="a mod b">a mod b</span> denotes the unique remainder <span class="math" data-say="r">r</span> from the division algorithm, so <span class="math" data-say="0 is at most a mod b is less than b">0 ≤ a mod b &lt; b</span> always.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Number theory workbench</h2></div><p>Algorithms with their traces</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Divisibility and division</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Divisibility</span><p>For integers <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span> with <span class="math" data-say="b is not equal to 0">b ≠ 0</span>, <span class="math" data-say="b divides a">b | a</span> ("<span class="math" data-say="b">b</span> divides <span class="math" data-say="A">a</span>") means there is an integer <span class="math" data-say="k">k</span> with <span class="math" data-say="A equals b k">a = bk</span>. Then <span class="math" data-say="b">b</span> is a <strong>divisor</strong> or <strong>factor</strong> of <span class="math" data-say="A">a</span>.</p></div><div class="thm"><span class="label">Theorem &middot; Basic properties</span><p>For integers <span class="math" data-say="A, b, c, d">a, b, c, d</span>: if <span class="math" data-say="d divides a">d | a</span> and <span class="math" data-say="d divides b">d | b</span> then <span class="math" data-say="d divides A x plus by">d | (ax + by)</span> for all integers <span class="math" data-say="x, y">x, y</span>; if <span class="math" data-say="A divides b">a | b</span> and <span class="math" data-say="b divides c">b | c</span> then <span class="math" data-say="A divides c">a | c</span>; and <span class="math" data-say="d divides a">d | a</span> with <span class="math" data-say="A is not equal to 0">a ≠ 0</span> implies <span class="math" data-say="the absolute value of d, is at most the absolute value of a">|d| ≤ |a|</span>.</p></div><div class="proof"><p>For the first: <span class="math" data-say="A equals d m">a = dm</span> and <span class="math" data-say="b equals d n">b = dn</span>, so <span class="math" data-say="A x plus b y equals d times the quantity m x plus n y">ax + by = d(mx + ny)</span>, and <span class="math" data-say="m x plus n y">mx + ny</span> is an integer.</p><p>For the second: <span class="math" data-say="b equals A m">b = am</span> and <span class="math" data-say="c equals b n">c = bn</span>, so <span class="math" data-say="c equals A times m n">c = a(mn)</span>.</p><p>For the third: <span class="math" data-say="A equals d k">a = dk</span> with <span class="math" data-say="A is not equal to 0">a ≠ 0</span> forces <span class="math" data-say="k is not equal to 0">k ≠ 0</span>, so <span class="math" data-say="the absolute value of k, is at least 1">|k| ≥ 1</span> and <span class="math" data-say="the absolute value of a, equals the absolute value of d the absolute value of k, is at least the absolute value of d">|a| = |d||k| ≥ |d|</span>.</p><p><span class="qed">&#9633;</span></p></div><p>The first property is the workhorse. It is what lets the Euclidean algorithm work, what proves Euclid's theorem on primes, and what makes Bézout's identity useful &mdash; and it is one line.</p><div class="thm"><span class="label">Theorem &middot; Division algorithm</span><p>For any integer <span class="math" data-say="A">a</span> and any positive integer <span class="math" data-say="b">b</span>, there are unique integers <span class="math" data-say="q">q</span> and <span class="math" data-say="r">r</span> with <span class="math" data-say="A equals q b plus r">a = qb + r</span> and <span class="math" data-say="0 is at most r is less than b">0 ≤ r &lt; b</span>.</p></div><div class="proof"><p><strong>Existence.</strong> Let <span class="math" data-say="S equals the set A minus q b such that q in the integers, A minus q b is at least 0">S = {a − qb : q ∈ ℤ, a − qb ≥ 0}</span>. It is nonempty (take <span class="math" data-say="q">q</span> very negative) and consists of non-negative integers, so by well-ordering (“The Well-Ordering Principle” in Induction and Recursion) it has a least element <span class="math" data-say="r equals A minus q b">r = a − qb</span>.</p><p>If <span class="math" data-say="r is at least b">r ≥ b</span> then <span class="math" data-say="r minus b equals A minus the quantity q plus 1, times b">r − b = a − (q+1)b</span> is in <span class="math" data-say="S">S</span> and smaller than <span class="math" data-say="r">r</span>, contradicting minimality. So <span class="math" data-say="0 is at most r is less than b">0 ≤ r &lt; b</span>.</p><p><strong>Uniqueness.</strong> If <span class="math" data-say="A equals q b plus r equals q &#x27; b plus r prime">a = qb + r = q'b + r'</span> with both remainders in <span class="math" data-say="0, b">[0, b)</span>, then <span class="math" data-say="b times the quantity q minus q prime, equals r prime minus r">b(q − q') = r' − r</span>. The right side has absolute value less than <span class="math" data-say="b">b</span>, and the left is a multiple of <span class="math" data-say="b">b</span>, so both are 0. Hence <span class="math" data-say="r equals r prime">r = r'</span> and <span class="math" data-say="q equals q prime">q = q'</span>.</p><p><span class="qed">&#9633;</span></p></div><p>Uniqueness is what makes the notation legitimate: <span class="math" data-say="a div b">a div b</span> and <span class="math" data-say="a mod b">a mod b</span> name specific integers rather than one of several possibilities.</p><h3>Negative dividends</h3><div class="example"><span class="label">Example &middot; <span class="math" data-say="negative 7">−7</span> divided by 3</span><p><span class="math" data-say="negative 7 equals the quantity negative 3, times 3 plus 2">−7 = (−3)(3) + 2</span>, so <span class="math" data-say="q equals negative 3">q = −3</span> and <span class="math" data-say="r equals 2">r = 2</span>. Not <span class="math" data-say="the quantity negative 2, times 3 plus negative 1">(−2)(3) + (−1)</span>, because the theorem requires <span class="math" data-say="0 is at most r is less than b">0 ≤ r &lt; b</span>. The quotient rounds toward negative infinity, not toward zero.</p></div><p>Many programming languages disagree with the theorem here: C-style <span class="math" data-say="percent">%</span> returns <span class="math" data-say="negative 1">−1</span> for <span class="math" data-say="negative 7 percent 3">−7 % 3</span>, while Python returns 2. The mathematical convention is Python's, and it is the one that makes modular arithmetic work &mdash; classes should not depend on the sign of a representative.</p><div class="defbox"><span class="label">Definition &middot; The mod operator</span><p><span class="math" data-say="a mod b">a mod b</span> denotes the unique remainder <span class="math" data-say="r">r</span> from the division algorithm, so <span class="math" data-say="0 is at most a mod b is less than b">0 ≤ a mod b &lt; b</span> always.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Number theory workbench</h2></div><p>Algorithms with their traces</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="ntTitle">Number theory workbench</strong><span id="ntSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the step that decides</span></div>
       </div>
       <div class="lab-stage"><div class="table-wrap" id="ntOut" tabindex="0" role="region" aria-label="Data table"></div></div>
       <div class="status-banner" id="ntStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The division algorithm</h3>
-          <p>The preset is the lesson's <span class="math" data-say="negative 7">−7</span> divided by 3: <span class="math" data-say="q equals negative 3">q = −3</span>, <span class="math" data-say="r equals 2">r = 2</span>, and the check line reads <span class="math" data-say="negative 3 times 3 plus 2 equals negative 7">−3·3 + 2 = −7</span>. Change <span class="math" data-say="A">a</span> to <span class="math" data-say="negative 8">−8</span> and then <span class="math" data-say="negative 9">−9</span> and watch <span class="math" data-say="q">q</span> stay at <span class="math" data-say="negative 3">−3</span> while <span class="math" data-say="r">r</span> runs through 1 and 0 &mdash; the remainder never goes negative, which is the theorem's requirement and the reason modular arithmetic is well defined.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The division algorithm</h3>
+            <p>The preset is the lesson's <span class="math" data-say="negative 7">−7</span> divided by 3: <span class="math" data-say="q equals negative 3">q = −3</span>, <span class="math" data-say="r equals 2">r = 2</span>, and the check line reads <span class="math" data-say="negative 3 times 3 plus 2 equals negative 7">−3·3 + 2 = −7</span>. Change <span class="math" data-say="A">a</span> to <span class="math" data-say="negative 8">−8</span> and then <span class="math" data-say="negative 9">−9</span> and watch <span class="math" data-say="q">q</span> stay at <span class="math" data-say="negative 3">−3</span> while <span class="math" data-say="r">r</span> runs through 1 and 0 &mdash; the remainder never goes negative, which is the theorem's requirement and the reason modular arithmetic is well defined.</p>
         <div class="field">
           <label for="ntMode">Mode</label>
           <select id="ntMode">
@@ -1444,12 +1487,14 @@
           <div class="kpi"><span id="ntK1Label">gcd</span><strong id="ntK1">&mdash;</strong></div>
           <div class="kpi"><span id="ntK2Label">steps</span><strong id="ntK2">&mdash;</strong></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Working with divisibility</h2></div><p>Replace the statement by the equation it abbreviates.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Translate <span class="math" data-say="b divides a">b | a</span> into <span class="math" data-say="A equals b k">a = bk</span></h3><p>Divisibility claims are unusable until unfolded. Almost every proof in this course starts here.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Use the linear-combination property</h3><p><span class="math" data-say="d divides a">d | a</span> and <span class="math" data-say="d divides b">d | b</span> give <span class="math" data-say="d divides A x plus by">d | (ax + by)</span>. This is the step that appears in nearly every argument.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Apply the division algorithm when a remainder is needed</h3><p><span class="math" data-say="A equals q b plus r">a = qb + r</span> with <span class="math" data-say="0 is at most r is less than b">0 ≤ r &lt; b</span>, and both are unique.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Watch the sign</h3><p>The remainder is never negative. If a computation produces one, add <span class="math" data-say="b">b</span>.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Working with divisibility</h2>
+      <p class="lead-in">Replace the statement by the equation it abbreviates.</p>
+      <ol class="key-ideas method"><li><strong>Translate <span class="math" data-say="b divides a">b | a</span> into <span class="math" data-say="A equals b k">a = bk</span>.</strong> Divisibility claims are unusable until unfolded. Almost every proof in this course starts here.</li><li><strong>Use the linear-combination property.</strong> <span class="math" data-say="d divides a">d | a</span> and <span class="math" data-say="d divides b">d | b</span> give <span class="math" data-say="d divides A x plus by">d | (ax + by)</span>. This is the step that appears in nearly every argument.</li><li><strong>Apply the division algorithm when a remainder is needed.</strong> <span class="math" data-say="A equals q b plus r">a = qb + r</span> with <span class="math" data-say="0 is at most r is less than b">0 ≤ r &lt; b</span>, and both are unique.</li><li><strong>Watch the sign.</strong> The remainder is never negative. If a computation produces one, add <span class="math" data-say="b">b</span>.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1475,17 +1520,16 @@ Example:  4 728  →  4+7+2+8 = 21  →  3 | 21   ⟹  3 | 4728
 Check:    4728 = 3 × 1576                        ✓</div><p>The whole argument is the linear-combination property used twice: once to see that <span class="math" data-say="the sum of d sub i times the quantity 10 to the power i minus 1,">Σ dᵢ(10ⁱ − 1)</span> is a multiple of 3, and once to pass divisibility between <span class="math" data-say="n">n</span> and its digit sum, whose difference that sum is. Nine divides every <span class="math" data-say="10 to the power i minus 1">10ⁱ − 1</span> too, so the same test works for 9. “Modular Arithmetic” will give the argument a notation &mdash; <span class="math" data-say="10 to the power i is congruent to 1 mod 3">10ⁱ ≡ 1 (mod 3)</span> &mdash; that makes it one line, and will handle 11, where <span class="math" data-say="10 to the power i minus the quantity negative 1, to the power i">10ⁱ − (−1)ⁱ</span> is the multiple.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Allowing a negative remainder</strong><span><span class="math" data-say="negative 7 mod 3 equals 2">−7 mod 3 = 2</span>. Some programming languages disagree with the mathematical convention, and mixing the two silently breaks modular arithmetic.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Confusing <span class="math" data-say="b divides a">b | a</span> with <span class="math" data-say="b over A">b/a</span></strong><span>The first is a statement (true or false); the second is a number. <span class="math" data-say="3 divides 12">3 | 12</span> is true and <span class="math" data-say="3 over 12">3/12</span> is a quarter.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting <span class="math" data-say="b is not equal to 0">b ≠ 0</span></strong><span>Divisibility by zero is undefined, and the division algorithm requires <span class="math" data-say="b is greater than 0">b &gt; 0</span> as stated.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the linear-combination property is automatic.</strong><p>Prove that if <span class="math" data-say="d divides A plus b">d | (a + b)</span> and <span class="math" data-say="d divides a">d | a</span> then <span class="math" data-say="d divides b">d | b</span>. It is one application of the property, and it is the shape of argument that every lesson from “Primes and Unique Factorisation” to “Bézout's Identity and Modular Inverses” repeats.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Everything in this course is a consequence of the division algorithm. The Euclidean algorithm is it applied repeatedly, modular arithmetic is its remainder, and RSA is modular arithmetic with large primes.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Allowing a negative remainder</strong><span><span class="math" data-say="negative 7 mod 3 equals 2">−7 mod 3 = 2</span>. Some programming languages disagree with the mathematical convention, and mixing the two silently breaks modular arithmetic.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Confusing <span class="math" data-say="b divides a">b | a</span> with <span class="math" data-say="b over A">b/a</span></strong><span>The first is a statement (true or false); the second is a number. <span class="math" data-say="3 divides 12">3 | 12</span> is true and <span class="math" data-say="3 over 12">3/12</span> is a quarter.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting <span class="math" data-say="b is not equal to 0">b ≠ 0</span></strong><span>Divisibility by zero is undefined, and the division algorithm requires <span class="math" data-say="b is greater than 0">b &gt; 0</span> as stated.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the linear-combination property is automatic.</strong><p>Prove that if <span class="math" data-say="d divides A plus b">d | (a + b)</span> and <span class="math" data-say="d divides a">d | a</span> then <span class="math" data-say="d divides b">d | b</span>. It is one application of the property, and it is the shape of argument that every lesson from “Primes and Unique Factorisation” to “Bézout's Identity and Modular Inverses” repeats.</p></div></div><div class="note"><strong>Note:</strong> Everything in this course is a consequence of the division algorithm. The Euclidean algorithm is it applied repeatedly, modular arithmetic is its remainder, and RSA is modular arithmetic with large primes.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Divisibility is exact</summary><p><span class="math" data-say="b divides a">b | a</span> means the division leaves no remainder. It is a statement about integers, not an operation.</p></details><details class="recall"><summary>The remainder is unique and non-negative</summary><p>That convention is what makes <span class="math" data-say="mod">mod</span> a function. <span class="math" data-say="negative 7 mod 3">−7 mod 3</span> is 2, not <span class="math" data-say="negative 1">−1</span>.</p></details><details class="recall"><summary>Divisibility is transitive and additive</summary><p><span class="math" data-say="d divides a">d | a</span> and <span class="math" data-say="d divides b">d | b</span> imply <span class="math" data-say="d divides A x plus by">d | (ax + by)</span> for any integers <span class="math" data-say="x, y">x, y</span>. Almost every proof in this course uses that one line.</p></details></div>
+      <h3>Summary</h3>
       <p><span class="math" data-say="A equals q b plus r">a = qb + r</span> with <span class="math" data-say="0 is at most r is less than b">0 ≤ r < b</span>, and both <span class="math" data-say="q">q</span> and <span class="math" data-say="r">r</span> are unique. That single theorem is the foundation of everything else in this course.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Divisibility is exact.</strong> <span class="math" data-say="b divides a">b | a</span> means the division leaves no remainder. It is a statement about integers, not an operation.</li><li><strong>The remainder is unique and non-negative.</strong> That convention is what makes <span class="math" data-say="mod">mod</span> a function. <span class="math" data-say="negative 7 mod 3">−7 mod 3</span> is 2, not <span class="math" data-say="negative 1">−1</span>.</li><li><strong>Divisibility is transitive and additive.</strong> <span class="math" data-say="d divides a">d | a</span> and <span class="math" data-say="d divides b">d | b</span> imply <span class="math" data-say="d divides A x plus by">d | (ax + by)</span> for any integers <span class="math" data-say="x, y">x, y</span>. Almost every proof in this course uses that one line.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="b divides a, means, A equals b k, for some integer k. A equals q b plus r, with, 0 is at most r is less than b, q, r UNIQUE. the remainder is never negative. negative 7 equals the quantity negative 3, times 3 plus 2, so, negative 7 mod 3 equals 2" tabindex="0" role="region" aria-label="Mathematical notation">b | a   means   a = bk  for some integer k
 a = qb + r  with  0 ≤ r &lt; b        q, r UNIQUE
 the remainder is never negative
@@ -2402,11 +2446,42 @@ the remainder is never negative
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2474,7 +2549,7 @@ the remainder is never negative
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

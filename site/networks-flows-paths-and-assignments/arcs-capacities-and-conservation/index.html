@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,40 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Networks: Flows, Paths and Assignments</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The network as a programme</p>
       <h1>Arcs, Capacities and Conservation</h1>
       <p class="lesson-lede">Write a directed network down as data and test a proposed flow twice: at every node, and on every arc.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>An arc is ordered, and an adjacency matrix cannot hold one</li><li>Conservation is local, and its failures cancel</li><li>Capacity is a second test, and an unbounded arc is not a large number</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Everything a network is, before anything is optimised</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; A directed network with capacities and costs</span><p>A <strong>directed network</strong> is a set of nodes together with a list of <strong>arcs</strong>. Each arc has a tail, a head, a <strong>capacity</strong> <span class="math" data-say="u">u</span> (possibly no upper bound) and a <strong>cost</strong> <span class="math" data-say="c">c</span> per unit. Each node <span class="math" data-say="i">i</span> carries a <strong>supply</strong> <span class="math" data-say="b sub i">bᵢ</span>, positive where goods enter the network and negative where they leave.</p><p>A <strong>flow</strong> is one number <span class="math" data-say="x sub j is at least 0">xⱼ ≥ 0</span> for each arc. It is <strong>feasible</strong> when it conserves at every node and respects every capacity.</p></div><p>The lab takes a network as text, one clause per arc: <span class="math" data-say="s is greater than A 5, 2">s>a 5:2</span> is an arc from <span class="math" data-say="s">s</span> to <span class="math" data-say="A">a</span> with capacity 5 and cost 2. A <span class="math" data-say="star">*</span> in the capacity field means no upper bound; <span class="math" data-say="7 over 2">7/2</span> is seven halves, exactly, because the field separator is a colon and a slash is therefore free to mean division. A clause running from a node back to itself is refused rather than drawn, and so is a negative capacity.</p><div class="mathblock" data-say="the network, the supplies, a proposed flow. s is greater than A, 5, 2, s, 4, s is greater than A, 4. A is greater than b, 4, 2, t, negative 4, A is greater than b, 2. b is greater than A, 3, 5, b is greater than A, 0. A is greater than t, 3, 1, A is greater than t, 2. b is greater than t, 4, 3, b is greater than t, 2. conservation, node by node, out minus in, supplied. s, 4 minus 0, equals, 4, 4, check. A, 2 plus 2 minus 4, equals, 0, 0, check. b, 0 plus 2 minus 2, equals, 0, 0, check. t, 0 minus 4, equals, negative 4, negative 4, check. capacity, 4 is at most 5, 2 is at most 4, 0 is at most 3, 2 is at most 3, 2 is at most 4, check. cost, 4 times 2 plus 2 times 2 plus 0 times 5 plus 2 times 1 plus 2 times 3, equals, 20" tabindex="0" role="region" aria-label="Mathematical notation">the network                       the supplies         a proposed flow
-
-   s&gt;a  5:2                         s :  4                s&gt;a  4
-   a&gt;b  4:2                         t : -4                a&gt;b  2
-   b&gt;a  3:5                                               b&gt;a  0
-   a&gt;t  3:1                                               a&gt;t  2
-   b&gt;t  4:3                                               b&gt;t  2
-
-conservation, node by node:   out − in    supplied
-
-   s      4 − 0                =   4         4     ✓
-   a      2 + 2 − 4            =   0         0     ✓
-   b      0 + 2 − 2            =   0         0     ✓
-   t      0 − 4                =  −4        −4     ✓
-
-capacity:  4 ≤ 5,  2 ≤ 4,  0 ≤ 3,  2 ≤ 3,  2 ≤ 4      ✓
-cost:      4(2) + 2(2) + 0(5) + 2(1) + 2(3)  =  20</div><p>Two arcs in that list join the same pair of nodes. <span class="math" data-say="A is greater than b">a>b</span> carries up to 4 at a price of 2; <span class="math" data-say="b is greater than A">b>a</span> carries up to 3 at a price of 5. They are two variables. Sending one unit forward and two back costs 12; sending two forward and one back costs 9 &mdash; same total movement, different bill, because the directions are priced separately. The lab draws the pair in its own colour so that the two arrows cannot be read as one edge.</p><h3>Conservation fails locally, and the total will not tell you</h3><div class="example"><span class="label">Example &middot; A flow that balances overall and is not a flow</span><p>Change one number in the flow above &mdash; <span class="math" data-say="A is greater than b">a>b</span> from 2 to 1 &mdash; and the net outflows become <span class="math" data-say="4, negative 1, 1, negative 4">4, −1, 1, −4</span> against supplies <span class="math" data-say="4, 0, 0, negative 4">4, 0, 0, −4</span>. Node <span class="math" data-say="A">a</span> now takes in one more unit than it sends on, and node <span class="math" data-say="b">b</span> sends on one more than it takes in.</p><p>Those two errors are equal and opposite, so the imbalances still sum to zero, and any check that adds them up passes. The lab names <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span> instead, and shades the two of them, because a verdict of &ldquo;this flow is invalid&rdquo; is not something a reader can act on.</p></div><div class="example"><span class="label">Example &middot; A flow that conserves everywhere and is still impossible</span><p>Set the supplies to <span class="math" data-say="s, 5">s: 5</span>, <span class="math" data-say="t, negative 5">t: −5</span> and the flow to <span class="math" data-say="s is greater than A 5, A is greater than b 5, b is greater than A 0, A is greater than t 0, b is greater than t 5">s>a 5, a>b 5, b>a 0, a>t 0, b>t 5</span>. Every node balances exactly.</p><p>Two arcs are over capacity: <span class="math" data-say="A is greater than b">a>b</span> is asked for 5 where it holds 4, and <span class="math" data-say="b is greater than t">b>t</span> for 5 where it holds 4. Conservation cannot see this, because the node equations contain no capacities at all. The two tests are separate and the lab runs them separately.</p></div><h3>Two things the data can get wrong before any flow does</h3><p>Add the node equations together. Every arc leaves exactly one node and enters exactly one, so its variable appears once with a plus and once with a minus and cancels. What is left is <span class="math" data-say="the sum over i of b sub i equals 0">Σᵢ bᵢ = 0</span>. So if the supplies do not sum to zero, the equations contradict each other and no flow of any kind exists &mdash; a test that costs one addition and needs no algorithm.</p><div class="example"><span class="label">Example &middot; Six in, four out</span><p>Leave the network alone and set the supplies to <span class="math" data-say="s, 6">s: 6</span>, <span class="math" data-say="t, negative 4">t: −4</span>. The lab reports a total of 2 and stops: adding the four node equations gives <span class="math" data-say="2 equals 0">2 = 0</span>.</p><p>This is worth meeting before the programme is written rather than after a solver reports infeasibility, because the diagnosis is completely different. Nothing is wrong with the network; the demand does not match the supply, and the fix is to say what happens to the surplus.</p></div><p>The second is quieter. A flow may only name arcs that exist: write <span class="math" data-say="s is greater than c 1">s>c 1</span> on a network with no such arc and the lab refuses it rather than creating one. This sounds pedantic until you have spent twenty minutes on a transportation problem in which a route you assumed was available was never in the data.</p><p>Everything from here on is this object with an objective attached. The arcs become the columns of a matrix, the nodes become its rows, the supplies become the right-hand side, and the whole of the rest of the course is what that matrix turns out to be like.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Arcs, capacities and conservation</h2></div><p>Two arcs between the same pair are two variables — and conservation is checked node by node</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Everything a network is, before anything is optimised</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; A directed network with capacities and costs</span><p>A <strong>directed network</strong> is a set of nodes together with a list of <strong>arcs</strong>. Each arc has a tail, a head, a <strong>capacity</strong> <span class="math" data-say="u">u</span> (possibly no upper bound) and a <strong>cost</strong> <span class="math" data-say="c">c</span> per unit. Each node <span class="math" data-say="i">i</span> carries a <strong>supply</strong> <span class="math" data-say="b sub i">bᵢ</span>, positive where goods enter the network and negative where they leave.</p><p>A <strong>flow</strong> is one number <span class="math" data-say="x sub j is at least 0">xⱼ ≥ 0</span> for each arc. It is <strong>feasible</strong> when it conserves at every node and respects every capacity.</p></div><p>The lab takes a network as text, one clause per arc: <span class="math" data-say="s is greater than A 5, 2">s>a 5:2</span> is an arc from <span class="math" data-say="s">s</span> to <span class="math" data-say="A">a</span> with capacity 5 and cost 2. A <span class="math" data-say="star">*</span> in the capacity field means no upper bound; <span class="math" data-say="7 over 2">7/2</span> is seven halves, exactly, because the field separator is a colon and a slash is therefore free to mean division. A clause running from a node back to itself is refused rather than drawn, and so is a negative capacity.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Arcs, capacities and conservation</h2></div><p>Two arcs between the same pair are two variables — and conservation is checked node by node</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Arcs, capacities and conservation</strong><span>an arc is ordered: a to b and b to a are two objects</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>an arc inside its capacity</span><span class="tone-red"><i class="legend-swatch"></i>over capacity, or a node that fails</span><span class="tone-purple"><i class="legend-swatch"></i>an arc whose reverse is also here</span></div>
@@ -1421,10 +1448,10 @@ cost:      4(2) + 2(2) + 0(5) + 2(1) + 2(3)  =  20</div><p>Two arcs in that list
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgNodes"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgArcs"></table></div>
       <div class="status-banner" id="dgStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Type a network, its supplies and a flow, and watch both tests run</h3>
-          <p>Each arc is labelled with what it carries out of what it can hold, and priced. The strip beneath the drawing is one bar per node: net outflow against what that node is supposed to supply, so a local failure is visible even when the total is zero. Four worked examples break it four different ways.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Type a network, its supplies and a flow, and watch both tests run</h3>
+            <p>Each arc is labelled with what it carries out of what it can hold, and priced. The strip beneath the drawing is one bar per node: net outflow against what that node is supposed to supply, so a local failure is visible even when the total is zero. Four worked examples break it four different ways.</p>
         <div class="field">
           <label for="dgPreset">Worked example</label>
           <select id="dgPreset"><option value="twoway" selected>a lane each way between a and b</option><option value="local">the same network, one unit short on a to b</option><option value="overcap">the same network, five units pushed out of s</option><option value="unbalanced">more supply than demand</option></select>
@@ -1450,12 +1477,31 @@ cost:      4(2) + 2(2) + 0(5) + 2(1) + 2(3)  =  20</div><p>Two arcs in that list
           <div class="kpi"><span>Is this a flow?</span><strong id="dgVerdict">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="dgHint" style="margin:0;">An arc is <span class="tt">tail&gt;head capacity:cost</span> and the capacity may be <span class="tt">*</span> for no bound. Write <span class="tt">a&gt;b 4:2</span> and <span class="tt">b&gt;a 3:5</span> and you have two arcs, not one edge with an arrow: they carry different amounts at different prices and the flow names each separately.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="the network, the supplies, a proposed flow. s is greater than A, 5, 2, s, 4, s is greater than A, 4. A is greater than b, 4, 2, t, negative 4, A is greater than b, 2. b is greater than A, 3, 5, b is greater than A, 0. A is greater than t, 3, 1, A is greater than t, 2. b is greater than t, 4, 3, b is greater than t, 2. conservation, node by node, out minus in, supplied. s, 4 minus 0, equals, 4, 4, check. A, 2 plus 2 minus 4, equals, 0, 0, check. b, 0 plus 2 minus 2, equals, 0, 0, check. t, 0 minus 4, equals, negative 4, negative 4, check. capacity, 4 is at most 5, 2 is at most 4, 0 is at most 3, 2 is at most 3, 2 is at most 4, check. cost, 4 times 2 plus 2 times 2 plus 0 times 5 plus 2 times 1 plus 2 times 3, equals, 20" tabindex="0" role="region" aria-label="Mathematical notation">the network                       the supplies         a proposed flow
+
+   s&gt;a  5:2                         s :  4                s&gt;a  4
+   a&gt;b  4:2                         t : -4                a&gt;b  2
+   b&gt;a  3:5                                               b&gt;a  0
+   a&gt;t  3:1                                               a&gt;t  2
+   b&gt;t  4:3                                               b&gt;t  2
+
+conservation, node by node:   out − in    supplied
+
+   s      4 − 0                =   4         4     ✓
+   a      2 + 2 − 4            =   0         0     ✓
+   b      0 + 2 − 2            =   0         0     ✓
+   t      0 − 4                =  −4        −4     ✓
+
+capacity:  4 ≤ 5,  2 ≤ 4,  0 ≤ 3,  2 ≤ 3,  2 ≤ 4      ✓
+cost:      4(2) + 2(2) + 0(5) + 2(1) + 2(3)  =  20</div><p>Two arcs in that list join the same pair of nodes. <span class="math" data-say="A is greater than b">a>b</span> carries up to 4 at a price of 2; <span class="math" data-say="b is greater than A">b>a</span> carries up to 3 at a price of 5. They are two variables. Sending one unit forward and two back costs 12; sending two forward and one back costs 9 &mdash; same total movement, different bill, because the directions are priced separately. The lab draws the pair in its own colour so that the two arrows cannot be read as one edge.</p><h3>Conservation fails locally, and the total will not tell you</h3><div class="example"><span class="label">Example &middot; A flow that balances overall and is not a flow</span><p>Change one number in the flow above &mdash; <span class="math" data-say="A is greater than b">a>b</span> from 2 to 1 &mdash; and the net outflows become <span class="math" data-say="4, negative 1, 1, negative 4">4, −1, 1, −4</span> against supplies <span class="math" data-say="4, 0, 0, negative 4">4, 0, 0, −4</span>. Node <span class="math" data-say="A">a</span> now takes in one more unit than it sends on, and node <span class="math" data-say="b">b</span> sends on one more than it takes in.</p><p>Those two errors are equal and opposite, so the imbalances still sum to zero, and any check that adds them up passes. The lab names <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span> instead, and shades the two of them, because a verdict of &ldquo;this flow is invalid&rdquo; is not something a reader can act on.</p></div><div class="example"><span class="label">Example &middot; A flow that conserves everywhere and is still impossible</span><p>Set the supplies to <span class="math" data-say="s, 5">s: 5</span>, <span class="math" data-say="t, negative 5">t: −5</span> and the flow to <span class="math" data-say="s is greater than A 5, A is greater than b 5, b is greater than A 0, A is greater than t 0, b is greater than t 5">s>a 5, a>b 5, b>a 0, a>t 0, b>t 5</span>. Every node balances exactly.</p><p>Two arcs are over capacity: <span class="math" data-say="A is greater than b">a>b</span> is asked for 5 where it holds 4, and <span class="math" data-say="b is greater than t">b>t</span> for 5 where it holds 4. Conservation cannot see this, because the node equations contain no capacities at all. The two tests are separate and the lab runs them separately.</p></div><h3>Two things the data can get wrong before any flow does</h3><p>Add the node equations together. Every arc leaves exactly one node and enters exactly one, so its variable appears once with a plus and once with a minus and cancels. What is left is <span class="math" data-say="the sum over i of b sub i equals 0">Σᵢ bᵢ = 0</span>. So if the supplies do not sum to zero, the equations contradict each other and no flow of any kind exists &mdash; a test that costs one addition and needs no algorithm.</p><div class="example"><span class="label">Example &middot; Six in, four out</span><p>Leave the network alone and set the supplies to <span class="math" data-say="s, 6">s: 6</span>, <span class="math" data-say="t, negative 4">t: −4</span>. The lab reports a total of 2 and stops: adding the four node equations gives <span class="math" data-say="2 equals 0">2 = 0</span>.</p><p>This is worth meeting before the programme is written rather than after a solver reports infeasibility, because the diagnosis is completely different. Nothing is wrong with the network; the demand does not match the supply, and the fix is to say what happens to the surplus.</p></div><p>The second is quieter. A flow may only name arcs that exist: write <span class="math" data-say="s is greater than c 1">s>c 1</span> on a network with no such arc and the lab refuses it rather than creating one. This sounds pedantic until you have spent twenty minutes on a transportation problem in which a route you assumed was available was never in the data.</p><p>Everything from here on is this object with an objective attached. The arcs become the columns of a matrix, the nodes become its rows, the supplies become the right-hand side, and the whole of the rest of the course is what that matrix turns out to be like.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Checking a flow somebody has handed you</h2></div><p>The data first, then conservation, then capacity, and the cost last. Doing them in that order means an infeasible instance never reaches the arithmetic.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Add the supplies up</h3><p>If <span class="math" data-say="the sum of b sub i">Σ bᵢ</span> is not zero, stop. There is no feasible flow and no flow you write down will be one. This is one addition and it is the cheapest test on the course.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Check that every arc in the flow is an arc in the network</h3><p>And that every arc in the network has been given a value, even if that value is zero. A missing arc is usually a typing error; an invented arc is usually a wish.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute net outflow at each node separately</h3><p>Out minus in, one node at a time, against <span class="math" data-say="b sub i">bᵢ</span>. Do not add the results up: the sum is always zero and it will tell you nothing. Write the imbalance beside each node and look for the non-zero ones.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check every capacity, including the ones you think are slack</h3><p><span class="math" data-say="0 is at most x sub j is at most u sub j">0 ≤ xⱼ ≤ uⱼ</span> on each arc. Conservation has said nothing about this. An arc with no upper bound needs only <span class="math" data-say="x sub j is at least 0">xⱼ ≥ 0</span>.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Only then price it</h3><p><span class="math" data-say="the sum over j of c sub j x sub j">Σⱼ cⱼ xⱼ</span>. Pricing an infeasible flow produces a number, and the number is meaningless; the lab still prints it, because a reader who watches a cost appear beside a red banner learns something a hidden field cannot teach.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Checking a flow somebody has handed you</h2>
+      <p class="lead-in">The data first, then conservation, then capacity, and the cost last. Doing them in that order means an infeasible instance never reaches the arithmetic.</p>
+      <ol class="key-ideas method"><li><strong>Add the supplies up.</strong> If <span class="math" data-say="the sum of b sub i">Σ bᵢ</span> is not zero, stop. There is no feasible flow and no flow you write down will be one. This is one addition and it is the cheapest test on the course.</li><li><strong>Check that every arc in the flow is an arc in the network.</strong> And that every arc in the network has been given a value, even if that value is zero. A missing arc is usually a typing error; an invented arc is usually a wish.</li><li><strong>Compute net outflow at each node separately.</strong> Out minus in, one node at a time, against <span class="math" data-say="b sub i">bᵢ</span>. Do not add the results up: the sum is always zero and it will tell you nothing. Write the imbalance beside each node and look for the non-zero ones.</li><li><strong>Check every capacity, including the ones you think are slack.</strong> <span class="math" data-say="0 is at most x sub j is at most u sub j">0 ≤ xⱼ ≤ uⱼ</span> on each arc. Conservation has said nothing about this. An arc with no upper bound needs only <span class="math" data-say="x sub j is at least 0">xⱼ ≥ 0</span>.</li><li><strong>Only then price it.</strong> <span class="math" data-say="the sum over j of c sub j x sub j">Σⱼ cⱼ xⱼ</span>. Pricing an infeasible flow produces a number, and the number is meaningless; the lab still prints it, because a reader who watches a cost appear beside a red banner learns something a hidden field cannot teach.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1495,17 +1541,16 @@ two arcs, one pair of nodes:   a&gt;b 4:2   and   b&gt;a 3:5
     2 forward and 1 back   2(2) + 1(5)  =  9</div><p>Case B is the one to sit with. It is cheaper than case A, it passes every capacity, and the imbalances add to zero. Nothing about it is wrong except that it is not a flow, and the only way to find that out is to look at the nodes one at a time.</p><p>For a rehearsal, take case A and try to move one unit off <span class="math" data-say="A is greater than t">a>t</span> without breaking anything. You will find that the unit has to go somewhere, that the only other way out of <span class="math" data-say="A">a</span> is <span class="math" data-say="A is greater than b">a>b</span>, and that <span class="math" data-say="b">b</span> then has to pass it on &mdash; so the repair is forced, and the repaired flow costs 22 rather than 20. That forced chain is a cycle in disguise, and it comes back as the stepping-stone cycle in the transportation lessons.</p><p>The harder rehearsal: type an arc with <span class="math" data-say="star">*</span> in the capacity field and satisfy yourself that the lab stops printing a capacity ratio for it. An unbounded arc contributes no row to the programme that follows, which is not the same thing as contributing a row with a very large number in it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the two arcs between a pair of nodes as one edge</strong><span>This is the undirected habit surviving into a directed setting, and it is the error this lesson exists for. The two arcs have separate capacities, separate costs and separate variables, and nothing in the model makes their flows related. A reader who collapses them will later write a transportation tableau with the wrong number of columns and never find out why the answer is cheap.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding the imbalances up and reading the total as a verdict</strong><span>The total is zero for every flow ever written, feasible or not. It is not a weak check, it is a check with no information in it. Report the imbalance at each node separately, and if you are writing code that reports a single boolean, make it return the list of failing nodes instead.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Modelling an unbounded arc with a large constant</strong><span>A capacity of one million is a capacity: it appears as a row in the programme, it can be tight at the optimum, and it can produce a shadow price on a constraint you invented. An arc with no upper bound contributes no row at all. If the quantity really is unbounded, say so; if it is not, use the real bound.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can take a drawing and a proposed flow and say exactly which test fails and where.</strong><p>You should be able to write a directed network as arcs with capacities and costs, check the supplies sum to zero before anything else, compute net outflow node by node without adding the results up, check capacities separately, and explain why an arc and its reverse are two variables.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Everything checked here was checked against the network as written down, and nothing yet has been optimised. That is the right order: a flow that fails conservation is not a bad solution, it is not a solution. The next lesson, “The Minimum-Cost Flow Programme”, turns these same two tests into the rows of a matrix and hands the result to the simplex method &mdash; at which point four problems you may have met separately turn out to be the same one.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the two arcs between a pair of nodes as one edge</strong><span>This is the undirected habit surviving into a directed setting, and it is the error this lesson exists for. The two arcs have separate capacities, separate costs and separate variables, and nothing in the model makes their flows related. A reader who collapses them will later write a transportation tableau with the wrong number of columns and never find out why the answer is cheap.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding the imbalances up and reading the total as a verdict</strong><span>The total is zero for every flow ever written, feasible or not. It is not a weak check, it is a check with no information in it. Report the imbalance at each node separately, and if you are writing code that reports a single boolean, make it return the list of failing nodes instead.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Modelling an unbounded arc with a large constant</strong><span>A capacity of one million is a capacity: it appears as a row in the programme, it can be tight at the optimum, and it can produce a shadow price on a constraint you invented. An arc with no upper bound contributes no row at all. If the quantity really is unbounded, say so; if it is not, use the real bound.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can take a drawing and a proposed flow and say exactly which test fails and where.</strong><p>You should be able to write a directed network as arcs with capacities and costs, check the supplies sum to zero before anything else, compute net outflow node by node without adding the results up, check capacities separately, and explain why an arc and its reverse are two variables.</p></div></div><div class="note"><strong>Note:</strong> Everything checked here was checked against the network as written down, and nothing yet has been optimised. That is the right order: a flow that fails conservation is not a bad solution, it is not a solution. The next lesson, “The Minimum-Cost Flow Programme”, turns these same two tests into the rows of a matrix and hands the result to the simplex method &mdash; at which point four problems you may have met separately turn out to be the same one.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>An arc is ordered, and an adjacency matrix cannot hold one</summary><p>A matrix indexed by a pair of nodes has one cell for that pair. A directed network needs two: <span class="math" data-say="A">a</span> to <span class="math" data-say="b">b</span> may hold 4 units at a price of 2 while <span class="math" data-say="b">b</span> to <span class="math" data-say="A">a</span> holds 3 at a price of 5, and those are different variables in the programme that follows. The lab stores an array of arcs for exactly this reason, and it will hold two copies of the same arc if you type it twice.</p></details><details class="recall"><summary>Conservation is local, and its failures cancel</summary><p>Each node carries one equation: what leaves minus what arrives equals what that node supplies. Add all those equations together and every arc appears once positively and once negatively, so the total is always zero &mdash; which means a single overall verdict can never detect a violation. The imbalances have to be reported node by node or they are invisible.</p></details><details class="recall"><summary>Capacity is a second test, and an unbounded arc is not a large number</summary><p>A flow that conserves at every node has said nothing about whether the arcs can carry it. Those are two independent checks and the lab runs both. An arc written with no upper bound contributes no capacity row at all &mdash; which is what &ldquo;unbounded&rdquo; means, and is different from an arc bounded by some very large constant, because the constant can bind and infinity cannot.</p></details></div>
+      <h3>Summary</h3>
       <p>A network on this course is not a picture. It is a list of ordered arcs, each with a capacity and a cost, and a supply at every node; and a flow on it is a number per arc that has to survive two separate tests. Conservation is local, so a flow can balance in total and still fail. Capacity is a different test entirely, so a flow can conserve everywhere and still ask an arc to carry more than it can.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>An arc is ordered, and an adjacency matrix cannot hold one.</strong> A matrix indexed by a pair of nodes has one cell for that pair. A directed network needs two: <span class="math" data-say="A">a</span> to <span class="math" data-say="b">b</span> may hold 4 units at a price of 2 while <span class="math" data-say="b">b</span> to <span class="math" data-say="A">a</span> holds 3 at a price of 5, and those are different variables in the programme that follows. The lab stores an array of arcs for exactly this reason, and it will hold two copies of the same arc if you type it twice.</li><li><strong>Conservation is local, and its failures cancel.</strong> Each node carries one equation: what leaves minus what arrives equals what that node supplies. Add all those equations together and every arc appears once positively and once negatively, so the total is always zero &mdash; which means a single overall verdict can never detect a violation. The imbalances have to be reported node by node or they are invisible.</li><li><strong>Capacity is a second test, and an unbounded arc is not a large number.</strong> A flow that conserves at every node has said nothing about whether the arcs can carry it. Those are two independent checks and the lab runs both. An arc written with no upper bound contributes no capacity row at all &mdash; which is what &ldquo;unbounded&rdquo; means, and is different from an arc bounded by some very large constant, because the constant can bind and infinity cannot.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="an arc is ORDERED, a to b and b to a are two objects, two capacities, two costs. conservation at node i, out of i minus into i equals b sub i, one equation per node. capacity on arc j, 0 is at most x sub j is at most u sub j, one row per BOUNDED arc only. the sum over i of b sub i equals 0, or nothing is feasible, add the node equations and every flow cancels. s is greater than A 5, 2, capacity 5, cost 2 per unit, s is greater than A star, 2, no upper bound at all" tabindex="0" role="region" aria-label="Mathematical notation">an arc is ORDERED:  a to b and b to a are two objects, two capacities, two costs
 conservation at node i:   (out of i) − (into i) = bᵢ      one equation per node
 capacity on arc j:        0 ≤ xⱼ ≤ uⱼ            one row per BOUNDED arc only
@@ -2959,11 +3004,42 @@ s&gt;a 5:2   capacity 5, cost 2 per unit          s&gt;a *:2   no upper bound at
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3031,7 +3107,7 @@ s&gt;a 5:2   capacity 5, cost 2 per unit          s&gt;a *:2   no upper bound at
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

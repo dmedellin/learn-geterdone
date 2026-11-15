@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Web Presentation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 14 · Web Presentation Patterns</p>
       <h1>Two Step View</h1>
       <p class="lesson-lede">Two Step View builds a logical screen for each page and turns every logical screen into HTML in one place, so a change of look is made once, at the price of fitting every page to the logical screen.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Logical screen</li><li>First stage and second stage</li><li>Single- and multiappearance</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The section and the pattern, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Two Step View's key value comes from the separation of first and second stages, allowing you to make global changes more easily.&rdquo; That is how When to Use It opens, in Chapter 14. If you have changed a site's look, a new header or a different style of table, and found the change waiting in every page's template, you have met the problem it answers. This lesson reads the second half of View Patterns in Chapter 4 and Two Step View in Chapter 14. Read them in your own copy first.</p><p>Chapter 4 sets the two shapes side by side. In a single-stage view there is, for the most part, one view component per screen, which turns the domain's data straight into HTML. A two-stage view breaks that into a logical screen produced from the domain data and then rendered in HTML, with one first stage for each screen and only one second stage for the application. The advantage, Fowler says, is that the decision about which HTML to use is in one place, so a global change to the HTML is one object to alter. He qualifies it at once: the gain lasts only as long as every screen keeps to one logical layout, so it works best where screens share a basic layout, and highly design-intensive sites will not find a good logical screen.</p><p>The section adds the case where the pattern works even better: one service fronted by several customers, his example being several airlines in front of one reservation system, each with its own look through its own second stage; and, in the same way, separate second stages for different devices. The limit is the same each time. Every look must fit one logical screen, and very different interfaces may not.</p><p>Two Step View, read as a pattern, makes the logical screen concrete. Its elements might be fields, headers, footers, tables and choices: presentation-oriented, and forcing the screens into a definite style, but with no HTML. The first stage, written for each screen, reads a domain-oriented model, extracts what the screen needs, and puts it into the structure. The second stage knows each kind of element and how to show it as HTML, so all the formatting decisions are made in one place. It can be built as two XSLT stylesheets, as classes for the elements rendered by themselves or by a separate renderer, or as templates written in logical tags.</p><p>When to Use It does the arithmetic in words. A single-stage site has one view module for each page; a two-step site has one first stage for each page and one second stage for the site, so a change to the site's appearance is one change. With several appearances the saving compounds. Fowler's own figures: ten screens and three appearances need thirty single-stage view modules, where two stages need thirteen, ten for the screens and three for the looks. The saving, he says, grows with both numbers.</p><p>The costs are as plain. The pattern depends on making the logical screen serve the look, and a site built on visual design, whose every page is to look unlike the others, is constrained by it, too much for many sites. Designers who lay out pages in visual editors cannot write a renderer, so programmers are involved in every design change. And it is a harder programming model to learn, Fowler concedes, though not difficult once you are used to it, and it may cut repetitive code. Its examples, a two-stage XSLT and JSP with custom tags, are worth reading in the book.</p><p>Now the code, written for the lesson. A <span class="math" data-say="field">Field</span> is the smallest logical screen there is, a label and a value. <span class="math" data-say="html renderer">HtmlRenderer</span> is a second stage: it takes any list of fields and writes them as a definition list. A first stage for a concert page would build the concert's list of fields and hand it over; so would the stages for a venue page and a tour page. To show every field on the site as a table instead, you would change <span class="math" data-say="render">render</span> and nothing else.</p><pre class="codeblock" data-say="line 1, comment, Stage one builds a logical screen stage two turns it into HTML.. line 2, class field. line 3, final string label. line 4, final string value. line 5, field of string label, string value. line 6, this dot label is set to label. line 7, this dot value is set to value. line 11, class html renderer. line 12, string render of list of field screen. line 13, string builder out is set to new string builder of dl. line 14, for field f in screen. line 15, out dot append of dt dot append of escape of f dot label dot append of dt. line 16, dot append of dd dot append of escape of f dot value dot append of dd. line 18, return out dot append of dl dot to string" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Stage one builds a logical screen; stage two turns it into HTML.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The section and the pattern, then the count</h2><div class="prose reading"><p>&ldquo;Two Step View's key value comes from the separation of first and second stages, allowing you to make global changes more easily.&rdquo; That is how When to Use It opens, in Chapter 14. If you have changed a site's look, a new header or a different style of table, and found the change waiting in every page's template, you have met the problem it answers. This lesson reads the second half of View Patterns in Chapter 4 and Two Step View in Chapter 14. Read them in your own copy first.</p><p>Chapter 4 sets the two shapes side by side. In a single-stage view there is, for the most part, one view component per screen, which turns the domain's data straight into HTML. A two-stage view breaks that into a logical screen produced from the domain data and then rendered in HTML, with one first stage for each screen and only one second stage for the application. The advantage, Fowler says, is that the decision about which HTML to use is in one place, so a global change to the HTML is one object to alter. He qualifies it at once: the gain lasts only as long as every screen keeps to one logical layout, so it works best where screens share a basic layout, and highly design-intensive sites will not find a good logical screen.</p><p>The section adds the case where the pattern works even better: one service fronted by several customers, his example being several airlines in front of one reservation system, each with its own look through its own second stage; and, in the same way, separate second stages for different devices. The limit is the same each time. Every look must fit one logical screen, and very different interfaces may not.</p><p>Two Step View, read as a pattern, makes the logical screen concrete. Its elements might be fields, headers, footers, tables and choices: presentation-oriented, and forcing the screens into a definite style, but with no HTML. The first stage, written for each screen, reads a domain-oriented model, extracts what the screen needs, and puts it into the structure. The second stage knows each kind of element and how to show it as HTML, so all the formatting decisions are made in one place. It can be built as two XSLT stylesheets, as classes for the elements rendered by themselves or by a separate renderer, or as templates written in logical tags.</p><p>When to Use It does the arithmetic in words. A single-stage site has one view module for each page; a two-step site has one first stage for each page and one second stage for the site, so a change to the site's appearance is one change. With several appearances the saving compounds. Fowler's own figures: ten screens and three appearances need thirty single-stage view modules, where two stages need thirteen, ten for the screens and three for the looks. The saving, he says, grows with both numbers.</p><p>The costs are as plain. The pattern depends on making the logical screen serve the look, and a site built on visual design, whose every page is to look unlike the others, is constrained by it, too much for many sites. Designers who lay out pages in visual editors cannot write a renderer, so programmers are involved in every design change. And it is a harder programming model to learn, Fowler concedes, though not difficult once you are used to it, and it may cut repetitive code. Its examples, a two-stage XSLT and JSP with custom tags, are worth reading in the book.</p><p>Now the code, written for the lesson. A <span class="math" data-say="field">Field</span> is the smallest logical screen there is, a label and a value. <span class="math" data-say="html renderer">HtmlRenderer</span> is a second stage: it takes any list of fields and writes them as a definition list. A first stage for a concert page would build the concert's list of fields and hand it over; so would the stages for a venue page and a tour page. To show every field on the site as a table instead, you would change <span class="math" data-say="render">render</span> and nothing else.</p><pre class="codeblock" data-say="line 1, comment, Stage one builds a logical screen stage two turns it into HTML.. line 2, class field. line 3, final string label. line 4, final string value. line 5, field of string label, string value. line 6, this dot label is set to label. line 7, this dot value is set to value. line 11, class html renderer. line 12, string render of list of field screen. line 13, string builder out is set to new string builder of dl. line 14, for field f in screen. line 15, out dot append of dt dot append of escape of f dot label dot append of dt. line 16, dot append of dd dot append of escape of f dot value dot append of dd. line 18, return out dot append of dl dot to string" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Stage one builds a logical screen; stage two turns it into HTML.</span>
 <span class="cl">class Field {</span>
 <span class="cl">    final String label;</span>
 <span class="cl">    final String value;</span>
@@ -1464,28 +1508,21 @@
 <span class="cl">        }</span>
 <span class="cl">        return out.append(&quot;&lt;/dl&gt;&quot;).toString();</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The lab is the ripple view of the first lesson: records <span class="math" data-say="dependent, then what it depends on">dependent, dependency</span>, a changed class, and what the change reaches directly and in all. In <code>one-step</code> three pages each format their own HTML, so each depends on <span class="math" data-say="look">look</span>, the site's style decisions, and two of them depend on their models too. Change <span class="math" data-say="look">look</span> and the lab prints 3: concertpage, tourpage, venuepage directly, and the same three in all. The model records make no difference to a change of look.</p><p>In <code>two-step</code> the pages depend on <span class="math" data-say="screen">screen</span>, the logical screen, and only <span class="math" data-say="renderer">renderer</span> depends on both <span class="math" data-say="screen">screen</span> and <span class="math" data-say="look">look</span>. The same change prints 1: renderer directly and 1: renderer in all. That is the quotation's global change, made in one class.</p><p>Being reached is not the same as being edited, and here the difference matters. In <code>one-step</code> each page holds its own HTML, so a page reached by a change of look is a page to edit; in <code>two-step</code> only the renderer holds any. The count says where to look. It also shows where the cost went, because the logical screen is now something everything depends on, and the exercise asks what that costs.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, home, screen. line 2, search, screen. line 3, account, screen. line 4, renderer, screen. line 5, renderer, look. line 6, printrenderer, screen. line 7, printrenderer, printlook" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">home, screen;</span>
-<span class="cl">search, screen;</span>
-<span class="cl">account, screen;</span>
-<span class="cl">renderer, screen;</span>
-<span class="cl">renderer, look;</span>
-<span class="cl">printrenderer, screen;</span>
-<span class="cl">printrenderer, printlook</span></code></pre><p>A site with three pages, a renderer for the browser and a second renderer for printing, each with its own look. Change <span class="math" data-say="screen">screen</span>, the logical screen, and say by hand what the change reaches directly and in all. Then compare it with a change to <span class="math" data-say="look">look</span>.</p><p>Views and controllers decide what one page shows. The next lesson, Application Controller, reads the pattern that decides which page comes next.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Counting dependencies</h2></div><p>what a change reaches</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The lab is the ripple view of the first lesson: records <span class="math" data-say="dependent, then what it depends on">dependent, dependency</span>, a changed class, and what the change reaches directly and in all. In <code>one-step</code> three pages each format their own HTML, so each depends on <span class="math" data-say="look">look</span>, the site's style decisions, and two of them depend on their models too. Change <span class="math" data-say="look">look</span> and the lab prints 3: concertpage, tourpage, venuepage directly, and the same three in all. The model records make no difference to a change of look.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Counting dependencies</h2></div><p>what a change reaches</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Counting dependencies</strong><span>what a change reaches</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgTable"></table></div>
       <div class="status-banner" id="dgStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What a change of look reaches</h3>
-          <p>A count over the structure the lesson states. Each record is one dependency, written dependent, dependency. Name the class that changes; the lab lists what depends on it directly and everything the change reaches. The sites are the lesson's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What a change of look reaches</h3>
+            <p>A count over the structure the lesson states. Each record is one dependency, written dependent, dependency. Name the class that changes; the lab lists what depends on it directly and everything the change reaches. The sites are the lesson's.</p>
         <div class="field">
           <label for="dgPreset">Worked example</label>
           <select id="dgPreset"><option value="one-step" selected>One stage: each page formats its own HTML (illustrative)</option><option value="two-step">Two stages: pages build a logical screen, one renderer formats it</option></select>
@@ -1503,12 +1540,21 @@
           <div class="kpi"><span>Reached in all</span><strong id="dgAffected">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>In <code>two-step</code> the pages depend on <span class="math" data-say="screen">screen</span>, the logical screen, and only <span class="math" data-say="renderer">renderer</span> depends on both <span class="math" data-say="screen">screen</span> and <span class="math" data-say="look">look</span>. The same change prints 1: renderer directly and 1: renderer in all. That is the quotation's global change, made in one class.</p><p>Being reached is not the same as being edited, and here the difference matters. In <code>one-step</code> each page holds its own HTML, so a page reached by a change of look is a page to edit; in <code>two-step</code> only the renderer holds any. The count says where to look. It also shows where the cost went, because the logical screen is now something everything depends on, and the exercise asks what that costs.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, home, screen. line 2, search, screen. line 3, account, screen. line 4, renderer, screen. line 5, renderer, look. line 6, printrenderer, screen. line 7, printrenderer, printlook" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">home, screen;</span>
+<span class="cl">search, screen;</span>
+<span class="cl">account, screen;</span>
+<span class="cl">renderer, screen;</span>
+<span class="cl">renderer, look;</span>
+<span class="cl">printrenderer, screen;</span>
+<span class="cl">printrenderer, printlook</span></code></pre><p>A site with three pages, a renderer for the browser and a second renderer for printing, each with its own look. Change <span class="math" data-say="screen">screen</span>, the logical screen, and say by hand what the change reaches directly and in all. Then compare it with a change to <span class="math" data-say="look">look</span>.</p><p>Views and controllers decide what one page shows. The next lesson, Application Controller, reads the pattern that decides which page comes next.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting what a change of look reaches</h2></div><p>Four steps, the last of them on a change you have made.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down who formats</h3><p>For each page, write a record for every class it uses, and a record for the look if the page makes its own decisions about HTML.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the reach of a look change</h3><p>Change the look and list what depends on it, directly and in all. With one stage that is every page that formats.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Redraw with a logical screen</h3><p>Make every page depend on the logical screen instead, and give one renderer the records for the screen and the look. Count again, and then count a change to the screen.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count a change of your own</h3><p>Take one site-wide change of look you have made, or one you would make. Count the files it touched, write the figure, and say which of them held their own HTML.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting what a change of look reaches</h2>
+      <p class="lead-in">Four steps, the last of them on a change you have made.</p>
+      <ol class="key-ideas method"><li><strong>Write down who formats.</strong> For each page, write a record for every class it uses, and a record for the look if the page makes its own decisions about HTML.</li><li><strong>Count the reach of a look change.</strong> Change the look and list what depends on it, directly and in all. With one stage that is every page that formats.</li><li><strong>Redraw with a logical screen.</strong> Make every page depend on the logical screen instead, and give one renderer the records for the screen and the look. Count again, and then count a change to the screen.</li><li><strong>Count a change of your own.</strong> Take one site-wide change of look you have made, or one you would make. Count the files it touched, write the figure, and say which of them held their own HTML.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1526,17 +1572,16 @@ reached in all: 1, renderer
 the pages use screen, not look: not reached</div><p>With one stage the same change reaches all three pages, each of which holds its own HTML. With two, the one class that holds HTML is the one class reached.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking Two Step View for two templates per page</strong><span>The name suggests each page now has two views. It is one first stage for each page and one second stage for the whole site, or one for each look. On the lesson's illustration three pages need three first stages and one renderer, and a change of look reaches only the renderer.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a second stage makes every change cheaper</strong><span>It makes a change of look cheaper by putting all the HTML in one place. A change to the logical screen itself, a new kind of element or a changed field, is the expensive one; the exercise counts it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the pattern to suit every site</strong><span>If one place for the HTML is good, it seems every site should have it. Fowler says a design-intensive site, where each page is meant to look different, will not find a good logical screen and is constrained by one, and that a two-step site needs programmers for every design change.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count what a change of look reaches.</strong><p>Given pages that each format their own HTML, list what a change of look reaches; then redraw the site with a logical screen and a renderer, and list what a change of look and a change of the logical screen each reach.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab follows the records it is given, so it cannot see whether your pages really share a layout, which is the condition the whole pattern rests on. It counts classes reached, not lines changed: a renderer reached by a change of look may need one line or a rewrite. Fowler's thirty against thirteen is an illustration of how the saving grows, not a figure for any site.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking Two Step View for two templates per page</strong><span>The name suggests each page now has two views. It is one first stage for each page and one second stage for the whole site, or one for each look. On the lesson's illustration three pages need three first stages and one renderer, and a change of look reaches only the renderer.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a second stage makes every change cheaper</strong><span>It makes a change of look cheaper by putting all the HTML in one place. A change to the logical screen itself, a new kind of element or a changed field, is the expensive one; the exercise counts it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the pattern to suit every site</strong><span>If one place for the HTML is good, it seems every site should have it. Fowler says a design-intensive site, where each page is meant to look different, will not find a good logical screen and is constrained by one, and that a two-step site needs programmers for every design change.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count what a change of look reaches.</strong><p>Given pages that each format their own HTML, list what a change of look reaches; then redraw the site with a logical screen and a renderer, and list what a change of look and a change of the logical screen each reach.</p></div></div><div class="note"><strong>Note:</strong> The lab follows the records it is given, so it cannot see whether your pages really share a layout, which is the condition the whole pattern rests on. It counts classes reached, not lines changed: a renderer reached by a change of look may need one line or a rewrite. Fowler's thirty against thirteen is an illustration of how the saving grows, not a figure for any site.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Logical screen</summary><p>A structure that describes what a screen shows, fields, headers, tables, choices, without saying how it looks: it contains no HTML. Fowler also calls it the presentation-oriented structure. Every page on the site has to be expressible in it.</p></details><details class="recall"><summary>First stage and second stage</summary><p>The first stage is code written for one screen: it reads the domain data and builds that screen's logical screen. The second stage turns any logical screen into HTML, and there is one for the whole site, or one for each look.</p></details><details class="recall"><summary>Single- and multiappearance</summary><p>A single-appearance site has one look throughout. A multiappearance site offers the same function under several looks, for several organisations or devices, each with its own second stage.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 4's View Patterns and Chapter 14's Two Step View: a first stage for each page that turns domain data into a logical screen with no formatting, and one second stage for the site that turns logical screens into HTML. Count what a change of look reaches with one stage and with two, and see which change becomes the expensive one.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Logical screen.</strong> A structure that describes what a screen shows, fields, headers, tables, choices, without saying how it looks: it contains no HTML. Fowler also calls it the presentation-oriented structure. Every page on the site has to be expressible in it.</li><li><strong>First stage and second stage.</strong> The first stage is code written for one screen: it reads the domain data and builds that screen's logical screen. The second stage turns any logical screen into HTML, and there is one for the whole site, or one for each look.</li><li><strong>Single- and multiappearance.</strong> A single-appearance site has one look throughout. A multiappearance site offers the same function under several looks, for several organisations or devices, each with its own second stage.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="first stage, data to a logical screen. second stage, logical screen to html. a first stage per page, one second stage. a change of look, the second stage. a change of screen, every stage" tabindex="0" role="region" aria-label="Mathematical notation">first stage: data to a logical screen
 second stage: logical screen to HTML
 a first stage per page; one second stage
@@ -2257,11 +2302,42 @@ a change of screen: every stage</div><figcaption>Two Step View in five lines</fi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2329,7 +2405,7 @@ a change of screen: every stage</div><figcaption>Two Step View in five lines</fi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

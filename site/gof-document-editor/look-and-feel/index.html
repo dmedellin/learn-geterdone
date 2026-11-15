@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,44 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">A Case Study: Designing a Document Editor</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 2 · A Case Study: Designing a Document Editor</p>
       <h1>Supporting Multiple Look-and-Feel Standards</h1>
       <p class="lesson-lede">Every product of one family made by one factory object, so that the code never names a family&#x27;s classes and a whole family can be swapped at once.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Factory</li><li>Product family</li><li>Abstract Factory</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Abstracting how objects are made</h2>
-      <article class="prose reading"><p>&ldquo;Littering our code with constructor calls to specific look-and-feel classes yields a maintenance nightmare—miss just one, and you could end up with a Motif menu in the middle of your Mac application.&rdquo; Section 2.5, Supporting Multiple Look-and-Feel Standards, is the authors' way out of that nightmare. Read it in your own copy first.</p><p>A look-and-feel standard is a style guide for how an application's controls look and respond, and each platform of the early 1990s had its own: Motif on Unix workstations, Presentation Manager on OS/2, the Macintosh's. The standards differ in detail rather than in kind, but a program that runs on several must follow each one where it runs, should take new ones easily, and ideally could change style while running. Lexi assumes two layers of widget classes: an abstract class per kind of widget, such as a scroll bar or a button, and under each a concrete class for each standard.</p><p>The obstacle is construction. Code that creates a widget with a constructor names one standard's class, which fixes the style when the program is compiled and scatters that choice over every place a widget is made; porting means finding them all. The authors' answer is to abstract creation itself. Instead of constructing a Motif scroll bar, Lexi asks a factory object for a scroll bar, and a Motif factory returns a Motif one. Nothing in the calling code names Motif. The factory's abstract class declares one creation operation for each kind of widget, and each standard has a concrete factory that implements all of them; the widgets one factory makes belong together, which is what the authors mean by a product family.</p><p>Where does the factory come from? Anywhere convenient, the authors say: a global, a static member, a local variable, or a Singleton, a pattern for well-known single objects that has a lesson in Creational Patterns. What matters is that it is set after the style is known and before the first widget is made, by assignment if the style is fixed at compile time, or from a name given at start-up. A registry from names to factories lets new factories be added without editing that choice, and spares linking a factory for a platform that cannot run it. Once set, the factory fixes the look and feel; to change it, the program installs another factory and rebuilds its interface.</p><p>The pattern is Abstract Factory, which the section says suits a design whose kinds of product are settled while its families vary. Its catalog entry states the other side plainly: supporting a new kind of product is hard, because the abstract factory's interface fixes the set of products, and adding one means changing that class and every concrete factory. The lab counts both kinds of change.</p><pre class="codeblock" data-say="line 1, comment, One factory per map style the viewer never names a style&#x27;s classes.. line 2, interface map style. line 3, tile create tile of int x, int y. line 4, label create label of string text. line 5, marker create marker of place p. line 7, final class terrain style implements map style. line 8, public tile create tile of int x, int y return new terrain tile of x, y. line 9, public label create label of string t return new terrain label of t. line 10, public marker create marker of place p return new terrain marker of p. line 12, final class map viewer. line 13, private final map style style, comment, chosen once, at start-up. line 14, map viewer of map style style this dot style is set to style. line 15, void show of place p. line 16, marker m is set to style dot create marker of p, comment, matches the tiles. line 17, m dot draw on of style dot create tile of p dot tile x, p dot tile y" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One factory per map style; the viewer never names a style&#x27;s classes.</span>
-<span class="cl">interface MapStyle {</span>
-<span class="cl">    Tile createTile(int x, int y);</span>
-<span class="cl">    Label createLabel(String text);</span>
-<span class="cl">    Marker createMarker(Place p);</span>
-<span class="cl">}</span>
-<span class="cl">final class TerrainStyle implements MapStyle {</span>
-<span class="cl">    public Tile createTile(int x, int y) { return new TerrainTile(x, y); }</span>
-<span class="cl">    public Label createLabel(String t) { return new TerrainLabel(t); }</span>
-<span class="cl">    public Marker createMarker(Place p) { return new TerrainMarker(p); }</span>
-<span class="cl">}</span>
-<span class="cl">final class MapViewer {</span>
-<span class="cl">    private final MapStyle style;   // chosen once, at start-up</span>
-<span class="cl">    MapViewer(MapStyle style) { this.style = style; }</span>
-<span class="cl">    void show(Place p) {</span>
-<span class="cl">        Marker m = style.createMarker(p);   // matches the tiles</span>
-<span class="cl">        m.drawOn(style.createTile(p.tileX(), p.tileY()));</span>
-<span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The sketch is a map viewer with three styles, street, satellite and terrain, each a family of three kinds of product: tiles, labels and markers drawn to match. On the preset <code>map-styles</code> there are <span data-say="3 times 3 equals 9">3 × 3 = 9</span> concrete products, and the design has 1 + 3 + 3 + 9 = 16 classes: the abstract factory, a concrete factory per style, an abstract class per kind and the nine concrete products. The classes that create are 1 + 3 = 4. The preset <code>new-style</code> adds a fourth style: 4 classes, one factory and its three products <span data-say="16 goes to 20">(16 → 20)</span>, and no existing class is edited. The preset <code>new-kind</code> adds a fourth kind of product instead, a compass rose: 4 classes again, one abstract product and one product per style, but now 4 existing classes are edited, the abstract factory and each of its 3 concrete factories, each given an operation to make the new kind. Same number added, different number changed: that is the asymmetry the pattern lives with. The scheme menu also offers Factory Method and Prototype, and the configuration tiles count Prototype's sets of instances; both schemes are counted in Creational Patterns, and on this lesson only Abstract Factory is Lexi's.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, families, kids adult. line 2, kinds, question timer. line 3, A new kind of product, hint" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">families: kids adult</span>
-<span class="cl">kinds:    question timer</span>
-<span class="cl">a new kind of product: hint</span></code></pre><p>A quiz app with a kids' mode and an adult mode, each a family of questions and timers. By hand, count the classes under Abstract Factory, then the classes a new kind of product, hints, adds and the existing classes it edits. Then type the families and kinds into the lab with the change set to a new kind.</p><p>Abstract Factory assumes the products' classes are yours to write. The next lesson, Supporting Multiple Window Systems, reads Section 2.6, where they are not.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Classes</h2></div><p>families and kinds of product, and who makes them</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Abstracting how objects are made</h2><div class="prose reading"><p>&ldquo;Littering our code with constructor calls to specific look-and-feel classes yields a maintenance nightmare—miss just one, and you could end up with a Motif menu in the middle of your Mac application.&rdquo; Section 2.5, Supporting Multiple Look-and-Feel Standards, is the authors' way out of that nightmare. Read it in your own copy first.</p><p>A look-and-feel standard is a style guide for how an application's controls look and respond, and each platform of the early 1990s had its own: Motif on Unix workstations, Presentation Manager on OS/2, the Macintosh's. The standards differ in detail rather than in kind, but a program that runs on several must follow each one where it runs, should take new ones easily, and ideally could change style while running. Lexi assumes two layers of widget classes: an abstract class per kind of widget, such as a scroll bar or a button, and under each a concrete class for each standard.</p><p>The obstacle is construction. Code that creates a widget with a constructor names one standard's class, which fixes the style when the program is compiled and scatters that choice over every place a widget is made; porting means finding them all. The authors' answer is to abstract creation itself. Instead of constructing a Motif scroll bar, Lexi asks a factory object for a scroll bar, and a Motif factory returns a Motif one. Nothing in the calling code names Motif. The factory's abstract class declares one creation operation for each kind of widget, and each standard has a concrete factory that implements all of them; the widgets one factory makes belong together, which is what the authors mean by a product family.</p><p>Where does the factory come from? Anywhere convenient, the authors say: a global, a static member, a local variable, or a Singleton, a pattern for well-known single objects that has a lesson in Creational Patterns. What matters is that it is set after the style is known and before the first widget is made, by assignment if the style is fixed at compile time, or from a name given at start-up. A registry from names to factories lets new factories be added without editing that choice, and spares linking a factory for a platform that cannot run it. Once set, the factory fixes the look and feel; to change it, the program installs another factory and rebuilds its interface.</p><p>The pattern is Abstract Factory, which the section says suits a design whose kinds of product are settled while its families vary. Its catalog entry states the other side plainly: supporting a new kind of product is hard, because the abstract factory's interface fixes the set of products, and adding one means changing that class and every concrete factory. The lab counts both kinds of change.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Classes</h2></div><p>families and kinds of product, and who makes them</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Classes</strong><span>families and kinds of product, and who makes them</span></div>
       </div>
@@ -1478,10 +1501,10 @@
       <div class="table-wrap" id="gclTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gclTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> F families × K kinds of product. Every scheme has K abstract products and F × K concrete product classes, counted as if each concrete product differs in behaviour. Abstract Factory adds 1 abstract factory and 1 concrete factory per family: 1 + F + K + F × K. Factory Method has 1 abstract creator declaring one factory method per kind and 1 concrete creator subclass per family overriding them: 1 + F + K + F × K, the same count, the difference being that the client subclasses the creator instead of composing with a factory object. Prototype adds 1 prototype manager, a registry keyed by kind, and no factory subclasses: 1 + K + F × K; a family is a configuration of K prototype instances. A new family adds its K products and, under Abstract Factory, 1 concrete factory, under Factory Method 1 concrete creator, under Prototype 1 configuration; it edits no existing class. A new kind adds 1 abstract product and F concrete products; under Abstract Factory it edits the abstract factory and every concrete factory (1 + F classes), each gaining an operation, and under Factory Method the abstract creator and every concrete creator (1 + F), each gaining a factory method; under Prototype it edits no class, and each of the F configurations registers one more prototype. The client is not counted.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Families and kinds of product, under Abstract Factory</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Families and kinds of product, under Abstract Factory</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gclPreset">Worked example</label>
           <select id="gclPreset"><option value="map-styles" selected>A map viewer: three styles, three kinds of product</option><option value="new-style">The map viewer gains a fourth style</option><option value="new-kind">The map viewer gains a fourth kind of product</option></select>
@@ -1512,12 +1535,35 @@
           <div class="kpi"><span>Configurations the change touches</span><strong id="gclConfigChange">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, One factory per map style the viewer never names a style&#x27;s classes.. line 2, interface map style. line 3, tile create tile of int x, int y. line 4, label create label of string text. line 5, marker create marker of place p. line 7, final class terrain style implements map style. line 8, public tile create tile of int x, int y return new terrain tile of x, y. line 9, public label create label of string t return new terrain label of t. line 10, public marker create marker of place p return new terrain marker of p. line 12, final class map viewer. line 13, private final map style style, comment, chosen once, at start-up. line 14, map viewer of map style style this dot style is set to style. line 15, void show of place p. line 16, marker m is set to style dot create marker of p, comment, matches the tiles. line 17, m dot draw on of style dot create tile of p dot tile x, p dot tile y" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One factory per map style; the viewer never names a style&#x27;s classes.</span>
+<span class="cl">interface MapStyle {</span>
+<span class="cl">    Tile createTile(int x, int y);</span>
+<span class="cl">    Label createLabel(String text);</span>
+<span class="cl">    Marker createMarker(Place p);</span>
+<span class="cl">}</span>
+<span class="cl">final class TerrainStyle implements MapStyle {</span>
+<span class="cl">    public Tile createTile(int x, int y) { return new TerrainTile(x, y); }</span>
+<span class="cl">    public Label createLabel(String t) { return new TerrainLabel(t); }</span>
+<span class="cl">    public Marker createMarker(Place p) { return new TerrainMarker(p); }</span>
+<span class="cl">}</span>
+<span class="cl">final class MapViewer {</span>
+<span class="cl">    private final MapStyle style;   // chosen once, at start-up</span>
+<span class="cl">    MapViewer(MapStyle style) { this.style = style; }</span>
+<span class="cl">    void show(Place p) {</span>
+<span class="cl">        Marker m = style.createMarker(p);   // matches the tiles</span>
+<span class="cl">        m.drawOn(style.createTile(p.tileX(), p.tileY()));</span>
+<span class="cl">    }</span>
+<span class="cl">}</span></code></pre><p>The sketch is a map viewer with three styles, street, satellite and terrain, each a family of three kinds of product: tiles, labels and markers drawn to match. On the preset <code>map-styles</code> there are <span data-say="3 times 3 equals 9">3 × 3 = 9</span> concrete products, and the design has 1 + 3 + 3 + 9 = 16 classes: the abstract factory, a concrete factory per style, an abstract class per kind and the nine concrete products. The classes that create are 1 + 3 = 4. The preset <code>new-style</code> adds a fourth style: 4 classes, one factory and its three products <span data-say="16 goes to 20">(16 → 20)</span>, and no existing class is edited. The preset <code>new-kind</code> adds a fourth kind of product instead, a compass rose: 4 classes again, one abstract product and one product per style, but now 4 existing classes are edited, the abstract factory and each of its 3 concrete factories, each given an operation to make the new kind. Same number added, different number changed: that is the asymmetry the pattern lives with. The scheme menu also offers Factory Method and Prototype, and the configuration tiles count Prototype's sets of instances; both schemes are counted in Creational Patterns, and on this lesson only Abstract Factory is Lexi's.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, families, kids adult. line 2, kinds, question timer. line 3, A new kind of product, hint" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">families: kids adult</span>
+<span class="cl">kinds:    question timer</span>
+<span class="cl">a new kind of product: hint</span></code></pre><p>A quiz app with a kids' mode and an adult mode, each a family of questions and timers. By hand, count the classes under Abstract Factory, then the classes a new kind of product, hints, adds and the existing classes it edits. Then type the families and kinds into the lab with the change set to a new kind.</p><p>Abstract Factory assumes the products' classes are yours to write. The next lesson, Supporting Multiple Window Systems, reads Section 2.6, where they are not.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting a family of factories</h2></div><p>Four steps, the last of them on a design of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the families and the kinds</h3><p>A family is a set of products that must be used together; a kind is one slot every family fills. Write F families and K kinds.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the classes</h3><p>1 abstract factory, F concrete factories, K abstract products and <span data-say="F times K">F × K</span> concrete products: <span data-say="1 plus F plus K plus F times K">1 + F + K + F × K</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count each change</h3><p>A new family adds 1 factory and K products and edits nothing. A new kind adds 1 abstract product and F products and edits the abstract factory and all F concrete ones.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a design of your own</h3><p>Find a place in your own code that chooses between sets of related classes: storage back ends, payment providers, themes, test doubles. Write its families and kinds, count the classes, and say which is likelier to grow, the families or the kinds.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting a family of factories</h2>
+      <p class="lead-in">Four steps, the last of them on a design of your own.</p>
+      <ol class="key-ideas method"><li><strong>Name the families and the kinds.</strong> A family is a set of products that must be used together; a kind is one slot every family fills. Write F families and K kinds.</li><li><strong>Count the classes.</strong> 1 abstract factory, F concrete factories, K abstract products and <span data-say="F times K">F × K</span> concrete products: <span data-say="1 plus F plus K plus F times K">1 + F + K + F × K</span>.</li><li><strong>Count each change.</strong> A new family adds 1 factory and K products and edits nothing. A new kind adds 1 abstract product and F products and edits the abstract factory and all F concrete ones.</li><li><strong>Do it on a design of your own.</strong> Find a place in your own code that chooses between sets of related classes: storage back ends, payment providers, themes, test doubles. Write its families and kinds, count the classes, and say which is likelier to grow, the families or the kinds.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1535,17 +1581,16 @@ it edits: 1 + 3 = 4 factory classes
 a new style would add 1 + 3 = 4 and edit 0</div><p>Both changes add four classes here, because the design is square. The difference is in the classes edited, and it grows with the number of families: a viewer with ten styles would edit eleven factory classes for one new kind of product.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Creating each product with a constructor and a flag</strong><span>Section 2.5 shows what that costs: the style is fixed where the code is written, and every creation site must be found to port it; one missed is a widget of the wrong style. With a factory chosen once, the calling code names no style at all.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting Abstract Factory to absorb new kinds of product cheaply</strong><span>The catalog says plainly that new kinds are hard: the abstract factory's interface lists the products, so a new kind edits it and every concrete factory. On the lesson's map viewer the lab counts 4 classes edited for a new kind against 0 for a new style; the authors recommend the pattern where the kinds stay put and the families vary.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Making the factory choice in many places</strong><span>The authors leave where the factory lives to convenience, a global, a static member or a Singleton, but insist that it is set after the style is known and before any product is made, and that the code which makes products never chooses it. Choosing a factory at each creation site brings back the scattered decision the pattern removed.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a family of factories and what each change costs.</strong><p>Given families and kinds of product, state the classes under Abstract Factory, and what a new family and a new kind each add and edit, and say which of the two the catalog calls difficult.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts classes as if every concrete product differs in behaviour, and does not count the client. It cannot say which of your families and kinds will grow, which is the question the pattern's fit turns on.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Creating each product with a constructor and a flag</strong><span>Section 2.5 shows what that costs: the style is fixed where the code is written, and every creation site must be found to port it; one missed is a widget of the wrong style. With a factory chosen once, the calling code names no style at all.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting Abstract Factory to absorb new kinds of product cheaply</strong><span>The catalog says plainly that new kinds are hard: the abstract factory's interface lists the products, so a new kind edits it and every concrete factory. On the lesson's map viewer the lab counts 4 classes edited for a new kind against 0 for a new style; the authors recommend the pattern where the kinds stay put and the families vary.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Making the factory choice in many places</strong><span>The authors leave where the factory lives to convenience, a global, a static member or a Singleton, but insist that it is set after the style is known and before any product is made, and that the code which makes products never chooses it. Choosing a factory at each creation site brings back the scattered decision the pattern removed.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a family of factories and what each change costs.</strong><p>Given families and kinds of product, state the classes under Abstract Factory, and what a new family and a new kind each add and edit, and say which of the two the catalog calls difficult.</p></div></div><div class="note"><strong>Note:</strong> The lab counts classes as if every concrete product differs in behaviour, and does not count the client. It cannot say which of your families and kinds will grow, which is the question the pattern's fit turns on.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Factory</summary><p>An object whose job is to create other objects. Lexi asks a factory for a scroll bar or a button instead of calling a constructor, and the factory returns one of the right style without the caller naming that style.</p></details><details class="recall"><summary>Product family</summary><p>A set of related products made to be used together, such as every widget of one look and feel. Each kind of product has an abstract class, and each family a concrete class for every kind.</p></details><details class="recall"><summary>Abstract Factory</summary><p>The pattern: an AbstractFactory declares one creation operation per kind of AbstractProduct, each ConcreteFactory makes one family's ConcreteProducts, and the client uses only the abstract interfaces. It has a lesson of its own, Abstract Factory, in Creational Patterns.</p></details></div>
+      <h3>Summary</h3>
       <p>Section 2.5 makes Lexi follow more than one look-and-feel standard by creating every widget through a factory object instead of a constructor. Read why direct construction fails, then count the classes a map viewer's styles need under Abstract Factory, and what a new style and a new kind of product each add and change.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Factory.</strong> An object whose job is to create other objects. Lexi asks a factory for a scroll bar or a button instead of calling a constructor, and the factory returns one of the right style without the caller naming that style.</li><li><strong>Product family.</strong> A set of related products made to be used together, such as every widget of one look and feel. Each kind of product has an abstract class, and each family a concrete class for every kind.</li><li><strong>Abstract Factory.</strong> The pattern: an AbstractFactory declares one creation operation per kind of AbstractProduct, each ConcreteFactory makes one family's ConcreteProducts, and the client uses only the abstract interfaces. It has a lesson of its own, Abstract Factory, in Creational Patterns.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="never name a concrete class to create. a factory makes a family of products. choose the factory once, at start minus up. swap a family by swapping the factory. A new family edits nothing. A new kind edits every factory" tabindex="0" role="region" aria-label="Mathematical notation">never name a concrete class to create
 a factory makes a family of products
 choose the factory once, at start-up
@@ -2342,11 +2387,42 @@ a new kind edits every factory</div><figcaption>Abstract Factory in six lines</f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2414,7 +2490,7 @@ a new kind edits every factory</div><figcaption>Abstract Factory in six lines</f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

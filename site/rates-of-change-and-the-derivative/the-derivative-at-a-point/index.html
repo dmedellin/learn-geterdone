@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Rates of Change and the Derivative</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The derivative at a point</p>
       <h1>The Derivative at a Point and the Tangent Line</h1>
       <p class="lesson-lede">The derivative at a point is the number the quotients approach, and the tangent line it defines estimates nearby values with an error you can write down exactly.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The derivative at a is the number the quotients approach</li><li>The tangent line is the line with that slope through the point</li><li>Near a, the line estimates the function, and the error is computable</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>A number, a line, and the error of using it</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; The derivative at a point</span><p>The <strong>derivative</strong> of <span class="math" data-say="f">f</span> at <span class="math" data-say="A">a</span> is the number the difference quotients <span class="math" data-say="the quantity f of the quantity A plus h, minus f of A, over h">(f(a + h) − f(a))/h</span> approach as <span class="math" data-say="h goes to 0">h → 0</span>. It is written <span class="math" data-say="f prime of A">f′(a)</span>.</p><p>The <strong>tangent line</strong> to the graph of <span class="math" data-say="f">f</span> at <span class="math" data-say="A">a</span> is the line through <span class="math" data-say="A, f of A">(a, f(a))</span> with slope <span class="math" data-say="f prime of A">f′(a)</span>: <span class="math" data-say="y equals f of A plus f prime of A times the quantity t minus A">y = f(a) + f′(a)·(t − a)</span>.</p></div><p>Take <span class="math" data-say="f of t equals t squared">f(t) = t²</span> and <span class="math" data-say="A equals 2">a = 2</span>. The quotient is <span class="math" data-say="the quantity the quantity 2 plus h, squared minus 4, over h equals 4 plus h">((2 + h)² − 4)/h = 4 + h</span>, so the derivative is <span class="math" data-say="f prime of 2 equals 4">f′(2) = 4</span>, the constant term. The point on the graph is <span class="math" data-say="2, 4">(2, 4)</span>, and the tangent line is <span class="math" data-say="y equals 4 plus 4 times the quantity t minus 2">y = 4 + 4·(t − 2)</span>, which simplifies to <span class="math" data-say="y equals 4 t minus 4">y = 4t − 4</span>.</p><h3>Using the line to estimate</h3><p>Move a tenth to the right, to <span class="math" data-say="t equals 21 over 10">t = 21/10</span>. The line gives <span class="math" data-say="4 times the quantity 21 over 10, minus 4 equals 22 over 5">4·(21/10) − 4 = 22/5</span>, which is <span class="math" data-say="440 over 100">440/100</span>. The function gives <span class="math" data-say="the quantity 21 over 10, squared equals 441 over 100">(21/10)² = 441/100</span>. The estimate is short by <span class="math" data-say="1 over 100">1/100</span>.</p><div class="mathblock" data-say="f of t equals t squared, A equals 2, h equals 1 over 10. f of 2 equals 4, f prime of 2 equals 4. line at 21 over 10, 4 plus 4 times the quantity 1 over 10, equals 22 over 5 equals 440 over 100. function at 21 over 10, 441 over 100. error, 1 over 100" tabindex="0" role="region" aria-label="Mathematical notation">f(t) = t²,  a = 2,  h = 1/10
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>A number, a line, and the error of using it</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The derivative at a point</span><p>The <strong>derivative</strong> of <span class="math" data-say="f">f</span> at <span class="math" data-say="A">a</span> is the number the difference quotients <span class="math" data-say="the quantity f of the quantity A plus h, minus f of A, over h">(f(a + h) − f(a))/h</span> approach as <span class="math" data-say="h goes to 0">h → 0</span>. It is written <span class="math" data-say="f prime of A">f′(a)</span>.</p><p>The <strong>tangent line</strong> to the graph of <span class="math" data-say="f">f</span> at <span class="math" data-say="A">a</span> is the line through <span class="math" data-say="A, f of A">(a, f(a))</span> with slope <span class="math" data-say="f prime of A">f′(a)</span>: <span class="math" data-say="y equals f of A plus f prime of A times the quantity t minus A">y = f(a) + f′(a)·(t − a)</span>.</p></div><p>Take <span class="math" data-say="f of t equals t squared">f(t) = t²</span> and <span class="math" data-say="A equals 2">a = 2</span>. The quotient is <span class="math" data-say="the quantity the quantity 2 plus h, squared minus 4, over h equals 4 plus h">((2 + h)² − 4)/h = 4 + h</span>, so the derivative is <span class="math" data-say="f prime of 2 equals 4">f′(2) = 4</span>, the constant term. The point on the graph is <span class="math" data-say="2, 4">(2, 4)</span>, and the tangent line is <span class="math" data-say="y equals 4 plus 4 times the quantity t minus 2">y = 4 + 4·(t − 2)</span>, which simplifies to <span class="math" data-say="y equals 4 t minus 4">y = 4t − 4</span>.</p><h3>Using the line to estimate</h3><p>Move a tenth to the right, to <span class="math" data-say="t equals 21 over 10">t = 21/10</span>. The line gives <span class="math" data-say="4 times the quantity 21 over 10, minus 4 equals 22 over 5">4·(21/10) − 4 = 22/5</span>, which is <span class="math" data-say="440 over 100">440/100</span>. The function gives <span class="math" data-say="the quantity 21 over 10, squared equals 441 over 100">(21/10)² = 441/100</span>. The estimate is short by <span class="math" data-say="1 over 100">1/100</span>.</p><div class="mathblock" data-say="f of t equals t squared, A equals 2, h equals 1 over 10. f of 2 equals 4, f prime of 2 equals 4. line at 21 over 10, 4 plus 4 times the quantity 1 over 10, equals 22 over 5 equals 440 over 100. function at 21 over 10, 441 over 100. error, 1 over 100" tabindex="0" role="region" aria-label="Mathematical notation">f(t) = t²,  a = 2,  h = 1/10
 
    f(2) = 4          f′(2) = 4
    line at 21/10:    4 + 4·(1/10) = 22/5 = 440/100
    function at 21/10:    441/100
-   error:                  1/100</div><p>The error is exactly <span class="math" data-say="1 over 100">1/100</span>, which is <span class="math" data-say="h squared">h²</span>. That is no accident for this function. The function at <span class="math" data-say="A plus h">a + h</span> is <span class="math" data-say="4 plus 4 h plus h squared">4 + 4h + h²</span> and the line is <span class="math" data-say="4 plus 4 h">4 + 4h</span>, so the difference is the <span class="math" data-say="h squared">h²</span> term that the line leaves out. Halve the step to <span class="math" data-say="1 over 20">1/20</span> and the error is <span class="math" data-say="1 over 400">1/400</span>: a quarter of it, not a half. The estimate gets better faster than the step gets smaller.</p><div class="example"><span class="label">Example &middot; A cube at 1</span><p>For <span class="math" data-say="f of t equals t cubed">f(t) = t³</span> at <span class="math" data-say="A equals 1">a = 1</span> the quotient is <span class="math" data-say="3 plus 3 h plus h squared">3 + 3h + h²</span>, so <span class="math" data-say="f prime of 1 equals 3">f′(1) = 3</span> and the tangent line is <span class="math" data-say="y equals 1 plus 3 times the quantity t minus 1, equals 3 t minus 2">y = 1 + 3·(t − 1) = 3t − 2</span>.</p><p>At <span class="math" data-say="h equals 1 over 10">h = 1/10</span> the line gives <span class="math" data-say="13 over 10">13/10</span> and the function gives <span class="math" data-say="1331 over 1000">1331/1000</span>. The error is <span class="math" data-say="31 over 1000">31/1000</span>, which is <span class="math" data-say="3 h squared plus h cubed">3h² + h³</span>: the terms of the expansion that the line leaves out.</p></div><div class="example"><span class="label">Example &middot; A function that is not a polynomial</span><p>For <span class="math" data-say="f of t equals 1 over t">f(t) = 1/t</span> at <span class="math" data-say="A equals 1">a = 1</span> the lab reports a slope of −1, which the next lesson derives. The tangent line is <span class="math" data-say="y equals 1 minus the quantity t minus 1, equals negative t plus 2">y = 1 − (t − 1) = −t + 2</span>.</p><p>At <span class="math" data-say="h equals 1 over 2">h = 1/2</span> the line gives <span class="math" data-say="1 over 2">1/2</span> and the function gives <span class="math" data-say="2 over 3">2/3</span>, so the error is <span class="math" data-say="1 over 6">1/6</span>. The line is too low here because <span class="math" data-say="1 over t">1/t</span> bends upward away from its tangent.</p></div><h3>Touching is the wrong picture</h3><p>A tangent is often described as a line that touches the graph at one point. That is true of a circle and misleading here. The tangent line to <span class="math" data-say="t squared">t²</span> at 2 meets the parabola at <span class="math" data-say="2, 4">(2, 4)</span> and nowhere else, but that is not what defines it. It is defined by the slope, and its usefulness is in the nearby values it estimates: <span class="math" data-say="22 over 5">22/5</span> against <span class="math" data-say="441 over 100">441/100</span>, off by <span class="math" data-say="1 over 100">1/100</span>, at a point a tenth of a unit away.</p><p>The error is always printed exactly in the lab, and for a polynomial it is made of the terms of <span class="math" data-say="f of the quantity A plus h">f(a + h)</span> that contain <span class="math" data-say="h squared">h²</span> or more. That is why the estimate improves faster than the step shrinks, and it is the whole reason a derivative is useful.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The tangent line</h2></div><p>The linear approximation and its exact error</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+   error:                  1/100</div><p>The error is exactly <span class="math" data-say="1 over 100">1/100</span>, which is <span class="math" data-say="h squared">h²</span>. That is no accident for this function. The function at <span class="math" data-say="A plus h">a + h</span> is <span class="math" data-say="4 plus 4 h plus h squared">4 + 4h + h²</span> and the line is <span class="math" data-say="4 plus 4 h">4 + 4h</span>, so the difference is the <span class="math" data-say="h squared">h²</span> term that the line leaves out. Halve the step to <span class="math" data-say="1 over 20">1/20</span> and the error is <span class="math" data-say="1 over 400">1/400</span>: a quarter of it, not a half. The estimate gets better faster than the step gets smaller.</p><div class="example"><span class="label">Example &middot; A cube at 1</span><p>For <span class="math" data-say="f of t equals t cubed">f(t) = t³</span> at <span class="math" data-say="A equals 1">a = 1</span> the quotient is <span class="math" data-say="3 plus 3 h plus h squared">3 + 3h + h²</span>, so <span class="math" data-say="f prime of 1 equals 3">f′(1) = 3</span> and the tangent line is <span class="math" data-say="y equals 1 plus 3 times the quantity t minus 1, equals 3 t minus 2">y = 1 + 3·(t − 1) = 3t − 2</span>.</p><p>At <span class="math" data-say="h equals 1 over 10">h = 1/10</span> the line gives <span class="math" data-say="13 over 10">13/10</span> and the function gives <span class="math" data-say="1331 over 1000">1331/1000</span>. The error is <span class="math" data-say="31 over 1000">31/1000</span>, which is <span class="math" data-say="3 h squared plus h cubed">3h² + h³</span>: the terms of the expansion that the line leaves out.</p></div><div class="example"><span class="label">Example &middot; A function that is not a polynomial</span><p>For <span class="math" data-say="f of t equals 1 over t">f(t) = 1/t</span> at <span class="math" data-say="A equals 1">a = 1</span> the lab reports a slope of −1, which the next lesson derives. The tangent line is <span class="math" data-say="y equals 1 minus the quantity t minus 1, equals negative t plus 2">y = 1 − (t − 1) = −t + 2</span>.</p><p>At <span class="math" data-say="h equals 1 over 2">h = 1/2</span> the line gives <span class="math" data-say="1 over 2">1/2</span> and the function gives <span class="math" data-say="2 over 3">2/3</span>, so the error is <span class="math" data-say="1 over 6">1/6</span>. The line is too low here because <span class="math" data-say="1 over t">1/t</span> bends upward away from its tangent.</p></div><h3>Touching is the wrong picture</h3><p>A tangent is often described as a line that touches the graph at one point. That is true of a circle and misleading here. The tangent line to <span class="math" data-say="t squared">t²</span> at 2 meets the parabola at <span class="math" data-say="2, 4">(2, 4)</span> and nowhere else, but that is not what defines it. It is defined by the slope, and its usefulness is in the nearby values it estimates: <span class="math" data-say="22 over 5">22/5</span> against <span class="math" data-say="441 over 100">441/100</span>, off by <span class="math" data-say="1 over 100">1/100</span>, at a point a tenth of a unit away.</p><p>The error is always printed exactly in the lab, and for a polynomial it is made of the terms of <span class="math" data-say="f of the quantity A plus h">f(a + h)</span> that contain <span class="math" data-say="h squared">h²</span> or more. That is why the estimate improves faster than the step shrinks, and it is the whole reason a derivative is useful.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The tangent line</h2></div><p>The linear approximation and its exact error</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The tangent line</strong><span>f(a) + f′(a)·(t − a), and how far f is from it at a + h</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>f</span><span class="tone-green"><i class="legend-swatch"></i>tangent line</span></div>
@@ -1409,10 +1452,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="tgPlot" viewBox="0 0 660 420" role="img" aria-label="f with its tangent line"></svg></div>
       <div class="status-banner" id="tgStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The tangent line and its exact error</h3>
-          <p>Type a function, a place and a step. The lab prints the slope, the tangent line, what the line estimates at a + h, the true value and the error, all as exact fractions. Shrink the step and watch the error fall faster than the step.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The tangent line and its exact error</h3>
+            <p>Type a function, a place and a step. The lab prints the slope, the tangent line, what the line estimates at a + h, the true value and the error, all as exact fractions. Shrink the step and watch the error fall faster than the step.</p>
         <div class="field">
           <label for="tgPreset">Function and point</label>
           <select id="tgPreset"><option value="square" selected>t² at 2, step 1/10</option><option value="cube">t³ at 1, step 1/10</option><option value="recip">1/t at 1, step 1/2</option></select>
@@ -1439,12 +1482,14 @@
         </div>
         <p class="small-copy" style="margin:0;">A polynomial or a ratio of polynomials in t: t^2, t^3, 1/t.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>From a quotient to a tangent line</h2></div><p>Five moves. The first three find the derivative, the last two use it.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Simplify the quotient at the place</h3><p>Expand and cancel the <span class="math" data-say="h">h</span>, as in the polynomial lesson, with <span class="math" data-say="A">a</span> in the place of <span class="math" data-say="t">t</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read off the constant term</h3><p>It is <span class="math" data-say="f prime of A">f′(a)</span>, the number the quotients approach.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write the line</h3><p><span class="math" data-say="y equals f of A plus f prime of A times the quantity t minus A">y = f(a) + f′(a)·(t − a)</span>: the point <span class="math" data-say="A, f of A">(a, f(a))</span> and the slope <span class="math" data-say="f prime of A">f′(a)</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Estimate at a + h</h3><p>The line gives <span class="math" data-say="f of A plus f prime of A times h">f(a) + f′(a)·h</span>. Compute it as a single fraction.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Subtract to find the error</h3><p>True value minus estimate: <span class="math" data-say="f of the quantity A plus h, minus the quantity f of A plus f prime of A times h">f(a + h) − (f(a) + f′(a)·h)</span>. A positive error means the line lies below the function there.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>From a quotient to a tangent line</h2>
+      <p class="lead-in">Five moves. The first three find the derivative, the last two use it.</p>
+      <ol class="key-ideas method"><li><strong>Simplify the quotient at the place.</strong> Expand and cancel the <span class="math" data-say="h">h</span>, as in the polynomial lesson, with <span class="math" data-say="A">a</span> in the place of <span class="math" data-say="t">t</span>.</li><li><strong>Read off the constant term.</strong> It is <span class="math" data-say="f prime of A">f′(a)</span>, the number the quotients approach.</li><li><strong>Write the line.</strong> <span class="math" data-say="y equals f of A plus f prime of A times the quantity t minus A">y = f(a) + f′(a)·(t − a)</span>: the point <span class="math" data-say="A, f of A">(a, f(a))</span> and the slope <span class="math" data-say="f prime of A">f′(a)</span>.</li><li><strong>Estimate at a + h.</strong> The line gives <span class="math" data-say="f of A plus f prime of A times h">f(a) + f′(a)·h</span>. Compute it as a single fraction.</li><li><strong>Subtract to find the error.</strong> True value minus estimate: <span class="math" data-say="f of the quantity A plus h, minus the quantity f of A plus f prime of A times h">f(a + h) − (f(a) + f′(a)·h)</span>. A positive error means the line lies below the function there.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1464,17 +1509,16 @@ function at 21/10:  (21/10)² = 441/100
 error:              441/100 − 440/100 = 1/100 = h²</div><p>The line is a good estimate: it is within one part in 441 of the true value. The error is the <span class="math" data-say="h squared">h²</span> term that the line leaves out.</p><p>For a rehearsal, find the tangent to <span class="math" data-say="t squared">t²</span> at 3 and use it at <span class="math" data-say="t equals 31 over 10">t = 31/10</span>. The slope is 6, the estimate is <span class="math" data-say="9 plus 6 over 10 equals 48 over 5">9 + 6/10 = 48/5</span>, and the error should again be <span class="math" data-say="h squared">h²</span>.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the tangent “touches at one point only”, so it says nothing about nearby values</strong><span>The tangent to <span class="math" data-say="t squared">t²</span> at 2 meets the parabola only at <span class="math" data-say="2, 4">(2, 4)</span>, and yet at <span class="math" data-say="t equals 21 over 10">t = 21/10</span> it estimates <span class="math" data-say="22 over 5">22/5</span> against the true <span class="math" data-say="441 over 100">441/100</span>, an error of <span class="math" data-say="1 over 100">1/100</span>. Touching once is not the definition; the slope is, and the line is valuable because the error falls as <span class="math" data-say="h squared">h²</span> while the step falls as <span class="math" data-say="h">h</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using the tangent far from its point</strong><span>The error is exact and it grows: at <span class="math" data-say="h equals 1">h = 1</span> the error for <span class="math" data-say="t squared">t²</span> at 2 is 1, and at <span class="math" data-say="h equals 10">h = 10</span> it is 100. The line is an estimate near <span class="math" data-say="A">a</span>, and the error formula says how near.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Confusing the derivative with a value of the function</strong><span><span class="math" data-say="f prime of 2">f′(2)</span> is the slope, 4, and <span class="math" data-say="f of 2">f(2)</span> is the height, also 4 here only by coincidence. For <span class="math" data-say="t cubed">t³</span> at 1 the slope is 3 and the height is 1. The tangent line uses both: the height as the starting point and the slope as the rate.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find <span data-say="f prime of A">f′(a)</span> for a polynomial, write the tangent line, and compute the exact error of the estimate at a + h.</strong><p>You should be able to simplify the quotient at a place, read the derivative off as the constant term, write the line, evaluate it at <span class="math" data-say="A plus h">a + h</span>, and subtract from the true value to get a fraction.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every derivative so far came from a quotient that simplifies to a polynomial in <span class="math" data-say="h">h</span>. One function does not do that, and it is worth doing by hand: &ldquo;The Derivative of 1/t&rdquo;.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the tangent “touches at one point only”, so it says nothing about nearby values</strong><span>The tangent to <span class="math" data-say="t squared">t²</span> at 2 meets the parabola only at <span class="math" data-say="2, 4">(2, 4)</span>, and yet at <span class="math" data-say="t equals 21 over 10">t = 21/10</span> it estimates <span class="math" data-say="22 over 5">22/5</span> against the true <span class="math" data-say="441 over 100">441/100</span>, an error of <span class="math" data-say="1 over 100">1/100</span>. Touching once is not the definition; the slope is, and the line is valuable because the error falls as <span class="math" data-say="h squared">h²</span> while the step falls as <span class="math" data-say="h">h</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using the tangent far from its point</strong><span>The error is exact and it grows: at <span class="math" data-say="h equals 1">h = 1</span> the error for <span class="math" data-say="t squared">t²</span> at 2 is 1, and at <span class="math" data-say="h equals 10">h = 10</span> it is 100. The line is an estimate near <span class="math" data-say="A">a</span>, and the error formula says how near.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Confusing the derivative with a value of the function</strong><span><span class="math" data-say="f prime of 2">f′(2)</span> is the slope, 4, and <span class="math" data-say="f of 2">f(2)</span> is the height, also 4 here only by coincidence. For <span class="math" data-say="t cubed">t³</span> at 1 the slope is 3 and the height is 1. The tangent line uses both: the height as the starting point and the slope as the rate.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find <span data-say="f prime of A">f′(a)</span> for a polynomial, write the tangent line, and compute the exact error of the estimate at a + h.</strong><p>You should be able to simplify the quotient at a place, read the derivative off as the constant term, write the line, evaluate it at <span class="math" data-say="A plus h">a + h</span>, and subtract from the true value to get a fraction.</p></div></div><div class="note"><strong>Note:</strong> Every derivative so far came from a quotient that simplifies to a polynomial in <span class="math" data-say="h">h</span>. One function does not do that, and it is worth doing by hand: &ldquo;The Derivative of 1/t&rdquo;.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The derivative at a is the number the quotients approach</summary><p>Write <span class="math" data-say="f prime of A">f′(a)</span> for it, read “f prime of a”. It is a single number for each place <span class="math" data-say="A">a</span>, not a family. For <span class="math" data-say="t squared">t²</span> at 2 the quotient is <span class="math" data-say="4 plus h">4 + h</span>, the column heads for 4, and <span class="math" data-say="f prime of 2 equals 4">f′(2) = 4</span>. That is a claim, as before, and for a polynomial it is backed by the constant term of the simplified quotient.</p></details><details class="recall"><summary>The tangent line is the line with that slope through the point</summary><p>It passes through <span class="math" data-say="A, f of A">(a, f(a))</span> with slope <span class="math" data-say="f prime of A">f′(a)</span>, so its equation is <span class="math" data-say="y equals f of A plus f prime of A times the quantity t minus A">y = f(a) + f′(a)·(t − a)</span>. For <span class="math" data-say="t squared">t²</span> at 2 that is <span class="math" data-say="y equals 4 plus 4 times the quantity t minus 2, equals 4 t minus 4">y = 4 + 4·(t − 2) = 4t − 4</span>. It is the limit of the secant lines as the step shrinks, which is why its slope is the derivative.</p></details><details class="recall"><summary>Near a, the line estimates the function, and the error is computable</summary><p>At <span class="math" data-say="t equals A plus h">t = a + h</span> the line gives <span class="math" data-say="f of A plus f prime of A times h">f(a) + f′(a)·h</span>, while the function gives <span class="math" data-say="f of the quantity A plus h">f(a + h)</span>. Their difference is the error of the linear approximation. For a polynomial it is an exact fraction, and it shrinks faster than <span class="math" data-say="h">h</span> does, which is what makes the line useful.</p></details></div>
+      <h3>Summary</h3>
       <p>The number a column of quotients approaches at <span class="math" data-say="A">a</span> is the derivative <span class="math" data-say="f prime of A">f′(a)</span>. The line through <span class="math" data-say="A, f of A">(a, f(a))</span> with that slope is the tangent line, <span class="math" data-say="y equals f of A plus f prime of A times the quantity t minus A">y = f(a) + f′(a)·(t − a)</span>. It is not a line that touches once and says nothing about the rest: it is the best straight-line estimate near <span class="math" data-say="A">a</span>, and its error at <span class="math" data-say="A plus h">a + h</span> is a fraction the lab prints exactly.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The derivative at a is the number the quotients approach.</strong> Write <span class="math" data-say="f prime of A">f′(a)</span> for it, read “f prime of a”. It is a single number for each place <span class="math" data-say="A">a</span>, not a family. For <span class="math" data-say="t squared">t²</span> at 2 the quotient is <span class="math" data-say="4 plus h">4 + h</span>, the column heads for 4, and <span class="math" data-say="f prime of 2 equals 4">f′(2) = 4</span>. That is a claim, as before, and for a polynomial it is backed by the constant term of the simplified quotient.</li><li><strong>The tangent line is the line with that slope through the point.</strong> It passes through <span class="math" data-say="A, f of A">(a, f(a))</span> with slope <span class="math" data-say="f prime of A">f′(a)</span>, so its equation is <span class="math" data-say="y equals f of A plus f prime of A times the quantity t minus A">y = f(a) + f′(a)·(t − a)</span>. For <span class="math" data-say="t squared">t²</span> at 2 that is <span class="math" data-say="y equals 4 plus 4 times the quantity t minus 2, equals 4 t minus 4">y = 4 + 4·(t − 2) = 4t − 4</span>. It is the limit of the secant lines as the step shrinks, which is why its slope is the derivative.</li><li><strong>Near a, the line estimates the function, and the error is computable.</strong> At <span class="math" data-say="t equals A plus h">t = a + h</span> the line gives <span class="math" data-say="f of A plus f prime of A times h">f(a) + f′(a)·h</span>, while the function gives <span class="math" data-say="f of the quantity A plus h">f(a + h)</span>. Their difference is the error of the linear approximation. For a polynomial it is an exact fraction, and it shrinks faster than <span class="math" data-say="h">h</span> does, which is what makes the line useful.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="f prime of A equals what the quotients approach. tangent, y equals f of A plus f prime of A times the quantity t minus A. estimate at A plus h, f of A plus f prime of A times h. error equals f of the quantity A plus h, minus estimate, exactly. t squared at 2, h equals 1 over 10, error 1 over 100 equals h squared" tabindex="0" role="region" aria-label="Mathematical notation">f′(a) = what the quotients approach
 tangent: y = f(a) + f′(a)·(t − a)
 estimate at a + h: f(a) + f′(a)·h
@@ -2994,11 +3038,42 @@ t² at 2, h = 1/10: error 1/100 = h²</div><figcaption>The derivative at a point
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      raf(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3066,7 +3141,7 @@ t² at 2, h = 1/10: error 1/100 = h²</div><figcaption>The derivative at a point
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 
