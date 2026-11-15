@@ -35,7 +35,9 @@ class TestCatalogDestinations(unittest.TestCase):
         courses,lessons,links=catalog_inventory(ui.SITE)
         self.assertEqual(180,len(courses))
         self.assertEqual(1505,len(lessons))
-        self.assertEqual(1520,len(links))
+        # 1520 list and pager links, plus the 172 generated course heads'
+        # "Start with <first lesson>" (docs/LESSON-LAYOUT-BACKLOG.md C-1).
+        self.assertEqual(1692,len(links))
         self.assertEqual(lessons,{a['target'] for a in links})
         self.assertEqual(set(courses),{a['course'] for a in links})
         bad=[a for a in links if ordinal(a['text'])]

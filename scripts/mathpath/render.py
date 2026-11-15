@@ -526,7 +526,7 @@ def course_home(*, course, index, courses, path):
         for i, lesson in enumerate(lessons)
     )
     outcomes = "".join(
-        "<li><strong>%s.</strong> %s</li>" % (esc_inline(t).rstrip("."), inline(body))
+        '<div class="outcome"><h3>%s</h3><p>%s</p></div>' % (esc_inline(t), inline(body))
         for t, body in course["outcomes"]
     )
 
@@ -578,6 +578,7 @@ def course_home(*, course, index, courses, path):
         "      <h1>%s</h1>\n"
         '      <p class="lesson-lede">%s</p>\n'
         '      <dl class="meta-line" data-ui="metadata">'
+        "<div><dt>Subject</dt><dd>%s</dd></div>"
         "<div><dt>Lessons</dt><dd>%d</dd></div>"
         "<div><dt>Level</dt><dd>%s</dd></div></dl>\n"
         '      <div class="hero-actions" data-ui="primary-actions">'
@@ -585,7 +586,7 @@ def course_home(*, course, index, courses, path):
         "    </section>\n"
         % (
             esc(path["title"]), esc(course["title"]), inline(course["blurb"]),
-            len(lessons), esc(course["level"]),
+            esc(path["title"]), len(lessons), esc(course["level"]),
             lessons[0]["slug"], esc(lessons[0]["title"]),
         ),
         '    <section class="section" id="syllabus" data-ui="lesson-list">\n'
@@ -593,11 +594,13 @@ def course_home(*, course, index, courses, path):
         '<p class="course-progress" id="courseProgress"></p><p>%s</p></div>\n'
         '      <div class="syllabus">%s</div>\n'
         "    </section>\n" % (len(lessons), inline(course["syllabus_intro"]), syllabus),
+        # Headings keep their levels and the outcomes their h3/p shape: the
+        # copy fixtures in tests/content_preservation.json pin (tag, text).
         '    <details class="section more" id="about">\n'
-        '      <summary><h2>More about this course</h2></summary>\n',
+        '      <summary class="more-summary">More about this course</summary>\n',
         '    <section class="more-part" data-ui="overview">\n'
-        "      <h3>What you will be able to do</h3><p>%s</p>\n"
-        '      <ul class="key-ideas">%s</ul>\n'
+        "      <h2>What you will be able to do</h2><p>%s</p>\n"
+        '      <div class="outcomes">%s</div>\n'
         "    </section>\n" % (inline(course["outcomes_intro"]), outcomes),
         '    <section class="more-part" id="background" data-ui="background">'
         # First character up, and NOTHING else touched. str.capitalize()
@@ -609,16 +612,18 @@ def course_home(*, course, index, courses, path):
         # what the no-ordinals rule asks for, hit it immediately.
         # escaped, then the `x` shorthand: a background that names `y′ = k·y`
         # shipped its backticks on six Differential Equations course homes
-        '<h3>Recommended background</h3><p>%s.</p></section>\n'
+        '<h2>Recommended background</h2><p>%s.</p></section>\n'
         % esc_inline(_first_upper(course["assumes_long"]).rstrip(".")),
         '    <section class="more-part">\n'
         '      <h3>Practice suggestions</h3>%s\n'
         '      <h3>What it does not cover</h3>%s\n'
+        '      <h3>What this course is about</h3><figure class="key-figure">%s</figure>\n'
         "    </section>\n"
         "    </details>\n"
         % (
             "".join("<p>%s</p>" % inline(p) for p in course["how_to"]),
             "".join("<p>%s</p>" % inline(p) for p in course["not_covered"]),
+            _mathblock(course["key"]),
         ),
         "    </main>\n",
         '\n    <nav class="path-nav" data-ui="course-navigation" aria-label="Course navigation">\n%s\n      </nav>\n' % "\n".join(nav),
@@ -675,12 +680,14 @@ def path_page(path):
         '<section class="section" id="courses" data-ui="course-list">'
         '<div class="list-head"><h2>Courses</h2><p>%s</p></div>'
         '<div class="spine">%s</div></section>\n' % (inline(path["sequence_intro"]), cards),
-        '<details class="section more" id="about"><summary><h2>More about this Subject</h2></summary>\n',
-        '<section class="more-part prose" data-ui="overview"><h3>Overview</h3>%s</section>\n'
+        '<details class="section more" id="about"><summary class="more-summary">More about this Subject</summary>\n',
+        '<section class="more-part prose" data-ui="overview"><h2>Overview</h2>%s</section>\n'
         % "".join('<p>%s</p>' % inline(p) for p in path["why_order"]),
         '<section class="more-part prose" id="background" data-ui="background">'
-        '<h3>Recommended background</h3>%s</section>\n'
+        '<h2>Recommended background</h2>%s</section>\n'
         % "".join('<p>%s</p>' % inline(p) for p in path["prerequisites"]),
+        '<section class="more-part"><h3>In symbols</h3><figure class="key-figure">%s</figure></section>\n'
+        % _mathblock(path["key"]),
         '</details>\n',
         '</main>\n',
         chrome.footer(inline(path["footer_lead"]), path["material"]),

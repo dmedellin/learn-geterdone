@@ -11,6 +11,19 @@ Direction chosen: **B, Reading mode**, shipped in two releases with the trim
 (**A**) first. C (guided steps) was not chosen: it works against long
 read-along passages, which are most of the library.
 
+## Status
+
+| release | items | state |
+|---|---|---|
+| 1, trim | L-1 to L-7, C-1, S-1 | implemented on `feat/lesson-reading-mode` |
+| 2, reading mode | L-8 to L-11 | implemented on `feat/lesson-reading-mode-2`, stacked on release 1 |
+| later | L-12 to L-15 | open, only if asked |
+
+Measured after release 1 on the same pages: the reading starts at 809 px on a
+phone (inside the first screen) and 755 px on a laptop, at about 72 characters
+per line. The course page's first lesson is at 1,030 px on a phone and 719 px on
+a laptop; the Subject page's first course at 1,178 px and 767 px.
+
 ## What was measured
 
 On the live templates, with Leviathan's "The War of Every Man Against Every

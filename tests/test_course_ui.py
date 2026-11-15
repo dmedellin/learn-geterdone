@@ -387,8 +387,9 @@ class TestGeneratedCatalogUI(unittest.TestCase):
             self.assertFalse(doc.find(**{"class": "spine-num"}), "subject cards must not number courses")
             self.assertIn("Recommended background", [words(n) for n in doc.find("h2")])
             actions = doc.find(**{"data-ui": "primary-actions"})[0]
-            self.assertEqual("View courses", words(actions["children"][0]))
-            self.assertEqual("#courses", actions["children"][0]["attrs"]["href"])
+            first = subject["courses"][0]
+            self.assertEqual("Start with " + first["title"], words(actions["children"][0]))
+            self.assertEqual("../../%s/" % first["slug"], actions["children"][0]["attrs"]["href"])
             # "the rest of the path" is relative prose: it survives renumbering
             # and states a real dependency. A numbered Course identity, generic
             # framing or a prescribed order does not.
@@ -419,9 +420,8 @@ class TestGeneratedCatalogUI(unittest.TestCase):
                     self.assertEqual("Start with " + first["title"], words(actions["children"][0]))
                     labels = [words(n) for n in doc.find("dt")]
                     # "Format: Interactive" was true of every course and said
-                    # nothing (SITE-STRUCTURE-BACKLOG B-18); the Subject is in
-                    # the kicker and the breadcrumb.
-                    self.assertEqual(["Lessons", "Level"], labels)
+                    # nothing (SITE-STRUCTURE-BACKLOG B-18).
+                    self.assertEqual(["Subject", "Lessons", "Level"], labels)
                     if i == len(subject["courses"]) - 1:
                         terminal = doc.find("a", **{"class": "path-move next"})[0]
                         self.assertEqual("All %s courses" % subject["title"], words(terminal))
