@@ -538,7 +538,9 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
 LESSON_BAR_JS = """
   (function () {
     var bar = document.getElementById('lessonBar');
-    if (!bar || typeof bar.querySelectorAll !== 'function') return;
+    if (!bar || typeof bar.querySelectorAll !== 'function'
+        || typeof window.addEventListener !== 'function') return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
     var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
     var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
     var lab = document.getElementById('lab');
@@ -560,7 +562,7 @@ LESSON_BAR_JS = """
     window.addEventListener('scroll', function () {
       if (queued) return;
       queued = true;
-      window.requestAnimationFrame(function () { queued = false; paint(); });
+      raf(function () { queued = false; paint(); });
     }, { passive: true });
     paint();
   })();
