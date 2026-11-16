@@ -5612,7 +5612,9 @@ class TestLessonDataMatchesTheRenderer(unittest.TestCase):
 
 
     # The body block kinds render._block draws; anything else raises at build.
-    BODY_KINDS = {"p", "h3", "math", "code", "ul", "ol", "def", "thm", "example", "proof"}
+    # "lab" is the optional placement marker (render.lab_position), drawn as
+    # nothing and allowed once per lesson.
+    BODY_KINDS = {"p", "h3", "math", "code", "ul", "ol", "def", "thm", "example", "proof", "lab"}
 
     def test_body_blocks_are_kinds_the_renderer_draws(self):
         """Every generated Subject, so a newly wired one is covered without

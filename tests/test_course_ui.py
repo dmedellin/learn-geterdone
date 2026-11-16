@@ -250,6 +250,27 @@ class TestGeneratedLessonUI(unittest.TestCase):
         self.assertIn(build_paths.render.inline(lesson["standard"][1]), markup,
                       "renaming the heading must preserve the pedagogical criterion")
 
+    def test_lab_placement_marker_overrides_the_mention_rule(self):
+        # LESSON-LAYOUT-BACKLOG L-14: a ("lab", None) block places the lab
+        # exactly; without one the lab follows the first block that mentions it.
+        place = build_paths.render.lab_position
+        body = [("p", "Opening."), ("p", "Use the lab below."), ("p", "Closing.")]
+        self.assertEqual(2, place(body))
+        self.assertEqual(3, place([("p", "Nothing here."), ("p", "Or here."), ("p", "Done.")]))
+        marked = [("p", "Opening."), ("lab", None), ("p", "Use the lab below."), ("p", "Closing.")]
+        self.assertEqual(1, place(marked))
+        with self.assertRaises(ValueError):
+            place([("lab", None), ("p", "x"), ("lab", None)])
+        subject = build_paths.GENERATED_PATHS[0]
+        course = subject["courses"][0]
+        lesson = dict(course["lessons"][0])
+        lesson["body"] = [("lab", None)] + [b for b in lesson["body"] if b[0] != "lab"]
+        markup = build_paths.render.lesson_page(path=subject, course=course, lesson=lesson,
+            index=0, prev_lesson=None, next_lesson=course["lessons"][1])
+        reading = markup[markup.index('id="read"'):]
+        self.assertLess(reading.index('id="lab"'), reading.index("<p"),
+                        "a marker at the start puts the lab before the first paragraph")
+
 
 class TestSharedMasthead(unittest.TestCase):
     def test_navigation_and_control_order(self):

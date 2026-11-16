@@ -16,14 +16,21 @@ read-along passages, which are most of the library.
 | release | items | state |
 |---|---|---|
 | 1, trim | L-1 to L-7, C-1, S-1 | shipped in PR #46 |
-| 2, reading mode | L-8 to L-11 | implemented on `feat/lesson-reading-mode-2`; the top "In brief" from release 1 is gone, its ideas are the recall list at the end |
-| later | L-12 to L-15 | open, only if asked |
+| 2, reading mode | L-8 to L-11 | shipped in PR #47; the top "In brief" from release 1 is gone, its ideas are the recall list at the end |
+| 3, the rest | L-12, L-14, L-15 | implemented on `feat/lesson-layout-rest`; L-13 declined, see its row |
 
 Measured after release 1 on the same pages: the reading starts at 809 px on a
 phone (inside the first screen) and 755 px on a laptop, at about 72 characters
 per line. The course page's first lesson is at 1,030 px on a phone and 719 px on
 a laptop; the Subject page's first course at 1,178 px and 767 px. After release
 2 the reading starts at 641 px on a phone and 589 px on a laptop.
+
+Release 3 on five Trading lessons at 390 px: the first section moves from
+1,066 to 1,327 px down to 541 to 981 px (Market Structure Lab: 1,114 to 620).
+The pages with an authored hero card (Time and Sales, Risk Management
+Fundamentals) gain least, because the card is content and stays. On a laptop
+Trading lessons were already at 41 to 80 characters per line inside their
+cards; only the section lead-ins needed a cap.
 
 ## What was measured
 
@@ -105,22 +112,25 @@ polish. Effort: S (an hour or two), M (a session), L (several sessions).
 | L-10 | P1 | **The lab inside the reading**, right after the first paragraph or list that mentions the lab; a lesson whose text never mentions it gets the lab after the reading. Measured on the current content: 1,079 of 1,387 lessons mention the lab, at a median 42% of the way through the text. A per-lesson override can come later if a placement reads badly. | M | `render.py` |
 | L-11 | P2 | **Method, practice, mistakes and check without card chrome**: the method steps as a numbered list in the reading column, the mistakes and the check as plain sections. The quiz and the lab keep their panels because they are things to use. | S | `render.py`, theme |
 
-### Later, only if asked
+### Release 3: the rest
 
-| id | pri | item | effort | notes |
+Dave asked for these on 2026-11-15 ("Continue").
+
+| id | pri | item | effort | outcome |
 |---|---|---|---|---|
-| L-12 | P2 | **Trading lessons** get the same treatment. They are hand-authored with their own template, so this is a pass through `add_progress_marks.py` per course, not a renderer change. | L | Release 1 reaches them only through L-6. |
-| L-13 | P3 | **Lab beside the text on wide screens.** The lab already lays its controls beside the figure; putting the whole lab in a margin column needs labs that fit 420 px. | M | |
-| L-14 | P3 | **Per-lesson lab placement**, an optional `("lab",)` body block that overrides L-10's rule where it reads badly. | S | |
-| L-15 | P3 | **Retire the fields no longer shown** below, or bring them back, once the new layout has been read for a while. | S | content packages, preservation fixtures |
+| L-12 | P2 | **Trading lessons** get the same treatment. They are hand-authored with their own template, so this is a pass through `add_progress_marks.py` per course, not a renderer change. | L | **Done as a CSS pass**, `TRADING_LESSON_CSS` in `add_progress_marks.py`, lesson pages only: the hero's jump links go (L-2), the phone breadcrumb is the course back link (L-5, the rule moved to `UI_CSS` so both page families share it), the decorative hero illustration leaves the phone layout, the hero is tighter on a phone, and section lead-ins keep 68 characters. Buttons in the hero stay because they start or reset labs; hero cards stay because they are authored. A structural rewrite (lesson bar, recall at the end, lab inside the text) would edit 118 hand-written pages one by one and is not done. |
+| L-13 | P3 | **Lab beside the text on wide screens.** The lab already lays its controls beside the figure; putting the whole lab in a margin column needs labs that fit 420 px. | M | **Declined.** The lab figures keep a minimum width of 460, 520 or 660 px so their text stays legible (`.lab-stage svg` rules in the theme), and the shell is 1,160 px. A 68-character reading column (about 610 px) beside a 660 px lab does not fit with gutters, and shrinking the figures undoes the legibility fix. |
+| L-14 | P3 | **Per-lesson lab placement**, an optional `("lab",)` body block that overrides L-10's rule where it reads badly. | S | **Done.** A `("lab", None)` block in a lesson's `body` puts the lab exactly there (`render.lab_position`); more than one is an error. No lesson uses it yet; add one where the automatic placement reads badly. |
+| L-15 | P3 | **Retire the fields no longer shown** below, or bring them back, once the new layout has been read for a while. | S | **Half done.** `concepts_intro` is back as the opening line of "Before you go", where it introduces the ideas it was written for. `read_intro` stays unshown: its job is now done by `one_line` under the title. |
 
 ## Fields no longer shown
 
-`read_intro` (the side note beside the reading's heading) and `concepts_intro`
-(the line above the three cards) were previews of previews. They stay in the
-content and in the preservation fixtures; nothing renders them. Every other
-field still reaches the page: `summary` and `key` in the recap, `one_line` under
-the title, `concepts` in "In brief" and then the recap.
+`read_intro` (the side note beside the reading's heading) was a preview of a
+preview. It stays in the content and in the preservation fixtures; nothing
+renders it. `concepts_intro` was unshown in releases 1 and 2 and is back in
+release 3 as the first line of "Before you go" (L-15). Every other field
+reaches the page: `summary` and `key` in the recap, `one_line` under the title,
+`concepts` in the recap.
 
 ## Overlap with SITE-STRUCTURE-BACKLOG.md
 
