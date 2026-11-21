@@ -46,9 +46,10 @@ LESSONS = [
                          "legitimate sample spaces; only in model A are the outcomes "
                          "equally likely. A sum of 7 arises six ways and a sum of 2 arises "
                          "one way.")),
-            ("p", "That is the granularity trap, and it produced a famous error: Cardano "
-                  "and later gamblers computed dice probabilities from the sums and got "
-                  "them wrong. The fix is to keep outcomes fine enough that symmetry "
+            ("p", "That is the granularity trap, and it produced a famous error: Leibniz "
+                  "thought a sum of 11 with two dice as likely as a sum of 12, since "
+                  "each looked like one combination. As ordered pairs, 11 arises two "
+                  "ways and 12 only one. The fix is to keep outcomes fine enough that symmetry "
                   "justifies equal likelihood."),
             ("h3", "Events as sets"),
             ("math", [
@@ -878,7 +879,7 @@ LESSONS = [
         "summary": (
             "`P(A|B) = P(B|A)P(A)/P(B)` converts one conditional into the other. Applied "
             "to a medical test with a rare disease, it produces an answer most people "
-            "&mdash; including most doctors &mdash; get badly wrong."
+            "&mdash; including many doctors in published surveys &mdash; get badly wrong."
         ),
         "key": [
             "P(A|B) = P(B|A)·P(A) / P(B)",
@@ -899,8 +900,9 @@ LESSONS = [
              "`P(B)` is usually computed by splitting on `A` and `Ā`, which is where the "
              "base rate enters the calculation."),
             ("The base rate dominates for rare events",
-             "A 99%-accurate test for a disease affecting 1 in 10 000 produces about 100 "
-               "false positives for every true one."),
+             "A test that is 99% sensitive with a 1% false-positive rate, for a disease "
+               "affecting 1 in 10 000, produces about 100 false positives for every true "
+               "one. At this lesson's 5% rate it would be about 500."),
         ],
         "read_title": "Bayes' theorem",
         "read_intro": "The statement, the total-probability denominator, and the medical-test calculation.",

@@ -1258,12 +1258,12 @@ LESSONS = [
                   "multipliers get their name."),
             ("h3", "An artificial left basic at zero"),
             ("p", "Phase I can finish at zero with an artificial still in the basis, at "
-                  "value zero. On `x₁ + x₂ = 4` together with `2x₁ + 2x₂ = 8` &mdash; "
-                  "the same row doubled &mdash; and `x₂ ≤ 3`, the first phase reaches "
+                  "value zero. Maximise `x₁ + 2x₂` on `x₁ + x₂ = 4` together with "
+                  "`2x₁ + 2x₂ = 8` &mdash; the same row doubled &mdash; and `x₂ ≤ 3`. The first phase reaches "
                   "`0` in one pivot and leaves the second artificial basic at zero, "
                   "because no real column can replace it: that row is redundant. This "
                   "is a degenerate basic feasible solution, not a failure. Phase II "
-                  "runs from it and reaches `7`, and the artificial is held at zero or "
+                  "runs from it and reaches `7`, at `x₁ = 1`, `x₂ = 3`, and the artificial is held at zero or "
                   "driven out on the way."),
             ("p", "The one-phase alternative is worth naming and not running. "
                   "<strong>Big-M</strong> keeps the artificials in the real objective "

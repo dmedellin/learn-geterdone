@@ -24,7 +24,8 @@ LESSONS = [
         ),
         "concepts": [
             ("The variable is the exponent, not the base",
-             "`x²` and `2^x` agree at `x = 2` and at very little else. In `x²` the "
+             "`x²` and `2^x` agree at `x = 2`, at `x = 4` and at one negative `x`, "
+             "and nowhere else. In `x²` the "
              "exponent is fixed and the base moves; in `2^x` the base is fixed and "
              "the exponent moves. Only the second is an exponential function."),
             ("A line adds, an exponential multiplies",
@@ -499,7 +500,8 @@ LESSONS = [
                      "rest.")),
             ("p", "At `n = 365` the two shortcuts give `1` and `2`, while the true "
                   "value is `2.714567…`. Both readings are off, in opposite "
-                  "directions, on every single row. That is what makes the limit worth "
+                  "directions, on every row after the first (at `n = 1` the true "
+                  "value is exactly `2`). That is what makes the limit worth "
                   "computing rather than reasoning about informally."),
             ("h3", "The lab's second computation is a check, not a second method"),
             ("p", "The lab also sums `1 + 1/1! + 1/2! + …` and compares its finite "

@@ -116,4 +116,7 @@ SPOKEN = {
     'χ(G) ≤ 3': 'chi of G is at most 3',
     'χ(G) ≤ 4': 'chi of G is at most 4',
     'χ(C₅)': 'chi of C sub 5',
+    '[x¹⁰](1 + x + x² + x³)⁴': 'the coefficient of x to the power 10 in the quantity 1 plus x plus x squared plus x cubed, to the power 4',
+    '[xᵏ]G(x)': 'the coefficient of x to the power k in G of x',
+    '[xʳ] 1/(1−x)ⁿ': 'the coefficient of x to the power r in 1 over the quantity 1 minus x, to the power n',
 }

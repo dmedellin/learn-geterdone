@@ -622,10 +622,11 @@ LESSONS = [
                   "finished exactly when `v` closes, because by then every child has closed and "
                   "every edge at `v` has been examined. So the cost is the walk's cost and "
                   "nothing more. On the opening graph the panel counts 6 vertex visits and 18 "
-                  "edge reads, against `Θ(V + E)` &mdash; 18 rather than 7 because each edge is "
-                  "considered from both of its ends, the adjacency index holds it at each end "
-                  "both as leaving and as entering, and the one arc the walk arrived on is "
-                  "skipped at every vertex but the root."),
+                  "edge reads, against `Θ(V + E)` &mdash; 18 rather than 7 because the adjacency "
+                  "index holds each of the 7 edges at both of its ends, and at each end both as "
+                  "leaving and as entering: 28 entries. The arc the walk arrived on is skipped, "
+                  "both copies, at each of the 5 vertices other than the root, and "
+                  "`28 − 10 = 18`."),
             ("thm", ("The bridge test",
                      "Let `(u, v)` be a tree edge with `v` the child. Then `(u, v)` is a bridge "
                      "if and only if `low[v] > d[u]`.")),

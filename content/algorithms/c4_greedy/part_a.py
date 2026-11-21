@@ -18,7 +18,7 @@ LESSONS = [
             "A greedy algorithm commits to a choice and never revisits it. Four rules for "
             "choosing non-overlapping activities all sound reasonable and three of them are "
             "wrong. Nothing on the page separates them except an optimum computed by trying "
-            "every subset &mdash; and on the opening instance three of the four reach it. "
+            "every subset &mdash; and on the opening instance two of the four reach it. "
             "Each of the three that can fail has its own instance in the lab on which it does, "
             "and the only difference between the two runs is the input."
         ),
@@ -28,7 +28,7 @@ LESSONS = [
             "optimum: the largest feasible subset, over all 2ⁿ subsets of the input",
             "eleven intervals  →  2048 subsets  →  optimum 4",
             "earliest finish 4    earliest start 3    shortest 4    fewest conflicts 1",
-            "three of the four match the optimum here, and two of those three are wrong rules",
+            "two of the four match the optimum here, and one of those two is a wrong rule",
         ],
         "key_label": "One instance, four rules, and the number that judges them",
         "concepts_intro": (
@@ -258,11 +258,11 @@ LESSONS = [
             {"q": "Why does switching rules on a single instance fail to separate the four rules?",
              "a": ["Because the optimum is recomputed for each rule",
                    "Because the rules happen to sort the same way on small inputs",
-                   "Because three of the four reach the optimum on the opening instance, so the experiment cannot distinguish a correct rule from a lucky one",
+                   "Because two of the four reach the optimum on the opening instance, so the experiment cannot distinguish a correct rule from a lucky one",
                    "Because the feasibility check passes for all of them"],
              "c": 2,
-             "why": "Earliest finish, shortest first and fewest conflicts are not all correct, "
-                    "yet on the opening instance two of them reach 4. The experiment that "
+             "why": "Earliest finish and shortest first both reach 4 on the opening instance, "
+                    "and only earliest finish is a correct rule. The experiment that "
                     "separates them holds the rule fixed and changes the instance, which is "
                     "why the lab ships one trap per losing rule."},
             {"q": "The panel's caption on the fewest-conflicts instance says that taking the two end intervals leaves the middle unusable, while the table above it names the optimum as those two ends plus the two middle intervals. What should you write down?",

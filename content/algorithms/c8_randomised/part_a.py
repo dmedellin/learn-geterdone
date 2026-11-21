@@ -1202,12 +1202,12 @@ LESSONS = [
                   "&mdash; that would be a much weaker statement and it is what a fixed hash "
                   "function offers. The adversary is allowed to pick the pair after seeing the "
                   "family, and is not allowed to see the coin that picks `h`."),
-            ("def", ("The multiply-shift family",
+            ("def", ("The Carter–Wegman family",
                      "Fix a prime `p` larger than every key. For `a` in `1..p − 1` and `b` in "
                      "`0..p − 1`, let `hₐ,ᵦ(k) = ((a·k + b) mod p) mod m`. The family is all "
                      "`p(p − 1)` of these functions, and drawing `h` uniformly means drawing `a` "
                      "and `b` uniformly.")),
-            ("thm", ("The multiply-shift family is universal",
+            ("thm", ("The Carter–Wegman family is universal",
                      "For distinct keys `x` and `y` below `p`, a uniformly chosen `hₐ,ᵦ` has "
                      "`P(hₐ,ᵦ(x) = hₐ,ᵦ(y)) ≤ 1/m`.")),
             ("proof", ("Work modulo `p`, which is a field because `p` is prime. Write "
@@ -1407,7 +1407,7 @@ LESSONS = [
              "the enumeration disagreeing with the theorem."),
         ],
         "standard": ("Finish when you can state the definition with the quantifiers in the right order and say what it buys.",
-                     "You should be able to define a universal family, verify the multiply-shift "
+                     "You should be able to define a universal family, verify the Carter–Wegman "
                      "family meets it, derive the expected chain length from pairwise collisions "
                      "and linearity, and say precisely what the guarantee does not cover about the "
                      "function you happened to draw."),

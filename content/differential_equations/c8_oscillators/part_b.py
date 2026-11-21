@@ -959,8 +959,8 @@ LESSONS = [
                 "The peak is lower in frequency than the natural frequency and "
                 "higher in amplitude than the response at it. The lab prints "
                 "`ω_r² = 3; A_max = 3/4` in the resonant tile. Because `ω_r = √3` is "
-                "not rational, the lab preset uses `ω = 7/4` and the tile shows an "
-                "amplitude squared a hair below `9/16`.",
+                "not rational, the second preset, `c = 2, k = 5, ω = 7/4`, sits just "
+                "above it, and its tile shows an amplitude squared a hair below `9/16`.",
             ],
         },
         "quiz_title": "Amplitude, peak and no peak",

@@ -403,9 +403,10 @@ LESSONS = [
                 "Both poles of `H` are negative, so both exponentials die out and `y` "
                 "settles at `1/2`. That is also the value the equation gives when `y″` "
                 "and `y′` are zero: `2y = 1`.",
-                "Change the middle coefficient to make `s² − s − 2` and the pole `2` "
-                "appears, which is the third preset. The only difference in the arithmetic "
-                "is one sign; the difference in the long run is bounded against unbounded.",
+                "Change the equation to `y″ − y′ − 2y = 2`, so the denominator is "
+                "`s² − s − 2`, and the pole `2` appears, which is the third preset. Both "
+                "coefficients and the forcing change, and the constant term changes sign; "
+                "the difference in the long run is bounded against unbounded.",
             ],
         },
         "quiz_title": "Poles and the long run",

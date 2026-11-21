@@ -603,7 +603,8 @@ LESSONS = [
              "Fibonacci's recur constantly."),
             ("Optimal substructure is what makes the recurrence valid",
              "The best solution must be assemblable from best sub-solutions. Longest "
-             "<em>simple</em> path fails this, and no dynamic program for it exists."),
+             "<em>simple</em> path fails this, and no polynomial-time dynamic program "
+             "for it is known."),
             ("Top-down and bottom-up are the same computation",
              "Memoised recursion computes only the subproblems it needs; a table computes "
              "all of them in dependency order. The complexity is the same."),
@@ -660,8 +661,9 @@ LESSONS = [
                          "substructure: the longest path from `a` to `c` need not consist of "
                          "the longest path from `a` to `b` plus the longest from `b` to `c`, "
                          "because those may share vertices and the concatenation would not "
-                         "be simple. The problem is NP-hard, and no dynamic program for it "
-                         "exists.")),
+                         "be simple. The problem is NP-hard, and no polynomial-time dynamic "
+                         "program for it is known; the ones that do exist run over "
+                         "subsets of vertices and take exponential time.")),
             ("p", "Contrast with the SHORTEST path, which does have optimal substructure &mdash; any subpath of a shortest path is shortest &mdash; and is solved in polynomial time by Graphs and Trees's Dijkstra. Two problems whose statements differ by one word, on opposite sides of tractability."),
             ("h3", "Top-down or bottom-up"),
             ("math", [
@@ -749,7 +751,7 @@ LESSONS = [
                     "`log n` is fewer than the number of distinct values, which cannot be; "
                     "`n²` overcounts &mdash; each value is a constant amount of work; and "
                     "`2ⁿ` is worse than the naive recursion it replaced."},
-            {"q": "Longest simple path has no dynamic program because:",
+            {"q": "Longest simple path has no dynamic program built from best subpaths, as shortest path does, because:",
              "a": ["it is too large",
                    "it lacks optimal substructure — subpaths may share vertices",
                    "graphs are not ordered",

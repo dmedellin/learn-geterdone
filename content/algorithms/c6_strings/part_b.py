@@ -19,7 +19,7 @@ LESSONS = [
             "compare the window right to left; stop at the first disagreement",
             "shift by the table entry for the text character under the last position",
             "the table is built from p[0..m−2], so p's own last character shifts the full m",
-            "measured: 14 alignments of 61, 19 comparisons, 52 alignments skipped outright",
+            "measured: 14 alignments of 61, 19 comparisons, 47 alignments never tried",
             "19 comparisons at only 18 distinct positions: 48 characters are never read",
             "naive 66 and KMP 66 on the same text; Horspool's worst case is still m(n − m + 1)",
         ],
@@ -45,8 +45,9 @@ LESSONS = [
                "shift the full `m` when the window's last character is the pattern's last "
                "character and everything else failed."),
             ("The saving is a property of the text, and nothing is proved by it",
-             "The panel reports 52 alignments skipped outright at an average shift of 4.71 out "
-             "of a maximum of 6, and 19 comparisons where the naive matcher makes 66. All of "
+             "The panel's skipped tile reads 52: the 14 shifts sum to 66 and jump over 52 "
+             "offsets, five of them past the end of the text, so 47 of the 61 alignments "
+             "are never tried. The average shift is 4.71 out of a maximum of 6, with 19 comparisons where the naive matcher makes 66. All of "
              "that is because this text is English and most of its characters do not appear in "
              "`mainly`. The proved worst case is unchanged from the naive matcher's: `m(n − m + "
              "1)` comparisons, attained on a text this page's sibling &ldquo;The Text Where "
@@ -186,7 +187,8 @@ LESSONS = [
                 "comparisons        13 x 1 + 1 x 6                  = 19",
                 "distinct positions compared   position 24 twice    = 18   (of 66)",
                 "characters never compared to anything  66 - 18     = 48",
-                "alignments skipped outright  66 - 14               = 52",
+                "offsets jumped over (tile)   66 - 14               = 52",
+                "alignments never tried       61 - 14               = 47",
                 "average shift  66/14 = 33/7                        = 4.71",
                 "naive 66      KMP 66      Horspool 19",
             ],
@@ -1109,7 +1111,7 @@ LESSONS = [
         ),
         "key": [
             "a trie node is a distinct prefix; he, she, his, hers is 10 nodes for 12 characters",
-            "held as an array per node it is 10 × sigma = 50 cells; as maps, 10 entries",
+            "held as an array per node it is 10 × sigma = 50 cells; as maps, 9 entries, one per edge",
             "prefix query h: he, hers, his — the same three as filtering the list",
             "one Aho-Corasick pass: 9 occurrences, 31 comparisons over 22 characters",
             "four separate KMP passes on the same text: 98 comparisons",
@@ -1132,7 +1134,7 @@ LESSONS = [
              "Holding each node's children in an array indexed by character costs sigma cells "
              "per node, whether or not they are used: 10 nodes at sigma 5 is 50 cells. Holding "
              "them in a map costs one entry per edge that exists, which is 9. The panel prints "
-             "both, because the choice between them is the whole space question for a trie and "
+             "the slots beside the node count, because the choice between them is the whole space question for a trie and "
              "the answer depends on how dense the alphabet is."),
             ("An output link follows suffixes, and that is why some words report together",
              "The failure link of a node points to the longest proper suffix of its string that "
@@ -1162,8 +1164,9 @@ LESSONS = [
                          "`hers` overlap and where `h` leads to both `he` and `his`.")),
             ("p", "Held with one array of sigma slots per node that is `10 × 5 = 50` cells, since "
                   "the dictionary uses the five characters `e, h, i, r, s`. Held with a map per "
-                  "node it is 9 entries. The panel prints 50 and 10 side by side so the trade is "
-                  "a pair of numbers rather than a preference."),
+                  "node it is 9 entries, one per edge, which is one fewer than the 10 nodes "
+                  "because the root has no edge into it. The panel prints the 50 slots beside "
+                  "the 10 nodes so the trade is a pair of numbers rather than a preference."),
             ("p", "A prefix query walks down from the root and then collects every word-end "
                   "below. Asking for `h` returns `he`, `hers` and `his`, and the panel checks "
                   "that against filtering the word list with a string comparison &mdash; the "

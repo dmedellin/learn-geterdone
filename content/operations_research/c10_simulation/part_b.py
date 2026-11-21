@@ -1013,7 +1013,7 @@ LESSONS = [
                          "`32505856/264153 ≈ 123.0569`.")),
             ("example", ("The same coin, weighted the wrong way",
                          "Take `P(head) = 1/5` instead. The event now has probability "
-                         "`1/9765625` under `q` &mdash; about a hundred times rarer than "
+                         "`1/9765625` under `q` &mdash; about 9 500 times rarer than "
                          "it already was &mdash; and the weight on it is `9765625/1024`, "
                          "about `9537`. One draw in ten million contributes nine thousand "
                          "five hundred, and the per-draw variance is `1220703/131072`, "
@@ -1182,7 +1182,7 @@ LESSONS = [
              "why": "Zero hits gives an estimate of exactly zero, and it is the "
                     "characteristic appearance of a high-variance importance sampler: all "
                     "of the damage is in the spread and none of it is in the picture. The "
-                    "event is not impossible under this `q`, merely a hundred times rarer "
+                    "event is not impossible under this `q`, merely about 9 500 times rarer "
                     "than it already was."},
             {"q": "Why does the panel refuse a proposal that removes all mass from the event, even though it is a valid probability distribution?",
              "a": ["Because the weights would be too large to compute",

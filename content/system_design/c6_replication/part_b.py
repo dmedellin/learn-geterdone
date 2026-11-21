@@ -161,8 +161,8 @@ LESSONS = [
         "worked": {
             "title": "Five candidates, ten slots, and a fixed timeout",
             "intro": [
-                "A five-node cluster loses its leader. Every remaining node times out and "
-                "stands. The implementation randomises the timeout across ten "
+                "A cluster loses its leader and five nodes remain. All five time out and "
+                "stand. The implementation randomises the timeout across ten "
                 "distinguishable slots, and the question is how long a leaderless period "
                 "to expect — and what would happen if the randomisation were removed.",
             ],
@@ -979,7 +979,7 @@ LESSONS = [
                 "  logical clocks         no window at all, at the cost of messages",
             ],
             "after": [
-                "The third line of the repairs is the one most systems take, and it is "
+                "The second line of the repairs, more frequent sync, is the one most systems take, and it is "
                 "worth seeing why: shrinking the interval from `30` seconds to `1` second "
                 "shrinks the window by a factor of thirty, from `12 ms` to `400 µs`, and "
                 "the `5 ms` gap is then comfortably outside it. Synchronisation traffic is "
@@ -1276,7 +1276,7 @@ LESSONS = [
                 "For a faded rehearsal, take the four-operation history with two concurrent "
                 "writes: `A w1[0,3]`, `B w2[1,5]`, `C r1[4,8]`, `D r2[6,10]`. The supplied "
                 "first move is that there are `24` total orders and the forced pairs are "
-                "`A` before `C` and `A` before `D`. Work out how many survive real time, "
+                "`A` before `C`, `A` before `D` and `B` before `D`. Work out how many survive real time, "
                 "predict whether any are legal, then check both in the lab and explain the "
                 "result in one sentence about where `B` had to be placed.",
             ],

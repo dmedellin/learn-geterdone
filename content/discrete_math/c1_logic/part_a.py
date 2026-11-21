@@ -1097,8 +1097,8 @@ LESSONS = [
              "NEGATIVE literal. Reversing this produces a formula false in all the wrong "
              "places."),
             ("Assuming the canonical form is minimal",
-             "The canonical DNF of a formula true in seven of eight rows has seven terms "
-             "of three literals each. The same formula is `¬p ∨ ¬q ∨ ¬r` &mdash; its one "
+             "The canonical DNF of a formula false only on the row where `p`, `q` and `r` "
+             "are all `T` has seven terms of three literals each. The same formula is `¬p ∨ ¬q ∨ ¬r` &mdash; its one "
              "false row, ruled out by one clause. Canonical and small are different goals."),
             ("Believing conversion is always cheap",
              "Converting CNF to DNF can multiply the size exponentially. That the two "
