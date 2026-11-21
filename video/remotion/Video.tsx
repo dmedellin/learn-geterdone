@@ -5,6 +5,7 @@ import type { Scene, VideoProps, Caption } from './types';
 import { TitleScene } from './scenes/Title';
 import { ArtScene } from './scenes/Art';
 import { QuoteScene } from './scenes/Quote';
+import { MathScene } from './scenes/Math';
 import { CodeScene } from './scenes/Code';
 import { WordsScene } from './scenes/Words';
 import { ListScene } from './scenes/List';
@@ -15,6 +16,7 @@ const Body: React.FC<{ s: Scene }> = ({ s }) => {
     case 'title': return <TitleScene s={s} />;
     case 'art': return <ArtScene s={s} />;
     case 'quote': return <QuoteScene s={s} />;
+    case 'math': return <MathScene s={s} />;
     case 'code': return <CodeScene s={s} />;
     case 'words': return <WordsScene s={s} />;
     case 'list': return <ListScene s={s} />;

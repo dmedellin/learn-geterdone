@@ -24,6 +24,9 @@ its narration. Values with spaces go in double quotes. Scene kinds:
     @words  text=".." [sub=".."]            one key line, big
     @list   heading=".." items="a@phrase|b@phrase|c"
             each item appears when its phrase is spoken (no phrase: spread through the scene)
+    @math   [heading=".."] items="x² + 5x + 6 = 0@phrase;;(x + 2)(x + 3) = 0@phrase"
+            worked mathematics, one line at a time, each when its phrase is spoken
+            (write it with Unicode: ² ³ √ π ≤ ≥ ≠ · − ÷ ±, not LaTeX)
     @quote  text=".." cite=".."             a short quotation the lesson itself quotes
     @code   block=N lines=a-b focus="2@phrase|4-5@phrase" [comments=keep]
             the lesson's N-th code block; each focus range lights up when its phrase is spoken
@@ -41,7 +44,13 @@ from . import lessons as L
 HERE = Path(__file__).resolve().parent
 EPISODES = HERE / "episodes"
 ART = HERE / "assets" / "art"
-KINDS = {"title", "art", "code", "words", "list", "quote", "end"}
+
+
+def art_path(lesson_key, name):
+    """A lesson's own art (assets/art/<course>/<lesson>/<name>.png) wins over shared art."""
+    own = ART / lesson_key / (name + ".png")
+    return own if own.exists() else ART / (name + ".png")
+KINDS = {"title", "art", "code", "words", "list", "math", "quote", "end"}
 SPEAKABLE = re.compile(r"^[A-Za-z0-9 .,?!'’:;%\-\n]+$")
 
 
@@ -104,6 +113,15 @@ def focus_list(s):
     return out
 
 
+def math_items(s):
+    """Math lines are separated by ';;' (a '|' is an absolute value): 'a@phrase;;b' -> [('a', 'phrase'), ('b', None)]"""
+    out = []
+    for part in (s or "").split(";;"):
+        text, _, phrase = part.rpartition("@") if "@" in part else (part, "", "")
+        out.append((text.strip(), phrase.strip() or None))
+    return out
+
+
 def list_items(s):
     """'a@phrase|b' -> [('a', 'phrase'), ('b', None)]"""
     out = []
@@ -162,8 +180,8 @@ def check(path):
         art = o.get("art") or (sc["pos"][0] if k == "art" and sc["pos"] else None)
         if k == "art" and not art:
             bad(i, "@art needs a name")
-        if art and not (ART / (art + ".png")).exists():
-            bad(i, "art %r is not in video/assets/art/" % art)
+        if art and not art_path(L.key(course, lesson), art).exists():
+            bad(i, "art %r is not in video/assets/art/%s/ (or shared in video/assets/art/)" % (art, L.key(course, lesson)))
         if k == "code":
             code = codes.get(o.get("block", "1"))
             if not code:
@@ -180,11 +198,10 @@ def check(path):
                     bad(i, "focus phrase %r is not in the narration, so it cannot be timed" % phrase)
         if k in ("words", "title", "quote") and not o.get("text"):
             bad(i, "@%s needs text=" % k)
-        if k == "list":
+        if k in ("list", "math"):
             if not o.get("items"):
-                bad(i, "@list needs items=")
-            for item in (o.get("items") or "").split("|"):
-                _, _, phrase = item.partition("@")
+                bad(i, "@%s needs items=" % k)
+            for _, phrase in (math_items if k == "math" else list_items)(o.get("items")):
                 if phrase and spoken_at(phrase, sc["say"]) is None:
                     bad(i, "list cue %r is not in the narration" % phrase)
     return errs

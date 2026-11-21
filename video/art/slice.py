@@ -85,10 +85,12 @@ def main_block(cell):
 
 
 def main():
-    args = [a for i, a in enumerate(sys.argv[1:], 1) if not a.startswith("--") and sys.argv[i - 1] != "--bg"]
+    args = [a for i, a in enumerate(sys.argv[1:], 1) if not a.startswith("--") and sys.argv[i - 1] not in ("--bg", "--out")]
     src, grid, names = args[0], args[1], args[2].split(",")
     hero = "--art" in sys.argv           # scene illustrations: assets/art/, longest side 1600 px
     out_dir, size = (OUT.parent / "art", 1600) if hero else (OUT, 256)
+    if "--out" in sys.argv:              # e.g. video/assets/art/<course>/<lesson>
+        out_dir = Path(sys.argv[sys.argv.index("--out") + 1])
     cols, rows = map(int, grid.split("x"))
     assert len(names) == cols * rows, "%d names for %d cells" % (len(names), cols * rows)
     bg = sys.argv[sys.argv.index("--bg") + 1] if "--bg" in sys.argv else None

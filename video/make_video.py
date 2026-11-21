@@ -193,7 +193,7 @@ def build_props(meta, scenes, spans, total, words, chunks, work):
             return max(0, int(round((sw[idx]["s"] - start) * FPS)) - 4)
 
         def art(name):
-            shutil.copy(E.ART / (name + ".png"), art_dir / (name + ".png"))
+            shutil.copy(E.art_path(meta["lesson"], name), art_dir / (name + ".png"))
             return "art/%s.png" % name
 
         if sc["chapter"]:
@@ -216,6 +216,12 @@ def build_props(meta, scenes, spans, total, words, chunks, work):
             item.update(text=o["text"], cite=o.get("cite", ""))
         elif k == "words":
             item.update(text=o["text"], sub=o.get("sub", ""))
+        elif k == "math":
+            items = E.math_items(o["items"])
+            n = len(items)
+            spread = [int(item["dur"] * (0.05 + 0.75 * j / max(1, n))) for j in range(n)]
+            item.update(heading=o.get("heading", ""), items=[t for t, _ in items],
+                        itemsAt=[at(ph) if at(ph) is not None else spread[j] for j, (_, ph) in enumerate(items)])
         elif k == "list":
             items = E.list_items(o["items"])
             n = len(items)
