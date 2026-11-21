@@ -53,8 +53,11 @@ def code_sources(lesson):
     for kind, body in lesson.get("body", []):
         if kind == "code":
             n += 1
-            lines = body if isinstance(body, list) else str(body).split("\n")
-            out[str(n)] = "\n".join(plain(x) for x in lines).strip("\n")
+            # a code line is shown exactly as written (scripts/mathpath/render.py
+            # code_block_problems), so it is not run through plain(): <T>, ** and *p are code
+            lines = body["lines"] if isinstance(body, dict) else body
+            lines = lines if isinstance(lines, (list, tuple)) else str(lines).split("\n")
+            out[str(n)] = "\n".join(lines).strip("\n")
     return out
 
 
