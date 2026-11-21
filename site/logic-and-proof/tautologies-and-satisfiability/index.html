@@ -1384,6 +1384,25 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1453,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Propositional logic</p>
       <h1>Tautology, Contradiction, Satisfiability</h1>
       <p class="lesson-lede">Always true, never true, and sometimes true.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:24</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full lesson</strong> <span class="watch-len">3:56</span><small>the whole lesson, with chapters</small></span></button></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Classifying formulas</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Tautology, contradiction, contingency</span><p>A formula is a <strong>tautology</strong> if it is true under every assignment, a <strong>contradiction</strong> if it is true under none, and <strong>contingent</strong> otherwise.</p></div><div class="defbox"><span class="label">Definition &middot; Satisfiability</span><p>A formula is <strong>satisfiable</strong> if at least one assignment makes it true. Tautologies and contingent formulas are satisfiable; contradictions are not.</p></div><p>The relationships are worth stating as a single sentence: <span class="math" data-say="A">A</span> is a tautology exactly when <span class="math" data-say="not A">¬A</span> is unsatisfiable, and <span class="math" data-say="A">A</span> is satisfiable exactly when <span class="math" data-say="not A">¬A</span> is not a tautology. Every one of these questions reduces to any other, which is why an algorithm for one is an algorithm for all.</p><div class="thm"><span class="label">Theorem &middot; Equivalence as a tautology</span><p><span class="math" data-say="A is equivalent to B">A ≡ B</span> if and only if <span class="math" data-say="A if and only if B">A ↔ B</span> is a tautology. “Logical Equivalence”'s whole subject is therefore a special case of this lesson's.</p></div><p>Deciding satisfiability by truth table takes <span class="math" data-say="2 to the power n">2ⁿ</span> rows. For a formula with 300 variables &mdash; small by the standards of real applications &mdash; that is <span class="math" data-say="2 to the power 300">2³⁰⁰</span> rows, more than there are atoms in the observable universe, and no faster general method is known.</p><div class="thm"><span class="label">Theorem &middot; SAT is NP-complete (Cook, 1971)</span><p>The problem of deciding whether a propositional formula is satisfiable was the first problem shown NP-complete. Algorithms and Complexity defines the term; what matters here is that this lesson's innocent question is the reference point against which computational hardness is measured.</p></div><p>The practical situation is stranger than the theory suggests. Modern SAT solvers routinely handle formulas with millions of variables, because real instances have structure that the worst case does not. Hardness in the worst case and difficulty in practice are different claims.</p><div class="example"><span class="label">Example &middot; Classifying three formulas</span><p><span class="math" data-say="the quantity p implies q, or the quantity q implies p">(p → q) ∨ (q → p)</span> is a tautology &mdash; check all four rows. <span class="math" data-say="p if and only if q and the quantity p x or q">(p ↔ q) ∧ (p ⊕ q)</span> is a contradiction, since the two conjuncts are negations of each other. <span class="math" data-say="p implies the quantity q and r">p → (q ∧ r)</span> is contingent.</p></div></div></div>
@@ -2364,6 +2387,55 @@ satisfiable    true under at least one assignment</div><figcaption>Three classes
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/logic-and-proof/tautologies-and-satisfiability/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 13.8, "title": "Three classes"}, {"t": 74.7, "title": "Three formulas"}, {"t": 91.3, "title": "Assume it's false"}, {"t": 149.1, "title": "The hard problem"}, {"t": 193.5, "title": "Where people slip"}, {"t": 211.2, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

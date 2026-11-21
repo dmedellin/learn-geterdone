@@ -1384,6 +1384,25 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1453,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Relations</p>
       <h1>Binary Relations</h1>
       <p class="lesson-lede">A relation is a set of ordered pairs, and nothing more.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:26</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full lesson</strong> <span class="watch-len">3:37</span><small>the whole lesson, with chapters</small></span></button></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Relations and their presentations</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Binary relation</span><p>A <strong>relation from <span class="math" data-say="A">A</span> to <span class="math" data-say="B">B</span></strong> is a subset <span class="math" data-say="R is a subset of A times B">R ⊆ A × B</span>. A <strong>relation on <span class="math" data-say="A">A</span></strong> is a subset of <span class="math" data-say="A times A">A × A</span>. We write <span class="math" data-say="A R b">a R b</span> for <span class="math" data-say="A, b in R">(a, b) ∈ R</span>.</p></div><p>The definition permits everything. <span class="math" data-say="the empty set">∅</span> is a relation (nothing is related), and <span class="math" data-say="A times A">A × A</span> is a relation (everything is related to everything). Between those extremes there are <span class="math" data-say="2 to the power n squared">2^(n²)</span> relations on an <span class="math" data-say="n">n</span>-element set &mdash; 512 on a three-element set, and over thirty-three million on a five-element one.</p><h3>Three presentations</h3><ul><li><strong>As pairs.</strong> <span class="math" data-say="R equals the set 1, 2, 2, 3, 3, 1">R = {(1,2), (2,3), (3,1)}</span>. Complete and unreadable beyond a handful.</li><li><strong>As a matrix.</strong> An <span class="math" data-say="n times n">n × n</span> grid with a 1 in row <span class="math" data-say="A">a</span>, column <span class="math" data-say="b">b</span> when <span class="math" data-say="A R b">a R b</span>. Reflexivity is the diagonal, symmetry is the matrix equalling its transpose.</li><li><strong>As a directed graph.</strong> A dot per element, an arrow from <span class="math" data-say="A">a</span> to <span class="math" data-say="b">b</span> when <span class="math" data-say="A R b">a R b</span>. Transitivity becomes "every two-step path has a one-step shortcut", which is the reading Graphs and Trees uses.</li></ul><p>The matrix is what the lab shows, because the four properties of “Properties of Relations” are all visible in it: the diagonal, the transpose, and the presence of both <span class="math" data-say="A, b">(a,b)</span> and <span class="math" data-say="b, A">(b,a)</span> for distinct <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span>.</p></div></div>
@@ -2281,6 +2304,55 @@ S ∘ R = {(a, c) : ∃b. aRb and bSc}   composition</div><figcaption>Pairs, and
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/sets-relations-functions/binary-relations/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 38.3, "title": "Everything counts"}, {"t": 63.2, "title": "Three presentations"}, {"t": 102.0, "title": "Inverse and composition"}, {"t": 149.0, "title": "Composing with itself"}, {"t": 177.9, "title": "Where people slip"}, {"t": 194.4, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

@@ -1438,6 +1438,25 @@
       color: var(--text);
       font-weight: 700;
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1488,6 +1507,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · Behavioral Patterns</p>
       <h1>Chain of Responsibility</h1>
       <p class="lesson-lede">A request passed along a line of candidate handlers until one takes it, so the sender never needs to know which object will.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:25</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full lesson</strong> <span class="watch-len">4:20</span><small>the whole lesson, with chapters</small></span></button></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>The chapter&#x27;s opening, then the pattern, then the count</h2><div class="prose reading"><p>&ldquo;Avoid coupling the sender of a request to its receiver by giving more than one object a chance to handle the request.&rdquo; That is the first sentence of Chain of Responsibility's Intent, the pattern that opens the catalog's Chapter 5, Behavioral Patterns. This lesson reads the chapter's short introduction and then the pattern, section by section. Read both in your own copy first; the book's own samples, here as everywhere, are in C++ and Smalltalk, and the sketches below are Java written for the lesson.</p><p>The introduction says what the chapter's eleven patterns share. They are about algorithms and the division of responsibility between objects, and so about the way objects talk to each other: control flow that is hard to follow when the program runs is described instead as a pattern of connections. Two of them are class patterns, which use inheritance: Template Method, an algorithm written once with steps a subclass fills in, and Interpreter, which turns the rules of a language into classes. The rest are object patterns. Mediator puts one object between peers that would otherwise know each other; Chain of Responsibility loosens the coupling further; Observer keeps dependents informed of a change; and Strategy, Command, State, Visitor and Iterator each wrap a piece of behaviour in an object and delegate to it. The chapter runs in alphabetical order, and this course reads its first six patterns.</p><p>The pattern's motivating example is context-sensitive help in a user interface. A user clicks on some part of a window for help; if that part has none of its own, the help should come from whatever encloses it, and so on outwards to the application. The button that receives the click cannot know which object will answer. So every candidate shares one interface for handling the request and knows its successor, and the request moves outwards from the most specific candidate until one of them deals with it.</p><p>Stated as you would apply it: a Handler declares the operation that handles a request and, usually, holds the link to the next handler; each ConcreteHandler takes the requests it is responsible for and passes every other one to its successor; the Client sends the request to a handler on the chain, normally the first, and knows no more than that. The default implementation in the Handler simply forwards, so a subclass with no interest in a request need not mention it.</p><pre class="codeblock" data-say="line 1, abstract class desk handler. line 2, private final desk handler next, comment, null at the end of the chain. line 3, desk handler of desk handler next this dot next is set to next. line 4, comment, The default passes the request on a subclass overrides it.. line 5, string handle of request r. line 6, if next is not equal to null. line 7, return next dot handle of r. line 9, return unhandled plus r dot topic, comment, fell off the end. line 12, final class kiosk extends desk handler. line 13, kiosk of desk handler next super of next. line 14, at override string handle of request r. line 15, if r dot topic dot equals of renew. line 16, return kiosk renewed plus r dot item id. line 18, return super dot handle of r" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">abstract class DeskHandler {</span>
@@ -2608,6 +2631,55 @@ a last handler that takes all guarantees it</div><figcaption>Chain of Responsibi
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/gof-behavioral-requests/chain-of-responsibility/", "videos": {"long": {"chapters": [{"t": 0, "title": "The problem"}, {"t": 44.7, "title": "The chain"}, {"t": 77.9, "title": "The code"}, {"t": 123.3, "title": "What it costs"}, {"t": 153.8, "title": "Count it"}, {"t": 214.7, "title": "Where people slip"}, {"t": 233.7, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

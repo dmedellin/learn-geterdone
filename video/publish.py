@@ -50,7 +50,7 @@ def upload(key, dest):
     files = [str(src / (n + e)) for n in NAMES for e in EXTS]
     remote_dir = "%s/%s/" % (dest.rstrip("/"), key)
     host, _, path = remote_dir.partition(":")
-    subprocess.run(["ssh", host, "mkdir -p '%s'" % path], check=True)
+    subprocess.run(["ssh", host, "mkdir -p '%s'" % path], check=True, stdin=subprocess.DEVNULL)
     subprocess.run(["rsync", "-t", "--chmod=F644,D755"] + files + [remote_dir], check=True)
 
 
