@@ -115,7 +115,10 @@ def main():
                 raise RuntimeError("; ".join(errs))
             if not rendered(key):
                 log("[%d/%d] %s: render" % (n, len(keys), key))
-                subprocess.run([PY, str(HERE / "make_video.py"), key], cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
+                r2 = subprocess.run([PY, str(HERE / "make_video.py"), key], cwd=ROOT, stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT, text=True)
+                if r2.returncode:
+                    raise RuntimeError("make_video failed: " + r2.stdout[-1500:])
             if args.publish:
                 subprocess.run([PY, str(HERE / "publish.py"), key], cwd=ROOT, check=True)
             r["ok"] = True
