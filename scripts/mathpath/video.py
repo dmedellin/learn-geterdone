@@ -39,7 +39,7 @@ def _clock(seconds):
     return "%d:%02d" % (s // 60, s % 60)
 
 
-LABELS = (("short", "Short", "the idea in under a minute"), ("long", "Full lesson", "the whole lesson, with chapters"))
+LABELS = (("short", "Short", "the idea in under a minute"), ("long", "Full video", "the whole lesson, with chapters"))
 
 
 def markup(lesson_id, entry):
