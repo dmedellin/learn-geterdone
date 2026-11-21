@@ -798,8 +798,8 @@ LESSONS = [
             ("p", "On <code>guest-customer</code> the finder returns a `GuestCustomer` "
                   "instead of null, whose name is &ldquo;friend&rdquo; and whose plan is "
                   "the basic one, and the greeting asks its questions directly: 1 "
-                  "decision point, breakdown 1, band 0–5, deepest nesting 0, first at "
-                  "line 3. The lab finds a routine header here, `greeting` on line 7, so "
+                  "decision point, breakdown 1, band 0–5, deepest nesting 0, which the "
+                  "lab first meets at line 3. The lab finds a routine header here, `greeting` on line 7, so "
                   "it measures depth from inside a routine, as it did on the Domain "
                   "Model lesson's first preset, and the class's one-line methods above "
                   "it read as 0. The listing is a class and a routine, and the lab counts the "
@@ -810,7 +810,8 @@ LESSONS = [
                   "the answer was the same wherever the question was asked."),
             ("code", _lines(GUEST_CUSTOMER)),
             ("p", "The rewrite assumes something the original did not: that a real "
-                  "customer always has a name and a plan. `NULL_CHECKS` also guarded "
+                  "customer always has a name and a plan. The <code>null-checks</code> "
+                  "listing also guarded "
                   "against a known customer with no name, and `GuestCustomer` does not "
                   "cover that case. A customer with a missing name is a different "
                   "special case from a missing customer, which is Fowler's point about "
