@@ -1023,7 +1023,7 @@ LESSONS = [
              "roots `1 ± 2i` are also complex, and the orbits turn, but the real part "
              "`1` makes them move steadily outward. Turning is the imaginary part, "
              "and in or out is the real part; both are needed."),
-            ("Using the sign of the trace without checking the discriminant",
+            ("Using the sign of the trace without checking the determinant",
              "A negative trace does not on its own mean decay in every direction. With "
              "`τ = −1` and `Δ = −2` the roots are `1` and `−2`, a saddle, so the sign of "
              "`τ` must be read after `Δ`. The determinant is checked first for exactly this "
@@ -1132,7 +1132,8 @@ LESSONS = [
                   "`1 + 4·h² = 5/4`, which is the lab's ratio. The true orbit is a "
                   "circle and the polygon spirals out. The classification is a statement "
                   "about the equation. The polygon is a method applied to it, and the "
-                  "gap between them is exactly the one the material clause names."),
+                  "gap between them is the one this path's footer warns about: exact "
+                  "arithmetic applied to an approximate method."),
             ("example", ("A saddle and the one stable line",
                          "For rows `1 2` and `3 0` the eigenvalues are `−2` and `3`. One of "
                          "them is negative, and the solution `e^(−2t)·(2, −3)` does tend "

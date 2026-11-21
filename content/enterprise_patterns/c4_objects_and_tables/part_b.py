@@ -533,7 +533,7 @@ LESSONS = [
                   "employee with 2; a manager, under employee, with 2; and a contractor, under "
                   "person, with 2: the tables are `1, 4, 3` and the columns `11, 13, 20`."),
             ("p", "The single table's 11 columns are a key, a type and 3 + 2 + 2 + 2 = 9 "
-                  "field columns. The `ihEmpty` tile is single-table only: the columns empty "
+                  "field columns. The tile for empty columns is single-table only: the columns empty "
                   "in a row of the class loaded. A manager's row uses its chain's 3 + 2 + 2 = "
                   "7 fields, so 2 of the 9 are empty, the contractor's two. Loading a manager "
                   "touches `1, 3, 1` tables: one under single table, three joined under class "

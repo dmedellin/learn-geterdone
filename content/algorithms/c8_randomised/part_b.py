@@ -935,7 +935,7 @@ LESSONS = [
                   "because a random root and a random pivot are the same object, and no lesson in "
                   "this library carries the full argument."),
             ("p", "So the panel prints `2 ln n` in its own row, labelled asymptotic, and it is "
-                  "about 15 per cent wrong about the tree in front of you. At `n = 12` it reads "
+                  "nearly double the mean depth of the tree in front of you. At `n = 12` it reads "
                   "`4.970` while the counted mean depth is `2.500` and the counted height is `5`. "
                   "Three numbers, three meanings: one asymptote, one exact mean of integers, one "
                   "count. Reading them as estimates of each other is the failure mode of this "
@@ -1045,7 +1045,7 @@ LESSONS = [
              "c": 1,
              "why": "The height is counted on the tree drawn beside it, and the mean depth is an "
                     "exact fraction computed from its node depths. `2 ln n` is an asymptote with "
-                    "suppressed constants and is about 15 per cent off at this size — it reads "
+                    "suppressed constants and is nearly twice the counted value at this size — it reads "
                     "`4.970` where the mean depth is `2.500`. The panel labels the row asymptotic."},
             {"q": "What invariant does a treap's rotation restore?",
              "a": ["A balance factor of at most one",
@@ -1184,10 +1184,12 @@ LESSONS = [
                 "   L3                 0                             2                 1.00",
                 "   L4                 2                             2                 0.50",
             ]),
-            ("p", "The right-hand column is what the geometric cascade predicts and the middle "
-                  "column is what this tape produced. They are in the same neighbourhood and they "
-                  "are not equal: 10 keys present at level 1 against a predicted 8, and 2 at level "
-                  "4 against a predicted `0.5`. Level 3 is the row worth staring at &mdash; no key "
+            ("p", "The right-hand column is what the geometric cascade predicts for the number "
+                  "of keys whose top level is `k`, and the first column of counts is what this "
+                  "tape produced. They are in the same neighbourhood and they are not equal: 7 "
+                  "keys top out at level 1 against a predicted 4, and 2 at level 4 against a "
+                  "predicted `0.5`. Presence is predicted at `n/2^k`, twice that column, so the "
+                  "10 keys present at level 1 compare with 8. Level 3 is the row worth staring at &mdash; no key "
                   "has 3 as its top level, and two keys are nevertheless present there, because a "
                   "key at level 4 appears at every level below it."),
             ("p", "That distinction between &ldquo;top level is `k`&rdquo; and &ldquo;present at "
@@ -1374,15 +1376,16 @@ LESSONS = [
         "summary": (
             "A Bloom filter stores a set in `m` bits by hashing each key to `k` of them and "
             "setting those bits. A clear bit is a certain no; a set bit may be somebody else's. "
-            "The false-positive rate is `(1 − (1 − 1/m)^{kn})^k` exactly, and at sixteen keys "
+            "With the `k` bit tests treated as independent, the false-positive rate is "
+            "`(1 − (1 − 1/m)^{kn})^k`, which the lab computes exactly: at sixteen keys "
             "in 160 bits with seven hashes that is `0.008319`. The textbook "
             "`(1 − e^{−kn/m})^k` gives `0.008194`, and the gap between the two is the "
-            "independence assumption."
+            "further step `(1 − 1/m)^{kn} ≈ e^{−kn/m}`."
         ),
         "key": [
             "insert: set the k bits h₁(x) … hₖ(x).  query: are all k bits set?",
             "a clear bit is a CERTAIN no; there are no false negatives, ever",
-            "P(false positive) = (1 − (1 − 1/m)^{kn})^k, exactly",
+            "P(false positive) = (1 − (1 − 1/m)^{kn})^k, exact for independent bit tests",
             "m = 160, n = 16, k = 7:  0.008319 — about 1 in 120",
             "the idealised (1 − e^{−kn/m})^k gives 0.008194, and it is an APPROXIMATION",
             "nothing can be deleted: clearing a bit would create false negatives",
@@ -1407,9 +1410,9 @@ LESSONS = [
              "`NaN`; the lab holds it as BigInt over BigInt and prints the decimal by long "
              "division."),
             ("The familiar formula is the approximation, not the answer",
-             "`(1 − e^{−kn/m})^k` is what textbooks quote, and it is the exact expression with two "
-             "idealisations: `(1 − 1/m)^{kn} ≈ e^{−kn/m}`, and the `k` bit tests treated as "
-             "independent when they are not. It reads `0.008194` where the truth is `0.008319`. The "
+             "`(1 − e^{−kn/m})^k` is what textbooks quote, and it is the expression above with "
+             "one more idealisation, `(1 − 1/m)^{kn} ≈ e^{−kn/m}`. Both treat the `k` bit tests "
+             "as independent when they are not. It reads `0.008194` where the truth is `0.008319`. The "
              "panel prints both and the difference, and the giveaway is that the idealised figure "
              "depends only on `k` and the bits per key &mdash; move the key slider and it does not "
              "change at all, while the exact rate does."),
@@ -1430,7 +1433,8 @@ LESSONS = [
             ("thm", ("The false-positive rate",
                      "Suppose `n` keys have been inserted into `m` bits with `k` hash functions, "
                      "each of the `kn` settings choosing a bit uniformly at random and "
-                     "independently. Then a key that was never inserted is reported present with "
+                     "independently, and treat the `k` bits a query tests as independent "
+                     "events. Then a key that was never inserted is reported present with "
                      "probability `(1 − (1 − 1/m)^{kn})^k`.")),
             ("proof", ("Fix a bit. Each of the `kn` settings misses it with probability `1 − 1/m`, "
                        "and the settings are independent, so the bit is clear with probability "
@@ -1505,7 +1509,8 @@ LESSONS = [
             "panel_intro": (
                 "`(1 − (1 − 1/m)^{kn})^k` is computed as a fraction over BigInt, and the familiar "
                 "`(1 − e^{−kn/m})^k` is printed beside it as the approximation it is. The gap "
-                "between the columns is the independence assumption, and the best `k` is found by "
+                "between the columns is the `e^{−kn/m}` step, since both treat the bit tests "
+                "as independent, and the best `k` is found by "
                 "evaluating every one of them rather than from the `(m/n)·ln 2` rule."
             ),
         }),
@@ -1683,11 +1688,11 @@ LESSONS = [
              "That is the same indicator-and-sum argument as &ldquo;Balls in Bins and the Birthday "
              "Bound&rdquo;, with updates in place of keys and counters in place of slots."),
             ("The bound is Markov's, per row, multiplied",
-             "Markov's inequality on that overcount at `a = 2F₁/w` gives `P ≥ 2F₁/w) ≤ 1/2` for one "
+             "Markov's inequality on that overcount at `a = 2F₁/w` gives `P(overcount ≥ 2F₁/w) ≤ 1/2` for one "
              "row. The rows use independent hashes, so all `d` rows overcount by that much with "
              "probability at most `2⁻ᵈ`, and the minimum overcounts by that much only if all of "
              "them do. At `w = 8` and `d = 3`: error at most `16` with probability at least `7/8`. "
-             "This library proves Markov and not Chernoff, so this is the guarantee it can state."),
+             "Markov at `e·F₁/w` instead gives the `e/w` and `e⁻ᵈ` form most references quote."),
         ],
         "read_title": "A fixed grid, a minimum, and a bound this library can prove",
         "read_intro": "The structure, the one-sided error, the Markov guarantee per row, and how far the bound sits from what happens.",
@@ -1727,11 +1732,11 @@ LESSONS = [
                        "only if every row does, which has probability at most `(1/2)ᵈ = 2⁻ᵈ`.")),
             ("p", "Markov's inequality is doing all the probabilistic work, and it is the "
                   "inequality &ldquo;From an Expectation to a Probability&rdquo; proves. The "
-                  "textbook statement of this bound is sharper &mdash; `e/w` in place of `2/w`, and "
-                  "`e⁻ᵈ` in place of `2⁻ᵈ` &mdash; and it needs a concentration result this library "
-                  "does not teach. So the guarantee here is the one that can be proved with what "
-                  "the reader has, and the panel prints `2/w` and `2⁻ᵈ` for that reason rather than "
-                  "quoting a stronger claim it cannot support."),
+                  "textbook statement of this bound reads `e/w` in place of `2/w`, and `e⁻ᵈ` in "
+                  "place of `2⁻ᵈ`, and it is the same argument: Markov at `e·F₁/w` instead of "
+                  "`2F₁/w` gives a per-row failure of `1/e`. The two forms are one trade between "
+                  "error and confidence, not a stronger result, and the panel prints `2/w` and "
+                  "`2⁻ᵈ` because those are the constants this page derives."),
             ("example", ("A heavy hitter in eight counters",
                          "The stream is 64 updates over 12 distinct keys: key 1 arrives forty "
                          "times, keys 2 and 3 arrive three times each, and keys 4 to 12 twice each. "
@@ -1876,8 +1881,8 @@ LESSONS = [
              "c": 1,
              "why": "The expected overcount per row is at most `F₁/w` by linearity over the other "
                     "updates; Markov at twice that mean gives a per-row failure probability of a "
-                    "half; independent rows multiply to `2⁻ᵈ`. The sharper textbook version with "
-                    "`e/w` and `e⁻ᵈ` needs a concentration bound this library does not teach."},
+                    "half; independent rows multiply to `2⁻ᵈ`. The textbook version with `e/w` "
+                    "and `e⁻ᵈ` is the same argument with Markov at `e` times the mean."},
             {"q": "On the opening stream, keys 1 and 4 are both overcounted by 2. Why does that matter?",
              "a": ["It does not: the bound covers both",
                    "The bound is additive in `F₁`, so the same absolute error is five per cent for a count of 40 and a factor of two for a count of 2",
@@ -1905,11 +1910,10 @@ LESSONS = [
              "most `2F₁/w` with high probability. On the opening stream that allowance is 16 out of "
              "64 updates. An estimate that is exactly right, as most of them are here, is this "
              "stream being kind rather than the structure promising accuracy."),
-            ("Quoting the sharper textbook bound",
-             "`e/w` and `e⁻ᵈ` are the numbers most references give, and their proof needs a "
-             "concentration result no Subject in this library teaches. Using them here would be "
-             "quoting a guarantee the reader cannot derive from anything they have been shown. The "
-             "panel prints `2/w` and `2⁻ᵈ`, which follow from Markov's inequality in three lines."),
+            ("Mixing the two forms of the bound",
+             "`e/w` and `e⁻ᵈ` are the numbers most references give. They come from the same "
+             "Markov step at `e·F₁/w`, and they go together: quoting `e/w` with `2⁻ᵈ`, or `2/w` "
+             "with `e⁻ᵈ`, claims more than either derivation gives. The panel prints `2/w` and `2⁻ᵈ`, which follow from Markov's inequality in three lines."),
             ("Reading an exact table as evidence that the sketch is exact",
              "Two of the lab's three presets have a worst overcount of zero, and neither says "
              "anything about the next stream. Those are streams whose keys missed each other in at "

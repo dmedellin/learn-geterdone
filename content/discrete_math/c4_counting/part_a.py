@@ -422,7 +422,7 @@ LESSONS = [
                 " 20! =  2 432 902 008 176 640 000",
                 " 52! ≈ 8.07 × 10⁶⁷",
             ]),
-            ("p", '`52!` is about `10¹⁸` times the number of atoms in the Earth, which is roughly `10⁵⁰`. Any algorithm that examines all permutations of a modest input is not slow &mdash; it is impossible, and “P, NP and NP-Completeness” in Algorithms and Complexity gives that observation a name.'),
+            ("p", '`52!` is about `8 × 10¹⁷` times the number of atoms in the Earth, which is roughly `10⁵⁰`. Any algorithm that examines all permutations of a modest input is not slow &mdash; it is impossible, and “P, NP and NP-Completeness” in Algorithms and Complexity gives that observation a name.'),
         ],
         "lab": ("counting", {
             "n": 5, "r": 3, "rule": "p",

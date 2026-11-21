@@ -109,7 +109,8 @@ LESSONS = [
                   "That condition is convexity, and it is the condition rather than the "
                   "background."),
             ("example", ("A falling price, and a cost no quantity achieves",
-                         "Quote the first 3 units at 5 each and everything after at 2. The true "
+                         "Quote the first 3 units at 5 each and everything after at 2, with "
+                         "each unit of `y` at 4, and minimise the total. The true "
                          "cheapest cost on this region is 16, at `(0, 4)`. The band model "
                          "reports 38/3, with `x(1) = 0` and `x(2) = 5`: it has bought five "
                          "units out of the second band without filling the first, which the "
@@ -549,7 +550,7 @@ LESSONS = [
              "`e₁ = 4 − (F + G)` is at or below zero at every feasible point, which breaks the "
              "sign restriction the whole form rests on."),
             ("Every added column measures something in the situation",
-             "The kiln's slack is unfired capacity, in pieces a day. The contract's surplus is "
+             "The kiln's slack is unfired capacity, in firing units a day. The contract's surplus is "
              "deliveries beyond what was promised, in pieces. A column you cannot describe in a "
              "sentence about the pottery is a column you have not understood, and “Duality "
              "and Sensitivity Analysis” reads prices and ranges off exactly these columns."),

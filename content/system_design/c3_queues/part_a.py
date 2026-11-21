@@ -958,7 +958,7 @@ LESSONS = [
                      "`P(T > t) = (1 − λΔ)^(t/Δ)`.")),
             ("p", "That expression is exact and rational. With `λ = 1/2` per second, "
                   "`Δ = 1/10` second and `t = 4` seconds it is `(19/20)⁴⁰` &mdash; a ratio of "
-                  "two forty-digit integers, computed as a fraction and only then printed as "
+                  "a 52-digit integer to a 53-digit one, computed as a fraction and only then printed as "
                   "a decimal."),
             ("math", [
                 "λ = 1/2 per second,   t = 4 s,   so λt = 2",

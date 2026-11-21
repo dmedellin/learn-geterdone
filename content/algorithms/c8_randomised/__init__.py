@@ -112,9 +112,8 @@ COURSE = {
     "not_covered": [
         "Chernoff and Hoeffding bounds, and everything that needs them. That is the largest "
         "deliberate hole on this path: it is why the maximum load of `n` balls in `n` bins "
-        "is stated and proved nowhere in this library, why the Count-Min sketch is given "
-        "its Markov guarantee rather than the sharper textbook one, and why no lesson here "
-        "claims a concentration result. Markov and Chebyshev are proved and used; anything "
+        "is stated and proved nowhere in this library, and why no lesson here claims a "
+        "concentration result. Markov and Chebyshev are proved and used; anything "
         "stronger is named as absent.",
         "Randomised complexity classes. The one-sided and two-sided errors this course "
         "measures are exactly the distinction those classes are built on, and naming them "

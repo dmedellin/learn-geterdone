@@ -688,9 +688,10 @@ LESSONS = [
                   "the algorithm never saw. On the opening instance the proposers' mean rank is "
                   "`1` and the receivers' is `4`, the extreme values in both directions."),
             ("h3", "Three more instances, and a caption that is wrong"),
-            ("p", "When everyone on both sides agrees on the same ranking there is exactly one "
-                  "stable matching, both sides reach it, and proposing buys nothing: the panel "
-                  "reports 6 proposals, 1 stable matching, and mean rank `2` for both sides. "
+            ("p", "The next two instances have three people a side. When everyone on both "
+                  "sides agrees on the same ranking there is exactly one stable matching, both "
+                  "sides reach it, and proposing buys nothing: the panel reports 6 proposals "
+                  "(`1 + 2 + 3`), 1 stable matching, and mean rank `2` for both sides. "
                   "When the two sides want opposite things there are 3 stable matchings and the "
                   "algorithm reaches the one its proposers prefer, mean ranks `1` and `3`."),
             ("p", "The fourth instance is labelled as having a long chain of rejections, and its "

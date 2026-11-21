@@ -947,8 +947,8 @@ LESSONS = [
                 "through the substitution.",
                 "Fade the substitution for `5 − 3x` at `x = −2`: copy it as "
                 "`5 − 3(−2)` and finish from there. The value is `11`. An answer of `−1` "
-                "dropped the substituted sign; `16` treated `3x` as the two-digit number "
-                "`3` followed by `2` before subtracting.",
+                "dropped the substituted sign; `−4` subtracted before multiplying, as if "
+                "the expression were `(5 − 3)·x`.",
             ],
         },
         "quiz_title": "Substitution",

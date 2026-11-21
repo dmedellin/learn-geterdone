@@ -1039,7 +1039,7 @@ LESSONS = [
             "A = Σ_{j≥k} C(n,j) Aʲ (1 − A)ⁿ⁻ʲ        the upper tail of a binomial",
             "k = n  →  the series product            k = 1  →  1 − ∏(1 − Aᵢ)",
             "at A = 99%:  3-of-5 = 99.9990149%,  5-of-5 = 95.0990%,  1-of-1 = 99%",
-            "so 5-of-5 is worse than one machine, by a factor of 49 in downtime",
+            "so 5-of-5 is worse than one machine, by a factor of 4.9 in downtime",
         ],
         "key_label": "One binomial tail, with the two earlier formulas inside it",
         "concepts_intro": (
@@ -1204,7 +1204,7 @@ LESSONS = [
                 "1-of-1   3 d 15 h 36 min",
             ],
             "after": [
-                "Three nodes requiring two are a hundred times better than one node. The "
+                "Three nodes requiring two have about a thirty-fourth of one node's downtime. The "
                 "same three nodes requiring three are three times worse than one node, "
                 "and the only thing that changed was a constant in a configuration file. "
                 "The `j = 2` term, `0.029403`, is where all of the difference lives: it "
@@ -1228,7 +1228,7 @@ LESSONS = [
                     "0.9509900499`, which is the series product of five components. The "
                     "first choice is 1-of-5, the parallel form; the second is 3-of-5. "
                     "The fourth is one machine, which at `99%` is better than this "
-                    "five-machine system by a factor of about fifty in downtime."},
+                    "five-machine system by a factor of about five in downtime."},
             {"q": "Which statement about `k`-of-`n` availability is correct?",
              "a": ["Raising `n` always raises availability",
                    "Raising `n` raises availability when `k` is held fixed, and can lower it when `k` rises with `n`",

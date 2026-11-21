@@ -260,10 +260,11 @@ LESSONS = [
              "range made by multiplying is `√(lo·hi)`, which returns `10¹²` here, "
              "exactly."),
             ("Adding the half-widths instead of multiplying them",
-             "Three factors at `±2×` are reported as `±6×`, and the answer looks "
-             "eight times narrower than it is. The rule follows from the interval "
-             "product: `[c/2, 2c]` times `[d/2, 2d]` is `[cd/4, 4cd]`, a half-width "
-             "of `4` and not of `4`&mdash;added. Any time the reported half-width is "
+             "Three factors at `±2×` are reported as `±6×`, when the product is "
+             "`±8×`. The rule follows from the interval product: `[c/2, 2c]` times "
+             "`[d/2, 2d]` is `[cd/4, 4cd]`, a half-width of `4`. With two factors of "
+             "`2` adding and multiplying happen to agree; the third is where they "
+             "part, `2 + 2 + 2 = 6` against `2 · 2 · 2 = 8`. Any time the reported half-width is "
              "close to the sum of the inputs rather than their product, this is what "
              "happened."),
             ("Taking the high end of every factor and calling it conservative",
@@ -379,8 +380,9 @@ LESSONS = [
             ]),
             ("p", "`108/125` is `0.864` exactly, which is the pleasant part of this "
                   "shortcut: the correction is a two-digit decimal. A rate computed "
-                  "the fast way, multiplied by `0.864`, is the rate computed the "
-                  "slow way, and the lab prints both columns so the correction can "
+                  "the slow way, multiplied by `0.864`, is the rate computed the "
+                  "fast way, so dividing the fast answer by `0.864` recovers the "
+                  "true one, and the lab prints both columns so the correction can "
                   "be checked rather than remembered."),
             ("example", ("Ten million users, a hundred actions each",
                          "The daily volume is `10⁹` requests. Divided by `86 400` "
@@ -462,8 +464,8 @@ LESSONS = [
             ("Correct in the right direction if you need to",
              "Shortcut rate to true rate is `×125/108`. True rate to shortcut rate "
              "is `×108/125 = ×0.864`. If you can only keep one of them, keep `0.864`: "
-             "it is exact, it is two digits, and it is the one that undoes the "
-             "shortcut you actually used."),
+             "it is exact, it is two digits, and dividing the shortcut rate by it "
+             "undoes the shortcut you actually used."),
             ("Carry the range through the division",
              "Dividing an interval by a positive constant divides both ends by it, "
              "so a daily volume known to `÷8 … ×8` is a rate known to `÷8 … ×8`. The "

@@ -829,7 +829,7 @@ LESSONS = [
              "pass the module that row's key."),
             ("Record Set",
              "Tabular data held in memory in the shape a query returns, which other "
-             "code can also create and edit. It usually the platform's own, such as a data set or a row "
+             "code can also create and edit. It is usually the platform's own, such as a data set or a row "
              "set."),
             ("Identity",
              "What makes one object a particular thing, so that holding a reference to "

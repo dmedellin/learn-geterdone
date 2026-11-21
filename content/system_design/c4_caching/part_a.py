@@ -721,9 +721,9 @@ LESSONS = [
              "this assumption, unstated."),
             ("Putting the exponent on the wrong thing",
              "`p_i ∝ 1/iˢ` raises the <em>rank</em> to the exponent, so at `s = 2` the "
-             "terms are `1, 1/4, 1/9, 1/16`. Raising the whole term instead gives "
-             "`1, 1/2, 1/3` squared away somewhere else and a harmonic number that is "
-             "not `H(n, s)`. Check against `H(3, 2) = 49/36` before going further."),
+             "terms are `1, 1/4, 1/9, 1/16`. Squaring the plain harmonic sum instead, "
+             "`(1 + 1/2 + 1/3)² = 121/36`, gives a normaliser that is not `H(n, s)`, "
+             "and every share computed from it is wrong. Check against `H(3, 2) = 49/36` before going further."),
             ("Taking `N` as the size of the database",
              "`N` is the number of distinct keys the workload touches in the window "
              "under discussion. A ten-million-row table read by forty thousand distinct "
