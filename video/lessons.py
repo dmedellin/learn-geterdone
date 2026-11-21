@@ -80,7 +80,12 @@ def outline(lesson):
     out = ["# %s" % plain(lesson["title"]), plain(lesson["one_line"]), "", plain(lesson["summary"]), ""]
     for kind, body in lesson.get("body", []):
         if kind in ("p", "def", "thm", "example", "proof"):
-            out.append(plain(body if isinstance(body, str) else " ".join(map(str, body))))
+            if isinstance(body, str):
+                out.append(plain(body))
+            elif isinstance(body, tuple) and len(body) > 1:  # (heading, text, ...): keep the heading apart
+                out.append("%s %s: %s" % (kind.capitalize(), plain(body[0]), " ".join(plain(x) for x in body[1:])))
+            else:
+                out.append(plain(" ".join(map(str, body))))
         elif kind == "h3":
             out.append("## " + plain(body))
         elif kind in ("ul", "ol"):
