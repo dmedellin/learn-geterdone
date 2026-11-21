@@ -62,7 +62,9 @@ def plain(text):
     """Lesson markup (HTML entities, <code>, `ticks`, **bold**) as plain text."""
     text = re.sub(r"</?[a-zA-Z][^<>]*>", "", str(text))  # tags only; a bare < or <= is mathematics
     text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
-    text = re.sub(r"[`*]", "", text)
+    text = text.replace("`", "").replace("**", "")
+    # *emphasis* only: a star after a letter (y*, the equilibrium) is mathematics
+    text = re.sub(r"(?<![\w*])\*(?!\s)([^*]+?)(?<!\s)\*(?![\w*])", r"\1", text)
     return html.unescape(text)
 
 

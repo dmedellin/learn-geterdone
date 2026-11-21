@@ -10,8 +10,8 @@ thumb: Equilibria are the roots of f
 Some differential equations never mention the time on their right side. That one restriction changes a lot. It makes the slope field repeat, lets you slide solutions sideways, and turns finding constant solutions into plain algebra.
 
 @chapter What autonomous means
-@math heading="Autonomous" items="y′ = f(y)@y prime equals f of y;;f(ȳ) = 0  ⟹  y = ȳ is a solution@an equilibrium"
-An equation is autonomous when it can be written y prime equals f of y, with the right side a function of y alone. An equilibrium is a number, call it y bar, where f of y bar is zero. Then the constant function y equals y bar is a solution for every t.
+@math heading="Autonomous" items="y′ = f(y)@y prime equals f of y;;f(y*) = 0  ⟹  y = y* is a solution@an equilibrium"
+An equation is autonomous when it can be written y prime equals f of y, with the right side a function of y alone. An equilibrium is a number, call it y star, where f of y star is zero. Then the constant function y equals y star is a solution for every t.
 
 @list heading="Which are autonomous?" items="y′ = k·y   ✓@Exponential growth|y′ = −k·(y − A)   ✓@Newton's law|y′ = y² − 1,  y′ = 3 − y   ✓@y squared minus one|y′ = 2t,  y′ = t·y,  y′ = y + t   ✗@not"
 The test is only whether t appears. Exponential growth is autonomous, and so is Newton's law of cooling, whose only equilibrium is the room temperature. y squared minus one and three minus y are autonomous too. But y prime equals two t is not, and nor are t y and y plus t.
@@ -40,7 +40,7 @@ The equilibria are the roots of f, so you find them by algebra. Write f as a pol
 @art cubic-roots
 On a graph of f against y, those are the three places where the curve crosses the axis. Each one is a constant solution.
 
-@math heading="y′ = y² − y − 1" items="ȳ = (1 ± √5)/2@one plus or minus;;≈ 1.61803,  ≈ −0.618034@rounded"
+@math heading="y′ = y² − y − 1" items="y* = (1 ± √5)/2@one plus or minus;;≈ 1.61803,  ≈ −0.618034@rounded"
 Not every equilibrium is a fraction. For y squared minus y minus one, the equilibria are one plus or minus root five, over two. Rounded, that's about one point six one eight and minus zero point six one eight. The surd stays exact, so the check that f is zero there can be stated exactly.
 
 @chapter Not a pause

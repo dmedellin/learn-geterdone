@@ -10,21 +10,21 @@ thumb: The slope decides, unless it's zero
 The sign test needs the whole phase line. Is there a test that looks only at the equilibrium itself? There is: the slope of f there. It's also the method that carries over to systems later, so it's worth seeing once by hand.
 
 @chapter Zoom in on the gap
-@math heading="Shift to zero" items="u = y − ȳ@the gap;;u′ = f(ȳ + u)@u prime;;= f′(ȳ)·u + (terms in u² and higher)@expanding"
-Shift the equilibrium to zero. Let u be y minus y bar, the gap. Then u prime is f of y bar plus u. Expanding, that's f of y bar, plus f prime of y bar times u, plus terms in u squared and higher. At an equilibrium f of y bar is zero, so what's left starts with f prime times u.
+@math heading="Shift to zero" items="u = y − y*@the gap;;u′ = f(y* + u)@u prime;;= f′(y*)·u + (terms in u² and higher)@expanding"
+Shift the equilibrium to zero. Let u be y minus y star, the gap. Then u prime is f of y star plus u. Expanding, that's f of y star, plus f prime of y star times u, plus terms in u squared and higher. At an equilibrium f of y star is zero, so what's left starts with f prime times u.
 
 @art zoom-in
-For a small gap, the higher terms are far smaller than the first. So close in, the equation is nearly u prime equals f prime of y bar times u, the growth or decay equation for the gap.
+For a small gap, the higher terms are far smaller than the first. So close in, the equation is nearly u prime equals f prime of y star times u, the growth or decay equation for the gap.
 
 @chapter A worked example
-@math heading="y′ = y² − 1,  ȳ = −1,  f′(y) = 2y" items="u = y + 1,  y = u − 1@Put u;;y² − 1 = (u − 1)² − 1 = u² − 2u@u minus one squared;;u′ = −2u + u²@exactly"
+@math heading="y′ = y² − 1,  y* = −1,  f′(y) = 2y" items="u = y + 1,  y = u − 1@Put u;;y² − 1 = (u − 1)² − 1 = u² − 2u@u minus one squared;;u′ = −2u + u²@exactly"
 Take y squared minus one, at the equilibrium minus one. Put u equal to y plus one. Then y squared minus one becomes u minus one squared, minus one, which is u squared minus two u. So u prime equals minus two u plus u squared, exactly. The slope f prime of minus one is minus two.
 
 @math heading="u = 1/10" items="−2/10 + 1/100 = −19/100@full right side;;−2/10 = −20/100@first term alone"
 How much does the u squared matter? Take u equals one tenth. The full right side is minus nineteen hundredths, against minus twenty hundredths for the first term alone. The neglected piece is a twentieth of it, and it shrinks faster than u, so it matters less as the solution closes in.
 
 @chapter The slope test
-@list heading="The slope test" items="f′(ȳ) < 0   →   stable@negative|f′(ȳ) > 0   →   unstable@positive|f′(ȳ) = 0   →   says nothing@zero"
+@list heading="The slope test" items="f′(y*) < 0   →   stable@negative|f′(y*) > 0   →   unstable@positive|f′(y*) = 0   →   says nothing@zero"
 So here's the test. If f prime at the equilibrium is negative, it's stable: the gap closes. If it's positive, it's unstable: the gap opens. If it's zero, the test says nothing.
 
 @art tangent-signs
@@ -51,14 +51,14 @@ Three equations have slope zero at zero, and no two behave alike. For y cubed, u
 Same slope, three verdicts. A zero slope means the first order term vanished, and you need the next order, which is the sign of f on both sides. For minus y cubed, f of minus one is one and f of one is minus one: positive then negative, stable.
 
 @chapter Where people slip
-@list heading="Common slips" items="Reading f′ = 0 as semistable@The first|Mixing up f′(ȳ) and y′@The second|Using f′ where f isn't zero@The third"
+@list heading="Common slips" items="Reading f′ = 0 as semistable@The first|Mixing up f′(y*) and y′@The second|Using f′ where f isn't zero@The third"
 The first slip is reading a zero slope as semistable. You just saw three answers. The second is mixing up f prime and y prime. At an equilibrium y prime is always zero. f prime measures how fast nearby solutions pull in or push out. The third is using the slope at a point that isn't an equilibrium.
 
 @art not-a-root
 On the cubic, f prime of one half is minus a quarter, negative. But one half isn't an equilibrium, and a solution there is rising, not being drawn in. Find the root first.
 
 @chapter Try it
-@words text="y′ = y² − 1,  ȳ = 1" sub="find f′(1) and the verdict"
+@words text="y′ = y² − 1,  y* = 1" sub="find f′(1) and the verdict"
 Your turn. Take y squared minus one at its other equilibrium, one. Compute f prime there, decide the type, then confirm it with the signs of f at zero and two.
 
 @end text="Check the slope at each root"
