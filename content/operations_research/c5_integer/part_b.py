@@ -921,7 +921,8 @@ LESSONS = [
                   "costing `96`. Against the optimum of `88` that is `8` worse, which is "
                   "`8/96 = 1/12` of the tour in hand &mdash; a measured gap, on this "
                   "instance, for this heuristic, which the panel shows as `8.3%`. "
-                  "with a gap of zero. That happens, and it is worth knowing rather than "
+                  "Improving that tour by 2-opt reaches `88`, the optimum, so the "
+                  "improved tour finishes with a gap of zero. That happens, and it is worth knowing rather than "
                   "assuming, which takes a bound."),
             ("p", "A measured gap and a proved ratio are different kinds of knowledge and "
                   "the difference is worth a paragraph. The Algorithms path&rsquo;s "

@@ -387,7 +387,7 @@ LESSONS = [
                          "last &mdash; and linearity does not care.")),
             ("p", "That result is worth pausing on. On average exactly one person gets their own hat back, whether there are 5 people or 5 million. Computing it from the derangement distribution of Combinatorics and Counting would be considerably harder."),
             ("example", ("The coupon collector",
-                         'There are `n` distinct coupons, one per box at random. How many boxes to collect them all? Let `Xᵢ` be the number of boxes bought while holding exactly `i − 1` distinct coupons. Then `E[Xᵢ] = n/(n − i + 1)` (“The Geometric Distribution and Waiting Times” supplies that), so `E[total] = n(1 + 1/2 + ⋯ + 1/n) ≈ n ln n`. For `n = 50` that is about 225 boxes.')),
+                         'There are `n` distinct coupons, one per box at random. How many boxes to collect them all? Let `Xᵢ` be the number of boxes bought while holding exactly `i − 1` distinct coupons. Then `E[Xᵢ] = n/(n − i + 1)` (“The Geometric Distribution and Waiting Times” supplies that), so `E[total] = n(1 + 1/2 + ⋯ + 1/n) ≈ n ln n`. For `n = 50` the exact sum is about 225 boxes; `50 ln 50 ≈ 196` is low because `n ln n` drops a further `0.577·n`.')),
             ("example", ("Matching pairs",
                          "Two shuffled decks are dealt face up side by side. The expected "
                          "number of positions where the cards match is "

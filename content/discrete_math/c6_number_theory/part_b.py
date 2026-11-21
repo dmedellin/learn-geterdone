@@ -431,8 +431,9 @@ LESSONS = [
                   "equivalent to computing `c^d mod p` and `c^d mod q` and recombining. "
                   "The two exponentiations use numbers half the size, and modular "
                   "multiplication costs roughly the square of the operand size &mdash; so "
-                  "each is about four times cheaper, and two of them together about twice."),
-            ("p", "In practice the exponents can also be reduced modulo `p − 1` and `q − 1` by Fermat's theorem (“Fermat's Little Theorem and Euler's Theorem”), which is where the rest of the speed-up comes from. The overall gain is roughly a factor of four, and essentially every RSA implementation does this."),
+                  "each is about four times cheaper, so the two together cost about half "
+                  "of one full-size exponentiation."),
+            ("p", "In practice the exponents can also be reduced modulo `p − 1` and `q − 1` by Fermat's theorem (“Fermat's Little Theorem and Euler's Theorem”), which halves the length of each exponent and with it the number of multiplications. The two savings together give roughly a factor of four, and essentially every RSA implementation does this."),
         ],
         "lab": ("number", {
             "mode": "crt", "a": 2, "b": 3, "m": 3, "n": 5,
@@ -766,7 +767,7 @@ LESSONS = [
                      "An LCG has full period `m` for every seed if and only if: "
                      "`gcd(c, m) = 1`; `a − 1` is divisible by every prime dividing `m`; "
                      "and `a − 1` is divisible by 4 if `m` is.")),
-            ("example", ("A bad generator",
+            ("example", ("A good generator, and a bad one beside it",
                          "`a = 5`, `c = 3`, `m = 8`, seed 0: `0, 3, 2, 5, 4, 7, 6, 1, 0, …` "
                          "&mdash; full period 8, and the conditions hold. Change `a` to 4 "
                          "and the sequence is `0, 3, 7, 7, 7, …`: it collapses almost "

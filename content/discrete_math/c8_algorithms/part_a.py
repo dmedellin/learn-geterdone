@@ -61,14 +61,15 @@ LESSONS = [
                 "        result = x",
                 "        repeat n−1 times: result = result · x",
                 "",
-                "B.  repeated squaring                about 2·log₂ n multiplications",
+                "B.  repeated squaring                at most 2·log₂ n multiplications",
                 '        as in “Modular Exponentiation” in Number Theory and Cryptography',
                 "",
                 "C.  addition-chain exponentiation    slightly fewer than B, sometimes",
                 "        precompute an optimal chain of products",
             ]),
             ("p", "All three are correct and they differ enormously in cost. At `n = 1000`, "
-                  "A performs 999 multiplications and B performs about 15. That gap is the "
+                  "A performs 999 multiplications and B performs 14: nine squarings "
+                  "and five more products, under its `2·log₂ n ≈ 20` bound. That gap is the "
                   "subject of this course, and it is a property of the algorithm rather "
                   "than of the machine."),
             ("h3", "Correctness before efficiency"),
@@ -136,7 +137,7 @@ LESSONS = [
              "why": 'Termination on every valid input is part of the definition, so it is not an algorithm at all, efficient or otherwise. "Heuristic" is the word for a procedure that offers no guarantee, and a heuristic that may not stop fails finiteness just the same; the Collatz procedure of “Correctness and Termination” is exactly this case.'},
             {"q": "Computing `x¹⁰⁰⁰` by repeated multiplication versus repeated squaring:",
              "a": ["both take 1000 steps",
-                   "999 multiplications versus about 15",
+                   "999 multiplications versus 14",
                    "squaring is slower",
                    "the difference depends on the machine"],
              "c": 1,
@@ -388,7 +389,8 @@ LESSONS = [
              "of the total."),
             ("Exponential is a different kind",
              "Polynomial costs scale with hardware; exponential ones do not. `2ⁿ` at "
-             "`n = 100` exceeds the number of atoms in the observable universe."),
+             "`n = 100` is about `1.3 × 10³⁰`, and by `n = 270` it exceeds the number "
+             "of atoms in the observable universe, about `10⁸⁰`."),
         ],
         "read_title": "Comparing growth",
         "read_intro": "The hierarchy, the numbers behind it, and what a faster machine buys.",

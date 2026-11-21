@@ -136,10 +136,11 @@ LESSONS = [
                 "  best at 0 of the 6            all 120 orders were scored",
                 "  makespan      25             25             all 120 of them",
             ]),
-            ("p", "Four different orders appear in that last column and none of them "
+            ("p", "Five different orders appear in that last column and none of them "
                   "is the one typed. The arrival order is optimal for nothing, which "
-                  "is unremarkable; what is worth looking at is that no single order "
-                  "appears twice. `D B C A E` is shortest-first and is `9` worse than "
+                  "is unremarkable; what is worth looking at is that only one order "
+                  "appears twice, `B D A C E` for `L max` and `T max`, and those two are "
+                  "the same question whenever some job is late. `D B C A E` is shortest-first and is `9` worse than "
                   "the best on weighted completion time. `B D A C E` is earliest-due-"
                   "date and is `17` against a best total tardiness of `16`. Being best "
                   "at one of these is normally being beaten at the rest."),

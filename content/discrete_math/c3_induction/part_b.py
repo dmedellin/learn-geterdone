@@ -324,7 +324,7 @@ LESSONS = [
                 "   n odd:   hypothesis gives a^(n−1);",
                 "            a × a^(n−1) = aⁿ.                             ✓",
                 "",
-                "Cost: at most 2·log₂ n calls — two odd steps never occur in a row.",
+                "Cost: at most 2·log₂ n + 2 calls for n ≥ 1 — two odd steps never occur in a row.",
             ],
             "after": [
                 'Strong induction is essential here: the even branch reaches back to `n/2`, not to `n − 1`. Ordinary induction would give a hypothesis about the wrong value. “Modular Exponentiation” in Number Theory and Cryptography uses this algorithm as modular exponentiation, where the saving is the difference between feasible and impossible.'
@@ -773,7 +773,7 @@ LESSONS = [
             ("Merge sort is the balanced case",
              "`a = 2`, `b = 2`, `d = 1`, so `log₂2 = 1 = d`. Every level does `Θ(n)` work "
              "and there are `log n` levels."),
-            ("Fewer, bigger pieces can beat more, smaller ones",
+            ("Fewer pieces of the same size can beat more of them",
              "Karatsuba multiplication does 3 multiplications of half-size instead of 4, "
              "and `log₂3 ≈ 1.585 &lt; 2` is the entire improvement."),
         ],
@@ -867,7 +867,7 @@ LESSONS = [
                 "3.  T(n) = 2T(n/2) + n²           a=2  b=2  d=2",
                 "    log₂2 = 1 < 2      →  CASE 1  →  Θ(n²)           root dominates",
                 "",
-                "Strassen improves case 2 above by using 7 multiplications, not 8:",
+                "Strassen improves recurrence 2 above by using 7 multiplications, not 8:",
                 "    T(n) = 7T(n/2) + n²,   log₂7 ≈ 2.807  →  Θ(n^2.807)",
             ],
             "after": [

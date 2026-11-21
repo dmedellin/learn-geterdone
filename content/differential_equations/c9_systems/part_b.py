@@ -96,8 +96,9 @@ LESSONS = [
             ("p", "Switch the search control on. The lab tests every point whose "
                   "coordinates are fractions with denominator 1, 2, 3 or 4 and "
                   "numerators between −12 and 12, exactly, and the status line names "
-                  "those bounds as it reports. On the search preset only the origin is listed, and "
-                  "the report is `found 2: (0, 0), (1, 1)`. It is a convenience for checking your own algebra, and "
+                  "those bounds as it reports. The search preset lists only the origin as a "
+                  "point to check; switch the search on and the status line reports "
+                  "`found 2: (0, 0), (1, 1)`, recovering the point left off the list. It is a convenience for checking your own algebra, and "
                   "the algebra is the method."),
             ("p", "Its limit is built into the last preset. The system "
                   "`x′ = y − 5x²`, `y′ = x − y` has the equilibria `(0, 0)` and "
@@ -1133,8 +1134,8 @@ LESSONS = [
             ],
             "after": [
                 "The exact tile reads `R₀ = 9/5; I peaks at S = 1/2`, as computed. "
-                "When `S` is at `1/2`, half the population has not been infected, "
-                "and the infection falls from there.",
+                "At the peak `S` is `1/2`: half the population has not yet been "
+                "infected, and from there the infection falls.",
                 "So the outbreak ends because the infected fraction has run down "
                 "while many are still susceptible. It did not end because everyone "
                 "had been through it.",

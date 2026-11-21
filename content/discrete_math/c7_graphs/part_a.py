@@ -709,8 +709,8 @@ LESSONS = [
              "In this course a path repeats no vertex. Several theorems &mdash; including "
              "the bridge characterisation &mdash; depend on the distinction."),
             ("Assuming enough edges implies connectivity",
-             "`n − 1` edges is necessary and not sufficient: a triangle plus two isolated "
-             "vertices has enough edges and three components."),
+             "`n − 1` edges is necessary and not sufficient: a triangle plus one isolated "
+             "vertex has 4 vertices, 3 edges and two components."),
             ("Confusing cut vertices with bridges",
              "One is a vertex and the other an edge, and neither implies the other. A "
              "vertex may be a cut vertex with no bridge incident to it."),

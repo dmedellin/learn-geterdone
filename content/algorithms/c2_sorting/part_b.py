@@ -629,7 +629,8 @@ LESSONS = [
                          "that has never heard of this one.")),
             ("p", "Change the seed and the count moves: 108 at seed 1, 57 at seed 2, 86 at "
                   "seed 3, 35 at seed 5. Over 200 seeds the mean is 59.6 and the extremes are "
-                  "23 and 118. Two of those draws are above the `4n = 96` reference line, "
+                  "23 and 118. Two of the counts named here, 108 at seed 1 and the maximum "
+                  "118, are above the `4n = 96` reference line, "
                   "which is allowed: `4n` bounds the expectation, not each run. A reader who "
                   "takes a single count as the bound will see it violated and conclude the "
                   "wrong thing."),

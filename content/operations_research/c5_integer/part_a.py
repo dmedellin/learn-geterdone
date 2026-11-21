@@ -1033,7 +1033,8 @@ LESSONS = [
              "the bound at the tightest `M` is the answer itself; a million takes it "
              "toward `2(30) = 60`, the shipping cost alone with the opening cost "
              "amortised away into nothing, and the tree has to close every unit "
-             "practice” but a number: here is the bound I lost and here are the extra "
+             "of that gap by branching. A loose `M` is not “bad practice” but a "
+             "number: here is the bound I lost and here are the extra "
              "nodes."),
             ("Choosing M by feel rather than by bound",
              "An `M` that happens to be too small does not weaken anything &mdash; it "

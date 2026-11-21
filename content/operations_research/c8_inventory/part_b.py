@@ -307,7 +307,8 @@ LESSONS = [
             ("Swapping the two unit costs",
              "`cᵤ` is the cost of being short and `cₒ` of being long. Swapping them "
              "replaces the ratio by its complement, and on the worked stall that moves the "
-             "answer from `3` to `2` with no sign that anything has gone wrong &mdash; both "
+             "answer from `3` to `1`, the first quantity whose cumulative probability "
+             "reaches `3/10`, with no sign that anything has gone wrong &mdash; both "
              "are plausible quantities and both come with a confident-looking table. "
              "Pricing one quantity either side is the check that catches it."),
             ("Normalising a distribution that does not sum to one",
