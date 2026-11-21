@@ -60,7 +60,7 @@ def code_sources(lesson):
 
 def plain(text):
     """Lesson markup (HTML entities, <code>, `ticks`, **bold**) as plain text."""
-    text = re.sub(r"<[^>]+>", "", str(text))
+    text = re.sub(r"</?[a-zA-Z][^<>]*>", "", str(text))  # tags only; a bare < or <= is mathematics
     text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
     text = re.sub(r"[`*]", "", text)
     return html.unescape(text)
