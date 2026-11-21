@@ -11,7 +11,7 @@ import html
 import json
 import re
 
-from . import chrome, feedback, labs, progress, readout, speech, theme
+from . import chrome, feedback, labs, progress, readout, speech, theme, video
 from .chrome import esc
 
 ORIGIN = chrome.CANONICAL_ORIGIN
@@ -318,6 +318,10 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
     url = "/%s/%s/" % (course["slug"], lesson["slug"])
 
     lab = labs.build(lesson["lab"][0], lesson["lab"][1])
+    lesson_id = "%s/%s" % (course["slug"], lesson["slug"])
+    # The short and full videos, once published (scripts/mathpath/video.py).
+    # A lesson without them renders exactly as before.
+    watch = video.for_lesson(lesson_id)
 
     parts = [
         chrome.head(
@@ -327,7 +331,8 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
             favicon=chrome.FAVICON_LESSON, page_kind="lesson",
             # only a page that draws a listing carries its styles, so every
             # other page is byte-for-byte what it was before code blocks existed
-            extra_css=theme.CODE_CSS if any(kind == "code" for kind, _ in lesson["body"]) else "",
+            extra_css=(theme.CODE_CSS if any(kind == "code" for kind, _ in lesson["body"]) else "")
+            + (video.CSS if watch else ""),
         ),
         chrome.topbar(up="../../"),
         chrome.crumbs([
@@ -373,6 +378,8 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
         "    </section>\n"
         % (esc(lesson["module"]), esc(lesson["title"]), esc_inline(lesson["one_line"]))
     )
+    if watch:
+        parts.append(video.markup(lesson_id, watch))
 
     # -- the reading, with the lab where the text first uses it --------------
     lab_markup = (
@@ -512,7 +519,6 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
         nxt = ("../", esc(course["title"]), True)
     # The completion mark sits between the material and the pager: the moment a
     # reader has finished. localStorage only, no request, never a gate.
-    lesson_id = "%s/%s" % (course["slug"], lesson["slug"])
     parts.append(progress.LESSON_MARKUP % "../..")
     parts.append(chrome.pager(prev=prev, next=nxt))
     # Recommendations for this lesson: what should CHANGE about it, as opposed
@@ -543,7 +549,8 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
                              + feedback.STORE_JS
                              + feedback.LESSON_JS
                              + LESSON_BAR_JS
-                             + readout.READOUT_JS))
+                             + readout.READOUT_JS
+                             + (video.script(lesson_id, watch) if watch else "")))
     return chrome.name_horizontal_scrollers("".join(parts)), lab
 
 

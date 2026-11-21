@@ -51,8 +51,9 @@
 		# inline SVG and data:image/svg+xml backgrounds, no external origins.
 		# 'unsafe-inline' is required by that shape; everything else is denied.
 		# If a page ever needs an external font/script/analytics, that is a
-		# reviewed change here, not a silent exception.
-		Content-Security-Policy "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'"
+		# reviewed change here, not a silent exception. media-src 'self' is the
+		# lesson videos at /video/ (same origin; see the /video/ route below).
+		Content-Security-Policy "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; media-src 'self'"
 	}
 }
 
@@ -91,6 +92,7 @@
 	@static {
 		path *.css *.js *.mjs *.png *.jpg *.jpeg *.gif *.svg *.webp *.avif *.ico *.woff2 *.woff *.ttf
 		not path /assets/*
+		not path /video/*
 	}
 	header @static Cache-Control "public, max-age=300, must-revalidate"
 
@@ -100,6 +102,7 @@
 	# never be immutable or long-lived. Unclassified paths fall here on purpose.
 	@revalidate {
 		not path /assets/*
+		not path /video/*
 		not path *.css *.js *.mjs *.png *.jpg *.jpeg *.gif *.svg *.webp *.avif *.ico *.woff2 *.woff *.ttf
 		not path /healthz
 	}
@@ -141,6 +144,19 @@
 		log_skip
 		header Cache-Control "no-store"
 		header Content-Type "text/plain; charset=utf-8"
+		file_server
+	}
+
+	# --- Lesson videos (scripts/mathpath/video.py, docs/VIDEO.md) ---
+	# Too large for the image, so they live on the host and are bind-mounted
+	# READ-ONLY at /srv-media (host folder named in docs/VIDEO.md). A video is
+	# re-rendered in place under the same name, so it is cached for an hour and
+	# then revalidated, never immutable. Byte ranges (seeking) are served by
+	# file_server. Without the mount every /video/ URL is a plain 404, and no
+	# page links one until video/published.json lists it.
+	handle /video/* {
+		root * /srv-media
+		header Cache-Control "public, max-age=3600, must-revalidate"
 		file_server
 	}
 
