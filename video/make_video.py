@@ -308,7 +308,9 @@ def main():
     ap.add_argument("targets", nargs="*", help="<course>/<lesson>[/<long|short>]; none = every script")
     ap.add_argument("--check", action="store_true")
     args = ap.parse_args()
-    errs = E.check_all()
+    # Named targets are checked one by one in make(); other lessons' missing art
+    # (still to be drawn in a batch run) must not block them.
+    errs = E.check_all() if args.check or not args.targets else []
     if errs or args.check:
         print("\n".join(errs) or "episode scripts OK (%d)" % len(E.all_scripts()))
         sys.exit(1 if errs else 0)
