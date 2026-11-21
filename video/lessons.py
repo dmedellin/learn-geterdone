@@ -53,17 +53,26 @@ def code_sources(lesson):
     for kind, body in lesson.get("body", []):
         if kind == "code":
             n += 1
-            lines = body if isinstance(body, list) else str(body).split("\n")
-            out[str(n)] = "\n".join(plain(x) for x in lines).strip("\n")
+            # a code line is shown exactly as written (scripts/mathpath/render.py
+            # code_block_problems), so it is not run through plain(): <T>, ** and *p are code
+            lines = body["lines"] if isinstance(body, dict) else body
+            lines = lines if isinstance(lines, (list, tuple)) else str(lines).split("\n")
+            out[str(n)] = "\n".join(lines).strip("\n")
     return out
 
 
 def plain(text):
     """Lesson markup (HTML entities, <code>, `ticks`, **bold**) as plain text."""
-    text = re.sub(r"<[^>]+>", "", str(text))
+    text = re.sub(r"</?[a-zA-Z][^<>]*>", "", str(text))  # tags only; a bare < or <= is mathematics
     text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
-    text = re.sub(r"[`*]", "", text)
+    text = text.replace("`", "").replace("**", "")
+    # *emphasis* only: a star after a letter (y*, the equilibrium) is mathematics
+    text = re.sub(r"(?<![\w*])\*(?!\s)([^*]+?)(?<!\s)\*(?![\w*])", r"\1", text)
     return html.unescape(text)
+
+
+def _as_list(x):
+    return [] if x is None else ([x] if isinstance(x, str) else list(x))
 
 
 def outline(lesson):
@@ -71,7 +80,12 @@ def outline(lesson):
     out = ["# %s" % plain(lesson["title"]), plain(lesson["one_line"]), "", plain(lesson["summary"]), ""]
     for kind, body in lesson.get("body", []):
         if kind in ("p", "def", "thm", "example", "proof"):
-            out.append(plain(body if isinstance(body, str) else " ".join(map(str, body))))
+            if isinstance(body, str):
+                out.append(plain(body))
+            elif isinstance(body, tuple) and len(body) > 1:  # (heading, text, ...): keep the heading apart
+                out.append("%s %s: %s" % (kind.capitalize(), plain(body[0]), " ".join(plain(x) for x in body[1:])))
+            else:
+                out.append(plain(" ".join(map(str, body))))
         elif kind == "h3":
             out.append("## " + plain(body))
         elif kind in ("ul", "ol"):
@@ -80,6 +94,36 @@ def outline(lesson):
             lines = body if isinstance(body, list) else [body]
             out += ["    " + plain(x) for x in lines]
         out.append("")
+    lab = lesson.get("lab")
+    if isinstance(lab, (list, tuple)) and len(lab) > 1 and isinstance(lab[1], dict):
+        cfg = lab[1]
+        out.append("## Lab: %s" % plain(cfg.get("panel_title", lab[0])))
+        if cfg.get("panel_intro"):
+            out.append(plain(cfg["panel_intro"]))
+        out.append("")
+    if lesson.get("steps"):
+        out.append("## Steps")
+        if lesson.get("steps_intro"):
+            out.append(plain(lesson["steps_intro"]))
+        out += ["%d. %s: %s" % (n, plain(t), plain(b)) for n, (t, b) in enumerate(lesson["steps"], 1)]
+        out.append("")
+    worked = lesson.get("worked")
+    if isinstance(worked, dict):
+        out.append("## Worked example: %s" % plain(worked.get("title", "")))
+        out += [plain(x) for x in _as_list(worked.get("intro"))]
+        out += ["    " + plain(x) for x in _as_list(worked.get("lines"))]
+        out += [plain(x) for x in _as_list(worked.get("after"))]
+        out.append("")
+    if lesson.get("quiz"):
+        out.append("## Quiz (answers marked *)")
+        for item in lesson["quiz"]:
+            out.append("- Q: " + plain(item["q"]))
+            out += ["    %s %s" % ("*" if i == item.get("c") else "-", plain(a)) for i, a in enumerate(item["a"])]
+            if item.get("why"):
+                out.append("    Why: " + plain(item["why"]))
+        out.append("")
+    if lesson.get("note"):
+        out += ["## Note", plain(lesson["note"]), ""]
     out.append("## Key")
     out += ["- " + plain(k) for k in lesson.get("key", [])]
     out.append("## Concepts")

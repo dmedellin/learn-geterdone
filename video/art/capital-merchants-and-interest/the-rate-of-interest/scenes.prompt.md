@@ -1,0 +1,20 @@
+Use your image generation tool to create ONE image and save it as `video/art/capital-merchants-and-interest/the-rate-of-interest/scenes.png` in this repository. Do not write code to draw it; generate it with the image model. Highest quality, as large as the tool allows, landscape if available.
+
+It is a sheet of 6 explainer illustrations for a calm, well-designed economics education video about the rate of interest in Marx's Capital, which normally lies between nothing and the rate of profit with no law fixing where, so that there is no natural rate of interest. Strict grid: 2 columns x 3 rows. Each cell holds one landscape (16:9) illustration.
+
+STYLE (identical across all six):
+- Flat vector explainer graphics, like a carefully designed engineering blog or a 3Blue1Brown-style diagram. Clean geometry, generous whitespace, front-on, no perspective, no 3D, no gradients, no texture, no shading, no glow.
+- Palette: white (#FFFFFF) rounded strokes of even weight; cyan (#37D7E7) for the rate of profit and its ceiling; warm yellow (#FFC857) for the rate of interest; muted slate (#3A4F63) flat fills for every other shape.
+- No people, no faces, no robots, no hands.
+- ABSOLUTELY NO text, letters, numbers or labels anywhere.
+- Background: one perfectly flat solid magenta (#FF00FF) across the whole image, with wide magenta gaps between cells. No frames, borders or cell backgrounds.
+
+CELLS, left to right, top to bottom:
+1. bread-and-rate: on the left a slate loaf of bread with a white needle settling on a fixed mark beside it, on the right a yellow needle swinging freely with no mark to settle on.
+2. ceiling-no-floor: a tall vertical shaft drawn in white strokes with a solid cyan ceiling bar at the top and no floor at the bottom, the shaft fading open downward, and a yellow ball floating inside.
+3. two-sliders: two vertical white slider tracks side by side, the left with a cyan knob and the right with a yellow knob at a different height.
+4. trade-cycle: a smooth white wave across the cell, with a small yellow dot low in the troughs, rising on the climb, and a large yellow dot spiking at the sharp drop.
+5. one-pie-two-hands: one round slate pie in the centre with a cyan wedge and a yellow wedge being pulled apart in opposite directions by two white arrows, the cut line wavering.
+6. barometer: on the left a crisp slate barometer with a sharp yellow needle, on the right a soft cyan cloud of mist with blurred edges.
+
+When done, reply with the saved file path and pixel size only.

@@ -17,8 +17,16 @@ from video import lessons as L  # noqa: E402
 
 class EpisodeScripts(unittest.TestCase):
     def test_every_script_renders(self):
-        """Every episode script parses, names a real lesson and only shows what that lesson has."""
-        self.assertEqual(E.check_all(), [])
+        """Every episode script parses, names a real lesson and only shows what that lesson has.
+
+        Art is drawn on the ThinkCentre just before a lesson renders, so missing art is an
+        error only for a lesson that is already published."""
+        published = set(json.loads((ROOT / "video" / "published.json").read_text(encoding="utf-8"))["lessons"])
+        errors = []
+        for p in E.all_scripts():
+            key = "%s/%s" % (p.parent.parent.name, p.parent.name)
+            errors += [e for e in E.check(p) if key in published or "is not in video/assets/art" not in e]
+        self.assertEqual(errors, [])
 
     def test_lessons_come_in_pairs(self):
         """A lesson gets both videos or neither, so the watch strip never offers half a pair."""
