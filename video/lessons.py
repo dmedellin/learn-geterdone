@@ -71,6 +71,10 @@ def plain(text):
     return html.unescape(text)
 
 
+def _as_list(x):
+    return [] if x is None else ([x] if isinstance(x, str) else list(x))
+
+
 def outline(lesson):
     """A plain-text digest of the lesson, for whoever writes the scripts."""
     out = ["# %s" % plain(lesson["title"]), plain(lesson["one_line"]), "", plain(lesson["summary"]), ""]
@@ -85,6 +89,36 @@ def outline(lesson):
             lines = body if isinstance(body, list) else [body]
             out += ["    " + plain(x) for x in lines]
         out.append("")
+    lab = lesson.get("lab")
+    if isinstance(lab, (list, tuple)) and len(lab) > 1 and isinstance(lab[1], dict):
+        cfg = lab[1]
+        out.append("## Lab: %s" % plain(cfg.get("panel_title", lab[0])))
+        if cfg.get("panel_intro"):
+            out.append(plain(cfg["panel_intro"]))
+        out.append("")
+    if lesson.get("steps"):
+        out.append("## Steps")
+        if lesson.get("steps_intro"):
+            out.append(plain(lesson["steps_intro"]))
+        out += ["%d. %s: %s" % (n, plain(t), plain(b)) for n, (t, b) in enumerate(lesson["steps"], 1)]
+        out.append("")
+    worked = lesson.get("worked")
+    if isinstance(worked, dict):
+        out.append("## Worked example: %s" % plain(worked.get("title", "")))
+        out += [plain(x) for x in _as_list(worked.get("intro"))]
+        out += ["    " + plain(x) for x in _as_list(worked.get("lines"))]
+        out += [plain(x) for x in _as_list(worked.get("after"))]
+        out.append("")
+    if lesson.get("quiz"):
+        out.append("## Quiz (answers marked *)")
+        for item in lesson["quiz"]:
+            out.append("- Q: " + plain(item["q"]))
+            out += ["    %s %s" % ("*" if i == item.get("c") else "-", plain(a)) for i, a in enumerate(item["a"])]
+            if item.get("why"):
+                out.append("    Why: " + plain(item["why"]))
+        out.append("")
+    if lesson.get("note"):
+        out += ["## Note", plain(lesson["note"]), ""]
     out.append("## Key")
     out += ["- " + plain(k) for k in lesson.get("key", [])]
     out.append("## Concepts")
