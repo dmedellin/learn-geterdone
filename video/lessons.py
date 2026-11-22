@@ -1,11 +1,13 @@
 """Find a generated lesson by "<course>/<lesson>" and pull out what a video can show.
 
 Stdlib only, so tests/test_video.py can use it without the video venv. The
-lessons are the ones scripts/build_paths.py renders (GENERATED_PATHS); the
-hand-written Trading pages are not covered yet.
+lessons are the ones scripts/build_paths.py renders (GENERATED_PATHS), then the
+hand-written Trading lessons, whose page is their source: trading_lesson()
+reads each page's <main> into the same lesson shape (title, one_line, body).
 """
 
 import html
+import html.parser
 import re
 import sys
 from pathlib import Path
@@ -20,12 +22,135 @@ _INDEX = None
 
 
 def all_lessons():
-    """Yield (path, course, lesson) for every generated lesson, in site order."""
+    """Yield (path, course, lesson) for every lesson with a script: generated, then Trading."""
     import build_paths  # noqa: E402  (imports every content package)
     for path in build_paths.GENERATED_PATHS:
         for course in path["courses"]:
             for lesson in course["lessons"]:
                 yield path, course, lesson
+    yield from trading_lessons()
+
+
+TRADING_PATH = {"slug": "trading", "title": "Trading"}
+
+
+def trading_lessons():
+    """(path, course, lesson) for each hand-written Trading lesson, in course order."""
+    import add_progress_marks as apm  # noqa: E402  (reads the course list out of the pages)
+    for c in apm.trading_inventory():
+        course = {"slug": c["slug"], "title": c["title"], "lessons": []}
+        for item in c["lessons"]:
+            course["lessons"].append(trading_lesson(c["slug"], item["slug"], item["title"]))
+        for lesson in course["lessons"]:
+            yield TRADING_PATH, course, lesson
+
+
+class _Main(html.parser.HTMLParser):
+    """Block text of a Trading page's <main>, as (kind, text) in reading order."""
+    SKIP = {"script", "style", "svg", "select", "option", "input", "textarea", "canvas", "noscript"}
+    BLOCKS = {"h1": "h1", "h2": "h3", "h3": "h4", "h4": "h4", "p": "p", "li": "li", "pre": "code",
+              "td": "cell", "th": "cell", "figcaption": "p", "blockquote": "p", "label": "li"}
+    ROWS = ("lesson-row", "callout", "note", "reading", "feedback")
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.out, self.skip, self.stack, self.buf, self.kind = [], 0, [], [], None
+        self.choice = 0
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        cls = a.get("class") or ""
+        if tag in self.SKIP or (tag == "section" and a.get("id") == "feedback") or "visually-hidden" in cls:
+            self.skip += 1
+            self.stack.append(("skip", tag))
+            return
+        if tag == "article" and a.get("data-correct", "").isdigit():
+            self.correct, self.qi = int(a["data-correct"]), 0
+        if "choice-grid" in cls or cls.split() == ["choices"]:
+            self.choice += 1
+            self.stack.append(("choice", tag))
+            return
+        self.stack.append(("tag", tag))
+        if self.skip:
+            return
+        row = tag == "div" and any(k in cls.split() for k in self.ROWS)
+        if tag in self.BLOCKS or (tag == "button" and self.choice) or row:
+            self.flush()
+            self.kind = "li" if tag == "button" else "p" if row else self.BLOCKS[tag]
+            if tag == "button" and getattr(self, "correct", None) is not None:
+                # a quiz choice: the page's data-correct marks the right one
+                self.buf.append("(correct) " if self.qi == self.correct else "(wrong) ")
+                self.qi += 1
+                if a.get("data-why"):
+                    self.why = a["data-why"]
+            self.depth = len(self.stack)
+        elif tag == "br" and self.kind == "code":
+            self.buf.append("\n")
+        elif self.kind and self.kind != "code":
+            self.buf.append(" ")
+
+    def handle_endtag(self, tag):
+        if tag == "article":
+            self.correct = None
+        while self.stack:
+            what, t = self.stack.pop()
+            if what == "skip":
+                self.skip -= 1
+            elif what == "choice":
+                self.choice -= 1
+            if t == tag:
+                break
+        if not self.skip and (tag in self.BLOCKS or tag == "button" or len(self.stack) < getattr(self, "depth", -1)):
+            self.flush()
+        elif self.kind and self.kind != "code":
+            self.buf.append(" ")
+
+    def handle_data(self, data):
+        if not self.skip and self.kind:
+            self.buf.append(data)
+
+    def flush(self):
+        if self.kind and self.buf:
+            text = "".join(self.buf)
+            text = text.strip("\n") if self.kind == "code" else re.sub(r"\s+", " ", text).strip()
+            if getattr(self, "why", None):
+                text += " [why it is wrong: %s]" % self.why
+                self.why = None
+            if text:
+                self.out.append((self.kind, text))
+        self.kind, self.buf, self.depth = None, [], -1
+
+
+def trading_lesson(course_slug, slug, title):
+    """A Trading lesson page read into the generated lesson shape."""
+    page = ROOT / "site" / course_slug / slug / "index.html"
+    text = page.read_text(encoding="utf-8")
+    main = re.search(r'<main id="main">(.*?)</main>', text, re.S)
+    parser = _Main()
+    parser.feed(main.group(1) if main else "")
+    parser.flush()
+    desc = re.search(r'<meta name="description" content="([^"]*)"', text)
+    body, cells = [], []
+    for kind, value in parser.out:
+        if kind != "cell" and cells:
+            body.append(("p", " | ".join(cells)))
+            cells = []
+        if kind == "h1":
+            continue
+        if kind == "cell":
+            cells.append(value)
+        elif kind in ("h3", "h4"):
+            body.append(("h3", value))
+        elif kind == "li":
+            body.append(("ul", [value]))
+        elif kind == "code":
+            body.append(("code", value.split("\n")))
+        else:
+            body.append(("p", value))
+    if cells:
+        body.append(("p", " | ".join(cells)))
+    return {"slug": slug, "title": title, "one_line": html.unescape(desc.group(1)) if desc else "",
+            "summary": "", "body": body, "trading": True}
 
 
 def key(course, lesson):
