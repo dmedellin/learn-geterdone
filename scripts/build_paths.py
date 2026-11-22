@@ -143,6 +143,19 @@ def path_pages(path):
     return out
 
 
+def trading_path():
+    """The hand-written Trading path in the shape reels.reels() reads, from its own pages.
+
+    Trading is not generated, so its course and lesson titles come from the
+    published pages (the same inventory add_progress_marks uses). It is
+    read-only here: no Trading page is written by this script.
+    """
+    import add_progress_marks
+    if not (REPO_ROOT / "site" / add_progress_marks.PATH_PAGE).is_file():
+        return {"slug": "trading", "title": "Trading", "courses": []}
+    return {"slug": "trading", "title": "Trading", "courses": add_progress_marks.trading_inventory()}
+
+
 def pages():
     """[(relative path under site/, markup, expectations or None)] for every path."""
     out = []
@@ -151,7 +164,7 @@ def pages():
     # /reels/: every published short in one feed, in catalog order. It is built
     # here, beside the lessons it links to, so --check covers it and a newly
     # published video cannot reach a lesson page without reaching the feed.
-    out.append((reels.RELATIVE, reels.page(GENERATED_PATHS, catalog.SUBJECTS, video.published()), None))
+    out.append((reels.RELATIVE, reels.page(list(GENERATED_PATHS) + [trading_path()], catalog.SUBJECTS, video.published()), None))
     return out
 
 

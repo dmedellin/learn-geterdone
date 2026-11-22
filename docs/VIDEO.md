@@ -93,6 +93,36 @@ anything, so pages show no player. Shipping this code first is safe.
    pages (the lessons and `/reels/`); commit `video/published.json` and the pages,
    and release as usual.
 
-The Trading Subject's hand-written lessons are not covered yet (they are not built
-by `scripts/build_paths.py`); they need the same strip added through
-`scripts/add_progress_marks.py`.
+## After publishing: run both scripts
+
+The Trading Subject's 118 lessons are hand-written, so their pages are not built
+by `scripts/build_paths.py`. After `publish.py` changes `video/published.json`,
+run BOTH, in either order:
+
+    python3 scripts/build_paths.py          # generated lessons, course homes, /reels/
+    python3 scripts/add_progress_marks.py   # Trading lessons and course homes
+
+then commit `video/published.json` and every page that changed. CI does not run
+either script; it runs `python3 -m unittest discover -s tests`, where
+`TestGeneratedPathIsCurrent` fails if `build_paths.py` would rewrite a page and
+`TestTradingVideos` fails if a Trading page disagrees with `published.json`
+(strip present without an entry, or entry without a strip).
+
+How the patcher handles Trading (`scripts/add_progress_marks.py`):
+
+- A Trading lesson listed in `published.json` gets the same watch strip
+  (`video.markup`, with "Open in Reels" when it has a short) between
+  `<!-- video-strip:begin -->` and `<!-- video-strip:end -->` right after the
+  hero, its stylesheet (`video.CSS`) between `/* video-marks:begin */` and
+  `/* video-marks:end */` in the FIRST `</style>` block, and the click handler in
+  `<script data-video-marks>` before `</body>`.
+- Each region is removed and re-inserted on every run, never edited in place, so
+  a second run rewrites nothing, and a lesson that leaves `published.json` goes
+  back to byte-identical unpatched text.
+- A course home marks each published lesson card `data-video="yes"`; its CSS
+  (`TRADING_LIST_CSS`, in the same marked block) draws the "Video" tag after
+  the card title. The block is present only while some lesson of the course is
+  published.
+- `/reels/` is written by `build_paths.py`, which reads Trading's course and
+  lesson titles from the published Trading pages (`trading_path()`). Trading
+  appears where `scripts/catalog.py` puts it (last), as Subject "Trading".
