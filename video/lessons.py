@@ -49,7 +49,7 @@ class _Main(html.parser.HTMLParser):
     """Block text of a Trading page's <main>, as (kind, text) in reading order."""
     SKIP = {"script", "style", "svg", "select", "option", "input", "textarea", "canvas", "noscript"}
     BLOCKS = {"h1": "h1", "h2": "h3", "h3": "h4", "h4": "h4", "p": "p", "li": "li", "pre": "code",
-              "td": "cell", "th": "cell", "figcaption": "p", "blockquote": "p", "label": "li"}
+              "td": "cell", "th": "cell", "figcaption": "p", "blockquote": "p", "label": "li", "dt": "p", "dd": "p"}
     ROWS = ("lesson-row", "callout", "note", "reading", "feedback")
 
     def __init__(self):
@@ -74,9 +74,11 @@ class _Main(html.parser.HTMLParser):
         if self.skip:
             return
         row = tag == "div" and any(k in cls.split() for k in self.ROWS)
-        if tag in self.BLOCKS or (tag == "button" and self.choice) or row:
+        formula = tag == "div" and "rule-output" in cls.split()  # pre-formatted formula block
+        if tag in self.BLOCKS or (tag == "button" and self.choice) or row or formula:
             self.flush()
-            self.kind = "li" if tag == "button" else "p" if row else self.BLOCKS[tag]
+            self.kind = ("li" if tag == "button" else "math" if formula else "p" if row
+                         else self.BLOCKS[tag])
             if tag == "button" and getattr(self, "correct", None) is not None:
                 # a quiz choice: the page's data-correct marks the right one
                 self.buf.append("(correct) " if self.qi == self.correct else "(wrong) ")
@@ -84,9 +86,9 @@ class _Main(html.parser.HTMLParser):
                 if a.get("data-why"):
                     self.why = a["data-why"]
             self.depth = len(self.stack)
-        elif tag == "br" and self.kind == "code":
+        elif tag == "br" and self.kind in ("code", "math"):
             self.buf.append("\n")
-        elif self.kind and self.kind != "code":
+        elif self.kind and self.kind not in ("code", "math"):
             self.buf.append(" ")
 
     def handle_endtag(self, tag):
@@ -102,7 +104,7 @@ class _Main(html.parser.HTMLParser):
                 break
         if not self.skip and (tag in self.BLOCKS or tag == "button" or len(self.stack) < getattr(self, "depth", -1)):
             self.flush()
-        elif self.kind and self.kind != "code":
+        elif self.kind and self.kind not in ("code", "math"):
             self.buf.append(" ")
 
     def handle_data(self, data):
@@ -112,7 +114,7 @@ class _Main(html.parser.HTMLParser):
     def flush(self):
         if self.kind and self.buf:
             text = "".join(self.buf)
-            text = text.strip("\n") if self.kind == "code" else re.sub(r"\s+", " ", text).strip()
+            text = text.strip("\n") if self.kind in ("code", "math") else re.sub(r"\s+", " ", text).strip()
             if getattr(self, "why", None):
                 text += " [why it is wrong: %s]" % self.why
                 self.why = None
@@ -143,8 +145,8 @@ def trading_lesson(course_slug, slug, title):
             body.append(("h3", value))
         elif kind == "li":
             body.append(("ul", [value]))
-        elif kind == "code":
-            body.append(("code", value.split("\n")))
+        elif kind in ("code", "math"):
+            body.append((kind, value.split("\n")))
         else:
             body.append(("p", value))
     if cells:
