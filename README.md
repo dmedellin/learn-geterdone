@@ -580,7 +580,7 @@ and nothing is served at `/paths/` itself — the list of paths is the site inde
 Every course on the path has its own URLs; nothing on the path page is an entry
 without a page behind it.
 
-**1,710 pages and eight assets. Nothing else is served** — 1,706 pages of the course tree (the site index and twenty path trees), plus the capstone's two pages, the two sign-in pages (`/progress/` and `/oauth2/spa/callback/`), and the seven course schemas plus the capstone's dataset.
+**1,711 pages and eight assets. Nothing else is served** — 1,706 pages of the course tree (the site index and twenty path trees), plus the capstone's two pages, the two sign-in pages (`/progress/` and `/oauth2/spa/callback/`), the reels feed (`/reels/`, every published lesson short in one vertical feed), and the seven course schemas plus the capstone's dataset.
 
 The table below enumerates the **Trading** path, which is hand-authored and whose
 pages are its source of truth. The other nineteen paths are GENERATED from
@@ -956,7 +956,7 @@ in its app registry under the slug `learn-geterdone`. The published tree is this
 homes, 1,505 lessons, the seven published schemas (trade journal, options trade plan,
 indicator rule, volume and order flow rule, trading risk plan, trading system
 specification, and automated trading system), the dated real-data capstone with its
-dataset, `/progress/` and the sign-in redirect target. 1,710 pages and 8 assets; the
+dataset, `/progress/`, the sign-in redirect target and `/reels/`. 1,711 pages and 8 assets; the
 trading path is complete at eight courses, the capstone is a worked example and not
 a ninth, and nothing in the library is announced without a page behind it.
 

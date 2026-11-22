@@ -2514,6 +2514,17 @@ AUTH_ORIGINS = frozenset({
 
 UNKNOWN_PATH_CHECK = "/release-smoke-unknown-path"
 
+# ---------------------------------------------------------------------------
+# /reels/: every published lesson's short video in one vertical feed
+# ---------------------------------------------------------------------------
+# Rendered by scripts/mathpath/reels.py through scripts/build_paths.py, so
+# TestGeneratedPathIsCurrent covers it. It is SHARED CHROME, not course
+# material: it lists lessons from every Subject, as the site index does, and
+# teaches none of them itself. It is NOT exempt from self-containment: the
+# page loads nothing until the reader taps, and the media URLs live only in
+# its inline script (TestReelsPage).
+REELS_PAGE = "/reels/"
+
 
 def lesson_url(home, slug):
     """The published URL of one lesson of the course whose home is `home`."""
@@ -2536,7 +2547,8 @@ SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
                        CC_PATH_PAGE, EAA_PATH_PAGE, ITA_PATH_PAGE,
                        DDD_PATH_PAGE, GOF_PATH_PAGE, ACC_PATH_PAGE,
                        WON_PATH_PAGE,
-                       LEV_PATH_PAGE)
+                       LEV_PATH_PAGE,
+                       REELS_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -2610,6 +2622,8 @@ for _url in REAL_DATA_PAGES:
 # sweeps treat them differently.
 for _url in AUTH_PAGES:
     REQUIRED_PAGES[_url] = source_of(_url)
+# The reels feed is published like any other page.
+REQUIRED_PAGES[REELS_PAGE] = source_of(REELS_PAGE)
 
 # Published, but NOT a document. The HTML invariants -- <title>,
 # <meta name="description">, rel=canonical, the educational-use disclaimer --
@@ -3396,12 +3410,13 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         )
         # The two sign-in pages are published like any other page; only the
         # network sweeps treat them differently.
-        expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
+        # So is the reels feed.
+        expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES) + 1
         self.assertEqual(
-            1710,
+            1711,
             expected,
-            "1706 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 1710, "
-            "got %d" % expected,
+            "1706 course-tree pages, the 2 capstone pages, the 2 sign-in pages and "
+            "the reels feed is 1711, got %d" % expected,
         )
         self.assertEqual(
             expected,
@@ -5453,6 +5468,71 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             "generated page was edited by hand and the next build will revert it. "
             "Run: python3 scripts/build_paths.py" % len(stale),
         )
+
+
+class TestReelsPage(unittest.TestCase):
+    """/reels/ lists every published short, loads nothing, and every door into it resolves.
+
+    The feed is the one page that plays media in sequence, so it is the one
+    most tempted to carry a src= or poster= in its markup -- either would be a
+    request on load, and the page would break the self-containment invariant
+    while looking finished. The media URLs belong in the inline script, which
+    builds a <video> only once the reader has tapped.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        target = SITE_ROOT / source_of(REELS_PAGE)
+        if not target.is_file():
+            raise unittest.SkipTest("no reels page at %s" % target)
+        cls.text = target.read_text(encoding="utf-8")
+        published = REPO_ROOT / "video" / "published.json"
+        cls.published = (json.loads(published.read_text(encoding="utf-8")).get("lessons", {})
+                         if published.is_file() else {})
+
+    def reel_ids(self):
+        return re.findall(r'<article class="reel" id="([^"]+)">', self.text)
+
+    def test_markup_requests_nothing(self):
+        for pattern in (r"<video\b", r"<source\b", r"<track\b", r"<img\b",
+                        r"\ssrc\s*=", r"\sposter\s*=", r"\ssrcset\s*="):
+            with self.subTest(pattern=pattern):
+                self.assertIsNone(re.search(pattern, self.text, re.I),
+                                  "the reels page carries %s in its markup, which the browser "
+                                  "fetches on load" % pattern)
+
+    def test_every_published_short_is_listed_once(self):
+        expected = sorted("%s--%s" % tuple(key.split("/"))
+                          for key, entry in self.published.items() if "short" in entry)
+        ids = self.reel_ids()
+        self.assertEqual(len(ids), len(set(ids)), "a reel is listed twice")
+        self.assertEqual(expected, sorted(ids))
+
+    def test_each_reel_links_to_its_lesson(self):
+        for rid, href in re.findall(
+                r'<article class="reel" id="([^"]+)">.*?<a class="btn primary" href="([^"]+)">',
+                self.text):
+            course, lesson = rid.split("--")
+            with self.subTest(reel=rid):
+                self.assertEqual("../%s/%s/" % (course, lesson), href)
+                self.assertIn(lesson_url("/%s/" % course, lesson), REQUIRED_PAGES)
+
+    def test_each_lesson_with_a_short_links_to_its_reel(self):
+        ids = set(self.reel_ids())
+        for key, entry in sorted(self.published.items()):
+            if "short" not in entry:
+                continue
+            course, lesson = key.split("/")
+            page = SITE_ROOT / course / lesson / "index.html"
+            with self.subTest(lesson=key):
+                self.assertTrue(page.is_file(), "%s has a video but no page" % key)
+                href = "../../reels/#%s--%s" % (course, lesson)
+                self.assertIn('href="%s"' % href, page.read_text(encoding="utf-8"))
+                self.assertIn("%s--%s" % (course, lesson), ids)
+
+    def test_the_library_links_to_the_feed(self):
+        index = (SITE_ROOT / "index.html").read_text(encoding="utf-8")
+        self.assertIn('href="./reels/"', index)
 
 
 class TestLessonDataMatchesTheRenderer(unittest.TestCase):

@@ -74,11 +74,11 @@ def words(node):
 class TestPublishedUI(unittest.TestCase):
     def test_every_page_family_exposes_the_shared_contract(self):
         from test_site_invariants import ALL_COURSES, COURSES as TRADING_COURSES, PATH_PAGES, REQUIRED_PAGES
-        families = [("/", "library"), ("/progress/", "progress")]
+        families = [("/", "library"), ("/progress/", "progress"), ("/reels/", "reels")]
         families += [(url, "subject") for url in PATH_PAGES]
         families += [(url, "course") for _title, url, _lessons in ALL_COURSES]
         families += [(url + lesson + "/", "lesson") for _title, url, lessons in ALL_COURSES for lesson in lessons]
-        self.assertEqual({"library": 1, "subject": 20, "course": 180, "lesson": 1505, "progress": 1},
+        self.assertEqual({"library": 1, "subject": 20, "course": 180, "lesson": 1505, "progress": 1, "reels": 1},
                          {kind: sum(k == kind for _u, k in families) for _url, kind in families})
         required = {"library": ["hero", "subject-list", "course-search"],
                     # The list a reader opened the page for comes before the
@@ -88,7 +88,10 @@ class TestPublishedUI(unittest.TestCase):
                     "subject": ["breadcrumbs", "hero", "metadata", "course-list", "overview", "background"],
                     "course": ["breadcrumbs", "hero", "metadata", "lesson-list", "overview", "background", "course-navigation"],
                     "lesson": ["breadcrumbs", "hero", "progress", "lesson-navigation", "feedback"],
-                    "progress": ["breadcrumbs", "hero", "metadata", "course-list"]}
+                    "progress": ["breadcrumbs", "hero", "metadata", "course-list"],
+                    # /reels/ is the feed and nothing else: one full-screen
+                    # region of reels, each a card linking to its lesson.
+                    "reels": ["breadcrumbs", "reel-feed"]}
         # Trading's Subject page and course homes are hand-written and keep
         # the overview before the list (LESSON-LAYOUT-BACKLOG L-12).
         legacy = {"subject": ["breadcrumbs", "hero", "metadata", "overview", "course-list", "background"],
@@ -168,7 +171,7 @@ class TestVisitorTaxonomy(unittest.TestCase):
 
     def test_published_copy_uses_subjects_and_course_titles(self):
         from test_site_invariants import ALL_COURSES, PATH_PAGES, REQUIRED_PAGES
-        urls = ["/", "/progress/", *PATH_PAGES]
+        urls = ["/", "/progress/", "/reels/", *PATH_PAGES]
         urls += [url for _t, url, _l in ALL_COURSES]
         urls += [url + lesson + "/" for _t, url, lessons in ALL_COURSES for lesson in lessons]
         failures=[]
@@ -193,7 +196,7 @@ class TestVisitorTaxonomy(unittest.TestCase):
                 scopes.append((self.SUBJECT_PATH,copy))
             found=sorted({m[0] for pattern,scope in scopes for m in pattern.finditer(scope)})
             if found:failures.append(url+": "+repr(found))
-        self.assertEqual(1707,len(urls),"taxonomy sweep must cover every requested page")
+        self.assertEqual(1708,len(urls),"taxonomy sweep must cover every requested page")
         self.assertEqual([],failures,"visitor taxonomy failures:\n"+"\n".join(failures[:45]))
 
 

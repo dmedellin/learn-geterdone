@@ -14,6 +14,7 @@ Everything that lists Subjects reads its order from SUBJECTS below:
     site/index.html             scripts/build_index.py (cards and course search)
     site/progress/index.html    scripts/build_auth_pages.py (library_inventory)
     site/oauth2/spa/callback/   the same inventory
+    site/reels/index.html       scripts/build_paths.py via mathpath/reels.py (feed order)
 
 A new Subject is one entry here, in its group, at the place a reader should
 meet it. tests/test_site_invariants.py fails if a published Subject is missing
