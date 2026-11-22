@@ -148,4 +148,11 @@ CSS = """
     .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
 """.replace("%%", "%")
 
-__all__ = ["published", "for_lesson", "markup", "script", "CSS", "esc"]
+# The marker on a course page's lesson list for each lesson with published videos.
+LIST_CSS = """
+    .syllabus-item[data-video] strong::after { content: "\\25B6\\00a0Video"; display: inline-block; margin-left: .5rem;
+        padding: 1px 8px; border-radius: 999px; border: 1px solid var(--cyan); color: var(--cyan);
+        font-size: .72rem; font-weight: 600; letter-spacing: 0; vertical-align: 2px; }
+"""
+
+__all__ = ["published", "for_lesson", "markup", "script", "CSS", "LIST_CSS", "esc"]
