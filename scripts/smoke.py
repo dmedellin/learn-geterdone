@@ -2850,6 +2850,15 @@ AUTH_PAGE_TARGETS = (
       "var LIBRARY = [{", 'id="ringFill"')),
 )
 
+# /reels/: every published lesson's short video in one vertical feed
+# (scripts/mathpath/reels.py). An ordinary self-contained page: it reaches
+# nothing until the reader taps, and then only same-origin /video/ files.
+REELS_PAGE_PATH = "/reels/"
+REELS_PAGE_TARGETS = (
+    ("reels-page", REELS_PAGE_PATH,
+     (canonical_marker(REELS_PAGE_PATH), "Reels | Learn", DISCLAIMER_MARKER)),
+)
+
 
 def path_page_targets(args):
     """(check id, path, markers) for every PATH page the library publishes.
@@ -2964,6 +2973,7 @@ def lesson_targets(args):
         + WON_COURSE_LESSONS
         + LEV_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
+        + REELS_PAGE_TARGETS
     ):
         if path in seen:
             # --lesson-path was pointed at a lesson that is already in the map;
