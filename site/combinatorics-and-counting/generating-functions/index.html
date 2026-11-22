@@ -1384,6 +1384,25 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1453,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Technique</p>
       <h1>Generating Functions</h1>
       <p class="lesson-lede">Encode a sequence as coefficients and let algebra do the counting.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:32</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:51</span><small>the whole lesson, with chapters</small></span></button></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Generating functions</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Ordinary generating function</span><p>For a sequence <span class="math" data-say="A sub 0, A sub 1, A sub 2, and so on">a₀, a₁, a₂, …</span>, its <strong>generating function</strong> is the formal power series <span class="math" data-say="G of x equals the sum over k is at least 0 of A sub k x to the power k">G(x) = Σ_{k≥0} a_k x^k</span>. Two series are equal exactly when all their coefficients agree.</p></div><div class="mathblock" data-say="1 over the quantity 1 minus x, equals 1 plus x plus x squared plus x cubed plus and so on, all a sub k equals 1. 1 over the quantity 1 minus x, squared, equals 1 plus 2 x plus 3 x squared plus 4 x cubed plus and so on, a sub k equals k plus 1. 1 over the quantity 1 minus A x, equals 1 plus A x plus A squared x squared plus and so on, a sub k equals A to the power k. the quantity 1 plus x, to the power n, equals the sum over k of n choose k x to the power k, binomial. 1 over the quantity 1 minus x, to the power n, equals the sum over k of n plus k minus 1 choose k x to the power k, stars and bars factorial. the quantity 1 minus x to the power m plus 1, over the quantity 1 minus x, equals 1 plus x, and so on, plus x to the power m, at most m copies" tabindex="0" role="region" aria-label="Mathematical notation">1/(1 − x)      = 1 + x + x² + x³ + …          all a_k = 1
@@ -2209,6 +2232,55 @@ MULTIPLY series  ⟷  COMBINE independent choices</div><figcaption>A sequence as
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/combinatorics-and-counting/generating-functions/", "videos": {"long": {"chapters": [{"t": 0, "title": "A sequence in one object"}, {"t": 41.2, "title": "The basic series"}, {"t": 61.8, "title": "Multiplying combines choices"}, {"t": 86.7, "title": "Making change"}, {"t": 134.3, "title": "Constraints live in the factors"}, {"t": 161.2, "title": "Solving a recurrence"}, {"t": 188.0, "title": "Where people slip"}, {"t": 207.8, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

@@ -1384,6 +1384,25 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1453,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The model</p>
       <h1>Sample Spaces and Events</h1>
       <p class="lesson-lede">The set of outcomes, and the subsets we ask about.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:24</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:52</span><small>the whole lesson, with chapters</small></span></button></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Setting up a model</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Sample space, outcome, event</span><p>The <strong>sample space</strong> <span class="math" data-say="S">S</span> is the set of all possible outcomes of an experiment. An <strong>outcome</strong> is one element of <span class="math" data-say="S">S</span>; an <strong>event</strong> is a subset of <span class="math" data-say="S">S</span>.</p></div><p>The outcomes must be <strong>mutually exclusive</strong> (no two happen together) and <strong>exhaustive</strong> (at least one happens), so that exactly one happens. Those are the two obligations a proof by cases carries in “Cases, Counterexamples, and Writing a Proof” in Logic and Proof &mdash; overlap nowhere, cover everything &mdash; and they fail in the same ways.</p><div class="example"><span class="label">Example &middot; Two dice, two models</span><p>Model A: <span class="math" data-say="S">S</span> is the 36 ordered pairs <span class="math" data-say="1, 1">(1,1)</span> through <span class="math" data-say="6, 6">(6,6)</span>, all equally likely. Model B: <span class="math" data-say="S">S</span> is the 11 sums <span class="math" data-say="2, and so on, 12">2, …, 12</span>. Both are legitimate sample spaces; only in model A are the outcomes equally likely. A sum of 7 arises six ways and a sum of 2 arises one way.</p></div><p>That is the granularity trap, and it produced a famous error: Leibniz thought a sum of 11 with two dice as likely as a sum of 12, since each looked like one combination. As ordered pairs, 11 arises two ways and 12 only one. The fix is to keep outcomes fine enough that symmetry justifies equal likelihood.</p><h3>Events as sets</h3><div class="mathblock" data-say="in words, as a set. A or B, A union B. A and B, A intersect B. not A, A bar, equals, S minus A. A but not B, A minus B. exactly one of A, B, A symmetric difference B. A and B cannot both, A intersect B equals the empty set, mutually exclusive" tabindex="0" role="region" aria-label="Mathematical notation">in words                 as a set
@@ -2273,6 +2296,55 @@ Outcomes must be MUTUALLY EXCLUSIVE and EXHAUSTIVE.
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/discrete-probability/sample-spaces-and-events/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 21.7, "title": "Three words"}, {"t": 50.9, "title": "Two dice, two models"}, {"t": 91.2, "title": "Events are sets"}, {"t": 130.0, "title": "Probability as a ratio"}, {"t": 147.7, "title": "Worked example"}, {"t": 174.0, "title": "Where people slip"}, {"t": 206.2, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
