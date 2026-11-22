@@ -51,6 +51,12 @@ def markup(lesson_id, entry):
         % (name, label, _clock(entry[name]["seconds"]), note)
         for name, label, note in LABELS if name in entry
     )
+    if "short" in entry:
+        # Its place in the /reels/ feed (scripts/mathpath/reels.py), for a reader
+        # who wants to keep going from this lesson's reel to the next one.
+        course, lesson = lesson_id.split("/")
+        buttons += ('<a class="watch-reel" href="../../reels/#%s--%s">Open in Reels</a>'
+                    % (esc(course), esc(lesson)))
     return (
         '    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">\n'
         '      <div class="watch-row">%s</div>\n'
@@ -130,6 +136,9 @@ CSS = """
                   background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
     .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
     .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
     .watch-stage { margin-top: 1rem; }
     .watch-stage video { display: block; width: 100%%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
     .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%%; margin: 0 auto; }

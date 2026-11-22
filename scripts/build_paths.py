@@ -43,7 +43,8 @@ from philosophy import PATH as PHILOSOPHY_PATH  # noqa: E402
 from reading import PATH as READING_PATH  # noqa: E402
 from system_design import PATH as SYSTEM_DESIGN_PATH  # noqa: E402
 from wealth_of_nations import PATH as WEALTH_OF_NATIONS_PATH  # noqa: E402
-from mathpath import render  # noqa: E402
+from mathpath import reels, render, video  # noqa: E402
+import catalog  # noqa: E402
 
 GENERATED_PATHS = (DISCRETE_MATH_PATH, ALGEBRA_PATH, SYSTEM_DESIGN_PATH,
                    ALGORITHMS_PATH, OPERATIONS_RESEARCH_PATH, PHILOSOPHY_PATH,
@@ -147,6 +148,10 @@ def pages():
     out = []
     for path in GENERATED_PATHS:
         out.extend(path_pages(path))
+    # /reels/: every published short in one feed, in catalog order. It is built
+    # here, beside the lessons it links to, so --check covers it and a newly
+    # published video cannot reach a lesson page without reaching the feed.
+    out.append((reels.RELATIVE, reels.page(GENERATED_PATHS, catalog.SUBJECTS, video.published()), None))
     return out
 
 

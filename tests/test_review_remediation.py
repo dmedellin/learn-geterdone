@@ -162,7 +162,7 @@ class TestReviewRemediation(unittest.TestCase):
 
     def test_complete_visitor_boundary_is_neutral(self):
         pages = sorted(ui.SITE.rglob('*.html'))
-        self.assertEqual(1710, len(pages), 'include capstones and no-script alternatives')
+        self.assertEqual(1711, len(pages), 'include capstones and no-script alternatives')
         failures = [(p.relative_to(ui.SITE).as_posix(), progression_matches(p.read_text())) for p in pages]
         self.assertEqual([], [(p, m) for p, m in failures if m], 'visitor progression/taxonomy')
 

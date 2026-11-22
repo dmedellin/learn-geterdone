@@ -11,7 +11,7 @@ assert(OUT&&!path.resolve(OUT).startsWith(ROOT+'/'),'external evidence required'
 fs.mkdirSync(OUT,{recursive:true});assert(!fs.existsSync(path.join(OUT,'observations.jsonl')),'fresh evidence required');
 const capOnly=process.argv.includes('--capstones'),only=process.argv.find(a=>a.startsWith('--only='))?.slice(7);
 const corpus=[];function walk(dir){for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name);if(entry.isDirectory())walk(file);else if(entry.name.endsWith('.html')){const source=fs.readFileSync(file,'utf8');corpus.push({file,route:'/'+path.relative(SITE,file).replace(/index\.html$/,''),kind:source.match(/<body data-page-kind="([^"]+)"/)?.[1]||'fallback',source});}}}walk(SITE);
-assert.equal(corpus.length,1710,'complete corpus');
+assert.equal(corpus.length,1711,'complete corpus');
 const caps=corpus.filter(p=>['slides','supplemental'].includes(p.kind));assert.equal(caps.length,2,'both capstone capabilities');
 const seen=new Set(),families=corpus.sort((a,b)=>a.route.localeCompare(b.route)).filter(p=>{
  if(p.kind!=='lesson')return true;
