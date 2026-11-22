@@ -602,10 +602,16 @@ def course_home(*, course, index, courses, path):
     url = "/%s/" % course["slug"]
     lessons = course["lessons"]
 
+    # A lesson whose videos are published carries data-video, and the course
+    # page's CSS draws a small video marker after its title (video.LIST_CSS).
+    # The marker is CSS content, so the title text the copy checks read is unchanged.
+    with_video = {lesson["slug"] for lesson in lessons
+                  if video.for_lesson("%s/%s" % (course["slug"], lesson["slug"]))}
     syllabus = "".join(
-        '<a class="syllabus-item" href="./%s/" data-lesson="%s/%s"><div class="num" aria-hidden="true"></div>'
+        '<a class="syllabus-item" href="./%s/" data-lesson="%s/%s"%s><div class="num" aria-hidden="true"></div>'
         '<div><strong>%s</strong><span>%s</span><span class="lesson-state">Not marked</span></div></a>'
         % (lesson["slug"], course["slug"], lesson["slug"],
+           ' data-video="yes"' if lesson["slug"] in with_video else "",
            esc(lesson["title"]), esc_inline(lesson["one_line"]))
         for i, lesson in enumerate(lessons)
     )
@@ -644,6 +650,7 @@ def course_home(*, course, index, courses, path):
             description=plain(course["summary"]),
             canonical_path=url,
             favicon=chrome.FAVICON_COURSE, page_kind="course",
+            extra_css=video.LIST_CSS if with_video else "",
         ),
         chrome.topbar(up="../"),
         chrome.crumbs([
