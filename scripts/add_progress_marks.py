@@ -35,7 +35,7 @@ from html import unescape
 from html.parser import HTMLParser
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from mathpath import capstone, chrome, feedback, progress, readout
+from mathpath import capstone, chrome, feedback, progress, readout, video
 import canvas_markup
 from mathpath.theme import UI_CSS  # noqa: E402
 
@@ -70,6 +70,25 @@ CSS_BEGIN = "/* progress-marks:begin */"
 CSS_END = "/* progress-marks:end */"
 SCRIPT_OPEN = "<script data-progress-marks>"
 SCRIPT_CLOSE = "</script>"
+
+# Lesson videos (docs/VIDEO.md). Each region below exists only while the lesson
+# is listed in video/published.json, and is REMOVED and re-inserted on every
+# run, so a lesson that leaves the list returns to byte-identical unpatched text.
+VIDEO_CSS_BEGIN = "/* video-marks:begin */"
+VIDEO_CSS_END = "/* video-marks:end */"
+VIDEO_STRIP_BEGIN = "<!-- video-strip:begin -->"
+VIDEO_STRIP_END = "<!-- video-strip:end -->"
+VIDEO_SCRIPT_OPEN = "<script data-video-marks>"
+
+# The course home's "Video" tag, beside the lesson title (the same pill as
+# video.LIST_CSS draws on generated course homes). The card's title link keeps
+# its stretched ::after, so the tag is the heading's own ::after.
+TRADING_LIST_CSS = """
+    .lesson-card[data-video] h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 0 .5rem; }
+    .lesson-card[data-video] h3::after { content: "\\25B6\\00a0Video"; display: inline-block; padding: 1px 8px;
+        border-radius: 999px; border: 1px solid var(--cyan); color: var(--cyan); font-size: .72rem; font-weight: 600;
+        letter-spacing: 0; }
+"""
 
 SIGNIN_TITLE = ("Optional. Signing in carries your completion ticks to your other "
                 "devices; it unlocks nothing, because nothing here is locked.")
@@ -369,6 +388,56 @@ def ensure_css(text):
     # settled. Idempotent from the first run is the requirement, not eventually.
     line_start = text.rfind("\n", 0, marker) + 1
     return text[:line_start] + "    " + block + "\n" + text[line_start:]
+
+
+def _strip_region(text, begin, end, lead=""):
+    return re.sub(lead + re.escape(begin) + r".*?" + re.escape(end) + r"\n?",
+                  lambda _m: "", text, flags=re.S)
+
+
+def ensure_video_css(text, css):
+    """The video stylesheet, or nothing (css=None). Run AFTER ensure_css.
+
+    Same rules as ensure_css: remove, then insert whole lines before the FIRST
+    </style>. Run after ensure_css each time, it always lands after the progress
+    block, so the order is the same on every run.
+    """
+    text = _strip_region(text, VIDEO_CSS_BEGIN, VIDEO_CSS_END, r"[ \t]*")
+    if css is None:
+        return text
+    marker = text.find("</style>")
+    if marker == -1:
+        raise SystemExit("no <style> block to extend")
+    line_start = text.rfind("\n", 0, marker) + 1
+    block = "    %s\n%s    %s\n" % (VIDEO_CSS_BEGIN, css.strip("\n") + "\n", VIDEO_CSS_END)
+    return text[:line_start] + block + text[line_start:]
+
+
+def ensure_video_strip(text, lesson_id, entry):
+    """The watch strip under the hero, or nothing (entry=None)."""
+    text = re.sub(r"\n" + re.escape(VIDEO_STRIP_BEGIN) + r".*?" + re.escape(VIDEO_STRIP_END),
+                  lambda _m: "", text, flags=re.S)
+    if entry is None:
+        return text
+    hero = text.find('data-ui="hero"')
+    close = text.find("</section>", hero) if hero != -1 else -1
+    if close == -1:
+        raise SystemExit("%s: no hero to follow" % lesson_id)
+    close += len("</section>")
+    block = "\n%s\n%s%s" % (VIDEO_STRIP_BEGIN, video.markup(lesson_id, entry), VIDEO_STRIP_END)
+    return text[:close] + block + text[close:]
+
+
+def ensure_video_script(text, lesson_id, entry):
+    text = re.sub(r"  " + re.escape(VIDEO_SCRIPT_OPEN) + r".*?</script>\n",
+                  lambda _m: "", text, flags=re.S)
+    if entry is None:
+        return text
+    marker = text.rfind("</body>")
+    if marker == -1:
+        raise SystemExit("no </body> to precede")
+    block = "  " + VIDEO_SCRIPT_OPEN + video.script(lesson_id, entry) + "</script>\n"
+    return text[:marker] + block + text[marker:]
 
 
 def ensure_script(text, body):
@@ -995,7 +1064,9 @@ def ensure_course_hooks(text, course_slug, lessons):
             return match.group(0)
         slug = link.group(1)
         seen.append(slug)
-        head = re.sub(r'\s+data-lesson="[^"]*"', "", head)
+        head = re.sub(r'\s+data-(?:lesson|video)="[^"]*"', "", head)
+        if video.for_lesson("%s/%s" % (course_slug, slug)):
+            head += ' data-video="yes"'
         body = re.sub(r'<span class="lesson-state">.*?</span>', '', body, flags=re.S)
         body = re.sub(r"(?m)^[ \t]+$", "", body)
         content = element(body, "div", cls="lesson-body")
@@ -1052,6 +1123,11 @@ def prepare_lesson(before, relative, course, lesson, courses):
     text = ensure_script(text, progress.PROGRESS_JS + (progress.LESSON_JS % lesson_id)
                          + feedback.STORE_JS + feedback.LESSON_JS + SIGNIN_JS
                          + readout.READOUT_JS)
+    key = "%s/%s" % (course["slug"], lesson["slug"])
+    watch = video.for_lesson(key)
+    text = ensure_video_css(text, video.CSS if watch else None)
+    text = ensure_video_strip(text, key, watch)
+    text = ensure_video_script(text, key, watch)
     # Remove the curricular prefix from the footer before resolving references,
     # so "Course 8 · <title>" retains exactly one course identity.
     footer = element(text, "footer")
@@ -1234,6 +1310,9 @@ def main():
         text = neutral_catalog_links(text, course)
         text = ensure_course_hooks(text, course["slug"], course["lessons"])
         text = ensure_script(text, progress.PROGRESS_JS + COURSE_JS + SIGNIN_JS)
+        # The "Video" tag, only if some lesson of this course has a published video.
+        text = ensure_video_css(text, TRADING_LIST_CSS if any(
+            video.for_lesson("%s/%s" % (course["slug"], l["slug"])) for l in course["lessons"]) else None)
         text = normalize_taxonomy_copy(text, courses)
         text = clean_catalog_spacing(text)
         save(relative, text, before)

@@ -5535,6 +5535,117 @@ class TestReelsPage(unittest.TestCase):
         self.assertIn('href="./reels/"', index)
 
 
+class TestTradingVideos(unittest.TestCase):
+    """The hand-written Trading pages take the same video strip as generated ones.
+
+    scripts/add_progress_marks.py inserts it between markers while a lesson is
+    in video/published.json and removes it when it is not. The committed
+    video/published.json lists no Trading lesson yet, so the patcher itself is
+    exercised on in-memory page text with an invented entry, never by writing
+    a fake entry anywhere.
+    """
+
+    ENTRY = {"short": {"seconds": 26.0, "chapters": []},
+             "long": {"seconds": 231.4, "chapters": [{"t": 0, "title": "A"}, {"t": 30, "title": "B"}]}}
+    KEY = "market-structure/market-structure"
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
+        import add_progress_marks
+        cls.apm = add_progress_marks
+        cls.lesson = SITE_ROOT / "market-structure" / "market-structure" / "index.html"
+        cls.course = SITE_ROOT / "market-structure" / "index.html"
+        if not cls.lesson.is_file():
+            raise unittest.SkipTest("no trading pages")
+        cls.published = json.loads((REPO_ROOT / "video" / "published.json").read_text(encoding="utf-8")).get("lessons", {})
+
+    def plain(self, path):
+        """The page with every video region removed."""
+        a = self.apm
+        text = path.read_text(encoding="utf-8")
+        text = a.ensure_video_css(text, None)
+        text = a.ensure_video_strip(text, self.KEY, None)
+        return a.ensure_video_script(text, self.KEY, None)
+
+    def with_video(self, text):
+        a = self.apm
+        text = a.ensure_video_css(text, a.video.CSS)
+        text = a.ensure_video_strip(text, self.KEY, self.ENTRY)
+        return a.ensure_video_script(text, self.KEY, self.ENTRY)
+
+    def test_strip_is_idempotent_and_removable(self):
+        base = self.plain(self.lesson)
+        once = self.with_video(base)
+        self.assertNotEqual(base, once)
+        self.assertEqual(once, self.with_video(once), "a second run changed the page")
+        self.assertEqual(base, self.apm.ensure_video_script(self.apm.ensure_video_strip(
+            self.apm.ensure_video_css(once, None), self.KEY, None), self.KEY, None),
+            "removal did not restore the unpatched text")
+
+    def test_strip_sits_under_the_hero_with_the_reels_link(self):
+        once = self.with_video(self.plain(self.lesson))
+        self.assertLess(once.index('data-ui="hero"'), once.index("<!-- video-strip:begin -->"))
+        self.assertLess(once.index("<!-- video-strip:end -->"), once.index('id="basics"'))
+        self.assertIn('href="../../reels/#market-structure--market-structure"', once)
+        self.assertIn('data-video="short"', once)
+        self.assertIn('data-video="long"', once)
+
+    def test_css_lands_in_the_first_style_block_not_the_noscript_one(self):
+        once = self.with_video(self.plain(self.lesson))
+        self.assertLess(once.index("/* video-marks:begin */"), once.index("</style>"))
+        self.assertLess(once.index("/* video-marks:end */"), once.index("</style>"))
+        self.assertIn("\\25B6", self.apm.TRADING_LIST_CSS)
+
+    def test_the_markup_requests_nothing_until_a_click(self):
+        once = self.with_video(self.plain(self.lesson))
+        start = once.index("<!-- video-strip:begin -->")
+        strip = once[start:once.index("<!-- video-strip:end -->")]
+        for pattern in (r"<video\b", r"<source\b", r"<track\b", r"\ssrc\s*=", r"\sposter\s*=", r"\ssrcset\s*="):
+            self.assertIsNone(re.search(pattern, strip, re.I), pattern)
+        # The player is built by the inline script on a click, same origin.
+        self.assertIn('"base": "../../video/market-structure/market-structure/"', once)
+        self.assertNotIn("http", strip)
+
+    def test_course_card_carries_the_marker_only_for_published_lessons(self):
+        text = self.course.read_text(encoding="utf-8")
+        for card in re.finditer(r'<article class="lesson-card"([^>]*)>', text):
+            key = re.search(r'data-lesson="([^"]+)"', card.group(1)).group(1)
+            with self.subTest(lesson=key):
+                self.assertEqual(key in self.published, 'data-video="yes"' in card.group(1))
+        self.assertEqual(any(k.startswith("market-structure/") for k in self.published),
+                         "/* video-marks:begin */" in text)
+
+    def test_published_state_matches_every_trading_lesson_page(self):
+        for course in self.apm.trading_inventory():
+            for lesson in course["lessons"]:
+                key = "%s/%s" % (course["slug"], lesson["slug"])
+                page = (SITE_ROOT / course["slug"] / lesson["slug"] / "index.html").read_text(encoding="utf-8")
+                with self.subTest(lesson=key):
+                    self.assertEqual(key in self.published, "<!-- video-strip:begin -->" in page,
+                                     "run scripts/add_progress_marks.py after publishing")
+                    self.assertEqual(key in self.published, "<script data-video-marks>" in page)
+
+    def test_reels_feed_lists_a_published_trading_short_in_catalog_order(self):
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
+        import build_paths
+        from mathpath import reels
+        import catalog
+        published = {self.KEY: self.ENTRY, "algebra-foundations/absolute-value": self.ENTRY,
+                     "market-structure/ranges-breakouts-liquidity": {"long": self.ENTRY["long"]}}
+        listed = reels.reels(list(build_paths.GENERATED_PATHS) + [build_paths.trading_path()],
+                             catalog.SUBJECTS, published)
+        self.assertEqual([item[1] for item in listed],
+                         ["algebra-foundations/absolute-value", self.KEY],
+                         "Trading follows the catalog position; a long-only lesson has no reel")
+        rid, key, subject, course, title = listed[1]
+        self.assertEqual((rid, subject, course, title),
+                         ("market-structure--market-structure", "Trading", "Market Structure", "Market Structure Lab"))
+        card = reels._reel(*listed[1])
+        self.assertIn('href="../market-structure/market-structure/"', card)
+        self.assertIn("Trading &middot; Market Structure", card)
+
+
 class TestLessonDataMatchesTheRenderer(unittest.TestCase):
     """The lesson dicts must have the shape the renderer draws.
 
