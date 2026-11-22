@@ -13,7 +13,7 @@ I'm bullish on this chart. It sounds like a plan, but it isn't one. It doesn't s
 This lesson turns a view of the market into a conditional plan. Context, a setup, a trigger, an invalidation, a target, and a no trade condition. Each piece is written before the trade, so each piece can be checked after it.
 
 @words text="Process and measurement" sub="no live data, no recommendations, no signals"
-A note on scope. The lesson teaches process and measurement. It doesn't provide live market data, personalized recommendations, or trade signals. Its charts are practice material.
+A note on scope. The lesson teaches process and measurement. It doesn't provide live market data, personalized recommendations, or trade signals.
 
 @chapter Three core ideas
 @list heading="Core concepts" items="Context@Context|Trigger@Trigger|Invalidation@Invalidation"
@@ -36,11 +36,17 @@ A thesis is complete only when every decision can be evaluated objectively after
 @words text="The bullish pullback tab" sub="every line checkable at the decision candle"
 The lesson works one example in full, on its bullish pullback tab. Every line is checkable against the chart at the decision candle. The idea is to read it once, then complete the other three tabs without it. And then the lesson makes an important point about that worked plan.
 
-@math heading="From the 111.7 trigger" items="risk = 4.7 points@risks four point seven;;reward = 3.3 points@to make three point three;;3.3 ÷ 4.7 = 0.70R@zero point seven"
-From the one hundred eleven point seven trigger, this plan risks four point seven points to make three point three. Three point three divided by four point seven is zero point seven R.
+@list heading="The bullish pullback, worked" items="Context: daily bullish, back to the 108.0 breakout area@Context|Setup: pullback@setup is a pullback|Trigger: the 111.7 close@trigger is the close"
+Context: daily bullish structure, with higher highs and higher lows, corrected to the one hundred eight area it broke out from. The decision is long, and the setup is a pullback. The trigger is the close at one hundred eleven point seven, the first close back above the whole correction.
+
+@list heading="Failure and objective" items="Invalidation: 107.0@Invalidation is one hundred seven|Target: 115.0, the prior high@target is one hundred fifteen|No trade: a close below 108.1 first@no trade condition"
+Invalidation is one hundred seven, under the correction's one hundred eight point one low, with room for a wick. The target is one hundred fifteen, the prior high, not chosen to make a ratio. And the no trade condition: a close below one hundred eight point one before the trigger cancels the plan.
+
+@math heading="From the 111.7 trigger" items="risk = 111.7 − 107.0 = 4.7@risks four point seven;;reward = 115.0 − 111.7 = 3.3@makes three point three;;3.3 ÷ 4.7 = 0.70R@zero point seven"
+From the one hundred eleven point seven trigger down to one hundred seven, this plan risks four point seven points, and up to one hundred fifteen it makes three point three. Three point three divided by four point seven is zero point seven R.
 
 @words text="Complete ≠ worth taking"
-So complete is not the same as worth taking. A later lesson, Risk to Reward, explains why zero point seven R matters. This lesson's job is narrower: every line is written, and can be checked. Whether the trade is worth taking is a separate question, with its own lesson.
+So complete is not the same as worth taking. A later lesson, Risk to Reward, explains why zero point seven R matters. This lesson's job is narrower: every line is written, and can be checked.
 
 @chapter Where people slip
 @list heading="Common mistakes" items="Bias presented as a plan@The first|Invalidation from a desired dollar loss@The second|A target forced to reach 2R@The third|Changing conditions after entry@And the fourth"

@@ -20,17 +20,26 @@ One note before we start. The lesson's option chain is synthetic. Its prices and
 There are four decisions, in order. Direction: a long call expresses bullish exposure, a long put bearish, and you define the chart invalidation first. Time, strike, and liquidity come next.
 
 @art expiry-buffer
-Time. The expiration must outlast the thesis. In the lab's example the thesis window is ten days, so the selected expiration has to outlast those ten days. Extra time adds premium, and it changes how much time decay and volatility exposure you carry.
+Time. The expiration must outlast the thesis. In the lab's example the thesis window is ten days, so the selected expiration has to outlast those ten days. A thesis that needs ten days can't be expressed in a contract that ends on day seven. Extra time adds premium, and it changes how much time decay and volatility exposure you carry.
 
 @art strike-ladder
-Strike. Moneyness changes the premium, the delta, the intrinsic value, and how much of the underlying's move the contract captures. In the lab's synthetic example, near the money contracts balance premium against directional sensitivity. But the best fit depends on your thesis, risk limits, volatility, and actual quotes.
+Strike. Moneyness changes the premium, the delta, the intrinsic value, and how much of the underlying's move the contract captures. In the lab's synthetic example, near the money contracts balance premium against directional sensitivity, but the best fit depends on your thesis and actual quotes.
 
 @art spread-gap
 Liquidity. Look at the bid ask spread and the actual market depth. The spread is part of the cost of getting in and getting out. A good thesis can be damaged by expensive friction at both ends.
 
 @chapter The words in the table
-@list heading="Reading the chain" items="Delta: directional sensitivity@Delta|Theta: time decay per day@Theta|Vega: exposure to implied volatility@Vega|Time buffer: days beyond the thesis@time buffer"
-The chain uses a few columns. Delta is the directional sensitivity. Theta is time decay, per day. Vega is exposure to implied volatility, per point. And the time buffer is how much life the contract has beyond your thesis window.
+@list heading="Call, put, strike" items="Long call: the right to buy at the strike@long call|Long put: the right to sell at the strike@long put|Strike below price: call in the money@in the money"
+First, the vocabulary. A long call is the right, not the obligation, to buy at the strike until expiration. A long put is the right to sell at the strike. Both cost a premium, and that's all a long option can lose. A call whose strike is below the price is in the money.
+
+@words text="ITM · ATM · OTM" sub="puts mirror calls"
+At the strike, it's at the money, and above it, out of the money. Puts mirror this.
+
+@math heading="Premium and breakeven" items="cost per contract = premium × 100@times the multiplier;;call breakeven at expiration = strike + premium@plus the premium;;put breakeven at expiration = strike − premium@minus the premium"
+The premium is quoted per share, times the multiplier of one hundred per contract. At expiration a call breaks even at the strike plus the premium, and a put at the strike minus the premium.
+
+@list heading="Reading the chain" items="Delta: premium move per 1.00 move@Delta|Theta: one day's cost@Theta|Vega: one IV point's worth@Vega|Spread: paid in and out@spread"
+Delta is how much the premium moves for a one point move in the underlying. A zero point five three delta call gains about fifty three cents per share when the underlying rises a dollar. Theta is what one day's passing costs, and it gets faster near expiration. Vega is what one point of implied volatility is worth. And the spread is paid twice, in and out.
 
 @chapter Right, and still disappointed
 @art time-decay
@@ -55,7 +64,7 @@ And keep the lesson's warnings. Long calls and puts can expire worthless. The la
 
 @chapter Try it
 @list heading="The drill" items="Expiration outlasts the thesis@outlasts the thesis|A strike you can defend@strike you can defend|A spread priced into the plan@priced into the plan"
-The drill is the whole decision. Choose the contract whose expiration outlasts the thesis, whose strike you can defend, and whose spread you've priced into the plan. Not simply the one with the lowest premium. A cheap contract that expires before your idea plays out isn't cheap at all. It's just a different bet from the one you meant to make.
+The drill is the whole decision. Choose the contract whose expiration outlasts the thesis, whose strike you can defend, and whose spread you've priced into the plan. Not simply the one with the lowest premium.
 
 @end text="Explore the synthetic chain"
 You can select rows, simulate exits, and grade a quote yourself, on Learn. That's learn dot get er done dot I O.

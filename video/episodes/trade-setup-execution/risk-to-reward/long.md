@@ -19,22 +19,29 @@ As with the rest of this course, it teaches process and measurement. It doesn't 
 @art r-unit
 One R is the initial planned loss, from entry to stop. Once every trade is measured in R, outcomes can be compared across trades with different prices and sizes. A target twice as far as the stop is a two R target.
 
+@chapter The balanced preset
+@math heading="Long · entry 100.00 · stop 98.00 · target 104.00" items="risk = |100.00 − 98.00| = 2.00@one hundred minus ninety eight;;reward = |104.00 − 100.00| = 4.00@one hundred four minus;;R multiple = 4.00 ÷ 2.00 = 2.00R@four divided by two"
+The lesson works its balanced preset by hand. A long, entering at one hundred, with a stop at ninety eight and a target at one hundred four. Risk is one hundred minus ninety eight, two points. Reward is one hundred four minus one hundred, four points. And four divided by two is a two R multiple.
+
+@math heading="Win rate 45% · avg loss 1.00R · costs 0.05R" items="break-even = 1.00 ÷ (2.00 + 1.00) = 33.3%@one over two plus one;;E = 0.45 × 2.00 − 0.55 × 1.00 − 0.05@zero point four five times two;;= 0.90 − 0.55 − 0.05 = +0.30R@plus zero point three"
+With an average loss of one R, the break even rate is one over two plus one, thirty three point three percent. With a forty five percent win rate and costs of five hundredths of an R, expectancy is zero point four five times two, minus zero point five five times one, minus zero point zero five. That's plus zero point three R per trade.
+
 @chapter The break-even rate
 @art breakeven-balance
 The average win compared with the average loss decides the win rate you need just to break even, before costs. Bigger wins relative to losses means you can afford to be right less often.
 
-@math heading="Break-even win rate" items="break-even = avg loss ÷ (avg win + avg loss)@average loss divided by;;1 ÷ (2 + 1) = 33.3%@one over two plus one;;0.50 ÷ (2.00 + 0.50) = 20.0%@zero point five over"
-The formula is the average loss divided by the average win plus the average loss. With a two R win and a one R loss, that's one over two plus one, thirty three point three percent. Now set the average loss to half an R. It's zero point five over two plus zero point five: twenty percent.
+@math heading="Break-even win rate" items="break-even = avg loss ÷ (avg win + avg loss)@average loss divided by;;0.50 ÷ (2.00 + 0.50) = 20.0%@zero point five over"
+The formula is the average loss divided by the average win plus the average loss. Now change one input from the preset. Set the average loss to half an R. It's zero point five over two plus zero point five: twenty percent.
 
 @words text="Losing less than 1R → fewer wins needed"
-So a system that loses less than one R on average needs fewer wins. The old shorthand, one over one plus the ratio, can't show that, because it assumes every loss is exactly one R.
+So a system that loses less than one R on average needs fewer wins. The old shorthand, one over one plus the ratio, can't show that. It's only right when the average loss is exactly one R.
 
 @chapter Expectancy
 @art expectancy-sum
 Expectancy combines everything: the win rate, the average win, the average loss, and the costs. It estimates the average result per trade, in R.
 
 @math heading="Win rate 30%, 2R plan, costs 0.05R" items="E = W × avg win − (1 − W) × avg loss − costs@win rate times;;= 0.30 × 2.00 − 0.70 × 1.00 − 0.05@zero point three times two;;= 0.60 − 0.70 − 0.05@zero point six minus;;= −0.15R@minus zero point one five"
-Take the lesson's example. Win rate times average win, minus the loss rate times average loss, minus costs. With a thirty percent win rate, that's zero point three times two, minus zero point seven times one, minus zero point zero five. Zero point six minus zero point seven minus zero point zero five. Minus zero point one five R.
+Now change a different input. Set the win rate to thirty percent instead. Win rate times average win, minus the loss rate times average loss, minus costs. With a thirty percent win rate, that's zero point three times two, minus zero point seven times one, minus zero point zero five. Zero point six minus zero point seven minus zero point zero five. Minus zero point one five R.
 
 @words text="Same 2R plan, negative expectancy"
 That's the two R plan that loses money. The ratio didn't change. The estimate behind it did. And that estimate is the part that has to come from backtesting.

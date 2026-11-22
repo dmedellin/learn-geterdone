@@ -26,15 +26,15 @@ Second, per unit risk. For each share or contract, include the loss from entry t
 And third, round down. Use whole tradable units, without ever going over the risk budget. Never round up past it. Rounding up by even one unit means the loss at your stop would be bigger than the budget you chose, and the budget stops meaning anything.
 
 @chapter Shares
-@math heading="Shares" items="budget = equity × risk %@equity times;;per-share risk = |entry − stop| + slippage and fees@entry to stop;;shares = budget ÷ per-share risk, rounded down@divide and round down"
-For shares, the budget is equity times your risk percentage. The per share risk is the distance from entry to stop, plus the estimated slippage and fees per share. Then divide and round down.
+@math heading="Shares" items="account risk = equity × risk %@equity times;;shares = floor(account risk ÷ (|entry − stop| + cost per share))@entry to stop"
+For shares, the account risk is equity times your risk percentage. Divide it by the per share risk, the distance from entry to stop plus the estimated slippage and fees per share, and round down. Floor just means round down to a whole number.
 
 @art stop-widens
 This is why a wider stop means fewer shares. The budget stays fixed. The per share risk grows. So the quantity shrinks. You never tighten the stop to make the number bigger. The stop comes from structure, as the stop placement lesson showed, and the size simply follows.
 
 @chapter Long options
-@math heading="Long options" items="loss per contract = planned premium loss + round-trip costs@planned premium loss;;contracts = budget ÷ loss per contract, rounded down@round down"
-For a long option, the per unit loss is the planned premium loss, from the premium you paid to your planned premium exit, plus the round trip costs per contract. Divide the budget by that, and round down.
+@math heading="Long options" items="contracts = floor(account risk ÷ planned loss per contract)@planned premium loss"
+For a long option, the per unit loss is the planned premium loss, from the premium you paid to your planned premium exit, plus the round trip costs per contract. Divide the account risk by that planned loss per contract, and round down.
 
 @art option-path
 But there's a limitation. An underlying price stop doesn't map to one guaranteed option price. Delta, gamma, implied volatility, time decay, the spread, and gaps can all change the premium you actually exit at.
