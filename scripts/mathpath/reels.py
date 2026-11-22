@@ -38,14 +38,14 @@ def reel_id(course_slug, lesson_slug):
 def reels(paths, subjects, published):
     """[(reel id, "<course>/<lesson>", subject display, course title, lesson title)] in catalog order.
 
-    `paths` are the generated PATH dicts, `subjects` the catalog entries (their
+    `paths` are the generated PATH dicts plus Trading's (build_paths.trading_path), `subjects` the catalog entries (their
     order and optional short_title), `published` the video/published.json lessons.
     """
     by_slug = {path["slug"]: path for path in paths}
     out = []
     for entry in subjects:
         path = by_slug.get(entry["slug"])
-        if path is None:  # Trading is hand-authored; its lessons carry no video yet
+        if path is None:
             continue
         display = entry.get("short_title", path["title"])
         for course in path["courses"]:

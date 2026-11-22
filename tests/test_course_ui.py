@@ -673,7 +673,7 @@ class TestTradingNormalization(unittest.TestCase):
                             return s[start:s.index('<div class="progress-bar"')].replace('</main>', '').strip()
                         self.assertEqual(instruction(original), instruction(result), "instructional markup changed")
                         scripts = lambda s: re.findall(r'<script(?:\s+[^>]*)?>.*?</script>', s, re.S)
-                        authored = lambda s: [v for v in scripts(s) if 'data-progress-marks' not in v]
+                        authored = lambda s: [v for v in scripts(s) if 'data-progress-marks' not in v and 'data-video-marks' not in v]
                         self.assertEqual(authored(original), authored(result), "authored lab or theme script changed")
             self.assertEqual(118, checked)
 
