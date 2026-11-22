@@ -179,6 +179,7 @@ published URL space:
 | `learn.geterdone.io/paths/<subject>/` | `site/paths/<subject>/index.html` — one page per path: `trading`, `discrete-math`, `algebra`, `system-design`, `algorithms`, `operations-research`, `philosophy`, `english`, `differential-equations`, `capital`, `phenomenology`, `reading-faster`, `code-complete`, `enterprise-patterns`, `intro-algorithms`, `domain-driven-design`, `design-patterns`, `accelerate`, `wealth-of-nations`, `leviathan` |
 | `learn.geterdone.io/<course>/` | `site/<course>/index.html` — one of the 180 course homes |
 | `learn.geterdone.io/<course>/<lesson>/` | `site/<course>/<lesson>/index.html` — one of the 1,505 lessons |
+| `learn.geterdone.io/reels/` | `site/reels/index.html` — every published lesson short in one vertical feed, rendered by `scripts/mathpath/reels.py` through `scripts/build_paths.py`; shared chrome, not course material |
 
 The site index and the path pages are SHARED CHROME: they must not assume the
 subject is trading — not in copy, not in a footer, not in metadata. Only course
@@ -189,7 +190,7 @@ it separately rather than classifying pages by URL shape.
 `site/` is the document root. Whatever `site/` contains is exactly what `/` serves;
 an extra directory level in `site/` becomes an extra path segment in the public URL.
 
-The full 1,710-page map (plus eight published JSON assets) is in
+The full 1,711-page map (plus eight published JSON assets) is in
 [README.md](README.md#url-layout), and it is enforced in five places that must
 agree: `REQUIRED_PAGES` in `tests/test_site_invariants.py`, `scripts/smoke.py`,
 `acceptance.checks` in `release/contract.json` (and in

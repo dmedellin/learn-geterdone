@@ -13,6 +13,7 @@ reads and renders the same on both sites.
 | Upload | `video/publish.py`: rsync to the host, then checks each file over HTTPS | ThinkCentre |
 | Live list | `video/published.json`, written by `publish.py` only after the files answer 200 | committed |
 | Player | `scripts/mathpath/video.py`: two buttons under the lesson title; a click builds the `<video>` | every lesson listed in `published.json` |
+| Reels feed | `scripts/mathpath/reels.py`: `/reels/`, every published short in one vertical feed | built by `scripts/build_paths.py` |
 | Serving | `deploy/Caddyfile` `handle /video/*` from `/srv-media`, CSP `media-src 'self'` | production container |
 
 The videos are not in the image: about 1,400 lessons times two videos is tens of
@@ -20,6 +21,26 @@ gigabytes. They live on the production host and are bind-mounted read-only into
 the container. A lesson that is not in `published.json` renders byte for byte as
 it did before videos existed, and the page still loads nothing until the reader
 presses play, so the self-containment invariant (AGENTS.md section 2) holds.
+
+## Reels
+
+`/reels/` puts every lesson's short in one full-screen vertical feed, in library
+order (Subjects as `scripts/catalog.py` lists them, then courses and lessons in
+path order), like a social reel: snap scrolling, the reel in view plays and loops,
+the one that leaves pauses, only the reel in view and its two neighbours hold a
+`<video>`, arrow keys / `j` `k` / PageUp PageDown step, `m` toggles sound, a tap
+pauses, and the URL fragment (`#<course>--<lesson>`) follows the reel. Each lesson
+with a short links to its reel ("Open in Reels") beside its two buttons, and the
+library index links to the feed.
+
+The one difference from loop.geterdone.io, which autoplays muted on load: here the
+page loads nothing until the reader acts (AGENTS.md section 2). Each reel is a
+static card under a "Tap to start" overlay; the first tap, click or key press
+starts the feed with sound, and from then on it autoplays. The media URLs live only
+in the inline script. `TestReelsPage` in `tests/test_site_invariants.py` checks
+that the markup carries no `src`/`poster`, that every published short is listed
+once, and that the links both ways resolve. A newly published video reaches the
+feed on the next `python3 scripts/build_paths.py`, with the lesson page.
 
 ## Host change needed (David, once)
 
@@ -69,7 +90,8 @@ anything, so pages show no player. Shipping this code first is safe.
    A full lesson takes roughly its own length to render, a short about 1.5 minutes,
    so a Subject of 50 lessons is most of a day of rendering.
 3. `publish.py` uploads and lists them; `python3 scripts/build_paths.py` rebuilds the
-   pages; commit `video/published.json` and the pages, and release as usual.
+   pages (the lessons and `/reels/`); commit `video/published.json` and the pages,
+   and release as usual.
 
 The Trading Subject's hand-written lessons are not covered yet (they are not built
 by `scripts/build_paths.py`); they need the same strip added through
