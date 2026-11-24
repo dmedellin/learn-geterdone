@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Budgets and limits</p>
       <h1>Packet Loss and Throughput</h1>
       <p class="lesson-lede">Compute the loss-limited bound on one TCP flow and the number of parallel streams needed to fill a link.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:28</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:59</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#latency-and-the-tail--packet-loss-and-throughput">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>One flow, bounded by two numbers that are not the link</h2><div class="prose reading"><p>A team copies a dataset between two regions over a ten-gigabit link and measures a little over a megabit a second. The link is not the problem, the disks are not the problem, and nothing is broken. The transfer is using one TCP connection over a <span class="math" data-say="100 milliseconds">100 ms</span> round trip with one percent packet loss, and that combination has a ceiling.</p><div class="defbox"><span class="label">Definition &middot; Mathis bound</span><p>For a loss rate <span class="math" data-say="p">p</span>, a maximum segment size <span class="math" data-say="MSS">MSS</span> and a round-trip time <span class="math" data-say="RTT">RTT</span>, a single congestion-controlled flow sustains at most approximately <span class="math" data-say="the quantity MSS over RTT, times the quantity 1 over the square root of p">(MSS / RTT) × (1 / √p)</span>. It is a bound on the average rate over many congestion cycles, derived from the sawtooth of window growth and halving; it ignores timeouts, receive-window limits and the slow-start phase, so a real flow achieves this or less.</p></div><div class="mathblock" data-say="MSS equals 1460 B, RTT equals 100 milliseconds, p equals 1 percent equals 1 over 100. MSS over RTT, equals, 1460 B over 0.1 seconds, equals, 14600 B per second. 1 over the square root of p, equals, 1 over the square root of 0.01, equals, 10. bound, equals, 14600 times 10, equals, 146000 B per second. equals, 146000 times 8 over 10 to the power 6, equals, 1.168 Mbit over s. link, 10000 Mbit over s. streams, equals, the ceiling of 10000 over 1.168, equals, 8562" tabindex="0" role="region" aria-label="Mathematical notation">MSS = 1460 B    RTT = 100 ms    p = 1% = 1/100
@@ -2794,6 +2820,55 @@ the square root is why this is the one rounded figure on the course</div><figcap
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/latency-and-the-tail/packet-loss-and-throughput/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 47.0, "title": "Working it out"}, {"t": 101.0, "title": "The square root"}, {"t": 133.0, "title": "Two levers"}, {"t": 161.5, "title": "Honest limits"}, {"t": 193.0, "title": "Where people slip"}, {"t": 209.8, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
