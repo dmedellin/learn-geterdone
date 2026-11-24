@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Storage and bandwidth</p>
       <h1>Storage from Ingest and Retention</h1>
       <p class="lesson-lede">Size storage after a retention window with a stated monthly growth rate and a stated number of copies.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:25</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:48</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#capacity-estimation--storage-from-ingest-and-retention">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>A rate over a window, under growth, times the copies</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Retention window</span><p>The <strong>retention window</strong> <span class="math" data-say="R">R</span> is how long data is kept before it is deleted. Steady state is reached once the system is older than <span class="math" data-say="R">R</span>: each day&rsquo;s arrivals are matched by one day&rsquo;s deletions, and the total held stops growing for that reason and starts growing again for any other.</p></div><p>So the quantity to size is what accumulates across <span class="math" data-say="R">R</span> days of arrivals. Write <span class="math" data-say="i sub m">iₘ</span> for the ingest per day during block <span class="math" data-say="m">m</span>; the unique data held is <span class="math" data-say="the sum of i sub m times days in block m">Σ iₘ · (days in block m)</span>, and everything that follows is about what the terms of that sum look like.</p><p>If the ingest never changes, every term is the same and the sum is <span class="math" data-say="rate times days">rate × days</span>. That is an arithmetic series with common difference zero, and it is the only case in which storage is a product. It is also the case everyone has in mind when they multiply, which is why the product feels like a definition rather than a special case.</p><div class="defbox"><span class="label">Definition &middot; Monthly compounded growth</span><p>An ingest <strong>growing at <span class="math" data-say="g">g</span> a month</strong> is multiplied by <span class="math" data-say="1 plus g">(1 + g)</span> once per month, so during month <span class="math" data-say="m">m</span> &mdash; counting from <span class="math" data-say="m equals 0">m = 0</span> &mdash; the daily ingest is <span class="math" data-say="i sub 0 times the quantity 1 plus g, to the power m">i₀ · (1 + g)ᵐ</span>. The window is a run of 30-day blocks, each with its own constant rate, and the total is a geometric sum. Growth here steps once a month rather than compounding continuously, which keeps every term an exact fraction.</p></div><div class="mathblock" data-say="i sub 0 equals 500 gigabytes per day, R equals 90 days, g equals 5 percent over month, copies equals 3. block, days, ingest over day, bytes added, held one copy. a table, shown on the page. one copy, 47.29 terabytes. times 3 copies, 141.86 terabytes. if the ingest never grew, 500 gigabytes times 90 times 3, equals 135 terabytes. growth costs, 141.86 over 135, equals 1.0508 times" tabindex="0" role="region" aria-label="Mathematical notation">i₀ = 500 GB/day     R = 90 days     g = 5%/month     copies = 3
@@ -2789,6 +2815,55 @@ then              × copies                         the last step
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/capacity-estimation/storage-from-ingest-and-retention/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 30.0, "title": "A sum over the window"}, {"t": 46.3, "title": "Growth makes it geometric"}, {"t": 74.3, "title": "A worked example"}, {"t": 127.3, "title": "Growth is not a rounding"}, {"t": 162.7, "title": "Where people slip"}, {"t": 200.8, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
