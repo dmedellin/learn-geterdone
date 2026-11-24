@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Variability and pooling</p>
       <h1>Many Servers: Pooling, and Erlang C</h1>
       <p class="lesson-lede">Compute the waiting time of one pooled queue and of s separate queues at the same load, and compare.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:27</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:40</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#queues-and-utilisation--many-servers-and-pooling">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Pooling, and the formula that prices it</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Offered load, and the M/M/s queue</span><p><span class="math" data-say="M over M over s">M/M/s</span> is the M/M/1 model with <span class="math" data-say="s">s</span> identical servers behind one queue. The <strong>offered load</strong> <span class="math" data-say="A equals lambda over mu">a = λ/μ</span> is measured in servers: it is how many servers the work would keep permanently busy. The per-server utilisation is <span class="math" data-say="rho equals A over s">ρ = a/s</span>, and the system settles when <span class="math" data-say="rho is less than 1">ρ < 1</span>. The server count on this path is always <span class="math" data-say="s">s</span>.</p></div><div class="defbox"><span class="label">Definition &middot; Erlang C, stated</span><p>The probability that an arrival has to wait at all is <span class="math" data-say="s choose A equals A to the power s over the quantity s factorial times the quantity 1 minus rho, divided by the sum over  of n is less than s A to the power n over n factorial plus A to the power s over the quantity s factorial times the quantity 1 minus rho">C(s,a) = [a^s/(s!(1 − ρ))] ÷ [Σ_(n&lt;s) aⁿ/n! + a^s/(s!(1 − ρ))]</span>.</p><p>From it, <span class="math" data-say="L sub q equals s choose A times rho over the quantity 1 minus rho">L_q = C(s,a)·ρ/(1 − ρ)</span> and <span class="math" data-say="W sub q equals L sub q over lambda">W_q = L_q/λ</span> by Little's Law. The derivation is not given here: it is Operations Research, <span class="math" data-say="markov-chains-decisions-and-queues over multiple-servers-and-erlang-c">markov-chains-decisions-and-queues/multiple-servers-and-erlang-c</span>, and this course's list of what it does not cover says the same.</p></div><p>At <span class="math" data-say="s equals 1">s = 1</span> the formula collapses to <span class="math" data-say="C equals rho">C = ρ</span> and the single-server results of &ldquo;The M/M/1 Queue&rdquo;, which is the check worth doing first on any implementation of it.</p><div class="mathblock" data-say="lambda equals 3 per second, mu equals 1 per second per server, s equals 4. A equals lambda over mu equals 3 servers prime worth of work, rho equals A over s equals 3 over 4. pooled M over M over 4, 4 choose 3 equals 27 over 53 is approximately 0.5094, the chance of waiting at all. L sub q equals the quantity 27 over 53, times 3 equals 81 over 53 is approximately 1.528. W sub q equals L sub q over lambda, equals 27 over 53 is approximately 0.5094 seconds. four separate M over M over 1 queues, lambda over 4 equals 3 over 4 each, same rho equals 3 over 4. L sub q equals rho squared over the quantity 1 minus rho, equals 9 over 4, per queue. W sub q equals L sub q over the quantity 3 over 4, equals 3 seconds. 3 divided by 27 over 53 equals 53 over 9 is approximately 5.9, the cost of splitting the traffic" tabindex="0" role="region" aria-label="Mathematical notation">λ = 3 / s      μ = 1 / s per server      s = 4
@@ -3103,6 +3129,55 @@ four separate queues at the same ρ = 3/4:  W_q = 3 s,  a ratio of 53/9</div><fi
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/queues-and-utilisation/many-servers-and-pooling/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 32.5, "title": "Offered load"}, {"t": 78.8, "title": "A worked example"}, {"t": 128.3, "title": "How it moves with load"}, {"t": 157.4, "title": "What pooling costs"}, {"t": 179.6, "title": "Where people slip"}, {"t": 194.4, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
