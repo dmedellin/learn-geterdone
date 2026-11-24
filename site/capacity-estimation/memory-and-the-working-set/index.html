@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Machines and memory</p>
       <h1>Memory and the Working Set</h1>
       <p class="lesson-lede">Size a cache in gigabytes for a target hit rate, given a dataset size and a stated hot fraction.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:27</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:32</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#capacity-estimation--memory-and-the-working-set">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>How much memory a target hit rate costs</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Working set</span><p>The <strong>working set</strong> is the portion of the data that the traffic touches over a window. A workload with <strong>hot fraction</strong> <span class="math" data-say="f">f</span> and <strong>hot share</strong> <span class="math" data-say="s">s</span> has <span class="math" data-say="f">f</span> of its bytes taking <span class="math" data-say="s">s</span> of its reads; caching a fraction <span class="math" data-say="c">c</span> of the data gives a <strong>hit rate</strong> <span class="math" data-say="h of c">h(c)</span>, and the <strong>memory needed</strong> for a target <span class="math" data-say="h">h</span> is the dataset times the <span class="math" data-say="c">c</span> that reaches it.</p></div><p>The two numbers <span class="math" data-say="f">f</span> and <span class="math" data-say="s">s</span> are what makes caching work at all. If reads were spread evenly over the data, caching <span class="math" data-say="c">c</span> of it would buy <span class="math" data-say="c">c</span> of the hits and a cache would be exactly as useful as it was large &mdash; which is to say, not useful, because you cannot afford a cache the size of the data. Skew is the whole business case.</p><div class="mathblock" data-say="inside the hot region, c is at most f. h of c, equals, s times c over f. past the knee, c is greater than f. h of c, equals, s plus the quantity 1 minus s, times the quantity c minus f, over the quantity 1 minus f. inverted, for a target h. h is at most s, c, equals, f times h per second. h is greater than s, c, equals, f plus the quantity 1 minus f, times the quantity h minus s, over the quantity 1 minus s" tabindex="0" role="region" aria-label="Mathematical notation">inside the hot region       c ≤ f
@@ -2780,6 +2806,55 @@ h(c) = s + (1−s)(c−f)/(1−f)      c &gt; f      past the knee
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/capacity-estimation/memory-and-the-working-set/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 39.8, "title": "The hit rate curve"}, {"t": 77.8, "title": "A worked example"}, {"t": 108.5, "title": "What the last points cost"}, {"t": 148.5, "title": "What the model assumes"}, {"t": 171.1, "title": "Where people slip"}, {"t": 184.4, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
