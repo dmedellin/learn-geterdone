@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Searching a graph</p>
       <h1>Depth-First Search and the Timestamps</h1>
       <p class="lesson-lede">Run one walk, write two numbers on every vertex, and classify every arc from those numbers alone.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:23</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:59</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#graph-algorithms--depth-first-search-and-the-timestamps">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>One walk, and everything it writes down</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Discovery and finish times</span><p>A <strong>depth-first walk</strong> of a digraph keeps a counter starting at 0. On reaching an undiscovered vertex <span class="math" data-say="v">v</span> it increments the counter and records <strong>d[v]</strong>; after every arc out of <span class="math" data-say="v">v</span> has been considered it increments the counter again and records <strong>f[v]</strong>. When the walk from one root runs out of reachable vertices it restarts at the lowest-numbered undiscovered vertex, so the tree arcs form a FOREST and not necessarily a tree.</p></div><p>The counter is shared across the whole forest, which is what makes the times comparable between vertices that were never on the same walk. On <span class="math" data-say="n">n</span> vertices it ends at <span class="math" data-say="2 n">2n</span>, always, because each vertex contributes exactly one tick when it opens and one when it closes.</p><div class="defbox"><span class="label">Definition &middot; The four classes of an arc</span><p>Relative to one completed walk, an arc <span class="math" data-say="u, v">(u, v)</span> is a <strong>tree</strong> arc if <span class="math" data-say="v">v</span> was discovered by it; a <strong>back</strong> arc if <span class="math" data-say="v">v</span> is a proper ancestor of <span class="math" data-say="u">u</span> in the forest; a <strong>forward</strong> arc if <span class="math" data-say="v">v</span> is a proper descendant of <span class="math" data-say="u">u</span> and the arc is not the tree arc; and a <strong>cross</strong> arc otherwise. The four are exhaustive and exclusive, so every arc gets exactly one label.</p></div><p>The definition names ancestry, and ancestry is read off the times: <span class="math" data-say="v">v</span> is a descendant of <span class="math" data-say="u">u</span> exactly when <span class="math" data-say="d at u is less than d at v">d[u] &lt; d[v]</span> and <span class="math" data-say="f at v is less than f at u">f[v] &lt; f[u]</span>. That is the whole of the implementation. The lab prints, for every arc, the class and the comparison that settled it.</p></div></div>
@@ -3531,6 +3557,55 @@ parenthesis theorem:  two intervals nest or are disjoint, never overlap</div><fi
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/graph-algorithms/depth-first-search-and-the-timestamps/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 12.6, "title": "Two timestamps"}, {"t": 45.0, "title": "The parenthesis theorem"}, {"t": 90.0, "title": "Four classes of arc"}, {"t": 139.9, "title": "A fact about the walk"}, {"t": 188.0, "title": "The cost"}, {"t": 201.1, "title": "Where people slip"}, {"t": 218.4, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
