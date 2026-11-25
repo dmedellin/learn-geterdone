@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The miss rate</p>
       <h1>Average Latency under a Cache</h1>
       <p class="lesson-lede">Compute the mean latency as a weighted average of two outcomes, and the p99 as a rank that is one of them.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:27</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:44</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#caching-and-hit-rates--average-latency-under-a-cache">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>An expectation over two outcomes, and the percentile that ignores it</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Latency under a cache</span><p>A request is served in <span class="math" data-say="t sub hit">t_hit</span> with probability <span class="math" data-say="h">h</span> and in <span class="math" data-say="t sub miss">t_miss</span> with probability <span class="math" data-say="1 minus h">1 − h</span>. Its <strong>mean latency</strong> is <span class="math" data-say="E of latency equals h times t sub hit plus the quantity 1 minus h, times t sub miss">E[latency] = h·t_hit + (1 − h)·t_miss</span>, and its <strong>distribution</strong> takes only those two values.</p><p><span class="math" data-say="t sub miss">t_miss</span> here is the whole miss path: the lookup that failed, the backend call, and the write back into the cache. It is not the backend&rsquo;s service time alone.</p></div><p>The mean lies strictly between the two latencies whenever <span class="math" data-say="h">h</span> is strictly between <span class="math" data-say="0">0</span> and <span class="math" data-say="1">1</span>, and it equals neither. It sits close to <span class="math" data-say="t sub hit">t_hit</span> because <span class="math" data-say="h">h</span> is close to <span class="math" data-say="1">1</span>: the weighted average is dragged toward whichever outcome is common, and in a cache that is the hit.</p><div class="example"><span class="label">Example &middot; A ninety-five per cent cache over a forty-millisecond backend</span><p><span class="math" data-say="h equals 95 percent">h = 95%</span>, <span class="math" data-say="t sub hit equals 1 milliseconds">t_hit = 1 ms</span>, <span class="math" data-say="t sub miss equals 40 milliseconds">t_miss = 40 ms</span>. The mean is <span class="math" data-say="the quantity 19 over 20, times 1 plus the quantity 1 over 20, times 40 equals 19 over 20 plus 2 equals 59 over 20 equals 2.95 milliseconds">(19/20)(1) + (1/20)(40) = 19/20 + 2 = 59/20 = 2.95 ms</span>. The unweighted average of the two latencies is <span class="math" data-say="20.5 milliseconds">20.5 ms</span>, seven times too large, and it is the answer you get by forgetting that one outcome happens nineteen times as often as the other.</p></div><h3>The percentile is a different question with a different answer</h3><p>A percentile asks for a value, not an average: the <span class="math" data-say="q">q</span>-quantile is the smallest <span class="math" data-say="t">t</span> with <span class="math" data-say="P of latency is at most t is at least q">P(latency ≤ t) ≥ q</span>, which is the nearest-rank convention of “Percentiles from a Sample”. Here the function <span class="math" data-say="P of latency is at most t">P(latency ≤ t)</span> is a staircase with two steps &mdash; it is <span class="math" data-say="0">0</span> below <span class="math" data-say="t sub hit">t_hit</span>, <span class="math" data-say="h">h</span> from <span class="math" data-say="t sub hit">t_hit</span> up to <span class="math" data-say="t sub miss">t_miss</span>, and <span class="math" data-say="1">1</span> at <span class="math" data-say="t sub miss">t_miss</span> and above.</p><div class="mathblock" data-say="P of latency is at most t, 1. h. 0. t sub hit, t sub miss. the curve is FLAT at h between the two values, so no percentile. can land between them, q is at most h to t sub hit, q is greater than h to t sub miss" tabindex="0" role="region" aria-label="Mathematical notation">P(latency ≤ t)      1 ┤                        ┌──────
@@ -2949,6 +2975,55 @@ p50 = 1 ms    p95 = 1 ms    p99 = 40 ms    p99.9 = 40 ms</div><figcaption>One ex
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/caching-and-hit-rates/average-latency-under-a-cache/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 20.1, "title": "The weighted mean"}, {"t": 44.8, "title": "A worked example"}, {"t": 87.3, "title": "The percentile steps"}, {"t": 121.6, "title": "Where each percentile flips"}, {"t": 171.3, "title": "Where people slip"}, {"t": 193.1, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

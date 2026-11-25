@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The miss rate</p>
       <h1>Hit Rate and Backend Load</h1>
       <p class="lesson-lede">Turn a hit rate into the requests per second the backend still receives, and into the utilisation that leaves it at.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:23</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:46</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#caching-and-hit-rates--hit-rate-and-backend-load">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>The miss rate, the backend load, and the utilisation it leaves</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Hit rate and miss rate</span><p>For a stream of requests arriving at rate <span class="math" data-say="lambda">λ</span>, the <strong>hit rate</strong> <span class="math" data-say="h">h</span> is the fraction served from the cache and the <strong>miss rate</strong> <span class="math" data-say="1 minus h">1 − h</span> is the fraction forwarded. The <strong>backend load</strong> is <span class="math" data-say="1 minus h lambda">(1 − h)λ</span>, in the same units as <span class="math" data-say="lambda">λ</span>.</p><p>The two rates are one number written two ways. Which one you write down decides what the sentence is about: <span class="math" data-say="h">h</span> is about the cache, <span class="math" data-say="1 minus h">1 − h</span> is about everything behind it.</p></div><p>There is no model in that definition and no assumption to argue with. It is a split of a rate into two parts, and it is exact whenever the hit rate is measured over the same window as the arrival rate. What it is not is stable: <span class="math" data-say="h">h</span> is a property of the workload and the cache together, and a change in either moves it.</p><div class="example"><span class="label">Example &middot; Ten thousand requests a second at a ninety per cent hit rate</span><p><span class="math" data-say="lambda equals 10000">λ = 10 000</span> rps and <span class="math" data-say="h equals 90 percent">h = 90%</span>. The cache absorbs <span class="math" data-say="the quantity 9 over 10, times 10000 equals 9000">(9/10)(10 000) = 9 000</span> rps and the backend receives <span class="math" data-say="the quantity 1 over 10, times 10000 equals 1000">(1/10)(10 000) = 1 000</span> rps. Against a backend that can serve <span class="math" data-say="mu equals 2000">μ = 2 000</span> rps that is <span class="math" data-say="rho equals 1000 over 2000 equals 1 over 2">ρ = 1 000/2 000 = 1/2</span>, so the backend is busy half the time.</p></div><h3>One more nine is a factor, not a gain</h3><p>Take the same <span class="math" data-say="lambda">λ</span> and improve the cache. At <span class="math" data-say="h equals 95 percent">h = 95%</span> the backend receives <span class="math" data-say="the quantity 1 over 20, times 10000 equals 500">(1/20)(10 000) = 500</span> rps: the hit rate went up by five points and the backend&rsquo;s work <strong>halved</strong>. At <span class="math" data-say="h equals 99 percent">h = 99%</span> it receives <span class="math" data-say="100">100</span> rps, a tenth of what it received at <span class="math" data-say="90 percent">90%</span>. Nothing about the backend improved by nine per cent.</p><div class="mathblock" data-say="backend at h sub 2, 1 minus h sub 2 lambda, 1 minus h sub 2. backend at h sub 1, 1 minus h sub 1 lambda, 1 minus h sub 1. h sub 1 equals 90 percent, h sub 2 equals 95 percent, the quantity 1 over 20, over the quantity 1 over 10, equals 1 over 2, half the load. h sub 1 equals 90 percent, h sub 2 equals 99 percent, the quantity 1 over 100, over the quantity 1 over 10, equals 1 over 10, a tenth of the load" tabindex="0" role="region" aria-label="Mathematical notation">backend at h₂     (1 − h₂)λ     1 − h₂
@@ -2927,6 +2953,55 @@ h = 99%    1 − h = 1/100   →    100 rps    ρ = 1/20    a tenth of it</div><
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/caching-and-hit-rates/hit-rate-and-backend-load/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 23.1, "title": "Two rates, one number"}, {"t": 49.3, "title": "A worked example"}, {"t": 66.3, "title": "One more nine"}, {"t": 111.5, "title": "What you were buying"}, {"t": 163.0, "title": "Where people slip"}, {"t": 197.4, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Skew, size and policy</p>
       <h1>Popularity Is Skewed: Zipf</h1>
       <p class="lesson-lede">Compute the share of requests the top k keys carry, as an exact ratio of harmonic sums.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:23</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:50</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#caching-and-hit-rates--popularity-is-skewed">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>A rank law, a harmonic normaliser, and the share of the head</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Zipf popularity</span><p>Rank <span class="math" data-say="N">N</span> keys from most to least requested. Under a <strong>Zipf popularity</strong> with exponent <span class="math" data-say="s is at least 0">s ≥ 0</span>, the key of rank <span class="math" data-say="i">i</span> is requested with probability <span class="math" data-say="p sub i equals the quantity 1 over i to the power s, over H of N and s">p_i = (1/iˢ)/H(N, s)</span>, where <span class="math" data-say="H of N and s equals 1 plus 1 over 2 to the power s plus 1 over 3 to the power s, and so on, plus 1 over N to the power s">H(N, s) = 1 + 1/2ˢ + 1/3ˢ + … + 1/Nˢ</span> is the <strong>generalised harmonic number</strong>.</p><p><span class="math" data-say="s equals 0">s = 0</span> makes every key equally likely: <span class="math" data-say="H of n and 0 equals n">H(n, 0) = n</span> and <span class="math" data-say="p sub i equals 1 over N">p_i = 1/N</span>. Larger <span class="math" data-say="s">s</span> concentrates the requests on the head. Measured web and key-value workloads usually land between <span class="math" data-say="s equals 0.7">s = 0.7</span> and <span class="math" data-say="s equals 1.2">s = 1.2</span>; this lesson uses integer exponents, for a reason given below.</p></div><p>Two things are being assumed and both are worth saying out loud. The first is the rank law itself, which is an empirical regularity rather than a theorem &mdash; workloads are measured and found to look like this, not derived and found to be this. The second is that the ranking is stable over the window you care about, which is false for news and true for a product catalogue.</p><p>Given the law, everything after it is addition. The share of the requests carried by the top <span class="math" data-say="k">k</span> keys is the sum of the first <span class="math" data-say="k">k</span> probabilities, and the normaliser cancels down to a ratio of two sums of the same shape.</p><div class="mathblock" data-say="k, k. the sum of, p sub i, equals, 1 over H of N and s, the sum of, 1 over i to the power s, equals, H of k and s. i equals 1, i equals 1. H of N and s. uniform popularity s equals 0, H of k and 0 over H of N and 0 equals k over N" tabindex="0" role="region" aria-label="Mathematical notation">                  k                    k
@@ -2957,6 +2983,55 @@ N = 50, s = 2:   k = 5  →  90.06% of the requests from 10% of the keys
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/caching-and-hit-rates/popularity-is-skewed/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 24.1, "title": "The Zipf law"}, {"t": 71.0, "title": "The top k share"}, {"t": 86.9, "title": "Fifty keys at s equals two"}, {"t": 122.4, "title": "The multiple"}, {"t": 148.0, "title": "Exact, until it isn't readable"}, {"t": 168.4, "title": "Where people slip"}, {"t": 201.6, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
