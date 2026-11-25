@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Budgets and retries</p>
       <h1>Retry Storms</h1>
       <p class="lesson-lede">Iterate the load-failure-retry map to its fixed point and say whether that point is above capacity.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:27</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">4:04</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#availability-and-failure--retry-storms">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>The loop, the iteration and the fixed point</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The retry-storm map</span><p>Write <span class="math" data-say="C">C</span> for capacity, <span class="math" data-say="lambda">λ</span> for the offered load before retries, <span class="math" data-say="base">base</span> for the failure probability under no overload and <span class="math" data-say="r">r</span> for the retry count. Define <span class="math" data-say="p of L equals base plus the quantity 1 minus base, times the max of 0 and the quantity L minus C, over L">p(L) = base + (1 − base)·max(0, (L − C)/L)</span> and <span class="math" data-say="L prime equals lambda times the quantity 1 minus p of L to the power the quantity r plus 1, over the quantity 1 minus p of L">L′ = λ · (1 − p(L)ʳ⁺¹)/(1 − p(L))</span>. A <strong>fixed point</strong> is a load with <span class="math" data-say="L prime equals L">L′ = L</span>; the system's steady state is such a point, if one exists below the ceiling <span class="math" data-say="lambda times the quantity r plus 1">λ(r + 1)</span>.</p></div><p>Capacity is the unit: every load on this page is a multiple of <span class="math" data-say="C">C</span>, so <span class="math" data-say="C equals 1">C = 1</span> and the offered load <span class="math" data-say="lambda equals 0.95">λ = 0.95</span> means ninety-five per cent of capacity. The base failure rate is what the service returns when it is not overloaded &mdash; a small tail of genuine errors, here ten per cent, which is high enough to make the iteration visible in five steps.</p><h3>Five steps of the map, by hand</h3><div class="mathblock" data-say="lambda equals 0.95, C equals 1, base equals 0.10, r equals 3. step, load in, p, attempts, load out, denominator digits. a table, shown on the page. the first step alone crosses capacity, 0.95 times 1.111 equals 1.05545" tabindex="0" role="region" aria-label="Mathematical notation">λ = 0.95, C = 1, base = 0.10, r = 3
@@ -2962,6 +2988,55 @@ the failure rate there is 0.479 and the amplification 1.818</div><figcaption>A m
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/availability-and-failure/retry-storms/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 23.7, "title": "The map"}, {"t": 51.7, "title": "Iterating by hand"}, {"t": 107.3, "title": "Bracketing the fixed point"}, {"t": 153.6, "title": "A cliff, not a slope"}, {"t": 200.6, "title": "Where people slip"}, {"t": 216.4, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
