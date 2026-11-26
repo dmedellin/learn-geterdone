@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Running a system</p>
       <h1>Discrete-Event Simulation of a Queue</h1>
       <p class="lesson-lede">Keep a calendar of scheduled events, jump the clock to the earliest, change the state, and schedule what follows.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:23</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:39</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#simulation-and-variance-reduction--discrete-event-simulation-of-a-queue">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>A clock that jumps, and the average it leaves behind</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Discrete-event simulation</span><p>A simulation in which the state changes only at a countable set of <strong>event times</strong>. The simulator holds the current state, a <strong>calendar</strong> of events scheduled for future times, and a clock. Each step removes the earliest calendar entry, advances the clock to its time, applies its effect, and schedules any events the new state implies.</p></div><p>The model on this page is the single-server queue the earlier course solved exactly: in each slot an arrival occurs with probability <span class="math" data-say="p">p</span>, and a customer in service completes with probability <span class="math" data-say="q">q</span>, so a service duration is a geometric variate on <span class="math" data-say="the set 1, 2, 3, and so on">{1, 2, 3, …}</span>. Both are sampled by inverse transform from the seeded stream, so the run is reproducible and every figure it produces is a fraction.</p><div class="defbox"><span class="label">Definition &middot; Time average</span><p>For a quantity <span class="math" data-say="N of t">N(t)</span> that is constant between events, the <strong>time average</strong> over <span class="math" data-say="0, T">[0, T)</span> is <span class="math" data-say="1 over T the integral of N of t d t">(1/T)∫N(t) dt</span>, which for a step function is the sum of <span class="math" data-say="N">N</span> times the length of each interval, divided by <span class="math" data-say="T">T</span>. It is not the average of the values <span class="math" data-say="N">N</span> took; it is the average weighted by how long it took them.</p></div><p>That distinction costs people real errors. A queue that holds one customer for nine hundred slots and nine customers for one hundred has a time average of <span class="math" data-say="1.8">1.8</span> and an unweighted average over its two distinct states of <span class="math" data-say="5">5</span>. Only the first is the number anyone wants, and only the first is what the area under the curve gives you.</p><h3>One run, event by event</h3><div class="example"><span class="label">Example &middot; The first ten events at p = 2/5, q = 1/2, seed 1</span><p>Customer 1 arrives at slot <span class="math" data-say="3">3</span> and leaves at <span class="math" data-say="4">4</span>. Customer 2 arrives at <span class="math" data-say="5">5</span> with a service of three slots; customers 3 and 4 arrive at <span class="math" data-say="6">6</span> and <span class="math" data-say="7">7</span> and queue behind it. At clock <span class="math" data-say="8">8</span> two events share the instant: customer 2 departs and customer 5 arrives. The departure is taken first, so immediately after it the system holds two, and the arrival then takes it to three. Nothing whatever happens at slots <span class="math" data-say="0">0</span>, <span class="math" data-say="1">1</span>, <span class="math" data-say="2">2</span>, and the clock never visits them.</p></div><p>The tie at clock <span class="math" data-say="8">8</span> is not a detail. A simulator that answered &ldquo;who is in the system at time <span class="math" data-say="t">t</span>?&rdquo; by testing <span class="math" data-say="arrival is at most t is less than departure">arrival ≤ t &lt; departure</span> would count the arriving customer as present at the instant the departure is being processed, and its headcount would disagree with its own list of names. The rule &mdash; departures before arrivals at the same instant &mdash; has to be stated once and then obeyed by every part of the program that asks the question.</p><h3>The long run, and the exact value it is aiming at</h3><div class="mathblock" data-say="p equals 2 over 5, q equals 1 over 2, single server, first in first out. exact, from the chain, L equals 12 over 5 equals 2.4, rho equals p over q equals 4 over 5. one run of 2000 slots, seed 1. customers, 776. area under N of t, 4733 slot-customers. time average, 4733 over 2000 equals 2.3665. server busy, 1593 of 2000 slots equals 79.7 percent. gap to the exact value, 0.0335 below" tabindex="0" role="region" aria-label="Mathematical notation">  p = 2/5,  q = 1/2,  single server, first in first out
@@ -3161,6 +3187,55 @@ L = λW is an identity about one run&#x27;s own averages, not a model of anythin
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/simulation-and-variance-reduction/discrete-event-simulation-of-a-queue/", "videos": {"long": {"chapters": [{"t": 0, "title": "The calendar is the model"}, {"t": 29.2, "title": "The model"}, {"t": 47.8, "title": "One run, event by event"}, {"t": 95.5, "title": "Time averages"}, {"t": 119.2, "title": "The long run"}, {"t": 154.6, "title": "Little's law in one run"}, {"t": 184.8, "title": "Where people slip"}, {"t": 199.5, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
