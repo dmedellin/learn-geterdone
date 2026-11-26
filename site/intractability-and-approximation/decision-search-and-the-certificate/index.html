@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Deciding, verifying, searching</p>
       <h1>Decision, Search and the Certificate</h1>
       <p class="lesson-lede">Ask a yes-or-no oracle four questions about a three-variable formula and watch an assignment it never returns come out.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:23</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:46</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#intractability-and-approximation--decision-search-and-the-certificate">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Three forms of one question, and the reduction between two of them</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; A decision problem</span><p>A <strong>decision problem</strong> is a set of inputs together with a yes-or-no question about each one. <span class="math" data-say="SAT">SAT</span> is the decision problem whose input is a formula in conjunctive normal form and whose question is &ldquo;is there an assignment satisfying every clause?&rdquo;. An algorithm solves it by answering the question; it is not required to produce anything else, and the oracle in the lab does not.</p></div><div class="defbox"><span class="label">Definition &middot; A certificate, and the class NP</span><p>A decision problem is in <span class="math" data-say="NP">NP</span> when every yes instance has a <strong>certificate</strong> of size polynomial in the input, and a verifier that reads the instance and the certificate and accepts in polynomial time, accepting no certificate whatever for a no instance. For <span class="math" data-say="SAT">SAT</span> the certificate is an assignment and the verifier evaluates the clauses. <span class="math" data-say="P">P</span> is the class of decision problems solvable in polynomial time, and <span class="math" data-say="P">P</span> is contained in <span class="math" data-say="NP">NP</span> because an algorithm that answers the question is a verifier that ignores its certificate.</p></div><p>Whether the containment is strict is not known, and nothing on this course settles it. What the rest of the course does is build the structure that makes the question sharp: a relation between problems that carries hardness from one to another, a family of problems at the top of that relation, and six things worth doing about a problem that reaches it.</p><h3>The same question in three forms</h3><p>Every problem here can be asked three ways, and it is worth separating them before the machinery starts. The <strong>decision</strong> form asks whether a solution exists; the <strong>search</strong> form asks for one; the <strong>optimisation</strong> form asks for the best one. They are different questions and the theory is stated for the first. The reason that costs nothing is this lesson.</p><div class="thm"><span class="label">Theorem &middot; Search reduces to decision for satisfiability</span><p>Suppose a routine decides <span class="math" data-say="SAT">SAT</span> in one unit of time. Then a satisfying assignment for a formula on <span class="math" data-say="n">n</span> variables can be produced with <span class="math" data-say="n plus 1">n + 1</span> calls to it.</p></div><div class="proof"><p>Call the oracle on the formula itself. If it says no there is no assignment to produce and the work is over, which is the first call. Otherwise fix <span class="math" data-say="x 1">x1</span> to true, simplify &mdash; delete every clause containing <span class="math" data-say="x 1">x1</span> and delete <span class="math" data-say="not x 1">&not;x1</span> from the clauses containing it &mdash; and call the oracle on what is left.</p><p>If that call says yes, some satisfying assignment of the original has <span class="math" data-say="x 1">x1</span> true, so committing to true loses nothing. If it says no, no satisfying assignment has <span class="math" data-say="x 1">x1</span> true; since the original is satisfiable, every satisfying assignment has <span class="math" data-say="x 1">x1</span> false, so committing to false loses nothing. Either way one call settles one variable and the remaining formula is still satisfiable.</p><p>Repeat for <span class="math" data-say="x 2">x2</span> up to <span class="math" data-say="xn">xn</span>. After <span class="math" data-say="n">n</span> more calls every variable is fixed and no clause remains unsatisfied, so reading the commitments off gives an assignment. The total is <span class="math" data-say="n plus 1">n + 1</span> calls, each on a formula no larger than the original.</p><p><span class="qed">&#9633;</span></p></div><h3>What the lab counts, and what it refuses to count</h3><p>The loaded formula is <span class="math" data-say="x 1 or x 2 or not x 3 and not x 1 or x 2 or x 3 and x 1 or not x 2 or x 3 and not x 1 or not x 2 or not x 3">(x1 or x2 or not x3) and (not x1 or x2 or x3) and (x1 or not x2 or x3) and (not x1 or not x2 or not x3)</span>: three variables, four clauses. The panel reports 4 oracle calls against 8 assignments a search would try, the assignment <span class="math" data-say="x 1 equals T x 2 equals T x 3 equals F">x1=T x2=T x3=F</span>, and the formula's 4 models out of those 8. Both branches are allowed at <span class="math" data-say="x 1">x1</span> and at <span class="math" data-say="x 2">x2</span>, so the reduction takes true and moves on; at <span class="math" data-say="x 3">x3</span> the oracle refuses true and the reduction takes false, which is the only place on this instance where a question does any work.</p><p>Two checks run beside the trace and neither is decoration. Every restricted formula is re-decided by brute force independently of the reduction, and all three steps are required to agree; and the assignment at the end is evaluated clause by clause rather than assumed. A reduction that produced a confident wrong witness would look identical on the page without them.</p><div class="example"><span class="label">Example &middot; The step that refuses a branch</span><p>After <span class="math" data-say="x 1">x1</span> and <span class="math" data-say="x 2">x2</span> are both fixed true, the formula that is left is <span class="math" data-say="not x 3">(not x3)</span>. The oracle is asked whether fixing <span class="math" data-say="x 3">x3</span> to true leaves something satisfiable and answers no, so <span class="math" data-say="x 3">x3</span> is false. That single refusal is the difference between an assignment and a guess, and it cost one question.</p></div><p>Now read the two numbers side by side and resist the conclusion. Four calls against eight assignments is a saving of one half on this formula. Move to the four-variable example in the panel and it is five calls against sixteen. The calls grow by one per variable and the assignments double, so the gap widens without limit &mdash; but that sentence is a claim about the two expressions, not about the two numbers on screen, and the numbers on screen cannot establish it.</p></div></div>
@@ -3633,6 +3659,55 @@ the reduction is polynomial in CALLS; the oracle is not polynomial in anything</
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/intractability-and-approximation/decision-search-and-the-certificate/", "videos": {"long": {"chapters": [{"t": 0, "title": "Yes-or-no problems"}, {"t": 30.2, "title": "Checking versus finding"}, {"t": 66.1, "title": "Search from decision"}, {"t": 114.1, "title": "Four calls"}, {"t": 160.1, "title": "Read the numbers carefully"}, {"t": 197.9, "title": "Where people slip"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
