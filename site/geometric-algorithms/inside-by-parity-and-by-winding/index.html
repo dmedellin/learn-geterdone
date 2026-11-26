@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Area, distance and the measured column</p>
       <h1>Inside, by Parity and by Winding</h1>
       <p class="lesson-lede">Cast a ray and count crossings, or count how many times the boundary goes round the point; the two agree only under a hypothesis worth checking.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:23</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:54</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#geometric-algorithms--inside-by-parity-and-by-winding">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Casting a ray correctly, and the second definition beside it</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Ray parity, with the half-open rule</span><p>For a query point <span class="math" data-say="q">q</span> and a polygon with vertices <span class="math" data-say="v sub 1, and so on, v sub n">v₁, …, vₙ</span>, cast the horizontal ray from <span class="math" data-say="q">q</span> in the direction of increasing <span class="math" data-say="x">x</span>. An edge <span class="math" data-say="v sub i v sub i plus 1">vᵢvᵢ₊₁</span> is <strong>counted</strong> when exactly one of <span class="math" data-say="y sub i">yᵢ</span>, <span class="math" data-say="y sub i plus 1">yᵢ₊₁</span> is strictly greater than <span class="math" data-say="qy">qy</span>, and the intersection of the edge's line with the ray's line lies at <span class="math" data-say="x is at least q x">x ≥ qx</span>. The point is <strong>inside</strong> when the number of counted edges is odd.</p></div><p>The strictly-above test is doing the delicate work. Written as <span class="math" data-say="y sub i is greater than q y">yᵢ &gt; qy</span> on one end and <span class="math" data-say="y sub i plus 1 is at most q y">yᵢ₊₁ ≤ qy</span> on the other, the condition treats the horizontal line through <span class="math" data-say="q">q</span> as half-open: a vertex exactly at that height counts as below. So a ray through a vertex where the boundary passes from below to above counts exactly one of the two edges, and a ray through a vertex where the boundary touches and turns back counts either both or neither &mdash; which is the right answer in both cases.</p><div class="thm"><span class="label">Theorem &middot; The Jordan parity theorem, as an algorithm</span><p>For a simple polygon and a point <span class="math" data-say="q">q</span> not on the boundary, the number of edges counted by the rule above is odd if and only if <span class="math" data-say="q">q</span> is in the interior.</p></div><div class="proof"><p>Take the ray from <span class="math" data-say="q">q</span> and travel along it to infinity. Beyond the polygon's bounding box the point is certainly outside. Every time the ray properly crosses the boundary, the side changes; every time it touches a vertex without passing through, it does not. The counting rule is exactly a bookkeeping of the first kind of event and not the second: a vertex at the ray's height is assigned to the edge going strictly above it, so a pass-through contributes one and a touch-and-return contributes zero or two.</p><p>Hence the parity of the count equals the number of side changes between <span class="math" data-say="q">q</span> and infinity. Since the far end is outside, <span class="math" data-say="q">q</span> is inside exactly when that number is odd.</p><p><span class="qed">&#9633;</span></p></div><div class="example"><span class="label">Example &middot; A comb, and the same horizontal line at seven places</span><p>The lab's comb has 14 vertices and three upward teeth, with doubled area 96 so an area of 48. Query at <span class="math" data-say="negative 1, 4">(−1, 4)</span>, outside to the left: the ray crosses 6 edges, even, outside. Query at <span class="math" data-say="3, 4">(3, 4)</span>, inside the first tooth: 5 crossings, odd, inside. At <span class="math" data-say="5, 4">(5, 4)</span>, in the notch between teeth: 4 crossings, outside. At <span class="math" data-say="7, 4">(7, 4)</span>: 3, inside. At <span class="math" data-say="9, 4">(9, 4)</span>: 2, outside. At <span class="math" data-say="11, 4">(11, 4)</span>: 1, inside. Every one of those is on the same horizontal line, and the count falls by one at each boundary crossing exactly as the theorem says.</p></div><p>That sequence &mdash; 6, 5, 4, 3, 2, 1, 0 as the query point moves right &mdash; is the proof made visible. Each step to the right passes one edge, reducing the number of edges still ahead of the ray by one, and flipping the parity. It is worth typing those seven query points into the lab in order.</p></div></div>
@@ -2990,6 +3016,55 @@ on the boundary is a third answer, and both routes report it</div><figcaption>Tw
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/geometric-algorithms/inside-by-parity-and-by-winding/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 10.8, "title": "Count the crossings"}, {"t": 42.2, "title": "The half-open rule"}, {"t": 85.4, "title": "The comb"}, {"t": 124.9, "title": "The winding number"}, {"t": 167.5, "title": "Where they part"}, {"t": 209.2, "title": "Where people slip"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
