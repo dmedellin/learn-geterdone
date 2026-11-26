@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The recursion, backwards</p>
       <h1>The State Is What Is Left</h1>
       <p class="lesson-lede">Split indivisible units across activities by building the network from a return table, and watch a rule that looks only at the next unit lose by six.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:23</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:48</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#dynamic-programming-and-sequential-decisions--the-state-is-what-is-left">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Inventing the nodes, and then solving the thing you invented</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; An allocation problem, and its state</span><p>Given activities <span class="math" data-say="1">1</span> to <span class="math" data-say="n">n</span>, a whole number <span class="math" data-say="u">u</span> of indivisible units to hand out, and a <strong>return table</strong> giving <span class="math" data-say="r sub i of x">rᵢ(x)</span> for each activity <span class="math" data-say="i">i</span> and each whole <span class="math" data-say="x">x</span> from 0 up, choose <span class="math" data-say="x sub 1, x sub n">x₁, ..., xₙ</span> with <span class="math" data-say="the sum of x sub i is at most u">Σ xᵢ ≤ u</span> maximising <span class="math" data-say="the sum of r sub i of x sub i">Σ rᵢ(xᵢ)</span>.</p><p>The <strong>state</strong> before activity <span class="math" data-say="i">i</span> decides is the number of units still unspent. The value function is <span class="math" data-say="g of i and s equals max">g(i, s) = max</span> over <span class="math" data-say="x">x</span> from 0 to <span class="math" data-say="s">s</span> of <span class="math" data-say="r sub i of x plus g of i plus 1 and s minus x">rᵢ(x) + g(i+1, s−x)</span>, with <span class="math" data-say="g of n plus 1 and s equals 0">g(n+1, s) = 0</span> for every <span class="math" data-say="s">s</span>: once there are no activities left, what remains is worth nothing.</p></div><p>Two things about that definition are worth saying out loud. The first is that <span class="math" data-say="r sub i of 0">rᵢ(0)</span> must be 0 &mdash; a table whose first column is not zero is measuring something other than a return, and the lab refuses it by name. The second is that nothing anywhere records which activity took what; the state is a single number. That is not an economy, it is the modelling claim, and it is the thing to check before trusting any answer the table produces.</p></div></div>
@@ -3201,6 +3227,55 @@ taking the best NEXT unit each time gives 15, and it is not an arithmetic error<
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/dynamic-programming-and-sequential-decisions/the-state-is-what-is-left/", "videos": {"long": {"chapters": [{"t": 0, "title": "Nobody hands you the stages"}, {"t": 24.5, "title": "The state"}, {"t": 65.2, "title": "The network it forces"}, {"t": 120.7, "title": "The rule that looks at the next unit"}, {"t": 170.7, "title": "Ties, and what the state leaves out"}, {"t": 201.2, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
