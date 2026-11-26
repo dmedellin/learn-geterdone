@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Hardness that travels</p>
       <h1>Numbers as Gadgets, and Weak Hardness</h1>
       <p class="lesson-lede">Turn two clauses into eight base-ten numbers, add up every digit in every column, and watch the largest total come out at 5 against a base of 10.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:24</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:38</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#intractability-and-approximation--numbers-as-gadgets">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>The digit table, the no-carry argument, and what the pseudo-polynomial table does not buy</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Subset sum</span><p>Given a list of positive integers and a target, is there a sublist adding to the target exactly? The input is the digits of the numbers, which matters for every complexity claim on this page: a list of ten numbers with a thousand digits each is a large input, and a list of ten numbers under 100 is a small one.</p></div><h3>The construction</h3><ol><li>One column per variable and one per clause, so <span class="math" data-say="n plus m">n + m</span> columns, read in base ten.</li><li>For each variable, a number <span class="math" data-say="x true">x true</span> with a 1 in that variable's column and a 1 in every clause column the positive literal satisfies; and a number <span class="math" data-say="x false">x false</span> with a 1 in the variable's column and a 1 in every clause column the negative literal satisfies.</li><li>For each clause, two <em>slack</em> numbers with a 1 and a 2 in that clause's column and zeros everywhere else.</li><li>The target has a 1 in every variable column and a 4 in every clause column.</li></ol><div class="thm"><span class="label">Theorem &middot; The construction is a reduction</span><p>The formula is satisfiable if and only if some subset of the constructed numbers adds to the target.</p></div><div class="proof"><p>No column can carry, because every column's digits add to at most 6 across all the rows, and 6 is less than 10. So a subset hits the target exactly when it hits each column's digit separately.</p><p>A variable column can only be reached by that variable's two numbers, each contributing 1, and the target is 1, so exactly one of the two is chosen: the subset picks an assignment. A clause column receives 1 from each chosen literal number that satisfies the clause, so between 0 and 3, plus whatever the two slack numbers contribute, which is 0, 1, 2 or 3.</p><p>The target is 4. If the assignment satisfies the clause, the literal contribution is 1, 2 or 3 and exactly one of the four slack combinations makes up the remaining 3, 2 or 1. If the assignment does not satisfy it, the literal contribution is 0 and the slack numbers can supply at most 3, so the column cannot reach 4. Hence the subsets that hit the target are exactly the satisfying assignments, each with its forced slack choice &mdash; which is why the map is not merely sound but a bijection.</p><p><span class="qed">&#9633;</span></p></div><h3>What the lab built</h3><p>The loaded formula is <span class="math" data-say="x 1 or x 2 and not x 1 or x 2">(x1 or x2) and (not x1 or x2)</span>: two variables, two clauses, so four columns. The panel reports 8 numbers of 4 digits, the target 1144, 2 subsets reaching it, 2 satisfying assignments out of 4, a largest column total of 5 against the base 10, and the verdict that the map is a bijection &mdash; sound, surjective and injective, all three computed.</p><p>The column totals are 2, 2, 5 and 5. The two variable columns get a 1 from each of the variable's two numbers and nothing else. Each clause column gets a 1 from every literal number satisfying that clause &mdash; two of them here &mdash; plus 1 and 2 from the slack, which is 5. Five is comfortably under ten and the bar chart draws it against the line.</p><p>Beside the enumeration the panel runs the dynamic programme from Dynamic Programming and Optimal Substructure on the same numbers and the same target, and requires the two to agree about whether the target is reachable. Two exhaustive routes that agree is evidence; one clever route is not, and the two routes here share no code.</p><div class="example"><span class="label">Example &middot; Both subsets, added in columns</span><p><span class="math" data-say="x 1 false plus x 2 true plus slack 1.1 plus slack 1.2 plus slack 2.2">x1 false + x2 true + slack 1.1 + slack 1.2 + slack 2.2</span> is <span class="math" data-say="1001 plus 0111 plus 0010 plus 0020 plus 0002 equals 1144">1001 + 0111 + 0010 + 0020 + 0002 = 1144</span>, and carries back to <span class="math" data-say="x 1 equals F, x 2 equals T">x1 = F, x2 = T</span>. The clause-1 column reads 1 from <span class="math" data-say="x 2 true">x2 true</span> plus 1 and 2 from the slacks; the clause-2 column reads 1 from <span class="math" data-say="x 1 false">x1 false</span>, 1 from <span class="math" data-say="x 2 true">x2 true</span> and 2 from a slack. Both reach 4 without help from anywhere else in the number.</p></div><h3>Two senses of hard, and why the table does not rescue this</h3><p>It is tempting to think a problem with a dynamic programme cannot be NP-hard. The table for subset sum has one row per item and one column per value from 0 to the target, so its size is proportional to <span class="math" data-say="n">n</span> times the target. That is polynomial in the target as a NUMBER and exponential in the target as an INPUT, because a target with <span class="math" data-say="d">d</span> digits has magnitude about <span class="math" data-say="10 to the power d">10^d</span>. Here <span class="math" data-say="d">d</span> is the number of variables plus the number of clauses, so the table has about <span class="math" data-say="10 to the power the quantity n plus m">10^(n+m)</span> columns and is not an algorithm anyone can run.</p><p>The distinction has a name and a consequence. A problem that is NP-hard but has an algorithm polynomial in the numeric values is <strong>weakly</strong> NP-hard; one that stays hard even when the numbers are bounded by a polynomial in the input length is <strong>strongly</strong> NP-hard. Only weakly NP-hard problems can have the kind of approximation scheme built later on this course, and that is not a coincidence: the scheme works by making the numbers small enough for the table to fit.</p></div></div>
@@ -3663,6 +3689,55 @@ the table is O(n · target); the target has n + m digits, so it is exponential i
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/intractability-and-approximation/numbers-as-gadgets/", "videos": {"long": {"chapters": [{"t": 0, "title": "A reduction made of digits"}, {"t": 25.8, "title": "The construction"}, {"t": 51.3, "title": "Why it works"}, {"t": 87.5, "title": "Two clauses"}, {"t": 137.1, "title": "Weakly NP-hard"}, {"t": 189.7, "title": "Where people slip"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

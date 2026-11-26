@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Randomness inside the structure</p>
       <h1>Bloom Filters</h1>
       <p class="lesson-lede">Trade an exactly computable false-positive rate for a few bits per key, and watch the familiar formula turn out to be the approximation.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:24</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:32</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#randomised-algorithms--bloom-filters">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>A set in a few bits, and the rate it costs</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; A Bloom filter</span><p>A <strong>Bloom filter</strong> for a set is an array of <span class="math" data-say="m">m</span> bits, initially all clear, together with <span class="math" data-say="k">k</span> hash functions into <span class="math" data-say="0, m minus 1">0..m − 1</span>. To <strong>insert</strong> <span class="math" data-say="x">x</span>, set the bits <span class="math" data-say="h sub 1 of x, and so on, h sub k of x">h₁(x), …, hₖ(x)</span>. To <strong>query</strong> <span class="math" data-say="x">x</span>, report present if all <span class="math" data-say="k">k</span> of those bits are set and absent otherwise. The structure stores no keys.</p></div><p>That last sentence is the point of it. Sixteen keys at ten bits each is 160 bits &mdash; twenty bytes &mdash; for a set that would take at least sixteen machine words to store exactly. The saving is what the false-positive rate is paid for, and the rate is what this lesson computes.</p><div class="thm"><span class="label">Theorem &middot; The false-positive rate</span><p>Suppose <span class="math" data-say="n">n</span> keys have been inserted into <span class="math" data-say="m">m</span> bits with <span class="math" data-say="k">k</span> hash functions, each of the <span class="math" data-say="kn">kn</span> settings choosing a bit uniformly at random and independently, and treat the <span class="math" data-say="k">k</span> bits a query tests as independent events. Then a key that was never inserted is reported present with probability <span class="math" data-say="the quantity 1 minus the quantity 1 minus 1 over m, to the power kn, to the power k">(1 − (1 − 1/m)^{kn})^k</span>.</p></div><div class="proof"><p>Fix a bit. Each of the <span class="math" data-say="kn">kn</span> settings misses it with probability <span class="math" data-say="1 minus 1 over m">1 − 1/m</span>, and the settings are independent, so the bit is clear with probability <span class="math" data-say="the quantity 1 minus 1 over m, to the power kn">(1 − 1/m)^{kn}</span> and set with probability <span class="math" data-say="1 minus the quantity 1 minus 1 over m, to the power kn">1 − (1 − 1/m)^{kn}</span>.</p><p>A query on an absent key reports present exactly when all <span class="math" data-say="k">k</span> of its bits are set. Treating those <span class="math" data-say="k">k</span> events as independent gives the product, which is the <span class="math" data-say="k">k</span>-th power.</p><p><span class="qed">&#9633;</span></p></div><p>The second step is where the honesty is required. The <span class="math" data-say="k">k</span> bits of a query are <em>not</em> independent: knowing that one of them is set is mild evidence that the filter is full, which makes the others more likely to be set too. So the expression above is itself an idealisation of the truth for a real filter, and this library's arithmetic computes it exactly as the expression it is, while labelling the further <span class="math" data-say="e to the power the quantity negative k n over m">e^{−kn/m}</span> step as approximate. The lab's measured column &mdash; the false positives an actual filter returned &mdash; is the only figure on the page with no model in it.</p></div></div>
@@ -3399,6 +3425,55 @@ nothing can be deleted: clearing a bit would create false negatives</div><figcap
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/randomised-algorithms/bloom-filters/", "videos": {"long": {"chapters": [{"t": 0, "title": "A set in a few bits"}, {"t": 38.8, "title": "Proof and hint"}, {"t": 57.3, "title": "The rate"}, {"t": 132.0, "title": "Choosing k"}, {"t": 169.5, "title": "No deletion"}, {"t": 187.0, "title": "Where people slip"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

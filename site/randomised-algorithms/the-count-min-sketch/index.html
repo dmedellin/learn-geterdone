@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Randomness inside the structure</p>
       <h1>The Count-Min Sketch</h1>
       <p class="lesson-lede">Estimate every frequency in a fixed grid of counters, never below the truth, with an error bound that is Markov applied once per row.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:24</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:54</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#randomised-algorithms--the-count-min-sketch">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>A fixed grid, a minimum, and a bound this library can prove</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The sketch</span><p>A <strong>Count-Min sketch</strong> is a <span class="math" data-say="d times w">d × w</span> array of counters, all initially zero, with one hash function per row mapping keys to <span class="math" data-say="0, w minus 1">0..w − 1</span>. To <strong>update</strong> key <span class="math" data-say="x">x</span>, increment the counter at <span class="math" data-say="i, h sub i of x">(i, hᵢ(x))</span> in every row <span class="math" data-say="i">i</span>. To <strong>estimate</strong> the count of <span class="math" data-say="x">x</span>, report the minimum of those <span class="math" data-say="d">d</span> counters. The space is <span class="math" data-say="d times w">d·w</span> counters, fixed in advance, independent of how many distinct keys arrive.</p></div><p>That last clause is why the structure exists. An exact frequency table grows with the number of distinct keys and a stream can have more of them than you have memory for. A sketch has the size you chose when you built it, and the price is an error whose size you can bound.</p><div class="thm"><span class="label">Theorem &middot; The estimate is never below the truth</span><p>For every key <span class="math" data-say="x">x</span>, every stream and every choice of hash functions, the reported estimate is at least the true count of <span class="math" data-say="x">x</span>.</p></div><div class="proof"><p>Fix a row <span class="math" data-say="i">i</span>. Every update of <span class="math" data-say="x">x</span> increments the counter at <span class="math" data-say="i, h sub i of x">(i, hᵢ(x))</span>, so that counter is at least the true count of <span class="math" data-say="x">x</span>. Every other update increments some counter, possibly this one, and counters are never decremented, so nothing can bring it below that.</p><p>The estimate is the minimum over <span class="math" data-say="d">d</span> such counters, each at or above the true count, so it is at or above the true count as well.</p><p><span class="qed">&#9633;</span></p></div><div class="thm"><span class="label">Theorem &middot; The error bound</span><p>Let <span class="math" data-say="F sub 1">F₁</span> be the number of updates. For any key <span class="math" data-say="x">x</span>, the estimate exceeds the true count by at least <span class="math" data-say="2 F sub 1 over w">2F₁/w</span> with probability at most <span class="math" data-say="2 to the power negative d">2⁻ᵈ</span>, provided the rows' hash functions are chosen independently and each spreads keys uniformly.</p></div><div class="proof"><p>Fix a row and a key <span class="math" data-say="x">x</span>. For each update of a key other than <span class="math" data-say="x">x</span>, let the indicator be <span class="math" data-say="1">1</span> if it lands in <span class="math" data-say="x">x</span>'s cell in this row. Each has expectation at most <span class="math" data-say="1 over w">1/w</span>, so by linearity the expected overcount in this row is at most <span class="math" data-say="F sub 1 over w">F₁/w</span>.</p><p>The overcount is non-negative, so Markov's inequality applies: <span class="math" data-say="P of overcount is at least 2 F sub 1 over w is at most the quantity F sub 1 over w, over the quantity 2 F sub 1 over w, equals 1 over 2">P(overcount ≥ 2F₁/w) ≤ (F₁/w)/(2F₁/w) = 1/2</span>.</p><p>The rows are independent, and the minimum overcounts by at least <span class="math" data-say="2 F sub 1 over w">2F₁/w</span> only if every row does, which has probability at most <span class="math" data-say="the quantity 1 over 2, to the power d equals 2 to the power negative d">(1/2)ᵈ = 2⁻ᵈ</span>.</p><p><span class="qed">&#9633;</span></p></div><p>Markov's inequality is doing all the probabilistic work, and it is the inequality &ldquo;From an Expectation to a Probability&rdquo; proves. The textbook statement of this bound reads <span class="math" data-say="e over w">e/w</span> in place of <span class="math" data-say="2 over w">2/w</span>, and <span class="math" data-say="e to the power negative d">e⁻ᵈ</span> in place of <span class="math" data-say="2 to the power negative d">2⁻ᵈ</span>, and it is the same argument: Markov at <span class="math" data-say="e times F sub 1 over w">e·F₁/w</span> instead of <span class="math" data-say="2 F sub 1 over w">2F₁/w</span> gives a per-row failure of <span class="math" data-say="1 over e">1/e</span>. The two forms are one trade between error and confidence, not a stronger result, and the panel prints <span class="math" data-say="2 over w">2/w</span> and <span class="math" data-say="2 to the power negative d">2⁻ᵈ</span> because those are the constants this page derives.</p><div class="example"><span class="label">Example &middot; A heavy hitter in eight counters</span><p>The stream is 64 updates over 12 distinct keys: key 1 arrives forty times, keys 2 and 3 arrive three times each, and keys 4 to 12 twice each. With <span class="math" data-say="w equals 8">w = 8</span> and <span class="math" data-say="d equals 3">d = 3</span> the sketch takes 192 increments and 36 reads. Every estimate is at or above the truth; five keys are overcounted, each by exactly 2, and the rest are exact. Key 1's estimate is 42 against a true 40.</p></div><p>The bound allows an error of <span class="math" data-say="2 F sub 1 over w equals 2 times 64 over 8 equals 16">2F₁/w = 2·64/8 = 16</span> with probability up to <span class="math" data-say="1 over 8">1/8</span>, and the worst error observed is <span class="math" data-say="2">2</span>. That is a factor of eight of slack on this stream, and it is the ordinary situation: Markov is loose, &ldquo;From an Expectation to a Probability&rdquo; measured it being loose by factors from 2 to nearly 3849, and nothing about this application changes that.</p><p>Notice which keys were overcounted. The heavy hitter was, by 2, and so were four of the light keys &mdash; and those light keys were overcounted by the same absolute amount, which is a much larger relative error: an estimate of 4 for a true count of 2 is out by a factor of two, while 42 for 40 is out by five per cent. The bound is additive in <span class="math" data-say="F sub 1">F₁</span> and says nothing about relative error, which is the sketch's real limitation and the reason it is used to find heavy hitters rather than to count rare keys.</p><h3>What the parameters buy</h3><p><span class="math" data-say="w">w</span> controls the size of the error and <span class="math" data-say="d">d</span> controls the probability of exceeding it. Doubling <span class="math" data-say="w">w</span> halves <span class="math" data-say="2 F sub 1 over w">2F₁/w</span>; adding a row halves <span class="math" data-say="2 to the power negative d">2⁻ᵈ</span>. They are separate knobs and the space is their product, so a sketch with many narrow rows and one with few wide rows can occupy the same memory and offer different guarantees.</p><p>The lab's third preset makes the trade visible: <span class="math" data-say="w equals 12">w = 12</span> and <span class="math" data-say="d equals 4">d = 4</span> over a seeded stream of 64 updates across 12 keys. The bound becomes <span class="math" data-say="2 F sub 1 over w equals 32 over 3 is approximately 10.67">2F₁/w = 32/3 ≈ 10.67</span> at a failure probability of <span class="math" data-say="1 over 16">1/16</span>, and every estimate came out exactly right &mdash; worst overcount <span class="math" data-say="0">0</span>. A wider sketch on the same amount of data collides less; the bound improved and the actual error improved more.</p></div></div>
@@ -3218,6 +3244,55 @@ space is fixed in advance and does not grow with the number of keys</div><figcap
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/randomised-algorithms/the-count-min-sketch/", "videos": {"long": {"chapters": [{"t": 0, "title": "Fixed memory"}, {"t": 41.3, "title": "Never below the truth"}, {"t": 58.3, "title": "How far above"}, {"t": 102.4, "title": "A heavy hitter"}, {"t": 154.9, "title": "Two knobs"}, {"t": 205.0, "title": "Where people slip"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

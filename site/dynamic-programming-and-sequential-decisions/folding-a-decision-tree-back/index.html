@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; When the next step is uncertain</p>
       <h1>Folding a Decision Tree Back</h1>
       <p class="lesson-lede">A chance node is an average and a decision node is a maximum; fold both back and the difference between them prices information before you buy it.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:23</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:38</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#dynamic-programming-and-sequential-decisions--folding-a-decision-tree-back">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Folding back, and then pricing what you did not know</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; A decision tree, and the two values around it</span><p>Given <strong>acts</strong> <span class="math" data-say="A">a</span>, <strong>states</strong> <span class="math" data-say="s">s</span>, a <strong>payoff</strong> <span class="math" data-say="pi of A and s">π(a, s)</span> and a <strong>prior</strong> <span class="math" data-say="p of s">p(s)</span>, the <strong>prior value</strong> is <span class="math" data-say="the max over a of the sum over s of p of s times pi of A and s">max over a of Σₛ p(s) π(a, s)</span> and the <strong>perfect-information value</strong> is <span class="math" data-say="the sum over s of p of s times the max over a of pi of A and s">Σₛ p(s) max over a of π(a, s)</span>. Their difference is <strong>EVPI</strong>.</p><p>A <strong>signal</strong> is a likelihood <span class="math" data-say="P of g given s">P(g | s)</span>. For each signal <span class="math" data-say="g">g</span>, <span class="math" data-say="P of g equals the sum over s of p of s times P of g given s">P(g) = Σₛ p(s) P(g | s)</span> and the posterior is <span class="math" data-say="p of s times P of g given s, over P of g">p(s) P(g | s) / P(g)</span>. The <strong>value with the signal</strong> is <span class="math" data-say="the sum over g of P of g times the max over a of the sum over s of posterior times pi of A and s">Σ_g P(g) max over a of Σₛ posterior × π(a, s)</span>, and <strong>EVSI</strong> is that minus the prior value.</p></div><p>The lab builds the tree from the payoff table rather than asking you to type one, because typing a tree is harder than typing the thing a tree is drawn from and the tree is not the model. With no signal it is one decision node over a chance node per act. With a signal it is a chance node over the signals, and inside each branch of it the same decision again, now over the posterior.</p></div></div>
@@ -3423,6 +3449,55 @@ go/stop, up/down, payoff 60 and -40, prior 1/2:  EVPI 20  and  EVSI 0</div><figc
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/dynamic-programming-and-sequential-decisions/folding-a-decision-tree-back/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 36.3, "title": "Two values"}, {"t": 64.2, "title": "A signal worth nothing"}, {"t": 107.6, "title": "A survey worth buying"}, {"t": 159.5, "title": "Where people slip"}, {"t": 190.6, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
