@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Paths, cuts and matchings</p>
       <h1>Maximum Flow and Minimum Cut</h1>
       <p class="lesson-lede">Any cut bounds any flow, the smallest cut equals the largest flow, and the set reachable in the final residual network is that cut.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:28</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:16</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#networks-flows-paths-and-assignments--maximum-flow-and-minimum-cut">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>The bound, the algorithm, and the certificate</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Cuts and their capacity</span><p>An <strong>s-t cut</strong> is a set of nodes <span class="math" data-say="S">S</span> containing the source and not the sink. Its <strong>capacity</strong> is the total capacity of the arcs whose tail is in <span class="math" data-say="S">S</span> and whose head is not &mdash; arcs running the other way do not count.</p><p>The <strong>value</strong> of a flow is the net amount leaving the source. Every unit of it must cross every cut, so the value of any flow is at most the capacity of any cut.</p></div><p>That is the easy half and it is worth having on its own: any cut you can write down is a bound on every flow that will ever be found, and an arithmetic check that takes seconds. The hard half is that the bound is attained &mdash; that some cut has exactly the capacity of the largest flow &mdash; and the algorithm proves it by producing the cut.</p><div class="mathblock" data-say="arcs, s is greater than A 3, s is greater than b 2, A is greater than b 2, A is greater than t 2, b is greater than t 3. every cut, enumerated, S, capacity. the set s, 5. the set s, A, b, 5. the set s, A, 6. the set s, b, 6. two of the four are minimum, so a minimum cut need not be unique. augmenting, from nothing. residual, s is greater than A s is greater than b A is greater than b A is greater than t b is greater than t, at x is greater than y below is BACKWARD. take, s is greater than A, A is greater than b, b is greater than t, bottleneck 2, value 2. take, s is greater than A, A is greater than t, bottleneck 1, value 3. take, s is greater than b, b is greater than A, A is greater than t, bottleneck 1, value 4, BACKWARD. take, s is greater than b, b is greater than t, bottleneck 1, value 5. no residual path from s to t remains. final flow, s is greater than A 3, s is greater than b 2, A is greater than b 1, A is greater than t 2, b is greater than t 3. reachable from s in the residual network, the set s. capacity of that cut, 3 plus 2, equals, 5, equals, the flow value" tabindex="0" role="region" aria-label="Mathematical notation">arcs   s&gt;a 3   s&gt;b 2   a&gt;b 2   a&gt;t 2   b&gt;t 3
@@ -3626,6 +3652,55 @@ the dual has one variable per interior node and one per arc; a cut sets them 0/1
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/networks-flows-paths-and-assignments/maximum-flow-and-minimum-cut/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 22.7, "title": "Cuts"}, {"t": 52.6, "title": "Augmenting paths"}, {"t": 94.7, "title": "The cut comes free"}, {"t": 123.4, "title": "Why a cut bounds a flow"}, {"t": 158.8, "title": "Where people slip"}, {"t": 172.8, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

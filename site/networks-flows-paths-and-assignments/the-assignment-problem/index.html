@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Integer corners</p>
       <h1>The Assignment Problem</h1>
       <p class="lesson-lede">Take a constant off every row and every column, count the cover properly, and watch the running total climb to meet the cost of the assignment it finds.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:26</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:39</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#networks-flows-paths-and-assignments--the-assignment-problem">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Reductions, covers and the bound that closes</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The assignment problem</span><p>Given an <span class="math" data-say="n times n">n × n</span> cost matrix <span class="math" data-say="C">C</span>, the <strong>assignment problem</strong> is to choose a permutation <span class="math" data-say="sigma">σ</span> of <span class="math" data-say="the set 1, and so on, n">{1, …, n}</span> minimising <span class="math" data-say="the sum over i of c sub i, sigma of i">Σᵢ cᵢ,σ(i)</span> &mdash; one job per worker, one worker per job.</p><p>Written as a linear programme it is the transportation problem with every supply and every demand equal to one, so the previous lessons apply unchanged; and since its matrix is a node-arc incidence matrix, its corners are whole and are exactly the permutations.</p></div><p>That last sentence is worth pausing on, because it is what makes the problem tractable. There are <span class="math" data-say="n factorial">n!</span> permutations &mdash; 24 on a four-by-four table, 120 on a five-by-five &mdash; and yet the linear relaxation does not need a single integrality constraint. The relaxation's corners <em>are</em> the permutations, by the determinant argument of &ldquo;Total Unimodularity and Integer Corners&rdquo;.</p><div class="thm"><span class="label">Theorem &middot; Reductions do not change the answer</span><p>Subtracting a constant from every entry of a row, or from every entry of a column, changes the cost of every complete assignment by that same constant. The set of optimal assignments is therefore unchanged, and the optimal value of the original problem is the optimal value of the reduced one plus the total subtracted.</p><p>The proof is the counting observation: a complete assignment meets each row once and each column once, so it picks up each constant exactly once. The lab verifies it by brute force on its five-by-five example rather than by restating it.</p></div><div class="mathblock" data-say="J 1, J 2, J 3, J 4, row min. a table, shown on the page. taken off so far, 32 plus 14 equals 46, and the answer will be 49" tabindex="0" role="region" aria-label="Mathematical notation">       J1   J2   J3   J4      row min
@@ -3625,6 +3651,55 @@ the constants taken off are u and v;  Σu + Σv climbs to the assignment&#x27;s 
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/networks-flows-paths-and-assignments/the-assignment-problem/", "videos": {"long": {"chapters": [{"t": 0, "title": "The problem"}, {"t": 23.8, "title": "Reductions don't move the answer"}, {"t": 53.3, "title": "Counting the cover"}, {"t": 99.4, "title": "Adjust"}, {"t": 113.6, "title": "The bound climbs"}, {"t": 151.0, "title": "Greed, priced"}, {"t": 169.1, "title": "Where people slip"}, {"t": 186.4, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
