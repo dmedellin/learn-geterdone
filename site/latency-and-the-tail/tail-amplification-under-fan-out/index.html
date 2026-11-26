@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The tail</p>
       <h1>Tail Amplification under Fan-out</h1>
       <p class="lesson-lede">Compute the slow-request probability for a fan-out of n calls, and find the n at which a per-call p99 becomes the request’s median.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:28</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:57</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#latency-and-the-tail--tail-amplification-under-fan-out">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>One multiplication, and what it does to a fan-out</h2><div class="prose reading"><p>A search page assembles itself from many services: one for results, one for advertisements, one for spelling, one for each of several personalisation signals, and a shard of the index for each partition of the corpus. They run in parallel, which is the right design &mdash; by the max rule of &ldquo;Serial Sums, Parallel Maxes&rdquo; the group costs what the slowest member costs rather than the sum. The question is what the slowest member costs.</p><div class="thm"><span class="label">Theorem &middot; Fan-out amplification</span><p>Let a request issue <span class="math" data-say="n">n</span> calls that are independent, and let each call complete within its own <span class="math" data-say="q">q</span>-th percentile with probability <span class="math" data-say="p equals q">p = q</span>. Then the probability that every call is inside its percentile is <span class="math" data-say="p to the power n">pⁿ</span>, and the probability that at least one is outside it is <span class="math" data-say="1 minus p to the power n">1 − pⁿ</span>.</p><p>The <span class="math" data-say="n">n</span> at which <span class="math" data-say="p to the power n equals one half">pⁿ = ½</span> is the fan-out width at which the per-call <span class="math" data-say="q">q</span>-th percentile has become the whole request&rsquo;s median: half of all requests contain a call beyond it.</p></div><p>The proof is one line &mdash; independent events multiply &mdash; and the content is entirely in the numbers it produces.</p><div class="mathblock" data-say="p equals 0.99. n equals, 1, 0.99 to the power 1, equals 0.990000, 1.00 percent of requests contain a slow call. n equals, 10, 0.99 to the power 10, equals 0.904382, 9.56 percent. n equals, 50, 0.99 to the power 50, equals 0.605006, 39.50 percent. n equals, 68, 0.99 to the power 68, equals 0.504886, 49.51 percent. n equals, 69, 0.99 to the power 69, equals 0.499837, 50.02 percent, gets the break-even. n equals 100, 0.99 to the power 100 equals 0.366032, 63.40 percent. n equals 200, 0.99 to the power 200 equals 0.133980, 86.60 percent" tabindex="0" role="region" aria-label="Mathematical notation">p = 0.99
@@ -2788,6 +2814,55 @@ break-even n:  p90 → 7    p95 → 14    p99 → 69    p99.9 → 693</div><figc
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/latency-and-the-tail/tail-amplification-under-fan-out/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 32.7, "title": "All of them must be fast"}, {"t": 67.2, "title": "The numbers"}, {"t": 109.8, "title": "What moves the number"}, {"t": 169.1, "title": "Independence"}, {"t": 189.0, "title": "Where people slip"}, {"t": 207.8, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Flow and matching</p>
       <h1>Bipartite Matching</h1>
       <p class="lesson-lede">Turn a pairing problem into a unit-capacity network, and read the matching, the cover and the obstruction off one run.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:25</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:56</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#graph-algorithms--bipartite-matching">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>One network, and the three readings of its answer</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Matching, maximal, maximum</span><p>A <strong>matching</strong> in a bipartite graph is a set of allowed pairs no two of which share a vertex. It is <strong>maximal</strong> if no further pair can be added to it, and <strong>maximum</strong> if no matching is larger. A matching is <strong>perfect</strong> on the left if every left vertex is in it.</p></div><h3>The construction</h3><ol><li>Add a source with an arc of capacity 1 to every left vertex.</li><li>Add a sink with an arc of capacity 1 from every right vertex.</li><li>For each allowed pair, add an arc of capacity 1 from the left vertex to the right one.</li><li>Find a maximum flow. The pair arcs carrying flow are a maximum matching.</li></ol><div class="thm"><span class="label">Theorem &middot; The two maxima coincide</span><p>In the network above, the maximum flow value equals the size of a maximum matching, and a maximum matching can be read off any integer maximum flow as the set of pair arcs carrying one unit.</p></div><div class="proof"><p>A matching gives a flow of the same value, by routing one unit through each matched pair. The capacity 1 on the source arcs and the sink arcs is respected because a matching uses each vertex at most once, and conservation holds at every left and right vertex by construction.</p><p>An integer flow of value <span class="math" data-say="k">k</span> gives a matching of size <span class="math" data-say="k">k</span>. Each pair arc carries 0 or 1. If two pair arcs carrying flow shared a left vertex, that vertex would emit 2 while receiving at most 1, breaking conservation; the same argument on the right settles the other side. So the arcs carrying flow form a matching, and there are <span class="math" data-say="k">k</span> of them because <span class="math" data-say="k">k</span> units leave the source along distinct arcs.</p><p>Each maximum therefore bounds the other, so they are equal. The augmenting-path method returns an integer flow on this network because every capacity is 1 and every bottleneck is therefore 1.</p><p><span class="qed">&#9633;</span></p></div><div class="example"><span class="label">Example &middot; Three on the left competing for two</span><p>The lab opens on three left vertices and two right ones with the allowed pairs L1&ndash;R1, L2&ndash;R1, L3&ndash;R1 and L3&ndash;R2. The network has 7 vertices and 9 arcs, and the maximum flow is 2, reached in two augmentations. The matching is L1 with R1 and L3 with R2. The cut, read back, is the cover {L3, R1}, of size 2. A search over every subset of the four pairs, which knows nothing about flow, also returns 2.</p></div><p>Check the cover against the pairs: L1&ndash;R1 is covered by R1, L2&ndash;R1 by R1, L3&ndash;R1 by both, and L3&ndash;R2 by L3. Four pairs, two vertices, everything touched. And no single vertex could do it, because L1&ndash;R1 and L3&ndash;R2 share nothing &mdash; which is the matching bounding the cover from below.</p><h3>Why the matching stopped at two</h3><p>The left vertices 1 and 2 have only one right vertex between them: both are joined to R1 and nothing else. Two of them cannot both be matched into one, so no matching covers all three left vertices. The lab exhibits that set rather than describing it, reporting <span class="math" data-say="S equals the set L 1, L 2">S = {L1, L2}</span> with a neighbourhood of size 1 against a set of size 2.</p></div></div>
@@ -3413,6 +3439,55 @@ maximal is not maximum: the greedy answer depends on the order</div><figcaption>
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/graph-algorithms/bipartite-matching/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 14.4, "title": "Words first"}, {"t": 26.0, "title": "The construction"}, {"t": 72.7, "title": "Three competing for two"}, {"t": 121.0, "title": "Why it stopped at two"}, {"t": 163.7, "title": "Greedy depends on order"}, {"t": 194.1, "title": "Where people slip"}, {"t": 214.7, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Search trees</p>
       <h1>Binary Search Trees</h1>
       <p class="lesson-lede">Search, insert and delete including a two-child node, and tell the global invariant apart from the local check that passes on a tree that is not a search tree.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:24</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:47</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#data-structures--binary-search-trees">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>The invariant, the walk that tests it, and the three deletions</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Binary search tree</span><p>A binary tree in which, at every node <span class="math" data-say="x">x</span>, every key in the left subtree of <span class="math" data-say="x">x</span> is less than the key at <span class="math" data-say="x">x</span>, and every key in the right subtree of <span class="math" data-say="x">x</span> is greater than it. Duplicate keys are excluded here.</p><p>The condition is quantified over subtrees, not over children. That is the whole of the definition and the source of the only misconception in this lesson.</p></div><p>Search follows one path. Compare the target with the root: equal and you are done; smaller and the target can only be in the left subtree, because every key to the right is larger; larger and only in the right. Repeat. The number of comparisons is one per level visited, so at most the height plus one. Insertion is the same walk, ending at the empty position where the search failed.</p><div class="thm"><span class="label">Theorem &middot; The in-order walk of a search tree is sorted</span><p>Traverse left subtree, then node, then right subtree, recursively. The sequence of keys produced is in increasing order if and only if the tree is a binary search tree.</p><p>One direction is the invariant unrolled: everything in the left subtree is smaller than the node and is emitted before it, and everything in the right subtree is larger and is emitted after. The other direction is why this is useful as a test &mdash; a walk that comes out sorted certifies the invariant everywhere, including the subtree conditions the local check never looks at.</p></div><div class="example"><span class="label">Example &middot; The tree that passes the local check</span><p>Root <span class="math" data-say="20">20</span>, left child <span class="math" data-say="10">10</span>, right child <span class="math" data-say="30">30</span>, and <span class="math" data-say="25">25</span> as the right child of <span class="math" data-say="10">10</span>. Local check: <span class="math" data-say="10 is less than 20">10 < 20</span>, <span class="math" data-say="30 is greater than 20">30 > 20</span>, <span class="math" data-say="25 is greater than 10">25 > 10</span>. All pass. In-order walk: <span class="math" data-say="10, 25, 20, 30">10, 25, 20, 30</span> &mdash; not sorted, and the walk names the offender. The lab builds this tree and evaluates both checks on it in your browser, reporting the local one as satisfied and the real one as violated.</p></div><h3>Deleting a node, in three cases</h3><p>No children: unlink it. One child: splice the child into its place, which preserves the invariant because the whole subtree moves up unchanged and its keys were already on the correct side of everything above. Two children: neither child can simply take the node&rsquo;s place, because the other subtree would have nowhere correct to go.</p><p>So replace the key rather than the node. The in-order successor is the smallest key in the right subtree &mdash; walk right once, then left as far as possible. Every key in the left subtree is smaller than it (they were smaller than the node, which is smaller than everything right), and every remaining key in the right subtree is larger than it (it was the smallest). So it can sit where the deleted node was. And it has no left child, or it would not have been the smallest, so removing it from where it was is one of the two easy cases.</p><div class="mathblock" data-say="insert 50 30 70 20 40 60 80, then delete 30. 50, 50. a table, shown on the page. 30 has two children, 20 and 40. successor of 30 equals smallest key right of it equals 40, which has no children. 40 takes 30 prime s place, 20 stays where it was. in-order before, 20 30 40 50 60 70 80. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">insert 50 30 70 20 40 60 80,  then delete 30
@@ -2995,6 +3021,55 @@ in-order walk is sorted  ⟺  the tree is a search tree</div><figcaption>The inv
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/data-structures/binary-search-trees/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 10.3, "title": "The invariant"}, {"t": 39.4, "title": "The local check fails"}, {"t": 97.5, "title": "Deleting a node"}, {"t": 162.7, "title": "Shape decides cost"}, {"t": 193.3, "title": "Where people slip"}, {"t": 208.6, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

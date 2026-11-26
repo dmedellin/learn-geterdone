@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Biases a measurement adds</p>
       <h1>Scrape Intervals and What They Cannot See</h1>
       <p class="lesson-lede">Compute the probability a spike of a given duration is caught at a given scrape interval, and the longest spike that can hide entirely.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:23</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:36</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#measuring-systems--scrape-intervals">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>The catch probability, the invisible spike, and the counter that went backwards</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Scrape interval</span><p>The <strong>scrape interval</strong> <span class="math" data-say="I">I</span> is the period at which a monitoring system reads a target&rsquo;s current metric values. For a gauge, the value recorded is the one in effect at the instant of the read. For a counter, what is stored is the running total, and a <strong>rate</strong> is computed as the difference between two reads divided by the time between them.</p></div><div class="thm"><span class="label">Theorem &middot; The probability of catching a spike</span><p>Let a spike of duration <span class="math" data-say="d">d</span> begin at a time uniformly distributed relative to the scrape clock, and let reads occur every <span class="math" data-say="I">I</span>. If <span class="math" data-say="d is at least I">d ≥ I</span> at least one read falls inside the spike and it is caught with certainty. If <span class="math" data-say="d is less than I">d &lt; I</span> the spike covers a fraction <span class="math" data-say="d over I">d/I</span> of the scrape cycle, so</p><p><span class="math" data-say="P of caught equals the min of 1 and d over I">P(caught) = min(1, d/I)</span>.</p><p>The assumption is the uniformity. It fails exactly when the spike is produced by something on a clock of its own &mdash; a cron job, a flush every sixty seconds, or the scrape itself &mdash; in which case the phase is fixed and the probability is not <span class="math" data-say="d over I">d/I</span> but zero or one, permanently.</p></div><p>That failure mode is worth more than the formula. A spike that is always missed is indistinguishable from no spike, and a periodic job whose period shares a factor with the scrape interval produces exactly that. If a graph is suspiciously flat, changing the interval to a value coprime with your suspicions is a cheap experiment.</p><div class="mathblock" data-say="I equals 15 seconds, d equals 3 seconds. P of caught equals 3 over 15 equals 1 over 5 equals 20 percent. so four spikes in five leave no trace at all. longest spike that can fall entirely between two reads. a spike of d seconds contains a read unless it fits strictly. inside one gap, which needs d is at most I minus 1 at one-second resolution. I equals 15 seconds, goes to, 14 seconds. I equals 60 seconds, goes to, 59 seconds. I equals, 1 seconds, goes to, 0 seconds, nothing can hide" tabindex="0" role="region" aria-label="Mathematical notation">I = 15 s,  d = 3 s
@@ -3220,6 +3246,55 @@ and 80 increments between the last read and the restart are unrecoverable</div><
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/measuring-systems/scrape-intervals/", "videos": {"long": {"chapters": [{"t": 0, "title": "A sample of an instant"}, {"t": 29.4, "title": "Catching a spike"}, {"t": 78.6, "title": "One run isn't the probability"}, {"t": 112.6, "title": "A counter that reset"}, {"t": 166.5, "title": "Prefer counters"}, {"t": 178.4, "title": "Where people slip"}, {"t": 191.9, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

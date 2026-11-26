@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Clocks and order</p>
       <h1>Vector Clocks and Concurrency</h1>
       <p class="lesson-lede">Stamp a diagram with vectors and count the pairs of events that are concurrent.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:23</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:45</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#replication-and-consistency--vector-clocks-and-concurrency">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Vectors, comparison, and the pairs that refuse to order</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Vector clock, and concurrency</span><p>A <strong>vector clock</strong> on <span class="math" data-say="n">n</span> processes assigns each event a vector <span class="math" data-say="V">V</span> of <span class="math" data-say="n">n</span> counters. Process <span class="math" data-say="i">i</span> increments <span class="math" data-say="V at i">V[i]</span> at each of its events; a receive first takes the elementwise maximum with the vector carried by the message. Then <span class="math" data-say="e goes to f">e → f</span> if and only if <span class="math" data-say="V of e is at most V of f">V(e) ≤ V(f)</span> componentwise with <span class="math" data-say="V of e is not equal to V of f">V(e) ≠ V(f)</span>, and <span class="math" data-say="e">e</span> and <span class="math" data-say="f">f</span> are <strong>concurrent</strong> if neither comparison holds.</p></div><p>The “if and only if” is what a Lamport stamp could not offer. A single integer can be compared with any other integer, so it always produces an answer even when there is no answer to produce; a vector produces three possible outcomes — before, after, or neither — and the third is as informative as the others.</p><div class="mathblock" data-say="components in the order A, B, C. messages, A 2 goes to B 2, B 3 goes to C 2, C 1 goes to A 4. A, A 1 1, 0, 0, A 2 2, 0, 0, A 3 3, 0, 0, A 4 4, 0, 1. B, B 1 0, 1, 0, B 2 2, 2, 0, B 3 2, 3, 0, B 4 2, 4, 0. C, C 1 0, 0, 1, C 2 2, 3, 2, C 3 2, 3, 3. the three receives, worked. B 2 equals the max of 0, 1, 0 and 2, 0, 0 then plus 1 in B equals 2, 2, 0. C 2 equals the max of 0, 0, 1 and 2, 3, 0 then plus 1 in C equals 2, 3, 2. A 4 equals the max of 3, 0, 0 and 0, 0, 1 then plus 1 in A equals 4, 0, 1" tabindex="0" role="region" aria-label="Mathematical notation">components in the order (A, B, C)
@@ -3287,6 +3313,55 @@ concurrent means unordered by information, not simultaneous in time</div><figcap
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/replication-and-consistency/vector-clocks-and-concurrency/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 26.9, "title": "The rule"}, {"t": 84.3, "title": "Comparing vectors"}, {"t": 127.2, "title": "The census"}, {"t": 153.7, "title": "Concurrent is not simultaneous"}, {"t": 183.9, "title": "Where people slip"}, {"t": 201.9, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

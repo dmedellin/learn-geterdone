@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Paying for the peak</p>
       <h1>Autoscaling Lag</h1>
       <p class="lesson-lede">Compute the requests a boot window costs during a ramp, and the warm reserve that removes the shortfall entirely.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:29</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:44</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#scaling-laws-and-cost--autoscaling-lag">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>A boot window, the area it costs, and the only thing that removes it</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Autoscaling shortfall</span><p>Let demand rise from a level the fleet already serves at a rate <span class="math" data-say="r">r</span> requests per second per second, for a ramp of duration <span class="math" data-say="D">D</span>. Let <span class="math" data-say="tau">τ</span> be the time between ordering an instance and it serving traffic. With no warm reserve, the <strong>shortfall</strong> &mdash; the number of requests demanded and not served &mdash; is</p><p><span class="math" data-say="r times tau times the quantity D minus tau over 2">r·τ·(D − τ/2)</span>  for <span class="math" data-say="D is at least tau">D ≥ τ</span>,</p><p>which is the area between the demand line and the capacity line over the ramp.</p></div><p>The derivation is geometry. For the first <span class="math" data-say="tau">τ</span> seconds capacity does not move at all, so the gap grows linearly from zero to <span class="math" data-say="r times tau">r·τ</span>: a triangle of area <span class="math" data-say="one half times r times tau squared">½·r·τ²</span>. After that, capacity rises at the same rate as demand but <span class="math" data-say="tau">τ</span> seconds later, so the gap is a constant <span class="math" data-say="r times tau">r·τ</span> for the remaining <span class="math" data-say="D minus tau">D − τ</span> seconds: a rectangle of area <span class="math" data-say="r times tau times the quantity D minus tau">r·τ·(D − τ)</span>.</p><div class="mathblock" data-say="r equals 50 rps per second, tau equals 90 seconds, D equals 300 seconds, base load 5000 rps. triangle, one half times r times tau squared, equals one half times 50 times 8100, equals, 202500. rectangle, r times tau times the quantity D minus tau, equals 4500 times 210, equals, 945000. total, 1147500 requests. closed form r times tau times the quantity D minus tau over 2, equals 4500 times 255, equals 1147500, check" tabindex="0" role="region" aria-label="Mathematical notation">r = 50 rps/s     τ = 90 s     D = 300 s     base load 5 000 rps
@@ -3249,6 +3275,55 @@ a warm reserve of r·τ = 4 500 rps makes the shortfall exactly zero</div><figca
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/scaling-laws-and-cost/autoscaling-lag/", "videos": {"long": {"chapters": [{"t": 0, "title": "Capacity arrives late"}, {"t": 45.4, "title": "The shortfall is an area"}, {"t": 97.2, "title": "Above one"}, {"t": 128.6, "title": "It never drains"}, {"t": 148.9, "title": "The warm reserve"}, {"t": 184.7, "title": "Where people slip"}, {"t": 199.7, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

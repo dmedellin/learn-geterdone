@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Shedding and overload</p>
       <h1>Bounded Queues and Loss</h1>
       <p class="lesson-lede">Compute a buffer&#x27;s loss, the K a loss target needs, its latency cap and its admitted rate.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:25</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:45</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#queues-and-utilisation--bounded-queues-and-loss">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Truncating the queue</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; M/M/1/K</span><p>The M/M/1 model with room for at most <span class="math" data-say="K">K</span> in the system, the one in service included. An arrival that finds <span class="math" data-say="K">K</span> present is <strong>blocked</strong> and lost. The states <span class="math" data-say="0">0</span> to <span class="math" data-say="K">K</span> carry the same geometric ratios as before, normalised over a finite sum, so <span class="math" data-say="pi sub n equals 1 minus rho rho to the power n over the quantity 1 minus rho to the power the quantity K plus 1">πₙ = (1 − ρ)ρⁿ/(1 − ρ^(K+1))</span> and in particular <span class="math" data-say="pi sub K equals 1 minus rho rho to the power K over the quantity 1 minus rho to the power the quantity K plus 1">π_K = (1 − ρ)ρ^K/(1 − ρ^(K+1))</span>.</p></div><p>One step in that definition deserves naming rather than sliding past. <span class="math" data-say="pi sub K">π_K</span> is the fraction of <em>time</em> the system is full; the loss is the fraction of <em>arrivals</em> that find it full. Those are two different quantities, and they are equal here because the arrivals are Poisson: a Poisson arrival sees the system exactly as an outside observer sampling at a random instant would. That property is called <strong>PASTA</strong> &mdash; Poisson arrivals see time averages &mdash; and it is an assumption of this model rather than a general truth about queues.</p><p>The discrete-time chain of &ldquo;Why Queues Form at <span class="math" data-say="rho is less than 1">ρ &lt; 1</span>&rdquo; does <em>not</em> have it. Under the late-arrival convention a departure resolves before the arrival in the same slot, so an arrival that meets a full system is still admitted whenever a completion happened first, and its blocking probability is strictly smaller than that chain's <span class="math" data-say="pi sub K">π_K</span>. The two statements look alike and are not the same statement; the discrete one is Operations Research, <span class="math" data-say="markov-chains-decisions-and-queues over queues-in-discrete-time">markov-chains-decisions-and-queues/queues-in-discrete-time</span>, and the one on this page is the continuous-time one.</p><p>One consequence is worth stating on its own: this chain settles at every <span class="math" data-say="rho">ρ</span>, including <span class="math" data-say="rho is at least 1">ρ ≥ 1</span>. There are finitely many states and the queue cannot grow past <span class="math" data-say="K">K</span>, so there is always a stationary distribution &mdash; at <span class="math" data-say="rho equals 1">ρ = 1</span> every state is equally likely, and with <span class="math" data-say="K equals 4">K = 4</span> that makes the blocking probability exactly <span class="math" data-say="1 over 5">1/5</span>. Overload in a bounded system is not unbounded growth; it is loss.</p><div class="mathblock" data-say="lambda equals 4 over 5 per second, mu equals 1 per second, rho equals 4 over 5, K equals 4. pi sub K, equals the quantity 1 over 5, times the quantity 256 over 625, divided by the quantity 1 minus 1024 over 3125, equals 256 over 2101, is approximately 12.2 percent. lambda sub eff equals lambda times the quantity 1 minus pi sub K, equals the quantity 4 over 5, times the quantity 1845 over 2101, equals 1476 over 2101, is approximately 0.703 per second. L, equals the sum of n pi sub n, equals 3284 over 2101 is approximately 1.563. W equals L over lambda sub eff equals 3284 over 1476, equals 821 over 369, is approximately 2.22 seconds, correct. W equals L over lambda, equals 3284 over 2101 divided by the quantity 4 over 5, is approximately 1.95 seconds, wrong. the ratio between them is exactly 1 over the quantity 1 minus pi sub K, equals 2101 over 1845" tabindex="0" role="region" aria-label="Mathematical notation">λ = 4/5 / s     μ = 1 / s     ρ = 4/5     K = 4
@@ -3107,6 +3133,55 @@ W = 821/369 ≈ 2.22 s        not 4105/2101 ≈ 1.95 s</div><figcaption>A trunca
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/queues-and-utilisation/bounded-queues-and-loss/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 58.6, "title": "A worked example"}, {"t": 110.3, "title": "It always settles"}, {"t": 129.2, "title": "Sizing the buffer"}, {"t": 182.9, "title": "Where people slip"}, {"t": 198.2, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

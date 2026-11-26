@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Beyond one cache</p>
       <h1>CDN Egress and Origin Load</h1>
       <p class="lesson-lede">Compute origin gigabytes per day and the monthly egress bill from a byte hit rate, and the gap between that and the request hit rate.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:25</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:54</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#caching-and-hit-rates--cdn-egress-and-origin-load">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Two hit rates, the size profile that separates them, and the bill</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Request hit rate and byte hit rate</span><p>For a cache holding the top <span class="math" data-say="C">C</span> of <span class="math" data-say="N">N</span> ranked objects, the <strong>request hit rate</strong> is the share of requests served from it and the <strong>byte hit rate</strong> is the share of bytes served from it. With Zipf popularity <span class="math" data-say="p sub i is proportional to 1 over i to the power s">p_i ∝ 1/iˢ</span> and sizes <span class="math" data-say="size sub i is proportional to i to the power b">size_i ∝ i^b</span>, the second is <span class="math" data-say="the sum of i to the power the quantity b minus s">Σ i^(b−s)</span> over the cached ranks divided by the same sum over all ranks.</p><p><span class="math" data-say="b">b</span> is a <strong>size exponent</strong>, positive when popular objects are small. Setting <span class="math" data-say="b equals 0">b = 0</span> recovers the request hit rate exactly, which is how you can tell the two formulas are one formula.</p></div><p>Everything that follows is that one ratio evaluated at three exponents, and each case arrives as arithmetic rather than as an assertion.</p><ul><li><span class="math" data-say="b equals 0">b = 0</span> &mdash; every object the same size. Byte hit rate equals request hit rate. The control.</li><li><span class="math" data-say="b equals s">b = s</span> &mdash; size grows exactly as fast as popularity falls, so every rank carries the same bytes and the byte hit rate is exactly <span class="math" data-say="C over N">C/N</span>, the uniform answer.</li><li><span class="math" data-say="b is greater than 0">b > 0</span> in general &mdash; popular objects are smaller, so the byte hit rate is below the request hit rate, and the gap widens with <span class="math" data-say="b">b</span>.</li></ul><div class="example"><span class="label">Example &middot; Twenty objects, classic Zipf, size proportional to rank</span><p><span class="math" data-say="N equals 20">N = 20</span>, <span class="math" data-say="s equals 1">s = 1</span>, <span class="math" data-say="C equals 4">C = 4</span>, <span class="math" data-say="b equals 1">b = 1</span>. The top four objects are <span class="math" data-say="57.91 percent">57.91%</span> of the requests and exactly <span class="math" data-say="20.00 percent">20.00%</span> of the bytes &mdash; which is <span class="math" data-say="C over N equals 4 over 20">C/N = 4/20</span>, because <span class="math" data-say="b equals s">b = s</span> here. A gap of <span class="math" data-say="37.91">37.91</span> points between two numbers people use interchangeably.</p></div><p>Push the size profile harder and the gap widens. At <span class="math" data-say="b equals 2">b = 2</span> on the same catalogue the byte hit rate falls to <span class="math" data-say="4.76 percent">4.76%</span> while the request hit rate is unchanged at <span class="math" data-say="57.91 percent">57.91%</span>: the edge is still serving more than half of the requests and is now serving one twentieth of the bytes, because the objects it is not holding are enormous.</p><h3>The invoice follows the byte rate</h3><p>Origin egress is <span class="math" data-say="the quantity 1 minus byte hit rate, times total bytes">(1 − byte hit rate) × total bytes</span>, and the bill is that times the price per gigabyte times the days. At <span class="math" data-say="50000 gigabytes per day">50 000 GB/day</span> of edge egress with a <span class="math" data-say="20.00 percent">20.00%</span> byte hit rate, <span class="math" data-say="40000 gigabytes per day">40 000 GB/day</span> still leaves the origin, and at two cents a gigabyte over thirty days that is <span class="math" data-say="$24000">$24 000</span>.</p><div class="mathblock" data-say="total edge egress, 50000 gigabytes per day. byte hit rate, 20.00 percent. origin, equals the quantity 1 minus 0.20, times 50000, equals, 40000 gigabytes per day. bill, equals 40000 times 30 times $0.02, equals, $24000.00. billing from the REQUEST hit rate instead 57.91 percent. origin, equals the quantity 1 minus 0.5791, times 50000 is approximately, 21047 gigabytes per day. bill, is approximately $12627.98, barely half the real invoice" tabindex="0" role="region" aria-label="Mathematical notation">total edge egress      50 000 GB/day
@@ -3001,6 +3027,55 @@ origin GB/day = (1 − byte hit) × total GB/day
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/caching-and-hit-rates/cdn-egress-and-origin-load/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 31.5, "title": "Two hit rates"}, {"t": 69.0, "title": "Twenty objects"}, {"t": 104.4, "title": "The invoice"}, {"t": 158.3, "title": "What to do about it"}, {"t": 188.5, "title": "Where people slip"}, {"t": 206.7, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Hash tables</p>
       <h1>Resizing and the Load Factor</h1>
       <p class="lesson-lede">Count the rehash cost of an insert/delete sequence under two threshold policies and identify the one that thrashes.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:23</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">4:01</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#data-structures--resizing-and-the-load-factor">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Two thresholds, the potential argument, and the policy that thrashes</h2><div class="prose reading"><p>A table&rsquo;s cost depends on its load factor, so the load factor has to be kept in a band. Too high and chains grow or probes cluster; too low and most of the memory is empty. The mechanism is to pick thresholds and resize when one is crossed, rehashing every key into the new table.</p><div class="defbox"><span class="label">Definition &middot; Growth and shrink thresholds</span><p>A table grows &mdash; usually doubling <span class="math" data-say="m">m</span> &mdash; when <span class="math" data-say="alpha">α</span> reaches the <strong>growth threshold</strong>, and shrinks &mdash; usually halving <span class="math" data-say="m">m</span> &mdash; when <span class="math" data-say="alpha">α</span> falls to the <strong>shrink threshold</strong>. Both resizes rehash all <span class="math" data-say="n">n</span> keys and cost <span class="math" data-say="theta of n">Θ(n)</span>.</p><p>The standard pair is grow at <span class="math" data-say="alpha equals 1">α = 1</span> and shrink at <span class="math" data-say="alpha equals one quarter">α = ¼</span>. The shrink threshold is deliberately far below half the growth threshold, and the next paragraph is why.</p></div><div class="thm"><span class="label">Theorem &middot; Doubling gives an amortised constant cost</span><p>Under a policy that doubles at <span class="math" data-say="alpha equals 1">α = 1</span> and halves at <span class="math" data-say="alpha equals one quarter">α = ¼</span>, a sequence of <span class="math" data-say="k">k</span> insertions and deletions on a table starting empty costs <span class="math" data-say="big O of k">O(k)</span> in total, so <span class="math" data-say="big O of 1">O(1)</span> amortised per operation.</p><p>The potential method: give the table a potential that measures how close it is to its next resize &mdash; roughly <span class="math" data-say="2 n minus m">2n − m</span> above half full and <span class="math" data-say="m over 2 minus n">m/2 − n</span> below. An ordinary operation changes <span class="math" data-say="n">n</span> by one and so changes the potential by a constant. A resize costs <span class="math" data-say="n">n</span> and releases potential that the operations since the last resize have paid in, because the gap between the thresholds guarantees there were at least about <span class="math" data-say="n over 2">n/2</span> of them. The released potential covers the rehash, and the amortised cost of every operation is constant.</p></div><p>That proof needs the gap. If growth and shrink happen at the same load, then immediately after a resize the table is sitting on the other threshold, no operations have accumulated any potential, and the next operation resizes again. There is nothing to release and the argument has no step to make. The failure is not a worse constant; it is the absence of a bound.</p><h3>Both policies, on the same forty operations</h3><p>The lab&rsquo;s boundary pattern fills a table and then alternates inserting and deleting, which is the mix designed to sit on a threshold. Forty operations from <span class="math" data-say="m equals 4">m = 4</span>:</p></div></div>
@@ -3362,6 +3388,55 @@ the two thresholds must differ, and by a factor of more than 2
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/data-structures/resizing-and-the-load-factor/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 13.1, "title": "Why resize at all"}, {"t": 54.2, "title": "Why the gap matters"}, {"t": 121.3, "title": "Forty operations, two ways"}, {"t": 169.5, "title": "Growth alone"}, {"t": 199.6, "title": "Where people slip"}, {"t": 219.9, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

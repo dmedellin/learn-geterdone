@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Sets and choices</p>
       <h1>Union–Find</h1>
       <p class="lesson-lede">Run a union/find sequence under each combination of the two rules and give the rank–height proof that union by rank bounds the depth.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:25</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">4:00</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#data-structures--union-find">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Two operations, two rules, and the induction that bounds the height</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Disjoint-set forest</span><p>A partition of <span class="math" data-say="the set 1, and so on, n">{1, …, n}</span> represented as a forest: each element has a parent pointer, each set is a tree, and the root of a tree is its <strong>representative</strong>. <span class="math" data-say="find of x">find(x)</span> follows parent pointers from <span class="math" data-say="x">x</span> to the root. <span class="math" data-say="union of x and y">union(x, y)</span> finds both roots and, if they differ, makes one the parent of the other.</p><p>The cost of <span class="math" data-say="find">find</span> is the number of pointers walked, which is the depth of <span class="math" data-say="x">x</span>. Everything about the performance of this structure is therefore a statement about how deep the trees get.</p></div><p>The naive version links the root of the first argument under the root of the second. Run <span class="math" data-say="union of 0 and 1, union of 1 and 2, and so on, union of 10 and 11">union(0,1), union(1,2), …, union(10,11)</span> that way and each union hangs the growing tree under a fresh singleton: the result is a path of twelve nodes. The twelve finds afterwards walk <span class="math" data-say="11 plus 10, and so on, plus 0 equals 66">11 + 10 + … + 0 = 66</span> pointers, and the deepest find walks <span class="math" data-say="11">11</span>.</p><div class="defbox"><span class="label">Definition &middot; Union by rank</span><p>Each root carries a <strong>rank</strong>, initially <span class="math" data-say="0">0</span>. On a union, the root of smaller rank is made a child of the root of larger rank. If the two ranks are equal, either becomes the child and the new root&rsquo;s rank increases by <span class="math" data-say="1">1</span>.</p><p>Rank is an upper bound on height and equals it when path compression is not used. The rule is two comparisons and costs nothing, and the next theorem is what it buys.</p></div><div class="thm"><span class="label">Theorem &middot; A tree of rank r has at least 2ʳ elements</span><p>Under union by rank, any root of rank <span class="math" data-say="r">r</span> has at least <span class="math" data-say="2 to the power r">2ʳ</span> elements in its tree. Consequently no rank exceeds <span class="math" data-say="log base 2 n">log₂ n</span>, and since rank bounds height, every <span class="math" data-say="find">find</span> walks at most <span class="math" data-say="log base 2 n">log₂ n</span> pointers.</p><p>Induction on <span class="math" data-say="r">r</span>. A rank-<span class="math" data-say="0">0</span> root is a singleton, and <span class="math" data-say="2 to the power 0 equals 1">2⁰ = 1</span>. A root reaches rank <span class="math" data-say="r">r</span> only by merging two roots of rank <span class="math" data-say="r minus 1">r − 1</span>, each of which has at least <span class="math" data-say="2 to the power r minus 1">2ʳ⁻¹</span> elements by the inductive hypothesis; the merged tree has at least <span class="math" data-say="2 to the power r minus 1 plus 2 to the power r minus 1 equals 2 to the power r">2ʳ⁻¹ + 2ʳ⁻¹ = 2ʳ</span>. Attaching a lower-rank tree does not change the root&rsquo;s rank, so it cannot break the claim &mdash; it only adds elements. With <span class="math" data-say="n">n</span> elements in total, <span class="math" data-say="2 to the power r is at most n">2ʳ ≤ n</span> forces <span class="math" data-say="r is at most log base 2 n">r ≤ log₂ n</span>.</p></div><p>Every step of that induction is about the rule. It is the &ldquo;only by merging two roots of equal rank&rdquo; clause that supplies the doubling, and the naive union has no such clause. So the bound is not a fact about disjoint-set forests; it is a fact about disjoint-set forests built with union by rank, and the lab makes the difference concrete.</p></div></div>
@@ -3321,6 +3347,55 @@ rank r ⟹ at least 2ʳ elements     ⟹  height ≤ log₂ n      proved here
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/data-structures/union-find/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 14.3, "title": "Sets as trees"}, {"t": 48.4, "title": "The naive way"}, {"t": 71.9, "title": "Union by rank"}, {"t": 131.8, "title": "Four ways, measured"}, {"t": 183.8, "title": "What's proved"}, {"t": 202.1, "title": "Where people slip"}, {"t": 217.6, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

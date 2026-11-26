@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Durability and layout</p>
       <h1>Working Set and the Page Cache</h1>
       <p class="lesson-lede">Compute the page cache&#x27;s hit rate from memory, dataset and skew, and the disk IOPS the misses leave behind.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:25</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:32</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#storage-engines-and-indexes--working-set-and-the-page-cache">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Pages, skew, and the reads that still reach the disk</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Working set and page-cache hit rate</span><p>The <strong>page cache</strong> holds <span class="math" data-say="C">C</span> pages of a dataset of <span class="math" data-say="N">N</span> pages in memory. Under Zipf popularity with exponent <span class="math" data-say="s">s</span>, the <strong>hit rate</strong> is <span class="math" data-say="h equals H of C and s over H of N and s">h = H(C,s)/H(N,s)</span>, where <span class="math" data-say="H of n and s">H(n,s)</span> is the generalised harmonic number <span class="math" data-say="the sum of 1 over i to the power s">Σ 1/iˢ</span> over <span class="math" data-say="i equals 1 and so on n">i = 1…n</span>.</p><p>The <strong>disk IOPS</strong> the workload leaves is <span class="math" data-say="the quantity 1 minus h, times reads">(1 − h) × reads</span>. At <span class="math" data-say="s equals 0">s = 0</span> the formula collapses to <span class="math" data-say="h equals C over N">h = C/N</span>, and every page is equally likely to be wanted.</p></div><p>Both sizes have to be converted into pages before anything else happens. At an <span class="math" data-say="8 kB">8 kB</span> page a <span class="math" data-say="500 gigabytes">500 GB</span> dataset is <span class="math" data-say="62500000">62 500 000</span> pages and <span class="math" data-say="64 gigabytes">64 GB</span> of memory is <span class="math" data-say="8000000">8 000 000</span> of them, so <span class="math" data-say="C over N equals 12.80 percent">C/N = 12.80%</span>. The formula takes counts, not bytes, and a units error here moves the answer more than the skew does.</p><div class="mathblock" data-say="page 8 kB, dataset 500 gigabytes, to, N equals 62500000 pages. memory, 64 gigabytes, to, C equals, 8000000 pages, C over N equals 12.80 percent. s equals 1, h equals H of 8000000 and 1 over H of 62500000 and 1, is approximately, 88.905 percent, rounded. disk IOPS equals the quantity 1 minus 0.88905, times 20000, is approximately, 2219 a second. s equals 0, h equals C over N equals 16 over 125, equals, 12.800 percent, exact. disk IOPS equals the quantity 1 minus 0.128, times 20000, equals, 17440 a second" tabindex="0" role="region" aria-label="Mathematical notation">page 8 kB     dataset 500 GB  →  N = 62 500 000 pages
@@ -2946,6 +2972,55 @@ s = 0     h =  12.800%   →                      17 440 IOPS</div><figcaption>T
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/storage-engines-and-indexes/working-set-and-the-page-cache/", "videos": {"long": {"chapters": [{"t": 0, "title": "Not every read hits the disk"}, {"t": 37.8, "title": "Convert to pages first"}, {"t": 58.4, "title": "Skewed against uniform"}, {"t": 113.3, "title": "Each doubling of memory"}, {"t": 171.1, "title": "Where people slip"}, {"t": 188.4, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

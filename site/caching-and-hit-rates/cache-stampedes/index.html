@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Where caches fail</p>
       <h1>Cache Stampedes</h1>
       <p class="lesson-lede">Compute how many requests reach the backend in the window after a hot key expires, with and without coalescing.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:27</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:58</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#caching-and-hit-rates--cache-stampedes">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>The window with no cache in it, and the two ways to survive it</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Miss window and stampede</span><p>The <strong>miss window</strong> <span class="math" data-say="d">d</span> of a key is the time from a miss being detected to the refilled value being available to serve &mdash; the backend call plus the write back. A <strong>stampede</strong> is the set of requests for that key which arrive during the miss window and are therefore all forwarded to the backend. Its size is <span class="math" data-say="lambda sub key times d">λ_key·d</span>.</p><p><span class="math" data-say="lambda sub key">λ_key</span> is the read rate of the one key, not of the service. A service at <span class="math" data-say="50000">50 000</span> rps whose hottest key takes ten per cent of the traffic has <span class="math" data-say="lambda sub key equals 5000">λ_key = 5 000</span>.</p></div><p>The formula is a rate times a time and nothing else. It does not depend on the hit rate, the cache size, the policy or the catalogue &mdash; those all describe steady state, and this is a transient. That independence is the uncomfortable part: a cache with a <span class="math" data-say="99.9 percent">99.9%</span> hit rate has exactly the same stampede as a cache with a <span class="math" data-say="50 percent">50%</span> one, for the same key at the same read rate.</p><div class="example"><span class="label">Example &middot; A hot key at five thousand reads a second</span><p><span class="math" data-say="lambda sub key equals 5000">λ_key = 5 000</span> reads a second, <span class="math" data-say="d equals 100 milliseconds">d = 100 ms</span>. The stampede is <span class="math" data-say="5000 times 0.1 equals 500">5 000 × 0.1 = 500</span> requests. Against a backend that can hold <span class="math" data-say="200">200</span> concurrent fills that is <span class="math" data-say="5 over 2 equals 2.50">5/2 = 2.50</span> times its capacity: the backend does not absorb this, and the requests it cannot take either queue or fail.</p></div><p>Scale either input and it scales linearly. The same key at a <span class="math" data-say="1 milliseconds">1 ms</span> fill sends <span class="math" data-say="5">5</span> requests through; at <span class="math" data-say="500 milliseconds">500 ms</span> it sends <span class="math" data-say="2500">2 500</span>; at <span class="math" data-say="2 seconds">2 s</span>, <span class="math" data-say="10000">10 000</span>. And the fill time is the one thing you least control, because a slow fill is exactly what happens when the backend is already under pressure &mdash; which is a feedback loop, not a coincidence.</p><h3>Why the obvious fixes are not fixes</h3><p>A bigger cache does not help: the key was in the cache and the problem is the moment it left. A longer TTL does not help either; it makes the expiry rarer, not smaller, and TTL and Staleness has already priced what a longer TTL costs in wrongness. Nor does a higher hit rate: the hit rate is an average over a window that contains this one, and the average is fine.</p><p>Two things do help. <strong>Coalescing</strong> &mdash; also called single-flight or request collapsing &mdash; makes one request per key per window reach the backend and parks the rest on the result. And <strong>early refresh</strong>, where a request arriving near the end of a TTL refreshes the entry while continuing to serve the old value, removes the window altogether at the cost of a little more staleness.</p><div class="thm"><span class="label">Theorem &middot; What coalescing is worth</span><p>Without coalescing, <span class="math" data-say="lambda sub key times d">λ_key·d</span> requests reach the backend per expiry. With it, exactly one does, per key. The reduction factor is <span class="math" data-say="lambda sub key times d">λ_key·d</span> itself.</p><p>So coalescing is worth the most precisely where the stampede is worst: the hotter the key and the slower the fill, the larger the factor. At <span class="math" data-say="5000">5 000</span> reads a second and a <span class="math" data-say="100 milliseconds">100 ms</span> fill it is a factor of <span class="math" data-say="500">500</span>.</p></div><h3>Many keys at once, which is the version that takes systems down</h3><p>A fleet that sets the same TTL on everything at deploy time expires everything together. Then <span class="math" data-say="k">k</span> hot keys each send <span class="math" data-say="lambda sub key times d">λ_key·d</span> requests in the same window, and the burst is <span class="math" data-say="k">k</span> times as large while coalescing still reduces it to <span class="math" data-say="k">k</span> &mdash; one per key. Jittering the TTLs spreads the expiries out, and it is the cheapest of the three fixes on this page.</p><p>One limit on the model: <span class="math" data-say="lambda times d">λ·d</span> counts arrivals in the window and assumes the backend keeps accepting them. A backend that starts queueing will make <span class="math" data-say="d">d</span> longer, which lets more requests into the window, which makes <span class="math" data-say="d">d</span> longer still. The formula gives the first step of that loop and not the rest of it, and the first step is already enough to size the problem.</p></div></div>
@@ -2948,6 +2974,55 @@ with single-flight coalescing:  1 request, a factor of 500</div><figcaption>The 
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/caching-and-hit-rates/cache-stampedes/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 25.3, "title": "The miss window"}, {"t": 70.4, "title": "A hot key"}, {"t": 104.8, "title": "Fixes that aren't"}, {"t": 120.3, "title": "Fixes that are"}, {"t": 151.7, "title": "Many keys at once"}, {"t": 190.9, "title": "Where people slip"}, {"t": 206.7, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

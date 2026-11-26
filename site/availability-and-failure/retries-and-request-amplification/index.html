@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Budgets and retries</p>
       <h1>Retries and Request Amplification</h1>
       <p class="lesson-lede">Compute the attempts a retry policy costs per request and the success probability it buys.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:24</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:52</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#availability-and-failure--retries-and-request-amplification">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>The geometric series behind a retry policy</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Retry policy, attempts and success</span><p>A <strong>retry policy</strong> of <span class="math" data-say="r">r</span> retries makes up to <span class="math" data-say="r plus 1">r + 1</span> attempts at a request, stopping at the first success. If each attempt fails independently with probability <span class="math" data-say="p">p</span>, the expected number of <strong>attempts</strong> per request is <span class="math" data-say="the quantity 1 minus p to the power r plus 1, over the quantity 1 minus p">(1 − pʳ⁺¹)/(1 − p)</span> and the probability the request eventually <strong>succeeds</strong> is <span class="math" data-say="1 minus p to the power r plus 1">1 − pʳ⁺¹</span>. The ratio of attempts to requests is the <strong>amplification factor</strong>.</p></div><p>The independence of attempts is a real assumption and it is generous. A request that failed because its payload is malformed will fail again with probability <span class="math" data-say="1">1</span>, and one that failed because a shard is down will fail again until the shard returns. Retrying a deterministic failure buys nothing and costs the full amplification, which is why policies distinguish retriable errors from the rest.</p><div class="mathblock" data-say="p equals 1 over 10, r equals 2, offered load 500 rps. attempt, P of it is ever made, at 500 rps. the request, p to the power 0 equals 1, 500.0 per second. retry 1, p to the power 1 equals 1 over 10, 50.0 per second. retry 2, p squared equals 1 over 100, 5.0 per second. attempts equals 111 over 100 equals 1.1100, 555.0 per second. lost anyway, p cubed equals 1 over 1000, success equals 999 over 1000 equals 99.9000 percent. share of the load that is retry traffic equals 0.11 over 1.11 equals 9.91 percent" tabindex="0" role="region" aria-label="Mathematical notation">p = 1/10,  r = 2,  offered load 500 rps
@@ -2934,6 +2960,55 @@ p = 0.9, r = 2:  2.71 attempts     p → 1:  attempts → r + 1</div><figcaption
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/availability-and-failure/retries-and-request-amplification/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 25.9, "title": "Two geometric series"}, {"t": 72.4, "title": "The bad day"}, {"t": 106.5, "title": "Failures that can't succeed"}, {"t": 142.2, "title": "Retries multiply along a chain"}, {"t": 187.8, "title": "Where people slip"}, {"t": 204.9, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

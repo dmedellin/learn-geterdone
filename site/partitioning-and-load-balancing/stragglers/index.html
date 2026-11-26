@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The maximum of N</p>
       <h1>Stragglers</h1>
       <p class="lesson-lede">Compute a job&#x27;s mean and p99 from one partition&#x27;s time distribution, and say what another partition buys.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:26</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">4:02</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#partitioning-and-load-balancing--stragglers">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>The maximum of N, enumerated</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Straggler</span><p>In a job that must wait for every partition, the <strong>straggler</strong> is the partition that finishes last. The job's completion time is that partition's completion time, so the job's running time is <span class="math" data-say="the max of T sub 1, and so on, T sub N">max(T₁, …, T_N)</span> where <span class="math" data-say="T sub i">Tᵢ</span> is partition <span class="math" data-say="i">i</span>'s time. The <strong>straggler tax</strong> is the ratio of the job's mean time to one partition's mean time.</p></div><p>The distribution of the maximum follows from one observation, and the observation is about the complement. The maximum is at most <span class="math" data-say="t">t</span> exactly when every one of the <span class="math" data-say="N">N</span> partitions is at most <span class="math" data-say="t">t</span>; there is no other way for the largest of them to be small. Under independence that probability is the product, and since the partitions are drawing from the same distribution it is a power.</p><div class="mathblock" data-say="P of max at most t equals P of T is at most t to the power N, independent, identically distributed. the lab&#x27;s partition-time distribution, in ms. 20 with weight 900, 40 with 70, 120 with 25, 400 with 5. one partition. mean equals 0.900 times 20 plus 0.070 times 40 plus 0.025 times 120 plus 0.005 times 400 equals 25.80 milliseconds. p 99, equals 120 milliseconds, since P of T is at most 40 equals 0.970 and P of T is at most 120 equals 0.995. the job over N equals 24. mean equals 111.63 milliseconds, p 99 equals 400 milliseconds. tax, equals 111.63 over 25.80 equals 4.33 times. P of at least one past 120 milliseconds equals 1 minus 0.995 to the power 24 equals 11.33 percent" tabindex="0" role="region" aria-label="Mathematical notation">P(max ≤ t) = P(T ≤ t)ᴺ        independent, identically distributed
@@ -3216,6 +3242,55 @@ P(at least one past 120 ms) = 1 − 0.995²⁴ = 11.33%</div><figcaption>The job
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/partitioning-and-load-balancing/stragglers/", "videos": {"long": {"chapters": [{"t": 0, "title": "The slowest one wins"}, {"t": 39.8, "title": "One partition"}, {"t": 72.9, "title": "Twenty four partitions"}, {"t": 107.6, "title": "More partitions, slower job"}, {"t": 163.8, "title": "What to do about it"}, {"t": 197.4, "title": "Where people slip"}, {"t": 212.6, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

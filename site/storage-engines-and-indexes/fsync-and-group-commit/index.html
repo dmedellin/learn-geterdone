@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Durability and layout</p>
       <h1>fsync and Group Commit</h1>
       <p class="lesson-lede">Compute the durable write ceiling from the fsync time, what grouping <span class="math" data-say="B">B</span> commits buys, and the batch wait it costs.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:23</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:44</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#storage-engines-and-indexes--fsync-and-group-commit">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>The durability ceiling, and what a batch buys and costs</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Durable write, fsync, group commit</span><p>A write is <strong>durable</strong> when it survives the loss of power. <strong>fsync</strong> is the call that forces buffered bytes onto the device and returns when they are there; <span class="math" data-say="t sub fsync">t_fsync</span> is how long it takes. <strong>Group commit</strong> is the practice of batching <span class="math" data-say="B">B</span> pending commits behind a single fsync and acknowledging them together.</p><p>The durable write rate is at most <span class="math" data-say="1 over t sub fsync">1/t_fsync</span> without grouping and <span class="math" data-say="B over t sub fsync">B/t_fsync</span> with it. Both are ceilings, not achieved rates.</p></div><p>The misconception this lesson is aimed at is that a successful <span class="math" data-say="write of">write()</span> means the data is safe. It means the bytes reached the page cache, which is memory, which is exactly the thing a power loss empties. Every engine that promises durability is therefore paying for fsyncs, and the count of them is the whole budget.</p><div class="mathblock" data-say="t sub fsync equals 10 milliseconds equals 0.01 seconds, arrivals lambda equals 5000 a second. B equals 1, cap 1 over 0.01, equals, 100 durable writes a second. batches arrive at 5000 per second, served at 100 per second, goes to, rho equals 50. no steady state, the backlog grows without bound. B equals 64, cap 64 over 0.01, equals 6400 durable writes a second. fsync per write 0.01 over 64, equals 156.3 micro s. fill wait the quantity 64 minus 1, over the quantity 2 times 5000, equals 6.30 milliseconds. batches 5000 over 64 equals 78.125 per second against 100 per second, goes to, rho equals 0.781. queue plus fsync 1 over the quantity 100 minus 78.125, equals 45.71 milliseconds. commit latency 6.30 plus 45.71, equals 52.01 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">t_fsync = 10 ms = 0.01 s          arrivals λ = 5 000 a second
@@ -2966,6 +2992,55 @@ paid for with a wait:  (B − 1)/2λ to fill the batch, then the queue</div><fig
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/storage-engines-and-indexes/fsync-and-group-commit/", "videos": {"long": {"chapters": [{"t": 0, "title": "A write isn't safe yet"}, {"t": 39.2, "title": "One per fsync"}, {"t": 68.7, "title": "Group commit"}, {"t": 115.3, "title": "The curve has a bottom"}, {"t": 184.5, "title": "Where people slip"}, {"t": 199.2, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

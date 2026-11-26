@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The cost model</p>
       <h1>Sequential vs Random I/O</h1>
       <p class="lesson-lede">Price the same read both ways from <span class="math" data-say="time equals seeks times t sub seek plus bytes over bandwidth">time = seeks × t_seek + bytes/bandwidth</span>, and find the chunk size where its two terms balance.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:25</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:45</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#storage-engines-and-indexes--sequential-vs-random-io">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Seeks, bytes, and the chunk size between them</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Read time</span><p>For a read of <span class="math" data-say="B">B</span> bytes issued as <span class="math" data-say="s">s</span> separate accesses on a device with seek time <span class="math" data-say="t sub seek">t_seek</span> and sequential bandwidth <span class="math" data-say="bw">bw</span>, the <strong>read time</strong> is <span class="math" data-say="s times t sub seek plus B over b w">s × t_seek + B/bw</span>. A <strong>sequential</strong> read is the case <span class="math" data-say="s equals 1">s = 1</span>. A <strong>random</strong> read in chunks of <span class="math" data-say="c">c</span> bytes is the case <span class="math" data-say="s equals the ceiling of B over c">s = ⌈B/c⌉</span>.</p><p>There are not two formulas here. What changes between the two rows of any comparison is <span class="math" data-say="s">s</span>, and <span class="math" data-say="s">s</span> is a property of the access pattern rather than of the data or of the device.</p></div><p>The habit worth building is to write the two terms down separately and look at them before adding. <span class="math" data-say="10.00 milliseconds plus 10.00 seconds">10.00 ms + 10.00 s</span> and <span class="math" data-say="41.7 minutes plus 10.00 seconds">41.7 min + 10.00 s</span> are the same gigabyte off the same disk. The second term is identical in both, to the digit. Every one of those forty-two minutes is first-term.</p><div class="mathblock" data-say="1 gigabytes equals 10 to the power 9 B, t sub seek equals 10 milliseconds, b w equals 100 megabytes per second. sequential, s equals 1. 1 times 10 milliseconds plus 10 to the power 9 over 10 to the power 8 s, equals, 0.01 seconds plus 10 seconds, equals, 10.01 seconds. random, c equals 4 kB, s equals 10 to the power 9 over 4000 equals 250000. 250000 times 10 milliseconds plus 10 to the power 9 over 10 to the power 8 s, equals, 2500.00 seconds plus 10 seconds, equals, 2510 seconds. ratio, 2510 over 10.01, equals, 250.75" tabindex="0" role="region" aria-label="Mathematical notation">1 GB = 10⁹ B      t_seek = 10 ms      bw = 100 MB/s
@@ -2956,6 +2982,55 @@ crossover chunk = t_seek × bandwidth = 10 ms × 100 MB/s = 1 MB</div><figcaptio
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/storage-engines-and-indexes/sequential-vs-random-io/", "videos": {"long": {"chapters": [{"t": 0, "title": "The same gigabyte"}, {"t": 42.2, "title": "Worked out"}, {"t": 93.4, "title": "The crossover chunk"}, {"t": 139.2, "title": "Faster hardware"}, {"t": 184.5, "title": "Where people slip"}, {"t": 199.7, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

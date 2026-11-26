@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Hash tables</p>
       <h1>Hashing with Chaining</h1>
       <p class="lesson-lede">Compute <span class="math" data-say="alpha">α</span> and the expected search cost as exact fractions, then build the key set that degenerates <span class="math" data-say="h of k equals k mod m">h(k) = k mod m</span>.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:25</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:51</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#data-structures--hashing-with-chaining">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>The load factor, the expected chain, and the key set that defeats the table</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Hashing with chaining</span><p>A table of <span class="math" data-say="m">m</span> slots and a hash function <span class="math" data-say="h">h</span> from keys to <span class="math" data-say="the set 0, and so on, m minus 1">{0, …, m−1}</span>. Each slot holds a linked list &mdash; a <strong>chain</strong> &mdash; of every key that hashed to it. Insert prepends to the chain; search computes <span class="math" data-say="h of k">h(k)</span> and walks the chain; delete unlinks. The <strong>load factor</strong> is <span class="math" data-say="alpha equals n over m">α = n/m</span>, the number of keys divided by the number of slots.</p><p>The division hash function is <span class="math" data-say="h of k equals k mod m">h(k) = k mod m</span>. It is the one this lesson uses, because its failure mode is arithmetic rather than mysterious.</p></div><div class="thm"><span class="label">Theorem &middot; Expected search cost under simple uniform hashing</span><p>Assume each key is equally likely to hash to any of the <span class="math" data-say="m">m</span> slots, independently. Then an unsuccessful search examines <span class="math" data-say="alpha">α</span> keys in expectation, and a successful search examines <span class="math" data-say="1 plus alpha over 2 minus alpha over 2 m">1 + α/2 − α/2m</span>. Both are <span class="math" data-say="theta of the quantity 1 plus alpha">Θ(1 + α)</span> once the constant probe for the slot itself is counted.</p><p>The unsuccessful case is immediate: the search walks the whole chain at <span class="math" data-say="h of k">h(k)</span>, whose expected length is <span class="math" data-say="n over m equals alpha">n/m = α</span> by linearity of expectation over the <span class="math" data-say="n">n</span> keys. The successful case is smaller than <span class="math" data-say="alpha">α</span> because the search stops at the key it wants and, on average, that key is halfway along &mdash; and the correction <span class="math" data-say="negative alpha over 2 m">−α/2m</span> is because the key being searched for is itself one of the <span class="math" data-say="n">n</span>, so it does not collide with itself.</p></div><p>Linearity of expectation is doing all the work in the first half, and it is imported from Discrete Mathematics&rsquo; &ldquo;Linearity of Expectation&rdquo;: the expected number of keys in a given slot is the sum over keys of the probability that key lands there, which is <span class="math" data-say="n times 1 over m">n × 1/m</span>. No independence is needed for that step, only for the assumption to be stated the way it usually is.</p><h3>The fractions, at a table small enough to draw</h3><p>Twenty keys into eight slots. The lab computes every quantity as an exact fraction over big integers, never as a decimal that is nearly one, and then counts the probes an actual search makes:</p></div></div>
@@ -3245,6 +3271,55 @@ measured at α = 5/2:   random keys 23/10       every key ≡ 0 (mod m)  21/2</d
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/data-structures/hashing-with-chaining/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 10.1, "title": "The structure"}, {"t": 62.1, "title": "The expected cost"}, {"t": 107.1, "title": "A table you can draw"}, {"t": 137.9, "title": "Breaking it on purpose"}, {"t": 190.5, "title": "Where people slip"}, {"t": 208.2, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

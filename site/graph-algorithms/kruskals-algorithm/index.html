@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Minimum spanning trees</p>
       <h1>Kruskal&#x27;s Algorithm</h1>
       <p class="lesson-lede">Sort the edges, take each one unless its ends are already joined, and count the union-find work that decides.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:22</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:46</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#graph-algorithms--kruskals-algorithm">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>One sorted pass, and the structure underneath it</h2><div class="prose reading"><h3>The algorithm</h3><ol><li>Sort the edges by weight, breaking ties any way at all.</li><li>Put every vertex in its own piece.</li><li>For each edge in order, ask whether its two ends are in the same piece. If they are, reject it. If they are not, take it and merge the two pieces.</li><li>Stop when <span class="math" data-say="V minus 1">V - 1</span> edges have been taken, or when the list runs out &mdash; in which case the graph was not connected and what was built is a minimum spanning forest.</li></ol><p>The operations on pieces are exactly the two a disjoint-set structure provides, and Data Structures' &ldquo;Union&ndash;Find&rdquo; costs them. This lesson uses the operations and re-derives none of their analysis; what it does measure is how many of each this algorithm performs, which is a property of the algorithm rather than of the structure.</p><div class="thm"><span class="label">Theorem &middot; Kruskal&#x27;s algorithm returns a minimum spanning tree</span><p>On a connected weighted graph, the set of edges the algorithm takes is a spanning tree of least total weight.</p></div><div class="proof"><p>It is a forest at every step, because an edge is taken only when its ends are in different pieces, which is exactly the condition for it not to close a cycle. It ends spanning: if two pieces remained, connectivity gives an edge between them, and that edge would have been taken when the list reached it.</p><p>It is minimum by induction on the number of edges taken, with the invariant that the current forest is contained in some minimum spanning tree. Empty at the start, so the invariant holds. Suppose it holds before an edge <span class="math" data-say="e">e</span> is taken, with the forest inside a minimum tree <span class="math" data-say="T">T</span>. Let <span class="math" data-say="S">S</span> be the piece containing one end of <span class="math" data-say="e">e</span>. No edge of the forest crosses that cut, and every crossing edge is either unexamined &mdash; hence at least as heavy as <span class="math" data-say="e">e</span> &mdash; or was rejected, which cannot happen to a crossing edge while <span class="math" data-say="S">S</span> is a piece. So <span class="math" data-say="e">e</span> is a lightest crossing edge, and by the exchange in the cut property there is a minimum tree containing the forest and <span class="math" data-say="e">e</span>. The invariant survives, and at the end the forest is a spanning tree inside a minimum tree, so it is one.</p><p><span class="qed">&#9633;</span></p></div><div class="example"><span class="label">Example &middot; Nine edges, six taken, three rejected</span><p>The lab opens on <span class="math" data-say="1 minus 2 4, 1 minus 3 3, 2 minus 3 2, 2 minus 4 5, 3 minus 4 7, 4 minus 5 1, 5 minus 6 6, 5 minus 7 8, 6 minus 7 2">1-2 4, 1-3 3, 2-3 2, 2-4 5, 3-4 7, 4-5 1, 5-6 6, 5-7 8, 6-7 2</span>. Sorted, the list is <span class="math" data-say="4 minus 5">4-5</span> at 1, <span class="math" data-say="2 minus 3">2-3</span> at 2, <span class="math" data-say="6 minus 7">6-7</span> at 2, <span class="math" data-say="1 minus 3">1-3</span> at 3, <span class="math" data-say="1 minus 2">1-2</span> at 4, <span class="math" data-say="2 minus 4">2-4</span> at 5, <span class="math" data-say="5 minus 6">5-6</span> at 6, <span class="math" data-say="3 minus 4">3-4</span> at 7, <span class="math" data-say="5 minus 7">5-7</span> at 8. The algorithm takes the first four, rejects <span class="math" data-say="1 minus 2">1-2</span>, takes <span class="math" data-say="2 minus 4">2-4</span> and <span class="math" data-say="5 minus 6">5-6</span>, then rejects <span class="math" data-say="3 minus 4">3-4</span> and <span class="math" data-say="5 minus 7">5-7</span>. Total weight 19, on six edges for seven vertices. The counters read 18 finds, 6 unions and 10 pointer hops. An independently written Kruskal, from another Subject and with its own representation, is handed the same graph and returns 19.</p></div><p>Read the rejections. <span class="math" data-say="1 minus 2">1-2</span> at weight 4 is refused because 1 and 2 are already joined through 3, by the edges <span class="math" data-say="2 minus 3">2-3</span> at 2 and <span class="math" data-say="1 minus 3">1-3</span> at 3, and 4 is heavier than both &mdash; it is the heaviest edge on that triangle. <span class="math" data-say="3 minus 4">3-4</span> and <span class="math" data-say="5 minus 7">5-7</span> are refused for the same reason on their own cycles. No rejected edge is ever reconsidered, and the cycle property is why that is sound rather than greedy.</p><h3>What the three counters are for</h3><p>Finds are two per edge examined, so 18 on nine edges, whatever the graph looks like. Unions are one per taken edge, so <span class="math" data-say="V minus 1">V - 1</span> on a connected graph, so 6 here. Neither of those is interesting on its own. The hops are: they count how far each find had to walk up the parent pointers, and that depends on how the unions happened to be arranged.</p><p>The lab's chain preset makes this visible. On <span class="math" data-say="1 minus 2 1, 2 minus 3 2, 3 minus 4 3, 4 minus 5 4, 5 minus 6 5, 1 minus 6 9">1-2 1, 2-3 2, 3-4 3, 4-5 4, 5-6 5, 1-6 9</span> the unions build a line, and the counters read 12 finds, 5 unions and 5 hops for weight 15. The complete graph on five vertices goes the other way: ten edges, four taken and six rejected, 20 finds, 4 unions and 18 hops for weight 7. The hop count is the only one of the three that moved for a reason other than the number of edges.</p></div></div>
@@ -3822,6 +3848,55 @@ stop after V - 1 edges are taken; fewer means the graph is not connected</div><f
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/graph-algorithms/kruskals-algorithm/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 13.9, "title": "The algorithm"}, {"t": 53.1, "title": "Why it's right"}, {"t": 86.2, "title": "Nine edges"}, {"t": 130.2, "title": "Three counters"}, {"t": 165.3, "title": "Not connected"}, {"t": 191.6, "title": "Where people slip"}, {"t": 207.2, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

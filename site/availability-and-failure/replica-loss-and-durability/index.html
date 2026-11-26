@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Fleets</p>
       <h1>Replica Loss and Durability</h1>
       <p class="lesson-lede">Estimate the annual probability of losing every copy of an item, and what halving the repair window is worth.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:25</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:55</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#availability-and-failure--replica-loss-and-durability">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>A race between failure and repair, to first order</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Durability, and the first-order loss estimate</span><p>Consider a <strong>placement group</strong> holding <span class="math" data-say="N">N</span> copies of an item, each on a device that fails independently at rate <span class="math" data-say="f">f</span> a year, with a lost copy rebuilt within a <strong>repair window</strong> of <span class="math" data-say="R">R</span> hours. The annual probability of losing the item is approximately <span class="math" data-say="N factorial times f to the power N times the quantity R over 8760, to the power N minus 1">N! × fᴺ × (R/8760)ᴺ⁻¹</span>. This is a <strong>first-order rare-event estimate</strong>: it drops every term in which failures overlap or a repair completes mid-window.</p></div><p>The shape is easier to see than the constant. Any one of the <span class="math" data-say="N">N</span> copies can fail first, at rate <span class="math" data-say="f">f</span> each; the second must fail inside the window, which happens with probability about <span class="math" data-say="f times R over 8760">f × R/8760</span>; the third likewise. Multiplying and counting the orderings gives the factorial, the <span class="math" data-say="N">N</span>-th power of <span class="math" data-say="f">f</span> and the <span class="math" data-say="N minus 1">(N − 1)</span>-th power of the window fraction.</p><div class="mathblock" data-say="N equals 3, f equals 0.02 a year, R equals 24 h, 8760 h in a year. R over 8760 equals 24 over 8760 equals 0.00273973. P is approximately 3 factorial times 0.02 cubed times 0.00273973 squared. equals 6 times 0.000008 times 0.0000075061. equals 3.603 times 10 to the power negative 10 per group per year. the same first-order formula as an exact fraction. equals 3 over 8326562500. across 10000 placement groups. 3.603 times 10 to the power negative 6 losses a year, one every 2.776 times 10 to the power 5 years" tabindex="0" role="region" aria-label="Mathematical notation">N = 3,  f = 0.02 a year,  R = 24 h,  8760 h in a year
@@ -2947,6 +2973,55 @@ first-order: every term with overlapping failures is dropped</div><figcaption>A 
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/availability-and-failure/replica-loss-and-durability/", "videos": {"long": {"chapters": [{"t": 0, "title": "The question"}, {"t": 24.9, "title": "The first-order estimate"}, {"t": 59.0, "title": "Three copies, one day"}, {"t": 90.6, "title": "The window has an exponent"}, {"t": 123.7, "title": "Two copies or three"}, {"t": 154.4, "title": "What the number is about"}, {"t": 191.9, "title": "Where people slip"}, {"t": 206.5, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

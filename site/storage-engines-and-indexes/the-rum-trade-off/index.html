@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Filters and the trade-off</p>
       <h1>The RUM Trade-off</h1>
       <p class="lesson-lede">Compute the read, update and memory amplification of three engine shapes from the same parameters, and the disk bandwidth each one implies.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:24</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:48</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#storage-engines-and-indexes--the-rum-trade-off">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Three amplifications, three engines, one triangle</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Read, update and memory amplification</span><p>For a storage engine, <strong>read amplification</strong> <span class="math" data-say="RA">RA</span> is the number of storage reads a logical lookup performs; <strong>update amplification</strong> <span class="math" data-say="UA">UA</span> is the bytes written to storage per byte ingested; <strong>memory amplification</strong> <span class="math" data-say="MA">MA</span> is the bytes occupied per byte of unique data.</p><p>The <strong>RUM conjecture</strong> is that no engine minimises all three: a design that is best in one is, in general, worse in at least one other.</p></div><p>Memory amplification is a measure of <em>space</em>, not of RAM. A tiered tree with <span class="math" data-say="MA equals 10">MA = 10</span> is keeping ten copies of a key on disk while it waits to merge them, and that is ten times the storage bill for the same unique data. The word is historical and it costs people an argument every time.</p><div class="mathblock" data-say="F equals 10, L equals 5, ingest 50 megabytes per second, 4 kB pages, 128 B rows, two thirds fill. engine, read, update, memory, bandwidth at 50 megabytes per second. a table, shown on the page. B-tree, 4, 125 over 4 equals 31.25, 3 over 2, 1.56 gigabytes per second. levelled, RA equals L, UA equals L times F over 2, MA equals 1 plus 1 over F. tiered, RA equals L times F, UA equals L, MA equals F. B-tree, RA equals height, UA equals page over r o w, MA equals 1 over fill" tabindex="0" role="region" aria-label="Mathematical notation">F = 10      L = 5      ingest 50 MB/s      4 kB pages, 128 B rows, ⅔ fill
@@ -2907,6 +2933,55 @@ compaction bandwidth = ingest × update amplification</div><figcaption>Three eng
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/storage-engines-and-indexes/the-rum-trade-off/", "videos": {"long": {"chapters": [{"t": 0, "title": "Three amplifications"}, {"t": 49.0, "title": "Two LSM shapes"}, {"t": 87.1, "title": "The B-tree corner"}, {"t": 121.8, "title": "The bandwidth question"}, {"t": 155.0, "title": "Using the triangle"}, {"t": 187.6, "title": "Where people slip"}, {"t": 203.7, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
