@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Running a system</p>
       <h1>Warm-Up and the Initial Transient</h1>
       <p class="lesson-lede">Average from an empty start and the answer is biased; compute the bias exactly, then throw the beginning away.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:26</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:45</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#simulation-and-variance-reduction--warm-up-and-the-initial-transient">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Where a run starts, and what that costs its average</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Initial transient</span><p>The <strong>initial transient</strong> is the part of a run during which the state distribution is still visibly moving away from the initial condition and toward the steady-state distribution. It is not a period of &ldquo;noise&rdquo;: the process is behaving correctly throughout, and it is simply not yet behaving like the system the long-run average describes.</p></div><div class="defbox"><span class="label">Definition &middot; Bias of an estimator</span><p>An estimator <span class="math" data-say="T">T</span> of a quantity <span class="math" data-say="theta">θ</span> has <strong>bias</strong> <span class="math" data-say="E of T minus theta">E[T] − θ</span>. Bias is a property of the estimator, not of a run: it does not shrink with replications, it does not show up in a standard error, and an interval built on that standard error is centred in the wrong place.</p></div><p>That is the whole reason this page exists. Every technique after it attacks variance, and all of them are worthless on an estimator aimed at the wrong number. A narrow interval around a biased estimate is worse than a wide one, because it is more convincing.</p><h3>The transient, as arithmetic</h3><p>The number in system at the end of a slot is a Markov chain: from state <span class="math" data-say="n">n</span> a departure happens first with probability <span class="math" data-say="q">q</span>, then an arrival with probability <span class="math" data-say="p">p</span>, so the chain steps to <span class="math" data-say="n minus 1">n − 1</span>, <span class="math" data-say="n">n</span> or <span class="math" data-say="n plus 1">n + 1</span>, and from <span class="math" data-say="0">0</span> only to <span class="math" data-say="0">0</span> or <span class="math" data-say="1">1</span>. Starting from the point mass at zero and pushing the whole distribution forward one slot at a time gives <span class="math" data-say="E of N sub t">E[Nₜ]</span> exactly, for every <span class="math" data-say="t">t</span>.</p><div class="mathblock" data-say="p equals 2 over 5, q equals 1 over 2, started empty. E of N sub 0 equals 0. E of N sub 1 equals 2 over 5. E of N sub 2 equals 3 over 5. E of N sub 3 equals 37 over 50. E of N sub 4 equals 17 over 20. and so on. E of N sub 50, is approximately 2.0332, E of N sub 100 is approximately 2.2633. E of N sub 399 is approximately 2.3982, stationary, 12 over 5 equals 2.4. expected time average over slots, 0 to 399, 2.2443. expected time average over slots 100 to 399, 2.3717" tabindex="0" role="region" aria-label="Mathematical notation">  p = 2/5,  q = 1/2,  started empty
@@ -3272,6 +3298,55 @@ a longer run dilutes the transient;  discarding it deletes the transient</div><f
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/simulation-and-variance-reduction/warm-up-and-the-initial-transient/", "videos": {"long": {"chapters": [{"t": 0, "title": "Starting empty"}, {"t": 53.4, "title": "The transient, exactly"}, {"t": 90.3, "title": "Dilute or delete"}, {"t": 121.2, "title": "One run"}, {"t": 147.7, "title": "Batch means"}, {"t": 184.4, "title": "Where people slip"}, {"t": 203.0, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
