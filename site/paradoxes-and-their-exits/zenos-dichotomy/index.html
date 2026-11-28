@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The infinite</p>
       <h1>Zeno&#x27;s Dichotomy</h1>
       <p class="lesson-lede">The halves of a unit distance form a geometric series whose partial sums are <span data-say="1 minus 1 over 2 to the power n">1 − 1/2ⁿ</span> and whose remainder shrinks below any bound.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:22</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:40</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#paradoxes-and-their-exits--zenos-dichotomy">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>Halves that add up</h2><div class="prose reading"><p>Cross a room of length one. Before you can get all the way across you must get halfway. Before the rest, you must cover half of what remains, a quarter. Then an eighth, and the halving never stops, so the crossing has infinitely many parts. Zeno's argument is that a task with infinitely many parts cannot be finished.</p><ol><li>To cross you must complete every one of the steps: a half, a quarter, an eighth, and so on.</li><li>At constant speed each step takes a positive time, a half, a quarter and an eighth of the whole crossing time.</li><li>A sum of infinitely many positive times is infinite.</li><li>So the crossing takes infinite time, and you never arrive.</li></ol><p>The argument is valid, and the first two premises are as plausible as a description of walking can be. The third is the one with a hidden claim in it: it says that adding enough positive amounts always passes any size. That is true of equal steps, as the next lesson shows. Whether it is true of steps that shrink is a matter of arithmetic.</p><div class="mathblock" data-say="1 over 2 plus 1 over 4 plus 1 over 8 plus and so on. S of n equals 1 minus 1 over 2 to the power n" tabindex="0" role="region" aria-label="Mathematical notation">1/2 + 1/4 + 1/8 + …
@@ -2434,6 +2460,55 @@ exit: not every infinite sum is infinite</div><figcaption>Infinitely many steps,
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/paradoxes-and-their-exits/zenos-dichotomy/", "videos": {"long": {"chapters": [{"t": 0, "title": "The paradox"}, {"t": 46.4, "title": "The series"}, {"t": 74.4, "title": "What the limit means"}, {"t": 107.2, "title": "A different cut"}, {"t": 129.5, "title": "The exit"}, {"t": 178.6, "title": "Where people slip"}, {"t": 199.5, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

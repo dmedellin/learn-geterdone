@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Questions</p>
       <h1>Asking a Question</h1>
       <p class="lesson-lede">The rule for questions is real, it covers a little over half of the questions in a novel, and the rest are printed here.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:21</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:33</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#word-order--asking-a-question">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>What the rule did not catch</h2><div class="prose reading"><p>This is the lesson where the rule covers only a little over half of what is printed, and that is part of what it teaches.</p><h3>The rule</h3><p>Every learner is taught how to ask a question. A helping verb goes before the subject. If there is no helping verb, add <em>do</em>. If there is a question word, it goes first. <em>Can you go? Did you go? Where did you go?</em> It is a short rule. It matters most to a speaker of a language that asks with a small word at the end of the sentence, such as Mandarin or Japanese, or by the voice alone, and to a speaker of Spanish or Russian, where the subject and verb may swap with no help word at all.</p><h3>The score</h3><p>The lab holds 90 questions from <em>Pride and Prejudice</em>, each one starting where its sentence starts and ending at its question mark, and prints every one. The rule covers 52 of them, which is 57.8%. A run over the whole novel, quoted here because no page can carry it, gave 55.4%. For a rule that is taught first, that is a modest figure. It is worth asking why.</p></div></div>
@@ -2254,6 +2280,55 @@ var perThousand = function (hits, words) {
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/word-order/asking-a-question/", "videos": {"long": {"chapters": [{"t": 0, "title": "The rule"}, {"t": 23.1, "title": "Step by step"}, {"t": 63.6, "title": "The score"}, {"t": 87.5, "title": "Five kinds of miss"}, {"t": 155.6, "title": "No questions in reports"}, {"t": 178.3, "title": "Where people slip"}, {"t": 194.6, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>

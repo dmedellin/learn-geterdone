@@ -1384,6 +1384,28 @@
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
     }
+
+    body[data-page-kind="lesson"] .lesson-watch { max-width: 38rem; margin: 18px auto 8px; padding: 0; border: 0; background: none; }
+    .watch-row { display: flex; flex-wrap: wrap; gap: .7rem; }
+    .watch-btn { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-radius: var(--radius-sm);
+                 border: 1px solid var(--line-strong); background: var(--panel-2); color: var(--text); cursor: pointer;
+                 font: inherit; text-align: left; }
+    .watch-btn:hover, .watch-btn[aria-pressed="true"] { border-color: var(--cyan); }
+    .watch-btn:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-play { display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+                  background: var(--cyan); color: var(--on-accent); font-size: .85rem; flex: 0 0 auto; }
+    .watch-len { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .watch-btn small { display: block; color: var(--muted); font-size: .82rem; }
+    .watch-reel { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .4rem; color: var(--cyan);
+                  font-weight: 650; text-underline-offset: 3px; }
+    .watch-reel:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+    .watch-stage { margin-top: 1rem; }
+    .watch-stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius-sm); }
+    .watch-stage.is-portrait video { aspect-ratio: 9 / 16; max-height: 80vh; width: auto; max-width: 100%; margin: 0 auto; }
+    .watch-chapters { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+    .watch-chapters button { font: inherit; font-size: .86rem; padding: .3rem .65rem; border-radius: 999px; cursor: pointer;
+                             border: 1px solid var(--line); background: transparent; color: var(--muted); white-space: pre; }
+    .watch-chapters button:hover { color: var(--text); border-color: var(--cyan); }
   </style>
 
   <script>
@@ -1434,6 +1456,10 @@
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Two words each</p>
       <h1>Be Is Mostly a Main Verb</h1>
       <p class="lesson-lede">Classrooms teach be as the helping verb of the -ing form. On the page it is rarely that.</p>
+    </section>
+    <section class="lesson-watch" id="watch" aria-label="Watch this lesson">
+      <div class="watch-row"><button type="button" class="watch-btn" data-video="short" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Short</strong> <span class="watch-len">0:20</span><small>the idea in under a minute</small></span></button><button type="button" class="watch-btn" data-video="long" aria-controls="watchStage"><span class="watch-play" aria-hidden="true">&#9654;</span><span><strong>Full video</strong> <span class="watch-len">3:26</span><small>the whole lesson, with chapters</small></span></button><a class="watch-reel" href="../../reels/#helping-verbs--be-is-mostly-a-main-verb">Open in Reels</a></div>
+      <div class="watch-stage" id="watchStage" hidden></div>
     </section>
     <section class="section lesson-reading" id="read">
       <div class="reading-col"><h2>The six rows with an -ing word, and the rows the scan lost</h2><div class="prose reading"><p>Most courses meet <em>be</em> in the progressive. <em>She is walking.</em> <em>They were singing.</em> The rule is simple: <em>be</em> and an <em>-ing</em> form make a continuing action, and the <em>-ing</em> form is the main verb.</p><p>Now count. Chapter XXVI has 137 forms of <em>be</em>. The lab reads the word after each one, past <em>not</em> and short <dfn>adverb</dfn> words, and sorts it. It finds six followed by an <em>-ing</em> word. That is 4.4%.</p></div></div>
@@ -2419,6 +2445,55 @@ var writeTiles = function (tiles) {
     });
     addEventListener('pagehide', function () {
       token++; synth.cancel(); playing = false; play.textContent = 'Play';  // a back/forward-cache restore comes back paused
+    });
+  })();
+
+  (function () {
+    var WATCH = {"base": "../../video/helping-verbs/be-is-mostly-a-main-verb/", "videos": {"long": {"chapters": [{"t": 0, "title": "Where courses start"}, {"t": 29.4, "title": "What the other 131 are"}, {"t": 66.6, "title": "Five jobs"}, {"t": 95.2, "title": "Never a bare verb"}, {"t": 110.1, "title": "The participle puzzle"}, {"t": 130.9, "title": "What the scan lost"}, {"t": 166.7, "title": "Where people slip"}, {"t": 184.3, "title": "Try it"}], "portrait": false}, "short": {"chapters": [], "portrait": true}}};
+    var stage = document.getElementById('watchStage');
+    if (!stage || typeof document.createElement !== 'function'
+        || typeof stage.appendChild !== 'function') return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.watch-btn'));
+    function clock(t) { t = Math.round(t); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function play(name) {
+      var v = WATCH.videos[name];
+      if (!v) return;
+      while (stage.firstChild) stage.removeChild(stage.firstChild);
+      stage.hidden = false;
+      stage.className = 'watch-stage' + (v.portrait ? ' is-portrait' : '');
+      var video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.poster = WATCH.base + name + '.jpg';
+      video.src = WATCH.base + name + '.mp4';
+      var track = document.createElement('track');
+      track.kind = 'captions';
+      track.label = 'English';
+      track.srclang = 'en';
+      track.src = WATCH.base + name + '.vtt';
+      video.appendChild(track);
+      stage.appendChild(video);
+      if (v.chapters.length > 1) {
+        var list = document.createElement('ol');
+        list.className = 'watch-chapters';
+        v.chapters.forEach(function (c) {
+          var li = document.createElement('li');
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = clock(c.t) + '  ' + c.title;
+          b.addEventListener('click', function () { video.currentTime = c.t; video.play(); });
+          li.appendChild(b);
+          list.appendChild(li);
+        });
+        stage.appendChild(list);
+      }
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-video') === name ? 'true' : 'false'); });
+      var started = video.play();
+      if (started && typeof started.catch === 'function') started.catch(function () {});
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { play(b.getAttribute('data-video')); });
     });
   })();
   </script>
